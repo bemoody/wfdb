@@ -43,24 +43,36 @@ CC = cc
 # For `gcc', uncomment the next line (and see CFLAGS below).
 # CC = gcc
 
+# INCDIR is the parent of the directory that contains the WFDB include (*.h)
+# files.  (These files should have been installed in $(INCDIR)/wfdb;  see
+# ../lib/Makefile.)
+INCDIR = /usr/include
+
 # If you trust your C compiler's optimizer, you may wish to add -O to CFLAGS;
 # for debugging, add -g to CFLAGS.  (If you use `gcc', you may use both;  most
 # other C compilers do not permit you to do so.)  Add -DNOMALLOC_H if you have
 # neither `stdlib.h' nor `malloc.h' (see ../lib/wfdblib.h).  Add -DNOSTRSTR if
 # you don't have the ANSI C `strstr' function (check your system's `string.h'
 # or `strings.h' file, normally in /usr/include; see `pschart.c' and `psfd.c').
-CFLAGS = -O -L/usr/local/lib
+CFLAGS = -O -I$(INCDIR)
+
+# LIBDIR is the directory that contains the WFDB library (see ../lib/Makefile).
+LIBDIR = /usr/lib
 
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.  Unless you have changed the value of WFDBLIB in the `Makefile'
 # for the WFDB library, `-lwfdb' should be correct.
-LDFLAGS = -lwfdb
+LDFLAGS = -L$(LIBDIR) -lwfdb
 
 # BINDIR specifies the directory in which the applications will be installed;
 # it should be a directory in the PATH of those who will use the applications.
 # You will need to have write permission in BINDIR.  Users of this software
 # will need to have search (execute) permission in BINDIR.
 BINDIR = /usr/local/bin
+
+# DBDIR specifies the name of a directory in which to install the contents
+# of the `data' directory.
+DBDIR = $(INSTALL)/database
 
 # PSPDIR specifies the directory in which PostScript prolog files are kept.
 # (You may use any directory for this purpose;  if you have other PostScript
@@ -116,11 +128,9 @@ MFILES = Makefile Makefile-dos-gcc makefile.dos
 	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
 
 # `make' or `make install':  build and install applications, clean up
-install:	all $(BINDIR) $(PSPDIR)
+install:	all $(BINDIR) $(PSPDIR) scripts
 	cp $(XFILES) $(BINDIR)
 	cd $(BINDIR); $(SETXPERMISSIONS) $(XFILES)
-	cp $(SCRIPTS) $(BINDIR)
-	cd $(BINDIR); $(SETPERMISSIONS) $(SCRIPTS)
 	cp $(PSFILES) $(PSPDIR)
 	cd $(PSPDIR); $(SETPERMISSIONS) $(PSFILES)
 	$(MAKE) clean
@@ -128,6 +138,12 @@ install:	all $(BINDIR) $(PSPDIR)
 # `make all': build applications
 all:	$(XFILES)
 	$(STRIP) $(XFILES)
+
+# `make scripts': install customized scripts for setting WFDB path
+scripts:
+	sed s+/usr/local/database+$(DBDIR)+g <setwfdb >$(BINDIR)/setwfdb
+	sed s+/usr/local/database+$(DBDIR)+g <cshsetwfdb >$(BINDIR)/cshsetwfdb
+	$(SETPERMISSIONS) $(SCRIPTS)
 
 $(BINDIR):
 	mkdir -p $(BINDIR)

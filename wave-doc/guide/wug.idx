@@ -1,0 +1,833 @@
+\indexentry{custom menu|see{menu file}}{i}
+\indexentry{shell variables|see{environment variables}}{i}
+\indexentry{Linux}{1}
+\indexentry{Solaris}{1}
+\indexentry{SunOS}{1}
+\indexentry{X Window System!server}{1}
+\indexentry{X Window System!client}{1}
+\indexentry{window manager}{1}
+\indexentry{Macintosh}{1}
+\indexentry{Microsoft Windows}{1}
+\indexentry{SPARCstation}{1}
+\indexentry{PC}{1}
+\indexentry{WAVE host@\WAVE{} host}{1}
+\indexentry{environment variables!WFDB}{2}
+\indexentry{WFDB environment variable}{2}
+\indexentry{environment variables!WFDBCAL}{2}
+\indexentry{WFDBCAL environment variable}{2}
+\indexentry{X Window System!server}{2}
+\indexentry{window manager}{2}
+\indexentry{olwm@{\tt olwm} (Open Look Window Manager)}{2}
+\indexentry{olvwm@{\tt olvwm} (Open Look Virtual Window Manager)}{2}
+\indexentry{olwm@{\tt olwm} (Open Look Window Manager)}{2}
+\indexentry{olvwm@{\tt olvwm} (Open Look Virtual Window Manager)}{2}
+\indexentry{root window|emph}{2}
+\indexentry{window!root|emph}{2}
+\indexentry{terminal window}{2}
+\indexentry{window!terminal}{2}
+\indexentry{shell}{3}
+\indexentry{command interpreter}{3}
+\indexentry{WAVE host@\WAVE{} host}{3}
+\indexentry{environment variables!SHELL}{3}
+\indexentry{SHELL environment variable}{3}
+\indexentry{csh@{\tt csh}}{3}
+\indexentry{C-shell}{3}
+\indexentry{cshsetwfdb@{\tt cshsetwfdb} command}{3}
+\indexentry{setwfdb@{\tt setwfdb} command}{3}
+\indexentry{profile@{\tt .profile}}{3}
+\indexentry{login@{\tt .login}}{3}
+\indexentry{mouse!middle button!simulating}{3}
+\indexentry{middle mouse button!simulating}{3}
+\indexentry{chording (mouse technique)}{3}
+\indexentry{mouse!right button!simulating}{3}
+\indexentry{right mouse button!simulating}{3}
+\indexentry{chording (mouse technique)}{3}
+\indexentry{hostname@{\tt hostname}}{3}
+\indexentry{names of computers}{3}
+\indexentry{WAVE host@\WAVE{} host}{3}
+\indexentry{who am I command@{\tt who am I} command}{3}
+\indexentry{IP address}{3}
+\indexentry{address, IP (Internet Protocol)}{3}
+\indexentry{xhost command@{\tt xhost} command}{3}
+\indexentry{telnet command@{\tt telnet} command}{3}
+\indexentry{environment variables!DISPLAY}{3}
+\indexentry{SHELL environment variable}{3}
+\indexentry{profile@{\tt .profile}}{3}
+\indexentry{login@{\tt .login}}{3}
+\indexentry{X Window System!server}{4}
+\indexentry{window manager}{4}
+\indexentry{terminal window}{4}
+\indexentry{moving windows}{4}
+\indexentry{window!moving}{4}
+\indexentry{dragging}{4}
+\indexentry{focus-follows-mouse policy}{4}
+\indexentry{click-to-type policy}{4}
+\indexentry{olwm@{\tt olwm} (Open Look Window Manager)}{4}
+\indexentry{olvwm@{\tt olvwm} (Open Look Virtual Window Manager)}{4}
+\indexentry{Open Look}{4}
+\indexentry{WAVE host@\WAVE{} host}{4}
+\indexentry{environment variables!WFDB}{5}
+\indexentry{WFDB environment variable}{5}
+\indexentry{rdsamp command@{\tt rdsamp} command}{5}
+\indexentry{rdann command@{\tt rdann} command}{5}
+\indexentry{starting WAVE@starting \WAVE{}}{5}
+\indexentry{wave command@{\tt wave} command}{5}
+\indexentry{terminal window}{5}
+\indexentry{WAVE host@\WAVE{} host}{5}
+\indexentry{environment variables!PATH}{5}
+\indexentry{PATH environment variable}{5}
+\indexentry{environment variables!WFDB}{6}
+\indexentry{WFDB environment variable}{6}
+\indexentry{environment variables!DISPLAY}{6}
+\indexentry{DISPLAY environment variable}{6}
+\indexentry{atr (reference) annotations@{\tt atr} (reference) annotations}{6}
+\indexentry{annotation!reference}{6}
+\indexentry{reference annotations}{6}
+\indexentry{main window|emph}{6}
+\indexentry{title bar|emph}{6}
+\indexentry{window!title bar|emph}{6}
+\indexentry{main control panel|emph}{6}
+\indexentry{signal!window|emph}{6}
+\indexentry{main window|textbf}{7}
+\indexentry{Find window@{\sf Find} window|textbf}{8}
+\indexentry{rhythm label}{8}
+\indexentry{annotation!rhythm}{8}
+\indexentry{time indicator|emph}{8}
+\indexentry{controls!navigation}{8}
+\indexentry{navigation controls}{8}
+\indexentry{moving through a record}{8}
+\indexentry{pop-up windows}{8}
+\indexentry{text cursor|emph}{8}
+\indexentry{insertion point}{8}
+\indexentry{keyboard focus|emph}{8}
+\indexentry{start time@{\sf Start time}}{9}
+\indexentry{end time@{\sf End time}}{9}
+\indexentry{search}{9}
+\indexentry{annotation!searching for}{9}
+\indexentry{notice box|textbf}{9}
+\indexentry{full screen grab, in {\sf  WAVE}\xspace  {} 5.0}{9}
+\indexentry{search}{9}
+\indexentry{annotation!searching for}{9}
+\indexentry{printing!signal window contents}{9}
+\indexentry{screen dump}{9}
+\indexentry{PostScript}{9}
+\indexentry{SPARCprinter}{9}
+\indexentry{spot help}{10}
+\indexentry{Open Look!spot help|textbf}{10}
+\indexentry{help}{10}
+\indexentry{on-line help}{10}
+\indexentry{spot help|emph}{10}
+\indexentry{Open Look!spot help|emph}{10}
+\indexentry{olwm@{\tt olwm} (Open Look Window Manager)}{10}
+\indexentry{olvwm@{\tt olvwm} (Open Look Virtual Window Manager)}{10}
+\indexentry{help window|emph}{10}
+\indexentry{printing!on-line help}{10}
+\indexentry{help!printing}{10}
+\indexentry{window!menu button}{10}
+\indexentry{closing windows}{10}
+\indexentry{Help Topics window@{\sf Help Topics} window|textbf}{11}
+\indexentry{help text window|textbf}{11}
+\indexentry{window!help text|textbf}{11}
+\indexentry{Netscape}{12}
+\indexentry{web browsers}{12}
+\indexentry{on-line manual}{12}
+\indexentry{User's Guide (on-line)}{12}
+\indexentry{WAVE User's Guide (on-line)@\WAVE{} User's Guide (on-line)}{12}
+\indexentry{Quit button@{\sf Quit} button}{12}
+\indexentry{WAVE host@\WAVE{} host}{12}
+\indexentry{Analyze window@{\sf Analyze} window|textbf}{13}
+\indexentry{analysis commands window@{\sf Analysis Commands} window|textbf}{14}
+\indexentry{cmdtool@{\tt cmdtool}}{14}
+\indexentry{action buttons}{14}
+\indexentry{annotation file!creating!using an external program}{14}
+\indexentry{creating an annotation file!using an external program}{14}
+\indexentry{annotation file!loading}{14}
+\indexentry{loading an annotation file}{14}
+\indexentry{title bar}{14}
+\indexentry{annotator name}{14}
+\indexentry{Load window@{\sf Load} window|textbf}{15}
+\indexentry{Annotation Template window@{\sf Annotation Template} window|textbf}{15}
+\indexentry{calibration file}{15}
+\indexentry{database path;}{15}
+\indexentry{Type menu@{\sf Type} menu}{15}
+\indexentry{annotation!mnemonic}{15}
+\indexentry{editing shortcuts}{15}
+\indexentry{Type menu@{\sf Type} menu|textbf}{16}
+\indexentry{annotation!enabling editing}{17}
+\indexentry{Edit menu@{\sf Edit} menu|textbf}{17}
+\indexentry{annotation!selecting}{17}
+\indexentry{selection rectangle|emph}{17}
+\indexentry{marker bars}{17}
+\indexentry{selection rectangle|textbf}{18}
+\indexentry{marker bars|textbf}{18}
+\indexentry{View window@{\sf View} window|textbf}{18}
+\indexentry{annotation!changing without moving}{19}
+\indexentry{changing an annotation}{19}
+\indexentry{title bar!parentheses in|textbf}{19}
+\indexentry{annotator name}{19}
+\indexentry{annotation!moving}{19}
+\indexentry{moving an annotation}{19}
+\indexentry{keyboard commands}{19}
+\indexentry{annotation!inserting}{19}
+\indexentry{inserting an annotation}{19}
+\indexentry{annotation!copying}{19}
+\indexentry{copying an annotation}{19}
+\indexentry{annotation!deleting}{20}
+\indexentry{deleting an annotation}{20}
+\indexentry{annotation!restoring deleted}{20}
+\indexentry{restoring a deleted annotation}{20}
+\indexentry{undeleting an annotation}{20}
+\indexentry{finding deleted annotations}{20}
+\indexentry{locating deleted annotations}{20}
+\indexentry{search!for deleted annotations}{20}
+\indexentry{marker|emph}{20}
+\indexentry{annotation!vs. marker}{20}
+\indexentry{index mark}{20}
+\indexentry{beginning of region}{20}
+\indexentry{end of region}{20}
+\indexentry{region of interest}{20}
+\indexentry{Analyze window@{\sf Analyze} window}{20}
+\indexentry{annotation!changing many at once}{21}
+\indexentry{changing many annotations}{21}
+\indexentry{shortcut}{21}
+\indexentry{search template window@{\sf Search Template} window}{21}
+\indexentry{annotation file!checkpointing}{22}
+\indexentry{saving edits}{22}
+\indexentry{saving edits}{22}
+\indexentry{Quit button@{\sf Quit} button}{22}
+\indexentry{backup}{22}
+\indexentry{annotation file!backup}{22}
+\indexentry{database path}{22}
+\indexentry{annotation file!creating!manually}{22}
+\indexentry{creating an annotation file!manually}{22}
+\indexentry{Annotator@{\sf Annotator}}{22}
+\indexentry{Load window@{\sf Load} window}{22}
+\indexentry{annotator name}{22}
+\indexentry{multi-edit mode|textit}{23}
+\indexentry{annotation!attached to signal}{23}
+\indexentry{signal!annotating independently}{23}
+\indexentry{View window@{\sf View} window}{23}
+\indexentry{chan in annotation@{\tt chan} in annotation}{23}
+\indexentry{annotation!chan@{\tt chan}}{23}
+\indexentry{signal!number}{23}
+\indexentry{signal!suppressing display}{23}
+\indexentry{signal!list}{23}
+\indexentry{link annotation}{24}
+\indexentry{annotation!link}{24}
+\indexentry{ANNTAB environment variable}{24}
+\indexentry{environment variables!ANNTAB}{24}
+\indexentry{X11 resources!{\tt Wave.Anntab}}{24}
+\indexentry{defining annotation types}{24}
+\indexentry{Type menu@{\sf Type} menu}{24}
+\indexentry{annotation!table of definitions}{24}
+\indexentry{annotation!type codes}{25}
+\indexentry{unassigned annotation type codes}{25}
+\indexentry{analysis commands window@{\sf Analysis Commands} window}{27}
+\indexentry{sqrs command@{\tt sqrs} command}{27}
+\indexentry{menu file}{28}
+\indexentry{EDITOR environment variable}{28}
+\indexentry{environment variables!EDITOR}{28}
+\indexentry{textedit command@{\tt textedit} command}{28}
+\indexentry{Analyze window@{\sf Analyze} window}{28}
+\indexentry{analysis commands window@{\sf Analysis Commands} window}{28}
+\indexentry{menu variables}{28}
+\indexentry{menu variables}{28}
+\indexentry{variables!in \WAVE{} menu file}{28}
+\indexentry{signal!list}{28}
+\indexentry{region of interest}{28}
+\indexentry{marker!{\tt >}}{28}
+\indexentry{marker!{\tt <}}{28}
+\indexentry{WFDB Software Package}{30}
+\indexentry{tach command@{\tt tach} command}{30}
+\indexentry{analysis commands window@{\sf Analysis Commands} window}{30}
+\indexentry{textedit command@{\tt textedit} command}{31}
+\indexentry{time scale}{31}
+\indexentry{amplitude scale}{31}
+\indexentry{scales!setting}{31}
+\indexentry{display scale}{31}
+\indexentry{View window@{\sf View} window}{31}
+\indexentry{signal!list}{31}
+\indexentry{Meta key@{\sf Meta} key}{31}
+\indexentry{Log window@{\sf Log} window|emph}{33}
+\indexentry{WAVEMENU environment variable}{33}
+\indexentry{environment variables!WAVEMENU}{33}
+\indexentry{menu file}{33}
+\indexentry{default menu}{33}
+\indexentry{login@{\tt .login}}{33}
+\indexentry{printing!log with charts}{34}
+\indexentry{log!printing with charts}{34}
+\indexentry{Scope window@{\sf Scope} window}{35}
+\indexentry{signal!selecting}{35}
+\indexentry{record!name}{36}
+\indexentry{annotator name}{36}
+\indexentry{plot2d command@{\tt plot2d} command}{40}
+\indexentry{analysis commands window@{\sf Analysis Commands} window}{40}
+\indexentry{format!of printed output}{47}
+\indexentry{resolution!of printed output}{47}
+\indexentry{analysis commands window@{\sf Analysis Commands} window}{47}
+\indexentry{menu file}{50}
+\indexentry{pschart command@{\tt pschart} command}{50}
+\indexentry{psfd command@{\tt psfd} command}{50}
+\indexentry{Print tag in menu file@{\tt <Print>} tag in menu file}{50}
+\indexentry{printer!resolution}{50}
+\indexentry{resolution!of printed output}{50}
+\indexentry{PostScript}{50}
+\indexentry{amplitude scale!on printed output}{51}
+\indexentry{PostScript}{51}
+\indexentry{printer!non-PostScript}{51}
+\indexentry{calibration}{53}
+\indexentry{display calibration}{53}
+\indexentry{signal!calibration}{53}
+\indexentry{adus (analog/digital converter units)|textbf}{53}
+\indexentry{physical units}{53}
+\indexentry{units!physical}{53}
+\indexentry{units!ADC}{53}
+\indexentry{header file}{53}
+\indexentry{gain}{53}
+\indexentry{signal!gain}{53}
+\indexentry{signal!baseline}{53}
+\indexentry{baselines}{53}
+\indexentry{calibration pulse}{53}
+\indexentry{calibration}{54}
+\indexentry{analysis commands window@{\sf Analysis Commands} window|textit}{54}
+\indexentry{signal!calibration}{55}
+\indexentry{calibration!signal}{55}
+\indexentry{calibrate command@{\tt calibrate} command}{55}
+\indexentry{display calibration}{55}
+\indexentry{calibration!display}{55}
+\indexentry{resolution!of display}{55}
+\indexentry{dpi option for WAVE@{\tt -dpi} option for \WAVE{}}{55}
+\indexentry{command-line options!{\tt -dpi}}{55}
+\indexentry{options!{\tt -dpi}}{55}
+\indexentry{scales!time}{56}
+\indexentry{scales!amplitude}{56}
+\indexentry{time scale}{56}
+\indexentry{amplitude scale}{56}
+\indexentry{View window@{\sf View} window}{56}
+\indexentry{signal!type}{56}
+\indexentry{calibration file}{56}
+\indexentry{WFDBCAL environment variable}{56}
+\indexentry{environment variables!WFDBCAL}{56}
+\indexentry{Load window@{\sf Load} window}{56}
+\indexentry{olwm@{\tt olwm} (Open Look Window Manager)}{57}
+\indexentry{olvwm@{\tt olvwm} (Open Look Virtual Window Manager)}{57}
+\indexentry{amplitude scale}{57}
+\indexentry{time scale}{57}
+\indexentry{format!of annotation display}{58}
+\indexentry{format!of time display/entry}{58}
+\indexentry{absolute time}{58}
+\indexentry{elapsed time}{58}
+\indexentry{time!display mode}{58}
+\indexentry{format!of grid display}{58}
+\indexentry{environment variables!list of}{59}
+\indexentry{WAVE host@\WAVE{} host}{59}
+\indexentry{DISPLAY environment variable}{59}
+\indexentry{environment variables!DISPLAY}{59}
+\indexentry{WFDB environment variable}{59}
+\indexentry{environment variables!WFDB}{59}
+\indexentry{WFDBCAL environment variable}{60}
+\indexentry{environment variables!WFDBCAL}{60}
+\indexentry{WAVEMENU environment variable}{60}
+\indexentry{environment variables!WAVEMENU}{60}
+\indexentry{PATH environment variable}{60}
+\indexentry{environment variables!PATH}{60}
+\indexentry{SHELL environment variable}{60}
+\indexentry{environment variables!SHELL}{60}
+\indexentry{analysis commands window@{\sf Analysis Commands} window}{60}
+\indexentry{EDITOR environment variable}{60}
+\indexentry{environment variables!EDITOR}{60}
+\indexentry{PRINTER environment variable}{60}
+\indexentry{environment variables!PRINTER}{60}
+\indexentry{PostScript}{60}
+\indexentry{PSPRINT environment variable}{60}
+\indexentry{environment variables!PSPRINT}{60}
+\indexentry{lpr command@{\tt lpr} command}{60}
+\indexentry{TEXTPRINT environment variable}{60}
+\indexentry{environment variables!TEXTPRINT}{60}
+\indexentry{ANNTAB environment variable}{60}
+\indexentry{environment variables!ANNTAB}{60}
+\indexentry{annotation!table of definitions}{60}
+\indexentry{XView}{60}
+\indexentry{on-line help}{60}
+\indexentry{HELPPATH environment variable}{60}
+\indexentry{environment variables!HELPPATH}{60}
+\indexentry{HELPDIR environment variable}{60}
+\indexentry{environment variables!HELPDIR}{60}
+\indexentry{MENUDIR environment variable}{60}
+\indexentry{environment variables!MENUDIR}{60}
+\indexentry{RESDIR environment variable}{60}
+\indexentry{environment variables!RESDIR}{60}
+\indexentry{resources}{61}
+\indexentry{X11 resources}{61}
+\indexentry{XView}{61}
+\indexentry{annotation!marker bars}{61}
+\indexentry{marker bars}{61}
+\indexentry{ANNTAB environment variable}{61}
+\indexentry{environment variables!ANNTAB}{61}
+\indexentry{annotation!table of definitions}{61}
+\indexentry{resolution!of display}{61}
+\indexentry{display resolution}{61}
+\indexentry{resolution}{61}
+\indexentry{dpi option for WAVE@{\tt -dpi} option for \WAVE{}}{61}
+\indexentry{command-line options!{\tt -dpi}}{61}
+\indexentry{options!{\tt -dpi}}{61}
+\indexentry{graphics mode}{62}
+\indexentry{display mode}{62}
+\indexentry{g option for WAVE@{\tt -g} option for \WAVE{}}{62}
+\indexentry{command-line options!{\tt -g}}{62}
+\indexentry{options!{\tt -g}}{62}
+\indexentry{m option for WAVE@{\tt -m} option for \WAVE{}}{62}
+\indexentry{command-line options!{\tt -m}}{62}
+\indexentry{options!{\tt -m}}{62}
+\indexentry{O option for WAVE@{\tt -O} option for \WAVE{}}{62}
+\indexentry{command-line options!{\tt -O}}{62}
+\indexentry{options!{\tt -O}}{62}
+\indexentry{S option for WAVE@{\tt -S} option for \WAVE{}}{62}
+\indexentry{command-line options!{\tt -S}}{62}
+\indexentry{options!{\tt -S}}{62}
+\indexentry{colors!signal window}{62}
+\indexentry{Scope window@{\sf Scope} window}{62}
+\indexentry{colors!scope window}{62}
+\indexentry{signal!window!dimensions}{62}
+\indexentry{window!size}{62}
+\indexentry{font!in signal window}{62}
+\indexentry{annotation!display font}{62}
+\indexentry{EDITOR environment variable}{63}
+\indexentry{environment variables!EDITOR}{63}
+\indexentry{amplitude scale}{63}
+\indexentry{time scale}{63}
+\indexentry{XView}{63}
+\indexentry{xrm option for WAVE@{\tt -xrm} option for \WAVE{}}{63}
+\indexentry{command-line options!{\tt -xrm}}{63}
+\indexentry{options!{\tt -xrm}}{63}
+\indexentry{default option for WAVE@{\tt -default} option for \WAVE{}}{63}
+\indexentry{command-line options!{\tt -default}}{63}
+\indexentry{options!{\tt -default}}{63}
+\indexentry{help}{65}
+\indexentry{on-line help}{65}
+\indexentry{File menu@{\sf File} menu}{65}
+\indexentry{View window@{\sf View} window}{65}
+\indexentry{Edit menu@{\sf Edit} menu}{65}
+\indexentry{Properties menu@{\sf Properties} menu}{65}
+\indexentry{Find window@{\sf Find} window}{66}
+\indexentry{search}{66}
+\indexentry{annotation!searching for}{66}
+\indexentry{Find window@{\sf Find} window}{66}
+\indexentry{search}{66}
+\indexentry{annotation!searching for}{66}
+\indexentry{search}{66}
+\indexentry{annotation!searching for}{66}
+\indexentry{on-line help}{66}
+\indexentry{Help Topics window@{\sf Help Topics} window}{66}
+\indexentry{annotator name!default}{66}
+\indexentry{Quit button@{\sf Quit} button}{66}
+\indexentry{File menu@{\sf File} menu}{66}
+\indexentry{Load window@{\sf Load} window}{66}
+\indexentry{record!name}{66}
+\indexentry{annotator name}{66}
+\indexentry{calibration file}{66}
+\indexentry{database path}{66}
+\indexentry{title bar!unsaved edit indicator}{67}
+\indexentry{annotation file!backup}{67}
+\indexentry{printing!signal window contents}{67}
+\indexentry{screen dump}{67}
+\indexentry{printing!commands}{67}
+\indexentry{menu file}{67}
+\indexentry{Analyze window@{\sf Analyze} window}{67}
+\indexentry{WAVEMENU environment variable}{67}
+\indexentry{environment variables!WAVEMENU}{67}
+\indexentry{action buttons}{67}
+\indexentry{environment variables!WAVEMENU}{67}
+\indexentry{WAVEMENU environment variable}{67}
+\indexentry{log file}{67}
+\indexentry{pschart command@{\tt pschart} command}{67}
+\indexentry{Load window@{\sf Load} window}{67}
+\indexentry{record!name}{67}
+\indexentry{annotator name}{68}
+\indexentry{record!reloading}{68}
+\indexentry{calibration file}{68}
+\indexentry{environment variables!WFDBCAL}{68}
+\indexentry{WFDBCAL environment variable}{68}
+\indexentry{database path}{68}
+\indexentry{WFDB environment variable}{68}
+\indexentry{environment variables!WFDB}{68}
+\indexentry{environment variables!WFDB}{68}
+\indexentry{WFDB environment variable}{68}
+\indexentry{Print setup window@{\sf Print setup} window}{68}
+\indexentry{PRINTER environment variable}{68}
+\indexentry{environment variables!PRINTER}{68}
+\indexentry{PSPRINT environment variable}{68}
+\indexentry{environment variables!PSPRINT}{68}
+\indexentry{TEXTPRINT environment variable}{68}
+\indexentry{environment variables!TEXTPRINT}{68}
+\indexentry{Analyze window@{\sf Analyze} window}{69}
+\indexentry{region of interest}{69}
+\indexentry{marker!{\tt <}}{69}
+\indexentry{elapsed time}{69}
+\indexentry{time!elapsed}{69}
+\indexentry{marker!{\tt >}}{69}
+\indexentry{signal!number}{69}
+\indexentry{absolute time}{69}
+\indexentry{time!absolute}{69}
+\indexentry{signal!list}{69}
+\indexentry{Scope window@{\sf Scope} window}{70}
+\indexentry{analysis commands window@{\sf Analysis Commands} window}{70}
+\indexentry{EDITOR environment variable}{70}
+\indexentry{environment variables!EDITOR}{70}
+\indexentry{textedit command@{\tt textedit} command}{70}
+\indexentry{menu file}{70}
+\indexentry{menu file}{70}
+\indexentry{action buttons}{70}
+\indexentry{Log window@{\sf Log} window}{70}
+\indexentry{log file}{71}
+\indexentry{marker!{\tt :}}{71}
+\indexentry{EDITOR environment variable}{71}
+\indexentry{environment variables!EDITOR}{71}
+\indexentry{environment variables!EDITOR}{71}
+\indexentry{EDITOR environment variable}{71}
+\indexentry{textedit command@{\tt textedit} command}{71}
+\indexentry{log file!review}{71}
+\indexentry{View window@{\sf View} window}{72}
+\indexentry{annotation!mnemonic}{72}
+\indexentry{annotation!subtyp@{\tt subtyp}}{72}
+\indexentry{subtyp in annotation@{\tt subtyp} in annotation}{72}
+\indexentry{annotation!chan@{\tt chan}}{72}
+\indexentry{chan in annotation@{\tt chan} in annotation}{72}
+\indexentry{annotation!num@{\tt num}}{72}
+\indexentry{num in annotation@{\tt num} in annotation}{72}
+\indexentry{annotation!aux@{\tt aux}}{72}
+\indexentry{aux in annotation@{\tt aux} in annotation}{72}
+\indexentry{signal!names}{72}
+\indexentry{signal!baselines}{72}
+\indexentry{baselines}{72}
+\indexentry{marker bars}{72}
+\indexentry{signal!levels}{72}
+\indexentry{time scale}{72}
+\indexentry{scales!time}{72}
+\indexentry{scales!amplitude}{72}
+\indexentry{amplitude scale}{72}
+\indexentry{grid}{72}
+\indexentry{resolution!of display}{72}
+\indexentry{display calibration}{72}
+\indexentry{calibration!display}{72}
+\indexentry{dpi option for WAVE@{\tt -dpi} option for \WAVE{}}{72}
+\indexentry{command-line options!{\tt -dpi}}{72}
+\indexentry{options!{\tt -dpi}}{72}
+\indexentry{signal!display mode}{72}
+\indexentry{signal!number}{72}
+\indexentry{signal!list}{72}
+\indexentry{format!of annotation display}{72}
+\indexentry{annotation!display mode}{72}
+\indexentry{chan in annotation@{\tt chan} in annotation}{72}
+\indexentry{num in annotation@{\tt num} in annotation}{72}
+\indexentry{format!of time display/entry}{73}
+\indexentry{time!display mode}{73}
+\indexentry{absolute time}{73}
+\indexentry{elapsed time}{73}
+\indexentry{format!of grid display}{73}
+\indexentry{grid}{73}
+\indexentry{Xdefaults file@{\tt .Xdefaults} file}{73}
+\indexentry{Edit menu@{\sf Edit} menu}{73}
+\indexentry{marker!editing}{73}
+\indexentry{Properties menu@{\sf Properties} menu}{73}
+\indexentry{wfdbdesc command@{\tt wfdbdesc} command}{73}
+\indexentry{sumann command@{\tt sumann} command}{73}
+\indexentry{WAVE version number@\WAVE{} version number}{73}
+\indexentry{Find window@{\sf Find} window}{74}
+\indexentry{View window@{\sf View} window}{74}
+\indexentry{format!of time display/entry}{74}
+\indexentry{annotation!mnemonic}{74}
+\indexentry{search}{74}
+\indexentry{annotation!searching for}{74}
+\indexentry{search template window@{\sf Search Template} window}{74}
+\indexentry{on-line help}{74}
+\indexentry{Help Topics window@{\sf Help Topics} window}{74}
+\indexentry{help!printing}{75}
+\indexentry{Annotation Template window@{\sf Annotation Template} window}{75}
+\indexentry{search template window@{\sf Search Template} window}{76}
+\indexentry{Level window@{\sf Level} window}{77}
+\indexentry{Scope window@{\sf Scope} window}{78}
+\indexentry{Analyze window@{\sf Analyze} window}{78}
+\indexentry{oscilloscope display}{78}
+\indexentry{scales!time}{78}
+\indexentry{scales!amplitude}{78}
+\indexentry{time scale}{78}
+\indexentry{amplitude scale}{78}
+\indexentry{Linux}{81}
+\indexentry{Solaris}{81}
+\indexentry{SunOS}{81}
+\indexentry{SPARCstation}{81}
+\indexentry{PC}{81}
+\indexentry{WAVE host@\WAVE{} host}{81}
+\indexentry{resolution!of display}{81}
+\indexentry{X Window System!XFree86 server}{81}
+\indexentry{SPARCstation}{82}
+\indexentry{PC}{82}
+\indexentry{WFDB Software Package}{82}
+\indexentry{MS-DOS}{82}
+\indexentry{CD-ROM}{82}
+\indexentry{ADC boards}{82}
+\indexentry{data acquisition}{82}
+\indexentry{resolution!of ADC}{82}
+\indexentry{printing}{82}
+\indexentry{PostScript}{82}
+\indexentry{SPARCprinter}{82}
+\indexentry{Ghostscript}{82}
+\indexentry{WAVE host@\WAVE{} host}{82}
+\indexentry{network access}{82}
+\indexentry{modem access}{82}
+\indexentry{PPP}{82}
+\indexentry{SLIP}{82}
+\indexentry{TERM}{82}
+\indexentry{Ethernet}{82}
+\indexentry{Linux}{83}
+\indexentry{X Window System!XFree86 server}{83}
+\indexentry{window manager}{83}
+\indexentry{ICCCM}{83}
+\indexentry{olwm@{\tt olwm} (Open Look Window Manager)}{83}
+\indexentry{olvwm@{\tt olvwm} (Open Look Virtual Window Manager)}{83}
+\indexentry{X terminal}{83}
+\indexentry{Linux}{83}
+\indexentry{digitizing signals}{83}
+\indexentry{ADC boards}{83}
+\indexentry{sample command@{\tt sample} command (for digitization under MS-DOS)}{83}
+\indexentry{CD-ROM}{84}
+\indexentry{MIT-BIH Arrhythmia Database}{84}
+\indexentry{European ST-T Database}{84}
+\indexentry{MIT-BIH Polysomnographic Database}{84}
+\indexentry{MGH/MF Waveform Database}{84}
+\indexentry{WAVE host@\WAVE{} host}{84}
+\indexentry{Linux}{84}
+\indexentry{MS-DOS}{84}
+\indexentry{Ethernet}{84}
+\indexentry{sample command@{\tt sample} command (for digitization under MS-DOS)}{84}
+\indexentry{Linux}{85}
+\indexentry{XView}{85}
+\indexentry{olwm@{\tt olwm} (Open Look Window Manager)}{85}
+\indexentry{olvwm@{\tt olvwm} (Open Look Virtual Window Manager)}{85}
+\indexentry{format!of binary executable files}{85}
+\indexentry{WFDB Software Package}{85}
+\indexentry{Netscape}{85}
+\indexentry{web browser}{85}
+\indexentry{gnuplot command@{\tt gnuplot} command}{85}
+\indexentry{plot2d command@{\tt plot2d} command}{85}
+\indexentry{xvgr command@{\tt xvgr} command}{85}
+\indexentry{WAVE host@\WAVE{} host}{87}
+\indexentry{Linux}{87}
+\indexentry{Solaris}{87}
+\indexentry{SunOS}{87}
+\indexentry{SPARCstation}{87}
+\indexentry{PC}{87}
+\indexentry{WWW}{87}
+\indexentry{WFDB Software Package}{87}
+\indexentry{downloading}{87}
+\indexentry{installing \WAVE{}}{87}
+\indexentry{MIMIC Database}{87}
+\indexentry{XView}{87}
+\indexentry{Linux}{88}
+\indexentry{lpr command@{\tt lpr} command}{88}
+\indexentry{PostScript}{88}
+\indexentry{Solaris}{88}
+\indexentry{Ghostscript}{88}
+\indexentry{PostScript}{88}
+\indexentry{printer!non-PostScript}{88}
+\indexentry{fax output}{88}
+\indexentry{format!of graphics files}{88}
+\indexentry{PRINTER environment variable}{88}
+\indexentry{environment variables!PRINTER}{88}
+\indexentry{PSPRINT environment variable}{88}
+\indexentry{environment variables!PSPRINT}{88}
+\indexentry{lpr command@{\tt lpr} command}{88}
+\indexentry{TEXTPRINT environment variable}{88}
+\indexentry{environment variables!TEXTPRINT}{88}
+\indexentry{on-line help}{88}
+\indexentry{help!printing}{88}
+\indexentry{printer!resolution}{88}
+\indexentry{resolution!of printed output}{88}
+\indexentry{profile@{\tt .profile}}{89}
+\indexentry{login@{\tt .login}}{89}
+\indexentry{printing!remotely vs. locally}{89}
+\indexentry{Linux}{91}
+\indexentry{XView}{91}
+\indexentry{PostScript}{91}
+\indexentry{remote access}{92}
+\indexentry{network access}{92}
+\indexentry{WAVE host@\WAVE{} host}{92}
+\indexentry{IP address}{92}
+\indexentry{address, IP (Internet Protocol)}{92}
+\indexentry{modem access}{92}
+\indexentry{PPP}{92}
+\indexentry{SLIP}{92}
+\indexentry{TERM}{92}
+\indexentry{mouse!middle button!simulating}{93}
+\indexentry{middle mouse button!simulating}{93}
+\indexentry{mouse!right button!simulating}{93}
+\indexentry{right mouse button!simulating}{93}
+\indexentry{chording (mouse technique)}{93}
+\indexentry{on-line help}{93}
+\indexentry{help}{93}
+\indexentry{XView}{93}
+\indexentry{olwm@{\tt olwm} (Open Look Window Manager)}{94}
+\indexentry{olvwm@{\tt olvwm} (Open Look Virtual Window Manager)}{94}
+\indexentry{wave command@{\tt wave} command}{94}
+\indexentry{record!name}{94}
+\indexentry{annotator name}{94}
+\indexentry{PATH environment variable}{94}
+\indexentry{environment variables!PATH}{94}
+\indexentry{dynamically linked libraries}{94}
+\indexentry{shared libraries}{94}
+\indexentry{libraries!missing}{94}
+\indexentry{LD\_LIBRARY\_PATH environment variable}{94}
+\indexentry{environment variables!LD\_LIBRARY\_PATH}{94}
+\indexentry{WFDB environment variable}{94}
+\indexentry{environment variables!WFDB}{94}
+\indexentry{DISPLAY environment variable}{94}
+\indexentry{environment variables!DISPLAY}{94}
+\indexentry{signal!window}{95}
+\indexentry{S option for WAVE@{\tt -S} option for \WAVE{}}{95}
+\indexentry{command-line options!{\tt -S}}{95}
+\indexentry{options!{\tt -S}}{95}
+\indexentry{Open Look fonts}{95}
+\indexentry{font!Open Look}{95}
+\indexentry{XView}{95}
+\indexentry{XView}{96}
+\indexentry{signal!window}{96}
+\indexentry{format!of signal files}{96}
+\indexentry{amplitude scale}{96}
+\indexentry{scales!amplitude}{96}
+\indexentry{WFDBCAL environment variable}{96}
+\indexentry{environment variables!WFDBCAL}{96}
+\indexentry{S option for WAVE@{\tt -S} option for \WAVE{}}{97}
+\indexentry{command-line options!{\tt -S}}{97}
+\indexentry{options!{\tt -S}}{97}
+\indexentry{Netscape!color map problem with}{97}
+\indexentry{color map}{97}
+\indexentry{Scope window@{\sf Scope} window}{97}
+\indexentry{S option for WAVE@{\tt -S} option for \WAVE{}}{97}
+\indexentry{command-line options!{\tt -S}}{97}
+\indexentry{options!{\tt -S}}{97}
+\indexentry{xdpyinfo command@{\tt xdpyinfo} command}{97}
+\indexentry{resolution!of display}{97}
+\indexentry{dpi option for WAVE@{\tt -dpi} option for \WAVE{}}{97}
+\indexentry{command-line options!{\tt -dpi}}{97}
+\indexentry{options!{\tt -dpi}}{97}
+\indexentry{display calibration}{97}
+\indexentry{calibration!display}{97}
+\indexentry{signal!calibration}{98}
+\indexentry{calibration!signal}{98}
+\indexentry{WFDBCAL environment variable}{98}
+\indexentry{environment variables!WFDBCAL}{98}
+\indexentry{header file}{98}
+\indexentry{scales}{98}
+\indexentry{colors!in signal window}{98}
+\indexentry{S option for WAVE@{\tt -S} option for \WAVE{}}{99}
+\indexentry{command-line options!{\tt -S}}{99}
+\indexentry{options!{\tt -S}}{99}
+\indexentry{stty command@{\tt stty command}}{99}
+\indexentry{analysis commands window@{\sf Analysis Commands} window}{99}
+\indexentry{record!name!vs. file name}{99}
+\indexentry{file names, vs. record names}{99}
+\indexentry{WFDB environment variable}{99}
+\indexentry{environment variables!WFDB}{99}
+\indexentry{WAVE host@\WAVE{} host}{99}
+\indexentry{wfdbwhich command@{\tt wfdbwhich} command}{100}
+\indexentry{annotation file}{100}
+\indexentry{CD-ROM}{101}
+\indexentry{edit!undo}{101}
+\indexentry{annotation file!backup}{101}
+\indexentry{backup!of annotation file}{101}
+\indexentry{anntab file}{101}
+\indexentry{autosaving}{102}
+\indexentry{wrann command@{\tt wrann} command}{102}
+\indexentry{rdann command@{\tt rdann} command}{102}
+\indexentry{annotation!editing using {\tt emacs}}{102}
+\indexentry{link annotation}{102}
+\indexentry{annotation!link}{102}
+\indexentry{snip command@{\tt snip} command}{103}
+\indexentry{wfdbcollate command@{\tt wfdbcollate} command}{103}
+\indexentry{xform command@{\tt xform} command}{103}
+\indexentry{rdsamp command@{\tt rdsamp} command}{103}
+\indexentry{wrsamp command@{\tt wrsamp} command}{103}
+\indexentry{PostScript}{103}
+\indexentry{xwd command@{\tt xwd} command}{103}
+\indexentry{xpr command@{\tt xpr} command}{103}
+\indexentry{screen dump}{103}
+\indexentry{pschart command@{\tt pschart} command}{103}
+\indexentry{psfd command@{\tt psfd} command}{103}
+\indexentry{format!of signal files}{104}
+\indexentry{file formats!signals}{104}
+\indexentry{signal file!formats}{104}
+\indexentry{multiplexed signal file}{104}
+\indexentry{block-interleaved signal file}{104}
+\indexentry{resolution!of multi-frequency records}{105}
+\indexentry{high-resolution mode}{105}
+\indexentry{WFDB\_HIGHRES@{\tt WFDB\_HIGHRES}}{105}
+\indexentry{resolution!of time in annotation files}{105}
+\indexentry{format!of signal files!changing}{105}
+\indexentry{xform command@{\tt xform} command}{105}
+\indexentry{embedded header data in signal files}{105}
+\indexentry{preamble in signal files}{105}
+\indexentry{signal file!preamble in}{105}
+\indexentry{wrsamp command@{\tt wrsamp} command}{105}
+\indexentry{format!of signal files!changing}{105}
+\indexentry{EDF (European Data Format)}{106}
+\indexentry{high-resolution mode}{106}
+\indexentry{resolution!of multi-frequency records}{106}
+\indexentry{H option for WAVE@{\tt -H} option for \WAVE{}}{106}
+\indexentry{command-line options!{\tt -H}}{106}
+\indexentry{options!{\tt -H}}{106}
+\indexentry{resolution!of display}{106}
+\indexentry{oversampled signal}{106}
+\indexentry{signal!oversampled}{106}
+\indexentry{resolution!of time in annotation files}{106}
+\indexentry{signal!window}{106}
+\indexentry{r option for WAVE@{\tt -r} option for \WAVE{}}{106}
+\indexentry{command-line options!{\tt -r}}{106}
+\indexentry{options!{\tt -r}}{106}
+\indexentry{WFDB\_MAXSIG@{\tt WFDB\_MAXSIG}}{107}
+\indexentry{bxb command@{\tt bxb} command}{108}
+\indexentry{search}{108}
+\indexentry{annotation!searching for}{108}
+\indexentry{mrgann command@{\tt mrgann} command}{108}
+\indexentry{wfdbcollate command@{\tt wfdbcollate} command}{108}
+\indexentry{Scope window@{\sf Scope} window}{109}
+\indexentry{menu variables}{109}
+\indexentry{Open Look}{109}
+\indexentry{PostScript}{109}
+\indexentry{on-line help}{110}
+\indexentry{help}{110}
+\indexentry{Netscape}{110}
+\indexentry{XView}{110}
+\indexentry{starting WAVE@starting \WAVE{}}{113}
+\indexentry{wave command@{\tt wave} command}{113}
+\indexentry{resolution!of display}{113}
+\indexentry{resolution!of multi-frequency records}{113}
+\indexentry{amplitude scale}{114}
+\indexentry{scales!amplitude}{114}
+\indexentry{time scale}{114}
+\indexentry{scales!time}{114}
+\indexentry{amplitude scale}{114}
+\indexentry{scales!amplitude}{114}
+\indexentry{absolute time}{115}
+\indexentry{elapsed time}{115}
+\indexentry{time!display mode}{115}
+\indexentry{record!name}{117}
+\indexentry{annotator name}{117}
+\indexentry{time scale}{117}
+\indexentry{scales!time}{117}
+\indexentry{amplitude scale}{117}
+\indexentry{scales!amplitude}{117}
+\indexentry{Open Look}{119}
+\indexentry{mouse!right button!uses for}{119}
+\indexentry{mouse!left button!uses for}{119}
+\indexentry{mouse!left button!uses for}{120}
+\indexentry{mouse!middle button!uses for}{120}
+\indexentry{mouse!right button!uses for}{120}
+\indexentry{marker!editing}{120}
+\indexentry{mouse!keyboard equivalents}{121}
+\indexentry{signal!selecting}{121}
+\indexentry{Meta key@{\sf Meta} key}{121}
+\indexentry{search}{122}
+\indexentry{annotation!searching for}{122}
+\indexentry{link annotation}{122}
+\indexentry{annotation!link}{122}

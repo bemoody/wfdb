@@ -1,5 +1,5 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised:   29 April 1999	dblib 10.0.0
+			Last revised: 1 October 1999		wfdblib 10.1.0
 WFDB library type, constant, structure, and function interface definitions
 
 _______________________________________________________________________________
@@ -32,7 +32,7 @@ _______________________________________________________________________________
 
 /* WFDB library version. */
 #define WFDB_MAJOR   10
-#define WFDB_MINOR   0
+#define WFDB_MINOR   1
 #define WFDB_RELEASE 0
 
 /* Determine what type of compiler is being used. */
@@ -101,9 +101,10 @@ the legal values for the format field in a WFDB_siginfo structure.
  160	16-bit offset binary amplitudes
  212	2 12-bit amplitudes bit-packed in 3 bytes
  310	3 10-bit amplitudes bit-packed in 4 bytes
+ 311    3 10-bit amplitudes bit-packed in 4 bytes
 */
-#define WFDB_FMT_LIST {0, 8, 16, 61, 80, 160, 212, 310}
-#define WFDB_NFMTS	  8    /* number of items in FMT_LIST */
+#define WFDB_FMT_LIST {0, 8, 16, 61, 80, 160, 212, 310, 311}
+#define WFDB_NFMTS	  9    /* number of items in FMT_LIST */
 
 /* Default signal specifications */
 #define WFDB_DEFFREQ	250.0  /* default sampling frequency (Hz) */
@@ -159,7 +160,7 @@ struct WFDB_anninfo {	/* annotator information structure */
 struct WFDB_ann {		/* annotation structure */
     WFDB_Time time;	/* annotation time, in sample intervals from
 			   the beginning of the record */
-    char anntyp;	/* annotation type (< ACMAX, see <ecg/ecgcodes.h> */
+    char anntyp;	/* annotation type (< ACMAX, see <wfdb/ecgcodes.h> */
     signed char subtyp;	/* annotation subtype */
     signed char chan;	/* channel number */
     signed char num;	/* annotator number */

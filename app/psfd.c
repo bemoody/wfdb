@@ -1,5 +1,5 @@
 /* file: psfd.c		G. Moody         9 August 1988
-			Last revised:      4 May 1999
+			Last revised:  14 September 1999
 
 -------------------------------------------------------------------------------
 psfd: Produces annotated full-disclosure ECG plots on a PostScript device
@@ -662,7 +662,7 @@ long t0, t1;
 {
     char *ts;
     double curr_s_top;
-    register int i, k;
+    int i, k;
     long j, jmax, vs[WFDB_MAXSIG];
     int nstrips, tm_y, tt, ttmax, *vp, x0, y0, ya[2];
     int v[WFDB_MAXSIG], vbase[WFDB_MAXSIG], vmax[WFDB_MAXSIG], vmin[WFDB_MAXSIG];

@@ -1,5 +1,5 @@
 /* file: pschart.c	G. Moody	 15 March 1988
-			Last revised:      4 May 1999
+			Last revised:   19 November 1999
 
 -------------------------------------------------------------------------------
 pschart: Produce annotated `chart recordings' on a PostScript device
@@ -60,7 +60,7 @@ extern char *calloc(), *malloc();
 #include <wfdb/wfdb.h>
 #include <wfdb/ecgcodes.h>
 
-/* The ANSI C function strstr is defined here for those systems which don't
+/* The ANSI C function strstr is defined here for those systems that don't
    include it in their libraries.  This includes all older (pre-ANSI) C
    libraries;  some modern non-ANSI C libraries (notably those supplied with
    SunOS 4.1) do have strstr, so we can't just make this conditional on
@@ -111,7 +111,6 @@ char *s1, *s2;
 				   grid (mm) */
 #define V_SEP	   5.0		/* vertical space between strips (mm) */
 
-
 #ifndef PTYPE
 #define PTYPE	 "letter"	/* default page type */
 #endif
@@ -146,6 +145,7 @@ int Eflag = 0;			/* generate EPSF */
 int gflag = 0;			/* if non-zero, plot grid */
 int lflag = 0;			/* if non-zero, label signals */
 int Lflag = 0;			/* if non-zero, use landscape orientation */
+double lwmm = 0.;		/* line width (mm); 0 is narrowest possible */
 int mflag = 0;			/* if non-zero, margins specified using -m */
 int Mflag = 0;			/* annotation/marker bar mode (0: do not print
 				   bars, print mnemonics at center; 1: print
@@ -171,6 +171,9 @@ int smode = 1;			/* scale mode (0: no scales; 1: mm/unit in
 				   mm/unit above strips; 4: units/tick above
 				   strips; 5: mm/unit within strips; 6: units/
 				   tick within strips) */
+
+double tpmv = TPMV;		/* grid ticks per millivolt */
+double tps = TPS;		/* grid ticks per second */
 double tscale = TSCALE;		/* time scale (mm/second) */
 int tsmode = 2;			/* time stamp mode (0: no time stamps; 1:
 				   elapsed times only; 2: absolute times if
@@ -180,6 +183,13 @@ int uflag = 0;			/* if non-zero, insert an extra `%!' at the
 				   bug in the Adobe TranScript package */
 int vflag = 0;			/* if non-zero, echo commands */
 double vscale = VSCALE;		/* voltage scale (mm/millivolt) */
+
+double h_sep = H_SEP;		/* horizontal space between strips (mm) */
+double l_sep = L_SEP;		/* distance from labels to sides of grid */
+double t_sep = T_SEP;		/* distance from bottom of title to top of
+				   grid (mm) */
+double v_sep = V_SEP;		/* vertical space between strips (mm) */
+
 
 char *prog_name();
 int printstrip(), setpagedim(), setpagetitle();
@@ -192,7 +202,7 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-    char *getenv();
+    char *p, *getenv();
     FILE *cfile = NULL;
     int i;
     struct tm *now;
@@ -225,6 +235,18 @@ char *argv[];
     (void)setpagedim();
     setmargins();
     
+    /* Set other defaults (see descriptions above). */
+    if ((p = getenv("DPI")) && (dpi = atof(p)) <= 0.0) dpi = DPI;
+    if ((p = getenv("TSCALE")) && (tscale = atof(p)) <= 0.0) tscale = TSCALE;
+    if ((p = getenv("VSCALE")) && (vscale = atof(p)) <= 0.0) vscale = VSCALE;
+    if ((p = getenv("TPS")) && (tps = atof(p)) <= 0.0) tps = TPS;
+    if ((p = getenv("TPMV")) && (tpmv = atof(p)) <= 0.0) tpmv = TPMV;
+    if (p = getenv("H_SEP")) h_sep = atof(p);
+    if (p = getenv("L_SEP")) l_sep = atof(p);
+    if (p = getenv("T_SEP")) t_sep = atof(p);
+    if (p = getenv("V_SEP")) v_sep = atof(p);
+    if (p = getenv("PTYPE")) ptype = p;
+
     /* Check for buggy TranScript software. */
     if (getenv("TRANSCRIPTBUG")) uflag = 1;
 
@@ -426,6 +448,14 @@ char *argv[];
 	  case 'V':	/* enable verbose mode */
 	    vflag = 1;
 	    break;
+	  case 'w':	/* specify line width in mm */
+	    if (++i >= argc || ((lwmm = atof(argv[i])) <= 0)) {
+		(void)fprintf(stderr,
+			      "%s: line width (mm) must follow -w\n",
+			pname);
+		exit(1);
+	    }
+	    break;
 	  case '1':	/* abbreviate aux strings to one character on output */
 	    aux_shorten = 1;
 	    break;
@@ -514,11 +544,11 @@ FILE *cfile;
 	}
     }
     else
-	(void)sprintf(scales, "Grid intervals: %g sec", 5.0/TPS);
+	(void)sprintf(scales, "Grid intervals: %g sec", 5.0/tps);
     dpmm = dpi/25.4; dppt = dpi/72.;
     sdur = s_defwidth/tscale;
-    t_tick = tscale / TPS;
-    v_tick = vscale / TPMV;
+    t_tick = tscale / tps;
+    v_tick = vscale / tpmv;
     lmargin = rhpage() ? imargin + boff : omargin - boff;
     rmargin = rhpage() ? omargin - boff : imargin + boff;
     while (fgets(combuf, 256, cfile)) {	/* read a command */
@@ -603,7 +633,7 @@ char *record, *title;
 {
     char *ts;
     double curr_s_top;
-    register int i, j;
+    int i, j;
     int jmax, tm_y, *vp, x0, y0, ya[2];
     int v[WFDB_MAXSIG], vbase[WFDB_MAXSIG], vmax[WFDB_MAXSIG], vmin[WFDB_MAXSIG];
     long vsum[WFDB_MAXSIG];
@@ -636,8 +666,7 @@ char *record, *title;
     if ((jmax = (int)(t1 - t0)) > nsamp) jmax = nsamp;
     for (j = 0; j < jmax && getvec(v) == nisig; j++) {
 	for (i = 0; i < nsig; i++) {
-	    register int vtmp;
-	    int sig = siglist[i];
+	    int sig = siglist[i], vtmp;
 
 	    vbuf[sig][j] = vtmp = v[sig];
 	    if (vtmp > vmax[sig]) vmax[sig] = vtmp;
@@ -669,12 +698,12 @@ char *record, *title;
     s_width = j*tscale/sps;
     if (vscale >= 5.) s_height = 4. * vscale * nsig;
     else s_height = 20. * nsig;
-    if (1.5 * (s_height+V_SEP) > p_height - (tmargin+bmargin))
-	s_height = p_height - (tmargin+bmargin+V_SEP);
-    else if (2.5 * (s_height+V_SEP) > p_height - (tmargin+bmargin))
-	s_height = (p_height - (tmargin+bmargin+2*V_SEP))/2; 
-    else if (3.5 * (s_height+V_SEP) > p_height - (tmargin+bmargin))
-	s_height = (p_height - (tmargin+bmargin+3*V_SEP))/3;
+    if (1.5 * (s_height+v_sep) > p_height - (tmargin+bmargin))
+	s_height = p_height - (tmargin+bmargin+v_sep);
+    else if (2.5 * (s_height+v_sep) > p_height - (tmargin+bmargin))
+	s_height = (p_height - (tmargin+bmargin+2*v_sep))/2; 
+    else if (3.5 * (s_height+v_sep) > p_height - (tmargin+bmargin))
+	s_height = (p_height - (tmargin+bmargin+3*v_sep))/3;
     if (nsig == 0) t_height = s_height;
     else t_height = s_height / nsig;
 
@@ -687,7 +716,7 @@ char *record, *title;
 	setpagetitle(t0);
 	ejectpage();
 	newpage();
-	s_top = p_height - (tmargin + V_SEP);
+	s_top = p_height - (tmargin + v_sep);
 	s_bot = s_top - s_height;
 	if (pflag) s_left = lmargin;
     }
@@ -700,7 +729,7 @@ char *record, *title;
     if (gflag)
 	grid(mm(s_left), mm(s_bot), mm(s_right), mm(s_top), t_tick, v_tick);
     setroman(8.);
-    move(mm(s_left), mm(s_top + T_SEP));
+    move(mm(s_left), mm(s_top + t_sep));
     if (rflag) { label("Record "); label(record); label("    "); }
     if (title) label(title);
     if (smode == 3 || smode == 4) {
@@ -711,11 +740,11 @@ char *record, *title;
 	if (rflag) a -= 9. + (double)strlen(record);
 	if (title) a -= (double)strlen(title);
 	if (a >= (double)strlen(scales) + 10.)
-	    move(mm(s_left + s_width), mm(s_top + T_SEP)); rlabel(scales);
+	    move(mm(s_left + s_width), mm(s_top + t_sep)); rlabel(scales);
     }
     else if ((smode == 5 || smode == 6) &&
 	     s_width >= (double)strlen(scales) + 10.) {
-	move(mm(s_right - L_SEP), mm(s_bot + T_SEP)); rlabel(scales);
+	move(mm(s_right - l_sep), mm(s_bot + t_sep)); rlabel(scales);
     }
     /* If side-by-side strip printing is enabled, print the time markers within
        the strip at the upper corners;  in this case, if the strip is less than
@@ -738,11 +767,11 @@ char *record, *title;
 	else
 	    ts = "0:00";
 	if (!pflag) {
-	    move(mm(s_left - L_SEP), tm_y);
+	    move(mm(s_left - l_sep), tm_y);
 	    rlabel(ts);
 	}
 	else {
-	    move(mm(s_left + L_SEP), tm_y);
+	    move(mm(s_left + l_sep), tm_y);
 	    label(ts);
 	}
 	if (vflag)
@@ -752,11 +781,11 @@ char *record, *title;
 	if (strcmp(ts + strlen(ts)-4, ".000") == 0)
 	    *(ts + strlen(ts)-4) = '\0';
 	if (!pflag) {
-	    move(mm(s_right + L_SEP), tm_y);
+	    move(mm(s_right + l_sep), tm_y);
 	    label(ts);
 	}
 	else if (s_width >= 30.) {
-	    move(mm(s_right - L_SEP), tm_y);
+	    move(mm(s_right - l_sep), tm_y);
 	    rlabel(ts);
 	}
 	if (vflag)
@@ -776,11 +805,11 @@ char *record, *title;
 	    *p++ = ']';
 	*p = '\0';
 	if (!pflag) {
-	    move(mm(s_left - L_SEP), tm_y);
+	    move(mm(s_left - l_sep), tm_y);
 	    rlabel(ts);
 	}
 	else {
-	    move(mm(s_left + L_SEP), tm_y);
+	    move(mm(s_left + l_sep), tm_y);
 	    label(ts);
 	}
 	if (vflag)
@@ -795,11 +824,11 @@ char *record, *title;
 	    *p++ = ']';
 	*p = '\0';
 	if (!pflag) {
-	    move(mm(s_right + L_SEP), tm_y);
+	    move(mm(s_right + l_sep), tm_y);
 	    label(ts);
 	}
 	else if (s_width >= 30.) {
-	    move(mm(s_right - L_SEP), tm_y);
+	    move(mm(s_right - l_sep), tm_y);
 	    rlabel(ts);
 	}
 	if (vflag)
@@ -819,7 +848,7 @@ char *record, *title;
 
 		d = s[sig].desc;
 		y0 = mm(s_top - (i + 0.5)*t_height);
-		move(mm(s_left - L_SEP), y0 - pt(4.));
+		move(mm(s_left - l_sep), y0 - pt(4.));
 		if (strncmp(d,"record ",7) == 0 && (t = strchr(d,',')) != NULL)
 		    d = t+1;
 		rlabel(d);
@@ -840,10 +869,10 @@ char *record, *title;
 
 	    if (strncmp(d, "record ", 7) == 0 && (t = strchr(d, ',')) != NULL)
 		d = t+1;
-	    move(mm(s_left - L_SEP), y0 - pt(3.));
+	    move(mm(s_left - l_sep), y0 - pt(3.));
 	    rlabel(d);
 	    if (uncal[sig]) rlabel("* ");
-	    move(mm(s_right + L_SEP), y0 - pt(3.));
+	    move(mm(s_right + l_sep), y0 - pt(3.));
 	    label(d);
 	    if (uncal[sig]) label(" *");
 	}
@@ -860,7 +889,7 @@ char *record, *title;
 	/* Adjust vbase for calibrated DC-coupled signals. */
 	if (ci.scale != 0.0 && (ci.caltype & 1) && !uncal[sig]) {
 	    int n, yzero = physadu((unsigned int)sig, 0.0), ytick;
-	    double ptick = 5.0*ci.scale/TPMV;
+	    double ptick = 5.0*ci.scale/tpmv;
 
 	    ytick = physadu((unsigned int)sig, ptick) - yzero;
 	    if (ytick == 0) ytick = 1;
@@ -876,16 +905,16 @@ char *record, *title;
 		setroman(6.);
 		(void)sprintf(lbuf, "%g", ptick * (n-1));
 		yt = y0 - adu(ytick);
-		move(mm(s_left - 1.5*L_SEP), yt - yi); rlabel(lbuf);
-		move(mm(s_left - L_SEP), yt); cont(mm(s_left), yt);
-		move(mm(s_right + 1.5*L_SEP), yt - yi); label(lbuf);
-		move(mm(s_right + L_SEP), yt); cont(mm(s_right), yt);
+		move(mm(s_left - 1.5*l_sep), yt - yi); rlabel(lbuf);
+		move(mm(s_left - l_sep), yt); cont(mm(s_left), yt);
+		move(mm(s_right + 1.5*l_sep), yt - yi); label(lbuf);
+		move(mm(s_right + l_sep), yt); cont(mm(s_right), yt);
 		(void)sprintf(lbuf, "%g", ptick * (n+1));
 		yt = y0 + adu(ytick);
-		move(mm(s_left - 1.5*L_SEP), yt - yi); rlabel(lbuf);
-		move(mm(s_left - L_SEP), yt); cont(mm(s_left), yt);
-		move(mm(s_right + 1.5*L_SEP), yt - yi); label(lbuf);
-		move(mm(s_right + L_SEP), yt); cont(mm(s_right), yt);
+		move(mm(s_left - 1.5*l_sep), yt - yi); rlabel(lbuf);
+		move(mm(s_left - l_sep), yt); cont(mm(s_left), yt);
+		move(mm(s_right + 1.5*l_sep), yt - yi); label(lbuf);
+		move(mm(s_right + l_sep), yt); cont(mm(s_right), yt);
 		setitalic(8.);
 	    }
 	}
@@ -925,7 +954,7 @@ char *record, *title;
        for the next strip. */
     curr_s_top = s_top;
     if (pflag) {
-	s_left = s_right + H_SEP;
+	s_left = s_right + h_sep;
 	/* If there is insufficient room on the current line to print at
 	   least one second at the current time scale, go to the next line. */
 	if (s_left + tscale > lmargin + s_defwidth) {
@@ -935,7 +964,7 @@ char *record, *title;
 		    char *d = s[siglist[i]].desc, *t;
 
 		    y0 = mm(s_top - (i + 0.5)*t_height);
-		    move(mm(s_right + L_SEP), y0 - pt(4.));
+		    move(mm(s_right + l_sep), y0 - pt(4.));
 		    if (strncmp(d,"record ",7)==0 && (t=strchr(d,',')) != NULL)
 			d = t+1;
 		    label(d);
@@ -944,11 +973,11 @@ char *record, *title;
 		setroman(8.);
 	    }
 	    s_left = lmargin;
-	    s_top -= (s_height + V_SEP);
+	    s_top -= (s_height + v_sep);
 	}
     }
     else
-	s_top -= (s_height + V_SEP);	/* set s_top for the next strip */
+	s_top -= (s_height + v_sep);	/* set s_top for the next strip */
 
     if (aflag) {
 	static WFDB_Annotation annot;
@@ -1155,13 +1184,13 @@ double scale;
 	    (void)sprintf(sctbuf, ", %g mm/%s (%s)",
 			  vscale/scale, units, desc);
 	else
-	    (void)sprintf(sctbuf, ", %g %s (%s)", 5.0*scale/TPMV, units, desc);
+	    (void)sprintf(sctbuf, ", %g %s (%s)", 5.0*scale/tpmv, units, desc);
     }
     else {
 	if (smode & 1)
 	    (void)sprintf(sctbuf, ", %g mm/%s", vscale/scale, units);
 	else
-	    (void)sprintf(sctbuf, ", %g %s", 5.0*scale/TPMV, units);
+	    (void)sprintf(sctbuf, ", %g %s", 5.0*scale/tpmv, units);
     }
     if ((scp = (char *)malloc((unsigned)strlen(scales)+strlen(sctbuf)+1)) ==
 	NULL)
@@ -1237,6 +1266,8 @@ void newpage()
 	(void)printf("/tm matrix currentmatrix def\n");
 	(void)printf("/gm matrix currentmatrix def\n");
     }
+    if (lwmm > 0.)
+	(void)printf("/lwmm %f def\n", lwmm);
     (void)printf("%g newpage\n", dpi);
     if (numberpages) {
 	pnx = p_width/2 + (rhpage() ? boff : -boff);
@@ -1307,7 +1338,7 @@ void ejectpage()
 		rlabel(scales);
 		/* reset scales for next page */
 		if (smode == 1) (void)sprintf(scales, "%g mm/sec", tscale);
-		else (void)sprintf(scales, "Grid intervals: %g sec", 5.0/TPS);
+		else (void)sprintf(scales, "Grid intervals: %g sec", 5.0/tps);
 	    }
 	}
 	(void)printf("endpschart\n");
@@ -1565,7 +1596,7 @@ static char *help_strings[] = {
  "   signal, annotations above bars) (default: 0)",
  " -n N      set first page number (default: 1)",
  " -p        pack short strips side-by-side",
- " -P PAGESIZE  set page dimensions (default: letter)",	  /* ** DEF_PTYPE ** */
+ " -P PAGESIZE  set page dimensions (default: letter)",	  /* ** PTYPE ** */
  " -r        include record names in strip titles",
  " -R        include record names in page headers",
  " -s SIGNAL-LIST  print listed signals only",
@@ -1578,6 +1609,7 @@ static char *help_strings[] = {
  " -u        generate `unstructured' PostScript",
  " -v N      set voltage scale to N mm/mV (default: 5)",     /* ** VSCALE ** */
  " -V        verbose mode",
+ " -w N      set line width to N mm (default: 0 (narrowest possible))",
  " -1        print only first character of comment annotation strings",
  " -         read script from standard input",
  "Script line format:",
@@ -1616,6 +1648,7 @@ static char *dprolog[] = {
 "save 100 dict begin /pschart exch def",
 "/dpi 300 def",
 "/lw 0 def",
+"/lwmm 0 def",
 "/tm matrix currentmatrix def",
 "/gm matrix currentmatrix def",
 "/mm {72 mul 25.4 div}def",
@@ -1647,7 +1680,7 @@ static char *dprolog[] = {
 " 6 R show } def",
 
 "/newpage {/dpi exch def tm setmatrix newpath [] 0 setdash 0 setgray",
-" 1 setlinecap dpi 600 idiv /lw exch def mark } def",
+" 1 setlinecap /lw lwmm mm def mark } def",
 
 "/ss {72 dpi div dup scale /gm matrix currentmatrix def lw setlinewidth} def",
 

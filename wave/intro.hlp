@@ -13,7 +13,7 @@ X11 servers are available.
 
 Among WAVE's capabilities are:
  - fast display of waveforms and annotations at various calibrated scales
- - fast access to any portion of a recording, with cacheing and `read-ahead'
+ - fast access to any portion of a recording, with caching and `read-ahead'
    heuristics to improve efficiency and reduce network traffic
  - forward and backward searches for annotation patterns
  - graphical annotation editing using standard or user-defined annotations

@@ -1,5 +1,5 @@
 /* file ihr.c		G. Moody      12 November 1992
-			Last revised:    4 May 1999
+			Last revised:  9 November 1999
 
 -------------------------------------------------------------------------------
 ihr: Generate instantaneous heart rate data from annotation file
@@ -182,7 +182,7 @@ char *s;
 static char *help_strings[] = {
     "usage: %s -r RECORD -a ANNOTATOR [OPTIONS ...]\n",
     "where RECORD and ANNOTATOR specify the input, and OPTIONS may include:",
-    " -d TOL   reject beat-to-beat HR changes > TOL bpm",
+    " -d TOL   reject beat-to-beat HR changes > TOL bpm (default: TOL = 10)",
     " -f TIME  start at specified TIME",
     " -h       print this usage summary",
     " -t TIME  stop at specified TIME",

@@ -9,7 +9,7 @@
 @sp 5
 @center @titlefont{WFDB Programmer's Guide}
 @sp 4
-@center Tenth Edition (revised and with additions for WFDB library version 10.0.0)
+@center Tenth Edition (revised and with additions for WFDB library version 10.0.1)
 @center @today
 @sp 5
 @center George B. Moody
@@ -499,6 +499,42 @@ guide since the first printing of the ninth edition of this guide in July,
 directory of the WFDB Software Package distribution, for details on these
 changes, and for information on any more recent changes that may not be
 described here.
+
+@unnumberedsubsec Changes in version 10.0.1
+
+Beginning with version 10.0.1, the WFDB library supports reading not only local
+files, but also remote files made available by web (HTTP) or FTP servers.  To
+make use of this feature, link your application with both the WFDB library and
+the @file{libwww} library (freely available for all versions of UNIX, and for
+most recent versions of MS Windows, from @file{http://www.w3.org/Library}).
+(In some cases, notably under Linux, @code{libwww} is linked together with the
+dynamically-loaded version of the WFDB library, so that you do not need to link
+@code{libwww} explicitly.)  All access to remote files is read-only.  If you do
+not wish to allow access to remote files, or if libwww is not available for
+your OS, simply do not define the symbol NETFILES when compiling the WFDB
+library.  For further details, see @file{wfdbio.c} in the WFDB library sources.
+
+The WFDB environment variable may now contain whitespace (space, tab, or
+newline characters) as path component separators under any OS.  Multiple
+consecutive whitespace characters are treated as a single path component
+separator.  Use a @samp{.} to specify the current directory as a path component
+when using whitespace as a path component separator.  A semicolon (@samp{;}) is
+also acceptable as a path component separator under any OS.  A colon (@samp{:})
+is still acceptable as a path component separator under UNIX (Linux, etc.),
+provided only that the colon is not immediately followed by @samp{//}.
+
+If the WFDB path includes components of the forms
+@file{http://somewhere.net/mydata} or @file{ftp://somewhere.else/yourdata}, the
+sequence @samp{://} is explicitly recognized as part of a URL prefix (under any
+OS), and the @samp{:} and @samp{/} characters within the @samp{://} are not
+interpreted further.  Note that the MS-DOS @samp{\} is @emph{not} acceptable as
+an alternative to @samp{/} in a URL prefix.  To make WFDB paths containing URL
+prefixes more easily (human) readable, use whitespace for path component
+separators.
+
+Previous versions of the WFDB library that were compiled for environments other
+than MS-DOS used file names in the format @var{TYPE.RECORD}.  This file
+name format is no longer supported.
 
 @unnumberedsubsec Changes in version 10.0.0
 

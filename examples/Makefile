@@ -1,6 +1,29 @@
 # file: Makefile	G. Moody	2 November 1989
-#			Last revised:	  7 May 1999
+#			Last revised:	4 September 1999
 # UNIX 'make' description file for WFDB example programs
+#
+# -----------------------------------------------------------------------------
+# WFDB example programs: how to use the WFDB library
+# Copyright (C) 1999 George B. Moody
+#
+# These programs are free software; you can redistribute them and/or modify
+# them under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 2 of the License, or (at your
+# option) any later version.
+#
+# These programs are distributed in the hope that they will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# these programs; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+# You may contact the author by e-mail (george@mit.edu) or postal mail
+# (MIT Room E25-505A, Cambridge, MA 02139 USA).  For updates to this software,
+# please visit the author's web site (http://ecg.mit.edu/).
+# _____________________________________________________________________________
 #
 # This file is used with the UNIX `make' command to compile the example
 # programs from the WFDB Programmer's Guide, for which the sources can be
@@ -21,15 +44,23 @@ CC = cc
 # For `gcc', uncomment the next line.
 # CC = gcc
 
+# INCDIR is the parent of the directory that contains the WFDB include (*.h)
+# files.  (These files should have been installed in $(INCDIR)/wfdb;  see
+# ../lib/Makefile.)
+INCDIR = /usr/include
+
 # If you trust your C compiler's optimizer, you may wish to add -O to CFLAGS;
 # for debugging, add -g to CFLAGS.  (If you use `gcc', you may use both;  most
 # other C compilers do not permit you to do so.)
-CFLAGS = -O
+CFLAGS = -O -I$(INCDIR)
+
+# LIBDIR is the directory that contains the WFDB library (see ../lib/Makefile).
+LIBDIR = /usr/lib
 
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # DB library.  Unless you have changed the value of WFDBLIB in the `Makefile'
 # for the WFDB library, `-lwfdb' should be correct.
-LDFLAGS = -lwfdb
+LDFLAGS = -L$(LIBDIR) -lwfdb
 
 # PRINT is the name of the program used to produce listings (including any
 # options for the desired formatting).

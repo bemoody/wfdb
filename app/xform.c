@@ -1,5 +1,5 @@
 /* file: xform.c	G. Moody       8 December 1983
-			Last revised:   30 April 1999
+			Last revised:  2 October 1999
 
 -------------------------------------------------------------------------------
 xform: Sampling frequency, amplitude, and format conversion for WFDB records
@@ -53,7 +53,7 @@ int argc;
 char *argv[];
 {
     char *irec = NULL, *orec = NULL, *nrec = NULL, *startp = "0:0";
-    register int i;
+    int i;
     int fflag = 0, gflag = 0, Hflag = 0, ifreq, j, m, msiglist[WFDB_MAXSIG],
 	Mflag = 0, mn, n, nann = 0, nisig, nminutes = 0, nosig = -1, ofreq = 0,
         reopen = 0, siglist[WFDB_MAXSIG], spf = 1, use_irec_desc = 1;
@@ -264,17 +264,21 @@ char *argv[];
 	    (void)fprintf(stderr,"Any of these output formats may be used:\n");
 	    (void)fprintf(stderr, "    8   8-bit first differences\n");
 	    (void)fprintf(stderr,
-			  "   16   16-bit two's complement amplitudes\n");
+		"   16   16-bit two's complement amplitudes (LSB first)\n");
+	    (void)fprintf(stderr,
+		"   61   16-bit two's complement amplitudes (MSB first)\n");
 	    (void)fprintf(stderr, "   80   8-bit offset binary amplitudes\n");
 	    (void)fprintf(stderr, "  160   16-bit offset binary amplitudes\n");
 	    (void)fprintf(stderr,
 		        "  212   2 12-bit amplitudes bit-packed in 3 bytes\n");
 	    (void)fprintf(stderr,
-		        "  310   3 10-bit amplitudes bit-packed in 4 bytes\n");
+  "  310   3 10-bit amplitudes bit-packed in 15 LS bits of each of 2 words\n");
+	    (void)fprintf(stderr,
+	  "  311   3 10-bit amplitudes bit-packed in 30 LS bits of 4 bytes\n");
 	    do {
 		dfout[0].fmt = dfin[0].fmt;
 		(void)fprintf(stderr,
-		       "Choose an output format (8/16/80/160/212/310) [%d]: ",
+		 "Choose an output format (8/16/61/80/160/212/310/311) [%d]: ",
 			      dfout[0].fmt);
 		(void)fgets(answer, 32, ttyin);
 		(void)sscanf(answer, "%d", &dfout[0].fmt);
@@ -880,7 +884,7 @@ char *argv[];
 }
 
 int gcd(x, y)	/* greatest common divisor of x and y (Euclid's algorithm) */
-register int x, y;
+int x, y;
 {
     while (x != y) {
 	if (x > y) x-=y;

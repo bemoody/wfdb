@@ -1,5 +1,5 @@
-/* file: helppan.c	G. Moody	1 May 1990
-			Last revised:   5 May 1999
+/* file: helppan.c	G. Moody	   1 May 1990
+			Last revised:   10 October 1999
 Help panel functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -66,6 +66,8 @@ void help()
     fprintf(stderr, " -H                 Use high-resolution mode\n");
     fprintf(stderr, " -m                 Use black and white only\n");
     fprintf(stderr, " -O                 Use overlay graphics\n");
+    fprintf(stderr, " -p PATH            Search for input files in PATH\n");
+    fprintf(stderr, "                     (if not found in $WFDB)\n");
     fprintf(stderr, " -s SIGNAL [SIGNAL ...]  Initialize the signal list\n");
     fprintf(stderr, " -S                 Use a shared colormap\n");
     fprintf(stderr, " -Vx                Set initial display option x\n");
@@ -77,7 +79,7 @@ void help()
     }
     if (getenv("WFDB") == NULL) {
 	fprintf(stderr, "\nBe sure to set the WFDB environment variable to\n");
-	fprintf(stderr, "indicate a list of directories that contain\n");
+	fprintf(stderr, "indicate a list of locations that contain\n");
 	fprintf(stderr, "input files for %s.\n", pname);
     }
     fprintf(stderr, "\nFor more information, type `more %s/wave/%s',\n",

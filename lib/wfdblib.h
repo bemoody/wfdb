@@ -1,5 +1,5 @@
 /* file: wfdblib.h	G. Moody	13 April 1989
-                        Last revised:   29 April 1999         wfdblib 10.0.0
+                        Last revised: 15 September 1999         wfdblib 10.1.0
 External definitions for WFDB library private functions
 
 _______________________________________________________________________________
@@ -104,6 +104,105 @@ information. */
 #endif
 #endif
 
+#ifndef TRUE
+#define TRUE 1 
+#endif 
+#ifndef FALSE
+#define FALSE 0
+#endif 
+
+/* Structures used by internal WFDB library functions only */
+struct netfile {
+  char *url;
+  char *data;
+  int mode;
+  long base_addr;
+  long cont_len;
+  long pos;
+  long err;
+  int fd;
+};
+
+struct WFDB_FILE {
+  FILE *fp;
+  struct netfile *netfp;
+  int type;
+};
+
+/* Values for WFDB_FILE 'type' field */
+#define WFDB_LOCAL	0	/* a local file, read via C standard I/O */
+#define WFDB_NET	1	/* a remote file, read via libwww */
+
+/* Composite data types */
+typedef struct netfile netfile;
+typedef struct WFDB_FILE WFDB_FILE;
+
+/* To enable http and ftp access as well as standard (local file) I/O via the
+   WFDB library, define NETFILES and link with libwww (see 'Makefile').
+   Otherwise, the WFDB library uses only the ANSI/ISO standard I/O library. */
+#ifdef NETFILES
+#include <WWWLib.h>
+#include <WWWInit.h>
+#include <errno.h>
+
+#ifndef EROFS	 /* errno value: attempt to write to a read-only file system */
+#ifdef EINVAL
+#define EROFS EINVAL
+#else
+#define EROFS 1
+#endif
+#endif
+
+/* Constants */
+/* #define USEHTCACHE */	/* uncomment to enable caching by libwww */
+
+/* http cache parameters (effective only if USEHTCACHE is defined) */
+#define CACHEDIR	"/tmp"	/* should be world-writable */
+#define CACHESIZE	100	/* max size of the entire http cache in MB */
+#define ENTRYSIZE	20	/* max size of a single cache entry in MB */
+
+#define NF_PAGE_SIZE	32768 	/* default bytes per http range request */
+
+/* values for netfile 'err' field */
+#define NF_NO_ERR	0	/* no errors */
+#define NF_EOF_ERR	1	/* file pointer at EOF */
+#define NF_REAL_ERR	2	/* read request failed */
+
+/* values for netfile 'mode' field */
+#define NF_CHUNK_MODE	0	/* http range requests supported */
+#define NF_FULL_MODE	1	/* http range requests not supported */
+
+/* Function prototypes */
+extern void wfdb_clearerr(WFDB_FILE *fp);
+extern int wfdb_fclose(WFDB_FILE *fp);
+extern int wfdb_feof(WFDB_FILE *fp);
+extern int wfdb_ferror(WFDB_FILE *fp);
+extern int wfdb_fflush(WFDB_FILE *fp);
+extern char* wfdb_fgets(char *s, int size, WFDB_FILE *fp);
+extern size_t wfdb_fread(void *ptr, size_t size, size_t nmemb, WFDB_FILE *fp);
+extern int wfdb_fseek(WFDB_FILE *fp, long offset, int whence);
+extern long wfdb_ftell(WFDB_FILE *fp);
+extern size_t wfdb_fwrite(void *ptr, size_t size, size_t nmemb, WFDB_FILE *fp);
+extern int wfdb_getc(WFDB_FILE *fp);
+extern int wfdb_putc(int c, WFDB_FILE *fp);
+extern void wfdb_wwwquit(void);
+
+#else		/* NETFILES not defined -- use standard I/O functions only */
+
+#define wfdb_fclose(wp)			fclose(wp->fp)
+#define wfdb_feof(wp)			feof(wp->fp)
+#define wfdb_ferror(wp)			ferror(wp->fp)
+#define wfdb_fflush(wp)		((wp == NULL) ? fflush(NULL) : fflush(wp->fp))
+#define wfdb_fgets(s, n, wp)		fgets(s, n, wp->fp)
+#define wfdb_fread(p, s, n, wp)		fread(p, s, n, wp->fp)
+#define wfdb_fseek(wp, o, w)		fseek(wp->fp, o, w)
+#define wfdb_ftell(wp)			ftell(wp->fp)
+#define wfdb_fwrite(p, s, n, wp)	fwrite(p, s, n, wp->fp)
+#define wfdb_getc(wp)			getc(wp->fp)
+#define wfdb_putc(c, wp)		putc(c, wp->fp)
+
+#endif
+
 #include "wfdb.h"
 
 /* The following block is needed only to declare the values returned by
@@ -160,14 +259,17 @@ extern "C" {
 #endif
 
 /* These functions are defined in wfdbio.c */
-extern FILE *wfdb_open(char *file_type, char *record, int mode);
+extern WFDB_FILE *wfdb_open(char *file_type, char *record, int mode);
 extern int wfdb_checkname(char *name, char *description);
-extern int wfdb_g16(FILE *fp);
-extern long wfdb_g32(FILE *fp);
-extern void wfdb_p16(unsigned int x, FILE *fp);
-extern void wfdb_p32(long x, FILE *fp);
+extern int wfdb_g16(WFDB_FILE *fp);
+extern long wfdb_g32(WFDB_FILE *fp);
+extern void wfdb_p16(unsigned int x, WFDB_FILE *fp);
+extern void wfdb_p32(long x, WFDB_FILE *fp);
+extern int wfdb_parse_path(char *wfdb_path);
 extern void wfdb_addtopath(char *pathname);
 extern void wfdb_error(char *format_string, ...);
+extern WFDB_FILE* wfdb_fopen(const char *fname, const char *mode);
+extern int wfdb_fprintf(WFDB_FILE *fp, const char *format, ...);
 extern void wfdb_setirec(char *record_name);
 
 /* These functions are defined in signal.c */
@@ -184,8 +286,8 @@ extern void wfdb_oaflush(void);
 
 #else        /* declare only function return types for non-ANSI C compilers */
 
-extern FILE *wfdb_open();
-extern int wfdb_checkname(), wfdb_g16();
+extern WFDB_FILE *wfdb_open(), *wfdb_fopen();
+extern int wfdb_checkname(), wfdb_g16(), wfdb_parse_path();
 extern long wfdb_g32();
 extern void wfdb_p16(), wfdb_p32(), wfdb_addtopath(), wfdb_error(),
     wfdb_setirec(), wfdb_sigclose(), wfdb_anclose(), wfdb_osflush(),

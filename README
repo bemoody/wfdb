@@ -77,10 +77,19 @@ otherwise, edit wave/wave.info and change all occurrences of
 (The utility 'wget' -- which you can find with a web search -- can be helpful
 if you wish to copy an entire directory of a web site, as suggested here.)
 
+The WFDB library can (optionally) use the freely available libwww libraries
+developed by the World Wide Web consortium to allow any application to read
+input from HTTP and FTP servers as well as from local disk files, without the
+use of a browser and in most cases without the need to download an entire
+file in order to examine a portion of it.  For further information, see
+README.NETFILES in this directory.  The libwww libraries are usable under
+UNIX (including Linux), MS-DOS/Windows, and (with some work) MacOS;  see
+http://www.w3.org/Library/ for details.  Sources and Linux x86 binaries
+can be downloaded from http://www.physionet.org/physiotools/libwww/ (and
+elsewhere).
+
 WAVE requires the (Sun-developed, but freely available) XView libraries and
 header files.  These are available from Sun for SunOS and Solaris; from various
 commercial sources for AIX, HP-UX, and other Unices; and as a part of some
 Linux distributions.  Sources and Linux x86 binaries can be downloaded from
 http://www.physionet.org/physiotools/xview (and elsewhere).
-
-

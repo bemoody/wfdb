@@ -1,5 +1,5 @@
 /* file: calibrate.c	G. Moody	 4 March 1991
-			Last revised:	12 August 1995
+			Last revised:  7 September 1999
 
 -------------------------------------------------------------------------------
 calibrate: measure gains and baselines in a DB record and rewrite header
@@ -532,14 +532,6 @@ char *argv[];
 	    (void)isigopen(buf, s, -WFDB_MAXSIG);
 	    rewrite_header(buf);
 	    wfdbquit();
-#ifndef MSDOS
-	    {
-		char headerx[WFDB_MAXRNL+8], xhea[WFDB_MAXRNL+5];
-		sprintf(headerx, "header.%s", buf);
-		sprintf(xhea, "%s.hea", buf);
-		rename(headerx, xhea);
-	    }
-#endif
 	}
 	fclose(hfile);
     }

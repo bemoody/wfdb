@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised: 	29 April 1999		wfdblib 10.0.0
+			Last revised:  14 October 1999		wfdblib 10.1.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -88,19 +88,7 @@ library functions defined elsewhere:
  wfdb_sigclose 	(closes signals and resets variables)
  wfdb_osflush	(flushes output signals)
 
-Two versions of the low-level macros r8() and w8() are provided here.  The
-default versions use the functions fileno(), read(), and write().  The
-alternate versions use the (usually) slower but universally available functions
-fread() and fwrite().  Although virtually all ANSI and non-ANSI C libraries
-include fileno(), read(), and write(), the ANSI C standard does not require
-that these functions exist.  To obtain the alternate versions of r8() and w8(),
-define the symbols USE_FREAD and USE_FWRITE when compiling this module.
-[Note: the Microsoft C version of fseek() may be incompatible with the
-read()-based version of r8().  This appears to be the cause of a problem with
-isgsettime() which appears only in that configuration.  For this reason,
-USE_FREAD should be defined when compiling this file with Microsoft C.]
-
-There are also two versions of r16() and w16().  The default versions are
+Two versions of r16() and w16() are provided here.  The default versions are
 implemented as macros for efficiency.  At least one C compiler (the Microport
 System V/AT `cc') is known to run out of space while attempting to compile
 these macros.  To avoid this problem, define the symbol BROKEN_CC when
@@ -132,36 +120,6 @@ segment records (constructed by concatenating single-segment records) and null
 #define BROKEN_CC
 #endif
 
-/* Under Linux, read() is compatible with fseek() on Linux native (ext2)
-file systems and ISO 9660 CD-ROMs only.  To read any other file systems (e.g.,
-MS-DOS disks or NFS-mounted remote file systems) it is necessary to use
-fread(). */
-#ifdef __linux__
-#define USE_FREAD
-#define USE_FWRITE
-#endif
-
-#ifdef __STDC__
-/* True for ANSI C.  Definitions in this section work around gratuitous
-deletions of universally available functions which have not been blessed
-by the ANSI C standard. */
-
-#if _MSC_VER >= 700
-/* For Microsoft C/C++ version 7.0 and later with the -Za option. */
-#define fileno _fileno
-#define read _read
-#define write _write
-#endif
-
-#ifdef __TURBOC__
-/* For Borland or Turbo C with the -A option.  The definition below is
-equivalent to the one in stdio.h that is censored in ANSI C mode. */
-#ifndef fileno
-#define fileno(file) ((file)->fd)
-#endif
-#endif
-#endif
-
 #ifndef NOTIME
 #include <time.h>
 #endif
@@ -177,7 +135,7 @@ static char *isbp[WFDB_MAXSIG];	/* pointers to next locations in isbuf[] */
 static char *isbe[WFDB_MAXSIG];	/* pointers to input buffer endpoints */
 static WFDB_Sample ivec[WFDB_MAXSIG]; /* most recent samples read */
 static char icount[WFDB_MAXSIG];/* input counters for bit-packed signals */
-static FILE *isf[WFDB_MAXSIG];	/* file pointers for open input signals */
+static WFDB_FILE *isf[WFDB_MAXSIG]; /* file pointers for open input signals */
 static WFDB_Siginfo isinfo[WFDB_MAXSIG]; /* input signal information */
 static char iseek[WFDB_MAXSIG];	/* flags to indicate if seeks are permitted */
 static int istat[WFDB_MAXSIG];	/* signal file status flags */
@@ -202,11 +160,11 @@ static char *osbp[WFDB_MAXSIG];	/* pointers to next locations in osbuf[]; */
 static char *osbe[WFDB_MAXSIG];	/* pointers to output buffer endpoints */
 static WFDB_Sample ovec[WFDB_MAXSIG]; /* most recent samples written */
 static char ocount[WFDB_MAXSIG];/* output counters for bit-packed signals */
-static FILE *osf[WFDB_MAXSIG];	/* file pointers for open output signals */
+static WFDB_FILE *osf[WFDB_MAXSIG]; /* file pointers for open output signals */
 static WFDB_Siginfo osinfo[WFDB_MAXSIG]; /* output signal information */
 
-static FILE *iheader;		/* file pointer for input header file */
-static FILE *oheader;		/* file pointer for output header file */
+static WFDB_FILE *iheader;	/* file pointer for input header file */
+static WFDB_FILE *oheader;	/* file pointer for output header file */
 static WFDB_Frequency ffreq;	/* frame rate (frames/second) */
 static WFDB_Frequency sfreq;	/* sampling frequency (samples/second) */
 static WFDB_Frequency cfreq;	/* counter frequency (ticks/second) */
@@ -255,7 +213,7 @@ WFDB_Siginfo *siarray;
     static char sep[] = " \t\n\r";
 
     /* If another input header file was opened, close it. */
-    if (iheader) (void)fclose(iheader);
+    if (iheader) (void)wfdb_fclose(iheader);
 
     /* Try to open the header file. */
     if ((iheader = wfdb_open("header", record, WFDB_READ)) == NULL) {
@@ -266,7 +224,7 @@ WFDB_Siginfo *siarray;
     /* Get the first token (the record name) from the first non-empty,
        non-comment line. */
     do {
-	if (fgets(linebuf, 256, iheader) == NULL) {
+	if (wfdb_fgets(linebuf, 256, iheader) == NULL) {
 	    wfdb_error("init: can't find record name in record %s header\n",
 		     record);
 	    return (-2);
@@ -284,7 +242,8 @@ WFDB_Siginfo *siarray;
 	segments = atoi(q+1);
 	*q = '\0';
     }
-    if (iheader != stdin && strcmp(p, record) != 0) {
+    if (iheader->type == WFDB_LOCAL &&
+	iheader->fp != stdin && strcmp(p, record) != 0) {
 	wfdb_error("init: record name in record %s header is incorrect\n",
 		 record);
 	return (-2);
@@ -391,7 +350,7 @@ WFDB_Siginfo *siarray;
 	    for (i = 0, ns = (WFDB_Time)0L; i < segments; i++, segp++) {
 		/* Get next segment spec, skip empty lines and comments. */
 		do {
-		    if (fgets(linebuf, 256, iheader) == NULL) {
+		    if (wfdb_fgets(linebuf, 256, iheader) == NULL) {
 			wfdb_error(
 		         "init: unexpected EOF in header file for record %s\n",
 				 record);
@@ -449,7 +408,7 @@ WFDB_Siginfo *siarray;
 	    /* Get the first token (the signal file name) from the next
 	       non-empty, non-comment line. */
 	    do {
-		if (fgets(linebuf, 256, iheader) == NULL) {
+		if (wfdb_fgets(linebuf, 256, iheader) == NULL) {
 		    wfdb_error(
 			"init: unexpected EOF in header file for record %s\n",
 			     record);
@@ -549,6 +508,7 @@ WFDB_Siginfo *siarray;
 	      case 160: i = 16; break;
 	      case 212: i = 12; break;
 	      case 310: i = 10; break;
+	      case 311: i = 10; break;
 	      default: i = WFDB_DEFRES; break;
 	    }
 	    siarray[s].adcres = i;
@@ -616,7 +576,8 @@ static void isigclose()
 {
     while (nisig) {
 	if (--nisig == 0 || isinfo[nisig].group != isinfo[nisig-1].group) {
-	    (void)fclose(isf[nisig]);
+	    (void)wfdb_fclose(isf[nisig]);
+	    isf[nisig] = NULL;
 	    if (isbuf[isinfo[nisig].group]) {
 #ifndef lint
 		(void)free(isbuf[isinfo[nisig].group]);
@@ -635,7 +596,7 @@ static void isigclose()
     istime = 0L;
     gvc = ispfmax = 1;
     if (iheader) {
-	(void)fclose(iheader);
+	(void)wfdb_fclose(iheader);
 	iheader = NULL;
     }
 }
@@ -653,10 +614,12 @@ static void osigclose()
 		    *(osbp[g]++) = '\0';
 	    /* Flush the last block. */
 	    if (osbp[g] != osbuf[g])
-		(void)fwrite(osbuf[g], 1, osbp[g]-osbuf[g], osf[nosig]);
+		(void)wfdb_fwrite(osbuf[g], 1, osbp[g]-osbuf[g], osf[nosig]);
 	    /* Don't close standard output (this will be done on exit). */
-	    if (strcmp(osinfo[nosig].fname, "-"))
-		(void)fclose(osf[nosig]);
+	    if (strcmp(osinfo[nosig].fname, "-")) {
+		(void)wfdb_fclose(osf[nosig]);
+		osf[nosig] = NULL;
+	    }
 #ifndef lint
 	    (void)free(osbuf[g]);
 	    (void)free(osinfo[nosig].fname);
@@ -679,7 +642,7 @@ static void osigclose()
     }
     ostime = 0L;
     if (oheader) {
-	(void)fclose(oheader);
+	(void)wfdb_fclose(oheader);
 	oheader = NULL;
     }
 }
@@ -692,35 +655,18 @@ static WFDB_Group _g;	    /* macro temporary storage for group number */
 static int _l;		    /* macro temporary storage for low byte of word */
 static int _n;		    /* macro temporary storage for byte count */
 
-#ifdef USE_FREAD
 #define r8(S)	((char)(_g = isinfo[S].group, \
 		 ((isbp[_g] < isbe[_g]) ? *(isbp[_g]++) : \
 		  ((_n = (isinfo[S].bsize > 0) ? isinfo[S].bsize : ibsize), \
-		   (istat[_g] = _n = fread(isbuf[_g], 1, _n, isf[S])), \
+		   (istat[_g] = _n = wfdb_fread(isbuf[_g], 1, _n, isf[S])), \
 		   (isbe[_g] = (isbp[_g] = isbuf[_g]) + _n),\
 		  *(isbp[_g]++)))))
-#else
-#define r8(S)	((char)(_g = isinfo[S].group, \
-		 ((isbp[_g] < isbe[_g]) ? *(isbp[_g]++) : \
-		  ((_n = (isinfo[S].bsize > 0) ? isinfo[S].bsize : ibsize), \
-		   (istat[_g] = _n = read(fileno(isf[S]), isbuf[_g], _n)), \
-		   (isbe[_g] = (isbp[_g] = isbuf[_g]) + _n),\
-		  *(isbp[_g]++)))))
-#endif
 
-#ifdef USE_FWRITE
 #define w8(V,S)	(_g = osinfo[S].group, \
 		 (*(osbp[_g]++) = (char)(V), \
 		  (_l = ((osbp[_g] != osbe[_g]) ? 0 : \
 		   ((_n = (osinfo[S].bsize > 0) ? osinfo[S].bsize : obsize), \
-		    (fwrite((osbp[_g] = osbuf[_g]), 1, _n, osf[S])))))))
-#else
-#define w8(V,S)	(_g = osinfo[S].group, \
-		 (*(osbp[_g]++) = (char)(V), \
-		  (_l = ((osbp[_g] != osbe[_g]) ? 0 : \
-		   ((_n = (osinfo[S].bsize > 0) ? osinfo[S].bsize : obsize), \
-		    (write(fileno(osf[S]), osbp[_g] = osbuf[_g], _n)))))))
-#endif
+		    (wfdb_fwrite((osbp[_g] = osbuf[_g]), 1, _n, osf[S])))))))
 
 /* If a short integer is not 16 bits, it may be necessary to redefine r16() and
 r61() in order to obtain proper sign extension. */
@@ -852,6 +798,50 @@ WFDB_Signal s;
     }
 }
 
+/* Note that formats 310 and 311 differ in the layout of the bit-packed data */
+
+static int r311(s)  /* read and return the next sample from a format 311    */
+WFDB_Signal s;	    /* signal file (3 10-bit samples bit-packed in 4 bytes) */
+{
+    WFDB_Group g = isinfo[s].group;
+    int v;
+    static int x[WFDB_MAXSIG], y[WFDB_MAXSIG];
+
+    /* Obtain the next 10-bit value right-justified in v. */
+    switch (icount[g]++) {
+      case 0:	v = (x[g] = r16(s)); break;
+      case 1:	y[g] = r16(s);
+	        v = ((x[g] & 0xfc00) >> 10) | ((y[g] & 0xf) << 6); break;
+      case 2:
+      default:	icount[g] = 0;
+		v = y[g] >> 4; break;
+    }
+    /* Sign-extend from the tenth bit. */
+    if (v & 0x200) v |= ~(0x3ff);
+    else v &= 0x3ff;
+    return (v);
+}
+
+static void w311(v, s)	/* write the next sample to a format 311 signal file */
+WFDB_Sample v;
+WFDB_Signal s;
+{
+    WFDB_Group g = osinfo[s].group;
+    static int x[WFDB_MAXSIG], y[WFDB_MAXSIG];
+
+    /* Samples are buffered here and written in groups of three, bit-packed
+       into the 30 low bits of a 32-bit word. */
+    switch (ocount[g]++) {
+      case 0:	x[g] = v & 0x3ff; break;
+      case 1:	x[g] |= (v << 10); w16(x[g], s);
+	        y[g] = (v >> 6) & 0xf; break;
+      case 2:
+      default:	ocount[g] = 0;
+	        y[g] |= (v << 4); y[g] &= 0x3fff; w16(y[g], s);
+		break;
+    }
+}
+
 static int isgsetframe(g, t)
 WFDB_Group g;
 WFDB_Time t;
@@ -951,6 +941,22 @@ WFDB_Time t;
 	    return (0);
 	}		  
 	b = 4*nn; d = 3; break;
+      case 311:
+	/* Reset the input counter. */
+	icount[g] = 0;
+	/* If the desired sample does not lie on a byte boundary, seek to
+	   the closest previous sample that does, then read ahead. */
+	if ((nn % 3) && (trem = (t % 3))) {
+	    if (in_msrec)
+		t += segp->samp0;	/* restore absolute time */
+	    if (i = isgsetframe(g, t - trem))
+		return (i);
+	    for (i = nn*trem; i > 0; i--)
+		(void)r311(s);
+	    istime += trem;
+	    return (0);
+	}		  
+	b = 4*nn; d = 3; break;
     }
 
     /* Seek to the beginning of the block which contains the desired sample.
@@ -962,7 +968,7 @@ WFDB_Time t;
 	/* Seek to a position such that the next block read will contain the
 	   desired sample. */
 	tt = nb/i;
-	if (fseek(isf[s], tt*i, 0)) {
+	if (wfdb_fseek(isf[s], tt*i, 0)) {
 	    wfdb_error("isigsettime: improper seek on signal group %d\n", g);
 	    return (-1);
 	}
@@ -977,7 +983,7 @@ WFDB_Time t;
 	/* There are three possibilities:  either the desired sample has been
 	   read and has passed out of the buffer, requiring a rewind ... */
 	if (t < t0) {
-	    if (fseek(isf[s], 0L, 0)) {
+	    if (wfdb_fseek(isf[s], 0L, 0)) {
 		wfdb_error("isigsettime: improper seek on signal group %d\n",
 			   g);
 		return (-1);
@@ -996,8 +1002,8 @@ WFDB_Time t;
 	    tt = (t - t1) * b;
 	    nb = tt/d;
 	}
-	while (nb > isinfo[s].bsize && !feof(isf[s]))
-	    nb -= fread(isbuf[g], 1, isinfo[s].bsize, isf[s]);
+	while (nb > isinfo[s].bsize && !wfdb_feof(isf[s]))
+	    nb -= wfdb_fread(isbuf[g], 1, isinfo[s].bsize, isf[s]);
     }
 
     /* Reset the block pointer to indicate nothing has been read in the
@@ -1061,6 +1067,8 @@ WFDB_Sample *vector;
 		*vector = r212(s); break;
 	      case 310:	/* 3 10-bit amplitudes bit-packed in 4 bytes */
 		*vector = r310(s); break;
+	      case 311:	/* 3 10-bit amplitudes bit-packed in 4 bytes */
+		*vector = r311(s); break;
 	    }
 	    if (istat[isinfo[s].group] <= 0) {
 		/* End of file -- reset input counter. */
@@ -1109,7 +1117,7 @@ char *record;
 WFDB_Siginfo *siarray;
 int nsig;
 {
-    FILE **ifp;
+    WFDB_FILE **ifp;
     WFDB_Group g;
     int navail;
     WFDB_Siginfo *isi;
@@ -1185,8 +1193,10 @@ int nsig;
 	if (tsinfo[si].fmt == 0)
 	    ifp[s] = NULL;
 	/* The file name '-' specifies the standard input. */
-	else if (strcmp(tsinfo[si].fname, "-") == 0)
-	    ifp[s] = stdin;
+	else if (strcmp(tsinfo[si].fname, "-") == 0) {
+	    ifp[s]->type = WFDB_LOCAL;
+	    ifp[s]->fp = stdin;
+	}
 	/* Skip this group if the signal file can't be opened. */
 	else if ((ifp[s]=wfdb_open(tsinfo[si].fname,(char *)NULL,WFDB_READ)) ==
 		 NULL){
@@ -1271,7 +1281,7 @@ char *record;
 WFDB_Siginfo *siarray;
 unsigned int nsig;
 {
-    FILE **ofp;
+    WFDB_FILE **ofp;
     int n;
     WFDB_Siginfo *osi;
     WFDB_Signal s, si;
@@ -1312,8 +1322,10 @@ unsigned int nsig;
 	else if (tsinfo[s].fmt == 0)
 	    ofp[s] = NULL;	/* don't open a file for a null signal */
 	/* The filename '-' specifies the standard output. */
-	else if (strcmp(tsinfo[s].fname, "-") == 0)
-	    ofp[s] = stdout;
+	else if (strcmp(tsinfo[s].fname, "-") == 0) {
+	    ofp[s]->type = WFDB_LOCAL;
+	    ofp[s]->fp = stdout;
+	}
 	/* An error in opening an output file is fatal. */
 	else if ((ofp[s]=wfdb_open(tsinfo[s].fname,(char *)NULL,WFDB_WRITE)) ==
 		 NULL){
@@ -1394,8 +1406,10 @@ unsigned int nsig;
 	else if (siarray[nosig].fmt == 0)
 	    osf[nosig] = NULL;	/* don't open a file for a null signal */
 	/* The filename '-' specifies the standard output. */
-	else if (strcmp(siarray[nosig].fname, "-") == 0)
-	    osf[nosig] = stdout;
+	else if (strcmp(siarray[nosig].fname, "-") == 0) {
+	    osf[nosig]->type = WFDB_LOCAL;
+	    osf[nosig]->fp = stdout;
+	}
 	/* An error in opening an output file is fatal. */
 	else if ((osf[nosig] = wfdb_open(siarray[nosig].fname, (char *)NULL,
 					 WFDB_WRITE)) == NULL) {
@@ -1512,9 +1526,10 @@ WFDB_Sample *vector;
 FINT getframe(vector)
 WFDB_Sample *vector;
 {
-    istime++;
+    int stat;
+
     if (dsbuf) {	/* signals must be deskewed */
-	int c, i, j, s, stat;
+	int c, i, j, s;
 
 	/* First, obtain the samples needed. */
 	if (dsbi < 0) {	/* dsbuf contents are invalid -- refill dsbuf */
@@ -1532,10 +1547,11 @@ WFDB_Sample *vector;
 	    for (c = 0; c < isinfo[s].spf; c++)
 		vector[j++] = dsbuf[i++];
 	}
-	return (stat);
     }
     else		/* no deskewing necessary */
-	return (getskewedframe(vector));
+	stat = getskewedframe(vector);
+    istime++;
+    return (stat);
 }
 
 FINT putvec(vector)
@@ -1571,8 +1587,10 @@ WFDB_Sample *vector;
 		w212(*vector, s); ovec[s] = *vector; break;
 	      case 310:	/* 3 10-bit amplitudes bit-packed in 4 bytes */
 		w310(*vector, s); ovec[s] = *vector; break;
+	      case 311:	/* 3 10-bit amplitudes bit-packed in 4 bytes */
+		w311(*vector, s); ovec[s] = *vector; break;
 	    }
-	    if (ferror(osf[s])) {
+	    if (wfdb_ferror(osf[s])) {
 		wfdb_error("putvec: write error in signal %d\n", s);
 		stat = -1;
 	    }
@@ -1681,7 +1699,10 @@ unsigned int nsig;
     WFDB_Signal s;
 
     /* If another output header file was opened, close it. */
-    if (oheader) (void)fclose(oheader);
+    if (oheader) {
+	(void)wfdb_fclose(oheader);
+	oheader = NULL;
+    }
 
     /* Quit (with message from wfdb_checkname) if name is illegal. */
     if (wfdb_checkname(record, "record"))
@@ -1694,40 +1715,39 @@ unsigned int nsig;
     }
 
     /* Write the general information line. */
-    (void)fprintf(oheader, "%s %d %g",
-		  record, nsig, ffreq);
+    (void)wfdb_fprintf(oheader, "%s %d %g", record, nsig, ffreq);
     if ((cfreq > 0.0 && cfreq != ffreq) || bcount != 0.0) {
-	(void)fprintf(oheader, "/%g", cfreq);
+	(void)wfdb_fprintf(oheader, "/%g", cfreq);
 	if (bcount != 0.0)
-	    (void)fprintf(oheader, "(%g)", bcount);
+	    (void)wfdb_fprintf(oheader, "(%g)", bcount);
     }
-    (void)fprintf(oheader, " %ld", siarray[0].nsamp);
+    (void)wfdb_fprintf(oheader, " %ld", siarray[0].nsamp);
     if (btime || bdate)
-	(void)fprintf(oheader, " %s", timstr((WFDB_Time)(btime*sfreq)));
+	(void)wfdb_fprintf(oheader, " %s", timstr((WFDB_Time)(btime*sfreq)));
     if (bdate)
-	(void)fprintf(oheader, "%s", datstr(bdate));
-    (void)fprintf(oheader, "\r\n");
+	(void)wfdb_fprintf(oheader, "%s", datstr(bdate));
+    (void)wfdb_fprintf(oheader, "\r\n");
 
     /* Write a signal specification line for each signal. */
     for (s = 0; s < nsig; s++) {
-	(void)fprintf(oheader, "%s %d", siarray[s].fname, siarray[s].fmt);
+	(void)wfdb_fprintf(oheader, "%s %d", siarray[s].fname, siarray[s].fmt);
 	if (siarray[s].spf > 1)
-	    (void)fprintf(oheader, "x%d", siarray[s].spf);
+	    (void)wfdb_fprintf(oheader, "x%d", siarray[s].spf);
 	if (oskew[s])
-	    (void)fprintf(oheader, ":%d", oskew[s]*siarray[s].spf);
+	    (void)wfdb_fprintf(oheader, ":%d", oskew[s]*siarray[s].spf);
 	if (ostart[s])
-	    (void)fprintf(oheader, "+%ld", ostart[s]);
-	(void)fprintf(oheader, " %g", siarray[s].gain);
+	    (void)wfdb_fprintf(oheader, "+%ld", ostart[s]);
+	(void)wfdb_fprintf(oheader, " %g", siarray[s].gain);
 	if (siarray[s].baseline != siarray[s].adczero)
-	    (void)fprintf(oheader, "(%d)", siarray[s].baseline);
+	    (void)wfdb_fprintf(oheader, "(%d)", siarray[s].baseline);
 	if (siarray[s].units && (p = strtok(siarray[s].units, " \t\n\r")))
-	    (void)fprintf(oheader, "/%s", p);
-	(void)fprintf(oheader, " %d %d %d %d %d",
+	    (void)wfdb_fprintf(oheader, "/%s", p);
+	(void)wfdb_fprintf(oheader, " %d %d %d %d %d",
 		     siarray[s].adcres, siarray[s].adczero, siarray[s].initval,
 		     (short int)(siarray[s].cksum & 0xffff), siarray[s].bsize);
 	if (siarray[s].desc && (p = strtok(siarray[s].desc, "\n\r")))
-	    (void)fprintf(oheader, " %s", p);
-	(void)fprintf(oheader, "\r\n");
+	    (void)wfdb_fprintf(oheader, " %s", p);
+	(void)wfdb_fprintf(oheader, "\r\n");
     }
 
     return (0);
@@ -1746,7 +1766,10 @@ unsigned nsegments;
     isigclose();	/* close any open input signals */
 
     /* If another output header file was opened, close it. */
-    if (oheader) (void)fclose(oheader);
+    if (oheader) {
+	(void)wfdb_fclose(oheader);
+	oheader = NULL;
+    }
 
     /* Quit (with message from wfdb_checkname) if name is illegal. */
     if (wfdb_checkname(record, "record"))
@@ -1836,22 +1859,22 @@ unsigned nsegments;
     }
 
     /* Write the first line of the master header. */
-    (void)fprintf(oheader, "%s/%u %d %g", record, nsegments, nsig, msfreq);
+    (void)wfdb_fprintf(oheader,"%s/%u %d %g", record, nsegments, nsig, msfreq);
     if ((mscfreq > 0.0 && mscfreq != msfreq) || msbcount != 0.0) {
-	(void)fprintf(oheader, "/%g", mscfreq);
+	(void)wfdb_fprintf(oheader, "/%g", mscfreq);
 	if (msbcount != 0.0)
-	    (void)fprintf(oheader, "(%g)", msbcount);
+	    (void)wfdb_fprintf(oheader, "(%g)", msbcount);
     }
-    (void)fprintf(oheader, " %ld", msnsamples);
+    (void)wfdb_fprintf(oheader, " %ld", msnsamples);
     if (msbtime || msbdate)
-	(void)fprintf(oheader, " %s", timstr((WFDB_Time)(msbtime*sfreq)));
+	(void)wfdb_fprintf(oheader, " %s", timstr((WFDB_Time)(msbtime*sfreq)));
     if (msbdate)
-	(void)fprintf(oheader, "%s", datstr(msbdate));
-    (void)fprintf(oheader, "\r\n");
+	(void)wfdb_fprintf(oheader, "%s", datstr(msbdate));
+    (void)wfdb_fprintf(oheader, "\r\n");
 
     /* Write a line for each segment. */
     for (i = 0; i < nsegments; i++)
-	(void)fprintf(oheader, "%s %ld\r\n", segment_name[i], ns[i]);
+	(void)wfdb_fprintf(oheader, "%s %ld\r\n", segment_name[i], ns[i]);
 
 #ifndef lint
     (void)free(ns);
@@ -1926,7 +1949,7 @@ char *record;
 
     /* Find a line beginning with '#'. */
     do {
-	if (fgets(linebuf, 256, iheader) == NULL)
+	if (wfdb_fgets(linebuf, 256, iheader) == NULL)
 	    return (NULL);
     } while (linebuf[0] != '#');
 
@@ -1945,7 +1968,7 @@ char *s;
                 "putinfo: header not initialized (call `newheader' first)\n");
 	return (-1);
     }
-    (void)fprintf(oheader, "#%s\r\n", s);
+    (void)wfdb_fprintf(oheader, "#%s\r\n", s);
     return (0);
 }
 
@@ -2306,9 +2329,9 @@ void wfdb_osflush()
     for (s = 0; s < nosig; s++)
 	if (s == 0 || (g = osinfo[s].group) != osinfo[s-1].group) {
 	    if (osinfo[s].bsize == 0 && osbp[g] != osbuf[g]) {
-		(void)fwrite(osbuf[g], 1, osbp[g] - osbuf[g], osf[s]);
+		(void)wfdb_fwrite(osbuf[g], 1, osbp[g] - osbuf[g], osf[s]);
 		osbp[g] = osbuf[g];
 	    }
-	    (void)fflush(osf[s]);
+	    (void)wfdb_fflush(osf[s]);
 	}
 }

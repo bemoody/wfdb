@@ -1,5 +1,5 @@
 /* file: nst.c		G. Moody	8 December 1983
-			Last revised:      4 May 1999
+			Last revised:  19 September 1999
 
 -------------------------------------------------------------------------------
 nst: Noise stress test
@@ -416,9 +416,8 @@ void nst(irec, nrec, protocol, orec, snr)
 char *irec, *nrec, *protocol, *orec;
 double snr;
 {
-    register int i;
     char buf[80], ofname[20], *p;
-    int errct = 0, nisig, nnsig, nse[WFDB_MAXSIG-1], vin[WFDB_MAXSIG],
+    int errct = 0, i, nisig, nnsig, nse[WFDB_MAXSIG-1], vin[WFDB_MAXSIG],
         vout[WFDB_MAXSIG-1];
     static int z[WFDB_MAXSIG-1], zz[WFDB_MAXSIG-1];
     long nlen, nend, t = 0L, dt, next_tick;

@@ -1,5 +1,5 @@
 /* file: calib.c	G. Moody	4 July 1991
-			Last revised:	29 April 1999		wfdblib 10.0.0
+			Last revised:  15 July 1999		wfdblib 10.0.1
 WFDB library functions for signal calibration
 
 _______________________________________________________________________________
@@ -70,7 +70,7 @@ static struct cle {
 FINT calopen(cfname)
 char *cfname;
 {
-    FILE *cfile;
+    WFDB_FILE *cfile;
     char buf[128], *p1, *p2, *p3, *p4, *p5, *p6, *getenv();
 
     /* If no calibration file is specified, return immediately. */
@@ -90,7 +90,7 @@ char *cfname;
 
     /* Read a line of the calibration file on each iteration.  See wfdbcal(5)
        for a description of the format. */
-    while (fgets(buf, 127, cfile)) {
+    while (wfdb_fgets(buf, 127, cfile)) {
 	/* ignore leading whitespace */
 	for (p1 = buf; *p1 == ' ' || *p1 == '\t' || *p1 == '\r'; p1++)
 	    ;
@@ -119,7 +119,7 @@ char *cfname;
 		free((char *)this_cle);
 	    }
 	    wfdb_error("calopen: insufficient memory\n");
-	    (void)fclose(cfile);
+	    (void)wfdb_fclose(cfile);
 	    return (-1);
 	}
 #endif
@@ -158,7 +158,7 @@ char *cfname;
 	    first_cle = prev_cle = this_cle;
     }
 
-    (void)fclose(cfile);
+    (void)wfdb_fclose(cfile);
     return (0);
 }
 
@@ -233,7 +233,7 @@ WFDB_Calinfo *cal;	/* WFDB_Calinfo record to be appended to list */
 FINT newcal(cfname)	/* name for new calibration file */
 char *cfname;
 {
-    FILE *cfile;
+    WFDB_FILE *cfile;
 
     if (wfdb_checkname(cfname, "calibration file") < 0)
 	return (-1);
@@ -246,26 +246,27 @@ char *cfname;
     for (this_cle = first_cle; this_cle; this_cle = this_cle->next) {
 	char *pulsetype;
 
-	(void)fprintf(cfile, "%s\t", this_cle->sigtype);
+	(void)wfdb_fprintf(cfile, "%s\t", this_cle->sigtype);
 	if (this_cle->caltype & WFDB_DC_COUPLED)
-	    (void)fprintf(cfile, "%g ", this_cle->low);
+	    (void)wfdb_fprintf(cfile, "%g ", this_cle->low);
 	else
-	    (void)fprintf(cfile, "- ");
+	    (void)wfdb_fprintf(cfile, "- ");
 	if (this_cle->high != this_cle->low)
-	    (void)fprintf(cfile, "%g ", this_cle->high);
+	    (void)wfdb_fprintf(cfile, "%g ", this_cle->high);
 	else
-	    (void)fprintf(cfile, "- ");
+	    (void)wfdb_fprintf(cfile, "- ");
 	switch (this_cle->caltype & (~WFDB_DC_COUPLED)) {
 	  case WFDB_CAL_SQUARE:	pulsetype = "square"; break;
 	  case WFDB_CAL_SINE:	pulsetype = "sine"; break;
 	  case WFDB_CAL_SAWTOOTH:	pulsetype = "sawtooth"; break;
 	  default:		pulsetype = "undefined"; break;
 	}
-	(void)fprintf(cfile, "%s %g %s\r\n",
+	(void)wfdb_fprintf(cfile, "%s %g %s\r\n",
 		      pulsetype,
 		      this_cle->scale,
 		      this_cle->units);
     }
+    (void)wfdb_fclose(cfile);
     return (0);
 }
 

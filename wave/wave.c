@@ -1,5 +1,5 @@
-/* file: wave.c		G. Moody	27 April 1990
-			Last revised:	29 April 1999
+/* file: wave.c		G. Moody	 27 April 1990
+			Last revised:	10 October 1999
 main() function for WAVE
 
 -------------------------------------------------------------------------------
@@ -175,6 +175,15 @@ char *argv[];
 	      case 'O':	/* use overlay mode */
 		mode |= MODE_OVERLAY;
 		break;
+	      case 'p': /* add argument to WFDB path */
+		if (++i >= argc) {
+		    fprintf(stderr,
+			    "%s: input file location(s) must follow -p\n",
+			    pname);
+		    exit(1);
+		}
+		wfdb_addtopath(argv[i]);
+		break;
 	      case 'r':	/* record name */
 		if (++i >= argc) {
 		    fprintf(stderr, "%s: record name must follow -r\n",
@@ -319,7 +328,7 @@ char *argv[];
     if (*wfdbp != ':') {
 	char *nwfdbp;
 
-	if ((nwfdbp = (char *)malloc(strlen(wfdbp+2))) == NULL) {
+	if ((nwfdbp = (char *)malloc(strlen(wfdbp)+2)) == NULL) {
 	    fprintf(stderr, "%s: memory allocation error\n", pname);
 	    exit(1);
 	}

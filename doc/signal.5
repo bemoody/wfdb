@@ -1,4 +1,4 @@
-.TH SIGNAL 5 "25 May 1999" "WFDB software 10.0" "WFDB File Formats"
+.TH SIGNAL 5 "10 October 1999" "WFDB software 10.1" "WFDB File Formats"
 .SH NAME
 signal \- Waveform Database signal file formats
 .SH DESCRIPTION
@@ -63,8 +63,22 @@ sample is obtained from the 11 least significant bits of the first byte pair
 sample comes from the 11 least significant bits of the second byte pair, in the
 same way as the first.  The third sample is formed from the 5 most significant
 bits of each of the first two byte pairs (those from the first byte pair are
-the least significant bits of the third sample).  The entire process is then
+the least significant bits of the third sample).  Note that the unused bit in
+each byte pair is set to zero when using the WFDB library to write a format 310
+signal file.  The entire process is then repeated for each successive set of
+three samples.
+.SS Format 311
+.PP
+Each sample is represented by a 10-bit two's-complement amplitude.  Three
+samples are bit-packed into a 32-bit integer as for format 310, but the layout
+is different.  Each set of four bytes is stored in little-endian order (least
+significant byte first, most significant byte last).  The first sample is
+obtained from the 10 least significant bits of the 32-bit integer, the second
+is obtained from the next 10 bits, the third from the next 10 bits, and the two
+most significant bits are unused (note that these bits are set to zero when
+using the WFDB library to write a format 311 signal file).  This process is
 repeated for each successive set of three samples.
+
 .SH SEE ALSO
 header(5)
 .br

@@ -105,7 +105,7 @@ the name of the input annotation file.  Since input annotation files are not
 necessarily found in the current directory, it may not be necessary to create
 a backup file for the input in order to avoid overwriting it.  If, however,
 the input file is found in the directory in which the output file is to be
-written, it is renamed by prefixing an underscore to the annotator name.  Only
+written, it is renamed by appending a tilde (`~') to the annotator name.  Only
 one level of backup is preserved, so you will overwrite the original
 annotation file if it is in the current directory and you open the same
 annotator more than once.

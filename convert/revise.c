@@ -1,5 +1,5 @@
 /* file: revise.c	G. Moody	8 February 1991
-			Last revised:     7 May 1999
+			Last revised:   7 September 1999
 
 -------------------------------------------------------------------------------
 revise: Convert obsolete-format header files into new ones
@@ -36,7 +36,7 @@ extern void exit();
 #include <strings.h>
 #endif
 
-static FILE *iheader;
+static WFDB_FILE *iheader;
 WFDB_Siginfo si[WFDB_MAXSIG];
 WFDB_Time nsamples;
 
@@ -87,13 +87,13 @@ WFDB_Siginfo *siarray;
     /* Get the first token (the record name) from the first non-empty,
        non-comment line. */
     do {
-	if (fgets(linebuf, 256, iheader) == NULL) {
+	if (fgets(linebuf, 256, iheader->fp) == NULL) {
 	    wfdb_error("init: can't find record name in record %s header\n",
 		     record);
 	    return (-2);
 	}
     } while ((p = strtok(linebuf, sep)) == NULL || *p == '#');
-    if (iheader != stdin && strcmp(p, record) != 0) {
+    if (iheader->fp != stdin && strcmp(p, record) != 0) {
 	wfdb_error("init: record name in record %s header is incorrect\n",
 		 record);
 	return (-2);
@@ -119,7 +119,7 @@ WFDB_Siginfo *siarray;
 	int mpx;
 
 	/* Determine the number of signal groups. */
-	if (fgets(linebuf, 256, iheader) == NULL ||
+	if (fgets(linebuf, 256, iheader->fp) == NULL ||
 	    (p = strtok(linebuf, sep)) == NULL) {
 	    wfdb_error("init: incorrect format in record %s header\n", record);
 	    return (-2);
@@ -133,7 +133,7 @@ WFDB_Siginfo *siarray;
 	    siarray[s].group = g;
 
 	    /* Get the signal file name. */
-	    if (fgets(linebuf, 256, iheader) == NULL ||
+	    if (fgets(linebuf, 256, iheader->fp) == NULL ||
 		(p = strtok(linebuf, sep)) == NULL ||
 		(siarray[s].fname = (char *)malloc((unsigned)(strlen(p) + 1)))
 		 == NULL) {
@@ -144,7 +144,7 @@ WFDB_Siginfo *siarray;
 	    (void)strcpy(siarray[s].fname, p);
 
 	    /* Determine the gain. */
-	    if (fgets(linebuf, 256, iheader) == NULL ||
+	    if (fgets(linebuf, 256, iheader->fp) == NULL ||
 		(p = strtok(linebuf, sep)) == NULL) {
 		wfdb_error("init: incorrect format in record %s header\n",
 			 record);
@@ -153,7 +153,7 @@ WFDB_Siginfo *siarray;
 	    siarray[s].gain = atof(p);
 
 	    /* Determine the sampling frequency. */
-	    if (fgets(linebuf, 256, iheader) == NULL ||
+	    if (fgets(linebuf, 256, iheader->fp) == NULL ||
 		(p = strtok(linebuf, sep)) == NULL ||
 		(f = atof(p)) <= 0.) {
 		wfdb_error("init: incorrect format in record %s header\n",
@@ -165,7 +165,7 @@ WFDB_Siginfo *siarray;
 	    /* Determine the format, block size, and number of signals in
 	       this group.  In old-style headers these three quantities are
 	       encoded into two fields. */
-	    if (fgets(linebuf, 256, iheader) == NULL ||
+	    if (fgets(linebuf, 256, iheader->fp) == NULL ||
 		(p = strtok(linebuf, sep)) == NULL) {
 		wfdb_error("init: incorrect format in record %s header\n",
 			 record);
@@ -196,7 +196,7 @@ WFDB_Siginfo *siarray;
 	    siarray[s].adczero = (p = strtok((char *)NULL, sep)) ? atoi(p) : 0;
 
 	    /* Determine the initial value. */
-	    if (fgets(linebuf, 256, iheader) == NULL ||
+	    if (fgets(linebuf, 256, iheader->fp) == NULL ||
 		(p = strtok(linebuf, sep)) == NULL) {
 		wfdb_error("init: incorrect format in record %s header\n",
 			 record);

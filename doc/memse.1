@@ -1,4 +1,4 @@
-.TH MEMSE 1 "12 June 1995" "PSD Estimation" "Signal processing"
+.TH MEMSE 1 "2 September 1999" "PSD Estimation" "Signal processing"
 .SH NAME
 memse \- estimate power spectrum using maximum entropy (all poles) method
 .SH SYNOPSIS
@@ -69,6 +69,9 @@ locations of sharp features in the spectrum;  since this is not possible using
 Use an \fIn\fRth order model (i.e., up to \fIn\fR poles).  Default:  the
 square root of the number of input samples.
 .TP
+\fB-P \fIn\fR
+Generate a power spectrum (print squared magnitudes).
+.TP
 \fB-w \fIwindow-type\fR
 Apply the specified window to the input data.  \fIwindow-type\fR may be
 one of: `Bartlett', `Blackman', `Blackman-Harris', `Hamming', `Hanning',
@@ -84,5 +87,9 @@ entire series is zero.
 Set the mean value of the inputs to zero as for \fB-z\fR, and detrend the
 series (set its mean first derivative to zero).  This is equivalent to
 subtracting a best-fit (by least squares) line from the input data.
+.SH NOTES
+Versions of \fImemse\fR released prior to September 1999 did not support the
+\fB-P\fR option, and did not normalize amplitudes with respect to the number
+of output points.
 .SH SEE ALSO
 fft(1), hrfft(1), lomb(1)

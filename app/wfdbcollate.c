@@ -1,5 +1,5 @@
 /* file: wfdbcollate.c        G. Moody        28 April 1994
-			      Last revised:     4 May 1999
+			      Last revised:  14 October 1999
 
 -------------------------------------------------------------------------------
 wfdbcollate: Collate WFDB records into a multi-segment record
@@ -93,7 +93,7 @@ WFDB_Sample v[WFDB_MAXSIG*WFDB_MAXSPF];
 WFDB_Siginfo si[WFDB_MAXSIG];
 
 int collate();
-void help(), renameheader(), splitrecord();
+void help(), splitrecord();
 
 main(argc, argv)
 int argc;
@@ -189,7 +189,6 @@ char *argv[];
 	    if (segnumber > 0) {
 		setbasetime(segbase+1);
 		newheader(segname);	/* write header for current segment */
-		renameheader(segname);
 		setbasetime(irecbase+1);
 		osigfopen(NULL, 0);	/* close output signal file */
 	    }
@@ -212,7 +211,6 @@ char *argv[];
 
 	setbasetime(segbase+1);
 	newheader(segname);	/* write header for final segment */
-	renameheader(segname);
 	wfdbquit();
 	fprintf(stderr, " done\ncollating segments ...");
 
@@ -225,7 +223,6 @@ char *argv[];
 
 	/* invoke main() to collate segments into a new record */
 	collate(4, cargv);
-	renameheader(orecname);
 	fprintf(stderr, " done\n");
     }
     else {
@@ -234,18 +231,6 @@ char *argv[];
 	exit(3);
     }
     exit(0);
-}
-
-void renameheader(record)
-char *record;
-{
-#ifndef MSDOS
-    char headerx[WFDB_MAXRNL+8], xhea[WFDB_MAXRNL+5];
-		
-    sprintf(headerx, "header.%s", record);
-    sprintf(xhea, "%s.hea", record);
-    rename(headerx, xhea);
-#endif
 }
 
 int collate(argc, argv)
@@ -281,6 +266,7 @@ char *argv[];
 		break;
 	      case 'o':	/* output record name follows */
 		orecname = argv[++i];
+		i++;
 		break;
 	      case 's': /* create multi-segment record from ordinary record */
 	        splitrecord(argc, argv);

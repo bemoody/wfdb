@@ -1,6 +1,6 @@
 # file: Makefile	G. Moody	 6 July 1983
-#			Last revised:	25 June 1999		Version 10.0.0
-# UNIX 'make' description file for compiling the WFDB library
+#			Last revised: 14 September 1999		Version 10.1.0
+# UNIX 'make' description file for compiling the WFDB library with NETFILES
 #
 # _____________________________________________________________________________
 # wfdb: a library for reading and writing annotated waveforms(time series data)
@@ -32,6 +32,23 @@
 # install the alternate WFDB library (not available on all systems), type
 # `make slib'.
 
+# Note:  This version contains experimental NETFILES support, which requires
+# that you have previously installed libwww (see http://www.w3.org/Library/);
+# if not, you must change the definitions of SCFLAGS and SBUILDLIB below.
+# As is, this Makefile is preconfigured for Linux and requires minor changes
+# for other supported operating systems.  It builds a static version of the
+# library without NETFILES support, and a shared (dynamically loadable) version
+# of the library with NETFILES support.
+
+# NETFILES support is known to work well under Linux (with both 2.0 and 2.2
+# series kernels and glibc 2.0 and 2.1) provided that the library is compiled
+# as a shared (dynamically loadable) library.  The library does not compile
+# properly as a static library under Linux if NETFILES is enabled (apparently
+# because of redefinitions in the libwww include files).
+
+# For further information about NETFILES, see README.NETFILES in the top-level
+# directory of the WFDB software package.
+
 # The WFDB library functions assume that a "char" is 8 bits, a "short int" is
 # 16 bits, an "int" is at least 16 bits, and a "long" is at least 32 bits.  The
 # last two assumptions are valid for ANSI C compilers, and for almost all older
@@ -47,7 +64,7 @@
 # top-level Makefile for the WFDB Software Package).  See the top-level
 # Makefile (in the parent of this directory) for details.
 MAJOR = 10
-MINOR = 0
+MINOR = 1
 RELEASE = 0
 VERSION = $(MAJOR).$(MINOR).$(RELEASE)
 
@@ -81,16 +98,14 @@ INCDIR = /usr/include
 # than one):
 #   -DISPRINTF	  if you do not have `stdlib.h' and your `sprintf' returns an
 #		   int (see wfdblib.h)
+#   -DNETFILES	  if you have libwww and want to be able to access WFDB files
+#		   remotely via http or ftp (as well as local files)
 #   -DNOMALLOC_H  if you have neither `stdlib.h' nor `malloc.h' (see wfdblib.h)
 #   -DNOSTRTOK	  if your standard C library does not include function `strtok'
 #		   (see wfdbio.c)
 #   -DNOTIME	  if you do not have `time.h' (see signal.c)
 #   -DOLDC	  if you have neither `stdarg.h' nor `varargs.h' (see wfdbio.c)
 #   -DSOLARIS     if you are using Solaris #include <...> files (see wfdb.h)
-#   -DUSE_FREAD	  if you do not have a `read' function, or if using `fread'
-#		    is preferable (see signal.c)
-#   -DUSE_FWRITE  if you do not have a `write' function, or if using `fwrite'
-#		    is preferable (see signal.c)
 # If your C compiler fails to compile `signal.c', add -DBROKEN_CC to CCDEFS
 # and try again (see signal.c).
 CCDEFS = -DWFDB_MAJOR=$(MAJOR) -DWFDB_MINOR=$(MINOR) -DWFDB_RELEASE=$(RELEASE)
@@ -157,6 +172,10 @@ BUILDLIB = $(AR) $(ARFLAGS) $(WFDBLIB) $(LFILES)
 # options for the desired formatting).
 PRINT = lpr
 
+# SETDPERMISSIONS is similarly used to make directories created during the
+# installation accessible.
+SETDPERMISSIONS = chmod 755
+
 # SETPERMISSIONS is the command needed to make the installed files accessible
 # to those who will use them.  The value given below makes them readable by
 # everyone, and writeable by the owner only.  (If you perform the installation
@@ -189,7 +208,9 @@ SINCDIR = $(INCDIR)
 # For Solaris or SVR4 `cc', uncomment the next line.
 # SCFLAGS = -K PIC -O $(CCDEFS)
 # For `gcc', uncomment the next line.
-SCFLAGS = -fpic -g -O $(CCDEFS)
+# SCFLAGS = -fpic -g -O $(CCDEFS)
+# For `gcc' with NETFILES, uncomment the next line.
+SCFLAGS = -fpic -g -O $(CCDEFS) -DNETFILES `libwww-config --cflags`
 # See comments on CFLAGS (above).  If you don't have `gdb', you won't be able
 # to debug the shared library, so you might want to remove the `-g' option in
 # that case.
@@ -197,18 +218,24 @@ SCFLAGS = -fpic -g -O $(CCDEFS)
 # SLIBDIR is the directory in which the alternate library is to be installed.
 SLIBDIR = $(LIBDIR)
 
-# SWFDBLIB is the name of the alternate library.  For a shared library, the
-# version number is significant for proper run-time binding.  If you make
-# incompatible changes to the library, increment the major version number and
-# set the minor version number to zero.  If you change the library without
-# changing the function interfaces, increment the minor version number.
-SWFDBLIB = libwfdb.so.$(MAJOR).$(MINOR)
-
-# SWFDBLIBBASE is the base name, without version numbers, of the alternate
-# library.  A symbolic link from SWFDBLIB to SWFDBLIBBASE will be created
-# as the final step in building the alternate library.  If you are building
-# a shared library, this step is necessary;  otherwise it's not required.
-SWFDBLIBBASE = libwfdb.so
+# SWFDBLIB_BASENAME is the name, without version numbers, of the alternate
+# library.  SWFDBLIB_SONAME is the shared object name ("soname") of the
+# alternate library; normally, this includes the base name and the major
+# version number only. SWFDBLIB is the complete name, including the minor
+# version number.  Symbolic links from SWFDBLIB to SWFDBLIB_BASENAME and
+# SWFDBLIB_SONAME will be created as the final step in building the alternate
+# library.  If you are building a shared library, these links are necessary;
+# otherwise they are not required.
+SWFDBLIB_BASENAME = libwfdb.so
+SWFDBLIB_SONAME = $(SWFDBLIB_BASENAME).$(MAJOR)
+SWFDBLIB = $(SWFDBLIB_SONAME).$(MINOR)
+# For a shared library, the soname is significant for proper run-time binding.
+# If you change function interfaces in the library, change its soname by
+# incrementing the major version number;  when you do this, set the minor
+# version number to zero.  If you change the library without changing the
+# function interfaces, increment the minor version number; this allows existing
+# binaries to use the new version without recompilation, since the soname is
+# unchanged in this case.
 
 # SLIBOBJS is the list of *.o modules to be included in the alternate library.
 # This should match OFILES below, and should not need to be changed.
@@ -224,8 +251,13 @@ SLIBOBJS = wfdbinit.o annot.o signal.o calib.o wfdbio.o
 # SBUILDLIB = ld -o $(SWFDBLIB) -z text $(SLIBOBJS)
 # For (at least some versions of) HP/UX, uncomment the next line instead.
 # SBUILDLIB = ld -b -o $(SWFDBLIB) $(SLIBOBJS)
-# For Linux, uncomment the next line instead.
-SBUILDLIB = gcc -shared -Wl,-soname,libwfdb.so.$(MAJOR) -o $(SWFDBLIB) $(SLIBOBJS)
+# For Linux without NETFILES (see above), uncomment the next line instead.
+# SBUILDLIB = gcc -shared -Wl,-soname,$(SWFDBLIB_SONAME) -o $(SWFDBLIB) \
+#  $(SLIBOBJS)
+# For Linux with NETFILES (see above), add -DNETFILES to CCDEFS and uncomment
+# the next line instead.
+SBUILDLIB = gcc -shared -Wl,-soname,$(SWFDBLIB_SONAME) \
+  `libwww-config --libs` -o $(SWFDBLIB) $(SLIBOBJS)
 
 # SRANLIB is the name of the program used to index the alternate library.
 # Shared libraries are not generally indexed.
@@ -243,26 +275,32 @@ LDCONFIG = /sbin/ldconfig
 
 # SMAKE is the `make' command that is to be executed when `make slib' is run.
 SMAKE = $(MAKE) CC=$(SCC) "CFLAGS=$(SCFLAGS)" INCDIR=$(SINCDIR) \
- LIBDIR=$(SLIBDIR) WFDBLIB=$(SWFDBLIB) "BUILDLIB=$(SBUILDLIB)" RANLIB=$(SRANLIB) \
- "LDCONFIG=$(LDCONFIG)"
+ LIBDIR=$(SLIBDIR) WFDBLIB=$(SWFDBLIB) "BUILDLIB=$(SBUILDLIB)" \
+ RANLIB=$(SRANLIB) "LDCONFIG=$(LDCONFIG)"
 
 # It should not be necessary to modify anything below this line.
 # -----------------------------------------------------------------------------
 
-HEADERS = $(INCDIR)/wfdb/wfdb.h $(INCDIR)/wfdb/ecgcodes.h \
- $(INCDIR)/wfdb/ecgmap.h $(INCDIR)/ecg/db.h
+INCLUDES = $(INCDIR)/wfdb/wfdb.h $(INCDIR)/wfdb/ecgcodes.h \
+ $(INCDIR)/wfdb/ecgmap.h
+COMPAT_INCLUDES = $(INCDIR)/ecg/db.h $(INCDIR)/ecg/ecgcodes.h \
+ $(INCDIR)/ecg/ecgmap.h
 HFILES = wfdb.h ecgcodes.h ecgmap.h wfdblib.h
 CFILES = wfdbinit.c annot.c signal.c calib.c wfdbio.c
 OFILES = wfdbinit.o annot.o signal.o calib.o wfdbio.o
 MFILES = Makefile makefile.dos
 
-# `make' or `make install':  build and install the WFDB library and headers
+# `make' or `make install':  build and install the WFDB library and includes
 install:	$(LIBDIR)/$(WFDBLIB)
-$(LIBDIR)/$(WFDBLIB):	$(HEADERS) $(OFILES)
+$(LIBDIR)/$(WFDBLIB):	$(INCDIR) $(LIBDIR) $(INCLUDES) $(OFILES)
 	$(BUILDLIB)
 	cp $(WFDBLIB) $(LIBDIR) 
 	$(SETPERMISSIONS) $(LIBDIR)/$(WFDBLIB)
 	$(RANLIB) $(LIBDIR)/$(WFDBLIB)
+
+# `make compat':  install the includes needed for source compatibility with
+# applications written for pre-version 10.0.0 versions of this library
+compat:		$(INCLUDES) $(COMPAT_INCLUDES)
 
 # `make lib': build the library in the current directory
 lib:		$(OFILES)
@@ -280,11 +318,16 @@ slib:
 	$(MAKE) clean
 	$(SMAKE)
 	$(MAKE) clean
-	$(LDCONFIG)
-	cd $(SLIBDIR); ln -sf $(SWFDBLIB) $(SWFDBLIBBASE)
+	cd $(SLIBDIR); ln -sf $(SWFDBLIB) $(SWFDBLIB_BASENAME)
+	cd $(SLIBDIR); ln -sf $(SWFDBLIB) $(SWFDBLIB_SONAME)
+	@$(LDCONFIG) || echo Warning: "$(LDCONFIG)" was unsuccessful
 
 # `make clean':  remove intermediate and backup files
 clean:
+	rm -f $(OFILES) *~
+
+# `make really-clean':  also remove previously compiled versions of the library
+really-clean:
 	rm -f $(WFDBLIB) $(SWFDBLIB) $(OFILES) *~
 
 # `make TAGS':  make an `emacs' TAGS file
@@ -295,24 +338,37 @@ TAGS:		$(HFILES) $(CFILES)
 listing:
 	$(PRINT) README $(MFILES) $(HFILES) $(CFILES)
 
-# Rules for installing the header files
+# Rules for creating installation directories
 $(INCDIR):
 	-mkdir $(INCDIR)
+	-$(SETDPERMISSIONS) $(INCDIR)
+$(LIBDIR):
+	-mkdir $(LIBDIR)
+	-$(SETDPERMISSIONS) $(LIBDIR)
+
+# Rules for installing the include files
 $(INCDIR)/wfdb:	$(INCDIR)
 	-mkdir $(INCDIR)/wfdb
+	-$(SETDPERMISSIONS) $(INCDIR)/wfdb
 $(INCDIR)/wfdb/wfdb.h:		$(INCDIR)/wfdb wfdb.h
 	cp -p wfdb.h $(INCDIR)/wfdb; $(SETPERMISSIONS) $(INCDIR)/wfdb/wfdb.h
 $(INCDIR)/wfdb/ecgcodes.h:	$(INCDIR)/wfdb ecgcodes.h
 	cp -p ecgcodes.h $(INCDIR)/wfdb
 	$(SETPERMISSIONS) $(INCDIR)/wfdb/ecgcodes.h
 $(INCDIR)/wfdb/ecgmap.h:		$(INCDIR)/wfdb ecgmap.h
-	cp -p ecgmap.h $(INCDIR)/wfdb; $(SETPERMISSIONS) $(INCDIR)/wfdb/ecgmap.h
+	cp -p ecgmap.h $(INCDIR)/wfdb
+	$(SETPERMISSIONS) $(INCDIR)/wfdb/ecgmap.h
 
-# Rules for installing <ecg/db.h> (for compatibility with old apps only)
+# Rules for installing the compatibility (pre-10.0.0) include files
 $(INCDIR)/ecg:	$(INCDIR)
 	-mkdir $(INCDIR)/ecg
+	-$(SETDPERMISSIONS) $(INCDIR)/ecg
 $(INCDIR)/ecg/db.h:		$(INCDIR)/ecg db.h
 	cp -p db.h $(INCDIR)/ecg; $(SETPERMISSIONS) $(INCDIR)/ecg/db.h
+$(INCDIR)/ecg/ecgcodes.h:	$(INCDIR)/ecg $(INCDIR)/wfdb/ecgcodes.h
+	ln -s $(INCDIR)/wfdb/ecgcodes.h $(INCDIR)/ecg/ecgcodes.h
+$(INCDIR)/ecg/ecgmap.h:		$(INCDIR)/ecg $(INCDIR)/wfdb/ecgmap.h
+	ln -s $(INCDIR)/wfdb/ecgmap.h $(INCDIR)/ecg/ecgmap.h
 
 # Prerequisites for the library modules
 wfdbinit.o:	wfdb.h wfdblib.h wfdbinit.c

@@ -1,5 +1,5 @@
 % file: pschart.pro	G. Moody	  27 May 1988
-%			Last revised:	   3 May 1999
+%			Last revised:	19 November 1999
 
 % -----------------------------------------------------------------------------
 % prolog for pschart output
@@ -38,8 +38,11 @@ save 100 dict begin /pschart exch def
 % printer resolution (dots per inch; reset by newpage, see below)
 /dpi 300 def
 
-% line width (may be reset by newpage)
+% basic line width (may be reset by newpage)
 /lw 0 def
+
+% line width in mm for signals, grid lines, marker bars
+/lwmm 0 def
 
 % TM for text
 /tm matrix currentmatrix def
@@ -88,7 +91,7 @@ save 100 dict begin /pschart exch def
 
 % dpi newpage: start page, resolution dpi dots per inch
 /newpage {/dpi exch def tm setmatrix newpath [] 0 setdash 0 setgray
- 1 setlinecap dpi 600 idiv /lw exch def mark } def
+ 1 setlinecap /lw lwmm mm def mark } def
 
 % ss: set scales for plotting
 /ss {72 dpi div dup scale /gm matrix currentmatrix def lw setlinewidth} def

@@ -1,4 +1,4 @@
-.TH PSCHART 1 "24 May 1999" "WFDB software 10.0" "WFDB applications"
+.TH PSCHART 1 "19 November 1999" "WFDB software 10.1" "WFDB applications"
 .SH NAME
 pschart \- produce annotated `chart recordings' on a PostScript device
 .SH SYNOPSIS
@@ -161,14 +161,20 @@ TranScript software (also see \fBENVIRONMENT\fR below).  Default: generate
 structured PostScript, suitable for processing by page-selection or
 page-reversal post-processors.
 .TP
-\fB-v \fIn\fR Set the voltage (ordinate) scale to \fIn\fR millimeters
-per millivolt.  Signals that do not have units of millivolts (as
-specified in the record's header file) are scaled proportionately, as
-specified by the calibration file (see \fIwfdbcal\fR(5)).  The default
-scale is 5 mm/mV, half of the standard scale for chart recorders.
+\fB-v \fIn\fR
+Set the voltage (ordinate) scale to \fIn\fR millimeters per millivolt.  Signals
+that do not have units of millivolts (as specified in the record's header file)
+are scaled proportionately, as specified by the calibration file (see
+\fIwfdbcal\fR(5)).  The default scale is 5 mm/mV, half of the standard scale
+for chart recorders.
 .TP
 \fB-V\fR
 Verbose mode (echo each command as it is read from the script file).
+.TP
+\fB-w \fIn\fR
+Set the line width for signals, grid lines, and marker bars to \fIn\fR mm.
+Default: 0 (the narrowest possible width;  note that some devices may not
+render zero-width lines correctly).
 .TP
 \fB-1\fR
 Print only the first character of each comment annotation.

@@ -1,5 +1,5 @@
 /* file: wavescript.c		G. Moody	10 October 1996
-				Last revised:	29 April 1999
+				Last revised:	17 October 1999
 Remote control for WAVE via script
 
 -------------------------------------------------------------------------------
@@ -34,12 +34,32 @@ When WAVE receives a SIGUSR1 signal, it reads the message, performs the
 requested action(s), and truncates the mailbox (so that it is once again
 empty).
 
+This program reads a command file specified in its first argument, and
+constructs the message sent to WAVE based on the contents of the command file.
 The (text) message written by this program may contain any or all of:
   -r RECORD	[to (re)open RECORD]
   -a ANNOTATOR	[to (re)open the specified ANNOTATOR for the current record]
   -f TIME	[to go to the specified TIME in the current record]
+  -p PATH	[to add PATH to the list of locations for input files ]
 These messages are copied from the file named in the first command-line
-argument.
+argument, with one exception.
+
+If the PATH argument to -p begins with "http://<", neither it nor the -p
+argument are included in the message.  This exception is because this program
+is most often used as a helper application for a web browser, the file it reads
+is usually obtained by the web browser from an HTTP server, and -p is used to
+specify a URL prefix using a server-side include of this form:
+  -p http://<!--#echo var="SERVER_NAME" --><!--#echo var="DOCUMENT_URI" -->
+If the file containing this string is served by an HTTP server that supports
+SSI (server-side includes), the argument of -p is replaced by the URL of the
+file.  When WAVE receives the message from this program, WAVE (via
+wfdb_addtopath) strips the file name from the end and appends the rest to the
+WFDB path, allowing the RECORD to be read from the web server if there is no
+local copy (or, more precisely, if there is no copy in any of the locations
+that were already in the WFDB path).  If, on the other hand, the file
+containing this string is read directly by this program from a local disk
+(i.e., not from a copy received by a web browser), then the literal string
+"<!--#echo ... -->" appears, and this should not be added to the WFDB path.
 
 If you wish to control a specific (known) WAVE process, use the -pid option
 to specify its process id;  otherwise, wave-remote attempts to control the
@@ -85,6 +105,7 @@ void help()
     fprintf(stderr, " -a ANNOTATOR\n");
     fprintf(stderr, " -f TIME\n");
     fprintf(stderr, " -r RECORD\n");
+    fprintf(stderr, " -p PATH\n");
     fprintf(stderr,
 	    "Any lines in the SCRIPT not beginning with '-' are ignored.\n");
 }
@@ -110,12 +131,17 @@ int find_wave_pid()
 }
 
 char **environ;
+#ifndef BINDIR
+#define BINDIR /usr/bin
+#endif
+#define STRING(A)	#A
+#define WAVE(A)		STRING(A) ## "/wave"
 
-int start_new_wave(record, annotator, ptime)
-char *record, *annotator, *ptime;
+int start_new_wave(record, annotator, ptime, path)
+char *record, *annotator, *ptime, *path;
 {
     if (*record) {
-	static char *arg[10];
+	static char *arg[16];
 	int nargs;
 
 	arg[0] = "wave";
@@ -130,6 +156,10 @@ char *record, *annotator, *ptime;
 	    arg[nargs++] = "-f";
 	    arg[nargs++] = ptime;
 	}
+	if (*path) {
+	    arg[nargs++] = "-p";
+	    arg[nargs++] = path;
+	}
 	arg[nargs] = NULL;
 	/* Send the standard error output to /dev/null.  This avoids having
 	   such error output appear as dialog boxes when wavescript is run from
@@ -140,16 +170,7 @@ char *record, *annotator, *ptime;
 	   group: Not a typewriter" appears whenever the Analysis Commands
 	   window opens or closes).  These may be safely ignored. */
 	freopen("/dev/null", "w", stderr);
-	return (execve("/usr/local/bin/wave", arg, environ));
-#if 0
-	char command[128];
-
-	sprintf(command, "wave -r %s", record);
-	if (*annotator) sprintf(command+strlen(command)," -a %s", annotator);
-	if (*ptime) sprintf(command+strlen(command), " -f '%s'", ptime);
-	system(command);
-	return (0);
-#endif
+	return (execve(WAVE(BINDIR), arg, environ));
     }
 
     else {	/* We can't start WAVE without specifying which record to open
@@ -163,10 +184,10 @@ main(argc, argv, env)
 int argc;
 char **argv, **env;
 {
-    char fname[30];
+    char fname[30], *p, *q;
     FILE *ofile = NULL, *script;
     int i, pid;
-    static char buf[80], record[80], annotator[80], ptime[80];
+    static char buf[80], record[80], annotator[80], ptime[80], path[80];
 
     pname = argv[0];
     environ = env;
@@ -175,17 +196,29 @@ char **argv, **env;
 	exit(1);
     }
     while (fgets(buf, sizeof(buf), script)) {
-	if (buf[0] == '-') switch (buf[1]) {
+	for (p = buf; p < buf+sizeof(buf) && (*p == ' ' || *p == '\t'); p++)
+	    ;
+	if (p >= buf+sizeof(buf) || *p != '-') continue;
+	for (q = p+3; q < buf+sizeof(buf) && (*q == ' ' || *q == '\t'); q++)
+	    ;
+	if (q >= buf+sizeof(buf) || *q == '\n' || *q == '\0') continue;
+	switch (*(p+1)) {
 	  case 'a':	/* annotator name follows */
-	    strcpy(annotator, buf+3);
+	    strcpy(annotator, q);
 	    annotator[strlen(annotator)-1] = '\0';
 	    break;
 	  case 'f':	/* time follows */
-	    strcpy(ptime, buf+3);
+	    strcpy(ptime, q);
 	    ptime[strlen(ptime)-1] = '\0';
 	    break;
+	  case 'p':	/* path follows */
+	    if (strncmp("http://<", q, 8)) {
+		strcpy(path, q);
+		path[strlen(path)-1] = '\0';
+	    }
+	    break;
 	  case 'r':	/* record name follows */
-	    strcpy(record, buf+3);
+	    strcpy(record, q);
 	    record[strlen(record)-1] = '\0';
 	    break;
 	}
@@ -198,7 +231,7 @@ char **argv, **env;
     }
     if (argc == 4 && strncmp(argv[2], "-p", 2) == 0) {	/* pid specified */
 	pid = atoi(argv[3]);
-	if (pid == 0) exit(start_new_wave(record, annotator, ptime));
+	if (pid == 0) exit(start_new_wave(record, annotator, ptime, path));
 	sprintf(fname, "/tmp/.wave.%d.%d", (int)getuid(), pid);
 	if ((ofile = fopen(fname, "r")) == NULL) {
 	    fprintf(stderr,
@@ -227,7 +260,7 @@ char **argv, **env;
 	    sleep(2);			/* give WAVE a chance to empty it */
 	    if ((ofile = fopen(fname, "r")) == NULL)
 		/* WAVE must have just exited, or someone else cleaned up. */
-		exit(start_new_wave(record, annotator, ptime));
+		exit(start_new_wave(record, annotator, ptime, path));
 	    if (fgetc(ofile) != EOF) {
 		/* The mailbox is still full -- WAVE may be stuck, or
 		   it may have crashed without removing the mailbox. */
@@ -236,7 +269,7 @@ char **argv, **env;
 		fprintf(stderr,
 	    "WAVE process %d not responding -- starting new WAVE process\n",
 			pid);
-		exit(start_new_wave(record, annotator, ptime));
+		exit(start_new_wave(record, annotator, ptime, path));
 	    }
 	}
 
@@ -253,5 +286,5 @@ char **argv, **env;
     }
 
     else 
-	exit(start_new_wave(record, annotator, ptime));
+	exit(start_new_wave(record, annotator, ptime, path));
 }

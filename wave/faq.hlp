@@ -1,14 +1,15 @@
 This is the WAVE FAQ (frequently asked questions) list.  It was last revised on
-29 April 1999.
+7 September 1999 (recent changes are marked with `*' below).
 
 Hardware questions:
  . Can I use WAVE if I don't have a SparcStation?
  . How can I use WAVE from an X terminal, PC, Mac, etc.?
- * Can I run WAVE remotely using a modem?
- * How can I insert annotations using a two-button mouse?
+ . Can I run WAVE remotely using a modem?
+ . How can I insert annotations using a two-button mouse?
  . How do I get spot help if I don't have a `Help' key?
 Problems starting WAVE:
  . Why won't WAVE run?
+ * Why does WAVE take so long to display the first screen?
  . Where do I find the missing fonts?
 Display-related questions:
  . I can't see the signals!
@@ -21,17 +22,18 @@ Display-related questions:
  . Everything in the Analysis Commands window appears twice!
 File-related questions:
  . I can't find the file named `RECORD'!
- . Why does WAVE tell me `Record ... is unavailable'?
- . Where is my annotation file?
+ * Why does WAVE tell me `Record ... is unavailable'?
+ * How can I view a record stored on a web site or an FTP server?
+ * Where is my annotation file?
 Questions about editing:
  . Why does WAVE tell me `You may not edit annotations ...'?
- . How do I edit a record on a CD-ROM?
- . How can I undo an edit?
+ * How do I edit a record on a CD-ROM, a web site, or an FTP server?
+ * How can I undo an edit?
  . Can I define my own annotations?
  . How can I recover work after a crash?
- * Can I edit annotations with a text editor?
- * What are `link' annotations?
- * Can WAVE edit signal files?
+ . Can I edit annotations with a text editor?
+ . What are `link' annotations?
+ . Can WAVE edit signal files?
 What else can WAVE do?
  . How can I make a screen dump?
  . Can WAVE read digitized signals in (fill in the blank) format?
@@ -243,6 +245,22 @@ Here are a few things to check:
     otherwise, its name is probably `header.RECORD'.
 
 
+Why does WAVE take so long to display the first screen?
+-------------------------------------------------------
+
+If you are running WAVE remotely, a slow network connection may be the
+reason for sluggish performance.  If possible, run WAVE locally, or get
+a faster network connection.  You might also try changing the time scale
+so that fewer points need to be drawn on each screen.
+
+If you are using WAVE to view a record via FTP, it is currently not possible
+to begin until the entire record has been downloaded;  for long records over
+slow network connections, this can take a long time.  Some web (HTTP) servers
+suffer from the same limitation.  If possible, use a web server that supports
+HTTP range requests, such as Apache, or download a copy of the record to your
+local disk.
+
+
 Where do I find the missing fonts?
 ----------------------------------
 
@@ -341,6 +359,13 @@ able to avoid it by switching from overlay graphics mode (the usual default) to
 shared color mode (selected using WAVE's `-S' command-line option), or vice
 versa, since WAVE uses different techniques for drawing in the scope window
 depending on the display mode. 
+
+A bug in network file handling can sometimes interfere with correct display
+of waveforms in the scope window when reading records via HTTP.  For now,
+the only workarounds are to restart WAVE, or to copy the record to local
+disk files (this can be done easily using `xform', `snip', or a web browser).
+Check http://www.physionet.org/ for updates to WAVE or to the WFDB library
+that may correct this bug.
 
 
 How can I get correct display scales?
@@ -464,8 +489,9 @@ running remotely, remember to set WFDB on the WAVE host (a default can usually
 be set for C-shell users by `source /usr/local/bin/cshsetwfdb', or for Bourne
 shell, Korn shell, and `bash' users by `. setwfdb'; don't omit the `.').  The
 directories named by WFDB are those on the WAVE host; thus (unless your WFDB
-files are already on the WAVE host) you must either transfer them to the remote
-machine, or NFS- or RFS-mount the directory in which they reside onto a
+files are already on the WAVE host, or are accessible to the WAVE host via
+HTTP or FTP -- see the next question) you must either transfer them to the
+remote machine, or NFS- or RFS-mount the directory in which they reside onto a
 suitable point in the file system of the WAVE host.  Furthermore, remember that
 output annotation, log, and print files will be written to your current
 directory on the WAVE host.
@@ -481,11 +507,25 @@ the path to the file;  in such cases, you will need to get the file's owner or
 your system administrator to give you appropriate permissions.
 
 
+How can I view a record stored on a web site or an FTP server?
+--------------------------------------------------------------
+
+Add the directory containing the record to your WFDB path, then use WAVE just
+as you would to view a record stored on your local disk.  For example, suppose
+the WFDB path is:
+   . /usr/local/database http://www.signals.r.us/data ftp://sand.bar.com/pub
+In this case, WAVE would look for input files first in the current directory
+(.) of the local disk, then in /usr/local/database (which might be local or
+might be part of a networked file system), then on the signals.r.us web site,
+and finally on sand.bar.com's FTP server.  Unless you have a slow network
+connection, you may not notice any difference between viewing locally and
+remotely stored records.
+
 Where is my annotation file?
 ----------------------------
 
 When you edit an annotation file, WAVE makes a copy with your edits, gives it a
-name of the form ANNOTATOR.RECORD, and saves it in the current directory (i.e.,
+name of the form RECORD.ANNOTATOR, and saves it in the current directory (i.e.,
 whatever directory was current when you started WAVE).  To be able to read your
 edited copy in a later WAVE session, be sure that the directory that contains
 your edited copy is listed in your WFDB path *before* any other directory that
@@ -496,16 +536,11 @@ starting WAVE each time.
 
 If you created an annotation file without specifying an annotator name,
 WAVE uses its own name as the annotator name, so you should look for a file
-named `wave.RECORD' in this case. 
+named `RECORD.wave' in this case. 
 
-If the annotation file was originally created under MS-DOS, or if it is
-intended for use under MS-DOS, the filename is constructed in the opposite
-order (i.e., as `record.ANNOTATOR', where ANNOTATOR is truncated to at most
-three characters). This is necessary in order to accommodate MS-DOS's
-restrictions on file names while still permitting flexibility in the choice of
-record names. Since the standard CD-ROM databases are intended to be usable
-under MS-DOS as well as in other environments, file names on these CD-ROMs
-follow this ``record name first'' convention as well.
+Old versions of WAVE created annotation files with names of the form
+ANNOTATOR.RECORD;  if you have any of these, rename them in order to continue
+using them with WAVE.
 
 
 Questions about editing
@@ -524,18 +559,18 @@ If you did intend to edit the annotations, select `Allow editing' from the
 `Edit' menu, then repeat the edit.
 
 
-How do I edit a record on a CD-ROM?
------------------------------------
+How do I edit a record on a CD-ROM, a web site, or an FTP server?
+-----------------------------------------------------------------
 
 Be sure that your current directory is writable, that both your current
-directory and the CD-ROM directory containing the record you wish to edit are
-in your WFDB path, and that your current directory comes *before* the CD-ROM
-directory in your WFDB path.  When WAVE writes your edits, they always go into
-the current directory (so the current directory cannot be on the CD-ROM, since
-the CD-ROM is not writable).  At a later time, when WAVE (or any other WFDB
-application) opens the record, it finds your edited version first, and doesn't
-look for the original version on the CD-ROM, provided only that, in your WFDB
-path, the CD-ROM directory follows the one in which your edits are stored.
+directory and the source (CD-ROM, web, or FTP) directory containing the record
+you wish to edit are in your WFDB path, and that your current directory comes
+*before* the source directory in your WFDB path.  When WAVE writes your edits,
+they always go into the current directory (so the current directory cannot be
+on a CD-ROM, since a CD-ROM is not writable).  At a later time, when WAVE (or
+any other WFDB application) opens the record, it finds your edited version
+first, and doesn't look for the original version, provided only that, in your
+WFDB path, the source directory follows the one in which your edits are stored.
 
 
 How can I undo an edit?
@@ -554,14 +589,14 @@ WAVE is careful not to destroy the version of the annotation file that was
 current at the time WAVE loaded the record.  WAVE always saves edited
 annotation files to the current directory (even if the original annotation
 file was loaded from another directory).  WAVE's saved annotation files are
-given names of the form `ANNOTATOR.RECORD'.  If, by saving its output, WAVE
+given names of the form `RECORD.ANNOTATOR'.  If, by saving its output, WAVE
 would overwrite an existing file with the same name, WAVE first renames the
-existing file by prefixing an underscore (`_') to its name.  Thus it is always
+existing file by appending a tilde (`~') to its name.  Thus it is always
 possible to recover the state of the annotation file as it was before you
 began the most recent editing pass.  To do so, exit WAVE, and:
- * If there is a file with a name of the form `_ANNOTATOR.RECORD' in the
-   current directory, rename it as `ANNOTATOR.RECORD'.
- * Otherwise, delete or rename `ANNOTATOR.RECORD' so that the previous version
+ * If there is a file with a name of the form `RECORD.ANNOTATOR~' in the
+   current directory, rename it as `RECORD.ANNOTATOR'.
+ * Otherwise, delete or rename `RECORD.ANNOTATOR' so that the previous version
    (which must be in another directory in the WFDB path) becomes visible once
    again to WAVE.
 

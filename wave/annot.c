@@ -1,5 +1,5 @@
-/* file: annot.c	G. Moody	1 May 1990
-			Last revised:  22 June 1999
+/* file: annot.c	G. Moody	  1 May 1990
+			Last revised:  7 September 1999
 Annotation list handling and display functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -133,7 +133,7 @@ annot_init()
 			    ts,
 			    "cannot be used.  Press `Continue', then",
 			    "select an annotator name containing only",
-			    "letters, digits, and underscores.", 0,
+			    "letters, digits, tildes, and underscores.", 0,
 			    NOTICE_BUTTON_YES, "Continue", NULL);
 #ifdef NOTICE
 	xv_destroy_safe(notice);
@@ -881,8 +881,8 @@ void change_annotations()
 
    This function attempts to ensure that the input file is not overwritten.
    If the current directory already contains a file with the name to be used
-   for the output file, the existing file is first renamed by prefixing its
-   name with an underscore (unless this was done during a previous invocation
+   for the output file, the existing file is first renamed by appending a "~"
+   to the annotator name (unless this was done during a previous invocation
    of this function and the record and annotator names have not been changed
    since).  Only one level of backup is preserved, so you will overwrite the
    original annotation file if it is in the current directory and you open the
@@ -908,21 +908,19 @@ int post_changes()
     }
 
     if (savebackup) {
-	char afname[ANLMAX+RNLMAX+2], *p;
+	char afname[ANLMAX+RNLMAX+2], afbackup[ANLMAX+RNLMAX+2];
 	FILE *tfile;
 
-	/* Discard any `/'-terminated prefix from the annotator name. */
-	for (p = af[0].name + strlen(af[0].name) - 1; p > af[0].name; p--)
-	    if (*p == '/') { p++; break; }
-	af[0].name = p;
+	/* Generate a name for the updated annotation file. */
+	sprintf(afname, "%s.%s", record, af[0].name);
 
-	/* Generate a name for a backup file. */
-	sprintf(afname, "_%s.%s", p, record);
-
-	/* Do we need to back up? */
-	if (tfile = fopen(afname+1, "r")) {
+	/* If the file already exists in the current directory, rename it. */
+	if (tfile = fopen(afname, "r")) {
 	    fclose(tfile);		/* yes -- try to do so */
-	    if (rename(afname+1, afname)) {
+
+	    /* Generate a name for a backup file by appending a `~'. */
+	    sprintf(afbackup, "%s~", afname);
+	    if (rename(afname, afbackup)) {
 #ifdef NOTICE
 		Xv_notice notice = xv_create((Frame)frame, NOTICE,
 					     XV_SHOW, TRUE,
@@ -933,7 +931,7 @@ int post_changes()
 			     NOTICE_MESSAGE_STRINGS,
 			     "Your changes cannot be saved unless you remove,",
 			     "or obtain permission to rename, the file named",
-			     afname+1,
+			     afname,
 			     "in the current directory.",
 			     "",
 			     "You may attempt to correct this problem from",
@@ -1112,7 +1110,7 @@ char *p;
 	return (1);	/* empty name is illegal */
     for (pb = p + strlen(p) - 1; pb >= p; pb--) {
 	if (('a' <= *pb && *pb <= 'z') || ('A' <= *pb && *pb <= 'Z') ||
-	    ('0' <= *pb && *pb <= '9') || *pb == '_')
+	    ('0' <= *pb && *pb <= '9') || *pb == '~' || *pb == '_')
 	    continue;	/* legal character */
 	else if (*pb == '/')
 	    return (0);	/* we don't need to check directory names */

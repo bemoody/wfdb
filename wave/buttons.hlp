@@ -145,8 +145,7 @@
 
  Quit		WAVE exits when you press this button, after saving your edits
 		if any.  If your input file would be overwritten as a result of
-		saving your edits, it is first renamed by prefixing its
-		annotator name with an underscore (`_').  If you have entered
-		annotations but have not specified an annotator, the name by
-		which you invoked this program (normally, `wave') is used for
-		the annotator name.
+		saving your edits, it is first renamed by appending a `~' to
+		the annotator name.  If you have entered annotations but have
+		not specified an annotator, the name by which you invoked this
+		program (normally, `wave') is used for the annotator name.

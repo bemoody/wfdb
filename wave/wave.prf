@@ -64,6 +64,8 @@ Summary of changes from version 5.0
 - Fewer restrictions on WAVE menu files
 - Timed autosave
 - WFDB environment editing
+- Support for remote file access via web (HTTP) and FTP servers
+- WAVE sources now available freely under the GPL
 - All previously reported bugs fixed
 
 New features
@@ -369,6 +371,16 @@ New features
   process, although you can export these values to processes running in the
   Analyze window using the symbols $WFDB and $WFDBCAL in the WAVE menu file.
 
+- WAVE (and all other applications based on the WFDB library) can now read
+  input files from web sites and FTP servers, provided that the WFDB library
+  has been compiled together with libwww (see http://www.w3.org/Library/).  To
+  do so, simply add the appropriate http:// or ftp:// base URL to the WFDB
+  path, and use WAVE in the usual way.
+
+- Sources for WAVE are now available on the web at http://www.physionet.org/.
+  WAVE has been released under the GNU Public License (GPL), which permits
+  it to be copied and redistributed without cost.
+
 Bug fixes
 ---------
 
@@ -478,3 +490,10 @@ signal window.  Using any of the navigation controls, or resizing the window,
 should make the signals visible.  On some of these displays, text in the
 signal window may be invisible using overlay graphics mode; if this happens,
 use the `-S' option.
+
+A bug in network file handling can sometimes interfere with correct display
+of waveforms in the scope window when reading records via HTTP.  For now,
+the only workarounds are to restart WAVE, or to copy the record to local
+disk files (this can be done easily using `xform', `snip', or a web browser).
+Check http://www.physionet.org/ for updates to WAVE or to the WFDB library
+that may correct this bug.

@@ -1,0 +1,36 @@
+file: README.NETFILES		G. Moody	14 September 1999
+
+This version of the WFDB software package contains experimental NETFILES
+support in the WFDB library, which requires that you have previously
+installed libwww (see http://www.w3.org/Library/);  if not, you must change
+the definitions of SCFLAGS and SBUILDLIB in lib/Makefile before compiling.
+
+NETFILES support is known to work well under Linux (with both 2.0 and 2.2
+series kernels and glibc 2.0 and 2.1) provided that the library is compiled
+as a shared (dynamically loadable) library.  The library does not compile
+properly as a static library under Linux if NETFILES is enabled (apparently
+because of redefinitions in the libwww include files).
+
+To use NETFILES once this software has been compiled and installed, add to
+the WFDB path one or more components that refer to remote files available
+via http or ftp.  All WFDB applications that read local files will then be
+able to read remote files with no other changes.
+
+If you would like to experiment with NETFILES under Linux, compile and install
+WAVE and wavescript (in the waverc directory);  this is done by default if you
+build the package by running 'make' in the top-level directory of the
+source tree.  Follow the instructions given in the 'WAVE and the Web' section
+of the WAVE User's Guide (in 'wave-doc';  also available on PhysioNet at
+http://www.physionet.org/physiotools/wug/) to install wavescript as a
+helper application for your web browser.  You should now be able to follow the
+.xws links in the on-line version of the MIT-BIH Arrhythmia Database Directory
+(http://www.physionet.org/physiobank/database/html/mitdbdir/mitdbdir.htm) and
+in the HTML files included in the MIMIC Database records available on
+PhysioNet.  (Once you have installed the software and configured your browser,
+following these links causes your browser to display the specified signals
+and annotations in a WAVE window;  you do not need to set the WFDB path in
+any special way in this case, since wavescript will do this automatically
+based on information it receives from your browser.)
+
+NETFILES support was originally implemented by Michael Dakin as part of his
+summer UROP project at MIT.  Thanks, Mike!

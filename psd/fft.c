@@ -1,5 +1,5 @@
 /* file: fft.c		G. Moody	24 February 1988
-		   Last revised:	   5 May 1999
+		   Last revised:	16 September 1999
 
 -------------------------------------------------------------------------------
 fft: Fast Fourier transform of real data
@@ -326,6 +326,16 @@ char *argv[];
 	else
 	    nflag = Nflag;
     }
+    if (smooth > 1) {
+        if (cflag) {
+	    fprintf(stderr, "%s: -c and -s or -S are incompatible\n", pname);
+	    exit(1);
+	}
+        if (pflag) {
+	    fprintf(stderr, "%s: -p and -s or -S are incompatible\n", pname);
+	    exit(1);
+	}
+    }
 
     /* Make sure that len is a power of two. */
     if (len < 1) len = 1;
@@ -498,23 +508,17 @@ fft_out()	/* print the FFT */
     c[1] = c[m+1] = 0.;
     for (i = 0; i <= m; i += 2*decimation) {
 	int j;
-	double re, im;
+	double pow;
 
 	if (fflag) printf("%g\t", i*fstep);
-	for (j = 0, re = im = 0.0; j < 2*smooth; j += 2) {
-	    re += c[i+j];
-	    im += c[i+j+1];
-	}
-	re /= smooth/decimation; im /= smooth/decimation;
-	if (cflag) printf("%g\t%g\n", re, im);
-	else if (Pflag) {
-	    printf("%g", (re*re + im*im)*norm*norm);
-	    if (pflag) printf("\t%g", atan2(im, re));
-	    printf("\n");
-	}
+	if (cflag) printf("%g\t%g\n", c[i], c[i+1]);
 	else {
-	    printf("%g", sqrt(re*re + im*im)*norm);
-	    if (pflag) printf("\t%g", atan2(im, re));
+	    for (j = 0, pow = 0.0; j < 2*smooth; j += 2)
+	        pow += (c[i+j]*c[i+j] + c[i+j+1]*c[i+j+1])*norm*norm;
+	    pow /= smooth/decimation;
+	    if (Pflag) printf("%g", pow);
+	    else printf("%g", sqrt(pow));
+	    if (pflag) printf("\t%g", atan2(c[i+1], c[i]));
 	    printf("\n");
 	}
     }

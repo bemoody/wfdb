@@ -1,4 +1,4 @@
-.TH IHR 1 "20 May 1999" "WFDB software 10.0" "WFDB applications"
+.TH IHR 1 "9 November 1999" "WFDB software 10.1" "WFDB applications"
 .SH NAME
 ihr \- calculate instantaneous heart rate
 .SH SYNOPSIS
@@ -19,8 +19,10 @@ but ideal for PSD estimation using the Lomb periodogram (see \fIlomb\fR(1)).
 .TP
 \fB-d\fI tolerance\fR
 Reject beat-to-beat heart rate changes exceeding \fItolerance\fR (in beats per
-minute).  Any intervals for which the calculated heart rate would differ by
-more than the specified tolerance are simply excluded from the output series.
+minute; default: 10).  Any intervals for which the calculated heart rate would
+differ by more than the specified tolerance are simply excluded from the output
+series.  To disable this behavior, use a large value for \fItolerance\fR
+(e.g., 10000).
 .TP
 \fB-f\fI time\fR
 Begin at the specified \fItime\fR in \fIrecord\fR (default: the beginning of

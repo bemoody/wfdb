@@ -1,5 +1,5 @@
-/* file: annot.c	G. Moody       	13 April 1989
-			Last revised:   29 April 1999	wfdblib 10.0.0
+/* file: annot.c	G. Moody       	 13 April 1989
+			Last revised:  15 September 1999	wfdblib 10.1.0
 WFDB library functions for annotations
 
 _______________________________________________________________________________
@@ -101,7 +101,8 @@ earlier versions.
 
 /* Shared local data */
 static unsigned niaf;			/* number of open input annotators */
-static FILE *iaf[WFDB_MAXANN];	/* file pointers for open input annotators */
+static WFDB_FILE *iaf[WFDB_MAXANN];     /* file pointers for open input
+					   annotators */
 static WFDB_Anninfo iafinfo[WFDB_MAXANN];    /* input annotator information */
 static WFDB_Annotation iann[WFDB_MAXANN];/* next annotation from each input */
 static unsigned iaword[WFDB_MAXANN];	 /* next word from each input file */
@@ -113,7 +114,8 @@ static WFDB_Time iantime[WFDB_MAXANN]; /* annotation time (MIT format only).
 					  of the annotation following iann) */
 
 static unsigned noaf;		       /* number of open output annotators */
-static FILE *oaf[WFDB_MAXANN]; /* file pointers for open output annotators */
+static WFDB_FILE *oaf[WFDB_MAXANN];      /* file pointers for open output
+					    annotators */
 static WFDB_Anninfo oafinfo[WFDB_MAXANN];    /* output annotator information */
 static WFDB_Annotation oann[WFDB_MAXANN];/* latest annotation in each output */
 static int oanum[WFDB_MAXANN];	 /* output annot numbers (AHA format only) */
@@ -347,7 +349,7 @@ WFDB_Annotation *annot;		/* address of structure to be filled in */
 	iann[an].subtyp = 0;	/* reset subtype field */
 	iann[an].aux = NULL;	/* reset aux field */
 	while (((iaword[an] = (unsigned)wfdb_g16(iaf[an]))&CODE) >= PAMIN &&
-	       !feof(iaf[an]))
+	       !wfdb_feof(iaf[an]))
 	    switch (iaword[an] & CODE) { /* process pseudo-annotations */
 	      case SKIP:  iantime[an] += wfdb_g32(iaf[an]); break;
 	      case SUB:   iann[an].subtyp = DATA & iaword[an]; break;
@@ -362,7 +364,7 @@ WFDB_Annotation *annot;		/* address of structure to be filled in */
 		   present in the annotation file to preserve word alignment;
 		   if so, this extra byte is read and then overwritten by
 		   the null in the second statement below. */
-		(void)fread(auxstr[an]+ai[an], 1, (len+1)&~1, iaf[an]);
+		(void)wfdb_fread(auxstr[an]+ai[an], 1, (len+1)&~1, iaf[an]);
 		auxstr[an][ai[an]+len] = '\0';		/* add a null */
 		ai[an] += len+1;		/* update buffer pointer */
 		break;
@@ -379,12 +381,13 @@ WFDB_Annotation *annot;		/* address of structure to be filled in */
 	iann[an].time = wfdb_g32(iaf[an]) * tmul; /* time of annotation */
 	if (wfdb_g16(iaf[an]) <= 0)	 /* serial number (starts at 1) */
 	    wfdb_error("getann: unexpected annot number in file %d\n", an);
-	iann[an].subtyp = getc(iaf[an]); /* MIT annotation subtype */
+	iann[an].subtyp = wfdb_getc(iaf[an]); /* MIT annotation subtype */
 	if (a == 'U' && iann[an].subtyp == 0)
 	    iann[an].subtyp = -1;	 /* unreadable (noise subtype -1) */
-	iann[an].chan = getc(iaf[an]);	 /* MIT annotation code */
+	iann[an].chan = wfdb_getc(iaf[an]);	 /* MIT annotation code */
 	if (ai[an] >= 256 - (AUXLEN+2)) ai[an] = 0;
-	(void)fread(auxstr[an]+ai[an]+1,1,AUXLEN,iaf[an]); /* read aux data */
+	(void)wfdb_fread(auxstr[an]+ai[an]+1,1,AUXLEN,iaf[an]); /* read aux
+								   data */
 	/* There is very limited space in AHA format files for auxiliary
 	   information, so no length byte is recorded;  instead, we
 	   assume that if the first byte of auxiliary data is
@@ -400,7 +403,7 @@ WFDB_Annotation *annot;		/* address of structure to be filled in */
 	iaword[an] = (unsigned)wfdb_g16(iaf[an]);
 	break;
     }
-    if (feof(iaf[an]))
+    if (wfdb_feof(iaf[an]))
 	ateof[an] = -1;
     return (0);
 }
@@ -473,29 +476,29 @@ WFDB_Annotation *annot;		/* address of annotation to be written */
 	if (annot->aux != NULL && *annot->aux != 0) {
 	    annwd = AUX+(unsigned)(*annot->aux); 
 	    wfdb_p16(annwd, oaf[an]);
-	    (void)fwrite(annot->aux + 1, 1, *annot->aux, oaf[an]);
+	    (void)wfdb_fwrite(annot->aux + 1, 1, *annot->aux, oaf[an]);
 	    if (*annot->aux & 1)
-		(void)fputc('\0', oaf[an]);
+		(void)wfdb_putc('\0', oaf[an]);
 	}
 	break;
       case WFDB_AHA_WRITE:	/* AHA-format output file */
-	(void)putc('\0', oaf[an]);
-	(void)putc(mamap(annot->anntyp, annot->subtyp), oaf[an]);
+	(void)wfdb_putc('\0', oaf[an]);
+	(void)wfdb_putc(mamap(annot->anntyp, annot->subtyp), oaf[an]);
 	wfdb_p32(annot->time, oaf[an]);
 	wfdb_p16((unsigned int)(++oanum[an]), oaf[an]);
-	(void)putc(annot->subtyp, oaf[an]);
-	(void)putc(annot->anntyp, oaf[an]);
+	(void)wfdb_putc(annot->subtyp, oaf[an]);
+	(void)wfdb_putc(annot->anntyp, oaf[an]);
 	if (ap = annot->aux)
 	    len = (*ap < AUXLEN) ? *ap : AUXLEN;
 	else
 	    len = 0;
 	for (i = 0, ap++; i < len; i++, ap++)
-	    (void)putc(*ap, oaf[an]);
+	    (void)wfdb_putc(*ap, oaf[an]);
 	for ( ; i < AUXLEN; i++)
-	    (void)putc('\0', oaf[an]);
+	    (void)wfdb_putc('\0', oaf[an]);
 	break;
     }
-    if (ferror(oaf[an])) {
+    if (wfdb_ferror(oaf[an])) {
 	wfdb_error("putann: write error on annotation file %d\n",an);
 	return (-1);
     }
@@ -517,7 +520,7 @@ WFDB_Time t;
     for (i = 0; i < niaf && stat == 0; i++) {
 	if (iann[i].time >= t) {	/* "rewind" the annotation file */
 	    ungotten[i].anntyp = 0;	/* flush pushback buffer */
-	    if (fseek(iaf[i], 0L, 0) == -1) {
+	    if (wfdb_fseek(iaf[i], 0L, 0) == -1) {
 		wfdb_error("iannsettime: improper seek\n");
 		return (-1);
 	    }
@@ -727,7 +730,7 @@ FVOID iannclose(an)      /* close input annotation file 'an' */
 WFDB_Annotator an;
 {
     if (an < WFDB_MAXANN && iaf[an] != NULL) {
-	(void)fclose(iaf[an]);
+	(void)wfdb_fclose(iaf[an]);
 	(void)free(iafinfo[an].name);
 	while (an < niaf-1) {
 	    iaf[an] = iaf[an+1];
@@ -759,12 +762,12 @@ WFDB_Annotator an;
 	    wfdb_p16(0, oaf[an]);
 	    break;
 	  case WFDB_AHA_WRITE:       /* write logical EOF for AHA-format files */
-	    i = ABLKSIZ - (unsigned)(ftell(oaf[an])) % ABLKSIZ;
+	    i = ABLKSIZ - (unsigned)(wfdb_ftell(oaf[an])) % ABLKSIZ;
 	    while (i-- > 0)
-		(void)fputc(EOAF, oaf[an]);
+		(void)wfdb_putc(EOAF, oaf[an]);
 	    break;
 	}
-	(void)fclose(oaf[an]);
+	(void)wfdb_fclose(oaf[an]);
 	while (an < noaf-1) {
 	    oaf[an] = oaf[an+1];
 	    oafinfo[an] = oafinfo[an+1];
@@ -810,7 +813,7 @@ void wfdb_oaflush()
     unsigned int i;
 
     for (i = 0; i < noaf; i++)
-	(void)fflush(oaf[i]);
+	(void)wfdb_fflush(oaf[i]);
 }
 
 void wfdb_anclose()

@@ -1,5 +1,5 @@
 /* file: memse.c	G. Moody	6 February 1992
-			Last revised:	   5 May 1999
+			Last revised:  17 September 1999
 
 -------------------------------------------------------------------------------
 memse: Estimate power spectrum using maximum entropy (all poles) method
@@ -26,6 +26,9 @@ _______________________________________________________________________________
 This program has been written to behave as much like `fft' as possible.  The
 input and output formats and many of the options are the same.  See the man
 page (memse.1) for details.
+
+This version agrees with `fft' output (amplitude spectrum with total power
+equal to the variance);  thanks to Joe Mietus.
 */
 
 #include <stdio.h>
@@ -151,7 +154,7 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-    int i;
+    int i, pflag = 0;
     char *prog_name();
     double df;
     float pm, *cof, *data, evlmem();
@@ -195,6 +198,9 @@ char *argv[];
 		exit(1);
 	    }
 	    poles = atoi(argv[i]);
+	    break;
+	  case 'P':     /* print power spectrum (squared magnitudes) */
+	    pflag = 1;
 	    break;
 	  case 'w':	/* apply windowing function to input */
 	    if (++i >= argc) {
@@ -331,7 +337,10 @@ char *argv[];
     /* Print outputs. */
     for (i = 0, df = 0.5/(npoints-1); i < npoints; i++) {
 	if (fflag) printf("%g\t", i*df*freq);
-	printf("%g\n", evlmem(i*df, cof, poles, pm));
+	if (pflag)
+	    printf("%g\n", evlmem(i*df, cof, poles, pm)/(npoints-1));
+	else
+	    printf("%g\n", sqrt(evlmem(i*df, cof, poles, pm)/(npoints-1)));
     }
 
     exit(0);
@@ -459,6 +468,7 @@ static char *help_strings[] = {
 " -o P     Specify the model order (number of poles); default: P = sqrt(LEN).",
 "          spectrum for each chunk.  For best results, n should be a power of",
 "          two.",
+" -P       Generate a power spectrum (print squared magnitudes).",
 " -w WINDOW",
 "          Apply the specified WINDOW to the input data.  WINDOW may be one",
 "          of: `Bartlett', `Blackman', `Blackman-Harris', `Hamming',",

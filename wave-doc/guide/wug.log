@@ -1,0 +1,849 @@
+This is TeX, Version 3.14159 (Web2C 7.2) (format=latex 1998.10.11)  26 MAY 1999 14:20
+**wug
+(wug.tex
+LaTeX2e <1998/06/01>
+Babel <v3.6j> and hyphenation patterns for american, french, german, italian, n
+ohyphenation, loaded.
+(/usr/share/texmf/tex/latex/base/book.cls
+Document Class: book 1998/05/05 v1.3y Standard LaTeX document class
+(/usr/share/texmf/tex/latex/base/bk10.clo
+File: bk10.clo 1998/05/05 v1.3y Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@chapter=\count80
+\c@section=\count81
+\c@subsection=\count82
+\c@subsubsection=\count83
+\c@paragraph=\count84
+\c@subparagraph=\count85
+\c@figure=\count86
+\c@table=\count87
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+) (html.sty
+Package: html 1998/06/21 v1.31 hypertext commands for latex2html (nd, hws, rrm)
+
+\c@lpart=\count88
+\c@lchapter=\count89
+\c@lsection=\count90
+\c@lsubsection=\count91
+\c@lsubsubsection=\count92
+\c@lparagraph=\count93
+\c@lsubparagraph=\count94
+\c@lsubsubparagraph=\count95
+\ptrfile=\write3
+)
+(/usr/share/texmf/tex/latex/graphics/epsfig.sty
+Package: epsfig 1996/10/04 v1.7 (e)psfig emulation (SPQR)
+
+(/usr/share/texmf/tex/latex/graphics/graphicx.sty
+Package: graphicx 1997/06/09 v1.0d Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texmf/tex/latex/graphics/keyval.sty
+Package: keyval 1998/06/05 v1.11 key=value parser (DPC)
+\KV@toks@=\toks14
+)
+(/usr/share/texmf/tex/latex/graphics/graphics.sty
+Package: graphics 1998/05/27 v1.0h Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texmf/tex/latex/graphics/trig.sty
+Package: trig 1994/10/16 v1.08 sin cos tan (DPC)
+)
+(/usr/share/texmf/tex/latex/config/graphics.cfg)
+Package graphics Info: Driver file: dvips.def on input line 85.
+
+(/usr/share/texmf/tex/latex/graphics/dvips.def
+File: dvips.def 1998/05/03 v3.0f Driver-dependant file (DPC,SPQR)
+))
+\Gin@req@height=\dimen103
+\Gin@req@width=\dimen104
+)
+\epsfxsize=\dimen105
+\epsfysize=\dimen106
+)
+(/usr/share/texmf/tex/latex/misc/wrapfig.sty
+\wrapoverhang=\dimen107
+\WF@size=\dimen108
+\c@WF@wrappedlines=\count96
+\WF@box=\box26
+\WF@everypar=\toks15
+Package: wrapfig 1995/11/02  v 3.1
+)
+(/usr/share/texmf/tex/latex/seminar/fancybox.sty
+\c@tocdepth=\count97
+
+Style option: `fancybox' v1.2 <1998/02/27> (tvz)
+\@fancybox=\box27
+\shadowsize=\dimen109
+\@Sbox=\box28
+\do@VerbBox=\toks16
+\the@fancyput=\toks17
+\this@fancyput=\toks18
+\EndVerbatimTokens=\toks19
+\Verbatim@Outfile=\write4
+\Verbatim@Infile=\read1
+) (/usr/share/texmf/tex/latex/base/latexsym.sty
+Package: latexsym 1996/11/20 v2.2d Standard LaTeX package (lasy symbols)
+\symlasy=\mathgroup4
+LaTeX Font Info:    Overwriting symbol font `lasy' in version `bold'
+(Font)                  U/lasy/m/n --> U/lasy/b/n on input line 85.
+)
+(/usr/share/texmf/tex/latex/base/makeidx.sty
+Package: makeidx 1995/04/19 v1.0j Standard LaTeX package
+)
+(/usr/share/texmf/tex/latex/tools/xspace.sty
+Package: xspace 1997/10/13 v1.06 Space after command names (DPC)
+)
+(/usr/share/texmf/tex/latex/tools/verbatim.sty
+Package: verbatim 1997/04/30 v1.5k LaTeX2e package for verbatim enhancements
+\every@verbatim=\toks20
+\verbatim@line=\toks21
+\verbatim@in@stream=\read2
+)
+\@indexfile=\write5
+\openout5 = `wug.idx'.
+
+
+Writing index file wug.idx
+(wug.aux)
+\openout1 = `wug.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <12> on input line 48.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 48.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 48.
+LaTeX Font Info:    Try loading font information for U+lasy on input line 48.
+ (/usr/share/texmf/tex/latex/base/ulasy.fd
+File: ulasy.fd 1996/11/20 v2.2dLaTeX symbol font definitions
+) [1
+
+
+]
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 53.
+
+(/usr/share/texmf/tex/latex/base/omscmr.fd
+File: omscmr.fd 1998/03/27 v2.5g Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 53.
+
+Underfull \hbox (badness 10000) in paragraph at lines 67--72
+
+ []
+
+
+Overfull \hbox (17.73032pt too wide) in paragraph at lines 81--89
+\OT1/cmr/m/n/10 An HTML ver-sion of this guide is avail-able; point your web br
+owser to \OT1/cmtt/m/n/10 http://ecg.-
+ []
+
+[2] (wug.toc)
+\tf@toc=\write6
+\openout6 = `wug.toc'.
+
+ [1
+
+] [2
+
+] [3]
+Underfull \hbox (badness 10000) in paragraph at lines 204--210
+
+ []
+
+[4] [5] [6
+
+]
+Chapter 1.
+[1]
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 390.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 390.
+
+Overfull \hbox (0.8099pt too wide) in alignment at lines 390--442
+[][]
+ []
+
+[2] [3] [4] [5]
+File: main-window.ps Graphic file (type eps)
+ <main-window.ps>
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <9> on input line 793.
+ [6] [7]
+File: find-window.ps Graphic file (type eps)
+ <find-window.ps> [8]
+File: nomatch.ps Graphic file (type eps)
+ <nomatch.ps>
+Underfull \hbox (badness 10000) in paragraph at lines 928--935
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 942--942
+\OT1/cmr/m/it/10 per-form a so-called `full
+ []
+
+
+Underfull \hbox (badness 2865) in paragraph at lines 942--942
+\OT1/cmr/m/it/10 mouse or key-board events
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 942--942
+\OT1/cmr/m/it/10 other win-dow, in-clud-ing
+ []
+
+
+Underfull \hbox (badness 1242) in paragraph at lines 942--942
+\OT1/cmr/m/it/10 those that be-long to other
+ []
+
+File: file-print.ps Graphic file (type eps)
+<file-print.ps>
+Overfull \hbox (2.64778pt too wide) in paragraph at lines 974--975
+[][] 
+ []
+
+File: chart1.ps Graphic file (type eps)
+<chart1.ps>
+Overfull \hbox (5.29999pt too wide) in paragraph at lines 990--995
+[][] 
+ []
+
+[9]
+File: spot-help.ps Graphic file (type eps)
+ <spot-help.ps>
+File: help-topics.ps Graphic file (type eps)
+ <help-topics.ps>
+File: help-intro.ps Graphic file (type eps)
+ <help-intro.ps>
+Underfull \hbox (badness 2245) in paragraph at lines 1075--1075
+[]\OT1/cmr/m/it/10 These [] but-tons are
+ []
+
+[10] [11]
+File: notice-quit.ps Graphic file (type eps)
+ <notice-quit.ps> [12]
+Chapter 2.
+File: file-analyze.ps Graphic file (type eps)
+<file-analyze.ps>
+Overfull \hbox (4.65529pt too wide) in paragraph at lines 1127--1128
+[][] 
+ []
+
+File: analyze-window.ps Graphic file (type eps)
+<analyze-window.ps>
+File: analysis-commands.ps Graphic file (type eps)
+ <analysis-commands.ps> [13
+
+]
+File: file-load.ps Graphic file (type eps)
+ <file-load.ps>
+Overfull \hbox (1.64403pt too wide) in paragraph at lines 1202--1203
+[][] 
+ []
+
+File: load-window.ps Graphic file (type eps)
+<load-window.ps> [14]
+File: annotation-template.ps Graphic file (type eps)
+ <annotation-template.ps>
+File: type-menu.ps Graphic file (type eps)
+ <type-menu.ps> [15] [16]
+File: noedit.ps Graphic file (type eps)
+
+<noedit.ps>
+Overfull \hbox (1.42255pt too wide) in paragraph at lines 1301--1302
+[][] 
+ []
+
+
+Underfull \hbox (badness 1406) in paragraph at lines 1303--1314
+\OT1/cmr/m/n/10 by de-fault, to avoid in-ad-ver-tent
+ []
+
+File: allow-edit.ps Graphic file (type eps)
+<allow-edit.ps>
+Underfull \hbox (badness 10000) in paragraph at lines 1316--1323
+[][]
+ []
+
+
+Underfull \hbox (badness 1024) in paragraph at lines 1343--1343
+[]\OT1/cmr/m/it/10 The ar-row keys can-not be
+ []
+
+File: main-with-markers.ps Graphic file (type eps)
+<main-with-markers.ps>
+File: view-window.ps Graphic file (type eps)
+ <view-window.ps>
+File: title-with-parens.ps Graphic file (type eps)
+ <title-with-parens.ps>
+Overfull \hbox (1.96799pt too wide) in paragraph at lines 1406--1413
+[][]
+ []
+
+
+Underfull \vbox (badness 1635) has occurred while \output is active []
+
+ [17]
+[18]
+Underfull \hbox (badness 3590) in paragraph at lines 1434--1434
+[]\OT1/cmr/m/it/10 These key-board com-mands
+ []
+
+[19]
+Underfull \vbox (badness 5119) has occurred while \output is active []
+
+ [20]
+Underfull \hbox (badness 10000) in alignment at lines 1572--1578
+[][]
+ []
+
+
+Overfull \hbox (15.0pt too wide) in paragraph at lines 1572--1579
+[][] 
+ []
+
+File: search-template.ps Graphic file (type eps)
+<search-template.ps> [21]
+File: file-save.ps Graphic file (type eps)
+ <file-save.ps> [22]
+File: attach-to-signals.ps Graphic file (type eps)
+ <attach-to-signals.ps>
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [23]
+[24] [25] [26
+
+]
+Chapter 3.
+File: system-menu.ps Graphic file (type eps)
+<system-menu.ps> [27]
+Underfull \hbox (badness 2221) in paragraph at lines 1869--1881
+[]\OT1/cmr/m/it/10 menu file\OT1/cmr/m/n/10 . Click left on
+ []
+
+
+Underfull \hbox (badness 3029) in paragraph at lines 1869--1881
+\OT1/cmr/m/n/10 the [] but-ton in
+ []
+
+
+Underfull \hbox (badness 2689) in paragraph at lines 1869--1881
+\OT1/cmr/m/n/10 up a no-tice as shown at
+ []
+
+File: wave-menu.ps Graphic file (type eps)
+<wave-menu.ps> [28] [29] [30]
+File: main-with-hr.ps Graphic file (type eps)
+ <main-with-hr.ps> [31] [32]
+File: log-window.ps Graphic file (type eps)
+ <log-window.ps>
+[33] [34]
+File: scope-window.ps Graphic file (type eps)
+ <scope-window.ps>
+Underfull \hbox (badness 10000) in paragraph at lines 2161--2161
+[]\OT1/cmr/m/n/10 Figure 3.4:
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [35]
+File: stdev.c  (verbatim)
+
+[36]
+Overfull \hbox (4.64594pt too wide) in paragraph at lines 2262--2262
+[]    \OT1/cmtt/m/n/9 int i, s = 0;        /* analyze signal 0 unless otherwise
+ specified */[] 
+ []
+
+
+Overfull \hbox (9.37088pt too wide) in paragraph at lines 2262--2262
+[]    \OT1/cmtt/m/n/9 DB_Time dt = 0L, dt0 = 0L, dt1 = 0L, epoch, ms80, tfrom =
+ 0L, tpq = 0L,[] 
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [37]
+Overfull \hbox (14.09583pt too wide) in paragraph at lines 2262--2262
+[]    \OT1/cmtt/m/n/9 ms80 = strtim("0.08");        /* 80 milliseconds, in samp
+le intervals */[] 
+ []
+
+
+Overfull \hbox (18.82077pt too wide) in paragraph at lines 2262--2262
+[]        \OT1/cmtt/m/n/9 tfrom = -tfrom;                /* convert absolute to
+ elapsed time */[] 
+ []
+
+
+Overfull \hbox (14.09583pt too wide) in paragraph at lines 2262--2262
+[]            \OT1/cmtt/m/n/9 fprintf(stderr, ".");        /* show progress by 
+minutes read */[] 
+ []
+
+
+Overfull \hbox (23.54572pt too wide) in paragraph at lines 2262--2262
+[]                                    \OT1/cmtt/m/n/9 /* found a valid `)', upd
+ate dt1 and dt */[] 
+ []
+
+
+Overfull \hbox (23.54572pt too wide) in paragraph at lines 2262--2262
+[]            \OT1/cmtt/m/n/9 dt1 = ms80 + annot.time - tqrs;     /* samples fr
+om QRS to J+80 */[] 
+ []
+
+
+Overfull \hbox (23.54572pt too wide) in paragraph at lines 2262--2262
+[]            \OT1/cmtt/m/n/9 if (dt0 > 0L) dt = dt0 + dt1;        /* samples f
+rom PQ to J+80 */[] 
+ []
+
+
+Overfull \hbox (23.54572pt too wide) in paragraph at lines 2262--2262
+[]            \OT1/cmtt/m/n/9 if (tpq > 0L) { /* previous `(' went with this be
+at, update dt0 */[] 
+ []
+
+
+Overfull \hbox (18.82077pt too wide) in paragraph at lines 2262--2262
+[]                \OT1/cmtt/m/n/9 dt0 = tqrs - tpq;                /* samples f
+rom PQ to QRS */[] 
+ []
+
+
+Overfull \hbox (28.27066pt too wide) in paragraph at lines 2262--2262
+[]                \OT1/cmtt/m/n/9 if (tto > 0L && /* if tto is zero, continue t
+o end of record */[] 
+ []
+
+
+Overfull \hbox (4.64594pt too wide) in paragraph at lines 2262--2262
+[]                \OT1/cmtt/m/n/9 /* tqrs, dt0, and dt1 are all valid: make a m
+easurement */[] 
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [38]
+Overfull \hbox (9.37088pt too wide) in paragraph at lines 2262--2262
+[]                \OT1/cmtt/m/n/9 dv = v1[s] - v0[s];        /* ST deviation, i
+n ADC units */[] 
+ []
+
+
+Overfull \hbox (9.37088pt too wide) in paragraph at lines 2262--2262
+[]    \OT1/cmtt/m/n/9 if (dt == 0) {        /* we didn't make any measurements 
+-- complain */[] 
+ []
+
+[39]
+Overfull \hbox (1.63866pt too wide) in paragraph at lines 2317--2329
+[]\OT1/cmr/m/n/10 You can plot this out-put by pip-ing it to the \OT1/cmtt/m/n/
+10 plot2d \OT1/cmr/m/n/10 com-mand (see \OT1/cmtt/m/n/10 plot2d(1)\OT1/cmr/m/n/
+10 ,
+ []
+
+File: stdev.ps Graphic file (type eps)
+<stdev.ps> [40] [41]
+Overfull \hbox (12.15628pt too wide) in paragraph at lines 2455--2459
+\OT1/cmss/m/n/10 WAVE \OT1/cmr/m/n/10 pro-vided that the record to be opened ha
+s been spec-i-fied. Once \OT1/cmtt/m/n/10 wave-remote
+ []
+
+[42]
+Overfull \hbox (27.5821pt too wide) in paragraph at lines 2473--2475
+\OT1/cmr/m/n/10 then the com-mand `\OT1/cmtt/m/n/10 wavescript example.xws\OT1/
+cmr/m/n/10 ' has the same ef-fect as the \OT1/cmtt/m/n/10 wave-remote
+ []
+
+
+Overfull \hbox (60.27594pt too wide) in paragraph at lines 2525--2528
+[]\OT1/cmr/m/n/10 You can set up your browser to view files with the MIME type 
+\OT1/cmtt/m/n/10 application/x-wavescript
+ []
+
+[43]
+File: netscape-new-helper.ps Graphic file (type eps)
+ <netscape-new-helper.ps>
+File: wave-icon.ps Graphic file (type eps)
+ <wave-icon.ps>
+Overfull \hbox (3.05553pt too wide) in paragraph at lines 2551--2569
+[][]\OT1/cmr/m/n/10 Once \OT1/cmtt/m/n/10 wavescript \OT1/cmr/m/n/10 has been i
+n-stalled as a helper ap-pli-ca-tion, your web browser
+ []
+
+[44] [45] [46]
+Chapter 4.
+File: chart2.ps Graphic file (type eps)
+<chart2.ps>
+Overfull \hbox (5.29999pt too wide) in paragraph at lines 2703--2705
+[][] 
+ []
+
+File: fulldisc.ps Graphic file (type eps)
+<fulldisc.ps>
+Overfull \hbox (5.29999pt too wide) in paragraph at lines 2714--2716
+[][] 
+ []
+
+[47
+
+] [48] [49] [50] [51] [52
+
+]
+Chapter 5.
+File: calibrate.ps Graphic file (type eps)
+<calibrate.ps> [53] [54] [55] [56]
+Chapter 6.
+[57
+
+] [58] [59] [60] [61]
+LaTeX Font Info:    Try loading font information for OMS+cmtt on input line 347
+7.
+LaTeX Font Info:    No file OMScmtt.fd. on input line 3477.
+
+
+LaTeX Font Warning: Font shape `OMS/cmtt/m/n' undefined
+(Font)              using `OMS/cmsy/m/n' instead
+(Font)              for symbol `textbraceleft' on input line 3477.
+
+[62]
+Overfull \hbox (2.9996pt too wide) in paragraph at lines 3546--3553
+[]\OT1/cmr/m/n/10 These re-sources spec-ify the po-si-tions of the ini-tial cho
+ices
+ []
+
+
+Overfull \hbox (3.02702pt too wide) in paragraph at lines 3555--3559
+[]\OT1/cmr/m/n/10 This re-source spec-i-fies the ini-tial grid dis-play mode
+ []
+
+[63] [64
+
+]
+Appendix A.
+File: main-control-panel.ps Graphic file (type eps)
+<main-control-panel.ps> [65] [66]
+File: load-window.ps Graphic file (type eps)
+ <load-window.ps> [67]
+File: print-setup-window.ps Graphic file (type eps)
+
+<print-setup-window.ps>
+File: analyze-window.ps Graphic file (type eps)
+ <analyze-window.ps> [68] [69]
+Overfull \hbox (10.13022pt too wide) in paragraph at lines 3972--3978
+[]\OT1/cmr/m/n/10 This but-ton pops up \OT1/cmss/m/n/10 WAVE\OT1/cmr/m/n/10 's 
+\OT1/cmss/m/n/10 Scope \OT1/cmr/m/n/10 win-dow (see sec-tion A.15[],
+ []
+
+
+Overfull \hbox (1.11252pt too wide) in paragraph at lines 3996--3999
+\OT1/cmr/m/n/10 have made changes to the menu file (most eas-ily done by us-ing
+ [])
+ []
+
+File: log-window.ps Graphic file (type eps)
+<log-window.ps> [70] [71]
+File: view-window.ps Graphic file (type eps)
+ <view-window.ps> [72]
+File: find-window.ps Graphic file (type eps)
+ <find-window.ps> [73]
+Underfull \hbox (badness 10000) in alignment at lines 4297--4303
+[][]
+ []
+
+
+Overfull \hbox (25.00003pt too wide) in paragraph at lines 4297--4304
+[][] 
+ []
+
+File: help-topics.ps Graphic file (type eps)
+<help-topics.ps> [74]
+File: annotation-template.ps Graphic file (type eps)
+ <annotation-template.ps> [75]
+File: search-template.ps Graphic file (type eps)
+ <search-template.ps>
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[76]
+File: level-window.ps Graphic file (type eps)
+ <level-window.ps>
+Underfull \hbox (badness 3019) in paragraph at lines 4479--4479
+[]\OT1/cmr/m/it/10 The \OT1/cmss/m/n/10 Level \OT1/cmr/m/it/10 win-dow is not
+ []
+
+[77]
+File: scope-window.ps Graphic file (type eps)
+ <scope-window.ps>
+Underfull \hbox (badness 1107) in paragraph at lines 4521--4528
+[]\OT1/cmr/m/n/10 Open the \OT1/cmss/m/n/10 Scope \OT1/cmr/m/n/10 win-dow from 
+the \OT1/cmss/m/n/10 An-a-lyze \OT1/cmr/m/n/10 win-dow, us-ing
+ []
+
+[78] [79] [80
+
+]
+Appendix B.
+
+Overfull \hbox (5.06433pt too wide) in paragraph at lines 4592--4623
+[]\OT1/cmr/m/n/10 (one for which a bi-nary ver-
+ []
+
+[81] [82] [83]
+Overfull \hbox (1.4846pt too wide) in paragraph at lines 4739--4745
+\OT1/cmr/m/n/10 MIT-BIH Polysomno-graphic Database, and the MGH/MF Wave-form Da
+tabase),
+ []
+
+
+Underfull \vbox (badness 1199) has occurred while \output is active []
+
+ [84]
+[85] [86]
+Appendix C.
+
+Underfull \hbox (badness 10000) in paragraph at lines 4924--4924
+[] \OT1/cmr/m/it/10 The sec-ond edi-tion of
+ []
+
+
+Underfull \hbox (badness 6876) in paragraph at lines 4924--4924
+\OT1/cmr/m/it/10 the MIT-BIH Ar-rhyth-mia
+ []
+
+
+Underfull \hbox (badness 3229) in paragraph at lines 4924--4924
+\OT1/cmr/m/it/10 for SPARC SunOS 4.1.x,
+ []
+
+
+Underfull \hbox (badness 2884) in paragraph at lines 4924--4924
+\OT1/cmr/m/it/10 for-mats. Fol-low the in-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 4924--4924
+\OT1/cmr/m/it/10 struc-tions in \OT1/cmtt/m/n/10 readme.doc
+ []
+
+
+Underfull \hbox (badness 5607) in paragraph at lines 4924--4924
+\OT1/cmr/m/it/10 for in-stalling the WFDB
+ []
+
+
+Underfull \hbox (badness 1515) in paragraph at lines 4924--4924
+\OT1/cmr/m/it/10 Soft-ware Pack-age on your
+ []
+
+
+Overfull \hbox (3.08179pt too wide) in paragraph at lines 4915--4941
+\OT1/cmr/m/n/10 Current (demo) ver-sions of \OT1/cmss/m/n/10 WAVE \OT1/cmr/m/n/
+10 for SPARC-sta-tions run-ning SunOS and Solaris,
+ []
+
+[87
+
+] [88] [89] [90
+
+]
+Appendix D.
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [91]
+Overfull \hbox (0.13795pt too wide) in paragraph at lines 5184--5191
+\OT1/cmr/m/n/10 shell on \OT1/cmtt/m/n/10 yon\OT1/cmr/m/n/10 , this will nor-ma
+lly be done by `\OT1/cmtt/m/n/10 setenv DISPLAY hither:0.0\OT1/cmr/m/n/10 '.
+ []
+
+[92] [93]
+Overfull \hbox (14.61089pt too wide) in paragraph at lines 5322--5337
+\OT1/cmr/m/n/10 tain root per-mis-sions, a more per-ma-nent so-lu-tion is to ad
+d \OT1/cmtt/m/n/10 /usr/openwin/lib
+ []
+
+[94] [95] [96] [97] [98]
+Overfull \hbox (9.9624pt too wide) in paragraph at lines 5673--5682
+\OT1/cmr/m/n/10 There is no file named `\OT1/cmtt/m/n/10 100s\OT1/cmr/m/n/10 ' 
+be-long-ing to the database. See \OT1/cmtt/m/n/10 annot(5)\OT1/cmr/m/n/10 , \OT
+1/cmtt/m/n/10 header(5)\OT1/cmr/m/n/10 ,
+ []
+
+[99] [100] [101] [102] [103]
+Overfull \hbox (0.88942pt too wide) in paragraph at lines 6013--6016
+[]\OT1/cmr/m/n/10 Block-interleaved files may be de-scribed sim-ply as files wi
+th very large frames.
+ []
+
+[104] [105] [106]
+Overfull \hbox (22.90787pt too wide) in paragraph at lines 6244--6248
+\OT1/cmr/m/n/10 Not with-out re-com-pil-ing. The limit is \OT1/cmtt/m/n/10 WFDB
+[]MAXSIG \OT1/cmr/m/n/10 (de-fined as 32 in \OT1/cmtt/m/n/10 <wfdb/wfdb.h>\OT1/
+cmr/m/n/10 );
+ []
+
+[107] [108] [109]
+Overfull \hbox (9.83177pt too wide) in paragraph at lines 6386--6401
+\OT1/cmr/m/n/10 have in-stalled \OT1/cmss/m/n/10 WAVE \OT1/cmr/m/n/10 6.0 or la
+ter on your sys-tem, or to \OT1/cmtt/m/n/10 http://ecg.mit.edu-
+ []
+
+[110] [111] [112
+
+]
+Appendix E.
+[113] [114] [115]
+Overfull \hbox (1.49698pt too wide) in paragraph at lines 6665--6665
+[]   \OT1/cmtt/m/n/10 wave -r 200+200+200 -a qrs +0/-display +0/atlantic.bigu.e
+du:0 \ 
+ []
+
+[116]
+Appendix F.
+
+Underfull \hbox (badness 10000) in alignment at lines 6722--6766
+[][]
+ []
+
+
+Overfull \hbox (15.0pt too wide) in paragraph at lines 6722--6767
+[][] 
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 6768--6779
+[][]
+ []
+
+
+Overfull \hbox (15.0pt too wide) in paragraph at lines 6768--6780
+[][] 
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [117
+
+]
+[118]
+Appendix G.
+[119
+
+] [120]
+
+LaTeX Font Warning: Font shape `OT1/cmss/m/it' in size <10> not available
+(Font)              Font shape `OT1/cmss/m/sl' tried instead on input line 6971
+.
+
+[121]
+Overfull \hbox (2.02255pt too wide) in paragraph at lines 7005--7006
+[]\OT1/cmss/m/n/10 Move back-ward a full screen (as for []). 
+ []
+
+[122] (wug.ind
+Overfull \hbox (5.4448pt too wide) in paragraph at lines 7--8
+[]\OT1/cmr/m/n/10 adus (ana-log/digital con-verter units),
+ []
+
+
+Overfull \hbox (2.30583pt too wide) in paragraph at lines 45--46
+[]| \OT1/cmr/m/n/10 us-ing an ex-ter-nal pro-gram, 14 
+ []
+
+[123
+
+]
+Overfull \hbox (1.25027pt too wide) in paragraph at lines 138--139
+[]\OT1/cmr/m/n/10 embedded header data in sig-nal files,
+ []
+
+[124]
+Overfull \hbox (17.67142pt too wide) in paragraph at lines 225--226
+[]\OT1/cmr/m/n/10 LD[]LIBRARY[]PATH en-vi-ron-ment vari-
+ []
+
+
+Overfull \hbox (2.6381pt too wide) in paragraph at lines 256--257
+[]\OT1/cmr/m/n/10 MENUDIR en-vi-ron-ment vari-able, 60 
+ []
+
+
+Overfull \hbox (13.88814pt too wide) in paragraph at lines 264--265
+[]\OT1/cmr/m/n/10 MIT-BIH Polysomno-graphic Database,
+ []
+
+[125]
+Overfull \hbox (5.05568pt too wide) in paragraph at lines 299--300
+[]\OT1/cmtt/m/n/10 olwm \OT1/cmr/m/n/10 (Open Look Win-dow Man-ager),
+ []
+
+
+Overfull \hbox (2.4992pt too wide) in paragraph at lines 333--334
+[]\OT1/cmr/m/n/10 PRINTER en-vi-ron-ment vari-able, 60,
+ []
+
+
+Overfull \hbox (0.69366pt too wide) in paragraph at lines 344--345
+[]\OT1/cmr/m/n/10 PSPRINT en-vi-ron-ment vari-able, 60,
+ []
+
+[126]
+Overfull \hbox (2.00154pt too wide) in paragraph at lines 395--396
+[]\OT1/cmr/m/n/10 shell vari-ables, \OT1/cmr/m/it/10 see \OT1/cmr/m/n/10 en-vi-
+ron-ment vari-
+ []
+
+
+Overfull \hbox (1.8603pt too wide) in paragraph at lines 439--440
+[]\OT1/cmr/m/n/10 TEXTPRINT en-vi-ron-ment vari-able,
+ []
+
+[127]
+Overfull \hbox (1.44365pt too wide) in paragraph at lines 472--473
+[]\OT1/cmr/m/n/10 WAVEMENU en-vi-ron-ment vari-able,
+ []
+
+
+Overfull \hbox (3.33258pt too wide) in paragraph at lines 479--480
+[]\OT1/cmr/m/n/10 WFDBCAL en-vi-ron-ment vari-able, 2,
+ []
+
+[128]) (wug.aux)
+
+LaTeX Font Warning: Some font shapes were not available, defaults substituted.
+
+ ) 
+Here is how much of TeX's memory you used:
+ 1326 strings out of 10906
+ 15963 string characters out of 71921
+ 69469 words of memory out of 263001
+ 4206 multiletter control sequences out of 10000+0
+ 16196 words of font info for 62 fonts, out of 200000 for 1000
+ 15 hyphenation exceptions out of 1000
+ 32i,8n,22p,211b,401s stack positions out of 300i,100n,500p,30000b,4000s
+
+Output written on wug.dvi (136 pages, 413452 bytes).
