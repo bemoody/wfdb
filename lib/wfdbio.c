@@ -1,10 +1,10 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-			Last revised:	17 December 2001	wfdblib 10.2.4
+			Last revised:	  2 June 2002		wfdblib 10.2.6
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -108,7 +108,6 @@ Unlike other private functions in the WFDB library, the interfaces to these
 are not likely to change, since they are designed to emulate the
 similarly-named ANSI/ISO C standard I/O functions:
  wfdb_clearerr		(emulates clearerr)
- wfdb_fclose		(emulates fclose)
  wfdb_feof		(emulates feof)
  wfdb_ferror		(emulates ferror)
  wfdb_fflush		(emulates fflush, for local files only)
@@ -119,13 +118,14 @@ similarly-named ANSI/ISO C standard I/O functions:
  wfdb_fwrite		(emulates fwrite, for local files only)
  wfdb_getc		(emulates getc)
  wfdb_putc		(emulates putc, for local files only)
+ wfdb_fclose		(emulates fclose)
  wfdb_fopen		(emulates fopen, but returns a WFDB_FILE pointer)
 
-(If WFDB_NETFILES is zero, wfdblib.h defines all but the last of these
+(If WFDB_NETFILES is zero, wfdblib.h defines all but the last two of these
 functions as macros that invoke the standard I/O functions that they would
-otherwise emulate.  The implementation of wfdb_fopen is below;  it includes
-a small amount of code compiled only if WFDB_NETFILES is non-zero.  All of
-these functions are new in version 10.0.1.)
+otherwise emulate.  The implementations of wfdb_fclose and wfdb_fopen are
+below;  they include a small amount of code compiled only if WFDB_NETFILES
+is non-zero.  All of these functions are new in version 10.0.1.)
 
 Finally, this file includes several miscellaneous functions needed only in
 certain environments:
@@ -160,7 +160,6 @@ static int getiwfdb_count = 0;
 
 FSTRING getwfdb()
 {
-    char *getenv();
     void wfdb_getiwfdb();
 
     if (wfdbpath == NULL) {
@@ -416,7 +415,6 @@ char *p;
 
     /* Register the cleanup function so that it is invoked on exit. */
     atexit(wfdb_free_path_list);
-
     q = p;
 
     /* Now construct the wfdb_path_list from the contents of p. */
@@ -612,6 +610,15 @@ FSTRING wfdberror()
     return (error_message);
 }
 
+#if WFDB_NETFILES
+static int nf_vfprintf(netfile *nf, const char *format, va_list ap)
+{
+    /* no support yet for writing to remote files */
+    errno = EROFS;
+    return (0);
+}
+#endif
+
 /* First version: for ANSI C compilers and Microsoft Windows */
 #if defined(__STDC__) || defined(_WINDOWS)
 #include <stdarg.h>
@@ -642,13 +649,12 @@ void wfdb_error(char *format, ...)
 int wfdb_fprintf(WFDB_FILE *wp, const char *format, ...)
 {
     int ret;
-    static int nf_vfprintf();
     va_list args;
 
     va_start(args, format);
 #if WFDB_NETFILES
     if (wp->type == WFDB_NET)
-	ret = nf_vfprintf(wp->fp, format, args);
+	ret = nf_vfprintf(wp->netfp, format, args);
     else
 #endif
 	ret = vfprintf(wp->fp, format, args);
@@ -911,6 +917,9 @@ char *p, *s;
 {
     do {
 	if (('0' <= *p && *p <= '9') || *p == '_' || *p == '~' || *p == DSEP ||
+#ifdef MSDOS
+	    *p == ':' ||
+#endif
 	    ('a' <= *p && *p <= 'z') || ('A' <= *p && *p <= 'Z'))
 	    p++;
 	else {
@@ -1080,16 +1089,22 @@ static HTChunk *www_get_url_range_chunk(const char *url, long startb, long len)
 	    }
 	}
 	if (chunk && (HTChunk_size(chunk) > len)) {
-	/* While we may have received something, we did not receive the
-	   requested range (more precisely, a range of the same size as the
-	   one we requested).  Assume that we got the entire file instead.
-	   This seems to happen both if the file was in the cache or if the 
-	   server does not support the range request. */
-	    /* What does this block of code do? */
-#define WWW_CHUNK_GROWBY	64
-	    extra_chunk = HTChunk_new(WWW_CHUNK_GROWBY);
+	    /* While we may have received something, we did not receive the
+	       requested range (more precisely, a range of the same size as the
+	       one we requested).  Assume that we got the entire file instead.
+	       This seems to happen both if the file was in the cache or if
+	       the server does not support the range request.  Since the caller
+	       expects only a chunk of len bytes (not necessarily at the
+	       beginning of the file), we need to create a new chunk and return
+	       it to the caller.  HTChunk_new makes a new chunk, which grows as
+	       needed in multiples of its argument (in bytes). */
+	    extra_chunk = HTChunk_new(64);
+	    /* Copy the desired range out of the chunk we received into the new
+	       chunk. */
 	    HTChunk_putb(extra_chunk, &HTChunk_data(chunk)[startb], len);
+	    /* Discard the chunk we received. */
 	    HTChunk_delete(chunk);
+	    /* Arrange for the new chunk to be returned. */
 	    chunk = extra_chunk;
 	}
 	HTRequest_delete(request);
@@ -1411,12 +1426,9 @@ static int nf_putc(int c, netfile *nf)
     return (EOF);
 }
 
-static int nf_vfprintf(netfile *nf, const char *format, va_list ap)
-{
-    /* no support yet for writing to remote files */
-    errno = EROFS;
-    return (0);
-}
+/* The definition of nf_vfprintf (which is a stub) has been moved;  it is
+   now just before wfdb_fprintf, which refers to it.  There is no completely
+   portable way to make a forward reference to a static (local) function. */
 
 void wfdb_clearerr(wp)
 WFDB_FILE *wp;
@@ -1424,13 +1436,6 @@ WFDB_FILE *wp;
     if (wp->type == WFDB_NET)
 	return (nf_clearerr(wp->netfp));
     return (clearerr(wp->fp));
-}
-
-int wfdb_fclose(WFDB_FILE *wp)
-{
-    if (wp->type == WFDB_NET)
-	return (nf_fclose(wp->netfp));
-    return (fclose(wp->fp));
 }
 
 int wfdb_feof(wp)
@@ -1528,6 +1533,19 @@ WFDB_FILE *wp;
 
 #endif	/* WFDB_NETFILES */
 
+int wfdb_fclose(WFDB_FILE *wp)
+{
+    int status;
+
+#if WFDB_NETFILES
+    status = (wp->type == WFDB_NET) ? nf_fclose(wp->netfp) : fclose(wp->fp);
+#else
+    status = fclose(wp->fp);
+#endif
+    (void)free(wp);
+    return (status);
+}
+
 WFDB_FILE *wfdb_fopen(fname, mode)
 char *fname;
 const char *mode;
@@ -1580,6 +1598,8 @@ const char *mode;
     free(wp);
     return (NULL);
 }
+
+/* Miscellaneous OS-specific functions. */
 
 #ifdef NOSTRTOK
 char *strtok(p, sep)
@@ -1676,4 +1696,3 @@ int WINAPI DllMain(HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved)
 }
 #endif
 #endif
-

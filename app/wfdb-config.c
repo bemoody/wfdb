@@ -1,4 +1,4 @@
-/* file: wfdbwhich.c	G. Moody	27 April 2002
+/* file: wfdb-config.c	G. Moody	27 April 2002
 
 -------------------------------------------------------------------------------
 wfdb-config: Print WFDB library version and linking information

@@ -1,10 +1,10 @@
-.TH WFDBF 3 "11 October 2002" "WFDB software 10.2.6" "WFDB library"
+.TH WFDBF 3 "1 June 2002" "WFDB software 10.2.6" "WFDB library"
 .SH NAME
 wfdbf \- Waveform Database library wrappers for Fortran
 .SH SYNOPSIS
 implicit integer(a-z)
 .br
-real aduphys, getbasecount, getcfreq, sampfreq
+real aduphys, getbasecount, getcfreq, getifreq, sampfreq
 .br
 character aux(256), desc(80), filetype(32), fname(40), name(20), pathname(80), record(16), string(32), units(20)
 .br
@@ -126,6 +126,10 @@ getcfreq(dummy)
 .br
 setcfreq(frequency)
 .br
+getifreq(dummy)
+.br
+setifreq(frequency)
+.br
 getbasecount(dummy)
 .br
 setbasecount(frequency)
@@ -178,8 +182,8 @@ Fortran programs can use the WFDB library to read and write waveform database
 files.  Differences in argument-passing conventions between Fortran and C
 (the language of the WFDB library) require the use of a set of wrappers
 as an interface between the library and Fortran code that invokes its
-functions.  These wrappers are contained within 'wfdbf.c', provided in the
-'fortran' directory of the WFDB software package.
+functions.  These wrappers are contained within 'wfdbf.c', provided in
+the 'fortran' directory of the WFDB software package.
 
 .PP
 Most of these wrapper subroutines behave like their similarly-named

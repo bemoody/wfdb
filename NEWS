@@ -1,12 +1,16 @@
 10.2.6:
-	Added setifreq() to the WFDB library.  This function allows the
-	caller to resample an input record at any convenient sampling
-	frequency, using getvec() to perform xform's resampling algorithm
-	transparently.  Thanks to Pat Hamilton for the inspiration!
-	NOTE:  The application must still keep track of the original
-	sampling frequency if it needs to read or write annotations, since
-	annotation times are in (unresampled) sample intervals in this
-	release.
+	Added setifreq() and getifreq() to the WFDB library.  setifreq
+	allows the caller to resample an input record at any convenient
+	sampling frequency, using getvec() to perform xform's resampling
+	algorithm transparently.  Thanks to Pat Hamilton for the inspiration!
+	The complementary getifreq returns the current getvec frequency
+	(either the native sampling frequency of the current record, or
+	the frequency previously set using setifreq()).  Times expressed
+	in sample intervals passed to or from other WFDB functions (getann,
+	putann, timstr, mstimstr, strtim) are rescaled to match the intervals
+	corresponding to the chosen frequency.
+
+	'sqrs' and 'sqrs125' now use setifreq() to resample their inputs.
 
 	Added 'wfdb-config', a tiny program (in app) that reports the WFDB
 	library version and linking information (similar to libwww-config,
@@ -15,16 +19,32 @@
 	The WFDB library now records the base time with millisecond precision
 	(previous versions did so with one-second precision), and 'xform'
 	provides starting times to the library function 'setbasetime' with
-	millisecond precision.  Thanks to Allavatam Venuopal for providing
+	millisecond precision.  Thanks to Allavatam Venugopal for providing
 	examples that illustrated the need for these features.
 
 	Fixed handling of absolute time strings in 'ann2rr', 'bxb', 'epic',
 	'fir', 'ihr', 'mxm', 'pscgen', 'rdann', and 'rxr' (all in app).
 
 	Fixed deskewing buffer initialization in getframe() (in lib/signal.c).
-	broken by 10.2.0 update, which introduced an infinite loop when
+	broken by the 10.2.0 update, which introduced an infinite loop when
 	reading a record that requires skew correction starting at sample 0.
 	Thanks to Andrew Walsh for finding an example that triggered this bug.
+
+	Fixed rounding errors in adumuv(), muvadu(), and physadu() (all in
+	lib/signal.c).  Previous versions rounded negative values toward zero;
+	to obtain consistent conversions, however, it is necessary to round
+	all values down (e.g., from -1.5 to -2 rather than up to -1).
+
+	Fixed a memory leak in wfdb_fclose() (in lib/wfdbio.h), and made
+	additional minor changes for portability (in lib/calib.c, lib/signal.c,
+	and lib/wfdblib.h).  Thanks to Ion Gaztañaga for bug reports, for his
+	careful notes on compiling the WFDB library using Borland C++ Builder
+	(see INSTALL for a summary), and for testing intermediate versions
+	of the library.
+
+	Fixed a bug in checkpkg/appcheck, which was correctly testing xform
+	with NETFILES and reporting any errors, but was not counting errors
+	in this test.
 
 10.2.5:
 	New output format options in 'ann2rr' and 'ihr'.

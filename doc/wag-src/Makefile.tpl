@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:  20 December 2001
+#				Last revised:    7 June 2002
 # Change the settings below as appropriate for your setup.
 
 # D2PARGS is a list of options for dvips.  Uncomment one of these to set the
@@ -67,6 +67,30 @@ TMAN = -rC1 -rD1 -man
 # Use the following definition to get the GNU groff version of the 'ms' macros.
 TMS = -mgs
 
+# WAGPSREQ is the target that must be made in order to make the PostScript
+# version of the manual (wag.ps), and MAKEWAGPS is the command that must be
+# run in order to do this.  The process is a bit convoluted, because the
+# simple PostScript version (wag0.ps) is concatenated from several PostScript
+# files and thus lacks DSCs (document structuring comments).  wag0.ps can be
+# printed or viewed directly, but most (perhaps all) viewers are incapable of
+# allowing the user to jump to a random page in a PostScript file that lacks
+# DSCs, and it's not easy to select a subset of pages to print in such a
+# file.  If you have ps2pdf and acroread (or pdftops), you can translate
+# wag0.ps into PDF (adding the DSCs in the process), and then translate the PDF
+# file back into PostScript with DSCs.  A disadvantage of this is that the PDF
+# version is roughly 25% larger than wag0.ps, and the final PostScript version
+# is nearly twice as large as wag0.ps, and takes longer to render as a
+# result.  To enable creation of PostScript with DSCs in this way, uncomment
+# the next two lines:
+WAGPSREQ = wag.pdf
+MAKEWAGPS = acroread -toPostScript wag.pdf
+# You can use pdftops instead of acroread by commenting out the previous line
+# and uncommenting the next one.
+# MAKEWAGPS = pdftops wag.pdf
+# Otherwise, uncomment the next two lines instead:
+# WAGPSREQ = wag0.ps
+# MAKEWAGPS = cp wag0.ps wag.ps
+
 # It should not be necessary to modify anything below this line.
 # -----------------------------------------------------------------------------
 
@@ -86,9 +110,9 @@ uninstall:
 	rm -f ../wag/*
 
 # 'make wag-book': print a copy of the WFDB Applications Guide
-wag-book:	wag.ps
+wag-book:	wag0.ps
 	$(TROFF) wag.cover >wagcover.ps
-	$(PSPRINT) wagcover.ps wag.ps
+	$(PSPRINT) wagcover.ps wag0.ps
 
 # 'make wag.html': format the WFDB Applications Guide as HTML
 wag.html:
@@ -126,22 +150,25 @@ wag.man:
 	$(LN) $(MAN1)/view.1 $(MAN1)/vsetup.1
 
 # 'make wag.pdf': format the WFDB Applications Guide as PDF
-wag.pdf:	wag.ps
-	ps2pdf wag.ps wag.pdf
-	# The PDF produced this way is not so great -- a better way
-	# of generating PDF will be implemented in the future
+wag.pdf:	wag0.ps
+	ps2pdf wag0.ps wag.pdf
 
-# 'make ag.ps': format the WFDB Applications Guide as PostScript
-wag.ps:
+# 'make wag.ps': format the WFDB Applications Guide as PostScript
+wag.ps:		$(WAGPSREQ)
+	$(MAKEWAGPS)
+
+wag0.ps:
 	latex wag
 	dvips -o wag1.ps wag.dvi
 	tbl appguide.int | $(TROFF) $(TMS) >wag2.ps
 	tbl *.1 *.3 *.5 | $(TROFF) $(TMAN) >wag3.ps
+	latex blankpage
+	dvips $(D2PARGS) -o blankpage.ps blankpage.dvi
 	latex install
 	dvips $(D2PARGS) -o wag4.ps install.dvi
 	latex eval
 	dvips $(D2PARGS) -o wag5.ps eval.dvi
-	cat wag[12345].ps | grep -v '^%%' >wag.ps
+	cat wag[123].ps blankpage.ps wag4.ps blankpage.ps wag5.ps | grep -v '^%%' >wag0.ps
 
 # 'make clean': remove intermediate and backup files
 clean:

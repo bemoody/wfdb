@@ -1,10 +1,10 @@
 /* file: calib.c	G. Moody	4 July 1991
-			Last revised:  7 November 2001		wfdblib 10.2.1
+			Last revised:	2 June 2002		wfdblib 10.2.6
 WFDB library functions for signal calibration
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -71,7 +71,7 @@ FINT calopen(cfname)
 char *cfname;
 {
     WFDB_FILE *cfile;
-    char buf[128], *p1, *p2, *p3, *p4, *p5, *p6, *getenv();
+    char buf[128], *p1, *p2, *p3, *p4, *p5, *p6;
 
     /* If no calibration file is specified, return immediately. */
     if (cfname == NULL && (cfname = getenv("WFDBCAL")) == NULL &&

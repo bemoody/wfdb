@@ -1,5 +1,5 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised:   11 March 2002	wfdblib 10.2.6
+			Last revised:   23 May 2002	wfdblib 10.2.6
 WFDB library type, constant, structure, and function interface definitions
 
 _______________________________________________________________________________
@@ -234,6 +234,8 @@ extern FINT wfdbinit(char *record, WFDB_Anninfo *aiarray, unsigned int nann,
                   WFDB_Siginfo *siarray, unsigned int nsig);
 extern FINT getspf(void);
 extern FVOID setgvmode(int mode);
+extern FINT setifreq(WFDB_Frequency freq);
+extern FFREQUENCY getifreq(void);
 extern FINT getvec(WFDB_Sample *vector);
 extern FINT getframe(WFDB_Sample *vector);
 extern FINT putvec(WFDB_Sample *vector);
@@ -300,12 +302,12 @@ extern FVOID wfdbflush(void);
 #endif
 
 #ifdef wfdb_KRC	/* declare only function return types for K&R C compilers */
-extern FINT annopen(), isigopen(), osigopen(), wfdbinit(), getspf(), getvec(),
-    getframe(), putvec(), getann(), ungetann(), putann(), isigsettime(),
-    isgsettime(), iannsettime(), strecg(), setecgstr(), strann(), setannstr(),
-    setanndesc(), adumuv(), newheader(), setheader(), setmsheader(),
-    setsampfreq(), setbasetime(), putinfo(), setibsize(), setobsize(),
-    calopen(), getcal(), putcal(), newcal(), wfdbgetskew();
+extern FINT annopen(), isigopen(), osigopen(), wfdbinit(), getspf(),
+    setifreq(), getvec(), getframe(), putvec(), getann(), ungetann(), putann(),
+    isigsettime(), isgsettime(), iannsettime(), strecg(), setecgstr(),
+    strann(), setannstr(), setanndesc(), adumuv(), newheader(), setheader(),
+    setmsheader(), setsampfreq(), setbasetime(), putinfo(), setibsize(),
+    setobsize(), calopen(), getcal(), putcal(), newcal(), wfdbgetskew();
 extern FLONGINT wfdbgetstart();
 extern FSAMPLE muvadu(), physadu();
 extern FSTRING ecgstr(), annstr(), anndesc(), timstr(), mstimstr(),
@@ -315,7 +317,7 @@ extern FDATE strdat();
 extern FVOID setgvmode(), wfdbquit(), wfdbquiet(), dbverbose(), setdb(),
     wfdbflush(), setcfreq(), setbasecount(), flushcal(), wfdbsetskew(), 
     wfdbsetstart();
-extern FFREQUENCY sampfreq(), getcfreq();
+extern FFREQUENCY getifreq(), sampfreq(), getcfreq();
 extern FDOUBLE aduphys(), getbasecount();
 #endif
 

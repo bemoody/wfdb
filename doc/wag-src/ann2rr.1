@@ -12,7 +12,7 @@ they have a wider range of uses.
 .PP
 Use \fBann2rr\fR to extract a list of intervals, in text format, from an
 annotation file.  By default, the intervals are listed in units of sample
-intervals (use \fBsampfreq\fR(1) to determine the sampling frequency of the
+intervals (use \fIsampfreq\fR(1) to determine the sampling frequency of the
 input record if necessary).  Options for \fBann2rr\fR include:
 .TP
 \fB-c\fR
@@ -85,7 +85,7 @@ Interpret the input as times of occurrence, rather than as intervals.
 Multiply input by \fIn\fR to obtain intervals (or, if \fB-T\fR is also used,
 times of occurrence) in units of sample intervals).  Default: \fIn\fR = 1.
 .PP
-Note that \fBwrann\fR(1) also provides a way to generate an annotation file from
+Note that \fIwrann\fR(1) also provides a way to generate an annotation file from
 text.  Unlike that of \fBrr2ann\fR, \fBwrann\fR's input format permits specifying
 annotation types and other fields in addition to the times of occurrence.
 .PP

@@ -3224,8 +3224,18 @@ The database path (see
 \htmladdnormallink{{\tt setwfdb(1)}}{../dbag/setwfd-1.htm},
 in the
 \htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm}.
-If not set, \WAVE{} can find database files only in the current
-directory (on the \WAVE{} host).
+If not set, \WAVE{} can find database files only in the locations
+specified by the compiled-in default database path, which normally
+includes the current directory and the {\tt /usr/database} directory
+(on the \WAVE{} host), and PhysioBank's archives at
+\begin{htmlonly}
+\htmladdnormallink{\tt http://www.\-physio\-net.\-org/\-physio\-bank/\-data\-base}{http://www.physionet.org/physiobank/database/}
+\end{htmlonly}
+\begin{latexonly}
+{\tt http://www.\-physio\-net.\-org/\-physio\-bank/\-data\-base}
+\end{latexonly}
+(if the Internet is accessible from the \WAVE{} host).
+
 
 \index{WFDBCAL environment variable}\index{environment variables!WFDBCAL}
 \item[{\tt WFDBCAL}]

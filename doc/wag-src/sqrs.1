@@ -1,4 +1,4 @@
-.TH SQRS 1 "16 October 2001" "WFDB software 10.2" "WFDB applications"
+.TH SQRS 1 "28 May 2002" "WFDB software 10.2" "WFDB applications"
 .SH NAME
 sqrs \- single-channel QRS detector
 .SH SYNOPSIS
@@ -18,14 +18,24 @@ file (with annotator name \fIqrs\fR) in which all detected beats are labelled
 normal; the annotation file may also contain `artifact' annotations at
 locations that \fIsqrs\fR believes are noise-corrupted.
 .PP
-\fIsqrs\fR can process records containing any number of signals, but it uses
-only one signal for QRS detection (signal 0 by default;  this can be changed
-using the \fB-s\fR option, see below).  For best results on adult human ECGs,
-use \fIxform\fR to resample the input signal at 250 Hz if a different sampling
-frequency was used originally (or use \fIsqrs125\fR, a variant of \fIsqrs\fR
-designed for signals sampled at 125 Hz). For other ECGs, it may be necessary to
-experiment with the input sampling frequency and the time constants indicated
-in the source file.
+\fIsqrs\fR can process records containing any number of signals, but
+it uses only one signal for QRS detection (signal 0 by default; this
+can be changed using the \fB-s\fR option, see below).  \fIsqrs\fR is
+optimized for use with adult human ECGs.  For other ECGs, it may be
+necessary to experiment with the sampling frequency as recorded in the
+input record's header file (see \fIheader\fR(5)) and the time constants
+indicated in the source file.
+.PP
+\fIsqrs\fR uses the WFDB library's \fIsetifreq\fR function to resample
+the input signal at 250 Hz if a significantly different sampling frequency
+is indicated in the header file.  \fIsqrs125\fR is identical to \fIsqrs\fR
+except that its filter and time constants have been designed for 125 Hz
+input, so that its speed is roughly twice that of \fIsqrs\fR.  If the input
+signal has been sampled at a frequency near 125 Hz, the quality of the
+outputs of \fIsqrs\fR and \fIsqrs125\fR will be nearly identical.  (Note
+that older versions of these programs did not resample their inputs;  rather,
+they warned if the sampling frequency was significantly different than the
+ideal frequency, and suggested using \fIxform\fR(1) to resample the input.)
 .PP
 This program is provided as an example only, and is not intended for any
 clinical application.  At the time the algorithm was originally published,

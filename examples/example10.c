@@ -30,9 +30,9 @@ char *argv[];
 	exit(2);
     }
     if (wfdbinit(argv[1], &a, 1, s, nsig) != nsig) exit(2);
-    if (sampfreq(NULL) != 250.)
-        fprintf(stderr, "warning: %s is designed for 250 Hz input\n",
-                argv[0]);
+    if (sampfreq((char *)NULL) < 240. ||
+	sampfreq((char *)NULL) > 260.)
+	setifreq(250.);
     if (argc > 2) scmin = muvadu(0, atoi(argv[2]));
     if (scmin < 1) scmin = muvadu(0, 1000);
     slopecrit = scmax = 10 * scmin;

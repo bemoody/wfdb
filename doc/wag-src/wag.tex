@@ -1,10 +1,12 @@
 \documentclass[twoside]{book}
+\usepackage{rawfonts}
+\IfFileExists{times.sty}{\usepackage{times}}{\@missingfileerror{times}{sty}}
 \pagenumbering{roman}
 
 \title{WFDB Applications Guide}
 \author{Tenth Edition\\
-(revised and with corrections for WFDB 10.2.4)\\
-20 December 2001\\
+(revised and with corrections for WFDB 10.2.6)\\
+1 June 2002\\
 \\
 \\
 \\
@@ -18,7 +20,7 @@ Harvard-MIT Division of Health Sciences and Technology}
 \pagestyle{empty}
 \vspace*{\fill}
 \noindent
-Copyright \copyright 1992 -- 2001 George B. Moody
+Copyright \copyright 1992 -- 2002 George B. Moody
 
 \vspace{1 in}
 \noindent
@@ -34,6 +36,7 @@ Cambridge, MA 02139\\
 USA\\
 \end{quote}
 
+\noindent
 An HTML version of this guide is available; point your web browser to
 {\tt http://www.\-physio\-net.\-org/\-physio\-tools/\-wug/} to view it.
 

@@ -1,10 +1,10 @@
 /* file: wfdblib.h	G. Moody	13 April 1989
-                        Last revised:  7 November 2001       wfdblib 10.2.1
+                        Last revised:   17 June 2002       wfdblib 10.2.6
 External definitions for WFDB library private functions
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -64,7 +64,11 @@ symbols reserved to the library begin with the characters "wfdb_".
 /* Define the symbol MSDOS if this library is to be used under MS-DOS or MS
    Windows.  Note: MSDOS is predefined by some MS-DOS and MS Windows compilers.
 */
-/* #define MSDOS */
+#if defined(_WINDOWS)
+# if !defined(MSDOS)
+#  define MSDOS
+# endif
+#endif
 
 /* Uncomment the next line if this software is to be compiled on a Macintosh.*/
 /* #define MAC */
@@ -131,7 +135,7 @@ symbols reserved to the library begin with the characters "wfdb_".
    invoking setgvmode(), the value of the environment variable WFDBGVMODE
    determines the mode (0: WFDB_LOWRES, non-zero: WFDB_HIGHRES);  if WFDBGVMODE
    is not set, the value of DEFWFDBMODE determines the mode. */
-#define DEFWFDBGVMODE 0
+#define DEFWFDBGVMODE WFDB_LOWRES
 
 /* putenv() is available in POSIX, SVID, and BSD Unices and in MS-DOS and
    32-bit MS Windows, but not under 16-bit MS Windows or under MacOS.  If it is
@@ -229,24 +233,8 @@ typedef struct WFDB_FILE WFDB_FILE;
 #define NF_CHUNK_MODE	0	/* http range requests supported */
 #define NF_FULL_MODE	1	/* http range requests not supported */
 
-/* Function prototypes */
-extern void wfdb_clearerr(WFDB_FILE *fp);
-extern int wfdb_fclose(WFDB_FILE *fp);
-extern int wfdb_feof(WFDB_FILE *fp);
-extern int wfdb_ferror(WFDB_FILE *fp);
-extern int wfdb_fflush(WFDB_FILE *fp);
-extern char* wfdb_fgets(char *s, int size, WFDB_FILE *fp);
-extern size_t wfdb_fread(void *ptr, size_t size, size_t nmemb, WFDB_FILE *fp);
-extern int wfdb_fseek(WFDB_FILE *fp, long offset, int whence);
-extern long wfdb_ftell(WFDB_FILE *fp);
-extern size_t wfdb_fwrite(void *ptr, size_t size, size_t nmemb, WFDB_FILE *fp);
-extern int wfdb_getc(WFDB_FILE *fp);
-extern int wfdb_putc(int c, WFDB_FILE *fp);
-extern void wfdb_wwwquit(void);
-
 #else	    /* WFDB_NETFILES = 0 -- use standard I/O functions only */
 
-#define wfdb_fclose(wp)			fclose(wp->fp)
 #define wfdb_feof(wp)			feof(wp->fp)
 #define wfdb_ferror(wp)			ferror(wp->fp)
 #define wfdb_fflush(wp)		((wp == NULL) ? fflush(NULL) : fflush(wp->fp))
@@ -261,11 +249,13 @@ extern void wfdb_wwwquit(void);
 #endif
 
 /* The following block is needed only to declare the values returned by
-   malloc() (either char * or void *) and sprintf() (either int or char *).
-   The object code should be correct even if these declarations are not. */
+   getenv() (char * unless otherwise defined in stdlib.h), malloc() (either
+   char * or void *) and sprintf() (either int or char *).  The object code
+   should be correct even if these declarations are not. */
 #if defined(__STDC__) || defined(_WINDOWS)
 # include <stdlib.h>
 #else
+extern char *getenv();
 # ifndef NOMALLOC_H
 # include <malloc.h>
 # else
@@ -296,6 +286,7 @@ extern long atol();
 #endif
 
 #ifdef _WINDOWS
+#include <dir.h>	/* needed for mkdir() declaration */
 #ifndef _WIN32	/* these definitions are needed for 16-bit MS Windows only */
 #define strcat _fstrcat
 #define strchr _fstrchr
@@ -314,6 +305,7 @@ extern "C" {
 #endif
 
 /* These functions are defined in wfdbio.c */
+extern int wfdb_fclose(WFDB_FILE *fp);
 extern WFDB_FILE *wfdb_open(char *file_type, char *record, int mode);
 extern int wfdb_checkname(char *name, char *description);
 extern int wfdb_g16(WFDB_FILE *fp);
@@ -323,9 +315,24 @@ extern void wfdb_p32(long x, WFDB_FILE *fp);
 extern int wfdb_parse_path(char *wfdb_path);
 extern void wfdb_addtopath(char *pathname);
 extern void wfdb_error(char *format_string, ...);
-extern WFDB_FILE* wfdb_fopen(char *fname, const char *mode);
+extern WFDB_FILE *wfdb_fopen(char *fname, const char *mode);
 extern int wfdb_fprintf(WFDB_FILE *fp, const char *format, ...);
 extern void wfdb_setirec(char *record_name);
+
+#if WFDB_NETFILES
+extern void wfdb_clearerr(WFDB_FILE *fp);
+extern int wfdb_feof(WFDB_FILE *fp);
+extern int wfdb_ferror(WFDB_FILE *fp);
+extern int wfdb_fflush(WFDB_FILE *fp);
+extern char *wfdb_fgets(char *s, int size, WFDB_FILE *fp);
+extern size_t wfdb_fread(void *ptr, size_t size, size_t nmemb, WFDB_FILE *fp);
+extern int wfdb_fseek(WFDB_FILE *fp, long offset, int whence);
+extern long wfdb_ftell(WFDB_FILE *fp);
+extern size_t wfdb_fwrite(void *ptr, size_t size, size_t nmemb, WFDB_FILE *fp);
+extern int wfdb_getc(WFDB_FILE *fp);
+extern int wfdb_putc(int c, WFDB_FILE *fp);
+extern void wfdb_wwwquit(void);
+#endif
 
 /* These functions are defined in signal.c */
 extern void wfdb_sigclose(void);
@@ -347,6 +354,15 @@ extern long wfdb_g32();
 extern void wfdb_p16(), wfdb_p32(), wfdb_addtopath(), wfdb_error(),
     wfdb_setirec(), wfdb_sigclose(), wfdb_anclose(), wfdb_osflush(),
     wfdb_oaflush();
+
+# if WFDB_NETFILES
+extern char *wfdb_fgets();
+extern int wfdb_feof(), wfdb_ferror(), wfdb_fflush(), wfdb_fseek(),
+    wfdb_getc(), wfdb_putc();
+extern long wfdb_ftell();
+extern size_t wfdb_fread(), wfdb_fwrite();
+extern void wfdb_clearerr(), wfdb_wwwquit();
+# endif
 
 /* Some non-ANSI C libraries (e.g., version 7, BSD 4.2) lack an implementation
    of strtok(); define NOSTRTOK to compile the portable version in wfdbio.c. */

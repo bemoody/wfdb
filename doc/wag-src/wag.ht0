@@ -11,8 +11,8 @@
 <B>Up:</B> <A HREF="../manuals.shtml">Books about PhysioToolkit</A>
 <H1 ALIGN=CENTER>WFDB Applications Guide</H1>
 <P ALIGN=CENTER><STRONG>Tenth Edition<BR>
-(Revised for release 10.2.5)<BR>
-10 March 2002<BR>
+(Revised for release 10.2.6)<BR>
+1 June 2002<BR>
 <BR> 
 <BR> 
 <BR> 
@@ -61,6 +61,7 @@ into another language, under the above conditions for modified versions.
 <LI> <A HREF="calsig-1.htm">calsig</A>: calibrate signals of a WFDB record
 <LI> <A HREF="cohere-1.htm">coherence</A>: estimate coherence and
 	cross-spectrum of two time series
+<LI> <A HREF="dfa-1.htm">dfa</A>: detrended fluctuation analysis
 <LI> <A HREF="ecgeva-1.htm">ecgeval</A>: generate and run ECG analyzer
 	evaluation script
 <LI> <A HREF="epic-1.htm">epic</A>: ANSI/AAMI-standard episode-by-episode
@@ -117,6 +118,7 @@ into another language, under the above conditions for modified versions.
 <LI> <A HREF="wfdbca-1.htm">wfdbcat</A>: copy WFDB files to standard output
 <LI> <A HREF="wfdbco-1.htm">wfdbcollate</A>: collate WFDB records into a
 	multi-segment record
+<LI> <A HREF="wfdb-c-1.htm">wfdb-config</A>: print WFDB library info
 <LI> <A HREF="wfdbde-1.htm">wfdbdesc</A>: read signal specifications
 <LI> <A HREF="wfdbwh-1.htm">wfdbwhich</A>: find a WFDB file and print its
         pathname
@@ -129,6 +131,8 @@ into another language, under the above conditions for modified versions.
 <H3>Functions</H3>
 <UL>
 <LI> <A HREF="wfdb-3.htm">wfdb</A>: Waveform Database library
+<LI> <A HREF="wfdbf-3.htm">wfdbf</A>: Waveform Database library bindings for
+	Fortran
 </UL>
 <H3>File formats</H3>
 <UL>

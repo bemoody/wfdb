@@ -1,5 +1,5 @@
 /* file: wfdbf.c	G. Moody	23 August 1995
-			Last revised:   11 March 2002
+			Last revised:    23 May 2002
 
 _______________________________________________________________________________
 wfdbf: Fortran wrappers for the WFDB library functions
@@ -243,6 +243,18 @@ long getspf_(dummy)
 long *dummy;
 {
     return (getspf());
+}
+
+long setifreq_(freq)
+double *freq;
+{
+    return (setifreq(*freq));
+}
+
+double getifreq_(dummy)
+long *dummy;
+{
+    return (getifreq());
 }
 
 long getvec_(long_vector)

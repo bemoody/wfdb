@@ -1,6 +1,6 @@
 #!/bin/sh
 # file: appcheck		G. Moody	7 September 2001
-#                               Last revised:   18 December 2001
+#                               Last revised:     23 May 2002
 #
 # This script checks the functionality of the WFDB applications in the 'app'
 # directory.
@@ -381,8 +381,9 @@ do
   TESTS=`expr $TESTS + 1`
 done
 
-( grep "WFDB_NETFILES 1" /usr/include/wfdb/wfdb.h >/dev/null 2>&1 ) &&
-( echo "Testing xform (with NETFILES) ..."
+if ( grep "WFDB_NETFILES 1" /usr/include/wfdb/wfdb.h >/dev/null 2>&1 )
+then
+  echo "Testing xform (with NETFILES) ..."
   xform -i mimicdb/237/237 -s 1 2 0 3 -f 9:19:45 -t "[22:01:23 20/07/1995]" \
    -a all -M -n xform -S input/xform >xform-2.out 2>&1
   for F in xform-2.out xform.hea xform.dat xform.all
@@ -396,7 +397,7 @@ done
     fi
     TESTS=`expr $TESTS + 1`
   done 
-)
+fi
 
 cat <<EOF
 

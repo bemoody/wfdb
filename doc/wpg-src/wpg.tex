@@ -9,7 +9,7 @@
 @sp 5
 @center @titlefont{WFDB Programmer's Guide}
 @sp 4
-@center Tenth Edition (revised and with additions for WFDB library version 10.2.5)
+@center Tenth Edition (revised and with additions for WFDB library version 10.2.6)
 @center @today
 @sp 5
 @center George B. Moody
@@ -62,8 +62,8 @@ translated versions of this guide for reference purposes.
 @ifinfo
 This guide documents the Waveform Database interface library (the WFDB
 library).  This file contains the text of the Tenth Edition of
-the @cite{WFDB Programmer's Guide} (March, 2002), with
-revisions for release 10.2.5 of the WFDB library.
+the @cite{WFDB Programmer's Guide} (June, 2002), with
+revisions for release 10.2.6 of the WFDB library.
 @end ifinfo
 
 @menu
@@ -74,7 +74,8 @@ revisions for release 10.2.5 of the WFDB library.
 				the WFDB library.
 * Functions::			Call and return syntax of each function, with
 				descriptions and program examples.
-* Data Types::		        Annotator and signal information structures,
+* Data Types::		        Simple and compound types, including annotator,
+				calibration, and signal information structures,
 				and annotation structures.
 * Annotation Codes::    	Table of codes, descriptions of mapping macros.
 * Database Files::		A description of the standard file types, and
@@ -401,7 +402,7 @@ The WFDB library has been written with portability in mind.  It runs on
 a wide variety of machines and operating systems, including Unix (BSD
 4.x, System V, SunOS, Solaris, HP-UX, OSF/1, Version 7, XENIX, VENIX,
 ULTRIX, GNU/Linux, OpenBSD, IRIX, AIX, AUX, Darwin, MacOS/X, SCO,
-Coherent, and more), MS-DOS, MS-Windows, VMS, and the Macintosh OS.
+Coherent, and more), MS-DOS, MS-Windows, VMS, and classic MacOS.
 This guide was written for Unix users (with notes for MS-Windows and
 MS-DOS users where differences exist), but others should find only minor
 differences.
@@ -413,8 +414,8 @@ Many friends have contributed to the development of the WFDB library.  Thanks
 to Paul Albrecht, Ted Baker, Phil Devlin, Scott Greenwald, David Israel, Roger
 Mark, Joe Mietus, Warren Muldrow, and especially to Paul Schluter, whose
 elegant 8080 assembly language functions inspired these (long live
-@code{getann}!).  Pat Hamilton and Bob Farrell contributed ports, to the
-Macintosh and the MS 32-bit Windows environments, respectively.  Jose Garcia
+@code{getann}!).  Pat Hamilton and Bob Farrell contributed ports, to classic
+MacOS and the MS 32-bit Windows environments, respectively.  Jose Garcia
 Moros and Salvador Olmos contributed Matlab/Octave reimplementations of a
 useful subset of the WFDB library.  Thanks also to the many readers of earlier
 versions of this guide; if this edition answers your questions, it is because
@@ -481,6 +482,42 @@ guide in June, 1999.  See @file{NEWS}, in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
+@unnumberedsubsec Changes in version 10.2.6
+@findex setifreq (10.2.6)
+@findex getifreq (10.2.6)
+@cindex interpolation
+@cindex resampling
+
+The new functions @code{setifreq} and @code{getifreq} allow an
+application to choose any convenient sampling frequency for reading
+input signals.  Samples read from signal files using @code{getvec} are
+buffered, resampled, and delivered to the calling application as if the
+original signals had been sampled at the desired frequency.  Times
+expressed in sample intervals passed to or from other WFDB library
+functions (@code{getann}, @code{putann}, @code{mstimstr}, @code{timstr},
+and @code{strtim}) are rescaled as needed to match intervals
+corresponding to the chosen frequency.  Thanks to Pat Hamilton for the
+inspiration!
+
+The WFDB library now records the base time with millisecond precision
+(previous versions did so with one-second precision), and @file{xform}
+provides starting times to the library function @code{setbasetime} with
+millisecond precision.  Thanks to Allavatam Venugopal for providing
+examples that illustrated the need for these features.
+
+Fixed deskewing buffer initialization in @code{getframe}, broken by the
+10.2.0 update, which introduced an infinite loop when reading a record
+that requires skew correction starting at sample 0.  Thanks to Andrew
+Walsh for finding an example that triggered this bug.
+
+Fixed rounding errors in @code{adumuv}, @code{muvadu}, and @code{physadu}.
+Previous versions rounded negative values toward zero;  to obtain consistent
+conversions, however, it is necessary to round all values down (e.g., from
+-1.5 to -2 rather than up to -1).
+
+Fixed a memory leak in wfdb_fclose() (in lib/wfdbio.h).  Thanks to
+Ion Gazta@~naga.
+
 @unnumberedsubsec Changes in version 10.2.5
 
 Additions and fixes in @file{wfdbf.c} (the Fortran wrappers for the WFDB
@@ -499,6 +536,7 @@ identical to 10.2.1.)
 
 @unnumberedsubsec Changes in version 10.2.1
 
+@cindex WFDB path
 Most users will no longer need to set the WFDB path explicitly, as a result
 of several minor changes in the default path and in the installer for the
 WFDB Software Package.
@@ -518,6 +556,7 @@ modified only by recompiling the WFDB library.  These symbols are still defined
 for compatibility with older applications that use them (typically to determine
 the size of static arrays).
 
+@cindex WFDB path
 Since version 10.1.1, record names may include path information (see the notes
 for version 10.1.1 below), but if such names are used to generate names of WFDB
 output files, the user has been required to ensure that the target directory
@@ -584,6 +623,7 @@ Changes in the @file{make} description files.
 
 @unnumberedsubsec Changes in version 10.1.1
 
+@cindex WFDB path
 Record names may contain (absolute or relative) path information as a prefix,
 and if (as a result) an input file is found in a location that does not appear
 explicitly in the WFDB path, that location is appended to the end of the WFDB
@@ -619,6 +659,7 @@ not available for your OS, simply do not define the symbol NETFILES when
 compiling the WFDB library.  For further details, see @file{wfdbio.c} in
 the WFDB library sources.
 
+@cindex WFDB path
 The WFDB environment variable may now contain whitespace (space, tab, or
 newline characters) as path component separators under any OS.  Multiple
 consecutive whitespace characters are treated as a single path component
@@ -760,6 +801,34 @@ this case, @code{isigopen} and @code{getvec}).  Some programs will need
 additional libraries, and the corresponding @samp{-l} options can
 usually be given before or after the @samp{-lwfdb} option.
 
+If the WFDB library was installed with NETFILES support, it will make
+use of functions contained in the @file{libwww} libraries.  If you have
+dynamically linkable versions of the @file{libwww} libraries, as under
+GNU/Linux, these will be loaded automatically when you run
+@code{psamples}.  If you have only static versions of these libraries,
+as under Solaris or MS-Windows, however, it is necessary to provide
+additional arguments in the @code{cc} command line in order to compile
+successfully.  One way to do this is to follow the model used to compile
+the standard WFDB applications supplied with the WFDB library; see
+@file{Makefile} in the @file{app} directory of the WFDB software package
+source tree.
+
+If you are using WFDB version 10.2.6 or a later version and @file{gcc}
+or a compatible compiler, the @file{wfdb-config} utility is available
+to help construct commands for compiling programs that use the WFDB
+library (and the @file{libwww} libraries, if available).  Use it like
+this:
+
+@example
+gcc `wfdb-config --cflags` -o psamples `wfdb-config --libs`
+@end example
+
+@noindent
+Note that this command contains backticks (`), not apostrophes (').
+@file{wfdb-config} is particularly useful if the WFDB library or
+its @file{*.h} files are installed in non-standard locations, or if
+you have only static @code{libwww} libraries.
+
 Under MS-Windows, it will be easiest to use @file{gcc}, the GNU C/C++
 compiler, which is included in the freely available Cygwin software
 development system (@code{http://@-source@-.redhat@-.com/@-cygwin/}),
@@ -768,27 +837,46 @@ and also in the freely available MinGW package
 is available in the free djgpp package
 (@code{http://@-www@-.delorie@-.com/@-djgpp/}). These are used within a
 Cygwin terminal emulator window or an MS-DOS box in exactly the same way
-as described above for Unix C compilers.
+as described above for Unix C compilers.  
 
-Each proprietary C or C++ compiler has its own idiosyncratic syntax, so no
-general rule can be given for these.  With Microsoft C/C++, use:
+The WFDB library is developed and tested using @code{gcc}, but careful
+attention has been given to making it usable with any K&R or ANSI/ISO C
+compiler.  Note, however, that binary versions of the WFDB library that
+have been compiled using @code{gcc} are @emph{not} compatible with most
+proprietary C/C++ compilers (except under Unix).  Since @code{gcc} is
+free, high quality, and supported, it is highly recommended that you
+use it for compiling your WFDB applications.
+
+If you choose to use an incompatible proprietary compiler, you are on
+your own!  You may be able to create a linkable version of the WFDB
+library from the sources in the @file{lib} directory of the WFDB source
+tree using a proprietary compiler, but doing so is unsupported (see your
+compiler's documentation, and if you are using MS-DOS or MS-Windows, see
+@file{Makefile.dos} for hints).  If you are not able to build the WFDB
+library using your compiler, you can compile the library sources
+together with the source file(s) for your application.  It may be
+easiest to copy the library sources (both the @file{*.c} and the
+@file{*.h} files) into the same directory as the application sources.
+If you follow this approach, find the directory that contains @file{stdio.h}
+on your system and make a @file{wfdb} subdirectory within that directory,
+then copy the WFDB library's @file{*.h} files into the @file{wfdb}
+subdirectory (this is necessary so that statements of the form
+@samp{#include <wfdb/wfdb.h>} will be handled properly by your compiler).
+For example, to compile @file{psamples.c} with Microsoft C/C++, set up
+the WFDB library source files as just described, then use this command:
 
 @example
-cl psamples.c -link wfdb
+cl psamples.c wfdbio.c signal.c annot.c calib.c wfdbinit.c
 @end example
 
 @noindent
-With Borland C/C++, use:
+With Borland C/C++ or Turbo C or C++, substitute @samp{bcc} or
+@samp{tcc}, respectively, for @samp{cl} in the command above.  You will
+find that some WFDB applications do not need to be compiled with all of
+the WFDB library sources (for example, @file{psamples} needs only
+@file{wfdbio.c} and @file{signal.c}); in such cases, you may omit the
+unneeded sources for faster compilation and smaller executable binaries.
 
-@example
-bcc -L@var{LIBDIR} psamples.c wfdb.lib
-@end example
-
-@noindent
-where @var{LIBDIR} is the directory in which @samp{wfdb.lib} (the WFDB
-library) has been installed.  (Substitute @samp{tcc} for @samp{bcc} if
-you are using Turbo C or C++.)  See your compiler manual for further
-information.
 
 @node     other languages, WFDB path, compiling, Usage
 @comment  node-name,  next,  previous,  up
@@ -879,6 +967,7 @@ Software Package with Scilab.
 @cindex @code{WFDBCAL} (environment variable)
 @cindex @code{WFDBGVMODE} (environment variable)
 @cindex @code{WFDBANNSORT} (environment variable)
+@cindex WFDB path
 
 WFDB applications make use of several @dfn{environment variables}, which are
 named @code{WFDB}, @code{WFDBCAL}, @code{WFDBGVMODE}, and @code{WFDBANNSORT}.
@@ -904,7 +993,7 @@ so that the WFDB path can be examined by the running program.  The WFDB
 software package includes easily customizable shell scripts (batch
 files) that illustrate how to do this for popular shells and command
 interpreters; see @emph{setwfdb}(1), in the @cite{WFDB Applications
-Guide}.  (On the Macintosh, for which the concept of environment
+Guide}.  (Under classic MacOS, for which the concept of environment
 variables is foreign, the WFDB path may be set only by using
 @code{DEFWFDB}.)  For further information, @pxref{WFDB path syntax}.
 
@@ -940,7 +1029,8 @@ psamples
 @end example
 
 @noindent
-and its output will appear as:
+(Try @samp{./psamples} if @samp{psamples} doesn't work.)  Its output
+will appear as:
 
 @example
 995     1011
@@ -984,6 +1074,7 @@ as needed in your programs, but avoid redefining them.
 @node     WFDB path syntax, exercises 1, name restrictions, Usage
 @section More About the WFDB Path
 
+@cindex WFDB path
 When a WFDB file must be opened for input, the WFDB library attempts to
 locate it by attaching each of the components of the WFDB path (one at a
 time) as a prefix to the file name.  If two or more matching files exist
@@ -993,6 +1084,7 @@ files are effectively invisible to WFDB applications unless the WFDB
 path is rearranged.
 
 @cindex database path (default)
+@cindex WFDB path
 
 The default WFDB path is specified at the time the WFDB library is
 compiled, by defining a value for the symbol @code{DEFWFDB} in
@@ -1062,7 +1154,7 @@ the specified @var{file}.  (This feature was first introduced in WFDB
 library version 8.0.)  Indirect WFDB path files may be nested up to ten
 levels (this arbitrary limit is imposed to avoid infinite recursion if
 the contents of the indirect file are incorrect).  This method of
-indirect assignment is useful on the Macintosh, where recompilation of
+indirect assignment is useful under classic MacOS, where recompilation of
 the WFDB library would otherwise be necessary in order to change the WFDB
 path.  It may also be useful under MS-DOS to reduce the need for
 environment space, or if the length of the command needed to set the
@@ -1154,7 +1246,7 @@ simply return the value it reads, as in @samp{v = getvec()}?
 @cindex functions in the WFDB library
 
 This chapter describes the functions that are available to programs
-compiled with the @samp{-lwfdb} option.  The functions are introduced in
+compiled with the WFDB library.  The functions are introduced in
 several groups, with examples to illustrate their usage.
 
 @menu
@@ -1166,6 +1258,7 @@ several groups, with examples to illustrate their usage.
 The remainder of the nodes in this section describe functions for:
 				
 * selecting::			Selecting database records (opening files).
+* special input modes::         Setting the input sampling frequency and more.
 * signal and annotation I/O::	Reading and writing signals and annotations.
 * non-sequential::		Non-sequential access to WFDB files.
 * conversion::			Time and other conversion functions.
@@ -1232,15 +1325,16 @@ properly set (@pxref{WFDB path}).  WFDB library functions responsible for
 opening signal files find them by reading the header file (which
 contains their names) first.
 
-The first part of this chapter describes functions that extract
+The first two sections of this chapter describes functions that extract
 information from header files in order to gain access to signal
-and annotation files.  The following two sections describe functions
-that deal with signal and annotation files.  Many readers will not need
+and annotation files, and functions that control how these files
+are read and written.  The following two sections describe functions
+that read and write signal and annotation files.  Many readers will not need
 to go any further; the remaining sections deal with special-purpose
 functions that exist to serve unusual applications.
 
 @page
-@node selecting,signal and annotation I/O,introduction to functions,Functions
+@node selecting,special input modes,introduction to functions,Functions
 @section Selecting Database Records
 @cindex selecting database records
 @cindex opening database files
@@ -1664,7 +1758,177 @@ if (n == 0)
 for methods of opening output signal files.
 
 @page
-@node     signal and annotation I/O, non-sequential, selecting, Functions
+@node     special input modes, signal and annotation I/O, selecting, Functions
+@section Special Input Modes
+
+@menu
+* setifreq::			Setting the input sampling frequency.
+* getifreq::                    Determining the input sampling frequency.
+* setgvmode::                   Setting the resolution for a multifrequency
+                                record.
+* getspf::                      Determining the number of samples per frame.
+@end menu
+
+@c @group
+@node     setifreq, getifreq, special input modes, special input modes
+@unnumberedsubsec setifreq
+@findex setifreq (10.2.6)
+@cindex interpolation
+@cindex decimation
+@cindex resampling
+
+@example
+void setifreq(WFDB_Frequency @var{frequency})
+@end example
+@noindent
+@c @end group
+
+@noindent
+This function sets the current input sampling frequency (in samples per
+second per signal).  It should be invoked after opening the input
+signals (using @code{isigopen} or @code{wfdbinit}), and before using any
+of @code{getvec}, @code{getann}, @code{putann}, @code{isigsettime},
+@code{isgsettime}, @code{timstr}, @code{mstimstr}, or @code{strtim}.
+@emph{Note that the operation of @code{getframe} is unaffected by
+@code{setifreq}.}
+
+Use @code{setifreq} when your application requires input samples at a
+specific frequency.  After invoking @code{setifreq}, @code{getvec}
+resamples the digitized signals from the input signals at the desired
+frequency (@pxref{getvec}), and all of the WFDB library functions that
+accept or return times in sample intervals automatically convert between
+the actual sampling intervals and those corresponding to the desired
+frequency.  This slightly elaborated version of the example program from
+the previous chapter invokes @code{setifreq}, passing it the desired sampling
+frequency from the command line, then prints the samples in record 100s,
+beginning 1 second (@code{t0}) and ending 2 seconds (@code{t1}) from the
+beginning of the record:
+
+@example
+#include <wfdb/wfdb.h>
+
+main(int argc, char **argv)
+@{
+    WFDB_Frequency f = (WFDB_Frequency)0;
+    WFDB_Sample v[2];
+    WFDB_Siginfo s[2];
+    WFDB_Time t, t0, t1;
+
+    if (argc > 1) sscanf(argv[1], "%lf", &f);
+    if (f <= (WFDB_Frequency)0) f = sampfreq("100s");
+
+    if (isigopen("100s", s, 2) < 1)
+        exit(1);
+    setifreq(f);
+    t0 = strtim("1");
+    isigsettime(t0);
+    t1 = strtim("2");
+    for (t = t0; t <= t1; t++) @{
+        if (getvec(v) < 0)
+            break;
+        printf("%d\t%d\n", v[0], v[1]);
+    @}
+    exit(0);
+@}
+@end example
+
+@noindent
+(The source for this program, @file{psamplex.c}, can be found in the
+@file{examples} directory of the WFDB source tree.  Compile it as shown
+in the previous chapter, then run it using a command such as
+@samp{psamplex 100}.)  The QRS detector in chapter 6 also illustrates
+the use of @code{setifreq} (@pxref{Example 10}).
+
+@c @group
+@node     getifreq, setgvmode, setifreq, special input modes
+@unnumberedsubsec getifreq
+@findex setifreq (10.2.6)
+
+@example
+WFDB_Frequency getifreq(void)
+@end example
+@noindent
+@strong{Return:}
+@table @asis
+@item @t{(WFDB_Frequency)}
+the input sampling frequency
+@end table
+@c @end group
+
+@noindent
+This function returns the current input sampling frequency (in samples
+per second per signal), which is either the raw sampling frequency for
+the record (as would be returned by @code{sampfreq}, @pxref{sampfreq}),
+or the frequency chosen using a previous invocation of @code{setifreq}.
+
+@c @group
+@node     setgvmode, getspf, getifreq, special input modes
+@unnumberedsubsec setgvmode
+@findex setgvmode (9.0)
+@cindex interpolation
+@cindex decimation
+@cindex resampling
+@cindex multi-frequency records (reading)
+
+@example
+void setgvmode(int *@var{mode})
+@end example
+@noindent
+@c @end group
+
+@noindent
+This function sets the mode used by @code{getvec} when reading a
+multi-frequency record (@pxref{Multi-Frequency Records}).  If @var{mode} is
+@code{WFDB_LOWRES}, @code{getvec} decimates any signals sampled at multiples of
+the frame rate, so that one sample is returned per signal per frame (i.e., the
+oversampled signals are resampled by simple averaging of the samples for each
+signal within each frame).  If @var{mode} is @code{WFDB_HIGHRES}, each sample
+of any oversampled signal is returned by successive invocations of
+@code{getvec}, and each sample of any signal sampled at a lower frequency is
+returned by two or more successive invocations of @code{getvec} (i.e., the less
+frequently sampled signals are resampled using zero-order interpolation).
+@code{getvec} operates in @code{WFDB_LOWRES} mode by default.
+@code{WFDB_LOWRES} and @code{WFDB_HIGHRES} are defined in @file{<wfdb/wfdb.h>}.
+
+In WFDB library version 9.6 and later versions, @code{setgvmode} also affects
+how annotations are read and written.  If @code{setgvmode(WFDB_HIGHRES)} is
+invoked @emph{before} using @code{annopen}, @code{wfdbinit}, @code{getvec},
+@code{sampfreq}, @code{strtim}, or @code{timstr}, then all @code{WFDB_Time}
+data (including the @code{time} attributes of annotations read by @code{getann}
+or written by @code{putann}) visible to the application are in units of the
+high-resolution sampling intervals.  (Otherwise, @code{WFDB_Time} data are in
+units of frame intervals.)
+
+@c @group
+@node     getspf, , setgvmode, special input modes
+@unnumberedsubsec getspf
+@findex getspf (9.6)
+@cindex interpolation
+@cindex decimation
+@cindex resampling
+@cindex multi-frequency records (reading)
+
+@example
+int getspf(void)
+@end example
+@noindent
+@strong{Return:}
+@table @asis
+@item @t{(int)}
+the number of samples per signal per frame
+@end table
+@c @end group
+
+@noindent
+Unless the application is operating in @code{WFDB_HIGHRES} mode
+(@pxref{setgvmode}) and has then opened a multi-frequency record, this
+function returns 1.  For the case of a multi-frequency record being read
+in high resolution mode, however, @code{getspf} returns the number of
+samples per signal per frame (hence @code{sampfreq(NULL)/getspf()} is
+the number of frames per second).
+
+@page
+@node     signal and annotation I/O, non-sequential, special input modes, Functions
 @section Reading and Writing Signals and Annotations
 @cindex signal I/O
 
@@ -1745,6 +2009,24 @@ Notice how the value returned by the first invocation of @code{isigopen}
 is used to determine how many input signals there are.  Several of the
 example programs in chapter 6 illustrate the use of @code{getvec}; for
 example, @pxref{Example 6}.
+
+@findex setifreq (10.2.6)
+@cindex interpolation
+@cindex decimation
+@cindex resampling
+If @code{setifreq} has been used to modify the input sampling rate,
+@code{getvec} resamples the input signals at the desired rate, using
+linear interpolation between the pair of samples nearest in time to that
+of the sample to be returned.  The results will generally be
+satisfactory, provided that the original signals do not contain
+frequencies near or above the Nyquist limit (half of the desired
+sampling frequency).  If this is a concern, you may wish to low-pass
+filter the input signals using, for example, @samp{fir} (see the
+@cite{WFDB Applications Guide}) before resampling them.  If you use
+@code{setifreq} to @emph{increase} the sampling frequency by a large
+factor, you may wish to filter the resampled signals within your
+application to remove harmonics of the original sampling frequency
+introduced by resampling.
 
 @c @group
 @node    getframe, putvec, getvec, signal and annotation I/O
@@ -2858,9 +3140,6 @@ first introduced in WFDB library version 6.0.)
 * sampfreq::			Reading the sampling frequency of a WFDB record.
 * setsampfreq::			Setting the sampling frequency.
 * setbasetime::			Setting the base time.
-* setgvmode::                   Setting the resolution for a multifrequency
-                                record.
-* getspf::                      Determining the number of samples per frame.
 * counter conversion::		Functions for reading and setting counter
 				conversion parameters.
 * setwfdb::			Dynamically changing the database path.
@@ -3270,7 +3549,7 @@ Use @code{setsampfreq} before creating a new @file{hea} file
 @xref{Example 8}, for an illustration of the use of @code{setsampfreq}.
 
 @c @group
-@node     setbasetime, setgvmode, setsampfreq, miscellaneous functions
+@node     setbasetime, counter conversion, setsampfreq, miscellaneous functions
 @unnumberedsubsec setbasetime
 @findex setbasetime
 @cindex current time
@@ -3307,76 +3586,10 @@ frequency and before creating a header file
 @end ifinfo
 @xref{Example 8}, for an illustration of the use of @code{setbasetime}.
 
-@c @group
-@node     setgvmode, getspf, setbasetime, miscellaneous functions
-@unnumberedsubsec setgvmode
-@findex setgvmode (9.0)
-@cindex interpolation
-@cindex decimation
-@cindex resampling
-@cindex multi-frequency records (reading)
-
-@example
-void setgvmode(int *@var{mode})
-@end example
-@noindent
-@c @end group
-
-@noindent
-This function sets the mode used by @code{getvec} when reading a
-multi-frequency record (@pxref{Multi-Frequency Records}).  If @var{mode} is
-@code{WFDB_LOWRES}, @code{getvec} decimates any signals sampled at multiples of
-the frame rate, so that one sample is returned per signal per frame (i.e., the
-oversampled signals are resampled by simple averaging of the samples for each
-signal within each frame).  If @var{mode} is @code{WFDB_HIGHRES}, each sample
-of any oversampled signal is returned by successive invocations of
-@code{getvec}, and each sample of any signal sampled at a lower frequency is
-returned by two or more successive invocations of @code{getvec} (i.e., the less
-frequently sampled signals are resampled using zero-order interpolation).
-@code{getvec} operates in @code{WFDB_LOWRES} mode by default.
-@code{WFDB_LOWRES} and @code{WFDB_HIGHRES} are defined in @file{<wfdb/wfdb.h>}.
-
-In WFDB library version 9.6 and later versions, @code{setgvmode} also affects
-how annotations are read and written.  If @code{setgvmode(WFDB_HIGHRES)} is
-invoked @emph{before} using @code{annopen}, @code{wfdbinit}, @code{getvec},
-@code{sampfreq}, @code{strtim}, or @code{timstr}, then all @code{WFDB_Time}
-data (including the @code{time} attributes of annotations read by @code{getann}
-or written by @code{putann}) visible to the application are in units of the
-high-resolution sampling intervals.  (Otherwise, @code{WFDB_Time} data are in
-units of frame intervals.)
-
-@c @group
-@node     getspf, counter conversion, setgvmode, miscellaneous functions
-@unnumberedsubsec getspf
-@findex getspf (9.6)
-@cindex interpolation
-@cindex decimation
-@cindex resampling
-@cindex multi-frequency records (reading)
-
-@example
-int getspf(void)
-@end example
-@noindent
-@strong{Return:}
-@table @asis
-@item @t{(int)}
-the number of samples per signal per frame
-@end table
-@c @end group
-
-@noindent
-Unless the application has used @code{setgvmode(WFDB_HIGHRES)} and has
-then opened a multi-frequency record, this function returns 1.  For the
-case of a multi-frequency record being read in high resolution mode,
-however, @code{getspf} returns the number of samples per signal per
-frame (hence @code{sampfreq(NULL)/getspf()} is the number of frames
-per second).
-
 @sp 2
 
 @c @group
-@node     counter conversion, setwfdb, getspf, miscellaneous functions
+@node     counter conversion, setwfdb, setbasetime, miscellaneous functions
 @cindex base counter value
 @cindex counter (base)
 @cindex counter frequency
@@ -3489,6 +3702,7 @@ functions that read @file{hea} files.
 @findex setwfdb
 @cindex database path (changing)
 @cindex changing the WFDB path
+@cindex WFDB path
 
 @example
 void setwfdb(char *@var{string})
@@ -3515,6 +3729,7 @@ understood to specify the current directory (which may also be indicated
 by a component consisting of a single @samp{.}).  If the string is empty or
 @code{NULL}, the database path is limited to the current directory.
 
+@cindex WFDB path
 @cindex indirect WFDB path
 @cindex file containing WFDB path
 @cindex database path file (indirect)
@@ -3553,6 +3768,7 @@ for an example of the use of @code{setwfdb}.
 @findex getwfdb
 @cindex database path (reading)
 @cindex reading the WFDB path
+@cindex WFDB path
 
 @example
 char *getwfdb(void)
@@ -3594,6 +3810,7 @@ as @samp{\\}.)
 @cindex filenames of WFDB files (obtaining)
 @cindex pathnames of WFDB files (obtaining)
 @cindex NETFILES
+@cindex WFDB path
 
 @example
 char *wfdbfile(char *@var{type}, char *@var{record})
@@ -4272,10 +4489,10 @@ underscores.  Annotation files are normally created in the current directory
 and found in any of the directories in the database path (@pxref{WFDB path}).
 
 @item int stat
-@cindex WFDB_AHA_READ
-@cindex WFDB_AHA_WRITE
-@cindex WFDB_READ
-@cindex WFDB_WRITE
+@cindex @code{WFDB_AHA_READ}
+@cindex @code{WFDB_AHA_WRITE}
+@cindex @code{WFDB_READ}
+@cindex @code{WFDB_WRITE}
 the file type/access code.  Usually, @code{stat} is either @code{WFDB_READ}
 or @code{WFDB_WRITE}, to specify standard (``MIT format'') annotation files
 to be read by @code{getann} or to be written by @code{putann}.  Both MIT
@@ -4602,6 +4819,7 @@ is the MIT annotation @code{subtyp} (significant only if @var{c} is
 @node     Database Files, Examples, Annotation Codes, Top
 @chapter Database Files
 
+@cindex WFDB path
 The WFDB library has been constructed to provide a standard interface
 between the database files and application programs.  Alternate means of
 access to database files is strongly discouraged, since file formats may
@@ -5029,6 +5247,7 @@ as will be used; if, for example, only one signal is needed, only
 @cindex URL
 @cindex http
 @cindex ftp
+@cindex WFDB path
 
 If the symbol @code{WFDB_NETFILES} is defined at the time the WFDB library is
 compiled, then input files located on remote web (HTTP) and FTP servers can be
@@ -5040,12 +5259,13 @@ NETFILES-enabled WFDB library (the necessary @code{libwww} functions will be
 loaded automatically), and incorporate one or more URL prefixes in the WFDB
 path.
 
+@cindex WFDB path
 @cindex PhysioBank
 In current versions of the WFDB library, the default WFDB path (defined in the
 WFDB library source file @code{wfdblib.h}, and used as the WFDB path if the
 WFDB environment variable is undefined) is @samp{. /usr/database
-http://www.physio@-net.org/physio@-bank/data@-base}.  (The second component,,
-after the @samp{.} that specifies the current directory,may vary, depending on
+http://www.physio@-net.org/physio@-bank/data@-base}.  (The second component,
+after the @samp{.} that specifies the current directory, may vary, depending on
 your platform and the choices made during installation.)  The URL prefix (the
 third component) points to PhysioBank, an on-line archive for a wide variety of
 standard databases of physiologic signals.  The databases are kept in
@@ -5156,6 +5376,12 @@ examples can be compiled (under Unix) using a command of the form
 cc @var{file.c} -lwfdb
 @end example
 @noindent
+or, if the WFDB library or its @code{*.h} files are not in the standard
+locations:
+@example
+cc `wfdb-config --cflags` @var{file.c} `wfdb-config --libs`
+@end example
+@noindent
 where @var{file.c} is the name of the file containing the source;
 @pxref{Usage, , Using the WFDB Library}, for further information.
 The sources for these examples are included in the WFDB Software Package,
@@ -5209,6 +5435,7 @@ to @code{NORMAL} and deleting all non-QRS annotations.
 @i{26}  @}
 @end example
 
+@page
 @c @group
 @noindent
 @strong{Notes:}
@@ -6244,9 +6471,9 @@ is based on a Pascal program written by W.A.H. Engelse and C. Zeelenberg,
 @i{30}          exit(2);
 @i{31}      @}
 @i{32}      if (wfdbinit(argv[1], &a, 1, s, nsig) != nsig) exit(2);
-@i{33}      if (sampfreq(NULL) != 250.)
-@i{34}          fprintf(stderr,"warning: %s is designed for 250 Hz input\n",
-@i{35}                  argv[0]);
+@i{33}      if (sampfreq((char *)NULL) < 240. ||
+@i{34}          sampfreq((char *)NULL) > 260.)
+@i{35}          setifreq(250.);
 @i{36}      if (argc > 2) scmin = muvadu(0, atoi(argv[2]));
 @i{37}      if (scmin < 1) scmin = muvadu(0, 1000);
 @i{38}      slopecrit = scmax = 10 * scmin;
@@ -6320,9 +6547,9 @@ The names of these variables match those in the original Pascal program.
 Most of this program is independent of sampling frequency, but the filter
 (lines 45--46) and the threshold are as specified by the authors
 of the original program for human ECGs sampled at 250 Hz (e.g., the AHA DB).
-The program will work for MIT DB records sampled at 360 Hz, but better
-results can be obtained if the filter is optimized for the correct sampling
-frequency.
+If the sampling frequency of the input record is significantly
+different, we use @code{setifreq} to specify that we want @code{getvec}
+to give us data resampled at 250 Hz.
 
 @item Lines 36--38:
 The threshold is actually a slope criterion (with units of amplitude/time);
@@ -6382,7 +6609,8 @@ through them first.
 @enumerate
 @item
 Type in the first program from the previous chapter, compile it, and run
-it.  Remember to set and export the environment variable @code{WFDB}
+it.  If you know that you will need to read WFDB files from non-standard
+locations, remember to set and export the environment variable @code{WFDB}
 (@pxref{WFDB path}).  It is a good idea to include this step in your
 @file{.profile}, @file{.cshrc}, or @file{autoexec.bat}.  As input, try
 record @file{100s}, input annotator @file{atr}, and output annotator
@@ -6622,14 +6850,10 @@ A set of annotations in time order.
 
 @item Annotator name
 @cindex annotator name (defined)
-A name associated with an annotation file.  On writable Unix and
-Macintosh file systems, the annotation file name is constructed from the
-annotator name by appending a @samp{.} and the record name.  On CD-ROMs
-and MS-DOS file systems, the annotator name is restricted to three
-characters, and the annotation file name is constructed from the record
-name by appending a @samp{.} and the annotator name.  Unix and Macintosh
-versions of the WFDB library can locate and read annotation files named
-using either convention.
+A name associated with an annotation file.  The annotation file name is
+constructed from the record name by appending a @samp{.} and the annotator
+name.  On CD-ROMs and MS-DOS file systems, the annotator name is restricted
+to three characters.
 
 @item Annotator [number]
 @cindex annotator number (defined)
@@ -6720,6 +6944,7 @@ Those files (annotation files, header files, signal files, and
 calibration files) that are accessed via the WFDB library.
 
 @item Database path
+@cindex WFDB path
 @cindex database path (defined)
 The names of the directories in which header, annotation, and calibration files
 are kept.  (Signal files may be located in these directories or elsewhere;
@@ -6951,7 +7176,7 @@ length of the prolog (in bytes) in the appropriate locations in a
 header file that names the signal file.  If you need to create
 such a header file, refer to the description of the byte offset
 field in @cite{header(5)} (the specification of the header file
-format in the @cite{WFDB Applications Guide}, or
+format in the @cite{WFDB Applications Guide}) or
 @pxref{wfdbsetstart}.
 
 @item Record
@@ -7015,7 +7240,8 @@ discrete samples.
 @item Signal file
 @cindex signal file (defined)
 A set of samples in time order, which represent a signal or signal
-group.
+group.  Signal files usually have names of the form @var{record}@code{.dat},
+but this is only a convention and is not required.
 
 @item Signal group
 @cindex signal group (defined)
@@ -7167,7 +7393,7 @@ single command: @samp{tar xfvz wfdb.tar.gz}.)
 
 This will create a directory with a name of the form @code{wfdb-}@var{m.n.r},
 where @var{m.n.r} is the version number of the included WFDB library (e.g.,
-@code{10.2.5}).  Enter this directory.
+@code{10.2.6}).  Enter this directory.
 
 You should now be ready to configure, compile, and install the software, using
 the commands:
@@ -7207,17 +7433,11 @@ install the @code{libwww} package from @code{http://www.w3.org/Library/} or
 from @code{http://@-www.physio@-net.org/physio@-tools/libwww/}.  You may
 omit this step if you do not wish to have NETFILES support.
 
-Download
-@code{http://www.physio@-net.org/physio@-tools/binaries/win@-dows/bin/which@-.exe}
-and put it into a directory in your PATH.  (This utility is needed by
-@code{configure} in a later step.  The sources for @code{which.exe} are
-available within @code{http://www.physio@-net.org/physio@-tools/util@-ities/}.)
-
 Open a Cygwin terminal window (the Cygwin installer will have added this to
 your MS-Windows start menu).  Perform the remaining steps by typing the
 commands given below into the terminal window.
 
-Check that @code{which} and @code{gcc} are accessible by typing the command:
+Check that @code{gcc} is accessible by typing the command:
 
 @example
 which gcc
@@ -7248,7 +7468,7 @@ tar xfv wfdb.tar
 
 This will create a directory with a name of the form @code{wfdb-}@emph{m.n.r},
 where @emph{m.n.r} is the version number of the included WFDB library (e.g.,
-@code{10.2.5}).  Enter this directory.
+@code{10.2.6}).  Enter this directory.
 
 You should now be ready to configure, compile, and install the software, using
 the commands:
@@ -7326,6 +7546,7 @@ consult an expert (such as the person who installed the WFDB library on
 your system).  If you use these programs often, you may wish to include
 the directory in which they are kept in your search path.
 
+@cindex WFDB path
 To use any of these programs, you will need to set the database path first
 (@pxref{WFDB path}), unless the default database path
 (@samp{. http://www.physio@-net.org/physio@-bank/data@-base}) is suitable.
@@ -7747,7 +7968,7 @@ The modular design of the library makes it fairly easy to remove
 unneeded functionality in order to conserve memory for special
 applications.  The @file{calib.c} package is not referenced by any other
 WFDB library modules.  For signal processing applications that do not involve
-ECGs, the entire @file{annot.c} package may be removed (with trivial
+annotations, the entire @file{annot.c} package may be removed (with trivial
 modifications to the functions in @file{wfdbinit.c}).  If you wish to add
 functions to the library, you will find that it will be easier to
 maintain your modified version and to merge updates if you preserve the
@@ -7758,6 +7979,7 @@ variables).  If you wish to define new types of binary files, consider
 using the low-level I/O routines in @file{wfdbio.c} for reading and writing
 them in a machine-independent format.
 
+@cindex WFDB path
 Porting the WFDB library to another environment is a straightforward
 operation if an ANSI C compiler is available in the target environment.
 Since all direct access to database files is performed using the
@@ -8271,7 +8493,7 @@ numbered versions of the WFDB library.
 @ifinfo
 WFDB Programmer's Guide
 
-Tenth Edition (revised and with additions for WFDB library version 10.2.5)
+Tenth Edition (revised and with additions for WFDB library version 10.2.6)
 
 George B. Moody
 

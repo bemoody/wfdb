@@ -1,9 +1,9 @@
 /* file: sqrs125.c	G. Moody	27 October 1990
-			Last revised:  17 December 2001
+			Last revised:     28 May 2002
 
 -------------------------------------------------------------------------------
 sqrs125: Single-channel QRS detector for data sampled at 100 - 150 Hz
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -177,11 +177,8 @@ char *argv[];
     }
     a.name = "qrs"; a.stat = WFDB_WRITE;
     if ((nsig = wfdbinit(record, &a, 1, s, nsig)) < 1) exit(2);
-    if (sampfreq((char *)NULL) < 100. || sampfreq((char *)NULL) > 150.) {
-        (void)fprintf(stderr, "warning: %s is designed for 125 Hz input\n",
-                argv[0]);
-	(void)fprintf(stderr, " Consider resampling using `xform'.\n");
-    }
+    if (sampfreq((char *)NULL) < 120. || sampfreq((char *)NULL) > 130.)
+	setifreq(125.);
     if (from > 0L) {
 	if ((from = strtim(argv[from])) < 0L)
 	from = -from;

@@ -1,5 +1,5 @@
 file: INSTALL			G. Moody	30 January 2000
-				Last revised:	6 September 2001
+				Last revised:	  2 June 2002
 WFDB Software Package installation notes
 
 These notes are included here for those who may not have ready access to the
@@ -56,11 +56,8 @@ Under MS-Windows:
    Unix utilities ported to MS-Windows.  Accept the defaults suggested by the
    installer.
 
-   IMPORTANT:  Although you may be able to compile the WFDB software package
-   using a proprietary compiler, this is NOT SUPPORTED.  The 'Makefile.dos'
-   files in several of the subdirectories of this one can be used with the
-   'make' utilities provided with most commercial C compilers, although you
-   will need to customize them for your compiler. Your feedback is appreciated.
+   See the notes near the end of this section for information contributed by
+   users about using proprietary compilers.
 
 2. Download http://www.physionet.org/physiotools/binaries/windows/bin/which.exe
    and put it into a directory in your PATH.  (This utility is needed by
@@ -91,6 +88,42 @@ Under MS-Windows:
 6. If for any reason you wish to uninstall the WFDB Software Package, type:
 	make uninstall
    from this directory.
+
+...............................................................................
+
+Using proprietary compilers
+
+   IMPORTANT:  Although you may be able to compile the WFDB software package
+   using a proprietary compiler, this is NOT SUPPORTED.  Cygwin 'gcc' is free,
+   robust, and supported -- please give it a try!
+
+   If, despite the above, you feel that you must use a proprietary compiler,
+   this section contains notes contributed by other users who have done so.
+   The developers of the WFDB software package do not use any of these
+   compilers, so you are on your own if you choose to use one of them.
+
+   Between 1985 and 1995, previous versions of this software were compiled
+   using Borland C/C++, Microsoft C/C++, and Turbo C/C++.  These compilers
+   came bundled with 'make'-like utilties (Microsoft's was called 'nmake').
+   If you are using one of these compilers, you may be able to use the
+   'Makefile.dos' files in several of the subdirectories of this one to
+   perform an automated compilation of the WFDB software package, although you
+   will need to customize these 'Makefile.dos' files for your compiler. Your
+   feedback is appreciated.
+
+Borland C++ Builder
+
+   Thanks to Ion Gaztañaga for these notes.
+
+1. Edit lib/wfdb.h to define WFDB_NETFILES as 0 (do not compile with libwww
+   support).  It's possible that libwww support will work, but this has not
+   been tested.
+
+2. Build a static library (wfdb.lib) from the sources in the 'lib' directory,
+   selecting:
+	C calling convention
+	Borland Language compliance
+	Others:  Borland C++ Builder default settings
 
 _______________________________________________________________________________
 

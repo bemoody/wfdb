@@ -74,6 +74,7 @@ checkpkg/expected/ecgeval.out
 checkpkg/expected/fir.dat
 checkpkg/expected/fir.hea
 checkpkg/expected/ihr.out
+checkpkg/expected/lcheck_cal
 checkpkg/expected/lcheck.log-NETFILES
 checkpkg/expected/lcheck.log-no-NETFILES
 checkpkg/expected/mfilt.dat
@@ -240,6 +241,7 @@ doc/wag-src/a2m.1
 doc/wag-src/ann2rr.1
 doc/wag-src/annot.5
 doc/wag-src/appguide.int
+doc/wag-src/blankpage.tex
 doc/wag-src/bxb.1
 doc/wag-src/calsig.1
 doc/wag-src/coherence.1
@@ -300,6 +302,7 @@ doc/wag-src/wfdb.3
 doc/wag-src/wfdbcal.5
 doc/wag-src/wfdbcat.1
 doc/wag-src/wfdbcollate.1
+doc/wag-src/wfdb-config.1
 doc/wag-src/wfdbdesc.1
 doc/wag-src/wfdbf.3
 doc/wag-src/wfdbwhich.1
@@ -425,7 +428,7 @@ examples/Makefile.dos
 examples/Makefile.top
 examples/Makefile.tpl
 examples/psamples.c
-examples/psamplesx.c
+examples/psamplex.c
 examples/README
 examples/refhr.c
 examples/stdev.c

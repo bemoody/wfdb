@@ -1,9 +1,9 @@
 /* file: sqrs.c		G. Moody	27 October 1990
-			Last revised:  17 December 2001
+			Last revised: 	  28 May 2002
 
 -------------------------------------------------------------------------------
 sqrs: Single-channel QRS detector
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -34,10 +34,9 @@ annotations at locations which `sqrs' believes are noise-corrupted.
 
 `sqrs' can process records containing any number of signals, but it uses only
 one signal for QRS detection (signal 0 by default;  this can be changed using
-the `-s' option, see below).  For best results on adult human ECGs, use `xform'
-to resample the input signal at 250 Hz if a different sampling frequency was
-used originally.  For other ECGs, it may be necessary to experiment with the
-input sampling frequency and the time constants indicated below.
+the `-s' option, see below).  'sqrs' has been optimized for adult human ECGs.
+For other ECGs, it may be necessary to experiment with the input sampling
+frequency and the time constants indicated below.
 
 This program is provided as an example only, and is not intended for any
 clinical application.  At the time the algorithm was originally published,
@@ -170,11 +169,8 @@ char *argv[];
     }
     a.name = "qrs"; a.stat = WFDB_WRITE;
     if ((nsig = wfdbinit(record, &a, 1, s, nsig)) < 1) exit(2);
-    if (sampfreq((char *)NULL) < 200. || sampfreq((char *)NULL) > 300.) {
-        (void)fprintf(stderr, "warning: %s is designed for 250 Hz input\n",
-                argv[0]);
-	(void)fprintf(stderr, " Consider resampling using `xform'.\n");
-    }
+    if (sampfreq((char *)NULL) < 240. || sampfreq((char *)NULL) > 260.)
+	setifreq(250.);
     if (from > 0L) {
 	if ((from = strtim(argv[from])) < 0L)
 	from = -from;

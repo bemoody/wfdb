@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:    21 May 2002	wfdblib 10.2.6
+			Last revised:   17 June 2002	wfdblib 10.2.6
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -52,6 +52,8 @@ This file also contains definitions of the following WFDB library functions:
  osigfopen	(opens output signals by name)
  getspf [9.6]	(returns number of samples returned by getvec per frame)
  setgvmode [9.0](sets getvec operating mode)
+ setifreq [10.2.6](sets the getvec sampling frequency)
+ getifreq [10.2.6](returns the getvec sampling frequency)
  getvec		(reads a (possibly resampled) sample from each input signal)
  getframe [9.0]	(reads an input frame)
  putvec		(writes a sample to each output signal)
@@ -69,9 +71,7 @@ This file also contains definitions of the following WFDB library functions:
  wfdbsetstart [9.4](sets byte offset to be written by setheader)
  getinfo [4.0]	(reads a line of info for a record)
  putinfo [4.0]	(writes a line of info for a record)
- rawsampfreq [10.2.6] (returns the rgetvec sampling frequency)
- setisampfreq [10.2.6](sets the getvec sampling frequency)
- sampfreq	(returns the getvec sampling frequency)
+ sampfreq	(returns the sampling frequency of the specified record)
  setsampfreq	(sets the putvec sampling frequency)
  setbasetime	(sets the base time and date)
  timstr		(converts sample intervals to time strings)
@@ -892,7 +892,7 @@ static void isigclose()
     if (igd) {
 	while (nigroups)
 	    if (ig = igd[--nigroups]) {
-		if (ig->fp) wfdb_fclose(ig->fp);
+		if (ig->fp) (void)wfdb_fclose(ig->fp);
 		if (ig->buf) (void)free(ig->buf);
 		(void)free(ig);
 	    }
@@ -1913,7 +1913,8 @@ int mode;
 /* An application can specify the input sampling frequency it prefers by
    calling setifreq after opening the input record. */
 
-static int mticks, nticks, mnticks, rgvstat;
+static long mticks, nticks, mnticks;
+static int rgvstat;
 static WFDB_Time rgvtime, gvtime;
 static WFDB_Sample *gv0, *gv1;
 
@@ -1921,7 +1922,7 @@ FINT setifreq(f)
 WFDB_Frequency f;
 {
     if (f > 0.0) {
-	WFDB_Frequency g = sfreq;
+	WFDB_Frequency error, g = sfreq;
 
 	gv0 = realloc(gv0, nisig*sizeof(WFDB_Sample));
 	gv1 = realloc(gv1, nisig*sizeof(WFDB_Sample));
@@ -1932,23 +1933,42 @@ WFDB_Frequency f;
 	    return (-2);
 	}
 	ifreq = f;
-	while (fabs(f - g) > 0.005)
+	/* The 0.005 below is the maximum tolerable error in the resampling
+	   frequency (in Hz).  The code in the while loop implements Euclid's
+	   algorithm for finding the greatest common divisor of two integers,
+	   but in this case the integers are (implicit) multiples of 0.005. */
+	while ((error = f - g) > 0.005 || error < -0.005)
 	    if (f > g) f -= g;
 	    else g -= f;
-        mticks = (int)(sfreq/f + 0.5);
-	nticks = (int)(ifreq/f + 0.5);
+	/* f is now the GCD of sfreq and ifreq in the sense described above.
+	   We divide each raw sampling interval into mticks subintervals. */
+        mticks = (long)(sfreq/f + 0.5);
+	/* We divide each resampled interval into nticks subintervals. */
+	nticks = (long)(ifreq/f + 0.5);
+	/* Raw and resampled intervals begin simultaneously once every mnticks
+	   subintervals; we say an epoch begins at these times. */
 	mnticks = mticks * nticks;
+	/* gvtime is the number of subintervals from the beginning of the
+	   current epoch to the next sample to be returned by getvec(). */
 	gvtime = 0;
 	rgvstat = rgetvec(gv0);
 	rgvstat = rgetvec(gv1);
+	/* rgvtime is the number of subintervals from the beginning of the
+	   current epoch to the most recent sample returned by rgetvec(). */
 	rgvtime = nticks;
 	return (0);
     }
     else {
 	ifreq = 0.0;
+	wfdb_error("setifreq: improper frequency %g (must be > 0)\n", f);
 	return (-1);
     }
 }
+
+FFREQUENCY getifreq(void)
+{
+    return (ifreq > (WFDB_Frequency)0 ? ifreq : sfreq);
+}    
 
 FINT getvec(vector)
 WFDB_Sample *vector;
@@ -2084,10 +2104,12 @@ FINT isgsettime(g, t)
 WFDB_Group g;
 WFDB_Time t;
 {
-    int spf, stat, trem = 0;
+    int spf, stat, tr, trem = 0;
 
     /* Handle negative arguments as equivalent positive arguments. */
     if (t < 0L) t = -t;
+
+    tr = t;
 
     /* Convert t to raw sample intervals if we are resampling. */
     if (ifreq > (WFDB_Frequency)0)
@@ -2116,6 +2138,14 @@ WFDB_Time t;
 	    rgvtime = nticks;
 	}
     }
+
+    if (tr != t) {
+	t = (WFDB_Time)(t * ifreq/sfreq);
+
+	while (t++ < tr)
+	    getvec(uvector);
+    }
+
     return (stat);
 }
 
@@ -2503,7 +2533,7 @@ char *string;
     if (string == NULL || *string == '\0') {
 #ifndef NOTIME
 	struct tm *now;
-	time_t t, time();
+	time_t t;
 
 	t = time((time_t *)NULL);    /* get current time from system clock */
 	now = localtime(&t);
@@ -2719,20 +2749,30 @@ FINT adumuv(s, a)
 WFDB_Signal s;
 WFDB_Sample a;
 {
+    double x;
     WFDB_Gain g = (s < nisig) ? isd[s]->info.gain : WFDB_DEFGAIN;
 
     if (g == 0.) g = WFDB_DEFGAIN;
-    return ((int)(a*1000./g + 0.5));
+    x = a*1000./g;
+    if (x >= 0.0)
+	return ((int)(x + 0.5));
+    else
+	return ((int)(x - 0.5));
 }
 
 FSAMPLE muvadu(s, v)
 WFDB_Signal s;
 int v;
 {
+    double x;
     WFDB_Gain g = (s < nisig) ? isd[s]->info.gain : WFDB_DEFGAIN;
 
     if (g == 0.) g = WFDB_DEFGAIN;
-    return ((int)(g*v*0.001 + 0.5));
+    x = g*v*0.001;
+    if (x >= 0.0)
+	return ((int)(x + 0.5));
+    else
+	return ((int)(x - 0.5));
 }
 
 FDOUBLE aduphys(s, a)
@@ -2770,7 +2810,11 @@ double v;
 	b = 0;
 	g = WFDB_DEFGAIN;
     }
-    return ((int)(g*v + 0.5) + b);
+    v *= g;
+    if (v >= 0)
+	return ((int)(v + 0.5) + b);
+    else
+	return ((int)(v - 0.5) + b);
 }
 
 /* Private functions (for use by other WFDB library functions only). */

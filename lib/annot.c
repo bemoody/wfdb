@@ -1,10 +1,10 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:   7 November 2001		wfdblib 10.2.1
+			Last revised:    28 May 2002		wfdblib 10.2.6
 WFDB library functions for annotations
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -127,13 +127,13 @@ static struct oadata {
     WFDB_Anninfo info;		/* output annotator information */
     WFDB_Annotation ann;	/* most recent annotation written by putann */
     int seqno;			/* annotation serial number (AHA format only)*/
-    char rname[WFDB_MAXRNL+1];	/* record with which annotator is associated */
+    char *rname;		/* record with which annotator is associated */
     char out_of_order;		/* if >0, one or more annotations written by
 				   putann are not in the canonical (time, chan)
 				   order */
 } **oad;
 
-static int tmul;		/* `time' fields in annotations are
+static double tmul;		/* `time' fields in annotations are
 				   tmul * times in annotation files */
 
 /* Local functions (for the use of other functions in this module only). */
@@ -267,7 +267,7 @@ unsigned int nann;
 	record++;		/* discard the '+' prefix */
     else {
 	wfdb_anclose();		/* close previously opened annotation files */
-	tmul = getspf();
+	tmul = 0.0;
     }
 
     /* Prescan aiarray to see how large maxiann and maxoann must be. */
@@ -370,7 +370,13 @@ unsigned int nann;
 		return (-4);
 	    }
 	    (void)strcpy(oa->info.name, aiarray[i].name);
-	    (void)strncpy(oa->rname, record, WFDB_MAXRNL);
+	    if ((oa->rname =
+		 (char *)malloc((unsigned)(strlen(record)+1)))
+		== NULL) {
+		wfdb_error("annopen: insufficient memory\n");
+		return (-4);
+	    }
+	    (void)strcpy(oa->rname, record);
 	    oa->ann.time = 0L;
 	    oa->info.stat = aiarray[i].stat;
 	    oa->out_of_order = 0;
@@ -416,7 +422,14 @@ WFDB_Annotation *annot;		/* address of structure to be filled in */
 	    return (0);
 	}
 	ia->tt += ia->word & DATA; /* annotation time */
-	ia->ann.time = ia->tt * tmul;
+	if (ia->tt > 0L && tmul <= 0.0) {
+	    WFDB_Frequency f = sampfreq(NULL);
+
+	    tmul = getspf();
+	    if (f != (WFDB_Frequency)0)
+		tmul = tmul * getifreq() / f;
+	}
+	ia->ann.time = (WFDB_Time)(ia->tt * tmul + 0.5);
 	ia->ann.anntyp = (ia->word & CODE) >> CS; /* set annotation type */
 	ia->ann.subtyp = 0;	/* reset subtype field */
 	ia->ann.aux = NULL;	/* reset aux field */
@@ -451,7 +464,15 @@ WFDB_Annotation *annot;		/* address of structure to be filled in */
 	}
 	a = ia->word >> 8;		 /* AHA annotation code */
 	ia->ann.anntyp = ammap(a);	 /* convert to MIT annotation code */
-	ia->ann.time = wfdb_g32(ia->file) * tmul; /* time of annotation */
+	if (tmul <= 0.0) {
+	    WFDB_Frequency f = sampfreq(NULL);
+
+	    tmul = getspf();
+	    if (f != (WFDB_Frequency)0)
+		tmul = tmul * getifreq() / f;
+	}
+	ia->ann.time = (WFDB_Time)(wfdb_g32(ia->file) * tmul + 0.5);
+					 /* time of annotation */
 	if (wfdb_g16(ia->file) <= 0)	 /* serial number (starts at 1) */
 	    wfdb_error("getann: unexpected annot number in annotator %s\n",
 		       ia->info.name);
@@ -508,17 +529,29 @@ WFDB_Annotation *annot;		/* address of annotation to be written */
     unsigned annwd;
     char *ap;
     int i, len;
-    long delta, t;
+    long delta;
+    WFDB_Time t;
     struct oadata *oa;
 
     if (n >= noaf || (oa = oad[n]) == NULL || oa->file == NULL) {
 	wfdb_error("putann: can't write annotation file %d\n", n);
 	return (-2);
     }
-    t = annot->time / tmul;
+    if (annot->time == 0L)
+	t = 0L;
+    else {
+	if (tmul <= 0.0) {
+	    WFDB_Frequency f = sampfreq(NULL);
+
+	    tmul = getspf();
+	    if (f != (WFDB_Frequency)0)
+		tmul = tmul * getifreq() / f;
+	}
+	t = (WFDB_Time)(annot->time / tmul + 0.5);
+    }
     if (((delta = t - oa->ann.time) < 0L ||
 	(delta == 0L && annot->chan <= oa->ann.chan)) &&
-	(annot->time != 0L || oa->ann.time != 0L)) {
+	(t != 0L || oa->ann.time != 0L)) {
 	oa->out_of_order = 1;
     }
     switch (oa->info.stat) {
@@ -559,7 +592,7 @@ WFDB_Annotation *annot;		/* address of annotation to be written */
       case WFDB_AHA_WRITE:	/* AHA-format output file */
 	(void)wfdb_putc('\0', oa->file);
 	(void)wfdb_putc(mamap(annot->anntyp, annot->subtyp), oa->file);
-	wfdb_p32(annot->time, oa->file);
+	wfdb_p32(t, oa->file);
 	wfdb_p16((unsigned int)(++(oa->seqno)), oa->file);
 	(void)wfdb_putc(annot->subtyp, oa->file);
 	(void)wfdb_putc(annot->anntyp, oa->file);
@@ -870,6 +903,7 @@ WFDB_Annotator n;
 	    wfdb_error("to rearrange annotations in the correct order.\n");
 	}
 	(void)free(oa->info.name);
+	(void)free(oa->rname);
 	(void)free(oa);
 	while (n < noaf-1) {
 	    oad[n] = oad[n+1];

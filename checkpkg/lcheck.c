@@ -1,8 +1,8 @@
-/* file: wfdbcheck.c	G. Moody       	7 September 2001
-			Last revised:  11 September 2001
+/* file: lcheck.c	G. Moody       	7 September 2001
+			Last revised:     17 June 2002
 -------------------------------------------------------------------------------
 wfdbcheck: test WFDB library
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -47,9 +47,10 @@ char *info, *pname, *prog_name();
 int n, nsig, i, j, framelen, errors = 0, stat, vflag = 0;
 char headerversion[40];
 char *libversion;
-char *p, *defpath, *dbpath;
+char *p, *q, *defpath, *dbpath;
 WFDB_Anninfo aiarray[2];
 WFDB_Annotation annot;
+WFDB_Calinfo cal;
 WFDB_Siginfo *si;
 WFDB_Sample *vector;
 void help(), list_untested();
@@ -137,6 +138,57 @@ char *argv[];
   else if (vflag)
     printf("[OK]:  WFDB path modified successfully\n");
 
+  /* *** calopen *** */
+  i = calopen(NULL);
+  if (i != 0) {
+    printf("Error: Could not open calibration list, calopen returned %d\n", i);
+    errors++;
+  }
+  else if (vflag)
+    printf("[OK]:  WFDB calibration list opened successfully\n");
+
+  /* *** getcal *** */
+  i = getcal("NBPfoo", "mmHg", &cal);
+  if (i != 0 || cal.low != 0.0 || cal.high != 100.0 || cal.scale != 100.0 ||
+      strcmp(cal.sigtype, "NBP") != 0 || strcmp(cal.units, "mmHg") != 0 ||
+      cal.caltype != (WFDB_DC_COUPLED | WFDB_CAL_SQUARE)) {
+    printf("Error: getcal returned %d, cal = { %g %g %g %s %s %d }\n", i,
+	   cal.low, cal.high, cal.scale, cal.sigtype, cal.units, cal.caltype);
+    errors++;
+  }
+  else if (vflag)
+    printf("[OK]:  getcal was successful\n");
+
+  /* *** putcal *** */
+  cal.sigtype = "foobar";
+  i = putcal(&cal);
+  if (i != 0) {
+    printf("Error: putcal returned %d\n", i);
+    errors++;
+  }
+  else if (vflag)
+    printf("[OK]:  putcal returned 0\n");
+
+  i = getcal("foobar", "mmHg", &cal);
+  if (i != 0 || cal.low != 0.0 || cal.high != 100.0 || cal.scale != 100.0 ||
+      strcmp(cal.sigtype, "foobar") != 0 || strcmp(cal.units, "mmHg") != 0 ||
+      cal.caltype != (WFDB_DC_COUPLED | WFDB_CAL_SQUARE)) {
+    printf("Error: putcal failed, cal = { %g %g %g %s %s %d }\n",
+	   cal.low, cal.high, cal.scale, cal.sigtype, cal.units, cal.caltype);
+    errors++;
+  }
+  else if (vflag)
+    printf("[OK]:  putcal was successful\n");
+
+  /* *** newcal *** */
+  i = newcal("lcheck_cal");
+  if (i != 0) {
+    printf("Error: newcal returned %d\n", i);
+    errors++;
+  }
+  else if (vflag)
+    printf("[OK]:  newcal was successful\n");
+
   /* Test I/O using the local record first. */
   check("100s", "100z");
 
@@ -175,6 +227,21 @@ char *argv[];
       printf("[OK]:  no WFDB library errors\n");
   }
 
+  /* In this section, test functions that can only be checked by looking
+     for library errors. */
+
+  /* *** flushcal *** */
+
+  flushcal();
+
+  i = getcal("foobar", "mmHg", &cal);
+  if (i == 0) {
+    printf("Error: flushcal did not empty the calibration list\n");
+    errors++;
+  }
+  else if (vflag)
+    printf("[OK]:  flushcal was successful\n");
+
   /* Summarize the results and exit. */
   if (errors)
     printf("%d error%s: test failed\n", errors, errors > 1 ? "s" :"");
@@ -187,8 +254,10 @@ char *argv[];
 
 int check(char *record, char *orec)
 {
+  WFDB_Date d;
   WFDB_Frequency f;
   WFDB_Time t, tt;
+  double x;
 
   /* *** sampfreq *** */
   if ((f = sampfreq(NULL)) != 0.0) {
@@ -238,7 +307,79 @@ int check(char *record, char *orec)
   else if (vflag)
     printf("[OK]:  annopen of 2 files succeeded\n");
 
-  /* *** strtim *** */
+  /* *** strecg, ecgstr *** */
+  i = strecg("N");
+  if (i != 1) {
+    printf("Error: strecg returned %d (should have been 1)\n", i);
+    errors++;
+  }
+  else if (vflag)
+    printf("[OK]:  strecg returned %d\n", i);
+
+  p = ecgstr(i);
+  if (strcmp(p, "N")) {
+    printf("Error: ecgstr returned '%s' (should have been 'N')\n", p);
+    errors++;
+  }
+  else if (vflag)
+    printf("[OK]:  ecgstr returned '%s'\n", p);
+
+  /* *** strann, annstr, anndesc *** */
+  i = strann("N");
+  if (i != 1) {
+    printf("Error: strann returned %d (should have been 1)\n", i);
+    errors++;
+  }
+  else if (vflag)
+    printf("[OK]:  strann returned %d\n", i);
+
+  p = annstr(i);
+  if (strcmp(p, "N")) {
+    printf("Error: annstr returned '%s' (should have been 'N')\n", p);
+    errors++;
+  }
+  else if (vflag)
+    printf("[OK]:  annstr returned '%s'\n", p);
+
+  p = anndesc(i);
+  if (strcmp(p, "Normal beat")) {
+    printf("Error: anndesc returned '%s' (should have been 'Normal beat')\n",
+	   p);
+    errors++;
+  }
+  else if (vflag)
+    printf("[OK]:  anndesc returned '%s'\n", p);
+
+  /* *** setecgstr, setannstr, setanndesc *** */
+
+  i = setecgstr(1, "X");
+  p = ecgstr(1);
+  if (i != 0 || strcmp(p, "X")) {
+    printf("Error: setecgstr failed\n");
+    errors++;
+  }
+  else if (vflag)
+    printf("[OK]:  setecgstr succeeded\n");
+
+  i = setannstr(-1, "Y");
+  p = annstr(1);
+  if (i != 0 || strcmp(p, "Y")) {
+    printf("Error: setannstr failed\n");
+    errors++;
+  }
+  else if (vflag)
+    printf("[OK]:  setannstr succeeded\n");
+
+  i = setanndesc(-1, "ZZ zz");
+  p = anndesc(1);
+  if (i != 0 || strcmp(p, "ZZ zz")) {
+    printf("Error: setanndesc failed\n");
+    errors++;
+  }
+  else if (vflag)
+    printf("[OK]:  setanndesc succeeded\n");
+
+  /* *** strtim, timstr *** */
   t = strtim("0:5");
   if (t != (WFDB_Time)(5.0 * f)) {
     printf("Error: strtim returned %ld (should have been %ld)\n", t,
@@ -247,7 +388,32 @@ int check(char *record, char *orec)
   }
   else if (vflag)
     printf("[OK]:  strtim returned %ld\n", t);
-  
+
+  p = timstr(t); q = "    0:05";
+  if (strcmp(p, q)) {
+    printf("Error: timstr returned '%s' (should have been '%s')\n", p, q);
+    errors++;
+  }
+  else if (vflag)
+    printf("[OK]:  timstr returned '%s'\n", p);
+
+  /* *** strdat, datstr *** */
+  q = " 31/12/1999";
+  d = strdat(q);
+  if (d != 2451544L) {
+    printf("Error: strdat returned %ld (should have been 2451544)\n", d);
+    errors++;
+  }
+  else if (vflag)
+    printf("[OK]:  strdat returned %ld\n", d);
+  p = datstr(d);
+  if (strcmp(p, q)) {
+    printf("Error: datstr returned '%s' (should have been '%s')\n", p, q);
+    errors++;
+  }
+  else if (vflag)
+    printf("[OK]:  datstr returned '%s'\n", p);
+
   /* *** iannsettime *** */
   stat = iannsettime(t);
   if (stat) {
@@ -259,7 +425,7 @@ int check(char *record, char *orec)
     printf("[OK]:  iannsettime skipping forward to %s\n",
 	    timstr(t));
 
-  /* *** getann, annstr, mstimstr *** */
+  /* *** getann, stimstr *** */
   for (i = 0; i < 5; i++) {
     stat = getann(0, &annot);
     if (stat != 0 && stat != -1) {
@@ -344,6 +510,40 @@ int check(char *record, char *orec)
     }
   }
 
+  /* *** aduphys, physadu *** */
+  x = aduphys((WFDB_Signal)0, (WFDB_Sample)1000);
+  if (x != -0.12) {
+    printf("Error: aduphys returned %g (should have been -0.12)\n", x);
+    errors++;
+  }
+  else if (vflag)
+    printf("[OK]:  aduphys returned %g\n", x);
+
+  i = physadu((WFDB_Signal)0, x);
+  if (i != (WFDB_Sample)1000) {
+    printf("Error: physadu returned %d (should have been 1000)\n", i);
+    errors++;
+  }
+  else if (vflag)
+    printf("[OK]:  physadu returned %d\n", i);
+
+  /* *** adumuv, muvadu *** */
+  i = adumuv((WFDB_Signal)0, (WFDB_Sample)1000);
+  if (i != 5000) {
+    printf("Error: adumuv returned %d (should have been 5000)\n", i);
+    errors++;
+  }
+  else if (vflag)
+    printf("[OK]:  adumuv returned %d\n", i);
+
+  i = muvadu((WFDB_Signal)0, i);
+  if (i != (WFDB_Sample)1000) {
+    printf("Error: muvadu returned %d (should have been 1000)\n", i);
+    errors++;
+  }
+  else if (vflag)
+    printf("[OK]:  muvadu returned %d\n", i);
+
   /* *** sampfreq *** */
   f = sampfreq(NULL);
   if (f != 360.0) {
@@ -362,6 +562,14 @@ int check(char *record, char *orec)
   }
   else if (vflag)
     printf("[OK]:  strtim returned %ld\n", t);
+
+  p = timstr(t); q = "    0:20";
+  if (strcmp(p, q)) {
+    printf("Error: timstr returned '%s' (should have been '%s')\n", p, q);
+    errors++;
+  }
+  else if (vflag)
+    printf("[OK]:  timstr returned '%s'\n", p);
   
   /* *** isigsettime *** */
   stat = isigsettime(t);
@@ -494,6 +702,9 @@ int check(char *record, char *orec)
   }
 
   wfdbquit();
+  setecgstr(1, "N");
+  setannstr(-1, "N");
+  setanndesc(-1, "Normal beat");
 }
 
 char *prog_name(s)
@@ -542,25 +753,8 @@ void list_untested()
     printf("setgvmode\n");
     printf("ungetann\n");
     printf("isgsettime\n");
-    printf("ecgstr\n");
-    printf("strecg\n");
-    printf("setecgstr\n");
-    printf("strann\n");
-    printf("setannstr\n");
-    printf("anndesc\n");
-    printf("setanndesc\n");
     printf("iannclose\n");
     printf("oannclose\n");
-    printf("datstr\n");
-    printf("strdat\n");
-    printf("adumuv\n");
-    printf("muvadu\n");
-    printf("physadu\n");
-    printf("calopen\n");
-    printf("getcal\n");
-    printf("putcal\n");
-    printf("newcal\n");
-    printf("flushcal\n");
     printf("setheader\n");
     printf("setmsheader\n");
     printf("wfdbgetskew\n");
@@ -578,4 +772,6 @@ void list_untested()
     printf("setobsize\n");
     printf("wfdbfile\n");
     printf("wfdbflush\n");
+    printf("setifreq\n");
+    printf("getifreq\n");
 }

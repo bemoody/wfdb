@@ -1,4 +1,6 @@
 \documentclass[twoside]{article}
+\usepackage{rawfonts}
+\IfFileExists{times.sty}{\usepackage{times}}{\@missingfileerror{times}{sty}}
 \oddsidemargin 0.1in
 \evensidemargin -0.1in
 \def\textwidth{6.375 in}
@@ -9,7 +11,7 @@ Harvard-MIT Division of Health Sciences and Technology, Cambridge, MA, USA}
 \date{}
 
 \begin{document}
-\setcounter{page}{115}
+\setcounter{page}{121}
 
 \maketitle
 
@@ -84,7 +86,7 @@ generally require between 1 and 10 minutes.
 \subsection*{MS-Windows}
 
 If you have not already done so, install the Cygwin development environment
-(freely available from {\tt http://sources.redhat.com/cygwin/}).  This includes
+(freely available from {\tt http://\-sources.\-red\-hat.\-com/\-cygwin/}).  This includes
 {\tt gcc} (the GNU C/C++ compiler) as well as a comprehensive assortment of
 other Unix utilities ported to MS-Windows.  Accept the defaults suggested by
 the installer.
@@ -184,6 +186,4 @@ programs) should be easy to compile with any K\&R or ANSI C compiler.
 The UNIX and MS-DOS {\tt make} description files ({\tt Makefile}
 and {\tt Makefile.dos} in {\tt wfdb} and in each of its subdirectories)
 should get you started.
-\newpage
-\center{[This page intentionally left blank.]}
 \end{document}
