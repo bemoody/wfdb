@@ -25,7 +25,7 @@ scripts:
 	sed s+/usr/local/bin+$(BINDIR)+g <hrmem >$(BINDIR)/hrmem
 	sed s+/usr/local/bin+$(BINDIR)+g <hrplot >$(BINDIR)/hrplot
 	cp plot2d plot3d $(BINDIR)
-	$(SETXPERMISSIONS) $(SCRIPTS)
+	cd $(BINDIR); $(SETXPERMISSIONS) $(SCRIPTS)
 
 uninstall:
 	../uninstall.sh $(BINDIR) $(XFILES) $(SCRIPTS)

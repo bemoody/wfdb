@@ -44,21 +44,18 @@ record names are 4-digit numbers, and European ST-T Database record
 names begin with lowercase `<TT>e</TT>', followed by a 4-digit number.
 Record names may contain letters, digits, and underscores.  Case is
 significant in record names that contain letters, even in environments
-such as MS-DOS for which case translation is normally performed by the
+such as MS-Windows for which case translation is normally performed by the
 operating system on file names; thus `<TT>e0104</TT>' is the name of a record
-found in the European ST-T Database, whereas `<TT>E0104</TT>' is not.  Under
-MS-DOS, furthermore, only the first eight characters of a record name
-are significant. A record name is <STRONG>not</STRONG> a file name.  See the
+found in the European ST-T Database, whereas `<TT>E0104</TT>' is not.
+A record name is <STRONG>not</STRONG> a file name.  See the
 <A HREF="../dbpg/dbpg.htm"><I>WFDB Programmer's Guide</I></A> for
 further details on record names.
 
 <DT><I>annotator</I>
 <DD>Where this appears, substitute an annotator name.  The annotator name
-`<TT>atruth</TT>' (shortened to `<TT>atr</TT>' under MS-DOS and on CD-ROMs)
-is used to name the set of <I>reference annotations</I> supplied by the
-database developers.  Annotator names may contain letters, digits, and
-underscores, as for record names.  Note that, under MS-DOS, only the first
-three characters of an annotator name are significant.
+`<TT>atr</TT>' is used to name the set of <I>reference annotations</I>
+supplied by the database developers.  Annotator names may contain letters,
+digits, and underscores, as for record names.
 
 <DT><I>time</I>
 <DD>Where this appears, substitute a string in <I>standard time format</I>.
@@ -98,6 +95,6 @@ Your comments on this guide, and on the software that it documents, are
 welcome.  Please send them to:
 <P><I><ADDRESS>
 <A HREF="mailto:george@mit.edu">George B. Moody (<tt>george@mit.edu</tt>)</A></ADDRESS></I><BR>
-20 May 1999
+16 October 2001
 </BODY>
 </HTML>

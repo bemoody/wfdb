@@ -1,4 +1,4 @@
-.TH RDANN 1 "26 February 2001" "WFDB software 10.1" "WFDB applications"
+.TH RDANN 1 "16 October 2001" "WFDB software 10.2" "WFDB applications"
 .SH NAME
 rdann \- read a WFDB annotation file
 .SH SYNOPSIS
@@ -20,7 +20,7 @@ Print only those annotations with \fBchan\fR fields that match \fIchan\fR.
 .TP
 \fB-e\fR
 Print annotation times as elapsed times from the beginning of the record
-(default: \fIrdann\rR prints absolute times if the absolute time of the
+(default: \fIrdann\fR prints absolute times if the absolute time of the
 beginning of the record is defined, and elapsed times otherwise, unless
 the \fB-x\fR option has been given).
 .TP
@@ -78,10 +78,10 @@ The shell variable \fBWFDB\fR should be set and exported (see
 \fIsetwfdb\fR(1)).
 .SS Example
 .br
-	\fBrdann -a atruth -r 200 -f 0 -t 5:0 -p V\fR
+	\fBrdann -a atr -r 200 -f 0 -t 5:0 -p V\fR
 .br
 This command prints on the standard output all ``V'' (PVC) annotations in
-the first five minutes of the \fIatruth\fR (reference annotation) file for
+the first five minutes of the \fIatr\fR (reference annotation) file for
 record 200.
 .SH CD-ROM VERSIONS
 The first edition of the MIT-BIH Arrhythmia Database CD-ROM, the first and

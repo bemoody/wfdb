@@ -1,5 +1,5 @@
 \" file: appguide.int		G. Moody	July 1989
-\"				Last revised:  15 October 2001
+\"				Last revised:  16 October 2001
 \" Table of contents and introduction to the WFDB Applications Guide.
 \"
 \" To print this document using GNU groff, use:
@@ -120,8 +120,8 @@ these sections do not exist in this guide.
 If you have not used any of these programs before, you should be sure that
 your environment is set up properly so that WFDB applications can find their
 input files.  See setwfdb(1) in this guide for information about doing this;
-a more detailed discussion may be found in the first chapter of the WFDB
-Programmer's Guide, in the section about the database path.
+a more detailed discussion may be found in the first chapter of the \fIWFDB
+Programmer's Guide\fP, in the section about the database path.
 .PP
 Certain types of command arguments are used by many of the applications
 described in this guide.  These include:
@@ -131,19 +131,16 @@ Database record names are 3-digit numbers, AHA Database record names are
 4-digit numbers, and European ST-T Database record names begin with lowercase
 `e', followed by a 4-digit number.  Record names may contain letters, digits,
 and underscores.  Case is significant in record names that contain letters,
-even in environments such as MS-DOS for which case translation is normally
+even in environments such as MS-Windows for which case translation is normally
 performed by the operating system on file names;  thus `e0104' is the name
 of a record found in the European ST-T Database, whereas `E0104' is not.
-Under MS-DOS, furthermore, only the first eight characters of a record name
-are significant. A record name is \fInot\fP a file name.  See the \fIWFDB
-Programmer's Guide\fP for further details on record names.
+A record name is \fInot\fP a file name.  See the \fIWFDB Programmer's Guide\fP
+for further details on record names.
 .IP \fIannotator\fP
 Where this appears, substitute an annotator name.  The annotator name
-`atruth' (shortened to `atr' under MS-DOS and on CD-ROMs) is used to
-name the set of \fIreference annotations\fP supplied by the database
-developers.  Annotator names may contain letters, digits, and
-underscores, as for record names.  Note that, under MS-DOS, only the
-first three characters of an annotator name are significant.
+`atr' is used to name the set of \fIreference annotations\fP supplied by
+the database developers.  Annotator names may contain letters, digits, and
+underscores, as for record names.
 .IP \fItime\fP
 Where this appears, substitute a string in \fIstandard time format\fP.
 \fITime\fP arguments generally specify elapsed times from the beginning
@@ -176,11 +173,7 @@ to add \fB/usr/local/man\fR to your \fBMANPATH\fR environment variable, in
 order to make these pages accessible to \fIman\fR.
 .PP
 An HTML version of this guide is also available;  point your Web browser to
-\fBhttp://www.physionet.org/physiotools/dbag/\fR to read it.  The HTML version
-of this guide is also supplied on our CD-ROMs that include the WFDB Software
-Package;  begin by pointing your browser to \fBfile:///cdrom/dbag/dbag.htm\fR
-(under UNIX, if the mount point for your CD-ROM is \fB/cdrom\fR), or to
-\fBfile:///d|/html/dbag.htm\fR (under MS-DOS, if your CD-ROM is the D: drive).
+\fBhttp://www.physionet.org/physiotools/dbag/\fR to read it.
 .PP
 The notations that appear at the bottom of each page indicate the date when
 that page was last revised, and (in most cases) the version of the WFDB

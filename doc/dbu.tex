@@ -247,7 +247,7 @@ sampling skew in your programs.
 @unnumberedsec Annotations
 @cindex annotation
 @cindex annotator
-@cindex @code{atruth}
+@cindex @code{atr}
 @cindex beat label
 @cindex label (beat)
 @cindex QRS label
@@ -265,17 +265,16 @@ sample number of the sample with which the annotation is associated.
 Annotations may be associated with a single signal, if desired.  Like
 samples in signals, annotations are kept in time and signal order in
 annotation files (but @pxref{Annotation Order} for exceptions to this
-rule).  No more than one annotation in a given annotation
-file may be associated with any given sample of any given signal.  There
-may be many annotation files associated with the same record, however;
-they are distinguished by @dfn{annotator names}.  The annotator name
-@file{atruth} (under MS-DOS, @file{atr}) is reserved to identify
-@dfn{reference annotation files} supplied by the developers of the
-databases to document correct beat labels.  You may use other annotator
-names (which may contain letters, digits and underscores, as for record
-names) to identify annotation files that you create.  You may wish to
-adopt the convention that the annotator name is the name of the file's
-creator (a program or a person).
+rule).  No more than one annotation in a given annotation file may be
+associated with any given sample of any given signal.  There may be many
+annotation files associated with the same record, however; they are
+distinguished by @dfn{annotator names}.  The annotator name @file{atr}
+is reserved to identify @dfn{reference annotation files} supplied by the
+developers of the databases to document correct beat labels.  You may
+use other annotator names (which may contain letters, digits and
+underscores, as for record names) to identify annotation files that you
+create.  You may wish to adopt the convention that the annotator name is
+the name of the file's creator (a program or a person).
 
 Annotations are visible to the WFDB library user as C structures, the
 fields of which specify time, beat type, and several user-definable
@@ -1389,7 +1388,7 @@ Failure: no input signals available
 Failure: unable to read @file{header} file (probably incorrect record
 name)
 @item @t{-2}
-Failure: incorrect @file{header} file format
+Failure: incorrect header file format
 @end table
 @c @end group
 
@@ -1400,7 +1399,7 @@ are left open, and the record name is taken to be the remainder of
 @var{record} after discarding the @samp{+}.  Otherwise, @code{isigopen}
 closes any previously opened input signal files, and takes all of
 @var{record} as the record name.  If the record name is @samp{-},
-@code{isigopen} reads the standard input rather than a @file{header}
+@code{isigopen} reads the standard input rather than a @file{hea}
 file.  @var{Siarray} is a pointer to an array of @code{WFDB_Siginfo}
 structures
 @iftex
@@ -1429,7 +1428,7 @@ number of input signals it actually opened, which may be less than
 allocate storage for the @code{WFDB_Siginfo} structures; @code{isigopen}
 will fill them in with information about the signals.  @dfn{Signal
 numbers} are assigned in the order in which signals are specified in the
-@file{header} file for the record; on return from @code{isigopen},
+@file{hea} file for the record; on return from @code{isigopen},
 information for signal @var{i} will be found in @var{siarray[i]}.  For
 example, we can read the @code{gain} attributes of each signal in record
 @file{100s} like this:
@@ -1467,7 +1466,7 @@ invocation of @code{isigopen}, passing in the pointer @code{siarray} and the
 number of signals determined from the first call (@code{nsig}).
 
 An error message is produced if @code{isigopen} is unable to open
-@emph{any} of the signals listed in the @file{header} file.  It is not
+@emph{any} of the signals listed in the header file.  It is not
 considered an error if only some of the signals can be opened, however.
 A signal will not be opened if its signal file is unreadable, if an
 input buffer cannot be allocated for it, or if opening all of the
@@ -1494,11 +1493,11 @@ If @var{nsig} is less than 0, @code{isigopen} fills in up to
 @ifinfo
 -@var{nsig}
 @end ifinfo
-members of @var{siarray}, based on information from the @file{header} file
+members of @var{siarray}, based on information from the header file
 for @var{record}, but @emph{no signals are actually opened}.  The value
-returned in this case is the number of signals named in the @file{header} file.
+returned in this case is the number of signals named in the @file{hea} file.
 Note, however, that there is no guarantee that all (or indeed any) of the
-signals named in the @file{header} file are available to be opened.
+signals named in the @file{hea} file are available to be opened.
 The features described in this paragraph were first introduced in
 version 4.4 of the WFDB library.
 
@@ -1519,9 +1518,9 @@ int osigopen(char *@var{record}, WFDB_Siginfo *@var{siarray}, unsigned int @var{
 Success: the returned value is the number of output signals; this number
 should match @var{nsig}
 @item @t{-1}
-Failure: unable to read @file{header} file
+Failure: unable to read header file
 @item @t{-2}
-Failure: incorrect @file{header} file format
+Failure: incorrect header file format
 @item @t{-3}
 Failure: unable to open output signal(s)
 @end table
@@ -1530,8 +1529,8 @@ Failure: unable to open output signal(s)
 @noindent
 This function opens output signal files.  Use it only if signals are to
 be @emph{written} using @code{putvec}.  The signal specifications,
-including the file names, are read from the @file{header} file for a
-specified record.  Unmodified MIT or AHA database @file{header} files
+including the file names, are read from the header file for a
+specified record.  Unmodified MIT or AHA database @file{hea} files
 cannot be used, since @code{osigopen} would attempt to overwrite the
 (write-protected) signal files named within.  If @var{record} begins
 with @samp{+}, previously opened output signal files are left open, and
@@ -1539,7 +1538,7 @@ the record name is taken to be the remainder of @var{record} after
 discarding the @samp{+}.  Otherwise, @code{osigopen} closes any
 previously opened output signal files, and takes all of @var{record} as
 the record name.  If the record name is @samp{-}, @code{osigopen} reads
-the standard input rather than a @file{header} file.  @var{siarray} is a
+the standard input rather than a @file{hea} file.  @var{siarray} is a
 pointer to an uninitialized array of @code{WFDB_Siginfo} structures;
 @var{siarray} must contain at least @var{nsig} members.  The caller must
 allocate storage for the @code{WFDB_Siginfo} structures.  On return,
@@ -1547,7 +1546,7 @@ allocate storage for the @code{WFDB_Siginfo} structures.  On return,
 the signal specifications.
 
 No more than @var{nsig} (additional) output signals will be opened by
-@code{osigopen}, even if the @file{header} contains specifications for
+@code{osigopen}, even if the header file contains specifications for
 more than @var{nsig} signals.  For example, this code fragment
 
 @example
@@ -1598,7 +1597,7 @@ Failure: unable to open output signal(s)
 @noindent
 This function opens output signals as does @code{osigopen}, but the
 signal specifications, including the signal file names, are supplied by
-the caller to @code{osigfopen}, rather than read from a @file{header}
+the caller to @code{osigfopen}, rather than read from a header
 file as in @code{osigopen}.  Any previously open output signals are
 closed by @code{osigfopen}.  @var{siarray} is a pointer to an array of
 @code{WFDB_Siginfo} structures
@@ -1645,10 +1644,10 @@ Annotation files opened successfully, input signals unavailable
 (not an error for programs that don't need them; no error
 message is printed if @var{nsig} is 0)
 @item @t{-1}
-Failure: unable to read @file{header} file (probably incorrect record
+Failure: unable to read header file (probably incorrect record
 name)
 @item @t{-2}
-Failure: incorrect @file{header} file format
+Failure: incorrect header file format
 @item @t{-3}
 Failure: unable to open input annotation file
 @item @t{-4}
@@ -1942,7 +1941,7 @@ specified by @var{an} into the annotation structure
 pointed to by @var{annot}.  The caller must allocate storage for the
 annotation structure.  Input annotators are numbered 0, 1, 2, etc.  This
 short program uses @code{getann} to read the contents of the reference
-(@file{atruth}) annotation file for record @file{100s}:
+(@file{atr}) annotation file for record @file{100s}:
 
 @example
 #include <wfdb/wfdb.h>
@@ -1952,7 +1951,7 @@ main()
     WFDB_Anninfo a;
     WFDB_Annotation annot;
 
-    a.name = "atruth"; a.stat = WFDB_READ;
+    a.name = "atr"; a.stat = WFDB_READ;
     if (annopen("100s", &a, 1) < 0)
         exit(1);
     while (getann(0, &annot) == 0)
@@ -2377,7 +2376,7 @@ The next three functions convert between ``standard time format''
 strings and times in units of sample intervals.  Normally they should be
 invoked after @code{isigopen}, @code{wfdbinit}, or @code{sampfreq}, any of
 which will determine the duration of a sample interval and the base time
-from a @file{header} file, or after defining these quantities using
+from a header file, or after defining these quantities using
 @code{setsampfreq} and @code{setbasetime}.  If this is not done, or if
 these time-conversion functions are used after @code{wfdbquit}, they will
 perform conversions in units of seconds (i.e., the sample interval is
@@ -2412,7 +2411,7 @@ format by @code{timstr}, or to @var{HH:MM:SS.SSS} format by
 @code{mstimstr}, with leading zero digits and colons suppressed.  If
 @var{t} is zero or negative, it is taken to represent negated elapsed
 time from the beginning of the record, and it is converted to a time of
-day using the base time for the record as indicated by the @file{header}
+day using the base time for the record as indicated by the @file{hea}
 file or the caller
 @iftex
 (@pxref{setbasetime, , @code{setbasetime}});
@@ -2489,7 +2488,7 @@ time of the next sample in input signal 0
 
 If the argument is bracketed (as in the second, third, and fourth examples), it
 is taken as a time of day, and @code{strtim} uses the base time defined
-by the @file{header} file or by the caller
+by the header file or by the caller
 @iftex
 (@pxref{setbasetime, , @code{setbasetime}});
 @end iftex
@@ -2594,8 +2593,8 @@ millivolt-dimensioned signals only, and convert potential differences
 @var{s}, irrespective of the @code{baseline} values specified in the
 header file).  Normally, these functions should be invoked after
 @code{isigopen} or @code{wfdbinit}, either of which will determine the
-gain from the @file{header} file.  If this is not done, or if the
-@file{header} file indicates that the gain is uncalibrated, or if the
+gain from the @file{hea} file.  If this is not done, or if the
+header file indicates that the gain is uncalibrated, or if the
 specified input signal is not currently open, a gain of @code{WFDB_DEFGAIN}
 (defined in @file{<wfdb/wfdb.h>}) ADC units per millivolt, and a baseline
 of zero, are assumed.  If the physical units
@@ -2876,10 +2875,10 @@ first introduced in WFDB library version 6.0.)
 @section Miscellaneous WFDB Functions
 
 @menu
-* newheader::			Creating a @file{header} file for a new WFDB
+* newheader::			Creating a @file{hea} file for a new WFDB
 				record.
-* setheader::			Creating or changing a @file{header} file.
-* setmsheader::                 Creating a @file{header} for a multi-segment
+* setheader::			Creating or changing a @file{hea} file.
+* setmsheader::                 Creating a @file{hea} for a multi-segment
                                 record.
 * wfdbquit::			Closing WFDB files.
 * iannclose and oannclose::     Closing annotation files.
@@ -2898,8 +2897,8 @@ first introduced in WFDB library version 6.0.)
 * wfdbfile::			Obtaining the pathname of a WFDB file.
 * wfdbflush::			Flushing buffered output annotations and
 				samples.
-* getinfo::			Reading info strings from a @file{header} file.
-* putinfo::			Writing info strings into a @file{header} file.
+* getinfo::			Reading info strings from a @file{hea} file.
+* putinfo::			Writing info strings into a @file{hea} file.
 * setibsize::			Setting the default input buffer size.
 * setobsize::			Setting the default output buffer size.
 * wfdbgetskew::                 Reading intersignal skew.
@@ -2925,18 +2924,18 @@ int newheader(char *@var{record})
 @item @t{ 0}
 Success
 @item @t{-1}
-Failure: unable to create @file{header} file
+Failure: unable to create header file
 @end table
 @c @end group
 
 @cindex record names (restrictions)
 @noindent
-This function creates a @file{header} file (in the current directory).
+This function creates a @file{hea} file (in the current directory).
 Use @code{newheader} just after you have finished writing the signal
 files, but before calling @code{wfdbquit}.  If @var{record} begins with
 @samp{+}, the @samp{+} is discarded and the remainder of @var{record} is
 taken as the record name.  Otherwise, all of @var{record} is taken to be
-the record name.  If the record name is @samp{-}, the @file{header} file
+the record name.  If the record name is @samp{-}, the header file
 is written to the standard output.  Record names may include letters in
 lower or upper case, digits, and underscores (@samp{_}); they may not
 include any other characters.  If @var{record} does not conform to these
@@ -2958,10 +2957,10 @@ and AHA DB records, do not use three- or four-digit record names.
 @node     setheader, setmsheader, newheader, miscellaneous functions
 @unnumberedsubsec setheader
 @findex setheader (5.0)
-@cindex @code{header} files (creating)
-@cindex @code{header} files (modifying)
-@cindex creating @file{header} files
-@cindex modifying @file{header} files
+@cindex header files (creating)
+@cindex header files (modifying)
+@cindex creating header files
+@cindex modifying header files
 
 @example
 int setheader(char *@var{record}, WFDB_Siginfo *@var{siarray}, unsigned int @var{nsig})
@@ -2972,20 +2971,20 @@ int setheader(char *@var{record}, WFDB_Siginfo *@var{siarray}, unsigned int @var
 @item @t{ 0}
 Success
 @item @t{-1}
-Failure: unable to create @file{header} file
+Failure: unable to create header file
 @end table
 @c @end group
 
 @noindent
-This function creates or recreates a @file{header} file (in the current
+This function creates or recreates a header file (in the current
 directory) for the specified @var{record}, based on the contents of the
 first @var{nsig} members of @var{siarray}.  The preferred way to create
 a header file for a new record is using @code{newheader}, which records
 signal checksum and length variables maintained by @code{putvec}.  The
 intended use of @code{setheader} is for editing @file{header} files,
 e.g., to change recorded signal gains from a calibration program, or to add
-signal descriptions.  In the following code fragment, the @file{header}
-file for record @file{old} is used to create a @file{header} file for
+signal descriptions.  In the following code fragment, the header
+file for record @file{old} is used to create a header file for
 record @file{new}:
 
 @example
@@ -3007,7 +3006,7 @@ if (nsig > 0) @{
 The @file{header} file for record @file{new} will contain the same signal
 information as that for record @file{old}, except that the @code{gain}
 for signal 0 will have been changed as shown.  Any ``info'' strings in
-the @file{header} file for record @file{old} must be copied explicitly;
+the @file{hea} file for record @file{old} must be copied explicitly;
 @iftex
 @pxref{getinfo, , @code{getinfo}}, and @pxref{putinfo, , @code{putinfo}}.
 @end iftex
@@ -3039,7 +3038,7 @@ Failure: illegal record name, or no segments specified, or header not writable
 Failure: segment name too long, or insufficient memory
 @item @t{-3}
 Failure: attempt to nest multi-segment records, or unreadable segment
-@file{header}
+header
 @item @t{-4}
 Failure: segment length unspecified, or numbers of signals or sampling
 frequencies don't match between segments
@@ -3047,11 +3046,11 @@ frequencies don't match between segments
 @c @end group
 
 @noindent
-This function creates a @file{header} file (in the current directory)
+This function creates a header file (in the current directory)
 for a multi-segment @var{record} (@pxref{Multi-Segment Records}.
 @var{snarray} contains the names of the segments, each of which must be
 an existing (single-segment) record; @var{nsegments} specifies the
-number of segments in @var{snarray}.  Once a @file{header} has been
+number of segments in @var{snarray}.  Once a header has been
 created by @code{setmsheader}, any WFDB application can read the
 concatenated signal files of the constituent segment simply by opening
 the multi-segment record (using @code{isigopen} or @code{wfdbinit}).  Note
@@ -3228,9 +3227,9 @@ WFDB_Frequency sampfreq(char *@var{record})
 @item @t{(WFDB_Frequency)>0.}
 Success: the returned value is the sampling frequency in Hz
 @item @t{(WFDB_Frequency)-1.}
-Failure: unable to read @file{header} file
+Failure: unable to read header file
 @item @t{(WFDB_Frequency)-2.}
-Failure: incorrect @file{header} file format
+Failure: incorrect header file format
 @end table
 @c @end group
 
@@ -3286,7 +3285,7 @@ functions
 @ifinfo
 (@pxref{timstr and strtim}).
 @end ifinfo
-Use @code{setsampfreq} before creating a new @file{header} file
+Use @code{setsampfreq} before creating a new @file{hea} file
 @iftex
 (@pxref{newheader, , @code{newheader}}).
 @end iftex
@@ -3324,7 +3323,7 @@ ASCII string in @var{HH:MM:SS} format.  An optional base date in
 the date should be separated from the time by a space or tab character.  If
 @var{string} is empty or @code{NULL}, the current date and time are read
 from the system clock.  Use @code{setbasetime} after defining the sampling
-frequency and before creating a @file{header} file
+frequency and before creating a header file
 @iftex
 (@pxref{newheader, , @code{newheader}}).
 @end iftex
@@ -3441,7 +3440,7 @@ the counter frequency in Hz
 
 @noindent
 This function returns the currently-defined counter frequency.  The
-counter frequency is set by the functions that read @file{header}
+counter frequency is set by the functions that read header
 files, or by @code{setcfreq}.  If the counter frequency has not been
 defined explicitly, @code{getcfreq} returns the sampling frequency.
 
@@ -3455,7 +3454,7 @@ void setcfreq(WFDB_Frequency @var{freq})
 
 @noindent
 This function sets the counter frequency.  Use @code{setcfreq}
-before creating a @file{header} file
+before creating a @file{hea} file
 @iftex
 (@pxref{newheader, , @code{newheader}}).
 @end iftex
@@ -3463,7 +3462,7 @@ before creating a @file{header} file
 (@pxref{newheader}).
 @end ifinfo
 The effect of @code{setcfreq} is nullified by later invoking any of the
-functions that read @file{header} files.  If @var{freq} is zero or
+functions that read header files.  If @var{freq} is zero or
 negative, the counter frequency is treated as equivalent to the sampling
 frequency.
 
@@ -3483,7 +3482,7 @@ base counter value
 
 @noindent
 This function returns the base counter value, which is set by the
-functions that read @file{header} files, or by @code{setbasecount}.
+functions that read header files, or by @code{setbasecount}.
 If the base counter value has not been set explicitly,
 @code{getbasecount} returns zero.
 
@@ -3497,7 +3496,7 @@ void setbasecount(double @var{count})
 
 @noindent
 This function sets the base counter value.  Use @code{setbasecount}
-before creating a @file{header} file
+before creating a header file
 @iftex
 (@pxref{newheader, , @code{newheader}}).
 @end iftex
@@ -3505,7 +3504,7 @@ before creating a @file{header} file
 (@pxref{newheader}).
 @end ifinfo
 The effect of @code{setbasecount} is nullified by later invoking any of the
-functions that read @file{header} files.
+functions that read @file{hea} files.
 
 @c @group
 @node     setwfdb, getwfdb, counter conversion, miscellaneous functions
@@ -3633,7 +3632,7 @@ pointer to a filename, or @code{NULL}
 @noindent
 This function attempts to locate an existing WFDB file by searching the
 database path (@pxref{WFDB path}).  Normally, the file is specified by its
-@var{type} (e.g., @file{header}, or an annotator name such as @file{atruth})
+@var{type} (e.g., @file{hea}, or an annotator name such as @file{atr})
 and by the @var{record} to which it belongs.  A file that does not include a
 record name as part of its name can be found by @code{wfdbfile} if the name is
 passed in the @var{type} variable and @var{record} is @code{NULL}.  The string
@@ -3665,8 +3664,8 @@ output files.
 @node     getinfo, putinfo, wfdbflush, miscellaneous functions
 @unnumberedsubsec getinfo
 @findex getinfo (4.0)
-@cindex @code{header} info (reading) 
-@cindex info (in @code{header} files)
+@cindex header info (reading) 
+@cindex info (in @code{hea} files)
 
 @example
 char *getinfo(char *@var{record})
@@ -3680,9 +3679,9 @@ pointer to an ``info'' string, or @code{NULL}
 @c @end group
 
 @noindent
-This function reads an ``info'' string from the @file{header} file for
+This function reads an ``info'' string from the @file{hea} file for
 the specified @var{record}.  Info strings are null-terminated and do not
-contain newline characters.  The @file{header} files of some records may
+contain newline characters.  The @file{hea} files of some records may
 contain no info strings;  others may contain more than one info string.
 To read additional info strings after the first, use @code{getinfo(NULL)}.
 For example, the following code fragment may be used to read and print
@@ -3705,8 +3704,8 @@ if (info = getinfo("100s"))
 @node     putinfo, setibsize, getinfo, miscellaneous functions
 @unnumberedsubsec putinfo
 @findex putinfo (4.0)
-@cindex @code{header} info (writing)
-@cindex info (in @code{header} files)
+@cindex header info (writing)
+@cindex info (in header files)
 
 @example
 int putinfo(char *@var{s})
@@ -3717,17 +3716,17 @@ int putinfo(char *@var{s})
 @item @t{ 0}
 Success
 @item @t{-1}
-Failure: @code{header} not initialized
+Failure: header not initialized
 @end table
 @c @end group
 
 @noindent
 This function writes @var{s} as an ``info'' string into the
-@file{header} file that was created by the most recent invocation of
+@file{hea} file that was created by the most recent invocation of
 @code{newheader}.  The string argument, @var{s}, must be null-terminated
 and should not contain newline characters.  No more than 254 characters
 may be written in a single invocation of @code{putinfo}.  Two or more
-info strings may be written to the same @code{header} by successive
+info strings may be written to the same header by successive
 invocations of @code{putinfo}.  Note that @code{newheader} or
 @code{setheader} must be used before @code{putinfo}.  (This function was
 first introduced in WFDB library version 4.0.)
@@ -3805,7 +3804,7 @@ signals are open (i.e., after invoking @code{osigopen} or
 positive, the default output buffers will be @var{size} bytes; if
 @var{size} is zero, the system default buffer size (@code{BUFSIZ}) is
 used.  Note that the default buffer size has no effect on writing
-signals for which an explicit buffer size is given in the @file{header}
+signals for which an explicit buffer size is given in the @file{hea}
 file read by @code{osigopen}, or in the @code{bsize} field of the
 @code{WFDB_Siginfo} structure
 @iftex
@@ -3836,13 +3835,13 @@ the skew (in frames) for input signal @var{s}
 @c @end group
 
 @noindent
-This function returns the @dfn{skew} (as recorded in the @file{header}
+This function returns the @dfn{skew} (as recorded in the @file{hea}
 file, but in frame intervals rather than in sample intervals) of the
 specified input signal, or 0 if @var{s} is not a valid input signal
 number.  Since sample vectors returned by @code{getvec} or
 @code{getframe} are already corrected for skew, @code{wfdbgetskew} is
 useful primarily for programs that need to rewrite existing
-@file{header} files, where it is necessary to preserve the previously
+@file{hea} files, where it is necessary to preserve the previously
 recorded skews.  The following code fragment demonstrates how this can
 be done:
 
@@ -3870,7 +3869,7 @@ setheader(record, siarray, (unsigned)nsig);
 Note that this function does not @emph{determine} the skew between
 signals;  the problem of doing so is not possible to solve in the
 general case.  @code{wfdbgetskew} merely reports what has previously been
-determined by other means and recorded in the @file{header} file for the input
+determined by other means and recorded in the header file for the input
 record.  (This function was first introduced in WFDB library version 9.4.)
 
 @c @group
@@ -3891,7 +3890,7 @@ by @code{newheader} or @code{setheader} for signal @var{s}.  For an
 example of the use of @code{wfdbsetskew}, @pxref{wfdbgetskew}.  Note that
 @code{wfdbsetskew} has no effect on the skew correction performed by
 @code{getframe} (or @code{getvec}), which is determined solely by the
-skews that were recorded in the @file{header} file at the time the input
+skews that were recorded in the header file at the time the input
 signals were opened.  (This function was first introduced in WFDB library
 version 9.4.)
 
@@ -3918,15 +3917,15 @@ the length of the prolog of the file that contains input signal @var{s}
 @noindent
 This function returns the number of bytes in the @dfn{prolog} of the
 signal file that contains the specified input signal, as recorded in the
-@file{header} file.  Note that @code{wfdbgetstart} does not
+header file.  Note that @code{wfdbgetstart} does not
 @emph{determine} the length of the prolog by inspection of the signal
 file; it merely reports what has been determined by other means and
-recorded in the @file{header} file.  Since the prolog is not readable
+recorded in the @file{hea} file.  Since the prolog is not readable
 using the WFDB library, and since functions such as @code{isigopen} and
 @code{isigsettime} take the prolog into account when calculating byte
 offsets for @code{getframe} and @code{getvec}, @code{wfdbgetstart} is
 useful primarily for programs that need to rewrite existing
-@file{header} files, where it is necessary to preserve the previously
+@file{hea} files, where it is necessary to preserve the previously
 recorded byte offsets.  For an example of how this can be done,
 @pxref{wfdbgetskew}.  (This function was first introduced in WFDB library
 version 9.4.)
@@ -3951,7 +3950,7 @@ recorded by @code{newheader} or @code{setheader} for signal @var{s}.
 For an example of the use of @code{wfdbsetstart}, @pxref{wfdbgetskew}.  Note
 that @code{wfdbsetstart} has no effect on the calculations of byte offsets
 within signal files as performed by @code{isigsettime}, which are
-determined solely by the contents of the @file{header} file at the time
+determined solely by the contents of the @file{hea} file at the time
 the signals were opened.  (This function was first introduced in WFDB library
 version 9.4.)
 
@@ -4184,7 +4183,7 @@ be known.
 @cindex signal file checksum
 a 16-bit checksum of all samples.  This field is not usually accessed by
 application programs; @code{newheader} records checksums calculated by
-@code{putvec} when it creates a new @file{header} file, and
+@code{putvec} when it creates a new @file{hea} file, and
 @code{getvec} compares checksums that it calculates against @code{cksum}
 at the end of the record, provided that the entire record was read
 through without skipping samples.
@@ -4283,13 +4282,13 @@ record:
 @table @code
 @item char *name
 @cindex annotator name
-the annotator name.  The name @file{atruth} is reserved for a @dfn{reference
+the annotator name.  The name @file{atr} is reserved for a @dfn{reference
 annotation file} supplied by the creator of the database record to document its
 contents as accurately and thoroughly as possible.  You may use other annotator
 names to identify annotation files that you create; unless there are compelling
 reasons not to do so, follow the convention that the annotator name is the name
 of the file's creator (a program or a person).  To avoid confusion, do not use
-@samp{dat}, @samp{data@var{n}}, @samp{d@var{n}}, @samp{hea}, or @samp{header}
+@samp{dat}, @samp{data@var{n}}, @samp{d@var{n}}, or @samp{hea}
 (all of which are commonly used as parts of WFDB file names) as annotator
 names.  The special name @samp{-} refers to the standard input or output.
 Other annotator names may contain upper- or lower-case letters, digits, and
@@ -4353,7 +4352,7 @@ object of type @code{WFDB_Annotation} containing these fields:
 @cindex time of annotation
 @cindex reference point (on QRS)
 time of the annotation, in samples from the beginning of the record.
-The times of beat annotations in the @file{atruth} files for the MIT DB
+The times of beat annotations in the @file{atr} files for the MIT DB
 generally coincide with the R-wave peak in signal 0; for the AHA DB,
 they generally coincide with the PQ-junction.
 
@@ -4379,7 +4378,7 @@ numbers between
 @ifinfo
 -128
 @end ifinfo
-and 127.  In MIT DB @file{atruth} files, the
+and 127.  In MIT DB @file{atr} files, the
 @code{subtyp} field is used with noise and artifact annotations to
 indicate which signals are affected (@pxref{Annotation Codes}).
 The @code{chan} field is intended to indicate the signal to which the
@@ -4398,7 +4397,7 @@ space unless they have changed since the previous annotation.
 @cindex @code{aux} string (annotation)
 a free text string.  The first byte is interpreted as an @code{unsigned
 char} that specifies the number of bytes that follow (up to 255).  In
-MIT DB @file{atruth} files, the @code{aux} field is used with rhythm
+MIT DB @file{atr} files, the @code{aux} field is used with rhythm
 change annotations to specify the new rhythm, and with comment
 annotations to store the text of the comment
 @iftex
@@ -4503,7 +4502,7 @@ in WFDB library version 4.0.  Codes @code{SYSTOLE}, @code{DIASTOLE}, and
 @cindex @code{subtyp} (in @code{NOISE} annotation)
 @cindex noisy signals (annotating)
 @item
-In MIT and ESC DB @file{atruth} files, each non-zero bit in the @code{subtyp}
+In MIT and ESC DB @file{atr} files, each non-zero bit in the @code{subtyp}
 field indicates that the corresponding signal contains noise (the least
 significant bit corresponds to signal 0).
 
@@ -4691,22 +4690,19 @@ The other topics in this section deal with special types of database access:
 
 @node     Header Files, Signal Files, Database Files, Database Files
 @unnumberedsubsec Header Files
-@cindex @code{header} file
+@cindex @code{hea} file
 
-@dfn{Header files} have names of the form @file{@var{record}.header} on
-writable UNIX and Macintosh file systems, where @var{record} is the
-record name.  (MIT DB records are named 100--124 and 200--234 with some
-numbers missing.  AHA DB records are named 1001--1010, 2001--2010,
-3001--3010, 4001--4010, 5001--5010, 6001--6010, 7001--7010, and
-8001--8010.  ESC DB records are named e0103--e1304, with many numbers
-missing.)  On CD-ROM and MS-DOS file systems, because of restrictions on
-the length of extensions, header files have names of the form
-@file{@var{record}.hea}.  Header files are text files, with lines
+@dfn{Header files} have names of the form @file{@var{record}.hea}, where
+@var{record} is the record name.  (MIT DB records are named 100--124 and
+200--234 with some numbers missing.  AHA DB records are named
+1001--1010, 2001--2010, 3001--3010, 4001--4010, 5001--5010, 6001--6010,
+7001--7010, and 8001--8010.  ESC DB records are named e0103--e1304, with
+many numbers missing.)  Header files are text files, with lines
 terminated by ASCII carriage-return/line-feed pairs, created by
 @code{newheader}, @code{setheader}, or @code{setmsheader}, from which
 @code{isigopen}, @code{osigopen}, and @code{wfdbinit} read the names of
 the signal files and their attributes as given in the array of
-@code{WFDB_Siginfo} objects; @code{sampfreq} also reads a @file{header}
+@code{WFDB_Siginfo} objects; @code{sampfreq} also reads a header
 file to determine the sampling frequency used for a record.
 
 @node     Signal Files, Annotation Files, Header Files, Database Files
@@ -4730,12 +4726,10 @@ application program are always amplitudes of type @code{int} (at least
 @cindex annotation file
 
 @dfn{Annotation files} have names of the form
-@file{@var{record}.@var{annotator}} (on CD-ROM and MS-DOS file systems,
-@var{annotator} is restricted to three characters).  Those named
-@file{@var{record}.atruth} (@file{@var{record}.atr}) are reference
-annotation files (assumed to be correct).  Annotation files are binary,
-and contain records of variable length that average slightly over 16
-bits per annotation.
+@file{@var{record}.@var{annotator}}.  Those named
+@file{@var{record}.atr} are reference annotation files (assumed to be
+correct).  Annotation files are binary, and contain records of variable
+length that average slightly over 16 bits per annotation.
 
 @node     Calibration Files, AHA Format Files, Annotation Files, Database Files
 @unnumberedsubsec Calibration Files
@@ -4789,9 +4783,9 @@ those in the original AHA format) to the standard formats.
 @cindex pipes (as WFDB files)
 
 If @samp{-} is supplied as a record name to any of the functions that
-read or write @file{header} files, the @file{header} file is taken to be
+read or write header files, the @file{hea} file is taken to be
 the standard input or output, as appropriate.  If the name of a signal
-file is specified in the @file{header} file (or in the array of
+file is specified in the @file{hea} file (or in the array of
 @code{WFDB_Siginfo} objects passed to @code{osigfopen}) as @samp{-}, the
 standard input (output) is used by @code{getvec} (@code{putvec}).  If
 the name of an annotator is given in the array of @code{WFDB_Anninfo} objects
@@ -5002,7 +4996,7 @@ memory) are needed when using pipes, in comparison with the usual
 method of operation.
 @end enumerate
 
-Several special-purpose @file{header} files allow application programs
+Several special-purpose header files allow application programs
 to read data directly from 9-track tape.  The names of most of these
 records (@file{512}, @file{1024}, @file{4096}, @file{10240}) specify the
 block size in bytes.  These use 16-bit format, 250 Hz samples, 12 bit
@@ -5014,7 +5008,7 @@ an AHA-format signal file on a 9-track tape that has been positioned to
 the beginning of the correct file; the signal file for these is
 @file{/dev/nrmt0} (the non-rewinding raw tape drive).  If the tape
 density is encoded into the tape drive name on your system, additional
-@file{header} files may be needed.
+header files may be needed.
 
 @node     Piped and Local Records, NETFILES, Special Files, Database Files
 @section Piped and Local Records
@@ -5023,7 +5017,7 @@ density is encoded into the tape drive name on your system, additional
 @cindex signal file (piped)
 @cindex standard I/O (as WFDB files)
 
-@dfn{Piped record} @file{header} files allow application programs to
+@dfn{Piped record} header files allow application programs to
 read signals from the standard input, or write them to the standard
 output.  Record @file{8} specifies 8-bit format, a 10-bit ADC, zero ADC
 offset, and two signals sampled at 250 Hz, both of which are to be
@@ -5042,7 +5036,7 @@ numbers of signals (use the existing files as a model).
 @cindex local record
 @cindex signal file (local)
 Application programs may also read or write signal files in the current
-directory using @dfn{local record} @file{header} files.  Record
+directory using @dfn{local record} header files.  Record
 @file{16l} (``one-six-ell'') specifies up to sixteen format 16
 files, and record @file{8l} (``eight-ell'') specifies up to
 sixteen format 8 files, named @file{data0}, @file{data1},
@@ -5313,7 +5307,7 @@ program creates an output file with @code{putann}.
 @node     Example 2, Example 3, Example 1, Examples
 @unnumberedsec Example 2: An Annotation Translator
 
-This program translates the @file{atruth} annotations for the record
+This program translates the @file{atr} annotations for the record
 named in its argument into an AHA-format annotation file with the
 annotator name @file{aha}.
 
@@ -5332,8 +5326,8 @@ annotator name @file{aha}.
 @i{12}          fprintf(stderr, "usage: %s record\n", argv[0]);
 @i{13}          exit(1);
 @i{14}      @}
-@i{15}      an[0].name = "atruth"; an[0].stat = WFDB_READ;
-@i{16}      an[1].name = "aha";    an[1].stat = WFDB_AHA_WRITE;
+@i{15}      an[0].name = "atr"; an[0].stat = WFDB_READ;
+@i{16}      an[1].name = "aha"; an[1].stat = WFDB_AHA_WRITE;
 @i{17}      if (annopen(argv[1], an, 2) < 0) exit(2);
 @i{18}      while (getann(0, &annot) == 0 && putann(0, &annot) == 0)
 @i{19}          ;
@@ -5356,7 +5350,7 @@ which the program was invoked.
 
 @item Lines 15--16:
 These lines set up the annotator information.  Input annotator 0 is the
-@file{atruth} annotation file, and output annotator 0 will be written
+@file{atr} annotation file, and output annotator 0 will be written
 in AHA format.
 
 @item Line 17:
@@ -5423,7 +5417,7 @@ by @code{timstr} below.
 
 @item Line 20:
 This line gives the annotation time as a time of day.  If the base time
-is omitted in the @file{header} file, or if we used
+is omitted in the header file, or if we used
 @code{timstr(annot.time)} instead, we would obtain the elapsed time from
 the beginning of the record.
 
@@ -5701,7 +5695,7 @@ to be called @file{dif}, which we can then open with another program if
 we want to read the signals that this program has written.  Since the
 @var{record} argument for @code{osigopen} was @file{8l}, we can also
 read these files using record @file{8l}; one reason for making a new
-@file{header} file here is that the @file{header} file for @file{8l} may
+@file{hea} file here is that the @file{hea} file for @file{8l} may
 not necessarily indicate the proper sampling frequency for these
 signals.
 
@@ -5730,7 +5724,7 @@ filter 100 5:0 20 .2 .2 .2 .2 .2
 which would apply a five-point moving average (rectangular window) filter
 to 20 seconds of record @file{100}, beginning 5 minutes into the record.
 The output of the program is readable as record @file{out}, for which a
-@file{header} file is created in the current directory.
+header file is created in the current directory.
 
 @example
  @i{1}  #include <stdio.h>
@@ -5879,7 +5873,7 @@ The entire process is repeated up to @code{nsamp} times, or until
 we run out of input samples.
 
 @item Line 77:
-The program creates a @file{header} file for record @file{out}, using
+The program creates a header file for record @file{out}, using
 the signal specifications from record @file{16l} and the sampling
 frequency from the input record.
 @end table
@@ -5891,7 +5885,7 @@ frequency from the input record.
 
 This program creates a new record from scratch.  It asks the user for
 information about the signals to be sampled, then records them, and
-finally creates a @file{header} file for the new record.  Details of
+finally creates a @file{hea} file for the new record.  Details of
 data acquisition are hardware-dependent and are not shown here. 
 
 @example
@@ -6064,16 +6058,16 @@ control register, stops the timer, and frees any system resources such as
 DMA channels or interrupts.
 
 @item Line 111:
-All of the information needed to generate the @file{header} file has been
+All of the information needed to generate the header file has been
 stored in WFDB library internal data structures by @code{osigfopen} and 
 @code{putvec};  we call @code{newheader} here (before @code{wfdbquit}) to
-create the new @file{header} file.
+create the new @file{hea} file.
 
 @item Line 112:
 It is still necessary to use @code{wfdbquit} to close the signal file(s),
 even after calling @code{newheader}.  (In fact, it would be possible,
 though not likely to be useful, to record more samples and to generate
-another @file{header} file before calling @code{wfdbquit}.)
+another header file before calling @code{wfdbquit}.)
 @end table
 
 @node     Example 9, Example 10, Example 8, Examples
@@ -6193,7 +6187,7 @@ start time.
 @item Lines 42--49:
 This code similarly determines when the averaging should stop.  Unless
 no stop time was specified on the command line and the signal length is
-not defined in the @file{header} file for the record, @code{stoptime}
+not defined in the @file{hea} file for the record, @code{stoptime}
 will have a positive value in line 49, which makes a tiny adjustment so
 that if a beat annotation occurs within 50 milliseconds of the end of the
 averaging period, the beat will not be included in the average.
@@ -6413,11 +6407,11 @@ Type in the first program from the previous chapter, compile it, and run
 it.  Remember to set and export the environment variable @code{WFDB}
 (@pxref{WFDB path}).  It is a good idea to include this step in your
 @file{.profile}, @file{.cshrc}, or @file{autoexec.bat}.  As input, try
-record @file{100s}, input annotator @file{atruth}, and output annotator
+record @file{100s}, input annotator @file{atr}, and output annotator
 @file{normal}.  The program should finish in five seconds or less.
 The annotations will have been written into a file called
 @file{100s.nor} in the current directory.  Now type
-``@code{rdann -r 100s -a atruth}'' and observe the output
+``@code{rdann -r 100s -a atr}'' and observe the output
 for a few seconds, then try ``@code{rdann -r 100s -a nor}'' and notice the
 difference.
 
@@ -6504,7 +6498,7 @@ of record @file{100}.  Why doesn't it work?
  @i{6}      WFDB_Anninfo ai;
  @i{7}      int t;
  @i{8}
- @i{9}      ai.name = "atruth";
+ @i{9}      ai.name = "atr";
 @i{10}      ai.stat = WFDB_READ;
 @i{11}      if (annopen(100, ai, 1)) @{
 @i{12}          while (getann(1, annot)) @{
@@ -6577,13 +6571,13 @@ record @file{mitdb/200}; otherwise, download the record from
 @code{http://www.physio@-net.org/physio@-bank/data@-base/mitdb/}.)  Read the
 documentation on the annotation comparator, @file{bxb}, and figure out how to
 use it to compare the annotation file produced by your program against the
-reference annotator @file{atruth}.  How does your detector compare to Example
+reference annotator @file{atr}.  How does your detector compare to Example
 10?
 
 @item
 If the previous exercise was too easy, modify your detector so that the
-annotations it generates match those in the @file{atruth} file.  Copying
-the @file{atruth} file is not permitted.  You may find this rather
+annotations it generates match those in the @file{atr} file.  Copying
+the @file{atr} file is not permitted.  You may find this rather
 difficult.  Good luck!
 @end enumerate
 
@@ -6669,19 +6663,17 @@ numbers assigned in serial order beginning with 0.
 In this guide, a program that uses the WFDB library to do
 something.
 
-@item @file{atruth}
-@cindex @code{atruth} (defined)
-The annotator name for the reference annotation files.  On CD-ROMs and
-MS-DOS file systems, @file{atruth} is truncated within the names of the
-reference annotation files to @file{atr};  @code{annopen} accepts either
-@file{atruth} or @file{atr} as the annotator name for these files.
+@item @file{atr}
+@cindex @code{atr} (defined)
+The annotator name for the reference annotation files (originally,
+@file{atruth}, i.e., the "truth" annotations).
 
 @item Base counter value
 @cindex base counter value (defined)
 @cindex counter (base)
 The counter value (q.v.) that corresponds to sample 0.  The base
 counter value is read by @code{getbasecount}, and set by @code{setbasecount}
-(or by any of the functions that read @file{header} files).  If not
+(or by any of the functions that read header files).  If not
 defined explicitly, the base counter value is taken to be 0.
 
 @item Base time
@@ -6734,7 +6726,7 @@ throughout any given record.  It may be undefined, in which case it is
 treated as equivalent to the sampling frequency (q.v.) by the WFDB
 library.  The counter frequency is read by @code{getcfreq},
 and set by @code{setcfreq} (or by any of the functions that read
-@file{header} files).
+header files).
 
 @item Counter value
 @cindex counter value (defined)
@@ -6747,12 +6739,12 @@ frequency.  The units of @samp{c}-prefixed @code{strtim} arguments are
 counter values.
 
 @item Database files
-Those files (annotation files, @file{header} files, signal files, and
+Those files (annotation files, header files, signal files, and
 calibration files) that are accessed via the WFDB library.
 
 @item Database path
 @cindex database path (defined)
-The names of the directories in which @file{header}, annotation, and
+The names of the directories in which header, annotation, and
 calibration files are kept.  The environment variable @code{WFDB} must be
 set by the user and exported accordingly.
 
@@ -6796,14 +6788,12 @@ degree of amplification (the usual meaning of the word) of the analog
 signal prior to digitization.  Gain may vary between signals in a
 record.
 
-@item @file{header} file
+@item header file
 @cindex @code{header} file (defined)
 A file accessible via the WFDB library that describes the signal files
-associated with a given database record.  A @file{header} file has a name of
-the form `@var{record}@code{.header}', where @var{record} is the record name
-(q.v.).  On CD-ROMs and MS-DOS file systems, @file{header} files have names of
-the form `@code{@var{record}.hea}'.  The WFDB library can locate and read
-@file{header} files named using either convention.
+associated with a given database record.  A header file has a name of
+the form `@var{record}@code{.hea}', where @var{record} is the record name
+(q.v.).
 
 @item High-resolution mode
 @cindex high-resolution mode (defined)
@@ -6815,7 +6805,7 @@ sample of any oversampled signals appear in at least one sample vector.
 
 @item Info string
 @cindex info string (defined)
-Free text within a @file{header} file.  Info strings can be read using
+Free text within a header file.  Info strings can be read using
 @code{getinfo} and written using @code{putinfo}.
 
 @item Local record
@@ -6874,7 +6864,7 @@ A composite record that is the concatenation of two or more ordinary
 (single-segment) records.  Multi-segment records do not have their own
 signal files (the signal files of their constituent segments are read
 when it is necessary to read signals of multi-segment records), but they
-have their own @file{header} files (created using @code{setmsheader}),
+have their own header files (created using @code{setmsheader}),
 and may have their own annotation files as well (annotation files for
 the constituent segments of a multi-segment record are @emph{not}
 concatenated automatically when the record is read).  The WFDB Software
@@ -6946,16 +6936,16 @@ contain prologs, but signal files created using other means may contain
 prologs.  To read such a signal file using the WFDB library, provided that
 the sample data are in a supported format, it is sufficient to record the
 length of the prolog (in bytes) in the appropriate locations in a
-@file{header} file that names the signal file.  If you need to create
-such a @file{header} file, refer to the description of the byte offset
-field in @cite{header(5)} (the specification of the @file{header} file
+header file that names the signal file.  If you need to create
+such a header file, refer to the description of the byte offset
+field in @cite{header(5)} (the specification of the header file
 format in the @cite{WFDB Applications Guide}, or
 @pxref{wfdbsetstart}.
 
 @item Record
 @cindex record (defined)
 An extensible set of files that may include signal files, annotation
-files, and a @file{header} file, all of which are associated with the
+files, and a header file, all of which are associated with the
 same original signals.  Only the @file{header} file is mandatory.
 Although records are sometimes called tapes for historical reasons,
 records are now more commonly maintained on CD-ROMs or magnetic disks
@@ -6977,7 +6967,7 @@ in file names.
 @cindex reference annotation file (defined)
 An annotation file supplied by the creator of a record to document its
 contents as accurately and thoroughly as possible.  The annotator name
-@file{atruth} is reserved for reference annotation files.
+@file{atr} is reserved for reference annotation files.
 
 @item Sample
 @cindex sample (defined)
@@ -7505,8 +7495,9 @@ a subset of signal numbers may be selected using the @samp{-s}
 option.  The output of @file{rdsamp}, or any similar text, can be
 converted into a WFDB record using @file{wrsamp}.
 
-To copy an excerpt of a longer record, use @file{snip}, which creates new
-@file{header} and signal files for @var{new-record} in the current directory.
+To copy an excerpt of a longer record, use @file{snip}, which creates
+new
+header and signal files for @var{new-record} in the current directory.
 The beginning and end of the excerpt are specified using @samp{-f} and
 @samp{-t} options as for @file{rdsamp}.  Annotator names may follow a @samp{-a}
 option; in this case excerpts from the specified annotation files are copied as
@@ -7514,7 +7505,7 @@ well (the annotations are appropriately time-shifted).
 
 @file{xform} is a more general version of @file{snip}; its main uses are for
 reformatting, rescaling, and sampling rate conversion.  You may create a
-@file{header} file specifying the desired format, sampling frequency, ADC zero
+@file{hea} file specifying the desired format, sampling frequency, ADC zero
 levels, signal gains, etc., and supply it to @file{xform} using the @samp{-o}
 option; if you do not do so, @file{xform} obtains the required information
 interactively.  @file{xform} accepts all of the options used by @file{snip},
@@ -7550,7 +7541,7 @@ means, program @file{calsig} may be useful for determining signal
 gains and offsets if your signals include standard calibration pulses or
 identifiable signal levels. @file{calsig} incorporates two
 independent algorithms for measuring calibration pulses; it rewrites
-@file{header} files based on its measurements.
+header files based on its measurements.
 
 @node     Graphics, , Signal processing, WFDB Applications
 @unnumberedsec Graphical Applications
@@ -7620,7 +7611,7 @@ directory.  Install the modified versions of the @file{.h} files in the
 system's @file{include} directory after installing the modified WFDB
 library.
 
-The cleanest mechanism for adding additional fields to @file{header} files is
+The cleanest mechanism for adding additional fields to @file{hea} files is
 to include them in `info' strings
 @iftex
 (@pxref{getinfo, , @code{getinfo}}),
@@ -7628,7 +7619,7 @@ to include them in `info' strings
 @ifinfo
 (@pxref{getinfo}),
 @end ifinfo
-rather than by modifying the code that reads and writes @file{header}
+rather than by modifying the code that reads and writes @file{hea}
 files (in @file{signal.c}).
 
 A common problem is the need to import signal files generated by other
@@ -7666,7 +7657,7 @@ or an ANSI C compiler to check your code).
 Although the WFDB library generally assumes that signal files are ``pure'',
 it is possible to read imported signal files that contain prologs
 (data that precede the first sample).  To do so, you must construct a
-@file{header} file in which the @code{format} fields encode the length
+header file in which the @code{format} fields encode the length
 of the prolog in bytes.  For example, a signal file with a 512-byte
 prolog followed by format 16 samples would be specified using @samp{16+512}
 in the @code{format} field or fields (if the file contains more than one
