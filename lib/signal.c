@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   17 July 2001		wfdblib 10.1.6
+			Last revised:   25 August 2001		wfdblib 10.2.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -27,8 +27,14 @@ _______________________________________________________________________________
 
 This file contains definitions of the following functions, which are not
 visible outside of this file:
+ allocisig	(sets max number of simultaneously open input signals)
+ allocigroup	(sets max number of simultaneously open input signal groups)
+ allocosig	(sets max number of simultaneously open output signals)
+ allocogroup	(sets max number of simultaneously open output signal groups)
  isfmt		(checks if argument is a legal signal format type)
+ copysi		(deep-copies a WFDB_Siginfo structure)
  readheader	(reads a header file)
+ hsdfree	(deallocates memory used by readheader)
  isigclose	(closes input signals)
  osigclose	(closes output signals)
  isgsetframe	(skips to a specified frame number in a specified signal group)
@@ -112,7 +118,42 @@ Multifrequency records (i.e., those for which not all signals are digitized at
 the same frequency) are supported by version 9.0 and later versions.  Multi-
 segment records (constructed by concatenating single-segment records) and null
 (format 0) signals are supported by version 9.1 and later versions.
+
+Beginning with version 10.2, there are no longer any fixed limits on the
+number of signals in a record or the number of samples per signal per frame.
+Older applications used the symbols WFDB_MAXSIG and WFDB_MAXSPF (which are
+still defined in wfdb.h for compatibility) to determine the sizes needed for
+arrays of WFDB_Siginfo structures passed into, e.g., isiginfo, and the lengths
+of arrays of WFDB_Samples passed into getvec and getframe.  Newly-written
+applications should use the methods illustrated immediately below instead.
 */
+
+#if 0
+/* This is sample code to show how to allocate signal information and sample
+   vector arrays in an application -- it is *not* compiled into this module! */
+example()
+{
+    int n, nsig, i, framelen;
+    WFDB_Siginfo *si;
+    WFDB_Sample *vector;
+
+    /* Get the number of signals without opening any signal files. */
+    n = isiginfo("record", NULL, 0);
+    if (n < 1) { /* no signals -- quit or try another record, etc. */ }
+	
+    /* Allocate WFDB_Siginfo structures before calling isiginfo again. */
+    si = calloc(n, sizeof(WFDB_Siginfo));
+    nsig = isiginfo("record", si, n);
+    /* Note that nsig equals n only if all signals were readable. */
+
+    /* Get the number of samples per frame. */
+    for (i = framelen = 0; i < nsig; i++)
+        framelen += si[i].spf;
+    /* Allocate WFDB_Samples before calling getframe. */
+    vector = calloc(framelen, sizeof(WFDB_Sample));
+    getframe(vector);
+}
+#endif
 
 #include "wfdblib.h"
 
@@ -125,46 +166,30 @@ segment records (constructed by concatenating single-segment records) and null
 #endif
 
 /* Shared local data */
-static unsigned ispfmax;	/* max number of samples of any open signal
-				   per input frame */
-static unsigned nisig;		/* number of open input signals */
-static WFDB_Time istime;	/* time of next input sample */
-static int ibsize;		/* default input buffer size */
-static char *isbuf[WFDB_MAXSIG];/* pointers to input buffers */
-static char *isbp[WFDB_MAXSIG];	/* pointers to next locations in isbuf[] */
-static char *isbe[WFDB_MAXSIG];	/* pointers to input buffer endpoints */
-static WFDB_Sample ivec[WFDB_MAXSIG]; /* most recent samples read */
-static char icount[WFDB_MAXSIG];/* input counters for bit-packed signals */
-static WFDB_FILE *isf[WFDB_MAXSIG]; /* file pointers for open input signals */
-static WFDB_Siginfo isinfo[WFDB_MAXSIG]; /* input signal information */
-static char iseek[WFDB_MAXSIG];	/* flags to indicate if seeks are permitted */
-static int istat[WFDB_MAXSIG];	/* signal file status flags */
-static long istart[WFDB_MAXSIG];/* signal file byte offsets to sample 0 */
-static long ostart[WFDB_MAXSIG];/* byte offsets to be written by setheader() */
-static int iskew[WFDB_MAXSIG];	/* intersignal skew (in frames) */
-static int oskew[WFDB_MAXSIG];	/* skews to be written by setheader() */
-static unsigned skewmax;	/* max skew (frames) between any 2 signals */
-static WFDB_Sample *dsbuf;	/* deskewing buffer */
-static int dsbi;		/* index to oldest sample in dsbuf (if < 0,
-				   dsbuf does not contain valid data) */
-static unsigned dsblen;		/* capacity of dsbuf, in samples */
-static unsigned framelen;	/* total number of samples per frame */
-static int gvmode = WFDB_LOWRES;/* getvec mode (WFDB_HIGHRES or WFDB_LOWRES) */
-static int gvc;			/* getvec sample-within-frame counter */
 
-static unsigned nosig;		/* number of open output signals */
-static WFDB_Time ostime;	/* time of next output sample */
-static int obsize;		/* default output buffer size */
-static char *osbuf[WFDB_MAXSIG];/* pointers to output buffers */
-static char *osbp[WFDB_MAXSIG];	/* pointers to next locations in osbuf[]; */
-static char *osbe[WFDB_MAXSIG];	/* pointers to output buffer endpoints */
-static WFDB_Sample ovec[WFDB_MAXSIG]; /* most recent samples written */
-static char ocount[WFDB_MAXSIG];/* output counters for bit-packed signals */
-static WFDB_FILE *osf[WFDB_MAXSIG]; /* file pointers for open output signals */
-static WFDB_Siginfo osinfo[WFDB_MAXSIG]; /* output signal information */
+/* These variables are set by readheader, and contain information about the
+   signals described in the most recently opened header file.
+*/
+static unsigned maxhsig;	/* # of hsdata structures pointed to by hsd */
+static WFDB_FILE *hheader;	/* file pointer for header file */
+static struct hsdata {
+    WFDB_Siginfo hsinfo;	/* info about signal from header */
+    long hstart;		/* signal file byte offset to sample 0 */
+    int hskew;			/* intersignal skew (in frames) */
+} **hsd;
 
-static WFDB_FILE *iheader;	/* file pointer for input header file */
-static WFDB_FILE *oheader;	/* file pointer for output header file */
+/* Variables in this group are also set by readheader, but may be reset (by,
+   e.g., setsampfreq, setbasetime, ...).  These are used by strtim, timstr,
+   etc., for converting among sample intervals, counter values, elapsed times,
+   and absolute times and dates; they are recorded when writing header files
+   using newheader, setheader, and setmsheader.  Changing these variables has
+   no effect on the data read by getframe (or getvec) or on the data written by
+   putvec (although changes will affect what is written to output header files
+   by setheader, etc.).  An application such as xform can use independent
+   sampling frequencies and different base times or dates for input and output
+   signals, but only one set of these parameters is available at any given time
+   for use by the strtim, timstr, etc., conversion functions.
+*/
 static WFDB_Frequency ffreq;	/* frame rate (frames/second) */
 static WFDB_Frequency sfreq;	/* sampling frequency (samples/second) */
 static WFDB_Frequency cfreq;	/* counter frequency (ticks/second) */
@@ -172,13 +197,31 @@ static WFDB_Time btime;		/* base time (seconds since midnight) */
 static WFDB_Date bdate;		/* base date (Julian date) */
 static WFDB_Time nsamples;	/* duration of signals (in samples) */
 static double bcount;		/* base count (counter value at sample 0) */
-static WFDB_Siginfo tsinfo[WFDB_MAXSIG]; /* WFDB_Siginfos for temporary use */
-static long tstart[WFDB_MAXSIG];/* signal file byte offsets to sample 0 */
 
+/* The next set of variables contains information about multi-segment records.
+   The first two of them ('segments' and 'in_msrec') are used primarily as
+   flags to indicate if a record contains multiple segments.  Unless 'in_msrec'
+   is set already, readheader sets 'segments' to the number of segments
+   indicated in the header file it has most recently read (0 for a
+   single-segment record).  If it reads a header file for a multi-segment
+   record, readheader also sets the variables 'msbtime', 'msbdate', and
+   'msnsamples'; allocates and fills 'segarray'; and sets 'segp' and 'segend'.
+   Note that readheader's actions are not restricted to records opened for
+   input.
+
+   If isigopen finds that 'segments' is non-zero, it sets 'in_msrec' and then
+   invokes readheader again to obtain signal information from the header file
+   for the first segment, which must be a single-segment record (readheader
+   refuses to open a header file for a multi-segment record if 'in_msrec' is
+   set).
+
+   When creating a header file for a multi-segment record using setmsheader,
+   the variables 'msbtime', 'msbdate', and 'msnsamples' are filled in by
+   setmsheader based on btime and bdate for the first segment, and on the
+   sum of the 'nsamp' fields for all segments.  */
+static int segments;		/* number of segments found by readheader() */
 static int in_msrec;		/* current input record is: 0: a single-segment
 				   record; 1: a multi-segment record */
-static int segments;		/* number of segments in current multi-segment
-				   input record (0: single-segment record) */
 static WFDB_Time msbtime;	/* base time for multi-segment record */
 static WFDB_Date msbdate;	/* base date for multi-segment record */
 static WFDB_Time msnsamples;	/* duration of multi-segment record */
@@ -188,7 +231,181 @@ static struct segrec {
     WFDB_Time samp0;		/* sample number of first sample in segment */
 } *segarray, *segp, *segend;	/* beginning, current segment, end pointers */
 
+/* These variables relate to open input signals. */
+static unsigned maxisig;	/* max number of input signals */
+static unsigned maxigroup;	/* max number of input signal groups */
+static unsigned nisig;		/* number of open input signals */
+static unsigned nigroups;	/* number of open input signal groups */
+static unsigned maxspf;		/* max allowed value for ispfmax */
+static unsigned ispfmax;	/* max number of samples of any open signal
+				   per input frame */
+static struct isdata {		/* unique for each input signal */
+    WFDB_Siginfo isinfo;	/* input signal information */
+    WFDB_Sample ivec;		/* most recent sample read */
+    int iskew;			/* intersignal skew (in frames) */
+} **isd;
+static struct igdata {		/* shared by all signals in a group (file) */
+    int idata;			/* raw data read by r*() */
+    int idatb;			/* more raw data used for bit-packed formats */
+    WFDB_FILE *isf;		/* file pointer for an input signal group */
+    long istart;		/* signal file byte offset to sample 0 */
+    int bsize;			/* if non-zero, all reads from the input file
+				   are in multiples of bsize bytes */
+    char *isbuf;		/* pointer to input buffer */
+    char *isbp;			/* pointer to next location in isbuf[] */
+    char *isbe;			/* pointer to input buffer endpoint */
+    char icount;		/* input counter for bit-packed signal */
+    int istat;			/* signal file status flag */
+    char iseek;			/* flag to indicate if seeks are permitted */
+} **igd;
+static WFDB_Sample *tvector;	/* getvec workspace */
+static WFDB_Sample *uvector;	/* isgsettime workspace */
+static WFDB_Time istime;	/* time of next input sample */
+static int ibsize;		/* default input buffer size */
+static unsigned skewmax;	/* max skew (frames) between any 2 signals */
+static WFDB_Sample *dsbuf;	/* deskewing buffer */
+static int dsbi;		/* index to oldest sample in dsbuf (if < 0,
+				   dsbuf does not contain valid data) */
+static unsigned dsblen;		/* capacity of dsbuf, in samples */
+static unsigned framelen;	/* total number of samples per frame */
+static int gvmode = WFDB_LOWRES;/* getvec mode (WFDB_HIGHRES or WFDB_LOWRES) */
+static int gvc;			/* getvec sample-within-frame counter */
+
+/* These variables relate to output signals. */
+static unsigned maxosig;	/* max number of output signals */
+static unsigned maxogroup;	/* max number of output signal groups */
+static unsigned nosig;		/* number of open output signals */
+static unsigned nogroups;	/* number of open output signal groups */
+static WFDB_FILE *oheader;	/* file pointer for output header file */
+static struct osdata {		/* unique for each output signal */
+    WFDB_Siginfo osinfo;	/* output signal information */
+    WFDB_Sample ovec;		/* most recent sample written */
+    int oskew;			/* skew to be written by setheader() */
+} **osd;
+static struct ogdata {		/* shared by all signals in a group (file) */
+    int odata;			/* raw data to be written by w*() */
+    int odatb;			/* more raw data used for bit-packed formats */
+    WFDB_FILE *osf;		/* file pointer for output signal */
+    long ostart;		/* byte offset to be written by setheader() */
+    int bsize;			/* if non-zero, all writes to the output file
+				   are in multiples of bsize bytes */
+    char *osbuf;		/* pointer to output buffer */
+    char *osbp;			/* pointer to next location in osbuf[]; */
+    char *osbe;			/* pointer to output buffer endpoint */
+    char ocount;		/* output counter for bit-packed signal */
+} **ogd;
+static WFDB_Time ostime;	/* time of next output sample */
+static int obsize;		/* default output buffer size */
+
 /* Local functions (not accessible outside this file). */
+
+/* Allocate workspace for up to n input signals. */
+static int allocisig(n)
+unsigned n;
+{
+    if (maxisig < n) {
+	unsigned m = maxisig;
+	struct isdata **isdnew = realloc(isd, n*sizeof(struct isdata *));
+
+	if (isdnew == NULL) {
+	    wfdb_error("init: too many (%d) input signals\n", n);
+	    return (-1);
+	}
+	isd = isdnew;
+	while (m < n) {
+	    if ((isd[m] = calloc(1, sizeof(struct isdata))) == NULL) {
+		wfdb_error("init: too many (%d) input signals\n", n);
+		while (--m > maxisig)
+		    free(isd[m]);
+		return (-1);
+	    }
+	    m++;
+	}
+	maxisig = n;
+    }
+    return (maxisig);
+}
+
+/* Allocate workspace for up to n input signal groups. */
+static int allocigroup(n)
+unsigned n;
+{
+    if (maxigroup < n) {
+	unsigned m = maxigroup;
+	struct igdata **igdnew = realloc(igd, n*sizeof(struct igdata *));
+
+	if (igdnew == NULL) {
+	    wfdb_error("init: too many (%d) input signal groups\n", n);
+	    return (-1);
+	}
+	igd = igdnew;
+	while (m < n) {
+	    if ((igd[m] = calloc(1, sizeof(struct igdata))) == NULL) {
+		wfdb_error("init: too many (%d) input signal groups\n", n);
+		while (--m > maxigroup)
+		    free(igd[m]);
+		return (-1);
+	    }
+	    m++;
+	}
+	maxigroup = n;
+    }
+    return (maxigroup);
+}
+
+/* Allocate workspace for up to n output signals. */
+static int allocosig(n)
+unsigned n;
+{
+    if (maxosig < n) {
+	unsigned m = maxosig;
+	struct osdata **osdnew = realloc(osd, n*sizeof(struct osdata *));
+
+	if (osdnew == NULL) {
+	    wfdb_error("init: too many (%d) output signals\n", n);
+	    return (-1);
+	}
+	osd = osdnew;
+	while (m < n) {
+	    if ((osd[m] = calloc(1, sizeof(struct osdata))) == NULL) {
+		wfdb_error("init: too many (%d) output signals\n", n);
+		while (--m > maxosig)
+		    free(osd[m]);
+		return (-1);
+	    }
+	    m++;
+	}
+	maxosig = n;
+    }
+    return (maxosig);
+}
+
+/* Allocate workspace for up to n output signal groups. */
+static int allocogroup(n)
+unsigned n;
+{
+    if (maxogroup < n) {
+	unsigned m = maxogroup;
+	struct ogdata **ogdnew = realloc(ogd, n*sizeof(struct ogdata *));
+
+	if (ogdnew == NULL) {
+	    wfdb_error("init: too many (%d) output signal groups\n", n);
+	    return (-1);
+	}
+	ogd = ogdnew;
+	while (m < n) {
+	    if ((ogd[m] = calloc(1, sizeof(struct ogdata))) == NULL) {
+		wfdb_error("init: too many (%d) output signal groups\n", n);
+		while (--m > maxogroup)
+		    free(ogd[m]);
+		return (-1);
+	    }
+	    m++;
+	}
+	maxogroup = n;
+    }
+    return (maxogroup);
+}
 
 static int isfmt(f)
 int f;
@@ -201,9 +418,38 @@ int f;
     return (0);
 }
 
-static int readheader(record, siarray)
+static int copysi(to, from)
+WFDB_Siginfo *to, *from;
+{
+    if (to == NULL || from == NULL) return (0);
+    *to = *from;
+    if (from->fname) {
+        to->fname = (char *)malloc((size_t)strlen(from->fname)+1);
+	if (to->fname == NULL) return (-1);
+	(void)strcpy(to->fname, from->fname);
+    }
+    if (from->desc) {
+        to->desc = (char *)malloc((size_t)strlen(from->desc)+1);
+	if (to->desc == NULL) {
+	    (void)free(to->fname);
+	    return (-1);
+	}
+	(void)strcpy(to->desc, from->desc);
+    }
+    if (from->units) {
+        to->units = (char *)malloc((size_t)strlen(from->units)+1);
+	if (to->units == NULL) {
+	    (void)free(to->desc);
+	    (void)free(to->fname);
+	    return (-1);
+	}
+	(void)strcpy(to->units, from->units);
+    }
+    return (1);
+}
+
+static int readheader(record)
 char *record;
-WFDB_Siginfo *siarray;
 {
     char linebuf[256], *p, *q;
     WFDB_Frequency f;
@@ -213,10 +459,10 @@ WFDB_Siginfo *siarray;
     static char sep[] = " \t\n\r";
 
     /* If another input header file was opened, close it. */
-    if (iheader) (void)wfdb_fclose(iheader);
+    if (hheader) (void)wfdb_fclose(hheader);
 
     /* Try to open the header file. */
-    if ((iheader = wfdb_open("header", record, WFDB_READ)) == NULL) {
+    if ((hheader = wfdb_open("hea", record, WFDB_READ)) == NULL) {
 	wfdb_error("init: can't open header for record %s\n", record);
 	return (-1);
     }
@@ -224,7 +470,7 @@ WFDB_Siginfo *siarray;
     /* Get the first token (the record name) from the first non-empty,
        non-comment line. */
     do {
-	if (wfdb_fgets(linebuf, 256, iheader) == NULL) {
+	if (wfdb_fgets(linebuf, 256, hheader) == NULL) {
 	    wfdb_error("init: can't find record name in record %s header\n",
 		     record);
 	    return (-2);
@@ -248,8 +494,8 @@ WFDB_Siginfo *siarray;
        if not, the header file may have been renamed in error or its contents
        may be corrupted.  The requirement for a match is waived for remote
        files since the user may not be able to make any corrections to them. */
-    if (iheader->type == WFDB_LOCAL &&
-	iheader->fp != stdin && strcmp(p, record) != 0) {
+    if (hheader->type == WFDB_LOCAL &&
+	hheader->fp != stdin && strcmp(p, record) != 0) {
 	/* If there is a mismatch, check to see if the record argument includes
 	   a directory separator (whether valid or not for this OS);  if so,
 	   compare only the final portion of the argument against the name in
@@ -271,483 +517,521 @@ WFDB_Siginfo *siarray;
        another token from the line which contains the record name.  (Old-style
        headers have only one token on the first line, but new-style headers
        have two or more.) */
-    if (p = strtok((char *)NULL, sep)) {
-
-	/* The file appears to be a new-style header file.  
-	   The second token specifies the number of signals. */
-	if ((nsig = (unsigned)atoi(p)) > WFDB_MAXSIG) {
-	    wfdb_error(
-		"init: number of signals in record %s header is incorrect\n",
-		     record);
-	    return (-2);
-	}
-
-	/* Determine the frame rate, if present and not set already. */
-	if (p = strtok((char *)NULL, sep)) {
-	    if ((f = (WFDB_Frequency)atof(p)) <= (WFDB_Frequency)0.) {
-		wfdb_error(
-	        "init: sampling frequency in record %s header is incorrect\n",
-			 record);
-		return (-2);
-	    }
-	    if (ffreq > (WFDB_Frequency)0. && f != ffreq) {
-		wfdb_error("warning (init):\n");
-		wfdb_error(" record %s sampling frequency differs", record);
-		wfdb_error(" from that of previously opened record\n");
-	    }
-	    else
-		ffreq = f;
-	}
-	else if (ffreq == (WFDB_Frequency)0.)
-	    ffreq = WFDB_DEFFREQ;
-
-	/* Set the sampling rate to the frame rate for now.  This may be
-	   changed later by isigopen or by setgvmode, if this is a multi-
-	   frequency record and WFDB_HIGHRES mode is in effect. */
-	sfreq = ffreq;
-
-	/* Determine the counter frequency and the base counter value. */
-	cfreq = bcount = 0.0;
-	if (p) {
-	    for ( ; *p && *p != '/'; p++)
-		;
-	    if (*p == '/') {
-		cfreq = atof(++p);
-		for ( ; *p && *p != '('; p++)
-		    ;
-		if (*p == '(')
-		    bcount = atof(++p);
-	    }
-	}
-	if (cfreq <= 0.0) cfreq = ffreq;
-
-	/* Determine the number of samples per signal, if present and not
-	   set already. */
-	if (p = strtok((char *)NULL, sep)) {
-	    if ((ns = (WFDB_Time)atol(p)) < 0L) {
-		wfdb_error(
-		"init: number of samples in record %s header is incorrect\n",
-			 record);
-		return (-2);
-	    }
-	    if (nsamples == (WFDB_Time)0L)
-		nsamples = ns;
-	    else if (ns > (WFDB_Time)0L && ns != nsamples && !in_msrec) {
-		wfdb_error("warning (init):\n");
-		wfdb_error(" record %s duration differs", record);
-		wfdb_error(" from that of previously opened record\n");
-		/* nsamples must match the shortest record duration. */
-		if (nsamples > ns)
-		    nsamples = ns;
-	    }
-	}
-	else
-	    ns = (WFDB_Time)0L;
-
-	/* Determine the base time and date, if present and not set already. */
-	if ((p = strtok((char *)NULL,"\n\r")) != NULL &&
-	    btime == (WFDB_Time)0L && setbasetime(p) < 0)
-		return (-2);	/* error message will come from setbasetime */
-
-	/* Special processing for master header of a multi-segment record. */
-	if (segments && !in_msrec) {
-	    msbtime = btime;
-	    msbdate = bdate;
-	    msnsamples = nsamples;
-	    /* Read the names and lengths of the segment records. */
-#ifndef lint
-	    segarray = (struct segrec *)
-		malloc((unsigned)(sizeof(struct segrec) * segments));
-#endif
-	    if (segarray == (struct segrec *)NULL) {
-		wfdb_error("init: insufficient memory\n");
-		segments = 0;
-		return (-2);
-	    }
-	    segp = segarray;
-	    for (i = 0, ns = (WFDB_Time)0L; i < segments; i++, segp++) {
-		/* Get next segment spec, skip empty lines and comments. */
-		do {
-		    if (wfdb_fgets(linebuf, 256, iheader) == NULL) {
-			wfdb_error(
-		         "init: unexpected EOF in header file for record %s\n",
-				 record);
-#ifndef lint
-			(void)free(segarray);
-#endif
-			segarray = (struct segrec *)NULL;
-			segments = 0;
-			return (-2);
-		    }
-		} while ((p = strtok(linebuf, sep)) == NULL || *p == '#');
-		if (strlen(p) > WFDB_MAXRNL) {
-		    wfdb_error(
-		    "init: `%s' is too long for a segment name in record %s\n",
-			     p, record);
-#ifndef lint
-		    (void)free(segarray);
-#endif
-		    segarray = (struct segrec *)NULL;
-		    segments = 0;
-		    return (-2);
-		}
-		(void)strcpy(segp->recname, p);
-		if ((p = strtok((char *)NULL, sep)) == NULL ||
-		    (segp->nsamp = (WFDB_Time)atol(p)) <= 0L) {
-		    wfdb_error(
-		"init: length must be specified for segment %s in record %s\n",
-			     segp->recname, record);
-#ifndef lint
-		    (void)free(segarray);
-#endif
-		    segarray = (struct segrec *)NULL;
-		    segments = 0;
-		    return (-2);
-		}
-		segp->samp0 = ns;
-		ns += segp->nsamp;
-	    }
-	    segend = --segp;
-	    segp = segarray;
-	    if (msnsamples == 0L)
-		msnsamples = ns;
-	    else if (ns != msnsamples) {
-		wfdb_error("warning (init): sum of segment lengths (%ld)\n", ns);
-		wfdb_error("   does not match stated record length (%ld)\n",
-			 msnsamples);
-	    }
-	    return (0);
-	}
-
-	/* Now get information for each signal. */
-	for (s = 0; s < nsig; s++) {
-	    int nobaseline;
-
-	    /* Get the first token (the signal file name) from the next
-	       non-empty, non-comment line. */
-	    do {
-		if (wfdb_fgets(linebuf, 256, iheader) == NULL) {
-		    wfdb_error(
-			"init: unexpected EOF in header file for record %s\n",
-			     record);
-		    return (-2);
-		}
-	    } while ((p = strtok(linebuf, sep)) == NULL || *p == '#');
-
-	    /* Determine the signal group number.  The group number for signal
-	       0 is zero.  For subsequent signals, if the file name does not
-	       match that of the previous signal, the group number is one
-	       greater than that of the previous signal. */
-	    if (s == 0 || strcmp(p, siarray[s-1].fname)) {
-		siarray[s].group = (s == 0) ? 0 : siarray[s-1].group + 1;
-		if ((siarray[s].fname =
-		     (char *)malloc((unsigned)(strlen(p)+1)))
-		     == NULL) {
-		    wfdb_error("init: insufficient memory\n");
-		    return (-2);
-		}
-		(void)strcpy(siarray[s].fname, p);
-	    }
-	    /* If the file names of the current and previous signals match,
-	       they are assigned the same group number and share a copy of the
-	       file name.  All signals associated with a given file must be
-	       listed together in the header in order to be identified as
-	       belonging to the same group;  readheader does not check that
-	       this has been done. */
-	    else {
-		siarray[s].group = siarray[s-1].group;
-		siarray[s].fname = siarray[s-1].fname;
-	    }
-
-	    /* Determine the signal format. */
-	    if ((p = strtok((char *)NULL, sep)) == NULL ||
-		!isfmt(siarray[s].fmt = atoi(p))) {
-		wfdb_error("init: illegal format for signal %d, record %s\n",
-			 s, record);
-		return (-2);
-	    }
-	    siarray[s].spf = 1;
-	    iskew[s] = 0;
-	    tstart[s] = 0L;
-	    while (*(++p)) {
-		if (*p == 'x' && *(++p))
-		    if ((siarray[s].spf = atoi(p)) < 1) siarray[s].spf = 1;
-		if (*p == ':' && *(++p))
-		    if ((iskew[s] = atoi(p)) < 0) iskew[s] = 0;
-		if (*p == '+' && *(++p))
-		    if ((tstart[s] = atol(p)) < 0L) tstart[s] = 0L;
-	    }
-	    /* The resolution for deskewing is one frame.  The skew in samples
-	       (given in the header) is converted to skew in frames here. */
-	    iskew[s] = (int)(((double)iskew[s])/siarray[s].spf + 0.5);
-
-	    /* Determine the gain in ADC units per physical unit.  This number
-               may be zero or missing;  if so, the signal is uncalibrated. */
-	    if (p = strtok((char *)NULL, sep))
-		siarray[s].gain = (WFDB_Gain)atof(p);
-	    else
-		siarray[s].gain = (WFDB_Gain)0.;
-
-	    /* Determine the baseline if specified, and the physical units
-	       (assumed to be millivolts unless otherwise specified). */
-	    nobaseline = 1;
-	    if (p) {
-		for ( ; *p && *p != '(' && *p != '/'; p++)
-		    ;
-		if (*p == '(') {
-		    siarray[s].baseline = atoi(++p);
-		    nobaseline = 0;
-		}
-		while (*p)
-		    if (*p++ == '/' && *p)
-			break;
-	    }
-	    if (p && *p) {
-		if ((siarray[s].units=(char *)malloc(WFDB_MAXUSL+1)) == NULL) {
-		    wfdb_error("init: insufficient memory\n");
-		    return (-2);
-		}
-		(void)strncpy(siarray[s].units, p, WFDB_MAXUSL);
-	    }
-	    else
-		siarray[s].units = NULL;
-
-	    /* Determine the ADC resolution in bits.  If this number is
-	       missing and cannot be inferred from the format, the default
-	       value (from wfdb.h) is filled in. */
-	    if (p = strtok((char *)NULL, sep))
-		i = (unsigned)atoi(p);
-	    else switch (siarray[s].fmt) {
-	      case 80: i = 8; break;
-	      case 160: i = 16; break;
-	      case 212: i = 12; break;
-	      case 310: i = 10; break;
-	      case 311: i = 10; break;
-	      default: i = WFDB_DEFRES; break;
-	    }
-	    siarray[s].adcres = i;
-
-	    /* Determine the ADC zero (assumed to be zero if missing). */
-	    siarray[s].adczero = (p = strtok((char *)NULL, sep)) ? atoi(p) : 0;
-	    
-	    /* Set the baseline to adczero if no baseline field was found. */
-	    if (nobaseline) siarray[s].baseline = siarray[s].adczero;
-
-	    /* Determine the initial value (assumed to be equal to the ADC 
-	       zero if missing). */
-	    siarray[s].initval = (p = strtok((char *)NULL, sep)) ?
-		                 atoi(p) : siarray[s].adczero;
-
-	    /* Determine the checksum (assumed to be zero if missing). */
-	    if (p = strtok((char *)NULL, sep)) {
-		siarray[s].cksum = atoi(p);
-		siarray[s].nsamp = ns;
-	    }
-	    else {
-		siarray[s].cksum = 0;
-		siarray[s].nsamp = (WFDB_Time)0L;
-	    }
-
-	    /* Determine the block size (assumed to be zero if missing). */
-	    siarray[s].bsize = (p = strtok((char *)NULL, sep)) ? atoi(p) : 0;
-
-	    /* Check that formats and block sizes match for signals belonging
-	       to the same group. */
-	    if (s && siarray[s].group == siarray[s-1].group &&
-		(siarray[s].fmt != siarray[s-1].fmt ||
-		 siarray[s].bsize != siarray[s-1].bsize)) {
-		wfdb_error("init: error in specification of signal %d or %d\n",
-			 s-1, s);
-		return (-2);
-	    }
-	    
-	    /* Get the signal description.  If missing, a description of
-	       the form "record xx, signal n" is filled in. */
-	    if ((siarray[s].desc = (char *)malloc(WFDB_MAXDSL+1)) == NULL) {
-		wfdb_error("init: insufficient memory\n");
-		return (-2);
-	    }
-	    if (p = strtok((char *)NULL, "\n\r"))
-		(void)strncpy(siarray[s].desc, p, WFDB_MAXDSL);
-	    else
-		(void)sprintf(siarray[s].desc,
-			      "record %s, signal %d", record, s);
-	}
-    }
-
-    else {
-	/* We come here if there were no other tokens on the line which
-	   contained the record name.  The file appears to be an old-style
-	   header file. */
+    if ((p = strtok((char *)NULL, sep)) == NULL) {
+	/* The file appears to be an old-style header file. */
 	wfdb_error("init: obsolete format in record %s header\n", record);
 	return (-2);
     }
 
+    /* The file appears to be a new-style header file.  The second token
+       specifies the number of signals. */
+    nsig = (unsigned)atoi(p);
+
+    /* Determine the frame rate, if present and not set already. */
+    if (p = strtok((char *)NULL, sep)) {
+	if ((f = (WFDB_Frequency)atof(p)) <= (WFDB_Frequency)0.) {
+	    wfdb_error(
+		 "init: sampling frequency in record %s header is incorrect\n",
+		 record);
+	    return (-2);
+	}
+	if (ffreq > (WFDB_Frequency)0. && f != ffreq) {
+	    wfdb_error("warning (init):\n");
+	    wfdb_error(" record %s sampling frequency differs", record);
+	    wfdb_error(" from that of previously opened record\n");
+	}
+	else
+	    ffreq = f;
+    }
+    else if (ffreq == (WFDB_Frequency)0.)
+	ffreq = WFDB_DEFFREQ;
+
+    /* Set the sampling rate to the frame rate for now.  This may be
+       changed later by isigopen or by setgvmode, if this is a multi-
+       frequency record and WFDB_HIGHRES mode is in effect. */
+    sfreq = ffreq;
+
+    /* Determine the counter frequency and the base counter value. */
+    cfreq = bcount = 0.0;
+    if (p) {
+	for ( ; *p && *p != '/'; p++)
+	    ;
+	if (*p == '/') {
+	    cfreq = atof(++p);
+	    for ( ; *p && *p != '('; p++)
+		;
+	    if (*p == '(')
+		bcount = atof(++p);
+	}
+    }
+    if (cfreq <= 0.0) cfreq = ffreq;
+
+    /* Determine the number of samples per signal, if present and not
+       set already. */
+    if (p = strtok((char *)NULL, sep)) {
+	if ((ns = (WFDB_Time)atol(p)) < 0L) {
+	    wfdb_error(
+		"init: number of samples in record %s header is incorrect\n",
+		record);
+	    return (-2);
+	}
+	if (nsamples == (WFDB_Time)0L)
+	    nsamples = ns;
+	else if (ns > (WFDB_Time)0L && ns != nsamples && !in_msrec) {
+	    wfdb_error("warning (init):\n");
+	    wfdb_error(" record %s duration differs", record);
+	    wfdb_error(" from that of previously opened record\n");
+	    /* nsamples must match the shortest record duration. */
+	    if (nsamples > ns)
+		nsamples = ns;
+	}
+    }
+    else
+	ns = (WFDB_Time)0L;
+
+    /* Determine the base time and date, if present and not set already. */
+    if ((p = strtok((char *)NULL,"\n\r")) != NULL &&
+	btime == (WFDB_Time)0L && setbasetime(p) < 0)
+	return (-2);	/* error message will come from setbasetime */
+
+    /* Special processing for master header of a multi-segment record. */
+    if (segments && !in_msrec) {
+	msbtime = btime;
+	msbdate = bdate;
+	msnsamples = nsamples;
+	/* Read the names and lengths of the segment records. */
+	segarray = (struct segrec *)calloc(segments, sizeof(struct segrec));
+	if (segarray == (struct segrec *)NULL) {
+	    wfdb_error("init: insufficient memory\n");
+	    segments = 0;
+	    return (-2);
+	}
+	segp = segarray;
+	for (i = 0, ns = (WFDB_Time)0L; i < segments; i++, segp++) {
+	    /* Get next segment spec, skip empty lines and comments. */
+	    do {
+		if (wfdb_fgets(linebuf, 256, hheader) == NULL) {
+		    wfdb_error(
+			"init: unexpected EOF in header file for record %s\n",
+			record);
+		    (void)free(segarray);
+		    segarray = (struct segrec *)NULL;
+		    segments = 0;
+		    return (-2);
+		}
+	    } while ((p = strtok(linebuf, sep)) == NULL || *p == '#');
+	    if (strlen(p) > WFDB_MAXRNL) {
+		wfdb_error(
+		    "init: `%s' is too long for a segment name in record %s\n",
+		    p, record);
+		(void)free(segarray);
+		segarray = (struct segrec *)NULL;
+		segments = 0;
+		return (-2);
+	    }
+	    (void)strcpy(segp->recname, p);
+	    if ((p = strtok((char *)NULL, sep)) == NULL ||
+		(segp->nsamp = (WFDB_Time)atol(p)) <= 0L) {
+		wfdb_error(
+		"init: length must be specified for segment %s in record %s\n",
+		           segp->recname, record);
+		(void)free(segarray);
+		segarray = (struct segrec *)NULL;
+		segments = 0;
+		return (-2);
+	    }
+	    segp->samp0 = ns;
+	    ns += segp->nsamp;
+	}
+	segend = --segp;
+	segp = segarray;
+	if (msnsamples == 0L)
+	    msnsamples = ns;
+	else if (ns != msnsamples) {
+	    wfdb_error("warning (init): sum of segment lengths (%ld)\n", ns);
+	    wfdb_error("   does not match stated record length (%ld)\n",
+		       msnsamples);
+	}
+	return (0);
+    }
+
+    /* Allocate workspace. */
+    if (maxhsig < nsig) {
+	unsigned m = maxhsig;
+	struct hsdata **hsdnew = realloc(hsd, nsig*sizeof(struct hsdata *));
+
+	if (hsdnew == NULL) {
+	    wfdb_error("init: too many (%d) signals in header file\n", nsig);
+	    return (-2);
+	}
+	hsd = hsdnew;
+	while (m < nsig) {
+	    if ((hsd[m] = calloc(1, sizeof(struct hsdata))) == NULL) {
+		wfdb_error("init: too many (%d) signals in header file\n",
+			   nsig);
+		while (--m > maxhsig)
+		    free(hsd[m]);
+		return (-2);
+	    }
+	    m++;
+	}
+	maxhsig = nsig;
+    }
+
+    /* Now get information for each signal. */
+    for (s = 0; s < nsig; s++) {
+	struct hsdata *hp, *hs;
+	int nobaseline;
+
+	hs = hsd[s];
+	if (s) hp = hsd[s-1];
+	/* Get the first token (the signal file name) from the next
+	   non-empty, non-comment line. */
+	do {
+	    if (wfdb_fgets(linebuf, 256, hheader) == NULL) {
+		wfdb_error(
+			"init: unexpected EOF in header file for record %s\n",
+			record);
+		return (-2);
+	    }
+	} while ((p = strtok(linebuf, sep)) == NULL || *p == '#');
+
+	/* Determine the signal group number.  The group number for signal
+	   0 is zero.  For subsequent signals, if the file name does not
+	   match that of the previous signal, the group number is one
+	   greater than that of the previous signal. */
+	if (s == 0 || strcmp(p, hp->hsinfo.fname)) {
+		hs->hsinfo.group = (s == 0) ? 0 : hp->hsinfo.group + 1;
+		if ((hs->hsinfo.fname =(char *)malloc((unsigned)(strlen(p)+1)))
+		     == NULL) {
+		    wfdb_error("init: insufficient memory\n");
+		    return (-2);
+		}
+		(void)strcpy(hs->hsinfo.fname, p);
+	}
+	/* If the file names of the current and previous signals match,
+	   they are assigned the same group number and share a copy of the
+	   file name.  All signals associated with a given file must be
+	   listed together in the header in order to be identified as
+	   belonging to the same group;  readheader does not check that
+	   this has been done. */
+	else {
+	    hs->hsinfo.group = hp->hsinfo.group;
+	    if ((hs->hsinfo.fname = (char *)malloc(strlen(hp->hsinfo.fname)+1))
+		     == NULL) {
+		    wfdb_error("init: insufficient memory\n");
+		    return (-2);
+		}
+		(void)strcpy(hs->hsinfo.fname, hp->hsinfo.fname);
+	}
+
+	/* Determine the signal format. */
+	if ((p = strtok((char *)NULL, sep)) == NULL ||
+	    !isfmt(hs->hsinfo.fmt = atoi(p))) {
+	    wfdb_error("init: illegal format for signal %d, record %s\n",
+		       s, record);
+	    return (-2);
+	}
+	hs->hsinfo.spf = 1;
+	hs->hskew = 0;
+	hs->hstart = 0L;
+	while (*(++p)) {
+	    if (*p == 'x' && *(++p))
+		if ((hs->hsinfo.spf = atoi(p)) < 1) hs->hsinfo.spf = 1;
+	    if (*p == ':' && *(++p))
+		if ((hs->hskew = atoi(p)) < 0) hs->hskew = 0;
+	    if (*p == '+' && *(++p))
+		if ((hs->hstart = atol(p)) < 0L) hs->hstart = 0L;
+	}
+	/* The resolution for deskewing is one frame.  The skew in samples
+	   (given in the header) is converted to skew in frames here. */
+	hs->hskew = (int)(((double)hs->hskew)/hs->hsinfo.spf + 0.5);
+
+	/* Determine the gain in ADC units per physical unit.  This number
+	   may be zero or missing;  if so, the signal is uncalibrated. */
+	if (p = strtok((char *)NULL, sep))
+	    hs->hsinfo.gain = (WFDB_Gain)atof(p);
+	else
+	    hs->hsinfo.gain = (WFDB_Gain)0.;
+
+	/* Determine the baseline if specified, and the physical units
+	   (assumed to be millivolts unless otherwise specified). */
+	nobaseline = 1;
+	if (p) {
+	    for ( ; *p && *p != '(' && *p != '/'; p++)
+		;
+	    if (*p == '(') {
+		hs->hsinfo.baseline = atoi(++p);
+		nobaseline = 0;
+	    }
+	    while (*p)
+		if (*p++ == '/' && *p)
+		    break;
+	}
+	if (p && *p) {
+	    if ((hs->hsinfo.units=(char *)malloc(WFDB_MAXUSL+1)) == NULL) {
+		wfdb_error("init: insufficient memory\n");
+		return (-2);
+	    }
+	    (void)strncpy(hs->hsinfo.units, p, WFDB_MAXUSL);
+	}
+	else
+	    hs->hsinfo.units = NULL;
+
+	/* Determine the ADC resolution in bits.  If this number is
+	   missing and cannot be inferred from the format, the default
+	   value (from wfdb.h) is filled in. */
+	if (p = strtok((char *)NULL, sep))
+	    i = (unsigned)atoi(p);
+	else switch (hs->hsinfo.fmt) {
+	  case 80: i = 8; break;
+	  case 160: i = 16; break;
+	  case 212: i = 12; break;
+	  case 310: i = 10; break;
+	  case 311: i = 10; break;
+	  default: i = WFDB_DEFRES; break;
+	}
+	hs->hsinfo.adcres = i;
+
+	/* Determine the ADC zero (assumed to be zero if missing). */
+	hs->hsinfo.adczero = (p = strtok((char *)NULL, sep)) ? atoi(p) : 0;
+	    
+	/* Set the baseline to adczero if no baseline field was found. */
+	if (nobaseline) hs->hsinfo.baseline = hs->hsinfo.adczero;
+
+	/* Determine the initial value (assumed to be equal to the ADC 
+	   zero if missing). */
+	hs->hsinfo.initval = (p = strtok((char *)NULL, sep)) ?
+	    atoi(p) : hs->hsinfo.adczero;
+
+	/* Determine the checksum (assumed to be zero if missing). */
+	if (p = strtok((char *)NULL, sep)) {
+	    hs->hsinfo.cksum = atoi(p);
+	    hs->hsinfo.nsamp = ns;
+	}
+	else {
+	    hs->hsinfo.cksum = 0;
+	    hs->hsinfo.nsamp = (WFDB_Time)0L;
+	}
+
+	/* Determine the block size (assumed to be zero if missing). */
+	hs->hsinfo.bsize = (p = strtok((char *)NULL, sep)) ? atoi(p) : 0;
+
+	/* Check that formats and block sizes match for signals belonging
+	   to the same group. */
+	if (s && hs->hsinfo.group == hp->hsinfo.group &&
+	    (hs->hsinfo.fmt != hp->hsinfo.fmt ||
+	     hs->hsinfo.bsize != hp->hsinfo.bsize)) {
+	    wfdb_error("init: error in specification of signal %d or %d\n",
+		       s-1, s);
+	    return (-2);
+	}
+	    
+	/* Get the signal description.  If missing, a description of
+	   the form "record xx, signal n" is filled in. */
+	if ((hs->hsinfo.desc = (char *)malloc(WFDB_MAXDSL+1)) == NULL) {
+	    wfdb_error("init: insufficient memory\n");
+	    return (-2);
+	}
+	if (p = strtok((char *)NULL, "\n\r"))
+	    (void)strncpy(hs->hsinfo.desc, p, WFDB_MAXDSL);
+	else
+	    (void)sprintf(hs->hsinfo.desc,
+			  "record %s, signal %d", record, s);
+    }
     return (s);			/* return number of available signals */
+}
+
+static void hsdfree()
+{
+    struct hsdata *hs;
+
+    while (maxhsig)
+	if (hs = hsd[--maxhsig]) {
+	    if (hs->hsinfo.fname) (void)free(hs->hsinfo.fname);
+	    if (hs->hsinfo.units) (void)free(hs->hsinfo.units);
+	    if (hs->hsinfo.desc)  (void)free(hs->hsinfo.desc);
+	    (void)free(hs);
+	}
+    (void)free(hsd);
+    hsd = NULL;
+    maxhsig = 0;
 }
 		
 static void isigclose()
 {
-    while (nisig) {
-	if (--nisig == 0 || isinfo[nisig].group != isinfo[nisig-1].group) {
-	    (void)wfdb_fclose(isf[nisig]);
-	    isf[nisig] = NULL;
-	    if (isbuf[isinfo[nisig].group]) {
-#ifndef lint
-		(void)free(isbuf[isinfo[nisig].group]);
-#endif
-		isbuf[isinfo[nisig].group] = NULL;
-	    }
-	    if (isinfo[nisig].fname) {
-#ifndef lint
-		(void)free(isinfo[nisig].fname);
-#endif
-		isinfo[nisig].fname = NULL;
-	    }
+    struct isdata *is;
+    struct igdata *ig;
+
+    if (nisig == 0) return;
+    while (nisig)
+	if (is = isd[--nisig]) {
+	    if (is->isinfo.fname) (void)free(is->isinfo.fname);
+	    if (is->isinfo.units) (void)free(is->isinfo.units);
+	    if (is->isinfo.desc)  (void)free(is->isinfo.desc);
+	    (void)free(is);
 	}
-	icount[nisig] = 0;
-    }
+    (void)free(isd);
+    isd = NULL;
+    maxisig = 0;
+
+    while (nigroups)
+	if (ig = igd[--nigroups]) {
+	    if (ig->isf) wfdb_fclose(ig->isf);
+	    if (ig->isbuf) (void)free(ig->isbuf);
+	    (void)free(ig);
+	}
+    (void)free(igd);
+    igd = NULL;
+    maxigroup = 0;
+
     istime = 0L;
     gvc = ispfmax = 1;
-    if (iheader) {
-	(void)wfdb_fclose(iheader);
-	iheader = NULL;
+    if (hheader) {
+	(void)wfdb_fclose(hheader);
+	hheader = NULL;
     }
+    if (nosig == 0 && maxhsig != 0)
+	hsdfree();
 }
 
 static void osigclose()
 {
-    WFDB_Group g;
+    struct osdata *os;
+    struct ogdata *og;
 
-    while (nosig) {
-	if (--nosig == 0 || osinfo[nosig].group != osinfo[nosig-1].group) {
-	    g = osinfo[nosig].group;
-	    /* Null-pad special files only, if anything was written. */
-	    if (osinfo[nosig].bsize != 0 && ocount[nosig])
-		while (osbp[g] != osbe[g])
-		    *(osbp[g]++) = '\0';
-	    /* Flush the last block. */
-	    if (osbp[g] != osbuf[g])
-		(void)wfdb_fwrite(osbuf[g], 1, osbp[g]-osbuf[g], osf[nosig]);
-	    /* Don't close standard output (this will be done on exit). */
-	    if (strcmp(osinfo[nosig].fname, "-")) {
-		(void)wfdb_fclose(osf[nosig]);
-		osf[nosig] = NULL;
+    if (nosig == 0) return;
+    while (nosig)
+	if (os = osd[--nosig]) {
+	    if (os->osinfo.fname) (void)free(os->osinfo.fname);
+	    if (os->osinfo.units) (void)free(os->osinfo.units);
+	    if (os->osinfo.desc)  (void)free(os->osinfo.desc);
+	    (void)free(os);
+	}
+    (void)free(osd);
+    osd = NULL;
+    maxosig = 0;
+
+    while (nogroups)
+	if (og = ogd[--nogroups]) {
+	    if (og->osf) {
+		/* If a block size has been defined, null-pad the buffer. */
+		if (og->bsize)
+		    while (og->osbp != og->osbe)
+			*(og->osbp++) = '\0';
+		/* Flush the last block unless it's empty. */
+		if (og->osbp != og->osbuf)
+		    (void)wfdb_fwrite(og->osbuf, 1, og->osbp - og->osbuf,
+				      og->osf);
+		/* Close file (except stdout, which will be closed on exit). */
+		if (og->osf->fp != stdout) {
+		    (void)wfdb_fclose(og->osf);
+		    og->osf = NULL;
+		}
 	    }
-#ifndef lint
-	    (void)free(osbuf[g]);
-	    (void)free(osinfo[nosig].fname);
-#endif
-	    osbuf[g] = osinfo[nosig].fname = NULL;
+	    if (og->osbuf) (void)free(og->osbuf);
+	    (void)free(og);
 	}
-	if (osinfo[nosig].desc) {
-#ifndef lint
-	    (void)free(osinfo[nosig].desc);
-#endif
-	    osinfo[nosig].desc = NULL;
-	}
-	if (osinfo[nosig].units) {
-#ifndef lint
-	    (void)free(osinfo[nosig].units);
-#endif
-	    osinfo[nosig].units = NULL;
-	}
-	ocount[nosig] = 0;
-    }
+    (void)free(ogd);
+    ogd = NULL;
+    maxogroup = 0;
+
     ostime = 0L;
     if (oheader) {
 	(void)wfdb_fclose(oheader);
 	oheader = NULL;
     }
+    if (nisig == 0 && maxhsig != 0)
+	hsdfree();
 }
 
 /* Low-level I/O routines.  The input routines each get a single argument (the
-signal number).  The output routines get two arguments (the value to be written
-and the signal number). */
+signal group number).  The output routines get two arguments (the value to be
+written and the signal group number). */
 
-static WFDB_Group _g;	    /* macro temporary storage for group number */
+static struct igdata *_ig;  /* macro temporary storage for input group ptr */
+static struct ogdata *_og;  /* macro temporary storage for output group ptr */
 static int _l;		    /* macro temporary storage for low byte of word */
 static int _n;		    /* macro temporary storage for byte count */
 
-#define r8(S)	((char)(_g = isinfo[S].group, \
-		 ((isbp[_g] < isbe[_g]) ? *(isbp[_g]++) : \
-		  ((_n = (isinfo[S].bsize > 0) ? isinfo[S].bsize : ibsize), \
-		   (istat[_g] = _n = wfdb_fread(isbuf[_g], 1, _n, isf[S])), \
-		   (isbe[_g] = (isbp[_g] = isbuf[_g]) + _n),\
-		  *(isbp[_g]++)))))
+#define r8(G)	((char)(_ig = igd[G], \
+		 ((_ig->isbp < _ig->isbe) ? *(_ig->isbp++) : \
+		  ((_n = (_ig->bsize > 0) ? _ig->bsize : ibsize), \
+		   (_ig->istat = _n = wfdb_fread(_ig->isbuf,1,_n,_ig->isf)), \
+		   (_ig->isbe = (_ig->isbp = _ig->isbuf) + _n),\
+		  *(_ig->isbp++)))))
 
-#define w8(V,S)	(_g = osinfo[S].group, \
-		 (*(osbp[_g]++) = (char)(V), \
-		  (_l = ((osbp[_g] != osbe[_g]) ? 0 : \
-		   ((_n = (osinfo[S].bsize > 0) ? osinfo[S].bsize : obsize), \
-		    (wfdb_fwrite((osbp[_g] = osbuf[_g]), 1, _n, osf[S])))))))
+#define w8(V,G)	(_og = ogd[G], \
+		 (*(_og->osbp++) = (char)(V), \
+		  (_l = ((_og->osbp != _og->osbe) ? 0 : \
+		   ((_n = (_og->bsize > 0) ? _og->bsize : obsize), \
+		    (wfdb_fwrite((_og->osbp=_og->osbuf), 1, _n, _og->osf)))))))
 
 /* If a short integer is not 16 bits, it may be necessary to redefine r16() and
 r61() in order to obtain proper sign extension. */
 
 #ifndef BROKEN_CC
-#define r16(S)	(_l = r8(S), ((int)((short)((r8(S) << 8) | (_l & 0xff)))))
-#define w16(V,S)	(w8((V), (S)), w8(((V) >> 8), (S)))
-#define r61(S)  (_l = r8(S), ((int)((short)((r8(S) & 0xff) | (_l << 8)))))
-#define w61(V,S)	(w8(((V) >> 8), (S)), w8((V), (S)))
+#define r16(G)	    (_l = r8(G), ((int)((short)((r8(G) << 8) | (_l & 0xff)))))
+#define w16(V,G)    (w8((V), (G)), w8(((V) >> 8), (G)))
+#define r61(G)      (_l = r8(G), ((int)((short)((r8(G) & 0xff) | (_l << 8)))))
+#define w61(V,G)    (w8(((V) >> 8), (G)), w8((V), (G)))
 #else
 
-static int r16(s)
-WFDB_Signal s;
+static int r16(g)
+WFDB_Group g;
 {
     int l, h;
 
-    l = r8(s);
-    h = r8(s);
+    l = r8(g);
+    h = r8(g);
     return ((int)((short)((h << 8) | (l & 0xff))));
 }
 
-static void w16(v, s)
+static void w16(v, g)
 WFDB_Sample v;
-WFDB_Signal s;
+WFDB_Group g;
 {
-    w8(v, s);
-    w8((v >> 8), s);
+    w8(v, g);
+    w8((v >> 8), g);
 }
 
-static int r61(s)
-WFDB_Signal s;
+static int r61(g)
+WFDB_Group g;
 {
     int l, h;
 
-    h = r8(s);
-    l = r8(s);
+    h = r8(g);
+    l = r8(g);
     return ((int)((short)((h << 8) | (l & 0xff))));
 }
 
-static void w61(v, s)
+static void w61(v, g)
 WFDB_Sample v;
-WFDB_Signal s;
+WFDB_Group g;
 {
-    w8((v >> 8), s);
-    w8(v, s);
+    w8((v >> 8), g);
+    w8(v, g);
 }
 #endif
 
-#define r80(S)		((r8(S) & 0xff) - (1 << 7))
-#define w80(V, S)	(w8(((V) & 0xff) + (1 << 7), S))
+#define r80(G)		((r8(G) & 0xff) - (1 << 7))
+#define w80(V, G)	(w8(((V) & 0xff) + (1 << 7), G))
 
-#define r160(S)		((r16(S) & 0xffff) - (1 << 15))
-#define w160(V, S)	(w16(((V) & 0xffff) + (1 << 15), S))
+#define r160(G)		((r16(G) & 0xffff) - (1 << 15))
+#define w160(V, G)	(w16(((V) & 0xffff) + (1 << 15), G))
 
-static int r212(s)  /* read and return the next sample from a format 212    */
-WFDB_Signal s;	    /* signal file (2 12-bit samples bit-packed in 3 bytes) */
+static int r212(g)  /* read and return the next sample from a format 212    */
+WFDB_Group g;	    /* signal file (2 12-bit samples bit-packed in 3 bytes) */
 {
-    WFDB_Group g = isinfo[s].group;
     int v;
-    static int x[WFDB_MAXSIG];
+    struct igdata *ig = igd[g];
 
     /* Obtain the next 12-bit value right-justified in v. */
-    switch (icount[g]++) {
-      case 0:	v = x[g] = r16(s); break;
+    switch (ig->icount++) {
+      case 0:	v = ig->idata = r16(g); break;
       case 1:
-      default:	icount[g] = 0;
-	        v = ((x[g] >> 4) & 0xf00) | (r8(s) & 0xff); break;
+      default:	ig->icount = 0;
+	        v = ((ig->idata >> 4) & 0xf00) | (r8(g) & 0xff); break;
     }
     /* Sign-extend from the twelfth bit. */
     if (v & 0x800) v |= ~(0xfff);
@@ -755,36 +1039,35 @@ WFDB_Signal s;	    /* signal file (2 12-bit samples bit-packed in 3 bytes) */
     return (v);
 }
 
-static void w212(v, s)	/* write the next sample to a format 212 signal file */
+static void w212(v, g)	/* write the next sample to a format 212 signal file */
 WFDB_Sample v;
-WFDB_Signal s;
+WFDB_Group g;
 {
-    WFDB_Group g = osinfo[s].group;
-    static int x[WFDB_MAXSIG];
+    struct ogdata *og = ogd[g];
 
     /* Samples are buffered here and written in pairs, as three bytes. */
-    switch (ocount[g]++) {
-      case 0:	x[g] = v & 0xfff; break;
-      case 1:	ocount[g] = 0;
-		x[g] |= (v << 4) & 0xf000; w16(x[g], s); w8(v, s);
+    switch (og->ocount++) {
+      case 0:	og->odata = v & 0xfff; break;
+      case 1:	og->ocount = 0;
+		og->odata |= (v << 4) & 0xf000; w16(og->odata, g); w8(v, g);
 		break;
     }
 }
 
-static int r310(s)  /* read and return the next sample from a format 310    */
-WFDB_Signal s;	    /* signal file (3 10-bit samples bit-packed in 4 bytes) */
+static int r310(g)  /* read and return the next sample from a format 310    */
+WFDB_Group g;	    /* signal file (3 10-bit samples bit-packed in 4 bytes) */
 {
-    WFDB_Group g = isinfo[s].group;
     int v;
-    static int x[WFDB_MAXSIG], y[WFDB_MAXSIG];
+    struct igdata *ig = igd[g];
 
     /* Obtain the next 10-bit value right-justified in v. */
-    switch (icount[g]++) {
-      case 0:	v = (x[g] = r16(s)) >> 1; break;
-      case 1:	v = (y[g] = r16(s)) >> 1; break;
+    switch (ig->icount++) {
+      case 0:	v = (ig->idata = r16(g)) >> 1; break;
+      case 1:	v = (ig->idatb = r16(g)) >> 1; break;
       case 2:
-      default:	icount[g] = 0;
-		v = ((x[g] & 0xf800) >> 11) | ((y[g] & 0xf800) >> 6); break;
+      default:	ig->icount = 0;
+		v = ((ig->idata & 0xf800) >> 11) | ((ig->idatb & 0xf800) >> 6);
+		break;
     }
     /* Sign-extend from the tenth bit. */
     if (v & 0x200) v |= ~(0x3ff);
@@ -792,43 +1075,42 @@ WFDB_Signal s;	    /* signal file (3 10-bit samples bit-packed in 4 bytes) */
     return (v);
 }
 
-static void w310(v, s)	/* write the next sample to a format 310 signal file */
+static void w310(v, g)	/* write the next sample to a format 310 signal file */
 WFDB_Sample v;
-WFDB_Signal s;
+WFDB_Group g;
 {
-    WFDB_Group g = osinfo[s].group;
-    static int x[WFDB_MAXSIG], y[WFDB_MAXSIG];
+    struct ogdata *og = ogd[g];
 
     /* Samples are buffered here and written in groups of three, as two
        left-justified 15-bit words. */
-    switch (ocount[g]++) {
-      case 0:	x[g] = (v << 1) & 0x7fe; break;
-      case 1:	y[g] = (v << 1) & 0x7fe; break;
+    switch (og->ocount++) {
+      case 0:	og->odata = (v << 1) & 0x7fe; break;
+      case 1:	og->odatb = (v << 1) & 0x7fe; break;
       case 2:
-      default:	ocount[g] = 0;
-	        x[g] |= (v << 11); w16(x[g], s);
-	        y[g] |= ((v <<  6) & ~0x7fe); w16(y[g], s);
+      default:	og->ocount = 0;
+	        og->odata |= (v << 11); w16(og->odata, g);
+	        og->odatb |= ((v <<  6) & ~0x7fe); w16(og->odatb, g);
 		break;
     }
 }
 
 /* Note that formats 310 and 311 differ in the layout of the bit-packed data */
 
-static int r311(s)  /* read and return the next sample from a format 311    */
-WFDB_Signal s;	    /* signal file (3 10-bit samples bit-packed in 4 bytes) */
+static int r311(g)  /* read and return the next sample from a format 311    */
+WFDB_Group g;	    /* signal file (3 10-bit samples bit-packed in 4 bytes) */
 {
-    WFDB_Group g = isinfo[s].group;
     int v;
-    static int x[WFDB_MAXSIG], y[WFDB_MAXSIG];
+    struct igdata *ig = igd[g];
 
     /* Obtain the next 10-bit value right-justified in v. */
-    switch (icount[g]++) {
-      case 0:	v = (x[g] = r16(s)); break;
-      case 1:	y[g] = r16(s);
-	        v = ((x[g] & 0xfc00) >> 10) | ((y[g] & 0xf) << 6); break;
+    switch (ig->icount++) {
+      case 0:	v = (ig->idata = r16(g)); break;
+      case 1:	ig->idatb = r16(g);
+	        v = ((ig->idata & 0xfc00) >> 10) | ((ig->idatb & 0xf) << 6);
+		break;
       case 2:
-      default:	icount[g] = 0;
-		v = y[g] >> 4; break;
+      default:	ig->icount = 0;
+		v = ig->idatb >> 4; break;
     }
     /* Sign-extend from the tenth bit. */
     if (v & 0x200) v |= ~(0x3ff);
@@ -836,22 +1118,21 @@ WFDB_Signal s;	    /* signal file (3 10-bit samples bit-packed in 4 bytes) */
     return (v);
 }
 
-static void w311(v, s)	/* write the next sample to a format 311 signal file */
+static void w311(v, g)	/* write the next sample to a format 311 signal file */
 WFDB_Sample v;
-WFDB_Signal s;
+WFDB_Group g;
 {
-    WFDB_Group g = osinfo[s].group;
-    static int x[WFDB_MAXSIG], y[WFDB_MAXSIG];
+    struct ogdata *og = ogd[g];
 
     /* Samples are buffered here and written in groups of three, bit-packed
        into the 30 low bits of a 32-bit word. */
-    switch (ocount[g]++) {
-      case 0:	x[g] = v & 0x3ff; break;
-      case 1:	x[g] |= (v << 10); w16(x[g], s);
-	        y[g] = (v >> 6) & 0xf; break;
+    switch (og->ocount++) {
+      case 0:	og->odata = v & 0x3ff; break;
+      case 1:	og->odata |= (v << 10); w16(og->odata, g);
+	        og->odatb = (v >> 6) & 0xf; break;
       case 2:
-      default:	ocount[g] = 0;
-	        y[g] |= (v << 4); y[g] &= 0x3fff; w16(y[g], s);
+      default:	og->ocount = 0;
+	        og->odatb |= (v << 4); og->odatb &= 0x3fff; w16(og->odatb, g);
 		break;
     }
 }
@@ -862,12 +1143,13 @@ WFDB_Time t;
 {
     int i, trem = 0;
     long nb, tt;
+    struct igdata *ig;
     WFDB_Signal s;
     unsigned int b, d = 1, n, nn;
 
 
-    /* Find the first signal which belongs to group g. */
-    for (s = 0; s < nisig && g != isinfo[s].group; s++)
+    /* Find the first signal that belongs to group g. */
+    for (s = 0; s < nisig && g != isd[s]->isinfo.group; s++)
 	;
     if (s == nisig) {
 	wfdb_error("isgsettime: incorrect signal group number %d\n", g);
@@ -892,7 +1174,7 @@ WFDB_Time t;
 	    tseg++;
 	if (segp != tseg) {
 	    segp = tseg;
-	    if (isigopen(segp->recname, tsinfo, (int)nisig) != nisig) {
+	    if (isigopen(segp->recname, NULL, (int)nisig) != nisig) {
 	        wfdb_error("isigsettime: can't open segment %s\n",
 			   segp->recname);
 		return (-1);
@@ -901,20 +1183,21 @@ WFDB_Time t;
 	t -= segp->samp0;
     }
 
+    ig = igd[g];
     /* Determine the number of samples per frame for signals in the group. */
-    for (n = nn = 0; s+n < nisig && isinfo[s+n].group == g; n++)
-	nn += isinfo[s+n].spf;
+    for (n = nn = 0; s+n < nisig && isd[s+n]->isinfo.group == g; n++)
+	nn += isd[s+n]->isinfo.spf;
     /* Determine the number of bytes per sample interval in the file. */
-    switch (isinfo[s].fmt) {
+    switch (isd[s]->isinfo.fmt) {
       case 0:
 	if (t < nsamples) {
 	    if (s == 0) istime = (in_msrec) ? t + segp->samp0 : t;
-	    isinfo[s].nsamp = nsamples - t;
-	    return (istat[g] = 1);
+	    isd[s]->isinfo.nsamp = nsamples - t;
+	    return (ig->istat = 1);
 	}
 	else {
 	    if (s == 0) istime = (in_msrec) ? msnsamples : nsamples;
-	    isinfo[s].nsamp = 0L;
+	    isd[s]->isinfo.nsamp = 0L;
 	    return (-1);
 	}
       case 8:
@@ -925,7 +1208,7 @@ WFDB_Time t;
       case 160: b = 2*nn; break;
       case 212:
 	/* Reset the input counter. */
-	icount[g] = 0;
+	ig->icount = 0;
 	/* If the desired sample does not lie on a byte boundary, seek to
 	   the previous sample and then read ahead. */
 	if ((nn & 1) && (t & 1)) {
@@ -934,14 +1217,14 @@ WFDB_Time t;
 	    if (i = isgsetframe(g, t - 1))
 		return (i);
 	    for (i = 0; i < nn; i++)
-		(void)r212(s);
+		(void)r212(g);
 	    istime++;
 	    return (0);
 	}
 	b = 3*nn; d = 2; break;
       case 310:
 	/* Reset the input counter. */
-	icount[g] = 0;
+	ig->icount = 0;
 	/* If the desired sample does not lie on a byte boundary, seek to
 	   the closest previous sample that does, then read ahead. */
 	if ((nn % 3) && (trem = (t % 3))) {
@@ -950,14 +1233,14 @@ WFDB_Time t;
 	    if (i = isgsetframe(g, t - trem))
 		return (i);
 	    for (i = nn*trem; i > 0; i--)
-		(void)r310(s);
+		(void)r310(g);
 	    istime += trem;
 	    return (0);
 	}		  
 	b = 4*nn; d = 3; break;
       case 311:
 	/* Reset the input counter. */
-	icount[g] = 0;
+	ig->icount = 0;
 	/* If the desired sample does not lie on a byte boundary, seek to
 	   the closest previous sample that does, then read ahead. */
 	if ((nn % 3) && (trem = (t % 3))) {
@@ -966,7 +1249,7 @@ WFDB_Time t;
 	    if (i = isgsetframe(g, t - trem))
 		return (i);
 	    for (i = nn*trem; i > 0; i--)
-		(void)r311(s);
+		(void)r311(g);
 	    istime += trem;
 	    return (0);
 	}		  
@@ -975,14 +1258,14 @@ WFDB_Time t;
 
     /* Seek to the beginning of the block which contains the desired sample.
        For normal files, use fseek() to do so. */
-    if (iseek[g]) {
+    if (ig->iseek) {
 	tt = t*b;
-	nb = tt/d + istart[s];
-	i = (isinfo[s].bsize == 0) ? ibsize : isinfo[s].bsize;
+	nb = tt/d + ig->istart;
+	if ((i = ig->bsize) == 0) i = ibsize;
 	/* Seek to a position such that the next block read will contain the
 	   desired sample. */
 	tt = nb/i;
-	if (wfdb_fseek(isf[s], tt*i, 0)) {
+	if (wfdb_fseek(ig->isf, tt*i, 0)) {
 	    wfdb_error("isigsettime: improper seek on signal group %d\n", g);
 	    return (-1);
 	}
@@ -992,23 +1275,25 @@ WFDB_Time t;
     else {
 	long t0, t1;
 
-	t0 = istime - (isbp[g] - isbuf[g])/b;	/* earliest buffered sample */
-	t1 = t0 + (isbe[g] - isbuf[g])/b;	/* earliest unread sample */
+	/* Get the time of the earliest buffered sample ... */
+	t0 = istime - (ig->isbp - ig->isbuf)/b;
+	/* ... and that of the earliest unread sample. */
+	t1 = t0 + (ig->isbe - ig->isbuf)/b;
 	/* There are three possibilities:  either the desired sample has been
 	   read and has passed out of the buffer, requiring a rewind ... */
 	if (t < t0) {
-	    if (wfdb_fseek(isf[s], 0L, 0)) {
+	    if (wfdb_fseek(ig->isf, 0L, 0)) {
 		wfdb_error("isigsettime: improper seek on signal group %d\n",
 			   g);
 		return (-1);
 	    }
 	    tt = t*b;
-	    nb = tt/d + istart[s];
+	    nb = tt/d + ig->istart;
 	}
 	/* ... or it is in the buffer already ... */
 	else if (t < t1) {
 	    tt = (t - t0)*b;
-	    isbp[g] = isbuf[g] + tt/d;
+	    ig->isbp = ig->isbuf + tt/d;
 	    return (0);
 	}
 	/* ... or it has not yet been read. */
@@ -1016,18 +1301,18 @@ WFDB_Time t;
 	    tt = (t - t1) * b;
 	    nb = tt/d;
 	}
-	while (nb > isinfo[s].bsize && !wfdb_feof(isf[s]))
-	    nb -= wfdb_fread(isbuf[g], 1, isinfo[s].bsize, isf[s]);
+	while (nb > ig->bsize && !wfdb_feof(ig->isf))
+	    nb -= wfdb_fread(ig->isbuf, 1, ig->bsize, ig->isf);
     }
 
     /* Reset the block pointer to indicate nothing has been read in the
        current block. */
-    isbp[g] = isbe[g];
-    istat[g] = 1;
-    /* Read any bytes in the current block which precede the desired sample. */
-    while (nb-- > 0 && istat[g] > 0)
-	i = r8(s);
-    if (istat[g] <= 0) return (-1);
+    ig->isbp = ig->isbe;
+    ig->istat = 1;
+    /* Read any bytes in the current block that precede the desired sample. */
+    while (nb-- > 0 && ig->istat > 0)
+	i = r8(g);
+    if (ig->istat <= 0) return (-1);
 
     /* Reset the getvec sample-within-frame counter. */
     gvc = ispfmax;
@@ -1036,66 +1321,71 @@ WFDB_Time t;
        testing (by setting the number of samples remaining to 0). */
     if (s == 0) istime = in_msrec ? t + segp->samp0 : t;
     while (n-- != 0)
-	isinfo[s+n].nsamp = (WFDB_Time)0L;
+	isd[s+n]->isinfo.nsamp = (WFDB_Time)0L;
     return (0);
 }
 
 static int getskewedframe(vector)
 WFDB_Sample *vector;
 {
-    int c, stat = (int)nisig;
+    int c, stat;
+    struct isdata *is;
+    struct igdata *ig;
+    WFDB_Group g;
     WFDB_Signal s;
 
+    if ((stat = (int)nisig) == 0) return (0);
     if (istime == 0L) {
-	/* Go through groups in reverse order since seeking on group 0 should
-	   always be done last. */
-	s = nisig-1;
-	do {
-	    ivec[s] = isinfo[s].initval;
-	    if ((s == 0 || isinfo[s].group != isinfo[s-1].group) &&
-		istart[s] > 0L)
-		(void)isgsetframe(isinfo[s].group, 0L);
-	    
-	} while (s-- != 0);
+	for (s = 0; s < nisig; s++)
+	    isd[s]->ivec = isd[s]->isinfo.initval;
+	for (g = nigroups; g; ) {
+	    /* Go through groups in reverse order since seeking on group 0
+	       should always be done last. */
+	    if (--g == 0 || igd[g]->istart > 0L)
+		(void)isgsetframe(g, 0L);
+	}
     }
 
     for (s = 0; s < nisig; s++) {
-	for (c = 0; c < isinfo[s].spf; c++, vector++) {
-	    switch (isinfo[s].fmt) {
+	is = isd[s];
+	g = is->isinfo.group;
+	ig = igd[g];
+	for (c = 0; c < is->isinfo.spf; c++, vector++) {
+	    switch (is->isinfo.fmt) {
 	      case 0:	/* null signal: return adczero */
-		*vector = isinfo[s].adczero;
-		if (isinfo[s].nsamp == 0) istat[isinfo[s].group] = -1;
+		*vector = is->isinfo.adczero;
+		if (is->isinfo.nsamp == 0) ig->istat = -1;
 		break;
 	      case 8:	/* 8-bit first differences */
 	      default:
-		*vector = ivec[s] += r8(s); break;
+		*vector = is->ivec += r8(g); break;
 	      case 16:	/* 16-bit amplitudes */
-		*vector = r16(s); break;
+		*vector = r16(g); break;
 	      case 61:	/* 16-bit amplitudes, bytes swapped */
-		*vector = r61(s); break;
+		*vector = r61(g); break;
 	      case 80:	/* 8-bit offset binary amplitudes */
-		*vector = r80(s); break;
+		*vector = r80(g); break;
 	      case 160:	/* 16-bit offset binary amplitudes */
-		*vector = r160(s); break;
+		*vector = r160(g); break;
 	      case 212:	/* 2 12-bit amplitudes bit-packed in 3 bytes */
-		*vector = r212(s); break;
+		*vector = r212(g); break;
 	      case 310:	/* 3 10-bit amplitudes bit-packed in 4 bytes */
-		*vector = r310(s); break;
+		*vector = r310(g); break;
 	      case 311:	/* 3 10-bit amplitudes bit-packed in 4 bytes */
-		*vector = r311(s); break;
+		*vector = r311(g); break;
 	    }
-	    if (istat[isinfo[s].group] <= 0) {
+	    if (ig->istat <= 0) {
 		/* End of file -- reset input counter. */
-		icount[isinfo[s].group] = 0;
-		if (isinfo[s].nsamp > (WFDB_Time)0L) {
+		ig->icount = 0;
+		if (is->isinfo.nsamp > (WFDB_Time)0L) {
 		    wfdb_error("getvec: unexpected EOF in signal %d\n", s);
 		    stat = -3;
 		}
 		else if (in_msrec && segp < segend) {
 		    segp++;
-		    if (isigopen(segp->recname, tsinfo, (int)nisig) < nisig) {
+		    if (isigopen(segp->recname, NULL, (int)nisig) < nisig) {
 			wfdb_error("getvec: error opening segment %s\n",
-				 segp->recname);
+				   segp->recname);
 			stat = -3;
 		    }
 		    else {
@@ -1105,7 +1395,7 @@ WFDB_Sample *vector;
 		}
 		else
 		    stat = -1;
-		if (isinfo[s].nsamp > (WFDB_Time)0L) {
+		if (is->isinfo.nsamp > (WFDB_Time)0L) {
 		    wfdb_error("getvec: unexpected EOF in signal %d\n", s);
 		    stat = -3;
 		}
@@ -1113,10 +1403,11 @@ WFDB_Sample *vector;
 		    stat = -1;
 	    }
 	    else
-		isinfo[s].cksum -= *vector;
+		is->isinfo.cksum -= *vector;
 	}
-	if (--isinfo[s].nsamp == (WFDB_Time)0L && (isinfo[s].cksum & 0xffff) &&
-	    isinfo[s].fmt != 0) {
+	if (--is->isinfo.nsamp == (WFDB_Time)0L &&
+	    (is->isinfo.cksum & 0xffff) &&
+	    is->isinfo.fmt != 0) {
 	    wfdb_error("getvec: checksum error in signal %d\n", s);
 	    stat = -4;
 	}
@@ -1131,12 +1422,12 @@ char *record;
 WFDB_Siginfo *siarray;
 int nsig;
 {
-    WFDB_FILE **ifp;
-    WFDB_Group g;
-    int navail;
-    WFDB_Siginfo *isi;
+    int navail, ngroups;
+    struct hsdata *hs;
+    struct isdata *is;
+    struct igdata *ig;
     WFDB_Signal s, si, sj;
-    unsigned int buflen, ga;
+    WFDB_Group g;
 
     /* Close previously opened input signals unless otherwise requested. */
     if (*record == '+') record++;
@@ -1146,11 +1437,11 @@ int nsig;
     if (!in_msrec) wfdb_setirec(record);
 
     /* Read the header and determine how many signals are available. */
-    if ((navail = readheader(record, tsinfo)) <= 0) {
+    if ((navail = readheader(record)) <= 0) {
 	if (navail == 0 && segments) {	/* this is a multi-segment record */
 	    in_msrec = 1;
 	    /* Open the first segment to get signal information. */
-	    if ((navail = readheader(segp->recname, tsinfo)) >= 0) {
+	    if ((navail = readheader(segp->recname)) >= 0) {
 		if (msbtime == 0L) msbtime = btime;
 		if (msbdate == 0L) msbdate = bdate;
 	    }
@@ -1167,84 +1458,85 @@ int nsig;
     if (nsig <= 0) {
 	nsig = -nsig;
 	if (navail < nsig) nsig = navail;
-	for (s = 0; s < nsig; s++)
-	    siarray[s] = tsinfo[s];
+	if (siarray != NULL)
+	    for (s = 0; s < nsig; s++)
+		siarray[s] = hsd[s]->hsinfo;
 	return (navail);
     }
 
-    /* Initialize local variables. */
-    ifp = &isf[nisig];
-    isi = &isinfo[nisig];
-    if (ibsize <= 0) ibsize = BUFSIZ;
-
-    /* Determine how many signals we should attempt to open.  The caller's
-       upper limit on this number is nsig, the upper limit defined by the
-       header is navail, and the upper limit imposed by the WFDB library is
-       WFDB_MAXSIG-nisig (the number of empty slots in the input signal
-       arrays). */
+    /* Determine how many new signals we should attempt to open.  The caller's
+       upper limit on this number is nsig, and the upper limit defined by the
+       header is navail. */
     if (nsig > navail) nsig = navail;
-    if (nsig > WFDB_MAXSIG - nisig) nsig = WFDB_MAXSIG - nisig;
 
-    /* Set the group number adjustment.  This quantity is added to the group
-       numbers of signals which are opened below;  it accounts for any input
-       signals which were left open from previous calls. */
-    ga = nisig ? isinfo[nisig-1].group + 1 : 0;
+    /* Allocate input signals and signal group workspace. */
+    nsig = allocisig(nisig + nsig);
+    ngroups = allocigroup(nigroups + hsd[nsig-1]->hsinfo.group + 1);
+    /* FIXME: check for errors from allocisig and allocigroup! */
 
+    /* Set default buffer size (if not set already by setibsize). */
+    if (ibsize <= 0) ibsize = BUFSIZ;
+  
     /* Open the signal files.  One signal group is handled per iteration.  In
-       this loop, si counts through the entries in tsinfo, and s counts the
-       entries added to the isinfo and isf (ifp) arrays. */
-    for (si = s = 0; si < navail && s < nsig; ) {
+       this loop, si counts through the entries that have been read from hsd,
+       and s counts the entries that have been added to isd. */
+    for (g = si = s = 0; si < navail && s < nsig; si = sj) {
+        hs = hsd[si];
+	is = isd[nisig+s];
+	ig = igd[nigroups+g];
+
 	/* Find out how many signals are in this group. */
-	for (sj = si+1; sj<navail && tsinfo[sj].group==tsinfo[si].group; sj++)
-	    ;
-	/* Skip this group if not enough slots are available. */
-	if (sj-si > nsig-s) {
-	    si = sj;
-	    ga--;
-	    continue;
+        for (sj = si + 1; sj < navail; sj++)
+	  if (hsd[sj]->hsinfo.group != hs->hsinfo.group) break;
+
+	/* Skip this group if there are too few slots in the caller's array. */
+	if (sj - si > nsig - s) continue;
+
+	/* Set the buffer size and the seek capability flag. */
+	if (hs->hsinfo.bsize < 0) {
+	    ig->bsize = hs->hsinfo.bsize = -hs->hsinfo.bsize;
+	    ig->iseek = 0;
 	}
-	/* Don't open a file for a null signal. */
-	if (tsinfo[si].fmt == 0)
-	    ifp[s] = NULL;
-	/* The file name '-' specifies the standard input. */
-	else if (strcmp(tsinfo[si].fname, "-") == 0) {
-	    ifp[s]->type = WFDB_LOCAL;
-	    ifp[s]->fp = stdin;
+	else {
+	    if ((ig->bsize = hs->hsinfo.bsize) == 0) ig->bsize = ibsize;
+	    ig->iseek = 1;
 	}
-	/* Skip this group if the signal file can't be opened. */
-	else if ((ifp[s]=wfdb_open(tsinfo[si].fname,(char *)NULL,WFDB_READ)) ==
-		 NULL){
-	    si = sj;
-	    ga--;
-	    continue;
-	}
-	g = tsinfo[si].group + ga;  /* the next group number to be assigned */
-	if (tsinfo[si].bsize > 0) buflen = tsinfo[si].bsize;
-	else if (tsinfo[si].bsize < 0) buflen = -tsinfo[si].bsize;
-	else buflen = ibsize;
+
 	/* Skip this group if a buffer can't be allocated. */
-	if ((isbuf[g] = (char *)malloc(buflen)) == NULL) {
-	    si = sj;
-	    ga--;
-	    continue;
+	if ((ig->isbuf = (char *)malloc(ig->bsize)) == NULL) continue;
+
+	/* Check that the signal file is readable. */
+	if (hs->hsinfo.fmt == 0)
+	    ig->isf = NULL;	/* Don't open a file for a null signal. */
+	else if (strcmp(hs->hsinfo.fname, "-") == 0) {
+	    /* The file name '-' specifies the standard input. */
+	    ig->isf->type = WFDB_LOCAL;
+	    ig->isf->fp = stdin;
 	}
-	isbe[g] = isbp[g] = isbuf[g] + buflen;
-	istat[g] = 1;
-	if (tsinfo[si].bsize < 0) {
-	    tsinfo[si].bsize = -tsinfo[si].bsize;
-	    iseek[g] = 0;
+	else { 
+	    ig->isf = wfdb_open(hs->hsinfo.fname, (char *)NULL, WFDB_READ);
+	    /* Skip this group if the signal file can't be opened. */
+	    if (ig->isf == NULL) {
+	        (void)free(ig->isbuf);
+		continue;
+	    }
 	}
-	else
-	    iseek[g] = 1;
-	istart[s+nisig] = tstart[si];
-	isi[s] = tsinfo[si++];
-	isi[s++].group = g;
-	while (si < sj) {
-	    ifp[s] = ifp[s-1];
-	    istart[s+nisig] = tstart[si];
-	    isi[s] = tsinfo[si++];
-	    isi[s++].group = g;
+
+	/* All tests passed -- fill in remaining data for this group. */
+	ig->isbe = ig->isbp = ig->isbuf + ig->bsize;
+	ig->istart = hs->hstart;
+	ig->istat = 1;
+	while (si < sj && s < nsig) {
+	    if (copysi(&is->isinfo, &hs->hsinfo) < 0) {
+		wfdb_error("isigopen: insufficient memory\n");
+		return (-3);
+	    }
+	    is->isinfo.group = g;
+	    is->iskew = hs->hskew;
+	    hs = hsd[++si];
+	    is = isd[nisig + ++s];
 	}
+	g++;
     }
 
     /* Produce a warning message if none of the requested signals could be
@@ -1253,39 +1545,47 @@ int nsig;
 	wfdb_error("isigopen: none of the signals for record %s is readable\n",
 		 record);
 
-    /* Copy the WFDB_Siginfo structures to the caller's array. */
+    /* Copy the WFDB_Siginfo structures to the caller's array.  Use these
+       data to construct the initial sample vector, and to determine the
+       maximum number of samples per signal per frame and the maximum skew. */
     for (si = 0; si < s; si++) {
-	siarray[si] = isi[si];
-	if (ispfmax < isi[si].spf) ispfmax = isi[si].spf;
-	if (skewmax < iskew[si]) skewmax = iskew[si];
-	ivec[si] = isi[si].initval;	/* *** check this *** */
+        is = isd[nisig + si];
+	if (siarray != NULL && copysi(&siarray[si], &is->isinfo) < 0) {
+	    wfdb_error("isigopen: insufficient memory\n");
+	    return (-3);
+	}
+	is->ivec = is->isinfo.initval;
+	if (ispfmax < is->isinfo.spf) ispfmax = is->isinfo.spf;
+	if (skewmax < is->iskew) skewmax = is->iskew;
     }
 
-    /* Reset sfreq if appropriate. */
-    setgvmode(gvmode);
-
-    /* Initialize getvec's sample-within-frame counter. */
-    gvc = ispfmax;
-
-    /* Update the count of open input signals. */
-    nisig += s;
+    setgvmode(gvmode);	/* Reset sfreq if appropriate. */
+    gvc = ispfmax;	/* Initialize getvec's sample-within-frame counter. */
+    nisig += s;		/* Update the count of open input signals. */
+    nigroups += g;	/* Update the count of open input signal groups. */
 
     /* Determine the total number of samples per frame. */
     for (si = framelen = 0; si < nisig; si++)
-	framelen += isinfo[si].spf;
+	framelen += isd[si]->isinfo.spf;
+
+    /* Allocate workspace for getvec and isgsettime. */
+    if ((tvector = calloc(sizeof(WFDB_Sample), framelen)) == NULL ||
+	(uvector = calloc(sizeof(WFDB_Sample), framelen)) == NULL) {
+	wfdb_error("isigopen: can't allocate frame buffer\n");
+	if (tvector) (void)free(tvector);
+	return (-3);
+    }
 
     /* If deskewing is required, allocate the deskewing buffer (unless this is
-       a multi-segment record and dsbuf has been allocated already); produce a
-       warning message if the buffer couldn't be allocated.  In this case, the
-       signals can still be read, but won't be deskewed. */
+       a multi-segment record and dsbuf has been allocated already). */
     if (skewmax != 0 && (!in_msrec || dsbuf == NULL)) {
 	dsbi = -1;	/* mark buffer contents as invalid */
 	dsblen = framelen * (skewmax + 1);
-#ifndef lint
 	if (dsbuf) free(dsbuf);
 	if ((dsbuf=(WFDB_Sample *)malloc(dsblen*sizeof(WFDB_Sample))) == NULL)
 	    wfdb_error("isigopen: can't allocate buffer for deskewing\n");
-#endif
+	/* If the buffer couldn't be allocated, the signals can still be read,
+	   but won't be deskewed. */
     }
     return (s);
 }
@@ -1295,9 +1595,9 @@ char *record;
 WFDB_Siginfo *siarray;
 unsigned int nsig;
 {
-    WFDB_FILE **ofp;
     int n;
-    WFDB_Siginfo *osi;
+    struct osdata *os, *op;
+    struct ogdata *og;
     WFDB_Signal s, si;
     unsigned int buflen, ga;
 
@@ -1305,12 +1605,7 @@ unsigned int nsig;
     if (*record == '+') record++;
     else osigclose();
 
-    /* Determine if nsig output signals can be opened. */
-    if (nsig > WFDB_MAXSIG - nosig) {
-	wfdb_error("osigopen: attempt to open too many output signals\n");
-	return (-3);
-    }
-    if ((n = readheader(record, tsinfo)) < 0)
+    if ((n = readheader(record)) < 0)
 	return (n);
     if (n < nsig) {
 	wfdb_error("osigopen: record %s has fewer signals than needed\n",
@@ -1318,58 +1613,79 @@ unsigned int nsig;
 	return (-3);
     }
 
+    /* Allocate workspace for output signals. */
+    if (allocosig(nosig + nsig) < 0) return (-3);
+    /* Allocate workspace for output signal groups. */
+    if (allocogroup(nogroups + hsd[nsig-1]->hsinfo.group + 1) < 0) return (-3);
+
     /* Initialize local variables. */
-    ofp = &osf[nosig];
-    osi = &osinfo[nosig];
+    og = ogd[nogroups];
     if (obsize <= 0) obsize = BUFSIZ;
 
     /* Set the group number adjustment.  This quantity is added to the group
        numbers of signals which are opened below;  it accounts for any output
        signals which were left open from previous calls. */
-    ga = nosig ? osinfo[nosig-1].group + 1 : 0;
+    ga = nogroups;
 
     /* Open the signal files.  One signal is handled per iteration. */
-    for (s = 0; s < nsig; s++) {
+    for (s = 0, os = osd[nosig]; s < nsig; s++, nosig++, os++) {
+	op = os;
+	os = osd[nosig];
+
+	/* Copy signal information from readheader's workspace. */
+	if (copysi(&os->osinfo, &hsd[s]->hsinfo) < 0) {
+	    wfdb_error("osigopen: insufficient memory\n");
+	    return (-3);
+	}
+	if (os->osinfo.spf < 1) os->osinfo.spf = 1;
+	os->osinfo.cksum = 0;
+	os->osinfo.nsamp = (WFDB_Time)0L;
+	os->osinfo.group += ga;
+
 	/* Check if this signal is in the same group as the previous one. */
-	if (s != 0 && tsinfo[s].group == tsinfo[s-1].group)
-	    ofp[s] = ofp[s-1];
-	else if (tsinfo[s].fmt == 0)
-	    ofp[s] = NULL;	/* don't open a file for a null signal */
-	/* The filename '-' specifies the standard output. */
-	else if (strcmp(tsinfo[s].fname, "-") == 0) {
-	    ofp[s]->type = WFDB_LOCAL;
-	    ofp[s]->fp = stdout;
+	if (s == 0 || os->osinfo.group != op->osinfo.group) {
+	    size_t obuflen;
+
+	    og->bsize = os->osinfo.bsize;
+	    obuflen = og->bsize ? og->bsize : obsize;
+	    /* This is the first signal in a new group; allocate buffer. */
+	    if ((og->osbuf = (char *)malloc(obuflen)) == NULL) {
+	        wfdb_error("osigopen: can't allocate buffer for %s\n",
+			   os->osinfo.fname);
+		return (-3);
+	    }
+	    og->osbp = og->osbuf;
+	    og->osbe = og->osbuf + obuflen;
+	    if (os->osinfo.fmt == 0)
+	        og->osf = NULL;	/* don't open a file for a null signal */
+	    /* The filename '-' specifies the standard output. */
+	    else if (strcmp(os->osinfo.fname, "-") == 0) {
+	        og->osf->type = WFDB_LOCAL;
+		og->osf->fp = stdout;
+	    }
+	    /* An error in opening an output file is fatal. */
+	    else {
+		og->osf = wfdb_open(os->osinfo.fname,(char *)NULL, WFDB_WRITE);
+		if (og->osf == NULL) {
+		    wfdb_error("osigopen: can't open %s\n", os->osinfo.fname);
+		    /* FIXME: close any open files, free allocated buffers */
+		    return (-3);
+		}
+	    }
+	    nogroups++;
+	    og++;
 	}
-	/* An error in opening an output file is fatal. */
-	else if ((ofp[s]=wfdb_open(tsinfo[s].fname,(char *)NULL,WFDB_WRITE)) ==
-		 NULL){
-	    wfdb_error("osigopen: can't open %s\n", tsinfo[s].fname);
-	    return (-3);
+	else {
+	    /* This signal belongs to the same group as the previous signal. */
+	    if (os->osinfo.fmt != op->osinfo.fmt ||
+		os->osinfo.bsize != op->osinfo.bsize) {
+		wfdb_error(
+		    "osigopen: error in specification of signal %d or %d\n",
+		     s-1, s);
+		return (-2);
+	    }
 	}
-	osi[s] = tsinfo[s];
-	buflen = (osi[s].bsize > 0) ? osi[s].bsize : obsize;
-	osi[s].group += ga;
-	/* An error allocating a buffer is fatal. */
-	if ((s == 0 || osi[s].group != osi[s-1].group) &&
-	    (osbuf[osi[s].group] = (char *)malloc(buflen)) == NULL) {
-	    wfdb_error("osigopen: can't allocate buffer for %s\n",
-		       osi[s].fname);
-	    return (-3);
-	}
-	osbp[osi[s].group] = osbuf[osi[s].group];
-	osbe[osi[s].group] = osbuf[osi[s].group] + buflen;
     }
-
-    /* Copy the WFDB_Siginfo structures to the caller's array. */
-    for (si = 0; si < s; si++) {
-	osi[si].cksum = 0;
-	osi[si].nsamp = (WFDB_Time)0L;
-	siarray[si] = osi[si];
-    }
-
-    /* Update the count of open output signals. */
-    nosig += s;
-
     return (s);
 }
 
@@ -1377,94 +1693,127 @@ FINT osigfopen(siarray, nsig)
 WFDB_Siginfo *siarray;
 unsigned int nsig;
 {
-    unsigned int buflen;
+    struct osdata *os, *op;
+    struct ogdata *og;
+    int s;
+    WFDB_Siginfo *si;
 
     /* Close any open output signals. */
     osigclose();
 
     if (obsize <= 0) obsize = BUFSIZ;
 
+    /* Prescan siarray to check the signal specifications and to determine
+       the number of signal groups. */
+    for (s = 0, si = siarray; s < nsig; s++, si++) {
+	/* The combined lengths of the fname and desc strings should be 80
+	   characters or less, the bsize field must not be negative, the
+	   format should be legal, group numbers should be the same if and
+	   only if file names are the same, and group numbers should begin
+	   at zero and increase in steps of 1. */
+	if (strlen(si->fname) + strlen(si->desc) > 80 ||
+	    si->bsize < 0 || !isfmt(si->fmt)) {
+	    wfdb_error("osigfopen: error in specification of signal %d\n",
+		       s);
+	    return (-2);
+	}
+	if (!((s == 0 && si->group == 0) ||
+	    (s && si->group == (si-1)->group &&
+	     strcmp(si->fname, (si-1)->fname) == 0) ||
+	    (s && si->group == (si-1)->group + 1 &&
+	     strcmp(si->fname, (si-1)->fname) != 0))) {
+	    wfdb_error(
+		     "osigfopen: incorrect file name or group for signal %d\n",
+		     s);
+	    return (-2);
+	}
+    }
+
+    /* Allocate workspace for output signals. */
+    if (allocosig(nsig) < 0) return (-3);
+    /* Allocate workspace for output signal groups. */
+    if (allocogroup((si-1)->group + 1) < 0) return (-3);
+
     /* Open the signal files.  One signal is handled per iteration. */
-    for ( ; nosig < nsig; nosig++) {
+    for (os = osd[0]; nosig < nsig; nosig++, siarray++) {
+
+	op = os;
+	os = osd[nosig];
 	/* Check signal specifications.  The combined lengths of the fname
 	   and desc strings should be 80 characters or less, the bsize field
 	   must not be negative, the format should be legal, group numbers
 	   should be the same if and only if file names are the same, and
 	   group numbers should begin at zero and increase in steps of 1. */
-	if (strlen(siarray[nosig].fname) + strlen(siarray[nosig].desc) > 80 ||
-	    siarray[nosig].bsize < 0 || !isfmt(siarray[nosig].fmt)) {
-	    wfdb_error("osigfopen: error in specification of signal %d\n",nosig);
+	if (strlen(siarray->fname) + strlen(siarray->desc) > 80 ||
+	    siarray->bsize < 0 || !isfmt(siarray->fmt)) {
+	    wfdb_error("osigfopen: error in specification of signal %d\n",
+		       nosig);
 	    return (-2);
 	}
-	if (!((nosig == 0 && siarray[nosig].group == 0) ||
-	    (nosig && siarray[nosig].group == siarray[nosig-1].group &&
-	     strcmp(siarray[nosig].fname, siarray[nosig-1].fname) == 0) ||
-	    (nosig && siarray[nosig].group == siarray[nosig-1].group + 1 &&
-	     strcmp(siarray[nosig].fname, siarray[nosig-1].fname) != 0))) {
+	if (!((nosig == 0 && siarray->group == 0) ||
+	    (nosig && siarray->group == (siarray-1)->group &&
+	     strcmp(siarray->fname, (siarray-1)->fname) == 0) ||
+	    (nosig && siarray->group == (siarray-1)->group + 1 &&
+	     strcmp(siarray->fname, (siarray-1)->fname) != 0))) {
 	    wfdb_error(
-		"osigfopen: incorrect file name or group for signal %d\n",
+		     "osigfopen: incorrect file name or group for signal %d\n",
 		     nosig);
 	    return (-2);
 	}
+
+	/* Copy signal information from the caller's array. */
+	if (copysi(&os->osinfo, siarray) < 0) {
+	    wfdb_error("osigfopen: insufficient memory\n");
+	    return (-3);
+	}
+	if (os->osinfo.spf < 1) os->osinfo.spf = 1;
+	os->osinfo.cksum = 0;
+	os->osinfo.nsamp = (WFDB_Time)0L;
+
 	/* Check if this signal is in the same group as the previous one. */
-	if (nosig && siarray[nosig].group == siarray[nosig-1].group) {
-	    osf[nosig] = osf[nosig-1];
-	    if (siarray[nosig].fmt != siarray[nosig-1].fmt ||
-		siarray[nosig].bsize != siarray[nosig-1].bsize) {
+	if (nosig == 0 || os->osinfo.group != op->osinfo.group) {
+	    size_t obuflen;
+
+	    og = ogd[os->osinfo.group];
+	    og->bsize = os->osinfo.bsize;
+	    obuflen = og->bsize ? og->bsize : obsize;
+	    /* This is the first signal in a new group; allocate buffer. */
+	    if ((og->osbuf = (char *)malloc(obuflen)) == NULL) {
+	        wfdb_error("osigfopen: can't allocate buffer for %s\n",
+			   os->osinfo.fname);
+		return (-3);
+	    }
+	    og->osbp = og->osbuf;
+	    og->osbe = og->osbuf + obuflen;
+	    if (os->osinfo.fmt == 0)
+	        og->osf = NULL;   /* don't open a file for a null signal */
+	    /* The filename '-' specifies the standard output. */
+	    else if (strcmp(os->osinfo.fname, "-") == 0) {
+	        og->osf->type = WFDB_LOCAL;
+	        og->osf->fp = stdout;
+	    }
+	    /* An error in opening an output file is fatal. */
+	    else {
+	        og->osf = wfdb_open(os->osinfo.fname,(char *)NULL, WFDB_WRITE);
+		if (og->osf == NULL) {
+		    wfdb_error("osigfopen: can't open %s\n", os->osinfo.fname);
+		    /* FIXME: close any open files, free allocated buffers */
+		    return (-3);
+		}
+	    }
+	    nogroups++;
+	    og++;
+	}
+	else {
+	    /* This signal belongs to the same group as the previous signal. */
+	    if (os->osinfo.fmt != op->osinfo.fmt ||
+		os->osinfo.bsize != op->osinfo.bsize) {
 		wfdb_error(
 		    "osigfopen: error in specification of signal %d or %d\n",
 		     nosig-1, nosig);
 		return (-2);
 	    }
 	}
-	else if (siarray[nosig].fmt == 0)
-	    osf[nosig] = NULL;	/* don't open a file for a null signal */
-	/* The filename '-' specifies the standard output. */
-	else if (strcmp(siarray[nosig].fname, "-") == 0) {
-	    osf[nosig]->type = WFDB_LOCAL;
-	    osf[nosig]->fp = stdout;
-	}
-	/* An error in opening an output file is fatal. */
-	else if ((osf[nosig] = wfdb_open(siarray[nosig].fname, (char *)NULL,
-					 WFDB_WRITE)) == NULL) {
-	    wfdb_error("osigfopen: can't open %s\n", siarray[nosig].fname);
-	    return (-3);
-	}
-	osinfo[nosig] = siarray[nosig];
-	if (osinfo[nosig].spf < 1) osinfo[nosig].spf = 1;
-	osinfo[nosig].cksum = 0;
-	osinfo[nosig].nsamp = (WFDB_Time)0L;
-	buflen = (osinfo[nosig].bsize > 0) ? osinfo[nosig].bsize : obsize;
-	/* An error allocating a buffer is fatal. */
-	if ((nosig == 0 || siarray[nosig].group != siarray[nosig-1].group) &&
-	    (osbuf[osinfo[nosig].group] = (char *)malloc(buflen)) == NULL ||
-	    (osinfo[nosig].fname =
-	     (char *)malloc((unsigned)strlen(siarray[nosig].fname)+1))==NULL) {
-	    wfdb_error("osigfopen: can't allocate buffer for %s\n",
-		     osinfo[nosig].fname);
-	    return (-3);
-	}
-	if (nosig != 0 && osinfo[nosig].group == osinfo[nosig-1].group)
-	    osinfo[nosig].fname = osinfo[nosig-1].fname;
-	else	
-	    (void)strcpy(osinfo[nosig].fname, siarray[nosig].fname);
-	if ((osinfo[nosig].desc =
-	     (char *)malloc((unsigned)strlen(siarray[nosig].desc)+1))==NULL) {
-	    wfdb_error("osigfopen: insufficient memory\n");
-	    return (-3);
-	}
-	(void)strcpy(osinfo[nosig].desc, siarray[nosig].desc);
-	if (siarray[nosig].units) {
-	    if ((osinfo[nosig].units =
-		 (char *)malloc((unsigned)strlen(siarray[nosig].units)+1)) ==
-		NULL) {
-		wfdb_error("osigfopen: insufficient memory\n");
-		return (-3);
-	    }
-	    (void)strcpy(osinfo[nosig].units, siarray[nosig].units);
-	}
-	osbp[osinfo[nosig].group] = osbuf[osinfo[nosig].group];
-	osbe[osinfo[nosig].group] = osbuf[osinfo[nosig].group] + buflen;
     }
 
     return (nosig);
@@ -1502,7 +1851,6 @@ int mode;
 FINT getvec(vector)
 WFDB_Sample *vector;
 {
-    static WFDB_Sample tvector[WFDB_MAXSIG*WFDB_MAXSPF];
     WFDB_Sample *tp;
     WFDB_Signal s;
     static int stat;
@@ -1517,9 +1865,11 @@ WFDB_Sample *vector;
 
 	stat = getframe(tvector);
 	for (s = 0, tp = tvector; s < nisig; s++) {
-	    for (c = v = 0; c < isinfo[s].spf; c++)
+	    int sf = isd[s]->isinfo.spf;
+
+	    for (c = v = 0; c < sf; c++)
 		v += *tp++;
-	    *vector++ = v/isinfo[s].spf;
+	    *vector++ = v/sf;
 	}
     }
     else {			/* return ispfmax samples per frame, using
@@ -1529,8 +1879,10 @@ WFDB_Sample *vector;
 	    gvc = 0;
 	}
 	for (s = 0, tp = tvector; s < nisig; s++) {
-	    *vector++ = tp[(isinfo[s].spf*gvc)/ispfmax];
-	    tp += isinfo[s].spf;
+	    int sf = isd[s]->isinfo.spf;
+
+	    *vector++ = tp[(sf*gvc)/ispfmax];
+	    tp += sf;
 	}
 	gvc++;
     }
@@ -1557,8 +1909,8 @@ WFDB_Sample *vector;
 	}
 	/* Assemble the deskewed frame from the data in dsbuf. */
 	for (j = s = 0; s < nisig; s++) {
-	    if ((i = j + dsbi + iskew[s]*framelen) >= dsblen) i -= dsblen;
-	    for (c = 0; c < isinfo[s].spf; c++)
+	    if ((i = j + dsbi + isd[s]->iskew*framelen) >= dsblen) i -= dsblen;
+	    for (c = 0; c < isd[s]->isinfo.spf; c++)
 		vector[j++] = dsbuf[i++];
 	}
     }
@@ -1572,44 +1924,48 @@ FINT putvec(vector)
 WFDB_Sample *vector;
 {
     int c, dif, stat = (int)nosig;
+    struct osdata *os;
     WFDB_Signal s;
+    WFDB_Group g;
 
     for (s = 0; s < nosig; s++) {
-	if (osinfo[s].nsamp++ == (WFDB_Time)0L)
-	    osinfo[s].initval = ovec[s] = *vector;
-	for (c = 0; c < osinfo[s].spf; c++, vector++) {
-	    switch (osinfo[s].fmt) {
+	os = osd[s];
+	g = os->osinfo.group;
+	if (os->osinfo.nsamp++ == (WFDB_Time)0L)
+	    os->osinfo.initval = os->ovec = *vector;
+	for (c = 0; c < os->osinfo.spf; c++, vector++) {
+	    switch (os->osinfo.fmt) {
 	      case 0:	/* null signal (do not write) */
-		ovec[s] = *vector; break;
+		os->ovec = *vector; break;
 	      case 8:	/* 8-bit first differences */
 	      default:
 		/* Handle large slew rates sensibly. */
-		if ((dif = *vector - ovec[s]) < -128) { dif = -128; stat = 0; }
+		if ((dif = *vector - os->ovec) < -128) { dif = -128; stat=0; }
 		else if (dif > 127) { dif = 127; stat = 0; }
-		ovec[s] += dif;
-		w8(dif, s);
+		os->ovec += dif;
+		w8(dif, g);
 		break;
 	      case 16:	/* 16-bit amplitudes */
-		w16(*vector, s); ovec[s] = *vector; break;
+		w16(*vector, g); os->ovec = *vector; break;
 	      case 61:	/* 16-bit amplitudes, bytes swapped */
-		w61(*vector, s); ovec[s] = *vector; break;
+		w61(*vector, g); os->ovec = *vector; break;
 	      case 80:	/* 8-bit offset binary amplitudes */
-		w80(*vector, s); ovec[s] = *vector; break;
+		w80(*vector, g); os->ovec = *vector; break;
 	      case 160:	/* 16-bit offset binary amplitudes */
-		w160(*vector, s); ovec[s] = *vector; break;
+		w160(*vector, g); os->ovec = *vector; break;
 	      case 212:	/* 2 12-bit amplitudes bit-packed in 3 bytes */
-		w212(*vector, s); ovec[s] = *vector; break;
+		w212(*vector, g); os->ovec = *vector; break;
 	      case 310:	/* 3 10-bit amplitudes bit-packed in 4 bytes */
-		w310(*vector, s); ovec[s] = *vector; break;
+		w310(*vector, g); os->ovec = *vector; break;
 	      case 311:	/* 3 10-bit amplitudes bit-packed in 4 bytes */
-		w311(*vector, s); ovec[s] = *vector; break;
+		w311(*vector, g); os->ovec = *vector; break;
 	    }
-	    if (wfdb_ferror(osf[s])) {
+	    if (wfdb_ferror(ogd[g]->osf)) {
 		wfdb_error("putvec: write error in signal %d\n", s);
 		stat = -1;
 	    }
 	    else
-		osinfo[s].cksum += ovec[s];
+		os->osinfo.cksum += os->ovec;
 	}
     }
     ostime++;
@@ -1620,15 +1976,14 @@ FINT isigsettime(t)
 WFDB_Time t;
 {
     WFDB_Group g;
-    int stat;
+    int stat = 0;
     WFDB_Signal s;
 	
     /* Return immediately if no seek is needed. */
     if (t == istime || nisig == 0) return (0);
 
-    for (g = s = stat = 0; s < nisig; s++)
-	if (isinfo[s].group != g &&
-	    (stat = isgsettime(g = isinfo[s].group, t)) < 0) break;
+    for (g = 1; g < nigroups; g++)
+        if ((stat = isgsettime(g, t)) < 0) break;
     /* Seek on signal group 0 last (since doing so updates istime and would
        confuse isgsettime if done first). */
     if (stat == 0) stat = isgsettime(0, t);
@@ -1654,9 +2009,7 @@ WFDB_Time t;
 
     if ((stat = isgsetframe(g, t)) == 0 && g == 0) {
 	while (trem-- > 0) {
-	    int v[WFDB_MAXSIG*WFDB_MAXSPF];
-
-	    if (getvec(v) < 0) {
+	    if (getvec(uvector) < 0) {
 		wfdb_error("isigsettime: improper seek on signal group %d\n",
 			   g);
 		return (-1);
@@ -1699,9 +2052,27 @@ int n;
 FINT newheader(record)
 char *record;
 {
+    int stat;
     WFDB_Signal s;
+    WFDB_Siginfo *osi;
 
-    return (setheader(record, osinfo, nosig));
+    if ((osi = malloc(nosig*sizeof(WFDB_Siginfo))) == NULL) {
+	wfdb_error("newheader: insufficient memory\n");
+	return (-1);
+    }
+    for (s = 0; s < nosig; s++)
+	if (copysi(&osi[s], &osd[s]->osinfo) < 0) {
+ 	    wfdb_error("newheader: insufficient memory\n");
+	    return (-1);
+	}
+    stat = setheader(record, osi, nosig);
+    for (s = 0; s < nosig; s++) {
+      if (osi[s].fname) (void)free(osi[s].fname);
+      if (osi[s].desc) (void)free(osi[s].desc);
+      if (osi[s].units) (void)free(osi[s].units);
+    }
+    (void)free(osi);
+    return (stat);
 }
 
 FINT setheader(record, siarray, nsig)
@@ -1747,10 +2118,11 @@ unsigned int nsig;
 	(void)wfdb_fprintf(oheader, "%s %d", siarray[s].fname, siarray[s].fmt);
 	if (siarray[s].spf > 1)
 	    (void)wfdb_fprintf(oheader, "x%d", siarray[s].spf);
-	if (oskew[s])
-	    (void)wfdb_fprintf(oheader, ":%d", oskew[s]*siarray[s].spf);
-	if (ostart[s])
-	    (void)wfdb_fprintf(oheader, "+%ld", ostart[s]);
+	if (osd[s]->oskew)
+	    (void)wfdb_fprintf(oheader, ":%d", osd[s]->oskew*siarray[s].spf);
+	if (ogd[osd[s]->osinfo.group]->ostart)
+	    (void)wfdb_fprintf(oheader, "+%ld",
+			       ogd[osd[s]->osinfo.group]->ostart);
 	(void)wfdb_fprintf(oheader, " %g", siarray[s].gain);
 	if (siarray[s].baseline != siarray[s].adczero)
 	    (void)wfdb_fprintf(oheader, "(%d)", siarray[s].baseline);
@@ -1794,40 +2166,32 @@ unsigned nsegments;
 	return (-1);
     }
 
-#ifndef lint
     if ((ns = (long *)malloc((unsigned)(sizeof(long)*nsegments))) == NULL) {
 	wfdb_error("setmsheader: insufficient memory\n");
 	return (-2);
     }
-#endif
 
     for (i = 0; i < nsegments; i++) {
 	if (strlen(segment_name[i]) > WFDB_MAXRNL) {
 	    wfdb_error(
 	     "setmsheader: `%s' is too long for a segment name in record %s\n",
 		     segment_name[i], record);
-#ifndef lint
 	    (void)free(ns);
-#endif
 	    return (-2);
 	}
 	in_msrec = 1;
-	n = readheader(segment_name[i], tsinfo);
+	n = readheader(segment_name[i]);
 	in_msrec = old_in_msrec;
 	if (n < 0) {
 	    wfdb_error("setmsheader: can't read segment %s header\n",
 		     segment_name[i]);
-#ifndef lint
 	    (void)free(ns);
-#endif
 	    return (-3);
 	}
-	if ((ns[i] = tsinfo[0].nsamp) <= 0L) {
+	if ((ns[i] = hsd[0]->hsinfo.nsamp) <= 0L) {
 	    wfdb_error("setmsheader: length of segment %s must be specified\n",
 		     segment_name[i]);
-#ifndef lint
 	    (void)free(ns);
-#endif
 	    return (-4);
 	}
 	if (i == 0) {
@@ -1844,18 +2208,14 @@ unsigned nsegments;
 		wfdb_error(
 		    "setmsheader: incorrect number of signals in segment %s\n",
 			 segment_name[i]);
-#ifndef lint
 		(void)free(ns);
-#endif
 		return (-4);
 	    }
 	    if (msfreq != ffreq) {
 		wfdb_error(
 		   "setmsheader: incorrect sampling frequency in segment %s\n",
 			 segment_name[i]);
-#ifndef lint
 		(void)free(ns);
-#endif
 		return (-4);
 	    }
 	    msnsamples += ns[i];
@@ -1863,12 +2223,10 @@ unsigned nsegments;
     }
 
     /* Try to create the header file. */
-    if ((oheader = wfdb_open("header", record, WFDB_WRITE)) == NULL) {
+    if ((oheader = wfdb_open("hea", record, WFDB_WRITE)) == NULL) {
 	wfdb_error("setmsheader: can't create header file for record %s\n",
 		 record);
-#ifndef lint
 	(void)free(ns);
-#endif
 	return (-1);
     }
 
@@ -1890,17 +2248,15 @@ unsigned nsegments;
     for (i = 0; i < nsegments; i++)
 	(void)wfdb_fprintf(oheader, "%s %ld\r\n", segment_name[i], ns[i]);
 
-#ifndef lint
     (void)free(ns);
-#endif
     return (0);
 }
 
 FINT wfdbgetskew(s)
 WFDB_Signal s;
 {
-    if (s < WFDB_MAXSIG)
-	return (iskew[s]);
+    if (s < nisig)
+	return (isd[s]->iskew);
     else
 	return (0);
 }
@@ -1911,8 +2267,8 @@ FVOID wfdbsetiskew(s, skew)
 WFDB_Signal s;
 int skew;
 {
-    if (s < WFDB_MAXSIG)
-        iskew[s] = skew;
+    if (s < nisig)
+        isd[s]->iskew = skew;
 }
 
 /* Note: wfdbsetskew affects *only* the skew to be written by setheader.
@@ -1922,15 +2278,15 @@ FVOID wfdbsetskew(s, skew)
 WFDB_Signal s;
 int skew;
 {
-    if (s < WFDB_MAXSIG)
-	oskew[s] = skew;
+    if (s < nosig)
+	osd[s]->oskew = skew;
 }
 
 FLONGINT wfdbgetstart(s)
 WFDB_Signal s;
 {
-    if (s < WFDB_MAXSIG)
-	return (istart[s]);
+    if (s < nisig)
+        return (igd[isd[s]->isinfo.group]->istart);
     else
 	return (0L);
 }
@@ -1942,8 +2298,8 @@ FVOID wfdbsetstart(s, bytes)
 WFDB_Signal s;
 long bytes;
 {
-    if (s < WFDB_MAXSIG)
-	ostart[s] = bytes;
+    if (s < nosig)
+        ogd[osd[s]->osinfo.group]->ostart = bytes;
 }
 
 FSTRING getinfo(record)
@@ -1952,18 +2308,18 @@ char *record;
     char *p;
     static char linebuf[256];
 
-    if (record != NULL && readheader(record, tsinfo) < 0) {
+    if (record != NULL && readheader(record) < 0) {
 	wfdb_error("getinfo: can't read record %s header\n", record);
 	return (NULL);
     }
-    else if (record == NULL && iheader == NULL) {
+    else if (record == NULL && hheader == NULL) {
 	wfdb_error("getinfo: caller did not specify record name\n");
 	return (NULL);
     }
 
     /* Find a line beginning with '#'. */
     do {
-	if (wfdb_fgets(linebuf, 256, iheader) == NULL)
+	if (wfdb_fgets(linebuf, 256, hheader) == NULL)
 	    return (NULL);
     } while (linebuf[0] != '#');
 
@@ -1994,7 +2350,7 @@ char *record;
     if (record != NULL) {
 	/* Save the current record name. */
 	wfdb_setirec(record);
-	if ((n = readheader(record, tsinfo)) < 0)
+	if ((n = readheader(record)) < 0)
 	    /* error message will come from readheader */
 	    return ((WFDB_Frequency)n);
     }
@@ -2016,6 +2372,12 @@ WFDB_Frequency freq;
 static char date_string[12] = "";
 static char time_string[30];
 
+#ifndef __STDC__
+#ifndef _WINDOWS
+typedef long time_t;
+#endif
+#endif
+
 FINT setbasetime(string)
 char *string;
 {
@@ -2024,15 +2386,9 @@ char *string;
     if (string == NULL || *string == '\0') {
 #ifndef NOTIME
 	struct tm *now;
-#if defined(__STDC__) || defined(_WINDOWS)
 	time_t t, time();
 
 	t = time((time_t *)NULL);    /* get current time from system clock */
-#else
-	long t, time();
-
-	t = time((long *)NULL);
-#endif
 	now = localtime(&t);
 	(void)sprintf(date_string, "%02d/%02d/%d",
 		now->tm_mday, now->tm_mon+1, now->tm_year+1900);
@@ -2240,7 +2596,7 @@ FINT adumuv(s, a)
 WFDB_Signal s;
 WFDB_Sample a;
 {
-    WFDB_Gain g = (s < nisig) ? isinfo[s].gain : WFDB_DEFGAIN;
+    WFDB_Gain g = (s < nisig) ? isd[s]->isinfo.gain : WFDB_DEFGAIN;
 
     if (g == 0.) g = WFDB_DEFGAIN;
     return ((int)(a*1000./g + 0.5));
@@ -2250,7 +2606,7 @@ FSAMPLE muvadu(s, v)
 WFDB_Signal s;
 int v;
 {
-    WFDB_Gain g = (s < nisig) ? isinfo[s].gain : WFDB_DEFGAIN;
+    WFDB_Gain g = (s < nisig) ? isd[s]->isinfo.gain : WFDB_DEFGAIN;
 
     if (g == 0.) g = WFDB_DEFGAIN;
     return ((int)(g*v*0.001 + 0.5));
@@ -2264,8 +2620,8 @@ WFDB_Sample a;
     WFDB_Gain g;
 
     if (s < nisig) {
-	b = isinfo[s].baseline;
-	g = isinfo[s].gain;
+	b = isd[s]->isinfo.baseline;
+	g = isd[s]->isinfo.gain;
 	if (g == 0.) g = WFDB_DEFGAIN;
     }
     else {
@@ -2283,8 +2639,8 @@ double v;
     WFDB_Gain g;
 
     if (s < nisig) {
-	b = isinfo[s].baseline;
-	g = isinfo[s].gain;
+	b = isd[s]->isinfo.baseline;
+	g = isd[s]->isinfo.gain;
 	if (g == 0.) g = WFDB_DEFGAIN;
     }
     else {
@@ -2305,31 +2661,23 @@ void wfdb_sigclose()
     pdays = (WFDB_Date)-1;
     segments = in_msrec = skewmax = 0;
     if (dsbuf) {
-#ifndef lint
 	(void)free(dsbuf);
-#endif
 	dsbuf = NULL;
 	dsbi = -1;
     }
     if (segarray) {
 	int i;
 
-#ifndef lint
 	(void)free(segarray);
-#endif
 	segarray = segp = segend = (struct segrec *)NULL;
-	for (i = 0; i < WFDB_MAXSIG; i++) {
-	    if (isinfo[i].desc) {
-#ifndef lint
-		(void)free(isinfo[i].desc);
-#endif
-		isinfo[i].desc = NULL;
+	for (i = 0; i < maxisig; i++) {
+	    if (isd[i]->isinfo.desc) {
+		(void)free(isd[i]->isinfo.desc);
+		isd[i]->isinfo.desc = NULL;
 	    }
-	    if (isinfo[i].units) {
-#ifndef lint
-		(void)free(isinfo[i].units);
-#endif
-		isinfo[i].units = NULL;
+	    if (isd[i]->isinfo.units) {
+		(void)free(isd[i]->isinfo.units);
+		isd[i]->isinfo.units = NULL;
 	    }
 	}
     }
@@ -2337,15 +2685,14 @@ void wfdb_sigclose()
 
 void wfdb_osflush()
 {
-    WFDB_Signal s;
     WFDB_Group g;
 
-    for (s = 0; s < nosig; s++)
-	if (s == 0 || (g = osinfo[s].group) != osinfo[s-1].group) {
-	    if (osinfo[s].bsize == 0 && osbp[g] != osbuf[g]) {
-		(void)wfdb_fwrite(osbuf[g], 1, osbp[g] - osbuf[g], osf[s]);
-		osbp[g] = osbuf[g];
-	    }
-	    (void)wfdb_fflush(osf[s]);
+    for (g = 0; g < nogroups; g++) {
+	if (ogd[g]->bsize == 0 && ogd[g]->osbp != ogd[g]->osbuf) {
+	    (void)wfdb_fwrite(ogd[g]->osbuf, 1,
+			      ogd[g]->osbp - ogd[g]->osbuf, ogd[g]->osf);
+	    ogd[g]->osbp = ogd[g]->osbuf;
 	}
+	(void)wfdb_fflush(ogd[g]->osf);
+    }
 }

@@ -1,5 +1,5 @@
 /* file: xform.c	G. Moody       8 December 1983
-			Last revised:  26 February 2001
+			Last revised:   15 August 2001
 
 -------------------------------------------------------------------------------
 xform: Sampling frequency, amplitude, and format conversion for WFDB records
@@ -52,7 +52,8 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-    char *irec = NULL, *orec = NULL, *nrec = NULL, *startp = "0:0";
+    char *irec = NULL, *orec = NULL, *nrec = NULL, *script = NULL,
+        *startp = "0:0";
     int clip = 0, fflag = 0, gflag = 0, Hflag = 0, ifreq, i, j, m, Mflag = 0,
 	mn, n, nann = 0, nisig, nminutes = 0, nosig = -1, ofreq = 0,
         reopen = 0, spf = 1, use_irec_desc = 1;
@@ -163,6 +164,14 @@ char *argv[];
 	    }
 	    i--;
 	    break;
+	  case 'S':	/* script name follows */
+	    if (++i >= argc) {
+	        (void)fprintf(stderr, "%s: script name must follow -S\n",
+			      pname);
+		exit(1);
+	    }
+	    script = argv[i];
+	    break;
 	  case 't':	/* end time */
 	    if (++i >= argc) {
 		(void)fprintf(stderr, "%s: time must follow -t\n", pname);
@@ -206,12 +215,11 @@ char *argv[];
 	    record[8], units[WFDB_MAXSIG][22];
 	static int formats[WFDB_NFMTS] = WFDB_FMT_LIST;	/* see <wfdb/wfdb.h> */
 	FILE *ttyin = NULL;
-
 #ifndef MSDOS
-	ttyin = fopen("/dev/tty", "r");
+	ttyin = fopen(script ? script : "/dev/tty", "r");
 #endif
 #ifdef MSDOS
-	ttyin = fopen("CON", "rt");
+	ttyin = fopen(script ? script : "CON", "rt");
 #endif
 	if (ttyin == NULL) ttyin = stdin;
 	if (nrec == NULL) {
@@ -964,6 +972,7 @@ static char *help_strings[] = {
  " -o OREC     produce output signal file(s) as specified by the header file",
  "              for record OREC",
  " -s SIGNAL [SIGNAL ...]  write only the specified signal(s)",
+ " -S SCRIPT   take answers to prompts from SCRIPT (a text file)",
  " -t TIME     stop at specified time",
  "Unless you use `-o' to specify an *existing* header that describes the",
  "desired signal files, you will be asked for output specifications.  Use",

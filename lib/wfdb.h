@@ -1,5 +1,5 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised:   28 February 2001	wfdblib 10.1.6
+			Last revised:   14 August 2001	wfdblib 10.2.0
 WFDB library type, constant, structure, and function interface definitions
 
 _______________________________________________________________________________
@@ -32,8 +32,8 @@ _______________________________________________________________________________
 
 /* WFDB library version. */
 #define WFDB_MAJOR   10
-#define WFDB_MINOR   1
-#define WFDB_RELEASE 6
+#define WFDB_MINOR   2
+#define WFDB_RELEASE 0
 #define WFDB_NETFILES 1	/* if 1, library includes code for HTTP, FTP clients */
 
 /* Determine what type of compiler is being used. */
@@ -78,7 +78,11 @@ typedef unsigned int WFDB_Group;    /* signal group number */
 typedef unsigned int WFDB_Signal;   /* signal number */
 typedef unsigned int WFDB_Annotator;/* annotator number */
 
-/* Array sizes */
+/* Array sizes
+   Many older applications use the values of WFDB_MAXANN, WFDB_MAXSIG, and
+   WFDB_MAXSPF to determine array sizes, but (since WFDB library version 10.2)
+   there are no longer any fixed limits imposed by the WFDB library.
+*/
 #define WFDB_MAXANN    2   /* maximum number of input or output annotators */
 #define	WFDB_MAXSIG   32   /* maximum number of input or output signals */
 #define WFDB_MAXSPF    4   /* maximum number of samples per signal per frame */
@@ -267,7 +271,7 @@ extern FSTRING getinfo(char *record);
 extern FINT putinfo(char *info);
 extern FINT newheader(char *record);
 extern FINT setheader(char *record, WFDB_Siginfo *siarray, unsigned int nsig);
-extern FINT setmsheader(char *record, char **seg_names, unsigned int nsegments);
+extern FINT setmsheader(char *record, char **segnames, unsigned int nsegments);
 extern FINT wfdbgetskew(WFDB_Signal s);
 extern FVOID wfdbsetskew(WFDB_Signal s, int skew);
 extern FLONGINT wfdbgetstart(WFDB_Signal s);

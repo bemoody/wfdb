@@ -71,6 +71,10 @@ test test-all: $(HOME)/wfdb-test/include $(HOME)/wfdb-test/lib
 test-install: $(TESTDIRS)
 	$(MAKE) WFDBROOT=$(HOME)/wfdb-test install
 
+# 'make check': test currently installed version of the WFDB software package
+check:
+	cd checkpkg; $(MAKE) all
+
 # Create directories for test installation if necessary.
 TESTDIRS = $(HOME)/wfdb-test/bin $(HOME)/wfdb-test/database \
  $(HOME)/wfdb-test/help $(HOME)/wfdb-test/include $(HOME)/wfdb-test/lib

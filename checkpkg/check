@@ -1,0 +1,8 @@
+xform -i mimicdb/237/237 -s 1 2 0 3 -f 9:19:45 -t "[22:01:23 20/07/1995]" -a all -M -n test -S response >test.log 2>&1
+
+for i in test.log test.hea test.dat test.all
+do
+	diff -q $i $i-expected &&
+	 ( echo Files $i and $i-expected match: test succeeded
+	   rm -f $i )
+done
