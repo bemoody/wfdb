@@ -1,4 +1,4 @@
-.TH PSFD 1 "16 October 2001" "WFDB software 10.2" "WFDB applications"
+.TH PSFD 1 "26 October 2001" "WFDB software 10.2.1" "WFDB applications"
 .SH NAME
 psfd \- produce annotated `full-disclosure' plots on a PostScript device
 .SH SYNOPSIS
@@ -210,11 +210,10 @@ variables \fBWFDB\fR and \fBWFDBCAL\fR should be set and exported (see
 default PostScript prolog file.
 .SH BUGS
 .PP
-High quality takes time.  A full page, with grids and default scales, typically
-takes about 3\-4 minutes to render on an Apple LaserWriter, or about 6\-8
-minutes on a Linotronic 1200 dpi phototypesetter.  A SPARCprinter attached
-to a Sparc IPC or equivalent can render \fIpsfd\fR output at nearly full speed
-(about 28 seconds for the first page, 8 seconds for each subsequent page).
+On older PostScript printers, output may be quite slow.  A full page, with
+grids and default scales, typically takes about 3 minutes to render on an Apple
+LaserWriter, or about 6 minutes on a Linotronic 1200 dpi phototypesetter. Most
+modern printers can render \fIpsfd\fR output at nearly full speed.
 .PP
 For a 300 dpi printer, a typical full page of output will be about 80 Kbytes.
 Expect this to increase approximately linearly with the printer resolution.

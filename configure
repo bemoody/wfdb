@@ -199,6 +199,10 @@ done
 rm conf/site.def conf/site-slib.def
 
 echo
+echo "Adding $DIR/database to the default WFDB path ..."
+sed "s+DBDIR+$DIR/database+" <lib/wfdblib.h0 >lib/wfdblib.h
+
+echo
 echo "Looking for the XView libraries ..."
 if [ -d /usr/openwin -o -d /usr/local/openwin -o -d /opt/openwin ]
 then

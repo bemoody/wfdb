@@ -33,10 +33,6 @@ USA
 
 An HTML version of this guide is available;  point your web browser to
 @code{http://@-www.@-physio@-net.@-org/@-physio@-tools/@-dbpg/} to view it.
-Additional printed copies of this guide are available for US$10 each
-(including shipping by surface mail) by writing to the address above.
-Please make checks payable to ``Beth Israel Hospital Biomedical
-Engineering Division.''
 
 @sp 2
 Permission is granted to make and distribute verbatim copies of this
@@ -109,23 +105,23 @@ Indices
 @cindex MIT DB
 @cindex AHA DB
 
-This guide documents the Waveform Database interface library (the @dfn{WFDB
-library}), a package of C-callable functions that provide clean and
-uniform access to digitized, annotated signals stored in a variety of
-formats.  These functions were designed for use with the MIT-BIH
-Arrhythmia Database (@dfn{MIT DB}) and the AHA Database for the
-Evaluation of Ventricular Arrhythmia Detectors (@dfn{AHA DB}).  In
-February 1990, the predefined annotation set was expanded to accommodate
-the needs of the European ST-T Database (@dfn{ESC DB}).  The WFDB library
-is sufficiently general, however, to be useful for dealing with any
-similar collection of digitized signals, which may or may not be
-annotated.  The WFDB library has evolved to support the development of
-several databases that include signals such as blood pressure,
-respiration, oxygen saturation, EEG, as well as ECGs.  Among these
-multi-parameter databases are the MIT-BIH Polysomnographic Database, the
-MGH/Marquette Foundation Waveform Database, and the not yet completed
-MIMIC Database.  Thus the WFDB library is considerably more than an
-@emph{ECG} database interface.
+This guide documents the Waveform Database interface library (the
+@dfn{WFDB library}), a package of C-callable functions that provide
+clean and uniform access to digitized, annotated signals stored in a
+variety of formats.  These functions were originally designed for use
+with databases of electrocardiograms, including the MIT-BIH Arrhythmia
+Database (@dfn{MIT DB}) and the AHA Database for the Evaluation of
+Ventricular Arrhythmia Detectors (@dfn{AHA DB}).  In February 1990, the
+predefined annotation set was expanded to accommodate the needs of the
+European ST-T Database (@dfn{ESC DB}).  The WFDB library is sufficiently
+general, however, to be useful for dealing with any similar collection
+of digitized signals, which may or may not be annotated.  The WFDB
+library has evolved to support the development of numerous other
+databases that include signals such as blood pressure, respiration,
+oxygen saturation, EEG, as well as ECGs.  Among these multi-parameter
+databases are the MIT-BIH Polysomnographic Database, the MGH/Marquette
+Foundation Waveform Database, and the MIMIC Database.  Thus the WFDB
+library is considerably more than an @emph{ECG} database interface.
 
 This guide describes how to write C-language programs that use databases
 of ECGs and other signals.  A standard set of such programs is included
@@ -161,7 +157,7 @@ study the three nodes above before going on.}
 @cindex tape
 
 The databases for which the WFDB library was designed consist of a small
-number of ECG @dfn{records}, each of which is quite large (typically a
+number of @dfn{records}, each of which is quite large (typically a
 megabyte or more).  Database records usually originate as multi-channel
 analog tape recordings that have been digitized and stored as disk
 files.  For this historical reason, they are often referred to as
@@ -173,8 +169,7 @@ several records, or to select sets of records.  These databases are
 therefore qualitatively different from those for which conventional
 database management software is written.
 
-@cindex MS-DOS file names
-@cindex UNIX file names
+@cindex file names
 Records are identified by @dfn{record names}, which are three-digit
 numbers for MIT DB records, four-digit numbers for AHA DB records, and
 four-digit numbers prefixed by @samp{e} for ESC DB records.  You may
@@ -186,15 +181,11 @@ normally performed by the operating system on file names; thus
 @samp{E0104} is not.  A record is comprised of several files, which
 contain signals, annotations, and specifications of signal attributes;
 each file belonging to a given record normally includes the record name
-as part of its name.  (On writable UNIX and Macintosh file systems, the
-record name is usually the last part of the file name; the opposite
-convention is used on CD-ROM and MS-DOS file systems, because of their
-restrictions on the length of file name suffixes.)  A record is an
-extensible collection of files, which need not all be located in the
-same directory, or even on the same physical device.  Thus it is
-possible, for example, to create on a magnetic disk a file of your own
-annotations for a record distributed on a CD-ROM, and to treat your file
-as part of the record.
+as the first part of its name.  A record is an extensible collection of
+files, which need not all be located in the same directory, or even on
+the same physical device.  Thus it is possible, for example, to create
+on a magnetic disk a file of your own annotations for a record
+distributed on a CD-ROM, and to treat your file as part of the record.
 
 @node     Concepts 2, Concepts 3, Concepts 1, Overview
 @unnumberedsec Signals, Samples, and Time
@@ -221,7 +212,7 @@ sample is usually interpreted as a voltage, and the units are called
 analog-to-digital converter units, or @dfn{adu}.  The @dfn{gain} defined
 for each signal specifies how many adus correspond to one @dfn{physical
 unit} (usually one millivolt, the nominal amplitude of a normal QRS
-complex on a body-surface lead roughly parallel to the mean cardiac
+complex on a body-surface ECG lead roughly parallel to the mean cardiac
 electrical axis).  All signals in a given record are usually sampled at
 the same frequency, but not necessarily at the same gain
 (@pxref{Multi-Frequency Records}, for exceptions to
@@ -264,7 +255,7 @@ are annotated throughout.  The ``time'' of an annotation is simply the
 sample number of the sample with which the annotation is associated.
 Annotations may be associated with a single signal, if desired.  Like
 samples in signals, annotations are kept in time and signal order in
-annotation files (but @pxref{Annotation Order} for exceptions to this
+annotation files (but @pxref{Annotation Order}, for exceptions to this
 rule).  No more than one annotation in a given annotation file may be
 associated with any given sample of any given signal.  There may be many
 annotation files associated with the same record, however; they are
@@ -355,21 +346,22 @@ here.)  You should know how to create a C source file using your
 favorite editor, and you should know how to compile it and how to run
 the resulting executable program.
 
-Resist all temptation to plunge into the esoteric details of file formats.
-(Those who find such details irresistible will find them in Section 5 of the
-@cite{WFDB Applications Guide}; note, however, that support for new file
-formats is added to the WFDB library from time to time, so that the information
-you find there may be incomplete.)  The WFDB library provides an efficient
-means of reading and writing files in many formats; it is not a trivial task to
-duplicate it, and time spent doing so is time that could be spent doing
-something useful, enjoyable, or possibly both.  If you really think you need to
-understand the file formats in order to translate them into whatever the
-ECGWhizz Model 666 needs, consider instead writing a format translator using
-the WFDB library to read the files; then you will at least have a program that
-requires only recompilation with a new version of the WFDB library when file
-formats change.  @emph{In extremis}, use @file{rdann} and @file{rdsamp} ---
-MS-DOS executables of which are available from PhysioNet and included on all
-CD-ROM databases of ECGs --- to translate files into text format.
+Resist all temptation to plunge into the esoteric details of file
+formats.  (Those who find such details irresistible will find them in
+Section 5 of the @cite{WFDB Applications Guide}; note, however, that
+support for new file formats is added to the WFDB library from time to
+time, so that the information you find there may be incomplete.)  The
+WFDB library provides an efficient means of reading and writing files in
+many formats; it is not a trivial task to duplicate it, and time spent
+doing so is time that could be spent doing something useful, enjoyable,
+or possibly both.  If you really think you need to understand the file
+formats in order to translate them into whatever the ECGWhizz Model 666
+needs, consider instead writing a format translator using the WFDB
+library to read the files; then you will at least have a program that
+requires only recompilation with a new version of the WFDB library when
+file formats change.  @emph{In extremis}, use @file{rdann} and
+@file{rdsamp} --- available from PhysioNet in source and ready-to run
+formats --- to translate files into text format.
 
 Chapter 1 of this guide begins with a simple example program that reads
 a few samples from a database record.  This example should help you
@@ -396,19 +388,19 @@ Another appendix (@pxref{WFDB Applications}) includes brief
 descriptions of the application programs that are distributed with the
 WFDB library as part of the WFDB software package.
 
-@cindex MS-DOS file names
 @cindex operating systems (supported)
-The WFDB library has been written with portability in mind.  It runs on a
-wide variety of machines and operating systems, including UNIX (BSD 4.x,
-System V, SunOS, Solaris, HP-UX, OSF/1, Version 7, XENIX, VENIX, ULTRIX,
-Linux, AIX, AUX, SCO, Coherent, and more), MS-DOS, MS-Windows, VMS, and
-the Macintosh OS.  This guide was written for UNIX users (with notes for
-MS-DOS users where differences exist), but others should find only minor
-differences.
-
 Another appendix discusses porting the WFDB library to new machines or
 operating systems, and includes notes on adding support for new file
 formats, annotation codes, and other enhancements (@pxref{Extensions}).
+The WFDB library has been written with portability in mind.  It runs on
+a wide variety of machines and operating systems, including Unix (BSD
+4.x, System V, SunOS, Solaris, HP-UX, OSF/1, Version 7, XENIX, VENIX,
+ULTRIX, GNU/Linux, OpenBSD, IRIX, AIX, AUX, Darwin, MacOS/X, SCO,
+Coherent, and more), MS-DOS, MS-Windows, VMS, and the Macintosh OS.
+This guide was written for Unix users (with notes for MS-Windows and
+MS-DOS users where differences exist), but others should find only minor
+differences.
+
 At the end of the guide is a list of sources for databases and other
 materials that may be useful to readers (@pxref{Sources}).
 
@@ -428,7 +420,7 @@ Before May, 1999, and the release of version 10.0.0 of the library, the
 WFDB library was known as the DB library, and this guide was the @cite{ECG
 Database Programmer's Guide}.  The name of the library was changed because
 of confusion caused by the recent proliferation of another library with
-the same name (a reimplementation of the Berkeley UNIX DBM library).
+the same name (a reimplementation of the Berkeley Unix DBM library).
 The names of this guide, and of the @cite{WFDB Applications Guide} (formerly
 the @cite{ECG Database Applications Guide}), have been changed in view of
 the increasingly broad range of applications in which the library is being
@@ -471,21 +463,18 @@ browser.
 You can format and print copies of this guide using TeX if you have it (see
 @file{makefile} in the @file{doc} directory of the library distribution for
 instructions on doing so).  You may obtain a preformatted version suitable for
-output on any PostScript device from @code{http://www.physionet.org}, or you
-can obtain nicely printed copies for $10 each from the author (address above;
-please make checks payable to ``Beth Israel Hospital Biomedical Engineering
-Division'').
+output on any PostScript device from @code{http://www.physionet.org/}.
 @end ifinfo
 
 @node     Recent changes, Usage, Overview, Top
 @comment  node-name,  next,  previous,  up
 @unnumberedsec Recent changes
 
-This section contains a brief summary of changes to the WFDB library and to
-this guide since the first printing of the ninth edition of this guide in July,
-1995.  See @file{NEWS}, in the top-level directory of the WFDB Software
-Package distribution, for details on these changes, and for information on any
-more recent changes that may not be described here.
+This section contains a brief summary of changes to the WFDB library and
+to this guide since the first printing of the tenth edition of this
+guide in June, 1999.  See @file{NEWS}, in the top-level directory of the
+WFDB Software Package distribution, for information on any more recent
+changes that may not be described here.
 
 @unnumberedsubsec Changes in version 10.2.0
 
@@ -585,17 +574,19 @@ numerous minor changes in the NETFILES support code introduced in 10.0.1.
 @unnumberedsubsec Changes in version 10.0.1
 @cindex NETFILES
 
-Beginning with version 10.0.1, the WFDB library supports reading not only local
-files, but also remote files made available by web (HTTP) or FTP servers.  To
-make use of this feature, link your application with both the WFDB library and
-the @file{libwww} library (freely available for all versions of UNIX, and for
-most recent versions of MS Windows, from @file{http://www.w3.org/Library}).
-(In some cases, notably under Linux, @code{libwww} is linked together with the
-dynamically-loaded version of the WFDB library, so that you do not need to link
-@code{libwww} explicitly.)  All access to remote files is read-only.  If you do
-not wish to allow access to remote files, or if @code{libwww} is not available
-for your OS, simply do not define the symbol NETFILES when compiling the WFDB
-library.  For further details, see @file{wfdbio.c} in the WFDB library sources.
+Beginning with version 10.0.1, the WFDB library supports reading not
+only local files, but also remote files made available by web (HTTP) or
+FTP servers.  To make use of this feature, link your application with
+both the WFDB library and the @file{libwww} library (freely available
+for all versions of Unix, and for most recent versions of MS Windows,
+from @file{http://www.w3.org/Library}).  (In some cases, notably under
+GNU/Linux, @code{libwww} is linked together with the dynamically-loaded
+version of the WFDB library, so that you do not need to link
+@code{libwww} explicitly.)  All access to remote files is read-only.  If
+you do not wish to allow access to remote files, or if @code{libwww} is
+not available for your OS, simply do not define the symbol NETFILES when
+compiling the WFDB library.  For further details, see @file{wfdbio.c} in
+the WFDB library sources.
 
 The WFDB environment variable may now contain whitespace (space, tab, or
 newline characters) as path component separators under any OS.  Multiple
@@ -603,7 +594,7 @@ consecutive whitespace characters are treated as a single path component
 separator.  Use a @samp{.} to specify the current directory as a path component
 when using whitespace as a path component separator.  A semicolon (@samp{;}) is
 also acceptable as a path component separator under any OS.  A colon (@samp{:})
-is still acceptable as a path component separator under UNIX (Linux, etc.),
+is still acceptable as a path component separator under Unix (Linux, etc.),
 provided only that the colon is not immediately followed by @samp{//}.
 
 If the WFDB path includes components of the forms
@@ -628,154 +619,23 @@ everywhere, in names of library functions, constants, type and structure
 definitions, library source file names, and names of environment variables
 (e.g., the DB environment variable is now the WFDB environment variable).
 
-Version 10.0.0 is functionally identical with version 9.7.4, except for the
-name changes.  It should be possible to recompile existing applications
-written for DB library version 9.x without modification, and to link them
-with WFDB library version 10.0.0.  This is possible because two sets of
-@code{#include} files are provided with the WFDB library.  The first set,
-accessible via @code{#include <wfdb/...>}, works with applications written
-as described in this guide.  The alternate set, accessible via
-@code{#include <ecg/...>}, is compatible with DB 9.x applications as
-described in previous editions of this guide.
-
-@unnumberedsubsec Changes in version 9.7.4
-
-Annotations written out-of-order were not being sorted within @code{oannclose}
-(which instead printed a message explaining how to sort them using
-@samp{sortann}).  This has now been fixed for all environments in which
-@samp{sortann} can be run as another process by @samp{oannclose} (these
-include all currently supported library configurations other than as a
-Windows DLL).  Once again, thanks to Bob Farrell for reporting this bug
-and pointing out the (one-character!) fix.
-
-This problem affected only user-written applications that write annotations
-out-of-order.  If @samp{sortann} was run manually as instructed, output
-annotation files would be identical to those produced using version 9.7.4.
-
-The functions @samp{iannclose} and @samp{oannclose} were incorrectly
-documented in previous versions of this guide, which indicated that they
-did not accept inputs.  In fact, each of these functions requires a
-single argument that specifies the annotator to which the call applies
-(@pxref{iannclose and oannclose, , @code{iannclose} and @code{oannclose}}).
-
-@unnumberedsubsec Changes in version 9.7.3
-
-If an annotation has been read, and @code{iannclose} has been used to close the
-input annotation file, and @code{annopen} has subsequently opened a new
-annotation file for input using the @samp{+xxx} syntax for the record
-number, and the new input file is empty, then @code{getann} formerly
-returned a ``phantom'' annotation at the same location as the last
-annotation in the previous input file.  This caused @samp{wfdbcollate} to
-insert extra annotations in its output files in some cases;  there are
-no other known applications that triggered this bug, which has now been fixed.
-
-@unnumberedsubsec Changes in version 9.7.2
-
-Correct results are now obtained when using @code{strtim("i")}, even
-when the input record is a multi-segment, multi-frequency record with
-skew correction required and frames do not necessarily begin on byte
-boundaries.  The correct samples are now returned by @code{getvec} or
-@code{getframe} following multiple skips (calls to @code{isigsettime} or
-@code{isgsettime}) in such records.  Thanks once again to Bob Farrell
-for reporting the problem and for his test cases that helped in finding
-and correcting its causes.
-
-@unnumberedsubsec Changes in version 9.7.1
-
-Minor changes for Win32 compatibility (thanks again to Bob Farrell).
-
-@unnumberedsubsec Changes in version 9.7
-
-Support for compiling the WFDB library as a 32-bit MS Windows DLL has been
-added (thanks to Bob Farrell).  Define the symbols @code{_WIN32} and 
-@code{_WINDLL} when building the DLL, and define the symbol @code{_WIN32}
-when compiling an application that uses the DLL.
-
-The string @samp{%r} is replaced by the record name wherever it appears in the
-WFDB path (@pxref{WFDB path}.  The string @samp{%@var{N}r}, where @var{N} is
-a non-zero digit, is replaced by the first @var{N} characters of the
-record name.  When followed by any other character, @samp{%} is an
-`escape';  thus, for example, to insert a literal @samp{%} in the WFDB
-path, use @samp{%%}.
-
-It is now possible to write annotations out-of-order using @code{putann}
-(@pxref{Annotation Order}).
-
-@unnumberedsubsec Changes in version 9.6.2
-
-Version 5.0 and later versions of Apple's ISO 9660 CD-ROM driver for the
-Macintosh handle version number suffixes more sensibly than do earlier
-versions.  When compiling the WFDB library on the Macintosh, the new driver
-behavior is assumed by default;  if you are still using a pre-5.0 version
-of this driver, define the symbol FIXISOCD when compiling the WFDB library.
-
-@unnumberedsubsec Changes in version 9.6.1
-
-A new annotation type (@code{LINK}) has been defined
-(@pxref{Annotation Codes}).
-
-@unnumberedsubsec Changes in version 9.6
-
-A new function was added to the WFDB library (@pxref{getspf}).
-
-A number of changes in the implementation of existing WFDB library functions now
-make use of high-resolution mode (@pxref{Multi-Frequency Records}) almost
-completely transparent to WFDB applications.  The recommended practice is to call
-@code{setgvmode(WFDB_HIGHRES)} @emph{before} calling @code{annopen},
-@code{wfdbinit}, @code{getvec}, @code{sampfreq}, @code{strtim}, or @code{timstr}.
-By doing so, all @code{WFDB_Time} data visible to the application are in units of
-the high-resolution sampling intervals(@pxref{setgvmode}).
-
-Note that the resolution of annotation times in annotation files created while
-in high-resolution mode remains that of the low-resolution sampling intervals.
-This may change in a future version of the WFDB library.
-
-@unnumberedsubsec Changes in version 9.5
-
-The number of signals that may be read simultaneously, @code{WFDB_MAXSIG},
-was increased from 16 to 32. [This limit has been eliminated entirely as of
-version 10.2.0.]
-
-@unnumberedsubsec Changes in version 9.4.2
-
-Support for use of the WFDB library with Fortran programs was added
-(@pxref{other languages}).
-
-@unnumberedsubsec Changes in version 9.4.1
-
-In release 9.4.0 only, WFDB library function @code{setheader} did not properly
-interpret the skew setting made by @code{wfdbsetskew} in the case of an
-oversampled signal in a multi-frequency record.  This has been corrected.
-
-@unnumberedsubsec Changes in version 9.4
-
-Four new functions were added to the WFDB library to simplify management of
-records with signal files containing prologs or intersignal skews.
-
-@pxref{wfdbgetskew}
-
-@pxref{wfdbsetskew}
-
-@pxref{wfdbgetstart}
-
-@pxref{wfdbsetstart}
-
-Also, @pxref{Glossary}, for definitions of @dfn{prolog} and @dfn{skew}.
-
-@code{newheader} and @code{setheader} now write header files containing skew
-and byte offset fields if you have previously set non-zero values for these
-parameters using @code{wfdbsetskew} or @code{wfdbsetstart}.
-
-If @code{wfdberror} is invoked before any errors have occurred, the character
-string it returns now contains the WFDB library version number.  Versions earlier
-than 9.4 returned an empty string in this case.
+Version 10.0.0 of the WFDB library is functionally identical with the
+final release (version 9.7.4) of the DB library, except for the name
+changes.  It should be possible to recompile existing applications
+written for DB library version 9.x without modification, and to link
+them with WFDB library version 10.0.0.  This is possible because two
+sets of @code{#include} files are provided with the WFDB library.  The
+first set, accessible via @code{#include <wfdb/...>}, works with
+applications written as described in this guide.  The alternate set,
+accessible via @code{#include <ecg/...>}, is compatible with DB 9.x
+applications as described in previous editions of this guide.
 
 @node     Usage, Functions, Recent changes, Top
 @chapter Using the WFDB Library
 
 This chapter gives a brief overview of the steps needed to compile,
 load, and run a program that uses the WFDB library.  It assumes that you
-are able to log onto a UNIX-based computer on which the WFDB Software
+are able to log onto a Unix-based computer on which the WFDB Software
 Package has been installed
 (@pxref{Installation, , Installing the WFDB Software Package}),
 and that you know how to create a source file using a text editor such
@@ -794,7 +654,7 @@ are a few differences noted below.
 @end menu
 
 @node     print samples, compiling, Usage, Usage
-@section A Trivial Example Program
+@section A Trivial Example Program in C
 
 Suppose we wish to print the first ten samples of record @file{100s}.
 (Record @file{100s} is the first minute of MIT-BIH Arrhythmia Database
@@ -849,24 +709,36 @@ the two signals each time it is called.
 @cindex compiling
 @cindex loader options
 
-To compile the example program on a UNIX system, we can say:
+To compile the example program on a Unix system, we can say:
 
 @example
 cc -o psamples psamples.c -lwfdb
 @end example
 
 @noindent
-to produce an executable program called @code{psamples}.  You may use any
-other compiler options you choose, but the @samp{-lwfdb} option must
-appear in the @code{cc} command line following any and all source
-(@file{*.c}) and object (@file{*.o}) file names, in order to instruct
-the loader to search the WFDB library for any functions that the program
-needs (in this case, @code{isigopen} and @code{getvec}).  Some programs
-will need additional libraries, and the corresponding @samp{-l} options
-can usually be given before or after the @samp{-lwfdb} option.
+to produce an executable program called @code{psamples}.  (Your C
+compiler may be named @file{gcc}, @file{acc}, @file{CC}, or something
+else, rather than @file{cc}, but under any version of Unix, it will
+almost certainly work as shown above.)  You may use any other compiler
+options you choose, but the @samp{-lwfdb} option must appear in the
+@code{cc} command line following any and all source (@file{*.c}) and
+object (@file{*.o}) file names, in order to instruct the loader to
+search the WFDB library for any functions that the program needs (in
+this case, @code{isigopen} and @code{getvec}).  Some programs will need
+additional libraries, and the corresponding @samp{-l} options can
+usually be given before or after the @samp{-lwfdb} option.
 
-Each MS-DOS C or C++ compiler has its own idiosyncratic syntax, so no general
-rule can be given for MS-DOS.  With Microsoft C/C++, use:
+Under MS-Windows, it will be easiest to use @file{gcc}, the GNU C/C++
+compiler, which is included in the freely available Cygwin software
+development system (@code{http://@-source@-.redhat@-.com/@-cygwin/}),
+and also in the freely available MinGW package
+(@code{http://@-www@-.mingw@-.org/}).  An MS-DOS version of @file{gcc}
+is available in the free djgpp package
+(@code{http://@-www@-.delorie@-.com/@-djgpp/}). These are used in exactly
+the same way as described above for Unix C compilers..
+
+Each proprietary C or C++ compiler has its own idiosyncratic syntax, so no
+general rule can be given for these.  With Microsoft C/C++, use:
 
 @example
 cl psamples.c -link wfdb
@@ -891,18 +763,20 @@ information.
 @cindex C++ bindings
 
 If you prefer to write your applications in C++, you may do so, but note
-that the WFDB library is written in C.  (Most C++ compilers can be run in
-ANSI/ISO C compatibility mode in order to compile the WFDB library
+that the WFDB library is written in C.  (Most C++ compilers can be run
+in ANSI/ISO C compatibility mode in order to compile the WFDB library
 itself.)  Each C++ source file that uses WFDB library functions must
-include @file{<wfdb/wfdb.h>}, in order to instruct your compiler to use C
-conventions for argument passing and to use unmangled names for the WFDB
-library functions.  In order for this to work, your C++ compiler should
-predefine @samp{__cplusplus} or @samp{c_plusplus}; if it predefines
-neither of these symbols, modify @file{<wfdb/wfdb.h>} so that the symbols
-@samp{wfdb_CPP} and @samp{wfdb_PROTO} are defined at the top of the file.
-Compile and link your program using whatever standard methods are
-supported by your compiler for linking C++ programs with C libraries.
-See your compiler manual for further information.
+include @file{<wfdb/wfdb.h>}, in order to instruct your compiler to use
+C conventions for argument passing and to use unmangled names for the
+WFDB library functions.  In order for this to work, your C++ compiler
+should predefine @samp{__cplusplus} or @samp{c_plusplus}; if it
+predefines neither of these symbols, modify @file{<wfdb/wfdb.h>} so that
+the symbols @samp{wfdb_CPP} and @samp{wfdb_PROTO} are defined at the top
+of the file, or define @samp{__cplusplus} in each of your source files
+before including @file{<wfdb/wfdb.h>}.  Compile and link your program
+using whatever standard methods are supported by your compiler for
+linking C++ programs with C libraries.  See your compiler manual for
+further information.
 
 @cindex Fortran bindings
 @cindex wrappers for Fortran
@@ -913,8 +787,8 @@ accepting Fortran-compatible arguments (there are no structures, and all
 arguments are passed by reference rather than by value).  You will still
 need a C or C++ compiler to compile the WFDB library and the wrapper
 functions themselves.  The Fortran wrapper functions are not discussed
-in this guide; for further information, refer to @file{fortran/readme.doc}
-in the WFDB Software Package (included in version 9.4 and later versions).
+in this guide; for further information, refer to @file{fortran/README}
+in the WFDB Software Package.
 
 @cindex Matlab bindings
 @cindex Octave bindings
@@ -937,39 +811,61 @@ and Salvador Olmos) is available from
 @cindex finding WFDB files
 @cindex @code{WFDB} (environment variable)
 
+WFDB applications make use of two @dfn{environment variables}, which are
+named @code{WFDB} and @code{WFDBCAL}.  If these variables have not been
+otherwise defined by the user, their values are those given by
+@code{DEFWFDBP} and @code{DEFWFDBC} (defined in @file{wfdblib.h} at the
+time the WFDB library was compiled).  Unless you have a non-standard
+setup, you may not need to set these variables, but it will be helpful
+to read this section to understand how they influence the behavior of
+WFDB applications.
+
 When WFDB applications @emph{read} database files, they must be able to
-find them in various locations that may vary from system to system.
-The WFDB library refers to a character string that consists of an ordered
-list of locations to be searched @emph{for input files}.  This string
-is called the @dfn{database path}, or the @dfn{WFDB path}.  Under UNIX and
-VMS, the WFDB path is a colon-separated list of prefixes, in the format
-used for the Bourne shell's @code{PATH} variable.  Under MS-DOS and on
-the Macintosh, the WFDB path is in the format used for the MS-DOS
-@code{PATH} variable, with semicolons used to separate prefixes (colons
-retain their customary meanings, as drive letter suffixes under MS-DOS,
-or as directory separators on the Macintosh).  When a WFDB file must be
-opened for input, the WFDB library attempts to locate it by attaching each
-of the components of the WFDB path (one at a time) as a prefix to the file
-name.  If two or more matching files exist in different locations in
-the WFDB path, the WFDB library opens only the file that resides in the
-first of these locations named in the WFDB path.  Any other matching
-files are effectively invisible to WFDB applications unless the WFDB path is
-rearranged.
+find them in various locations that may vary from system to system.  The
+WFDB library refers to a character string (the value of the @code{WFDB}
+environment variable) that consists of an ordered list of locations to
+be searched @emph{for input files}.  This string is called the
+@dfn{database path}, or the @dfn{WFDB path}.
+
+Under Unix and VMS, the WFDB path can be given as a colon-separated list
+of prefixes, in the format used for the Bourne shell's @code{PATH}
+variable.  Under MS-Windows, MS-DOS, and MacOS, the WFDB path can be
+given in the format used for the MS-DOS @code{PATH} variable, with
+semicolons used to separate prefixes (colons retain their customary
+meanings, as drive letter suffixes under MS-DOS, or as directory
+separators on the Macintosh).  Alternatively, components of the WFDB
+path may be separated by whitespace (under any operating system); this
+also implies that embedded spaces are not permitted within path
+components.  @strong{For this reason, avoid using directories with names
+such as @file{My Documents} to store WFDB files).}
+
+When a WFDB file must be opened for input, the WFDB library attempts to
+locate it by attaching each of the components of the WFDB path (one at a
+time) as a prefix to the file name.  If two or more matching files exist
+in different locations in the WFDB path, the WFDB library opens only the
+file that resides in the first of these locations named in the WFDB
+path.  Any other matching files are effectively invisible to WFDB
+applications unless the WFDB path is rearranged.
 
 @cindex NETFILES
-Alternatively, components of the WFDB path may be separated by
-whitespace (under any operating system), and the WFDB path may contain
-@code{http://} and @code{ftp://} URL prefixes (other schema, such as
-@code{file://} and @code{https://}, may also be supported if they are
-supported by your version of @code{libwww}).  If @code{NETFILES}
-support is not compiled into the WFDB library, any WFDB path components
-containing @file{://} are ignored.  (These
-features were first introduced in WFDB library version 10.1.0.)
+The WFDB path may contain @code{http://} and @code{ftp://} URL prefixes
+(other schema, such as @code{file://} and @code{https://}, may also be
+supported if they are supported by your version of @code{libwww}).  If
+@code{NETFILES} support is not compiled into the WFDB library, any WFDB
+path components containing @file{://} are ignored.  (These features were
+first introduced in WFDB library version 10.1.0.)
 
 When WFDB applications @emph{write} database files, these files are
 generally written to the current directory.  (As an example, an
 application that analyzes one or more signals in a record may record its
-findings in an annotation file in the current directory.)
+findings in an annotation file in the current directory.)  If the record
+name (as provided by the application to the WFDB library) contains path
+information, however, output files are written to the corresponding
+subdirectory of the current directory.  (For example, if a WFDB
+application writes an annotation file for record @code{edb/e0103}, the
+file will be written in the @code{edb} subdirectory of the current
+directory.  The @code{edb} subdirectory will be created by the WFDB
+library if necessary in this case.)
 
 Note particularly that the current directory is @emph{not} necessarily
 part of the WFDB path.  In order to be sure that your WFDB applications can
@@ -1018,80 +914,47 @@ was first introduced in WFDB library version 6.2.)
 The string @samp{%r} is replaced by the current record name wherever it appears
 in the WFDB path;  @samp{%@var{N}r} is replaced by the first @var{N}
 digits of the record name, if @var{N} is a non-zero digit.  For example,
-if (under UNIX) the WFDB path is @samp{:/cdrom/mimicdb/%3r:/cdrom/mitdb},
+if (under Unix) the WFDB path is @samp{:/cdrom/mimicdb/%3r:/cdrom/mitdb},
 a request to read a file associated with record 055n will cause the WFDB
 library to look first in the current directory (since the WFDB path begins
 with an empty component), then in @samp{/cdrom/mimicdb/055}, and then in
 @samp{/cdrom/mitdb}.  If @samp{%} is followed by any character other than
-@samp{r} or a non-zero digit followed by @samp{r}), that character is used
+@samp{r} or a non-zero digit followed by @samp{r}, that character is used
 as is in the WFDB path;  thus a literal @samp{%} can be included in the WFDB
 path by `escaping' it as @samp{%%}.  (Substitutions of @samp{%}-strings
 in the WFDB path were first introduced in WFDB library version 9.7.)
 
-Before the example program can be run successfully, @code{WFDB} must be
-set appropriately and placed in the environment where it can be examined
-by the running program.  If you use the Bourne shell (@code{sh}), the
-GNU Bourne Again shell (@code{bash}), or the Korn shell (@code{ksh}), do
-so by typing
+Current versions of the WFDB library are compiled with a two-component
+default WFDB path; the first component is empty (i.e., it refers
+to the current directory), and the second component is
+@code{http://www.physionet.org/physiobank/database} (referring to the
+PhysioBank data archives).  Note that this default may be changed at the
+time the WFDB library is compiled.  Normally, however, this means that
+any record available from PhysioBank is readable by any WFDB application
+provided that PhysioBank is accessible from the user's computer and that
+the database name is included in the record name (for example,
+@file{slpdb/slp60} or @file{nsrdb/16265}).
 
-@example
-. setwfdb
-@end example
-
-@noindent
-@cindex @code{.profile}
-@cindex @code{setwfdb}
-(or by placing this command in your @file{.profile}, which will cause
-@code{WFDB} to be set automatically whenever you log in).  If you use the
-C-shell (@code{csh}) or a variant of it (such as @code{ecsh} or @code{tcsh}),
-type
-
-@example
-source /usr/local/bin/cshsetwfdb
-@end example
-
-@noindent
-@cindex @code{.cshrc}
-@cindex @code{cshsetwfdb}
-(or put this command in your @file{.cshrc}).  These shell scripts should
-be available on any system on which the WFDB library itself is available,
-although they may not be in @file{/usr/local/bin} as shown above.  If
-you cannot find the script you need, consult an expert (such as the
-person who installed the WFDB library on your system).  Note that the
-default value for @code{WFDB} obtained in this way begins with the current
-directory, and includes all standard directories in which database
-records are kept.  Thus, if you create your own database records or
-files, you may keep them in your own directory without special
-arrangements.
-
-Under MS-DOS, you may set @code{WFDB} using the batch file
-@file{setwfdb.bat} (created during installation of the WFDB Software
-Package), or you may include the contents of that file in your
-@file{autoexec.bat} file, which will cause @code{WFDB} to be set automatically
-whenever your system is rebooted.  Since environment space under
-MS-DOS is an operating system resource and is often in very short
-supply, you may need to allocate additional environment space within
-your @file{config.sys} file, with a line of the form
-
-@example
-shell=c:\command.com /p /e:512
-@end example
-
-@noindent
-See your MS-DOS manual for further information.
+If you need to use a non-default WFDB path, you must set the @code{WFDB}
+environment variable appropriately before running any WFDB applications,
+so that the WFDB path can be examined by the running program.  The WFDB
+software package includes easily customizable shell scripts (batch
+files) that illustrate how to do this for popular shells and command
+interpreters; see @emph{setdb}(1), in the @cite{WFDB Applications
+Guide}.
 
 @cindex calibration file
 @cindex @code{WFDBCAL} (environment variable)
-These shell scripts usually set the @code{WFDBCAL} environment variable,
+These shell scripts also set the @code{WFDBCAL} environment variable,
 which is important if you make use of records that contain signals other
 than ECGs.  @code{WFDBCAL} names a @dfn{calibration file} located in one
-of the directories named by @code{WFDB}.  (Beginning with WFDB library
-version 8.3, the symbol @code{DEFWFDBC} may be defined in @file{wfdblib.h}
-to specify the name of a default calibration file, to be used by the WFDB
-library if @code{WFDBCAL} has not been set.)  Each signal type may be
-represented by an entry in the calibration file.  Entries specify the
-characteristics of any calibration pulses that may be present, and
-customary scales for plotting the signals.
+of the directories named by @code{WFDB}.  (The symbol @code{DEFWFDBC}
+is usually defined in @file{wfdblib.h} to specify the name of a default
+calibration file, to be used by the WFDB library if @code{WFDBCAL} has
+not been set.)  Each signal type may be represented by an entry in the
+calibration file.  Entries specify the characteristics of any
+calibration pulses that may be present, and customary scales for
+plotting the signals.
 
 @node     running example, name restrictions, WFDB path, Usage
 @section Running the Example Program
@@ -1154,14 +1017,45 @@ them, you will have an opportunity to become acquainted with a few of
 the most common errors in using the WFDB library.
 
 @enumerate
+
+@item
+Compile the example program in this chapter and run it.  If the WFDB
+Software Package has not already been installed on your system,
+download and install the most recent version from PhysioNet first
+(@pxref{Installation, , Installing the WFDB Software Package}).
+
 @item
 Find out where database records are kept on your system.  What records
 are available?
 
 @item
-Run the example program in this chapter @emph{without} setting the WFDB
-path.  Try doing so from your home directory, and from the directory
-where record @file{100s} is kept.  Can you explain the results?
+Modify the example program so that you can specify the record to be
+opened, either as a command-line argument or by having the program prompt
+you to type a record name.  If you are unfamiliar with command-line
+argument processing, @pxref{Example 2}.
+
+@item
+Use the modified version of the example to read samples from records
+@file{mitdb/200}, @file{edb/e0103}, @file{slpdb/slp04}, and
+@file{mimicdb/237/237}.  The last two of these records have 4 and 6 signals
+respectively, so you will need to make a few changes to the program in
+order to read these records successfully.
+
+@item
+Once again using the modified version of the example, what happens if
+you omit the path information from one of the records in the previous
+exercise (for example, if you try to open @file{e0103} instead of
+@file{edb/e0103}?  Figure out how to set the WFDB path so that the
+program will work properly in this case.  (Hint: use the application
+@file{wfdbwhich}, included with the WFDB Software Package, to find the
+header file for record @file{edb/e0103}; this information will help
+you to determine how to set the WFDB path.)
+
+@item
+If you use MS-DOS or MS-Windows, explore and explain what happens in
+the previous exercise if you type the record name using upper-case
+letters, or if you type a @samp{\} (backslash) instead of @samp{/}
+(forward slash).  (Hint: record names are @emph{not} filenames!)
 
 @item
 What happens when you compile the example program as shown, but with the
@@ -1355,7 +1249,7 @@ will read an annotation from annotator @file{c}, and
 @code{putann(0, &annot)} will write an annotation for annotator @file{b}.
 Input annotation files will be found if they are located in any of the
 directories specified by @code{WFDB} (@pxref{WFDB path}); output annotators
-are created in the current directory (but note that, under UNIX at
+are created in the current directory (but note that, under Unix at
 least, it is possible to specify annotator names such as @file{/here} or
 @file{zzz/there} or even @file{../somewhere/else}; @pxref{Annotation
 Files}, for details of how file names are constructed from annotator and
@@ -3525,13 +3419,13 @@ This function may be used to set or change the database path
 null-terminated string that specifies the desired database path (but see
 the next paragraph for an exception).  The string contains a list of
 locations where input files may be found.  These locations may be
-absolute directory names (such as @samp{/usr/local/database} under UNIX,
+absolute directory names (such as @samp{/usr/local/database} under Unix,
 or @samp{d:/database} under MS-DOS), relative directory names (e.g.,
 @code{../mydata}), or URL prefixes (e.g.,
 @samp{http://www.physio@-net.org/physio@-bank/database}).  If NETFILES
 support is unavailable, any URL prefixes in the string are ignored.  The
 special form @samp{.} refers to the current directory.  Entries in the
-list may be separated by whitespace or by semicolons; under UNIX, colons
+list may be separated by whitespace or by semicolons; under Unix, colons
 may also be used as separators.  An empty component, indicated by an
 initial or terminal separator, or by two consecutive separators, will be
 understood to specify the current directory (which may also be indicated
@@ -4131,7 +4025,7 @@ the record are integer multiples of the frame rate).
 
 @item int bsize
 @cindex block size
-the block size, in bytes.  For signal files that reside on UNIX character
+the block size, in bytes.  For signal files that reside on Unix character
 device special files (or their equivalents), the @code{bsize} field
 indicates how many bytes must be read or written at a time
 (@pxref{Special Files}).  For ordinary disk files, @code{bsize} is zero.
@@ -4269,7 +4163,6 @@ structures.  It is accessible only via @code{calopen}, @code{getcal},
 @cindex MIT-format annotation file
 @cindex standard annotation file
 @cindex format (annotation file)
-@cindex MS-DOS file names
 @cindex information structure (annotator)
 @cindex structure (annotator information)
 
@@ -4294,10 +4187,6 @@ names.  The special name @samp{-} refers to the standard input or output.
 Other annotator names may contain upper- or lower-case letters, digits, and
 underscores.  Annotation files are normally created in the current directory
 and found in any of the directories in the database path (@pxref{WFDB path}).
-Under MS-DOS, note that the only the first three characters of the annotator
-name are used to construct the MS-DOS file name, so be careful to keep
-annotator names distinct from each other and from commonly used MS-DOS file
-name ``extensions''.
 
 @item int stat
 @cindex WFDB_AHA_READ
@@ -4648,9 +4537,9 @@ together with any additional files in other directories
 that you may have associated with record 100 (such as your own
 annotation file).  All files associated with a given record include the
 record name in their file names, either as the first part of the name
-(the default on writable UNIX and Macintosh file systems) or as the
+(the default on writable Unix and Macintosh file systems) or as the
 suffix or extension (on CD-ROM and MS-DOS file systems).  Applications
-that use the WFDB library under UNIX or the Macintosh OS can locate files
+that use the WFDB library under Unix or the Macintosh OS can locate files
 named using either of these conventions.  No explicit action (other than
 choosing the file name, and locating the file in the WFDB path) is needed
 in order to associate a new file with an existing WFDB record.
@@ -4820,7 +4709,7 @@ contains a sample from each signal, always in the same order
 Multiplexed signal files can be useful if the storage device is
 sequential-access only (e.g., 9-track tape), if the storage device
 has lengthy seek times (e.g., optical disk), if many signals must
-be recorded and UNIX's per-process limit on open files would otherwise
+be recorded and Unix's per-process limit on open files would otherwise
 be exceeded, or if very high speed is required while the file is
 being created (because of sampling constraints).  CD-ROM signal files
 are multiplexed unless the record contains only one signal.
@@ -4958,14 +4847,14 @@ if the calibration file name is prefixed by @samp{+}.
 @cindex reading 9-track tape
 @cindex signal file (on tape)
 @cindex special files (as signal files)
-@cindex UNIX character devices (as signal files)
+@cindex Unix character devices (as signal files)
 @cindex writing 9-track tape
 
 The @code{fname} component of a @code{WFDB_Siginfo} object can be any
-string acceptable as a file name to your operating system.  Under UNIX,
+string acceptable as a file name to your operating system.  Under Unix,
 for example, signals can be read from (or written to) `special' files
 such as @file{/dev/rmt0} (the raw tape drive).  If I/O must be performed
-in fixed-size blocks (such as for UNIX character devices), the
+in fixed-size blocks (such as for Unix character devices), the
 @code{bsize} component of the @code{WFDB_Siginfo} object must contain the
 appropriate block size in bytes.  In such cases, the WFDB library must
 obtain (using @code{malloc} (see @cite{K&R}, page 167) an amount of
@@ -4973,10 +4862,10 @@ memory equal to the size of one block when the signal file is first
 opened.  For large programs running on 16-bit machines, this can cause
 problems if signal files with large block sizes are read.  (In such
 cases, @code{isigopen} or @code{osigopen} will not open the signal file
-if there is not enough memory to allocate a buffer.)  Under UNIX, if
+if there is not enough memory to allocate a buffer.)  Under Unix, if
 this problem occurs, use the ``piped records'' (@pxref{Piped and Local
 Records}) instead.  The usual method is to read or write the signal file
-using a utility such as UNIX's @code{dd} and to pipe the data to or from
+using a utility such as Unix's @code{dd} and to pipe the data to or from
 the application program.  Although this approach is flexible, there are
 a few drawbacks:
 
@@ -5173,7 +5062,7 @@ automatic annotation sorting by @code{wfdbquit} and @code{oannclose}.
 The programs in this chapter are useful as models for a variety of
 applications that use the WFDB library.  The line numbers are for
 reference only; they are not part of the programs.  Any of these
-examples can be compiled (under UNIX) using a command of the form
+examples can be compiled (under Unix) using a command of the form
 @example
 cc @var{file.c} -lwfdb
 @end example
@@ -5345,7 +5234,7 @@ If this doesn't look familiar, see @cite{K&R}, pp. 114--115.
 
 @item Lines 11--14:
 This is the standard idiom for producing those cryptic error messages
-for which UNIX programs are notorious; @code{argv[0]} is the name by
+for which Unix programs are notorious; @code{argv[0]} is the name by
 which the program was invoked.
 
 @item Lines 15--16:
@@ -5366,7 +5255,7 @@ there is a read or write error.
 @item Line 21:
 Since we have carefully defined non-zero exit codes for the various
 errors that this program might encounter, we also define this
-successful exit here.  If this program is run as part of a UNIX shell
+successful exit here.  If this program is run as part of a Unix shell
 script, the exit codes are accessible to the shell, which can determine
 what to do next as a result.  If this line were omitted (as in example
 1), the exit code would be undefined.
@@ -6644,12 +6533,12 @@ A set of annotations in time order.
 
 @item Annotator name
 @cindex annotator name (defined)
-A name associated with an annotation file.  On writable UNIX and
+A name associated with an annotation file.  On writable Unix and
 Macintosh file systems, the annotation file name is constructed from the
 annotator name by appending a @samp{.} and the record name.  On CD-ROMs
 and MS-DOS file systems, the annotator name is restricted to three
 characters, and the annotation file name is constructed from the record
-name by appending a @samp{.} and the annotator name.  UNIX and Macintosh
+name by appending a @samp{.} and the annotator name.  Unix and Macintosh
 versions of the WFDB library can locate and read annotation files named
 using either convention.
 
@@ -7079,23 +6968,23 @@ callable by C and C++ programs, and described in this guide.
 @menu
 * Distribution::	How to obtain the latest version of the WFDB
 			Software Package.
-* UNIX installation::	Installing the WFDB Software Package on UNIX,
+* Unix installation::	Installing the WFDB Software Package on Unix,
 			GNU/Linux, and similar systems.
 * MS-DOS installation::	Installing the WFDB Software Package on MS-DOS PCs.
 * Other installation::	Installing the WFDB Software Package on other systems.
 @end menu
 
-@node Distribution, UNIX installation, Installation, Installation
+@node Distribution, Unix installation, Installation, Installation
 @unnumberedsec How to obtain the WFDB Software Package
 
 This appendix briefly describes how to install the WFDB Software Package
 on a new system.  The package includes C-language sources for the WFDB
 library and for a variety of applications (@pxref{WFDB Applications}),
-@TeX{} source for this manual, @code{troff} source for UNIX @code{man}
+@TeX{} source for this manual, @code{troff} source for Unix @code{man}
 pages for the package, and a one-minute sample record (@samp{100s}).
-Except for UNIX-specific and MS-DOS-specific visualization programs and
+Except for Unix-specific and MS-DOS-specific visualization programs and
 an MS-DOS-specific digitization/replay program, all of the software is
-portable between UNIX and MS-DOS, and is usable under VMS and on the
+portable between Unix and MS-DOS, and is usable under VMS and on the
 Macintosh with only minor modifications.
 
 The latest version of the WFDB Software Package can always be downloaded in
@@ -7119,8 +7008,8 @@ see the files @file{readme.doc} (in the root directory of the CD-ROM) and
 @file{lib.doc} (in the @file{lib} directory), or @file{README.TXT} (in the
 @file{software} directory).
 
-@node UNIX installation, MS-DOS installation, Distribution, Installation
-@unnumberedsec UNIX, GNU/Linux, and similar operating systems
+@node Unix installation, MS-DOS installation, Distribution, Installation
+@unnumberedsec Unix, GNU/Linux, and similar operating systems
 
 Before beginning the installation of the WFDB Software Package, obtain and
 install the @code{libwww} package from @code{http://www.w3.org/Library/} or
@@ -7197,7 +7086,7 @@ to your @code{PATH}, and @var{WFDBROOT}@code{/lib} to your
 Depending on the speed of your system and of your C compiler, @samp{make} will
 generally require between 1 and 10 minutes.
 
-@node MS-DOS installation, Other installation, UNIX installation, Installation
+@node MS-DOS installation, Other installation, Unix installation, Installation
 @unnumberedsec MS-DOS and MS-Windows
 
 Install your C compiler if you have not already done so, and make sure that
@@ -7234,7 +7123,7 @@ and install the WFDB Software Package.
 
 If you are installing the software from a CD-ROM, copy the contents of
 the @file{wfdb} directory to your hard disk.  Note that the text files
-are in UNIX format (i.e., lines are terminated by ASCII line-feed
+are in Unix format (i.e., lines are terminated by ASCII line-feed
 characters only).  If your system expects text files in MS-DOS format
 (with both a carriage return and a line-feed at the end of each line;
 VMS is one such system), use @file{u2d.exe} (available from PhysioNet or
@@ -7246,9 +7135,9 @@ using third-party software.  Additional notes for Macintosh users may be
 found in file @file{MAC} (within the @file{wfdb} directory).
 
 The WFDB Software Package is written in highly portable C, and (with the
-exception of a few MS-DOS or UNIX-specific display or data-acquisition
+exception of a few MS-DOS or Unix-specific display or data-acquisition
 programs) should be easy to compile with any K&R or ANSI C compiler.
-The UNIX and MS-DOS @file{make} description files (@file{makefile.unx}
+The Unix and MS-DOS @file{make} description files (@file{makefile.unx}
 and @file{makefile.dos} in @file{wfdb} and in each of its subdirectories)
 should get you started.
 
@@ -7259,7 +7148,7 @@ This appendix briefly describes the application programs that are
 included with the WFDB Software Package.  Except where noted otherwise,
 these applications are usable on all systems for which the WFDB library is
 available.  For details on using these programs, refer to the @cite{WFDB
-Applications Guide}.  (On UNIX systems, the contents of the
+Applications Guide}.  (On Unix systems, the contents of the
 @cite{Applications Guide} may also be available as on-line @code{man}
 pages.)
 
@@ -7559,7 +7448,7 @@ psfd @var{[ [ options ... ] script ... ]}
 @file{wave} is an X Window System client application for viewing
 and editing WFDB records.  (@file{wave} is not included in the WFDB software
 package, but is available separately; @pxref{Sources}.)  @file{wave} can be
-run on UNIX systems, and can be accessed remotely using networked PCs or
+run on Unix systems, and can be accessed remotely using networked PCs or
 other systems for which X11 servers are available.  Run @file{wave}
 without any arguments to obtain instructions for printing its on-line
 manual.
@@ -7913,7 +7802,7 @@ other archive sites.  Please support the FSF with a donation if you use GNU
 software.
 
 @sp 1
-@item @TeX{} for UNIX systems
+@item @TeX{} for Unix systems
 
 This software is available by anonymous FTP from CTAN (Comprehensive TeX
 Archive Network) mirrors, including @code{ftp.tex.ac.uk}, @code{ftp.dante.de},
@@ -7921,7 +7810,7 @@ and @code{ctan.tug.org}.  Many of the sources of GNU software (above) also make
 @TeX{}, etc. available.  CTAN is indexed on the World Wide Web (one such index
 is @file{http://ctan.tug.org/ctan/}).
 
-The UNIX @TeX{} distribution is also distributed on CD-ROM and in other tape
+The Unix @TeX{} distribution is also distributed on CD-ROM and in other tape
 formats by the Free Software Foundation (address above) and others.  It is
 also included with most GNU/Linux distributions (see below).
 
@@ -7965,7 +7854,7 @@ on CD-ROM from the Free Software Foundation (address above).
 @cindex Linux
 @item GNU/Linux
 
-GNU/Linux is a POSIX-compliant reimplementation of the UNIX operating system,
+GNU/Linux is a POSIX-compliant reimplementation of the Unix operating system,
 written by Linus Torvalds and a cast of thousands.  It runs on Intel 386,
 486, and Pentium PCs, among others.  For information about GNU/Linux, visit
 the web site of the Linux Documentation Project:
@@ -8027,39 +7916,55 @@ telefax: +49 911 7417755
 @end display
 
 @sp 1
+@item Compilers and software development systems
+
+Any ANSI/ISO C compiler (or any K&R C compiler, if you still have one)
+can be used to compile the WFDB library and applications that use it.
+Under Unix and GNU/Linux, high-quality free compilers and development
+tools are universally available and taken for granted.  Even if you must
+work in the MS-Windows or MS-DOS environment, however, there is no
+reason to purchase expensive, bloated, and inferior proprietary
+compilers and software development systems, since there are several
+excellent, highly recommended, and completely free alternatives based
+on the GNU C/C++ compiler (gcc).
+
+Using any of these packages does not limit you to creating free (open
+source) software, although you are certainly encouraged to do so.  If you
+wish to develop and sell proprietary software using @code{gcc}, this is
+certainly possible, with fewer and less severe restrictions than you
+will encounter if using a commercial compiler.
+
 @cindex Cygwin
 @item Cygwin
 
 WWW: @code{http://source.redhat.com/cygwin/}
 
-This is a free software development platform for MS-Windows 9x/NT/2000/ME/XP,
-based on GNU @code{gcc} and a large set of UNIX utilities ported by Cygnus
-Software (now part of Red Hat, see above).  Cygwin itself is open-source
-software and is highly recommended in preference to commercial C/C++ compilers
-if you must work in the MS-Windows environment.  The WFDB Software Package
-binaries available via PhysioNet are created using Cygwin.
+This is a freely available software development platform for MS-Windows
+9x/NT/2000/ME/XP, based on GNU @code{gcc} and a large set of Unix
+utilities developed by the GNU project and ported to MS-Windows by
+Cygnus Software (now part of Red Hat, see above).  Cygwin itself is
+open-source software and is highly recommended in preference to
+commercial C/C++ compilers if you must work in the MS-Windows
+environment.  The WFDB Software Package binaries available via PhysioNet
+are created using Cygwin.
 
-@item Borland C++
-@itemx Turbo C/C++
-@display
-Inprise Corporation
-100 Enterprise Way
-Scotts Valley, CA 95066 USA
+@cindex MinGW
+@item MinGW
 
-WWW: @code{http://www.borland.com/}
-telephone: +1 408 431 1000
-@end display
+WWW: @code{http://www.mingw.org/}
 
-@sp 1
-@item Microsoft C/C++
-@display
-Microsoft Corporation
-One Microsoft Way
-Redmond, WA 98052 USA
+This is another freely available software development platform for
+MS-Windows, also based on @code{gcc} and many of the same utilities as
+Cygwin.
 
-WWW: @code{http://www.microsoft.com/}
-telephone: +1 425 882 8080
-@end display
+@cindex djgpp
+@item djgpp
+
+WWW: @code{http://www.delorie.com/djgpp/}
+
+A freely available software development platform for MS-DOS, including
+@code{gcc}, a free 32-bit DOS extender, and many of the same utilties
+as Cygwin and MinGW.
 
 @sp 1
 @item Microstar DAP analog interface boards for PCs
@@ -8142,7 +8047,7 @@ done using @file{xform};  it reduces the storage requirement by
 one-fifth.
 
 @item 8.
-On a UNIX system that supports the @samp{graph} and @samp{plot}
+On a Unix system that supports the @samp{graph} and @samp{plot}
 commands, a simple solution is to write the sample numbers and values on
 the standard output in two-column ASCII format.  The plotting is then
 performed by the pipeline:

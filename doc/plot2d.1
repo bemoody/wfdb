@@ -7,13 +7,13 @@ plot2d, plot3d \- make 2-D or 3-D plots from text files of data, using \fIgnuplo
 \fBplot3d\fR [ \fIinput-file\fR ] [ [ \fIxcol ycol\fR ] \fIzcol\fR ] [ \fIoptions ...\fR ]
 .SH DESCRIPTION
 .PP
-These UNIX shell scripts can be used to produce simple 2-D and 3-D plots using
-\fIgnuplot\fR(1) in batch (non-interactive) mode.  \fIplot2d\fR was designed
-as a portable, quick-and-dirty replacement for Paul Albrecht's elegant but
-unsupported \fIplt\fR;  \fIplot2d\fR accepts a few of the most commonly-used
-\fIplt\fR options and produces similar plots.  \fIplot3d\fR uses the same
-syntax as \fIplot2d\fR, but it produces simple 3-D plots (a capability not
-offered by \fIplt\fR).
+These UNIX shell scripts can be used to produce simple 2-D and 3-D
+plots using \fIgnuplot\fR(1) in batch (non-interactive) mode.
+\fIplot2d\fR was designed as a quick-and-dirty replacement for
+\fIplt\fR (http://www.physionet.org/physiotools/plt/). \fIplot2d\fR
+accepts a few of the most commonly-used \fIplt\fR options and produces
+similar plots.  \fIplot3d\fR uses the same syntax as \fIplot2d\fR, but
+it produces simple 3-D plots (a capability not offered by \fIplt\fR).
 .PP
 The \fIinput-file\fR should contain one or more space- or tab-separated columns
 of data per line, with each point on a line.  Omit the \fIinput-file\fR
@@ -83,7 +83,7 @@ The same file can be used to generate a number of different plots, by
 choosing different columns.  To plot the third column vs. the first, try:
     \fBplot2d powers 2 0 -t "Marshmallows" -x "Mass (kg)" -y "Height (m)"\fR
 .SH SEE ALSO
-\fIgnuplot\fR(1)
+\fIgnuplot\fR(1), \fIplt\fR(1)
 .SH AUTHOR
 George B. Moody (george@mit.edu)
 .SH SOURCES

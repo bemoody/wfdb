@@ -1,5 +1,5 @@
 /* file: wfdblib.h	G. Moody	13 April 1989
-                        Last revised:  7 September 2001       wfdblib 10.2.0
+                        Last revised:  25 October 2001       wfdblib 10.2.1
 External definitions for WFDB library private functions
 
 _______________________________________________________________________________
@@ -34,11 +34,11 @@ symbols reserved to the library begin with the characters "wfdb_".
 #include "wfdb.h"
 
 /* Define the symbol _WINDLL if this library is to be compiled as a Microsoft
-Windows DLL.  Note that a DLL's private functions (such as those listed below)
-*cannot* be called by Windows user programs, which can call only DLL functions
-that use the Pascal calling interface (see wfdb.h).  To compile this library
-for use in a Microsoft Windows application, but *not* as a DLL, define the
-symbol _WINDOWS instead of _WINDLL. */
+   Windows DLL.  Note that a DLL's private functions (such as those listed
+   below) *cannot* be called by Windows user programs, which can call only DLL
+   functions that use the Pascal calling interface (see wfdb.h).  To compile
+   this library for use in a Microsoft Windows application, but *not* as a DLL,
+   define the symbol _WINDOWS instead of _WINDLL. */
 /* #define _WINDLL */
 
 #if defined(_WINDLL) && !defined(_WINDOWS)
@@ -62,28 +62,35 @@ symbol _WINDOWS instead of _WINDLL. */
 #endif
 
 /* Define the symbol MSDOS if this library is to be used under MS-DOS or MS
-Windows.  Note: MSDOS is predefined by some MS-DOS and MS Windows compilers. */
+   Windows.  Note: MSDOS is predefined by some MS-DOS and MS Windows compilers.
+*/
 /* #define MSDOS */
 
 /* Uncomment the next line if this software is to be compiled on a Macintosh.*/
 /* #define MAC */
 /* Macintosh users only:  If the version of "ISO 9660 File Access" in the
-"System:Extensions" folder is earlier than 5.0, either update your system
-software (recommended) or uncomment the next line. */
+   "System:Extensions" folder is earlier than 5.0, either update your system
+   software (recommended) or uncomment the next line. */
 /* #define FIXISOCD */
 
 /* DEFWFDBP is the default value of the WFDB path if the WFDB environment
-variable is not set.  In most cases, it is sufficient to use the string "."
-for this purpose (thus restricting the search for DB files to the current
-directory).  If WFDB_NETFILES support is enabled, the setting below adds the
-web-accessible PhysioBank databases to the default path;  you may wish to
-change this to use a nearby PhysioNet mirror (for a list of mirrors, see
-http://www.physionet.org/mirrors/).   DEFWFDBP must not be NULL, however.
-The default given below for the Macintosh specifies that the WFDB path is to
-be read from the file udb/dbpath.mac on the third edition of the MIT-BIH
-Arrhythmia Database CD-ROM (which has a volume name of `MITADB3'); you may
-prefer to use a file on a writable disk for this purpose to make
-reconfiguration possible.  See getwfdb() in wfdbio.c for further information.
+   variable is not set.  This value is edited by the configuration script
+   (../configure), which also edits this block of comments to match.
+
+   In most cases, it is sufficient to use the string ". DBDIR" for
+   this purpose, thus restricting the search for WFDB files to the current
+   directory ("."), followed by DBDIR).
+   
+   If WFDB_NETFILES support is enabled, the setting below adds the
+   web-accessible PhysioBank databases to the default path; you may wish to
+   change this to use a nearby PhysioNet mirror (for a list of mirrors, see
+   http://www.physionet.org/mirrors/).  DEFWFDBP must not be NULL, however.
+   The default given below for the Macintosh specifies that the WFDB path is to
+   be read from the file udb/dbpath.mac on the third edition of the MIT-BIH
+   Arrhythmia Database CD-ROM (which has a volume name of `MITADB3'); you may
+   prefer to use a file on a writable disk for this purpose to make
+   reconfiguration possible.  See getwfdb() in wfdbio.c for further
+   information.
 */
 #ifdef MAC
 # ifdef FIXISOCD
@@ -94,28 +101,29 @@ reconfiguration possible.  See getwfdb() in wfdbio.c for further information.
 # endif
 #else
 # if WFDB_NETFILES
-#  define DEFWFDBP	". http://www.physionet.org/physiobank/database"
+#  define DEFWFDBP 	". DBDIR http://www.physionet.org/physiobank/database"
 # else
-#  define DEFWFDBP	"."
+#  define DEFWFDBP	". DBDIR"
 # endif
 #endif
 
 /* DEFWFDBC is the name of the default WFDB calibration file, used if the
-WFDBCAL environment variable is not set.  This name need not include path
-information if the calibration file is located in a directory included in the
-WFDB path.  The value given below is the name of the standard calibration file
-supplied on the various CD-ROM databases.  DEFWFDBC may be NULL if you prefer
-not to have a default calibration file.  See calopen() in calib.c for further
-information. */
+   WFDBCAL environment variable is not set.  This name need not include path
+   information if the calibration file is located in a directory included in
+   the WFDB path.  The value given below is the name of the standard
+   calibration file supplied on the various CD-ROM databases.  DEFWFDBC may be
+   NULL if you prefer not to have a default calibration file.  See calopen() in
+   calib.c for further information. */
 #define DEFWFDBC "wfdbcal"
 
 /* putenv() is available in POSIX, SVID, and BSD Unices and in MS-DOS and
-32-bit MS Windows, but not under 16-bit MS Windows or under MacOS.  If it is
-available, getwfdb() (in wfdbio.c) detects when the environment variables WFDB
-or WFDBCAL are not set, and sets them according to DEFWFDBP or DEFWFDBC as
-needed using putenv().  This feature is useful mainly for programs such as
-WAVE, where WFDB or WFDBCAL are set interactively and it is useful to show
-their default values to the user;  setwfdb() and getwfdb() do not depend on it.
+   32-bit MS Windows, but not under 16-bit MS Windows or under MacOS.  If it is
+   available, getwfdb() (in wfdbio.c) detects when the environment variables
+   WFDB or WFDBCAL are not set, and sets them according to DEFWFDBP or DEFWFDBC
+   as needed using putenv().  This feature is useful mainly for programs such
+   as WAVE, where WFDB or WFDBCAL are set interactively and it is useful to
+   show their default values to the user; setwfdb() and getwfdb() do not depend
+   on it.
 */
 #if !defined(_WIN16) && !defined(MAC)
 #define HAS_PUTENV
@@ -235,8 +243,8 @@ extern void wfdb_wwwquit(void);
 #endif
 
 /* The following block is needed only to declare the values returned by
-malloc() (either char * or void *) and sprintf() (either int or char *).
-The object code should be correct even if these declarations are not. */
+   malloc() (either char * or void *) and sprintf() (either int or char *).
+   The object code should be correct even if these declarations are not. */
 #if defined(__STDC__) || defined(_WINDOWS)
 # include <stdlib.h>
 #else
@@ -254,9 +262,9 @@ extern char *sprintf();
 # endif
 #endif
 
-/* Declare the values returned by atof() and atol() (not needed for ANSI C
-or Microsoft Windows C compilers, which have these declarations in stdlib.h,
-included above). */
+/* Declare the values returned by atof() and atol() (not needed for ANSI C or
+   Microsoft Windows C compilers, which have these declarations in stdlib.h,
+   included above). */
 #if !defined(__STDC__) && !defined(_WINDOWS)
 extern double atof();
 extern long atol();
@@ -323,7 +331,7 @@ extern void wfdb_p16(), wfdb_p32(), wfdb_addtopath(), wfdb_error(),
     wfdb_oaflush();
 
 /* Some non-ANSI C libraries (e.g., version 7, BSD 4.2) lack an implementation
-of strtok();  define NOSTRTOK to compile the portable version in wfdbio.c. */
+   of strtok(); define NOSTRTOK to compile the portable version in wfdbio.c. */
 # ifdef NOSTRTOK
 extern char *strtok();
 # endif

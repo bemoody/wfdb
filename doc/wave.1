@@ -651,9 +651,19 @@ Analysis Commands window.  To avoid this bug, always run \fIwave\fR in
 the background under SunOS.  The Solaris 2.x and Linux versions of the
 XView library do not have this bug.
 .PP
-On some 24-bit displays, an X server bug causes \fIwave\fR to start with
-an empty signal window.  Using any of the navigation controls, or resizing
-the window, should make the signals visible.  On some of these displays,
+If \fIwave\fR opens with an empty signal window, this may mean that
+the X server's backing store is disabled.  If possible, enable backing
+store and restart the X server.  (Using XFree86 4.x, backing store can
+be enabled by inserting the line `Option "backingstore"' in the
+`Device' section(s) of the \fIXF86Config-4\fR file.  If the X server is
+normally started by a display manager such as \fIxdm\fR, close all windows
+and restart the server with Control+Alt+Backspace.  Otherwise, log out,
+log in, and restart the X server manually if necessary.)
+.PP
+If this doesn't solve the problem, use any of \fIwave\fR's navigation
+controls, or resize the signal window, to make the signals visible.  On
+some 24-bit displays, this problem may be the result of an X server bug,
+and these methods will work around the problem.  On some of these displays,
 text in the signal window may be invisible using overlay graphics mode;
 if this happens, use the \fB-S\fR option.
 .PP
@@ -664,6 +674,16 @@ is a pipe, it is possible only to search forward through it (although
 can be reviewed in any case).  Using the `>' button to move by half a frame
 does not work properly with piped input, nor does changing the display scales,
 since these actions require rereading the signals.
+.PP
+There appears to be a subtle incompatibility between Xview-based applications
+such as \fIwave\fR and at least some X servers.  The symptom of this problem
+is that \fIwave\fR's View panel may be blank, and many warning messages from
+the notifier may appear in the controlling terminal window.  This problem
+appears to occur only when all of the following are true: the X server is
+running on a multi-head display with Xinerama enabled, the user does not have
+root privileges, a .Xdefaults file exists, and \fIwave\fR or another XView
+application has run at least once before since the X server was started.
+
 .SH SEE ALSO
 pschart(1), view(1), wview(1)
 .br

@@ -44,7 +44,7 @@ LN = ln -s
 # package, specify the command needed to format them from the texinfo source
 # files.  If you have the GNU `makeinfo' utility (the preferred formatter),
 # uncomment the next line.
-MAKEINFO = makeinfo --force
+MAKEINFO = makeinfo --force --no-warn
 # Otherwise, you can use GNU emacs to do the job by uncommenting the next line.
 # MAKEINFO = ./makeinfo.sh
 

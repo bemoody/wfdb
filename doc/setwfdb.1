@@ -1,4 +1,4 @@
-.TH SETWFDB 1 "24 May 2000" "WFDB software 10.1.4" "WFDB applications"
+.TH SETWFDB 1 "26 October 2001" "WFDB software 10.2.1" "WFDB applications"
 .SH NAME
 setwfdb, cshsetwfdb \- set WFDB environment variables
 .SH SYNOPSIS
@@ -8,26 +8,48 @@ source cshsetwfdb
 .br
 call setwfdb\fR
 .SH DESCRIPTION
+.PP
+WFDB applications search for input files by looking for them in an
+ordered list of locations called the WFDB path.  These locations can
+be given by directory names or (if the WFDB library has been installed
+with NETFILES support) URLs.  If the \fBWFDB\fR environment variable
+is set, its value specifies the WFDB path; otherwise, applications use
+the default path specified at the time the WFDB library was compiled.
+The default path includes the current directory (``.''), the \fIdatabase\fR
+subdirectory within the WFDB software package's root directory, and
+the PhysioBank data archive (http://www.physionet.org/physiobank/database).
+
+.PP
+WFDB applications that need access to the signal calibration database
+find it in a file located on the WFDB path.  If the \fBWFDBCAL\fR
+environment variable has been set, its value specifies the name of the
+calibration file;  otherwise, applications look for the default calibration
+file, the name of which ("wfdbcal") is compiled into the WFDB library.
+
+.PP
+Many users will not need to change the defaults, but for those who do, the
+scripts described here may be helpful.  \fIImportant:\fR these programs must
+be customized before using them for the first time on a new machine.  Since
+they are text files, use any text editor to customize them.
+
 .SS \fIsh\fR, \fIbash\fR, and \fIksh\fR shell users:
-\fIsetwfdb\fR sets the shell variables \fBWFDB\fR and \fBWFDBCAL\fR to the
-appropriate values to permit access to on-line ECG databases.  It must be
-executed using the ``.'' as shown above.  A frequent user of the databases
-will find it convenient to include an invocation of \fIsetwfdb\fR in
-the \fI.profile\fR file.
+\fIsetwfdb\fR sets the environment variables \fBWFDB\fR and
+\fBWFDBCAL\fR.  It must be executed using the ``.'' as shown above.
+It may be convenient to include an invocation of \fIsetwfdb\fR in the
+\fI.profile\fR file.
 .SS \fIcsh\fR and \fItcsh\fR users:
-\fIcshsetwfdb\fR sets \fBWFDB\fR and \fBWFDBCAL\fR similarly for the C-shell.  It
-must be executed using ``source'' as shown above.  It may be convenient to
+\fIcshsetwfdb\fR sets \fBWFDB\fR and \fBWFDBCAL\fR similarly for the C-shell.
+It must be executed using ``source'' as shown above.  It may be convenient to
 include this command in the \fI.cshrc\fR file.
 .SS MS-DOS/MS-Windows users:
-\fIsetwfdb.bat\fR sets \fBWFDB\fR and \fBWFDBCAL\fR similarly for MS-DOS;  it also
-sets \fBVIEWP\fR (see \fIview\fR(1)).  It may be convenient to include this
-command in the \fIautoexec.bat\fR file (under MS-DOS 3.3 and later, include
-the command ``call setwfdb'' within \fIautoexec.bat\fR;  under earlier
-versions of MS-DOS, use ``command /c setwfdb'', or append the contents of
-\fIsetwfdb.bat\fR to \fIautoexec.bat\fR).
+\fIsetwfdb.bat\fR sets \fBWFDB\fR and \fBWFDBCAL\fR similarly for
+MS-DOS or MS-Windows; it also sets \fBVIEWP\fR (see \fIview\fR(1)). It
+may be convenient to include this command in the \fIautoexec.bat\fR
+file (under MS-DOS 3.3 and later, include the command ``call setwfdb''
+within \fIautoexec.bat\fR; under earlier versions of MS-DOS, use
+``command /c setwfdb'', or append the contents of \fIsetwfdb.bat\fR to
+\fIautoexec.bat\fR).
 .PP
-These programs are shell scripts that must be customized
-before using them for the first time on a new machine.
 .SH ENVIRONMENT
 .TP
 \fBWFDB\fR
@@ -57,19 +79,19 @@ useful under MS-DOS to avoid the 128-character limit on the length of
 environment variables.  Indirect WFDB path files can be nested up to
 10 levels deep.
 .TP
-\fBWFDBCAL\fR The name of the WFDB calibration file (see
-\fIwfdbcal\fR(5)).  The usual rules for finding WFDB files by
-searching the WFDB path apply to the WFDB calibration file, so the
-value of \fBWFDBCAL\fR need not be an absolute path name.  The WFDB
-calibration file is used by WFDB applications that need to plot
-signals at standard scales, as well as by \fIcalsig\fR(1), which
-can determine the baseline and gain of signals if calibration pulses
-are present and if the parameters of the calibration pulses are
-described in the calibration file.  If \fBWFDBCAL\fR is not set by the
-user, the WFDB library uses a default WFDB calibration file
-(\fIwfdbcal\fR, named in \fIwfdblib.h\fR).  If the WFDB calibration
-file is not readable, programs that rely on it may not choose
-appropriate scales for some types of signals.
+\fBWFDBCAL\fR
+The name of the WFDB calibration file (see \fIwfdbcal\fR(5)).  The
+usual rules for finding WFDB files by searching the WFDB path apply to
+the WFDB calibration file, so the value of \fBWFDBCAL\fR need not be
+an absolute path name.  The WFDB calibration file is used by WFDB
+applications that need to plot signals at standard scales, as well as
+by \fIcalsig\fR(1), which can determine the baseline and gain of
+signals if calibration pulses are present and if the parameters of the
+calibration pulses are described in the calibration file.  If
+\fBWFDBCAL\fR is not set by the user, the WFDB library uses a default
+WFDB calibration file (\fIwfdbcal\fR, named in \fIwfdblib.h\fR).  If
+the WFDB calibration file is not readable, programs that rely on it
+may not choose appropriate scales for some types of signals.
 .SH AUTHOR
 George B. Moody (george@mit.edu)
 .SH SOURCES

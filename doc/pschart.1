@@ -1,4 +1,4 @@
-.TH PSCHART 1 "16 October 2001" "WFDB software 10.2" "WFDB applications"
+.TH PSCHART 1 "26 October 2001" "WFDB software 10.2.1" "WFDB applications"
 .SH NAME
 pschart \- produce annotated `chart recordings' on a PostScript device
 .SH SYNOPSIS
@@ -254,7 +254,7 @@ variables \fBWFDB\fR and \fBWFDBCAL\fR should be set and exported (see
 .TP
 \fI/usr/local/lib/ps/pschart.pro\fR
 default PostScript prolog file.
-.br
+.TP
 \fI/usr/local/lib/ps/12lead.pro\fR
 alternative PostScript prolog file, suitable for printing standard 12-lead
 diagnostic ECGs (10 seconds, 4 traces, with the top three traces divided into
@@ -262,11 +262,10 @@ diagnostic ECGs (10 seconds, 4 traces, with the top three traces divided into
 the \fB-G\fR option (see the \fIGrid\fR procedure for details).
 .SH BUGS
 .PP
-High quality takes time.  A full page, with grids and default scales, typically
-takes about 3 minutes to render on an Apple LaserWriter, or about 6 minutes
-on a Linotronic 1200 dpi phototypesetter.  A SPARCprinter attached to a Sparc
-IPC or equivalent can render \fIpschart\fR output at nearly full speed (about
-28 seconds for the first page, 8 seconds for each subsequent page).
+On older PostScript printers, output may be quite slow.  A full page, with
+grids and default scales, typically takes about 3 minutes to render on an Apple
+LaserWriter, or about 6 minutes on a Linotronic 1200 dpi phototypesetter. Most
+modern printers can render \fIpschart\fR output at nearly full speed.
 .PP
 If the record you wish to plot is sampled at a very high rate relative to the
 printer resolution (i.e., if one sample interval would appear on the page as
