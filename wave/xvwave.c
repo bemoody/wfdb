@@ -1,5 +1,5 @@
 /* file: xvwave.c	G. Moody	 27 April 1990
-			Last revised:  17 September 2001
+			Last revised:   14 October 2001
 XView support functions for WAVE
 
 -------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 /* file: wavescript.c		G. Moody	10 October 1996
-				Last revised:	 1 August 2001
+				Last revised:	14 October 2001
 Remote control for WAVE via script
 
 -------------------------------------------------------------------------------
@@ -127,7 +127,6 @@ char **environ;
 #ifndef BINDIR
 #define BINDIR /usr/bin
 #endif
-#define MAXARGS		(WFDB_MAXSIG+12)
 #define STRING(A)	#A
 #define PATH(A,B)	STRING(A) "/" #B
 
@@ -135,9 +134,19 @@ int start_new_wave(record, annotator, ptime, siglist, path)
 char *record, *annotator, *ptime, **siglist, *path;
 {
     if (*record) {
-	static char *arg[MAXARGS+1];
-	int nargs;
+	char **arg;
+	int i, nargs;
 
+	nargs = 4;
+	if (*annotator) nargs += 2;
+	if (*ptime) nargs += 2;
+	if (*path) nargs += 2;
+	if (*siglist) {
+	    for (i = 0; siglist[i]; i++)
+		;
+	    nargs += i+1;
+	}
+	arg = (char **)malloc(nargs * sizeof(char *));
 	arg[0] = PATH(BINDIR, wave);
 	arg[1] = "-r";
 	arg[2] = record;
@@ -156,7 +165,7 @@ char *record, *annotator, *ptime, **siglist, *path;
 	}
 	if (*siglist) {
 	    arg[nargs++] = "-s";
-	    while (nargs < MAXARGS && *siglist)
+	    while (*siglist)
 		arg[nargs++] = *siglist++;
 	}
 	arg[nargs] = NULL;
@@ -186,7 +195,7 @@ char **argv, **env;
     FILE *ofile = NULL, *script;
     int i = 0, pid;
     static char buf[80], record[80], annotator[80], ptime[80], path[80];
-    static char *siglist[WFDB_MAXSIG], sigstrings[80];
+    static char **siglist, sigstrings[80];
 
     pname = argv[0];
     environ = env;
@@ -224,14 +233,28 @@ char **argv, **env;
 	    strcpy(sigstrings, q);	  /* copy the list of signal numbers */
 	    sigstrings[strlen(sigstrings)-1] = ' ';	   /* append a space */
 	    q = sigstrings;
-	    while (*q && i < WFDB_MAXSIG) {    /* split the list into tokens */
-		siglist[i++] = q++;	    /* save pointer to current token */
-		while (*q != ' ' && *q != '\t')	/* find the end of the token */
-		    q++;
-		*q++ = '\0';	   /* split the list at the end of the token */
-		while (*q == ' ' || *q == '\t')
+	    while (*q) {		     /* count the tokens in the list */
+		while (*q && (*q == ' ' || *q == '\t'))
 		    q++;		  /* look for the next token, if any */
+		if (*q) i++;				 /* count this token */
+		while (*q && (*q != ' ' && *q != '\t'))
+		    q++;			/* find the end of the token */
 	    }
+	    siglist = (char **)malloc((i+1) * sizeof(char *));
+	    q = sigstrings;
+	    i = 0;
+	    while (*q) {		       /* split the list into tokens */
+		while (*q && (*q == ' ' || *q == '\t'))
+		    q++;		  /* look for the next token, if any */
+		if (*q) siglist[i++] = q++; /* save pointer to current token */
+		while (*q && (*q != ' ' && *q != '\t'))
+		    q++;			/* find the end of the token */
+		*q++ = '\0';	   /* split the list at the end of the token */
+	    }
+	    siglist[i] = NULL;
+	    break;
+	  default:
+	    break;
 	}
     }
     fclose(script);
@@ -292,7 +315,7 @@ char **argv, **env;
 	if (*ptime) fprintf(ofile, "-f %s\n", ptime);
 	if (siglist[0]) {
 	    fprintf(ofile, "-s %s", siglist[0]);
-	    for (i = 1; i < WFDB_MAXSIG && siglist[i]; i++)
+	    for (i = 1; siglist[i]; i++)
 		fprintf(ofile, " %s", siglist[i]);
 	    fprintf(ofile, "\n");
 	}

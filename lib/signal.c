@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  8 October 2001	wfdblib 10.2.0
+			Last revised:  14 October 2001	wfdblib 10.2.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -1592,7 +1592,7 @@ unsigned int nsig;
     int n;
     struct osdata *os, *op;
     struct ogdata *og;
-    WFDB_Signal s, si;
+    WFDB_Signal s;
     unsigned int buflen, ga;
 
     /* Close previously opened output signals unless otherwise requested. */
@@ -1613,7 +1613,6 @@ unsigned int nsig;
     if (allocogroup(nogroups + hsd[nsig-1]->info.group + 1) < 0) return (-3);
 
     /* Initialize local variables. */
-    og = ogd[nogroups];
     if (obsize <= 0) obsize = BUFSIZ;
 
     /* Set the group number adjustment.  This quantity is added to the group
@@ -1641,6 +1640,7 @@ unsigned int nsig;
 	    /* This is the first signal in a new group; allocate buffer. */
 	    size_t obuflen;
 
+	    og = ogd[os->info.group];
 	    og->bsize = os->info.bsize;
 	    obuflen = og->bsize ? og->bsize : obsize;
 	    if ((og->buf = (char *)malloc(obuflen)) == NULL) {
@@ -1664,7 +1664,6 @@ unsigned int nsig;
 		}
 	    }
 	    nogroups++;
-	    og++;
 	}
 	else {
 	    /* This signal belongs to the same group as the previous signal. */
@@ -1793,7 +1792,6 @@ unsigned int nsig;
 		}
 	    }
 	    nogroups++;
-	    og++;
 	}
 	else {
 	    /* This signal belongs to the same group as the previous signal. */

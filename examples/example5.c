@@ -5,15 +5,21 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-    static WFDB_Siginfo s[WFDB_MAXSIG];
+    WFDB_Siginfo *s;
     int i, nsig;
 
     if (argc < 2) {
         fprintf(stderr, "usage: %s record\n", argv[0]);
         exit(1);
     }
-    nsig = isigopen(argv[1], s, WFDB_MAXSIG);
+    nsig = isigopen(argv[1], NULL, 0);
     if (nsig < 1) exit(2);
+    s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+    if (s == NULL) {
+	fprintf(stderr, "insufficient memory\n");
+	exit(3);
+    }
+    if (isigopen(argv[1], s, nsig) != nsig) exit(2);
     printf("Record %s\n", argv[1]);
     printf("Starting time: %s\n", timstr(0L));
     printf("Sampling frequency: %g Hz\n", sampfreq(argv[1]));

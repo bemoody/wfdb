@@ -1,5 +1,5 @@
 /* file: xform.c	G. Moody       8 December 1983
-			Last revised:  8 October 2001
+			Last revised:  14 October 2001
 
 -------------------------------------------------------------------------------
 xform: Sampling frequency, amplitude, and format conversion for WFDB records
@@ -55,10 +55,11 @@ char *argv[];
     char btstring[30], **description, **filename, *irec = NULL, *orec = NULL,
 	*nrec = NULL, *script = NULL, *startp = "0:0", **units;
     double *gain;
-    int clip = 0, *deltav, fflag = 0, gflag = 0, Hflag = 0, ifreq, i, j, m,
-	Mflag = 0, mn, *msiglist, n, nann = 0, nisig, nminutes = 0, nosig = 0,
-	ofreq = 0, reopen = 0, sflag = 0, *siglist = NULL, spf, uflag = 0,
-	use_irec_desc = 1, *v, *vin, *vmax, *vmin, *vout, *vv;
+    int clip = 0, *deltav, fflag = 0, gflag = 0, Hflag = 0, i, iframelen,
+	ifreq, j, m, Mflag = 0, mn, *msiglist, n, nann = 0, nisig,
+	nminutes = 0, nosig = 0, oframelen, ofreq = 0, reopen = 0, sflag = 0,
+	*siglist = NULL, spf, uflag = 0, use_irec_desc = 1, *v, *vin, *vmax,
+	*vmin, *vout, *vv;
     long from = 0L, it = 0L, nsamp = -1L, nsm = 0L, ot = 0L, spm, to = 0L;
     WFDB_Anninfo *ai = NULL;
     WFDB_Annotation annot;
@@ -214,8 +215,7 @@ char *argv[];
     /* Otherwise, prepare to read and write signals. */
     else {
 	/* Allocate storage for variables related to the input signals. */
-	if ((dfin = malloc(nisig * sizeof(WFDB_Siginfo))) == NULL ||
-	    (vin = malloc(nisig * sizeof(int))) == NULL) {
+	if ((dfin = malloc(nisig * sizeof(WFDB_Siginfo))) == NULL) {
 	    (void)fprintf(stderr, "%s: insufficient memory\n", pname);
 	    exit(2);
 	}
@@ -257,7 +257,6 @@ char *argv[];
 	    (v = malloc(nosig * sizeof(int))) == NULL ||
 	    (vmax = malloc(nosig * sizeof(int))) == NULL ||
 	    (vmin = malloc(nosig * sizeof(int))) == NULL ||
-	    (vout = malloc(nosig * sizeof(int))) == NULL ||
 	    (vv = malloc(nosig * sizeof(int))) == NULL ||
 	    (filename = malloc(nosig * sizeof(char *))) == NULL ||
 	    (description = malloc(nosig * sizeof(char *))) == NULL ||
@@ -275,6 +274,22 @@ char *argv[];
     (void)setsampfreq(0.);
 
     if (isigopen(irec, dfin, nisig) != nisig) exit(2);
+
+    if (Mflag) {
+	for (i = iframelen = 0; i < nisig; i++)
+	    iframelen += dfin[i].spf;
+	for (i = oframelen = 0; i < nosig; i++)
+	    oframelen += dfin[siglist[i]].spf;
+    }
+    else {
+	iframelen = nisig;
+	oframelen = nosig;
+    }
+    if ((vin = malloc(iframelen * sizeof(int))) == NULL ||
+	(vout = malloc(oframelen * sizeof(int))) == NULL) {
+	(void)fprintf(stderr, "%s: insufficient memory\n", pname);
+	exit(2);
+    }
 
     if (orec != NULL) {	/* an output record was specified */
 	/* If a new record name was specified, check that it can be created. */

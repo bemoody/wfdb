@@ -1,5 +1,5 @@
 /* file: wave.c		G. Moody	 27 April 1990
-			Last revised:	12 October 2001
+			Last revised:	14 October 2001
 main() function for WAVE
 
 -------------------------------------------------------------------------------
@@ -27,6 +27,7 @@ _______________________________________________________________________________
 */
 
 #include "wave.h"
+#include "xvwave.h"
 #include <malloc.h>		/* for realloc declaration */
 #include <string.h>		/* for strchr declaration */
 #include <unistd.h>		/* for getpid declaration */
@@ -223,7 +224,11 @@ char *argv[];
 		/* allocate storage for the signal list */
 		if (siglistlen + j > maxsiglistlen) {
 		    if ((siglist = realloc(siglist,
-				      (siglistlen+j) * sizeof(int))) == NULL) {
+				      (siglistlen+j) * sizeof(int))) == NULL ||
+			(base = realloc(base,
+				      (siglistlen+j) * sizeof(int))) == NULL ||
+			(level = realloc(level,
+				 (siglistlen+j) * sizeof(XSegment))) == NULL) {
 			(void)fprintf(stderr, "%s: insufficient memory\n",
 				      pname);
 			exit(2);

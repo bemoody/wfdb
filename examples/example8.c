@@ -4,22 +4,39 @@
 main()
 {
     char answer[32], record[8], directory[32];
-    int i, nsig = 0, v[WFDB_MAXSIG];
+    int i, nsig = 0;
     long nsamp, t;
     double freq = 0.;
-    static char filename[WFDB_MAXSIG][32], description[WFDB_MAXSIG][32],
-        units[WFDB_MAXSIG][22];
-    static WFDB_Siginfo s[WFDB_MAXSIG];
+    char **filename, **description, **units;
+    WFDB_Sample *v;
+    WFDB_Siginfo *s;
 
     do {
         printf("Choose a record name [up to 6 characters]: ");
         fgets(record, 8, stdin); record[strlen(record)-1] = '\0';
     } while (newheader(record) < 0);
     do {
-        printf("Number of signals to be recorded [1-%d]: ",
-               WFDB_MAXSIG);
+        printf("Number of signals to be recorded [>0]: ");
         fgets(answer, 32, stdin); sscanf(answer, "%d", &nsig);
-    } while (nsig < 1 || nsig > WFDB_MAXSIG);
+    } while (nsig < 1);
+    s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+    v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
+    filename = (char **)malloc(nsig * sizeof(char *));
+    description = (char **)malloc(nsig * sizeof(char *));
+    units = (char **)malloc(nsig * sizeof(char *));
+    if (s == NULL || v == NULL || filename == NULL ||
+	description == NULL || units == NULL) {
+	fprintf(stderr, "insufficient memory\n");
+	exit(1);
+    }
+    for (i = 0; i < nsig; i++) {
+	if ((filename[i] = (char *)malloc(32)) == NULL ||
+	    (description[i] = (char *)malloc(32)) == NULL ||
+	    (units[i] = (char *)malloc(32)) == NULL) {
+	    fprintf(stderr, "insufficient memory\n");
+	    exit(1);
+	}
+    }
     do {
         printf("Sampling frequency [Hz per signal, > 0]: ");
         fgets(answer, 32, stdin); sscanf(answer, "%lf", &freq);

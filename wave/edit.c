@@ -1,5 +1,5 @@
 /* file: edit.c		G. Moody	 1 May 1990
-			Last revised:  12 October 2001
+			Last revised:  14 October 2001
 Annotation-editing functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -186,8 +186,7 @@ void create_level_popup()
 				PANEL_LABEL_BOLD, TRUE,
 				XV_HELP_DATA, "wave:level.time",
 				0);
-    /* *** FIXME: need to create more of these items when nsig changes *** */
-    for (i = 0; i < nsig; i++) {
+   for (i = 0; i < nsig; i++) {
 	level_name[i] = xv_create(level_panel, PANEL_MESSAGE,
 				  XV_X, xv_col(level_panel, 0),
 				  XV_Y, xv_row(level_panel, i+2),

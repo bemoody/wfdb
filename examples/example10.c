@@ -8,19 +8,27 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-    int filter, time=0, slopecrit, sign, maxslope=0, nslope=0,
+    int filter, time=0, slopecrit, sign, maxslope=0, nsig, nslope=0,
         qtime, maxtime, t0, t1, t2, t3, t4, t5, t6, t7, t8, t9,
-        ms160, ms200, s2, scmax, scmin = 0, v[WFDB_MAXSIG];
+        ms160, ms200, s2, scmax, scmin = 0;
     WFDB_Anninfo a;
     WFDB_Annotation annot;
-    static WFDB_Siginfo s[WFDB_MAXSIG];
+    WFDB_Sample *v;
+    WFDB_Siginfo *s;
 
     if (argc < 2) {
         fprintf(stderr, "usage: %s record [threshold]\n", argv[0]);
         exit(1);
     }
-    a.name = argv[0]; a.stat = WFDB_WRITE;
-    if (wfdbinit(argv[1], &a, 1, s, WFDB_MAXSIG) < 1) exit(2);
+    a.name = "qrs"; a.stat = WFDB_WRITE;
+
+    if ((nsig = isigopen(argv[1], NULL, 0)) < 1) exit(2);
+    if ((s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo))) == NULL ||
+	(v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample))) == NULL) {
+	fprintf(stderr, "%s: insufficient memory\n", argv[0]);
+	exit(2);
+    }
+    if (wfdbinit(argv[1], &a, 1, s, nsig) != nsig) exit(2);
     if (sampfreq(NULL) != 250.)
         fprintf(stderr, "warning: %s is designed for 250 Hz input\n",
                 argv[0]);

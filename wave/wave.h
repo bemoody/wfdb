@@ -1,5 +1,5 @@
 /* file: wave.h		G. Moody	26 April 1990
-			Last revised:  12 October 2001
+			Last revised:  14 October 2001
 Constants, macros, global variables, and function prototypes for WAVE
 
 -------------------------------------------------------------------------------

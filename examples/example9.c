@@ -6,11 +6,12 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-    int btype,i,j,nbeats=0,nsig,hwindow,window,v[WFDB_MAXSIG],vb[WFDB_MAXSIG];
-    long stoptime = 0L, *sum[WFDB_MAXSIG];
+    int btype, i, j, nbeats = 0, nsig, hwindow, window;
+    long stoptime = 0L, **sum;
     WFDB_Anninfo a;
     WFDB_Annotation annot;
-    static WFDB_Siginfo s[WFDB_MAXSIG];
+    WFDB_Sample *v, *vb;
+    WFDB_Siginfo *s;
     void *calloc();
 
     if (argc < 3) {
@@ -20,7 +21,20 @@ char *argv[];
         exit(1);
     }
     a.name = argv[1]; a.stat = WFDB_READ;
-    if ((nsig = wfdbinit(argv[2], &a, 1, s, WFDB_MAXSIG)) < 1) exit(2);
+    if ((nsig = isigopen(argv[2], NULL, 0)) < 1) exit(2);
+    if ((s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo))) == NULL ||
+	(v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample))) == NULL ||
+	(vb = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample))) == NULL ||
+	(sum = (long **)malloc(nsig * sizeof(long *))) == NULL) {
+	fprintf(stderr, "%s: insufficient memory\n", argv[0]);
+	exit(2);
+    }
+    for (i = 0; i < nsig; i++)
+        if ((sum[i]=(long *)calloc(window,sizeof(long))) == NULL) {
+            fprintf(stderr, "%s: insufficient memory\n", argv[0]);
+            exit(2);
+        }
+    if (wfdbinit(argv[2], &a, 1, s, nsig) != nsig) exit(3);
     hwindow = strtim(".05"); window = 2*hwindow + 1;
     btype = (argc > 3) ? strann(argv[3]) : NORMAL;
     if (argc > 4) iannsettime(strtim(argv[4]));
@@ -32,11 +46,6 @@ char *argv[];
     }
     else stoptime = s[0].nsamp;
     if (stoptime > 0L) stoptime -= hwindow;
-    for (i = 0; i < nsig; i++)
-        if ((sum[i]=(long *)calloc(window,sizeof(long))) == NULL) {
-            fprintf(stderr, "%s: insufficient memory\n", argv[0]);
-            exit(3);
-        }
     while (getann(0, &annot) == 0 && annot.time < hwindow)
         ;
     do {

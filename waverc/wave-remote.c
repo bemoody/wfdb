@@ -1,5 +1,5 @@
 /* file: wave-remote.c		G. Moody	10 October 1996
-				Last revised:	29 May 2001
+				Last revised:	14 October 2001
 Remote control for WAVE
 
 -------------------------------------------------------------------------------
@@ -119,7 +119,7 @@ char **argv;
 {
     char fname[30];
     FILE *ofile;
-    int i, j = 0, pid, siglist[WFDB_MAXSIG];
+    int i, j = 0, pid, *siglist;
     static char *ppid, *record, *annotator, *ptime;
 
     pname = argv[0];
@@ -157,13 +157,21 @@ char **argv;
 	    }
 	    record = argv[i];
 	    break;
-	case 's':	/* signal numbers follow */
-	    if (++i >= argc) {
-		fprintf(stderr, "%s: -s must be followed by a signal number\n",
-			argv[0]);
+	  case 's':	/* signal numbers follow */
+	    /* count the number of output signals */
+	    for (j = 0; ++i < argc && argv[i][0] != '-'; j++)
+		;
+	    if (j == 0) {
+		fprintf(stderr, "%s: signal list must follow -s\n", argv[0]);
 		exit(1);
 	    }
-	    while (i < argc && j < WFDB_MAXSIG && argv[i][0] != '-')
+	    /* allocate storage for the signal list */
+	    if ((siglist = (int *)malloc((j+1) * sizeof(int))) == NULL) {
+		(void)fprintf(stderr, "%s: insufficient memory\n", argv[0]);
+		exit(2);
+	    }
+	    /* fill the signal list */
+	    for (i -= j, j = 0; i < argc && argv[i][0] != '-'; )
 		siglist[j++] = atoi(argv[i++]);
 	    i--;
 	    break;

@@ -1,10 +1,10 @@
 /* file: scope.c	G. Moody	31 July 1991
-			Last revised: 	 4 May 1999
+			Last revised:  14 October 2001
 Scope window functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software

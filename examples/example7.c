@@ -1,20 +1,21 @@
 #include <stdio.h>
 #include <wfdb/wfdb.h>
 #define BUFLN 512
-int sample_ok = 1;
+int nsig, sample_ok = 1;
+WFDB_Sample *sbuf;
 
 sample(s, t)
 int s;
 long t;
 {
-    static int sbuf[BUFLN][WFDB_MAXSIG];
     static long tt = -1L;
 
     if (t <= tt - BUFLN)
         fprintf(stderr, "sample: buffer too short\n");
     while (t > tt)
-        if (getvec(sbuf[(++tt)&(BUFLN-1)]) < 0) sample_ok = 0;
-    return (sbuf[t&(BUFLN-1)][s]);
+        if (getvec(sbuf + nsig * ((++tt)&(BUFLN-1))) < 0)
+	    sample_ok = 0;
+    return (*(sbuf + nsig * (t&(BUFLN-1)) + s));
 }
 
 main(argc, argv)
@@ -22,9 +23,10 @@ int argc;
 char *argv[];
 {
     double *c, one = 1.0, vv, atof();
-    int i, j, nc = argc - 4, nsig, v[WFDB_MAXSIG];
+    int i, j, nc = argc - 4;
     long nsamp, t;
-    static WFDB_Siginfo s[WFDB_MAXSIG];
+    static WFDB_Sample *v;
+    static WFDB_Siginfo *s;
 
     if (argc < 4) {
         fprintf(stderr,
@@ -42,7 +44,16 @@ char *argv[];
     }
     for (i = 0; i < nc; i++)
         c[i] = atof(argv[i+4]);
-    if ((nsig = isigopen(argv[1], s, WFDB_MAXSIG)) < 1)
+    if ((nsig = isigopen(argv[1], NULL, 0)) < 1)
+        exit(3);
+    s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+    v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
+    sbuf = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample) * BUFLN);
+    if (s == NULL || v == NULL || sbuf == NULL) {
+	fprintf(stderr, "insufficient memory\n");
+	exit(3);
+    }
+    if (isigopen(argv[1], s, nsig) != nsig)
         exit(3);
     if (isigsettime(strtim(argv[2])) < 0)
         exit(4);

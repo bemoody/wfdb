@@ -1,5 +1,5 @@
 /* file: analyze.c	G. Moody	10 August 1990
-			Last revised:	12 October 2001
+			Last revised:	14 October 2001
 Functions for the analysis panel of WAVE
 
 -------------------------------------------------------------------------------
@@ -562,6 +562,8 @@ char *s;
     /* Allocate storage for siglist. */
     if (siglistlen > maxsiglistlen) {
 	siglist = realloc(siglist, siglistlen * sizeof(int));
+	base = realloc(base, siglistlen * sizeof(int));
+	level = realloc(level, siglistlen * sizeof(XSegment));
 	maxsiglistlen = siglistlen;
     }
     /* Now store the signal numbers in siglist. */
@@ -840,6 +842,8 @@ int i;
     if (0 <= i && i < nsig) {
 	if (++siglistlen >= maxsiglistlen) {
 	    siglist = realloc(siglist, siglistlen * sizeof(int));
+	    base = realloc(base, nsig * sizeof(int));
+	    level = realloc(level, nsig * sizeof(XSegment));
 	    maxsiglistlen = siglistlen;
 	}
 	siglist[siglistlen-1] = i;

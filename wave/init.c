@@ -1,5 +1,5 @@
 /* file: init.c		G. Moody	1 May 1990
-			Last revised: 13 October 2001
+			Last revised: 14 October 2001
 Initialization functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -73,7 +73,6 @@ int ns;
 	(level_units_string =
 		realloc(level_units_string, ns * sizeof(char **))) == NULL ||
 	(vscale = realloc(vscale, ns * sizeof(double))) == NULL ||
-	(base = realloc(base, ns * sizeof(int))) == NULL ||
 	(dc_coupled = realloc(dc_coupled, ns * sizeof(int))) == NULL ||
 	(sigbase = realloc(sigbase, ns * sizeof(int))) == NULL ||
 	(blabel = realloc(blabel, ns * sizeof(char *))) == NULL ||
@@ -82,17 +81,15 @@ int ns;
 	(level_value =
 		realloc(level_value, ns * sizeof(Panel_item))) == NULL ||
 	(level_units =
-		realloc(level_units, ns * sizeof(Panel_item))) == NULL ||
-	(level = realloc(level, ns * sizeof(XSegment))) == NULL) {
+		realloc(level_units, ns * sizeof(Panel_item))) == NULL) {
 	memerr();
     }
     for (i = maxnsig; i < ns; i++) {
 	signame[i] = sigunits[i] = blabel[i] = NULL;
 	level_name[i] = level_value[i] = level_units[i] = (Panel_item)NULL;
-	scope_v[i] = vref[i] = level_v[i] = v[i] = v0[i] = vmax[i] =
-	    vmin[i] = 0;
+	dc_coupled[i] = scope_v[i] = vref[i] = level_v[i] = v[i] = v0[i] =
+	    vmax[i] = vmin[i] = 0;
 	vscale[i] = 1.0;
-	base[i] = dc_coupled[i] = 0;
 	if ((level_name_string[i] = calloc(1, 12)) == NULL ||
 	    (level_value_string[i] = calloc(1, 12)) == NULL ||
 	    (level_units_string[i] = calloc(1, 12)) == NULL) {
@@ -214,6 +211,8 @@ char *s;
     if (rebuild_list) {
 	if (nsig > maxsiglistlen) {
 	    siglist = realloc(siglist, nsig * sizeof(int));
+	    base = realloc(base, nsig * sizeof(int));
+	    level = realloc(level, nsig * sizeof(XSegment));
 	    maxsiglistlen = nsig;
 	}
 	for (i = 0; i < nsig; i++)
