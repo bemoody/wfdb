@@ -562,7 +562,7 @@ char *s;
     (void)strcpy(t, wfdbpath);
     t[l++] = PSEP;		/* append a path separator */
     (void)strncpy(t+l, s, i); 	/* append the new path component */
-    t[l+i+1] = '\0';
+    t[l+i] = '\0';
     setwfdb(t);
     free(t);
 }

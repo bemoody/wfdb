@@ -57,7 +57,7 @@ Harvard-MIT Division of Health Sciences and Technology}
 \pagestyle{empty}
 \vspace*{\fill}
 \noindent
-Copyright \copyright 1992 -- 2002 George B. Moody
+Copyright \copyright 1992 -- 2003 George B. Moody
 
 \vspace{1 in}
 \noindent
@@ -4863,16 +4863,6 @@ using a DAP 1200- or 2400-series data acquisition board (available from
 Microstar Laboratories,
 \htmladdnormallink{http://www.mstarlabs.com/).}{http://www.mstarlabs.com/}
 
-\index{CD-ROM}\index{MIT-BIH Arrhythmia Database}
-\index{European ST-T Database}\index{MIT-BIH Polysomnographic Database}
-\index{MGH/MF Waveform Database}
-You may also find that an existing database of digitally recorded signals may
-be useful for your studies.  Four such databases are currently available on
-CD-ROM (the MIT-BIH Arrhythmia Database, the European ST-T Database, the
-MIT-BIH Polysomnographic Database, and the MGH/MF Waveform Database), and
-several more databases in this format are in preparation.  These disks are
-compatible with any CD-ROM drive.
-
 Note that the \WAVE{} host
 \index{WAVE host@\WAVE{} host}
 must be able
@@ -4930,6 +4920,25 @@ You can write digitized data to removable storage, then read the data on the
 using writable CDs or DVDs, USB or Firewire disk drives, or compact
 flash memory cards.
 \end{itemize}
+
+\index{CD-ROM}\index{MIT-BIH Arrhythmia Database} \index{European ST-T
+Database}\index{MIT-BIH Polysomnographic Database} \index{MGH/MF
+Waveform Database} You may also find that an existing database of
+digitally recorded signals may be useful for your studies.  PhysioNet, at
+\htmladdnormallink{http://www.physionet.org/,}{http:/www.physionet.org/},
+offers free on-line access to over 30 such databases with thousands of
+recordings ranging in length from a few seconds to several days.
+These include all or most of the MIT-BIH Arrhythmia Database, the
+European ST-T Database, the MIT-BIH Polysomnographic Database, the
+MGH/MF Waveform Database, and the Long-Term ST Database (which are
+also available on CD-ROMs from their creators), and many other
+databases available only via PhysioNet.  \WAVE{} can read these
+databases directly from PhysioNet without downloading them first (the
+WFDB library, which handles reading and writing data for \WAVE{},
+contains HTTP client code that permits applications such as \WAVE{} to
+read input with equal ease from local disks or remote web servers).
+This is an excellent way to explore PhysioBank (PhysioNet's collection
+of signal databases).
 
 \section{About Linux}
 
@@ -6368,13 +6377,17 @@ frequency in lockstep (for example, to view digitally filtered signals
 and the original unfiltered signals side-by-side), another approach is
 to create a single header file that names the signal files for both
 records.  It is not necessary for all signals to be in the same signal
-file, or even on the same disk drive.  In this case, however, the total
-number of open signals must be 32 or less (see the next question).
+file, or even on the same disk drive.
 
 \subsection{Can \WAVE{} open more than 32 signals in a window at once?}
 
 Yes.  There is no fixed limit on the number of signals that current versions
 of \WAVE{} can open.  Earlier versions were limited to 32 or fewer signals.
+
+If the signal window gets to be too crowded, select a subset of
+signals to be displayed by editing the signal list (in \WAVE{}'s {\sf
+Analyze} window, and choose {\sf Draw: listed signals only} in the
+{\sf View} window.
 
 \subsection{Can \WAVE{} open more than one annotation file in a window at once?}
 

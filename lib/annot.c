@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:    16 July 2003		wfdblib 10.3.9
+			Last revised:    3 August 2003		wfdblib 10.3.10
 WFDB library functions for annotations
 
 _______________________________________________________________________________
@@ -694,7 +694,7 @@ int code;
 char *string;
 {
     if (NOTQRS <= code && code <= ACMAX) {
-	if (strcmp(cstring[code], string)) {
+	if (cstring[code] == NULL || strcmp(cstring[code], string)) {
 	    char *p = malloc(strlen(string)+1);
 	    if (p) strcpy(cstring[code] = p, string);
 	}
@@ -746,7 +746,7 @@ int code;
 char *string;
 {
     if (0 < code && code <= ACMAX) {
-	if (strcmp(astring[code], string)) {
+	if (astring[code] == NULL || strcmp(astring[code], string)) {
 	    char *p = malloc(strlen(string)+1);
 	    if (p) {
 		strcpy(astring[code] = p, string);
@@ -756,7 +756,7 @@ char *string;
 	return (0);
     }
     else if (-ACMAX < code && code <= 0) {
-	if (strcmp(astring[-code], string)) {
+	if (astring[-code] == NULL || strcmp(astring[-code], string)) {
 	    char *p = malloc(strlen(string)+1);
 	    if (p) strcpy(astring[-code] = p, string);
 	}
@@ -835,7 +835,7 @@ int code;
 char *string;
 {
     if (0 < code && code <= ACMAX) {
-	if (strcmp(tstring[code], string)) {
+	if (tstring[code] == NULL || strcmp(tstring[code], string)) {
 	    char *p = malloc(strlen(string)+1);
 	    if (p) {
 		strcpy(tstring[code] = p, string);
@@ -845,7 +845,7 @@ char *string;
 	return (0);
     }
     else if (-ACMAX < code && code <= 0) {
-	if (strcmp(tstring[-code], string)) {
+	if (tstring[-code] == NULL || strcmp(tstring[-code], string)) {
 	    char *p = malloc(strlen(string)+1);
 	    if (p) strcpy(tstring[-code] = p, string);
 	}

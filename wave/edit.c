@@ -1,5 +1,5 @@
 /* file: edit.c		G. Moody	 1 May 1990
-			Last revised:  12 February 2003
+			Last revised:  24 July 2003
 Annotation-editing functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -859,23 +859,27 @@ Notify_arg arg;
 		 3. If the <Meta> key is depressed, select the signal nearest
 		    the pointer, delete its first occurrence (if any) in the
 		    signal list, and return.
-	         4. If the middle button is down, switch the annotation
+		 4. If annotation editing is disabled and  if this instance of
+		    WAVE has a sync button, signal other WAVE processes to
+		    recenter their signal windows at the time indicated by
+		    the mouse, and return.
+	         5. If the middle button is down, switch the annotation
 		    template to the previous entry in the annotation template
 		    buffer.
-	         5. Make the annotation template popup visible.
-	         6. If the middle or right button is down, or if there are no
+	         6. Make the annotation template popup visible.
+	         7. If the middle or right button is down, or if there are no
 		    annotations left of the pointer, return.
-		 7. If annotations are shown attached to signals, and the
+		 8. If annotations are shown attached to signals, and the
 		    pointer is in a selection box, attach the previous
 		    annotation.
-		 8. If annotations are shown attached to signals, and the
+		 9. If annotations are shown attached to signals, and the
 		    pointer is not in a selection box, attach the closest
 		    annotation to the left of the pointer.
-		 9. Otherwise, find the previous group of simultaneous
+		10. Otherwise, find the previous group of simultaneous
 		    annotations and attach the first annotation of that group.
-		10. Recenter the display around the attached annotation, if
+		11. Recenter the display around the attached annotation, if
 		    it is not currently displayed.
-		11. Draw marker bars above and below the attached annotation.
+		12. Draw marker bars above and below the attached annotation.
 	    */
 	    if (event_shift_is_down(event) ||
 		event_ctrl_is_down(event) ||
@@ -896,6 +900,13 @@ Notify_arg arg;
 		break;
 	    }
 	    dragged = 0;
+	    if (accept_edit == 0 && wave_ppid) {
+		char buf[80];
+		sprintf(buf, "wave-remote -pid %d -f '%s'\n", wave_ppid,
+			mstimstr(-t));
+		system(buf);
+		break;
+	    }
 	    if (middle_down) set_prev_ann_template();
 	    show_ann_template();
 	    if (middle_down || right_down) break;
@@ -1013,17 +1024,18 @@ Notify_arg arg;
 	    /* The middle button was pressed:
 	         1. If the left or right button is down, ignore this event.
 		 2. Draw marker bars above and below the pointer.
-		 3. If the <Control> key is depressed and this instance of
-		    WAVE has a sync button, signal other WAVE processes to
-		    recenter their signal windows at the time indicated by
-		    the mouse, and return.
+		 3. If annotation editing is disabled or if the <Control> key
+		    is depressed, and if this instance of WAVE has a sync
+		    button, signal other WAVE processes to recenter their
+		    signal windows at the time indicated by the mouse, and
+		    return.
 		 4. If there is an attached annotation, and the pointer is
 		    outside the box, detach the annotation (erase the box).
 	    */
 	    if (left_down || right_down || ann_template.anntyp < 0) break;
 	    middle_down = 1;
 	    bar(x, y /* ? */, 1);
-	    if (event_ctrl_is_down(event) && wave_ppid) {
+	    if ((accept_edit == 0 || event_ctrl_is_down(event)) && wave_ppid) {
 		char buf[80];
 		sprintf(buf, "wave-remote -pid %d -f '%s'\n", wave_ppid,
 			mstimstr(-t));
