@@ -1,9 +1,22 @@
 \documentclass[twoside]{article}
 \usepackage{rawfonts}
 \IfFileExists{times.sty}{\usepackage{times}}{\@missingfileerror{times}{sty}}
+
+\usepackage{fancyheadings}
 \oddsidemargin 0.1in
 \evensidemargin -0.1in
+\topmargin -0.5in
+\textheight 650pt
+\footskip 48pt
 \def\textwidth{6.375 in}
+\pagestyle{fancy}
+\def\headrulewidth{0pt}
+\lhead{\rm{}Evaluating ECG Analyzers}
+\chead{\rm{}WFDB Applications Guide}
+\rhead{\rm{}Evaluating ECG Analyzers}
+\lfoot[\rm\thepage]{\rm{}WFDB VERSION}
+\cfoot{\rm{}LONGDATE}
+\rfoot[\rm{}WFDB VERSION]{\rm\thepage}
 
 \title{Evaluating ECG Analyzers}
 \author{George B. Moody\\
@@ -11,7 +24,7 @@ Harvard-MIT Division of Health Sciences and Technology, Cambridge, MA, USA}
 \date{}
 
 \begin{document}
-\setcounter{page}{125}
+\setcounter{page}{129}
 
 \maketitle
 
@@ -260,11 +273,11 @@ the analyzer's frame of reference can be converted to database sample numbers
 by linear interpolation.  The WFDB software package includes a program ({\tt
 sample}) that uses a Microstar DAP 2400-series analog interface
 board\footnote{
-Source: Microstar Laboratories, 2863 152nd Avenue NE, Redmond,
-WA 98052 USA.  External analog anti-aliasing filters (to reduce
-``staircasing'') and attenuators (to obtain patient-level signals) may also be
-required, depending on the system to be evaluated.  DAP boards can also be
-used with {\tt sample} to create new database records.}
+Source: Microstar Laboratories, {\tt http://www.mstarlabs.com/}. External
+analog anti-aliasing filters (to reduce ``staircasing'') and attenuators (to
+obtain patient-level signals) may also be required, depending on the system to
+be evaluated.  DAP boards can also be used with {\tt sample} to create new
+database records.}
 and an MS-DOS PC to recreate analog signals from digital database records on
 CD-ROMs or magnetic disk files.
 

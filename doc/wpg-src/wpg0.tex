@@ -3,14 +3,18 @@
 @setfilename wpg
 @settitle WFDB Programmer's Guide
 @setchapternewpage odd
+@dircategory Libraries
+@direntry
+* WFDB library: (wpg).		The Waveform Database library.
+@end direntry
 @comment %**end of header (This is for running Texinfo on a region.)
 
 @titlepage
 @sp 5
 @center @titlefont{WFDB Programmer's Guide}
 @sp 4
-@center Tenth Edition (revised and with additions for WFDB library version 10.2.6)
-@center @today
+@center Tenth Edition (revised and with additions for WFDB library version VERSION)
+@center LONGDATE
 @sp 5
 @center George B. Moody
 @sp 1
@@ -31,8 +35,8 @@ Cambridge, MA 02139
 USA
 @end display
 
-An HTML version of this guide is available;  point your web browser to
-@code{http://@-www.@-physio@-net.@-org/@-physio@-tools/@-dbpg/} to view it.
+An HTML version of this guide is available at
+@code{http://@-www.@-physio@-net.@-org/@-physio@-tools/@-wpg/}.
 
 @sp 2
 Permission is granted to make and distribute verbatim copies of this
@@ -62,8 +66,8 @@ translated versions of this guide for reference purposes.
 @ifinfo
 This guide documents the Waveform Database interface library (the WFDB
 library).  This file contains the text of the Tenth Edition of
-the @cite{WFDB Programmer's Guide} (June, 2002), with
-revisions for release 10.2.6 of the WFDB library.
+the @cite{WFDB Programmer's Guide} (LONGDATE), with
+revisions for release VERSION of the WFDB library.
 @end ifinfo
 
 @menu
@@ -338,7 +342,7 @@ a copy of a database directory, such as the @cite{MIT-BIH Arrhythmia Database
 Directory}
 (@code{http://@-www.@-physionet.@-org/@-physio@-bank/@-data@-base/@-mitdb/@-mitdbdir/}).
 The @cite{WFDB Applications Guide}
-(@code{http://@-www.@-physionet.@-org/@-physio@-tools/@-dbag/}) will be useful
+(@code{http://@-www.@-physionet.@-org/@-physio@-tools/@-wag/}) will be useful
 as a reference for existing WFDB library-based applications (available from
 PhysioNet, @code{http://@-www.@-physio@-net.@-org/}).
 
@@ -462,7 +466,7 @@ information about obtaining GNU @code{emacs}).
 
 An HTML version of this guide, suitable for viewing using any web browser,
 is included with the WFDB Software Package.  The latest version may always be
-viewed at @code{http://@-www.@-physio@-net.@-org/@-physio@-tools/@-dbpg/} using your web
+viewed at @code{http://@-www.@-physio@-net.@-org/@-physio@-tools/@-wpg/} using your web
 browser.
 
 @ifinfo
@@ -481,6 +485,16 @@ to this guide since the first printing of the tenth edition of this
 guide in June, 1999.  See @file{NEWS}, in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
+
+@unnumberedsubsec Changes in version 10.2.7
+
+Added a workaround to @code{wfdb_fclose} (in @file{lib/wfdbio.c}) so that
+closing @code{stdin} after using @code{freopen} doesn't trigger a core dump.
+
+If out-of-order annotations were written and automatic annotation sorting was
+suppressed, the warning produced by @code{oannclose} (in @file{lib/annot.c})
+once again includes the correct @code{sortann} command needed to put the
+annotations into order.  (This feature was broken by a previous revision.)
 
 @unnumberedsubsec Changes in version 10.2.6
 @findex setifreq (10.2.6)
@@ -831,7 +845,7 @@ you have only static @code{libwww} libraries.
 
 Under MS-Windows, it will be easiest to use @file{gcc}, the GNU C/C++
 compiler, which is included in the freely available Cygwin software
-development system (@code{http://@-source@-.redhat@-.com/@-cygwin/}),
+development system (@code{http://@-www@-.cygwin@-.com/}),
 and also in the freely available MinGW package
 (@code{http://@-www@-.mingw@-.org/}).  An MS-DOS version of @file{gcc}
 is available in the free djgpp package
@@ -7407,7 +7421,7 @@ The @code{./configure} command asks where you wish to install the package.
 If you accept the default (@code{/usr}), you will need root permissions when
 runnning @code{make install}.  If you choose another location, follow the
 instructions given by @code{configure} for setting your @code{PATH} and
-@code{LD\_LIBRARY\_PATH} environment variables.
+@code{LD_LIBRARY_PATH} environment variables.
 
 Depending on the speed of your system and of your C compiler, @samp{make} will
 generally require between 1 and 10 minutes.
@@ -7416,7 +7430,7 @@ generally require between 1 and 10 minutes.
 @unnumberedsec MS-Windows
 
 If you have not already done so, install the Cygwin development environment
-(freely available from @code{http://sources.redhat.com/cygwin/}).  This
+(freely available from @code{http://www.cygwin.com}).  This
 includes @code{gcc} (the GNU C/C++ compiler) as well as a comprehensive
 assortment of other Unix utilities ported to MS-Windows.  Accept the defaults
 suggested by the installer.
@@ -7549,11 +7563,11 @@ the directory in which they are kept in your search path.
 @cindex WFDB path
 To use any of these programs, you will need to set the database path first
 (@pxref{WFDB path}), unless the default database path
-(@samp{. http://www.physio@-net.org/physio@-bank/data@-base}) is suitable.
-Programs that accept @emph{time} arguments or commands (usually shown as
-@var{from} and @var{to} below) use @code{strtim} to convert these strings into
-sample intervals; hence they accept any of the varieties of standard time
-format described earlier
+(@samp{. /usr/database http://www.physio@-net.org/physio@-bank/data@-base})
+is suitable. Programs that accept @emph{time} arguments or commands (usually
+shown as @var{from} and @var{to} below) use @code{strtim} to convert these
+strings into sample intervals; hence they accept any of the varieties of
+standard time format described earlier
 @iftex
 (@pxref{timstr and strtim, , @code{timstr} and @code{strtim}}).
 @end iftex
@@ -8316,7 +8330,7 @@ will encounter if using a commercial compiler.
 @cindex Cygwin
 @item Cygwin
 
-WWW: @code{http://source.redhat.com/cygwin/}
+WWW: @code{http://www.cygwin.com/}
 
 This is a freely available software development platform for MS-Windows
 9x/NT/2000/ME/XP, based on GNU @code{gcc} and a large set of Unix
@@ -8493,7 +8507,7 @@ numbered versions of the WFDB library.
 @ifinfo
 WFDB Programmer's Guide
 
-Tenth Edition (revised and with additions for WFDB library version 10.2.6)
+Tenth Edition (revised and with additions for WFDB library version VERSION)
 
 George B. Moody
 

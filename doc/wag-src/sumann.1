@@ -1,17 +1,17 @@
-.TH SUMANN 1 "12 December 2000" "WFDB software 10.2" "WFDB applications"
+.TH SUMANN 1 "31 July 2002" "WFDB 10.2.7" "WFDB Applications Guide"
 .SH NAME
 sumann \- summarize the contents of a WFDB annotation file
 .SH SYNOPSIS
-\fBsumann -r\fI record\fB -a \fIannotator\fR [ \fIoptions\fR ... ]
+\fBsumann -r\fR \fIrecord\fR \fB-a\fR \fIannotator\fR [ \fIoptions\fR ... ]
 .SH DESCRIPTION
-\fIsumann\fR reads the annotation file specified by \fIrecord\fR and
+\fBsumann\fR reads the annotation file specified by \fIrecord\fR and
 \fIannotator\fR and produces a tabular summary of its contents, including
 the number of annotations of each type as well the duration and number of
 episodes of each rhythm and signal quality.
 .PP
 \fIOptions\fR include:
 .TP
-\fB-f\fI time\fR
+\fB-f\fR \fItime\fR
 Begin at the specified \fItime\fR.
 .TP
 \fB-h\fR
@@ -20,13 +20,14 @@ Print a usage summary.
 \fB-q\fR
 Summarize QRS annotations only.
 .TP
-\fB-t\fI time\fR
+\fB-t\fR \fItime\fR
 Stop at the specified \fItime\fR.
+.SH ENVIRONMENT
 .PP
-The shell variable \fBWFDB\fR should be set and exported (see
-\fIsetwfdb\fR(1)).
+It may be necessary to set and export the shell variable \fBWFDB\fR (see
+\fBsetwfdb\fR(1)).
 .SH SEE ALSO
-rdann(1), setwfdb(1)
+\fBrdann\fR(1), \fBsetwfdb\fR(1)
 .SH AUTHOR
 George B. Moody (george@mit.edu)
 .SH SOURCE

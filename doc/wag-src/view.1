@@ -1,78 +1,78 @@
 '\" t
-.TH VIEW 1 "11 January 2000" "WFDB software 10.0" "WFDB applications"
+.TH VIEW 1 "31 July 2002" "WFDB 10.2.7" "WFDB Applications Guide"
 .SH NAME
 view, vsetup \- WFDB browser for MS-DOS
 .SH SYNOPSIS
 \fBview\fR
 .br
-\fBview\fI record\fR
+\fBview\fR \fIrecord\fR
 .br
-\fBview\fI record annotator\fR
+\fBview\fR \fIrecord annotator\fR
 .br
-\fBview\fI record annotator time\fR
+\fBview\fR \fIrecord annotator time\fR
 .br
-\fBview\fI record annotator type\fR
+\fBview\fR \fIrecord annotator type\fR
 .br
 \fBvsetup\fR
 .br
-\fBvsetup -s\fI file \fR
+\fBvsetup -s\fR \fIfile \fR
 .br
-\fBvsetup\fI mode\fR
+\fBvsetup\fR \fImode\fR
 .SH DESCRIPTION
 .PP
 This program reads one or more signal files and an annotation file (if one is
 available), and displays the signals with annotations at the standard
 chart recorder scale of 25 mm/sec and 10 mm/mV on systems equipped with
 a CGA, Hercules, EGA, VGA, or compatible graphics display adapter.  Run
-\fIvsetup\fR to determine a suitable display mode and scaling constants before
-using \fIview\fR for the first time (see \fIvsetup\fR below).
+\fBvsetup\fR to determine a suitable display mode and scaling constants before
+using \fBview\fR for the first time (see \fBvsetup\fR below).
 .PP
-If no \fIrecord\fR is specified on the command line, \fIview\fR asks for a
+If no \fIrecord\fR is specified on the command line, \fBview\fR asks for a
 record name when it starts.  If no \fIannotator\fR is specified on the command
-line, \fIview\fR attempts to find an annotation file named \fIrecord\fB.atr\fR;
+line, \fBview\fR attempts to find an annotation file named \fIrecord\fB.atr\fR;
 otherwise, it attempts to find one named \fIrecord\fB.\fIannotator\fR.
-If the annotation file does not exist or cannot be read, \fIview\fR simply
-displays the signals.  A \fItime\fR argument, if present, causes \fIview\fR
+If the annotation file does not exist or cannot be read, \fBview\fR simply
+displays the signals.  A \fItime\fR argument, if present, causes \fBview\fR
 to display its first screenful such that the left-hand edge of the screen
 corresponds to the specified time.  A \fItype\fR argument, if present, causes
-\fIview\fR to search for the first occurrence of the specified annotation type
+\fBview\fR to search for the first occurrence of the specified annotation type
 in the annotation file, and to center the first screenful on that annotation
 if possible.
 .PP
-\fIview\fR is an interactive program.  Once the first screenful has been
-displayed, \fIview\fR waits for additional commands, which can be typed in the
+\fBview\fR is an interactive program.  Once the first screenful has been
+displayed, \fBview\fR waits for additional commands, which can be typed in the
 prompt area near the bottom of the screen, and which are executed when you
 press ENTER.  These commands can be in any of the formats permissible for
 \fItime\fR or \fItype\fR command-line arguments;  such commands have the same
 effect as if given on the command line.  You may also merely press ENTER to see
 the next screenful;  if the previous action involved searching for an
-annotation, this will cause \fIview\fR to search for the next occurrence of the
+annotation, this will cause \fBview\fR to search for the next occurrence of the
 same annotation type that does not already appear on the screen.  The \fBg\fR
 command may be used to turn the grid display on or off;  initially, the grid
 display is off.  When the grid is visible, it marks 0.2 second and 0.5
 millivolt intervals.  The \fBm\fR command may be used to turn annotation
 marker bars (dotted lines above and below each annotation showing the exact
 location of the annotation fiducial mark) on or off;  initially, annotation
-marker bars are on.  Finally, use the \fBx\fR command to exit from \fIview\fR
+marker bars are on.  Finally, use the \fBx\fR command to exit from \fBview\fR
 and return to the DOS prompt.
 .PP
-Current versions of \fIview\fR (4.0 and later) support the use of a mouse to
-navigate through the record.  If a mouse is available, \fIview\fR displays
+Current versions of \fBview\fR (4.0 and later) support the use of a mouse to
+navigate through the record.  If a mouse is available, \fBview\fR displays
 buttons at the bottom of the screen;  click left on these to move forward
 or backward by whole or half screenfuls.  If the mouse pointer is above the
 level of the buttons, clicking left or right moves the pointer left or right
 one annotation at a time, recentering the display if the pointer would
 otherwise move out of the display region.
 .PP
-\fIvsetup\fR is used to calibrate your monitor for \fIview\fR.  If \fIvsetup\fR
+\fBvsetup\fR is used to calibrate your monitor for \fBview\fR.  If \fBvsetup\fR
 is able to identify a usable graphics mode, it will ask you to measure the
 dimensions of a rectangle that it draws on your screen.  When it finishes, it
 will print instructions for setting an environment variable that is required
-by \fIview\fR, unless you have used the \fB-s\fR option;  in the latter case,
+by \fBview\fR, unless you have used the \fB-s\fR option;  in the latter case,
 the MS-DOS command needed to set the variable is appended to the specified
 \fIfile\fR.  If your graphics adapter is capable of several display modes,
-and you prefer to use a different mode from that selected by \fIvsetup\fR, you
-can run \fIvsetup\fR with an integer argument that corresponds to your
+and you prefer to use a different mode from that selected by \fBvsetup\fR, you
+can run \fBvsetup\fR with an integer argument that corresponds to your
 preferred \fImode\fR, from among the following:
 .br
 .TS
@@ -102,18 +102,18 @@ r l.
 Incolor Card, or a compatible.  To use mode 8 with one of these cards, load
 \fImsherc.com\fR (from the \fIbin\fR directory of your CD-ROM or software
 distribution diskette, or from your Microsoft C, Pascal, or Fortran compiler
-diskettes) before using \fIvsetup\fR or \fIview\fR.  Do so by typing
+diskettes) before using \fBvsetup\fR or \fBview\fR.  Do so by typing
 \fImsherc\fR from within the directory where you find \fImsherc.com\fR (you
 may wish to include this step in your \fIautoexec.bat\fR).  If you have both a
 Hercules monochrome card and a color video card in the same system, type
 \fImsherc /h\fR instead.
 .PP
-[2] \fIview\fR uses at most 5 colors, so the 256-color modes offer no advantage
+[2] \fBview\fR uses at most 5 colors, so the 256-color modes offer no advantage
 over the 16-color modes.  In the 16- and 256-color modes, the background is
 white;  in the 4-color and black-and-white modes, the background is black.
 .PP
 [3] These modes can be used only with a VESA-compatible SVGA and a compatible
-monitor.  \fIvsetup\fR will not identify these modes automatically, because
+monitor.  \fBvsetup\fR will not identify these modes automatically, because
 of the potential for damage to your monitor if your SVGA card supports these
 modes but your monitor does not.  \fBDo not attempt to use these modes unless
 your monitor supports them.  Otherwise, you risk damaging your monitor.\fR
@@ -122,67 +122,67 @@ your monitor supports them.  Otherwise, you risk damaging your monitor.\fR
 \fBWFDB\fR
 The database path: a list of directories that contain database files.  An
 empty component is taken to refer to the current directory.  All applications
-built with the \fIwfdb\fR(3) library search for their database input files in
-the order specified by \fBWFDB\fR.  If \fBWFDB\fR is not set, searches are limited
-to the current directory.  Under MS-DOS, directory names are separated by
-semicolons (;), and the format of \fBWFDB\fR is that of the MS-DOS \fBPATH\fR
-variable (colons may be used following drive specifiers within \fBWFDB\fR in this
-case).
+built with the \fBwfdb\fR(3) library search for their database input files in
+the order specified by \fBWFDB\fR.  If \fBWFDB\fR is not set, searches are limited to the builtin WFDB path (see \fBsetwfdb\fR(1).  Under MS-DOS, directory
+names are separated by semicolons (;), and the format of \fBWFDB\fR is that of
+the MS-DOS \fBPATH\fR variable (colons may be used following drive specifiers
+within \fBWFDB\fR in this case).
 .TP
 \fBWFDBCAL\fR
-The name of the WFDB calibration file (see \fIwfdbcal\fR(5)), which
+The name of the WFDB calibration file (see \fBwfdbcal\fR(5)), which
 must be in a directory named by \fBWFDB\fR (see immediately above).
-This file is used by \fIview\fR to determine standard scales for
+This file is used by \fBview\fR to determine standard scales for
 signals other than ECGs.  If \fBWFDBCAL\fR is not set, or if the file
 named by \fBWFDBCAL\fR is not readable, these signals may be drawn at
 incorrect scales.
 .TP
 \fBVIEWF\fR
-The pathname for the font file containing characters to be drawn by \fIview\fR.
+The pathname for the font file containing characters to be drawn by \fBview\fR.
 \fBVIEWF\fR should name a Microsoft Windows-compatible `\fI.fon\fR' file.  By
-default, if \fBVIEWF\fR is not set, \fIview\fR checks the \fBPATH\fR variable
+default, if \fBVIEWF\fR is not set, \fBview\fR checks the \fBPATH\fR variable
 to see if Microsoft Windows is available, and uses \fImodern.fon\fR in the
 Windows \fIsystem\fR subdirectory if so, or a file of the same name in the
-current directory if not; otherwise, \fIview\fR uses text mode to draw
-characters.  If you are using \fIview\fR in a DOS box under MS-Windows 95, you
+current directory if not; otherwise, \fBview\fR uses text mode to draw
+characters.  If you are using \fBview\fR in a DOS box under MS-Windows 95, you
 will probably find \fImodern.fon\fR in the Windows \fIfonts\fR subdirectory,
 and you should set \fBVIEWF\fR accordingly.  Note that text mode character
 placement is constrained to text mode character cells; annotations shown using
 text mode will not be placed as precisely as those shown using graphics mode.
 .TP
 \fBVIEWP\fR
-Instructions for setting this variable are printed by \fIvsetup\fR. The
+Instructions for setting this variable are printed by \fBvsetup\fR. The
 format for the command to do so is
 .br
-  \fBset VIEWP=\fImode,left,right,top,bottom,width,height\fR
+	\fBset VIEWP=\fR\fImode,left,right,top,bottom,width,height\fR
 .br
 where \fImode\fR is one of those specified in the table above, \fIleft\fR,
 \fIright\fR, \fItop\fR, and \fIbottom\fR are the pixel column and row numbers
-corresponding to the edges of the display area to be used by \fIview\fR, and
+corresponding to the edges of the display area to be used by \fBview\fR, and
 \fIwidth\fR and \fIheight\fR are the dimensions of the display area in
 millimeters.
 .PP
 After determining appropriate values for these variables, you may wish to add
 commands for setting them to your \fIautoexec.bat\fR file.  The standard
 installation procedure determines appropriate values interactively and inserts
-the necessary commands into \fIsetwfdb.bat\fR (see \fIsetwfdb\fR(1)).
+the necessary commands into \fIsetwfdb.bat\fR (see \fBsetwfdb\fR(1)).
 .SH CD-ROM VERSIONS
 The first edition of the MIT-BIH Arrhythmia Database CD-ROM, the first and
 second editions of the European ST-T Database CD-ROM, and the first edition of
-the MIT-BIH Polysomnographic Database CD-ROM contain versions of \fIview\fR
+the MIT-BIH Polysomnographic Database CD-ROM contain versions of \fBview\fR
 that do not support color or greyscale output, SVGA display modes,
 \fBVIEWF\fR, annotation marker bar display, or mouse interaction.
 .PP
 Later editions of the MIT-BIH Arrhythmia Database CD-ROM and of the MIT-BIH
-Polysomnographic Database CD-ROM contain a version of \fIview\fR that supports
+Polysomnographic Database CD-ROM contain a version of \fBview\fR that supports
 all of these features.  Note that version 4.0, included on the second editions
 of these CD-ROMs, requires that the record name be supplied on the command
-line.  (As described above, earlier and later versions of \fIview\fR obtain the
+line.  (As described above, earlier and later versions of \fBview\fR obtain the
 record name interactively if it is not supplied on the command line.)
 .SH SEE ALSO
-pschart(1) (for PostScript), wave(1) (for X11), wview(1) (for MS Windows)
+\fBpschart\fR(1) (for PostScript), \fBwave\fR(1) (for X11), \fBwview\fR(1)
+(for MS-Windows)
 .br
-setwfdb(1)
+\fBsetwfdb\fR(1)
 .SH AUTHOR
 George B. Moody (george@mit.edu)
 .SH SOURCE

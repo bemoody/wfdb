@@ -1,4 +1,9 @@
-This is wpg, produced by makeinfo version 4.0b from wpg.tex.
+This is wpg, produced by makeinfo version 4.1 from wpg.tex.
+
+INFO-DIR-SECTION Libraries
+START-INFO-DIR-ENTRY
+* WFDB library: (wpg).		The Waveform Database library.
+END-INFO-DIR-ENTRY
 
 
 File: wpg,  Node: WFDB_Anninfo structures,  Next: WFDB_Annotation structures,  Prev: WFDB_Calinfo structures,  Up: Data Types

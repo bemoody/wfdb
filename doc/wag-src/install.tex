@@ -1,9 +1,22 @@
 \documentclass[twoside]{article}
 \usepackage{rawfonts}
 \IfFileExists{times.sty}{\usepackage{times}}{\@missingfileerror{times}{sty}}
+
+\usepackage{fancyheadings}
 \oddsidemargin 0.1in
 \evensidemargin -0.1in
+\topmargin -0.5in
+\textheight 650pt
+\footskip 48pt
 \def\textwidth{6.375 in}
+\pagestyle{fancy}
+\def\headrulewidth{0pt}
+\lhead{\rm{}Installing}
+\chead{\rm{}WFDB Applications Guide}
+\rhead{\rm{}Installing}
+\lfoot[\rm\thepage]{\rm{}WFDB VERSION}
+\cfoot{\rm{}LONGDATE}
+\rfoot[\rm{}WFDB VERSION]{\rm\thepage}
 
 \title{Installing the WFDB Software Package}
 \author{George B. Moody\\
@@ -11,7 +24,7 @@ Harvard-MIT Division of Health Sciences and Technology, Cambridge, MA, USA}
 \date{}
 
 \begin{document}
-\setcounter{page}{121}
+\setcounter{page}{125}
 
 \maketitle
 
@@ -86,7 +99,7 @@ generally require between 1 and 10 minutes.
 \subsection*{MS-Windows}
 
 If you have not already done so, install the Cygwin development environment
-(freely available from {\tt http://\-sources.\-red\-hat.\-com/\-cygwin/}).  This includes
+(freely available from {\tt http://\-www.\-cygwin.\-com/}).  This includes
 {\tt gcc} (the GNU C/C++ compiler) as well as a comprehensive assortment of
 other Unix utilities ported to MS-Windows.  Accept the defaults suggested by
 the installer.

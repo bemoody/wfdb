@@ -1,19 +1,19 @@
-.TH WFDBCAL 5 "24 May 2000" "WFDB software 10.1.4" "WFDB File Formats"
+.TH WFDBCAL 5 "1 August 2002" "WFDB software 10.2.7" "WFDB Applications Guide"
 .SH NAME
 wfdbcal \- Waveform Database calibration file format
 .SH DESCRIPTION
 .PP
-Programs compiled using the WFDB library (see \fIwfdb\fR(3)) require
+Programs compiled using the WFDB library (see \fBwfdb\fR(3)) require
 calibration data in order to convert between sample values (expressed
 in analog-to-digital converter units, or adus) and physical units.
 Calibration files specify the physical characteristics of calibration
 pulses that may be present in various types of signals, and specify
-customary scales for plotting these signals.  \fIcalsig\fR(1) reads
+customary scales for plotting these signals.  \fBcalsig\fR(1) reads
 the signal file(s) for a record, measures the size of the calibration
 pulses it finds in adus, and uses specifications from a calibration
 file to determine adu-to-physical unit conversion parameters, the
 `gain' and `baseline' fields that it writes back into the header file
-for the record.  Other programs, such as \fIpschart\fR(1), make use of
+for the record.  Other programs, such as \fBpschart\fR(1), make use of
 the `gain' and `baseline' fields from the header file to determine how
 to convert adus into physical units, and use customary scale
 specifications from a calibration file to determine how to convert
@@ -25,7 +25,7 @@ Calibration files are line-oriented text files.  Lines are separated by
 a carriage-return/line-feed pair. Each type of signal to be calibrated is
 described by a one-line entry.  The format of each entry is:
 .br
-	\fBDESC\fI<tab>\fBLOW HIGH TYPE SCALE UNITS\fR
+	\fBDESC\fR\fI<tab>\fBLOW HIGH TYPE SCALE UNITS\fR
 .br
 where \fBDESC\fR is a string, possibly containing embedded
 spaces but not tabs, taken from the signal description field of the header
@@ -45,7 +45,7 @@ Lines that begin with `#', empty lines, and improperly formatted lines are
 treated as comments and ignored.
 .PP
 The WFDB library function \fIgetcal\fR, used by programs such as
-\fIcalsig\fR(1), \fIpsfd\fR(1), and \fIwave\fR(1) to obtain calibration
+\fBcalsig\fR(1), \fBpsfd\fR(1), and \fBwave\fR(1) to obtain calibration
 data from a calibration file, returns the first entry that matches a signal's
 description and units.  A calibration file entry is considered to match a
 signal if the \fBDESC\fR field is either an exact match or a prefix of the
@@ -105,11 +105,12 @@ should be inserted \fIbefore\fR the entry for `ECG lead I'.
 .SH ENVIRONMENT
 Programs compiled with the WFDB library use the environment variable
 \fBWFDBCAL\fR to determine the name of the calibration file.  Calibration files
-must be located in one of the directories named by the environment variable
-\fBWFDB\fR (see \fIsetwfdb\fR(1)).
+must be located in one of the directories named by the WFDB path (see
+\fIsetwfdb\fR(1)).
 .SH SEE ALSO
-calsig(1), setwfdb(1), header(5)
+\fBcalsig\fR(1), \fBsetwfdb\fR(1), \fBannot\fR(5), \fBheader\fR(5).
+\fBsignal\fR(5)
 .br
-.I WFDB Programmer's Guide
+\fIWFDB Programmer's Guide\fR
 .SH AUTHOR
 George B. Moody (george@mit.edu)

@@ -1,12 +1,17 @@
-This is wpg, produced by makeinfo version 4.0b from wpg.tex.
+This is wpg, produced by makeinfo version 4.1 from wpg.tex.
+
+INFO-DIR-SECTION Libraries
+START-INFO-DIR-ENTRY
+* WFDB library: (wpg).		The Waveform Database library.
+END-INFO-DIR-ENTRY
 
 
 File: wpg,  Node: Top,  Next: Overview,  Prev: (dir),  Up: (dir)
 
    This guide documents the Waveform Database interface library (the
 WFDB library).  This file contains the text of the Tenth Edition of the
-`WFDB Programmer's Guide' (June, 2002), with revisions for release
-10.2.6 of the WFDB library.
+`WFDB Programmer's Guide' (8 August 2002), with revisions for release
+10.2.7 of the WFDB library.
 
 * Menu:
 
@@ -256,10 +261,9 @@ Newcomers to C should have a copy for ready reference while reading
 this guide.)  It may also be helpful to have a copy of a database
 directory, such as the `MIT-BIH Arrhythmia Database Directory'
 (`http://www.physionet.org/physiobank/database/mitdb/mitdbdir/').  The
-`WFDB Applications Guide'
-(`http://www.physionet.org/physiotools/dbag/') will be useful as a
-reference for existing WFDB library-based applications (available from
-PhysioNet, `http://www.physionet.org/').
+`WFDB Applications Guide' (`http://www.physionet.org/physiotools/wag/')
+will be useful as a reference for existing WFDB library-based
+applications (available from PhysioNet, `http://www.physionet.org/').
 
    You should have access to a computer that has the WFDB library and at
 least one or two database records on-line, or access to the World Wide
@@ -367,7 +371,7 @@ and suggestions are welcome.  Please send them to:
    An HTML version of this guide, suitable for viewing using any web
 browser, is included with the WFDB Software Package.  The latest
 version may always be viewed at
-`http://www.physionet.org/physiotools/dbpg/' using your web browser.
+`http://www.physionet.org/physiotools/wpg/' using your web browser.
 
    You can format and print copies of this guide using TeX if you have
 it (see `makefile' in the `doc' directory of the library distribution
@@ -386,6 +390,18 @@ and to this guide since the first printing of the tenth edition of this
 guide in June, 1999.  See `NEWS', in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
+
+Changes in version 10.2.7
+-------------------------
+
+   Added a workaround to `wfdb_fclose' (in `lib/wfdbio.c') so that
+closing `stdin' after using `freopen' doesn't trigger a core dump.
+
+   If out-of-order annotations were written and automatic annotation
+sorting was suppressed, the warning produced by `oannclose' (in
+`lib/annot.c') once again includes the correct `sortann' command needed
+to put the annotations into order.  (This feature was broken by a
+previous revision.)
 
 Changes in version 10.2.6
 -------------------------
@@ -728,9 +744,9 @@ static `libwww' libraries.
 
    Under MS-Windows, it will be easiest to use `gcc', the GNU C/C++
 compiler, which is included in the freely available Cygwin software
-development system (`http://source.redhat.com/cygwin/'), and also in
-the freely available MinGW package (`http://www.mingw.org/').  An
-MS-DOS version of `gcc' is available in the free djgpp package
+development system (`http://www.cygwin.com/'), and also in the freely
+available MinGW package (`http://www.mingw.org/').  An MS-DOS version
+of `gcc' is available in the free djgpp package
 (`http://www.delorie.com/djgpp/'). These are used within a Cygwin
 terminal emulator window or an MS-DOS box in exactly the same way as
 described above for Unix C compilers.

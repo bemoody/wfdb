@@ -1,10 +1,10 @@
-/* file: helppan.c	G. Moody         1 May 1990
-			Last revised:  27 November 2001
+/* file: helppan.c	G. Moody        1 May 1990
+			Last revised:  24 June 2002
 Help panel functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software

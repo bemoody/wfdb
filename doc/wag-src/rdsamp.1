@@ -1,19 +1,19 @@
-.TH RDSAMP 1 "10 April 2000" "WFDB software 10.1.3" "WFDB applications"
+.TH RDSAMP 1 "31 July 2002" "WFDB 10.2.7" "WFDB Applications Guide"
 .SH NAME
 rdsamp \- read WFDB signal files
 .SH SYNOPSIS
-\fBrdsamp -r \fIrecord\fR [ \fIoptions\fR ... ]
+\fBrdsamp -r\fR \fIrecord\fR [ \fIoptions\fR ... ]
 .SH DESCRIPTION
-\fIrdsamp\fR reads signal files for the specified \fIrecord\fR and writes the
+\fBrdsamp\fR reads signal files for the specified \fIrecord\fR and writes the
 samples as decimal numbers on the standard output.  If no \fIoptions\fR are
-provided, \fIrdsamp\fR starts at the beginning of the record and prints all
+provided, \fBrdsamp\fR starts at the beginning of the record and prints all
 samples.  Each line of output contains the sample number and samples from each
 signal, beginning with channel 0, separated by tabs.
 .PP
 \fIOptions\fR include:
 .TP
-\fB-f\fI time\fR
-Begin at the specified \fItime\fR.  By default, \fIrdsamp\fR starts at the
+\fB-f\fR \fItime\fR
+Begin at the specified \fItime\fR.  By default, \fBrdsamp\fR starts at the
 beginning of the record.
 .TP
 \fB-h\fR
@@ -29,35 +29,36 @@ sampling frequency).
 \fB-l\fR \fIinterval\fR
 Limit the amount of output to the specified time \fIinterval\fR (in standard
 time format;  default: no limit).  If both \fB-l\fR and \fB-t\fR are used,
-\fIrdsamp\fR stops at the earlier of the two limits.
+\fBrdsamp\fR stops at the earlier of the two limits.
 .TP
 \fB-p\fR
 Print times in seconds and milliseconds, and values in physical units.  By
-default, \fIrdsamp\fR prints times in sample intervals and values in A/D units.
+default, \fBrdsamp\fR prints times in sample intervals and values in A/D units.
 .TP
 \fB-s\fR \fIsignal-list\fR
 Print only the signals named in the \fIsignal-list\fR (one or more input signal
 numbers, separated by spaces;  default: print all signals).  This option may be
 used to re-order or duplicate signals.
 .TP
-\fB-t\fI time\fR
-Stop at the specified \fItime\fR.  By default, \fIrdsamp\fR stops at the end
+\fB-t\fR \fItime\fR
+Stop at the specified \fItime\fR.  By default, \fBrdsamp\fR stops at the end
 of the record.
 .TP
 \fB-v\fR
 Print column headings.
+.SH ENVIRONMENT
 .PP
-The shell variable \fBWFDB\fR should be set and exported (see
-\fIsetwfdb\fR(1)).
-.SH CD-ROM VERSIONS
+It may be necessary to set and export the shell variable \fBWFDB\fR (see
+\fBsetwfdb\fR(1)).
+.SH CD-ROM Versions
 The first edition of the MIT-BIH Arrhythmia Database CD-ROM, the first and
 second editions of the European ST-T Database CD-ROM, and the first edition of
-the MIT-BIH Polysomnographic Database CD-ROM contain versions of \fIrdsamp\fR
+the MIT-BIH Polysomnographic Database CD-ROM contain versions of \fBrdsamp\fR
 that use an older command syntax (still supported by the current version but
 not described here).  Refer to \fIbin.doc\fR in the CD-ROM directory that
-contains \fIrdsamp\fR for further information.
+contains \fBrdsamp\fR for further information.
 .SH SEE ALSO
-rdann(1), setwfdb(1), wrsamp(1)
+\fBrdann\fR(1), \fBsetwfdb\fR(1), \fBwrsamp\fR(1)
 .SH AUTHOR
 George B. Moody (george@mit.edu)
 .SH SOURCE

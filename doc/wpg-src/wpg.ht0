@@ -11,8 +11,8 @@
 <B>Up:</B> <A HREF="../manuals.shtml">Books about PhysioToolkit</A>
 <H1 ALIGN=CENTER>WFDB Programmer's Guide</H1>
 <P ALIGN=CENTER><STRONG>Tenth Edition<BR>
-(Revised and with corrections for WFDB library version 10.2.6)<BR>
-24 June 2002<BR>
+(Revised and with corrections for WFDB library version VERSION)<BR>
+LONGDATE<BR>
 <BR> 
 <BR> 
 <BR> 
@@ -84,3 +84,4 @@ on SPARC-based systems under SunOS or Solaris.
 <P><I><ADDRESS>
 <A HREF="mailto:george@mit.edu">George B. Moody (<tt>george@mit.edu</tt>)</A>
 </ADDRESS></I><BR>
+LONGDATE

@@ -1,20 +1,20 @@
-.TH MRGANN 1 "11 January 2000" "WFDB software 10.0" "WFDB applications"
+.TH MRGANN 1 "31 July 2002" "WFDB 10.2.7" "WFDB Applications Guide"
 .SH NAME
 mrgann \- merge annotation files
 .SH SYNOPSIS
-\fBmrgann -r \fIrecord\fB -i \fIann1 ann2\fR -o \fIann3\fR [ \fIoptions\fR ... ]
+\fBmrgann -r\fR \fIrecord\fR \fB-i\fR \fIann1 ann2\fR \fB-o\fR \fIann3\fR [ \fIoptions\fR ... ]
 .SH DESCRIPTION
 .PP
-\fImrgann\fR reads a pair of annotation files (specified by \fIann1\fR,
+\fBmrgann\fR reads a pair of annotation files (specified by \fIann1\fR,
 \fIann2\fR) for the specified \fIrecord\fR and writes a third annotation file
 (specified by \fIann3\fR) for the same \fIrecord\fR.  Typical applications of
-\fImrgann\fR include combining annotation files that apply to different signals
+\fBmrgann\fR include combining annotation files that apply to different signals
 within a multi-signal record, and replacing a segment of an annotation file
-with annotations from another file (see the examples below).  \fImrgann\fR
+with annotations from another file (see the examples below).  \fBmrgann\fR
 cannot concatenate annotation files from \fIdifferent\fR records (e.g.,
-segments of a multi-segment record);  use \fIwfdbcollate\fR(1) for this purpose.
+segments of a multi-segment record);  use \fBwfdbcollate\fR(1) for this purpose.
 If you wish to merge annotation files in order to be able to study or resolve
-the differences between them, \fIbxb\fR(1) (which can also merge annotation
+the differences between them, \fBbxb\fR(1) (which can also merge annotation
 files using its \fB-o\fR or \fB-O\fR options) is almost certainly a better
 choice for such an application.
 .PP
@@ -24,14 +24,14 @@ each of the input files (if there are annotations with the same \fBtime\fR and
 \fIann1\fR is copied).  This behavior can be modified by command-line
 \fIoptions\fR, which include:
 .TP
-\fB-c\fI n\fR
+\fB-c\fR \fIn\fR
 Map (reset) the \fBchan\fR fields of all annotations from \fIann1\fR to
 \fIn\fR.  \fBchan\fR fields may contain integers between 0 and 255 inclusive;
 the \fBchan\fR field often specifies the signal number of the signal with which
 the annotation is associated.  Specify \fB-c -1\fR to disable \fBchan\fR
 mapping for \fIann1\fR (the default).
 .TP
-\fB-C\fI n\fR
+\fB-C\fR \fIn\fR
 Map (reset) the \fBchan\fR fields of all annotations from \fIann2\fR to
 \fIn\fR.  Specify \fB-C -1\fR to disable \fBchan\fR mapping for \fIann2\fR
 (the default).
@@ -39,24 +39,24 @@ Map (reset) the \fBchan\fR fields of all annotations from \fIann2\fR to
 \fB-h\fR
 Print a usage summary.
 .TP
-\fB-m0\fI time\fR
+\fB-m0\fR \fItime\fR
 Discard all annotations from both input annotators, beginning at \fItime\fR,
 until the time specified in the next \fB-m\fIx\fR option, or the end of the
 data if no other \fB-m\fIx\fR option is given.
 .TP
-\fB-m1\fI time\fR
+\fB-m1\fR \fItime\fR
 Copy all annotations from \fIann1\fR, and discard all annotations from
 \fIann2\fR, beginning at \fItime\fR, until the time specified in the next
 \fB-m\fIx\fR option, or the end of the data if no other \fB-m\fIx\fR option is
 given.
 .TP
-\fB-m2\fI time\fR
+\fB-m2\fR \fItime\fR
 Copy all annotations from \fIann2\fR, and discard all annotations from
 \fIann1\fR, beginning at \fItime\fR, until the time specified in the next
 \fB-m\fIx\fR option, or the end of the data if no other \fB-m\fIx\fR option is
 given.
 .TP
-\fB-m3\fI time\fR
+\fB-m3\fR \fItime\fR
 Copy all annotations from \fIann1\fR and \fIann2\fR, beginning at \fItime\fR,
 until the time specified in the next \fB-m\fIx\fR option, or the end of the
 data if no other \fB-m\fIx\fR option is given.  Annotations from \fIann2\fR
@@ -81,12 +81,12 @@ To merge three sets of annotations (named \fBa0\fR, \fBa2\fR, and \fBa3\fR, one
 for each of signals 0, 2, and 3 of record \fB999\fR), use the following
 commands:
 .br
-    \fBmrgann -r 999 -a a0 a2 -o tmp -c 0 -C 2\fR
+	\fBmrgann -r 999 -a a0 a2 -o tmp -c 0 -C 2\fR
 .br
-    \fBmrgann -r 999 -a tmp a3 -o all -c -1 -C 3\fR
+	\fBmrgann -r 999 -a tmp a3 -o all -c -1 -C 3\fR
 .br
 Note that two passes are needed to merge three annotation files,
-since \fImrgann\fR reads only two annotation files at a time.  The first pass
+since \fBmrgann\fR reads only two annotation files at a time.  The first pass
 yields an intermediate result (annotator \fBtmp\fR);  annotator \fBall\fR is
 the desired output.  The \fB-c -1\fR option in the second command above
 disables \fBchan\fR mapping for annotations in \fBtmp\fR, which have already
@@ -97,7 +97,7 @@ To replace any annotations in a set (named \fBold\fR) during the interval
 between 5 minutes and 6 minutes from the beginning of record \fBxyz\fR, with
 annotations from another set (named \fBnew\fR), use the command:
 .br
-    \fBmrgann -r xyz -a old new -o out -m1 0 -m2 5:0 -m1 6:0\fR
+	\fBmrgann -r xyz -a old new -o out -m1 0 -m2 5:0 -m1 6:0\fR
 .br
 In this command, the desired output is written to annotator \fBout\fR for
 record \fBxyz\fR.  The \fB-m1 0\fR option overrides the default behavior and
@@ -109,11 +109,12 @@ The rules are changed a third and final time at the 6-minute mark by the
 \fB-m1 6:0\fR option, which instructs \fImrgann\fR to copy the remaining
 \fBold\fR annotations to \fBout\fR, while once again discarding any \fBnew\fR
 annotations that occur during this interval.
+.SH ENVIRONMENT
 .PP
-The shell variable \fBWFDB\fR should be set and exported (see
-\fIsetwfdb\fR(1)).
+It may be necessary to set and export the shell variable \fBWFDB\fR (see
+\fBsetwfdb\fR(1)).
 .SH SEE ALSO
-bxb(1), wfdbcollate(1), setwfdb(1)
+\fBbxb\fR(1), \fBsetwfdb(1), \fBwfdbcollate\fR(1)
 .SH AUTHOR
 George B. Moody (george@mit.edu)
 .SH SOURCE

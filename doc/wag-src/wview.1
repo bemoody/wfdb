@@ -1,61 +1,63 @@
 '\" t
-.TH WVIEW 1 "11 January 2000" "WVIEW 1.04 alpha" "WFDB applications"
+.TH WVIEW 1 "1 August 2002" "WFDB 10.2.7" "WFDB Applications Guide"
 .SH NAME
 wview \- WFDB browser for MS Windows
 .SH SYNOPSIS
-\fBwview\fP
+\fBwview\fR
 .br
-\fBwview\fI record\fR
+\fBwview\fR \fIrecord\fR
 .br
-\fBwview\fI record annotator\fR
+\fBwview\fR \fIrecord annotator\fR
 .br
-\fBwview\fI record annotator start-time\fR
+\fBwview\fR \fIrecord annotator start-time\fR
 .br
 \fBwview\fR [\fIdrive:\fR][\fIpath\fR]\fIrecord\fB.hea\fR
 .SH DESCRIPTION
 .PP
+Note: \fBwview\fR will soon be retired in favor of \fBgtkwave\fR(1).
+.PP
 This program reads one or more signal files and an annotation file (if
 one is available), and displays the signals with annotations on a PC
 running MS Windows 3.1 (or later).  To run it, either select the
-\fIwview\fR icon from the appropriate Start menu or Program Manager
+\fBwview\fR icon from the appropriate Start menu or Program Manager
 group (usually `Applications'), select a WFDB `header' file (a file
 named with the suffix `.hea') from Windows Explorer or File Manager,
-or enter one of the \fIwview\fR command lines listed above (under
+or enter one of the \fBwview\fR command lines listed above (under
 `Synopsis') in the \fBRun...\fR window of the Start menu or the
 Program Manager's \fBFile\fR menu.  The first two of these methods
-work only if \fIwview\fR has been installed as described below, under
+work only if \fBwview\fR has been installed as described below, under
 `Installation'; use the \fBRun...\fR method if you have not performed
 the full installation procedure.  If MS Windows is not running, you
-may start it and launch \fIwview\fR from the MS-DOS prompt by
+may start it and launch \fBwview\fR from the MS-DOS prompt by
 typing \fBwin wview\fR (this command may also include \fIrecord\fR,
 \fIannotator\fR and \fIstart-time\fR options as shown above).  Refer
 to Microsoft's \fIWindows User's Guide\fR for general information
 about starting and using MS Windows.
 .PP
-The current version of \fIwview\fR is an alpha release.  A few of the
-controls are not yet implemented, and appear as inactive (greyed) menu items.
+The current version of \fBwview\fR is an alpha release.  A few of the
+controls are not implemented, and appear as inactive (greyed) menu items.
 In comparison with other available software for viewing annotated WFDB records,
-\fIwview\fR's capabilities lie somewhere between those of \fIview\fR(1)
-(for MS-DOS) and \fIwave\fR(1) (for the X Window System).  \fIwview\fR can
-do anything that \fIview\fR can do, and much more, but \fIview\fR is likely
-to be substantially faster than \fIwview\fR on older PCs that do not have
+\fBwview\fR's capabilities lie somewhere between those of \fBview\fR(1)
+(for MS-DOS) and \fBwave\fR(1) (for the X Window System).  \fBwview\fR can
+do anything that \fBview\fR can do, and much more, but \fBview\fR is likely
+to be substantially faster than \fBwview\fR on older PCs that do not have
 32-bit CPUs with numeric coprocessors and MS Windows accelerated graphics
-cards.  \fIwview\fR has most of the display capabilities of \fIwave\fR with
-the exception of `scope' windows, but it lacks \fIwave\fR's capabilities for
-annotation editing (these may be added in a future version) and control of
-external analysis programs, as well as a variety of less important features.
+cards.  \fBwview\fR has most of the display capabilities of \fBwave\fR with
+the exception of `scope' windows, but it lacks \fBwave\fR's capabilities for
+annotation editing and control of external analysis programs, as well as a
+variety of less important features.
 .SS Choosing Files to View
 .PP
-The \fBChoose Inputs\fR dialog usually appears when you start \fIwview\fR.
+The \fBChoose Inputs\fR dialog usually appears when you start \fBwview\fR.
 It allows you to select a database \fIrecord\fR to view.  If you start
-\fIwview\fR using a command line, or by selecting a WFDB `header' file from the
-File Manager, \fIwview\fR opens the record immediately without showing the
+\fBwview\fR using a command line, or by selecting a WFDB `header' file from the
+File Manager, \fBwview\fR opens the record immediately without showing the
 \fBChoose Inputs\fR dialog.  If you supply a record name but omit the annotator
-name, \fIwview\fR attempts to find the reference (\fBatr\fR) annotations.
+name, \fBwview\fR attempts to find the reference (\fBatr\fR) annotations.
 At any time, you may pop up the \fBChoose Inputs\fR dialog by selecting
 \fBOpen...\fR from the \fBFile\fR menu, in order to change the record or
-annotator names, or the \fIWFDB environment\fR (the \fIWFDB path\fR and the \fIWFDB
-calibration file\fR).
+annotator names, or the \fIWFDB environment\fR (the \fIWFDB path\fR and the
+\fIWFDB calibration file\fR).
 .PP
 To select sets of signals and annotations to view, fill in the \fBRecord
 name:\fR field (up to 8 characters), and the \fBAnnotator name:\fR field (up to
@@ -63,24 +65,26 @@ name:\fR field (up to 8 characters), and the \fBAnnotator name:\fR field (up to
 unannotated, or if you do not wish to view annotations.  Although the WFDB
 environment may be changed within the \fBChoose Inputs\fR dialog, note that
 the effects of any such changes are limited to the current session of the WFDB
-(other WFDB applications and future \fIwview\fR sessions are unaffected).
+(other WFDB applications and future \fBwview\fR sessions are unaffected).
 .PP
-The \fIWFDB path\fR is a list of directories that are searched when you specify a
-record or annotator name.  The WFDB path is usually initialized by setting
-the MS-DOS environment variable \fBWFDB\fR before starting MS Windows, using the
-MS-DOS batch file \fBdossetwfdb.bat\fR (see \fIsetwfdb\fR(1)).  If a WFDB `header'
-file was selected (either from the File Manager or from the command line), the
-optional \fIdrive:path\fR component of the file name, if present, is inserted
-at the beginning of the WFDB path (but after the current directory, if the WFDB
-path begins with the current directory or has not been initialized).
+The \fIWFDB path\fR is a list of directories that are searched when you specify
+a record or annotator name.  The WFDB path is usually initialized by setting
+the MS-DOS environment variable \fBWFDB\fR before starting MS Windows, using
+the MS-DOS batch file \fBsetwfdb.bat\fR (see \fIsetwfdb\fR(1)).  If a WFDB
+`header' file was selected (either from the File Manager or from the command
+line), the optional \fIdrive:path\fR component of the file name, if present,
+is inserted at the beginning of the WFDB path (but after the current directory,
+if the WFDB path begins with the current directory or has not been
+initialized).
 .PP
 The \fIWFDB calibration file\fR is a text file containing information about the
-relative scales of many different types of signals (see \fIwfdbcal\fR(5)).  The
+relative scales of many different types of signals (see \fBwfdbcal\fR(5)).  The
 WFDB calibration file is usually specified by setting the MS-DOS environment
 variable \fBWFDBCAL\fR;  as for the WFDB path, this is usually performed using
-\fBdossetwfdb.bat\fR before starting MS Windows.  Do not include a drive
-specification or path information in the name of the WFDB calibration file unless
-the file cannot be found in any of the directories named in the WFDB path.
+\fBsetwfdb.bat\fR before starting MS Windows.  Do not include a drive
+specification or path information in the name of the WFDB calibration file
+unless the file cannot be found in any of the directories named in the WFDB
+path.
 .SS Browsing a Record
 .PP
 Use the scrollbar at the bottom of the window to move in either direction
@@ -109,7 +113,7 @@ r l.
 .TE
 .PP
 You may also enter a desired time in the \fBRecenter at\fR field of the
-\fBFind\fR window (accessible from the \fBEdit\fR menu).  \FIwview\FR
+\fBFind\fR window (accessible from the \fBEdit\fR menu).  \fBwview\fR
 redraws the display centered on the specified time.
 .PP
 The times shown in the lower corners of the signal window usually indicate
@@ -135,8 +139,8 @@ you have chosen for display.
 .PP
 If displayed or printed, the \fBgrid\fR marks 200 ms intervals horizontally,
 and 0.5 mV intervals vertically.  (For signals not dimensioned in units of mV,
-the WFDB calibration file specifies the scaling factor between the physical units
-of the signal and mV.)  At the default scales, the grid intervals should
+the WFDB calibration file specifies the scaling factor between the physical
+units of the signal and mV.)  At the default scales, the grid intervals should
 measure 5 mm on your screen or printed output, corresponding to the standard
 ECG display scales of 25 mm/s and 10 mm/mV.  (If this is not the case, click
 on \fBCalibrate...\fR and follow the instructions on-screen to make appropriate
@@ -148,7 +152,7 @@ between records (for example, in the MIT-BIH Arrhythmia Database, QRS
 annotations are placed at the R-wave peak, but in the AHA Database, these
 annotations are placed at the PQ junction).
 .PP
-Normally, \fIwview\fR shows only the mnemonic corresponding to the primary
+Normally, \fBwview\fR shows only the mnemonic corresponding to the primary
 annotation type (the \fBanntyp\fR field) of each annotation.  Exceptions
 include \fBRHYTHM\fR annotations (for which the rhythm, encoded in the
 \fBaux\fR field of the annotation, is shown);  \fBNOISE\fR annotations, for
@@ -184,7 +188,7 @@ the \fIWFDB Programmer's Guide\fR for further information.
 Select \fBFind...\fR from the \fBEdit\fR menu to bring up the \fBFind\fR
 dialog.  Enter an annotation mnemonic (e.g., \fBV\fR) in the \fBSearch
 forward\fR or \fBSearch backward\fR field.  Click on the radio button to the
-left of the chosen search direction, then click on \fBOK\fR.  \FIwview\FR
+left of the chosen search direction, then click on \fBOK\fR.  \fBwview\fR
 redraws the signals, centered on the next annotation of the specified type
 that was not visible in the previous screenful.  If the search is unsuccessful,
 the \fBFind\fR window remains visible, so that you can modify the search
@@ -194,7 +198,7 @@ In addition to standard annotation mnemonics (listed in the \fIWFDB
 Programmer's Guide\fR), you may enter signal quality strings (as displayed by
 \fIwview\fR for \fBNOISE\fR annotations), or \fBaux\fR strings (as displayed
 for \fBRHYTHM\fR, ST and T change, and \fBNOTE\fR annotations).  In short, you
-may search for any string that \fIwview\fR uses when drawing annotations.
+may search for any string that \fBwview\fR uses when drawing annotations.
 When specifying \fBaux\fR strings, a prefix is sufficient as a search target
 (for example, ``\fB(S\fR'' matches any annotation with an \fBaux\fR string
 beginning with these characters, such as ``\fB(SVTA\fR'' or ``\fB(ST0+\fR'').
@@ -206,7 +210,7 @@ without having defined a search target, <enter> behaves in the same way as
 adjacent screenful in the appropriate direction).
 .SS Printing
 .PP
-You can print the current contents of the main \fIwview\fR window, or any
+You can print the current contents of the main \fBwview\fR window, or any
 selected segment of the current record, by selecting \fBPrint...\fR from the
 \fBFile\fR menu to bring up the \fBPrint\fR dialog.  Choose the output device
 from the \fBPrinter\fR list.  Select the range (time interval) to be printed
@@ -214,46 +218,45 @@ by choosing either \fBEntire Record\fR, \fBCurrent Contents of Window\fR (the
 default), or \fBSegment\fR.  If you choose \fBSegment\fR, enter the times of
 the beginning and end of the desired segment in the \fBFrom:\fR and \fBTo:\fR
 fields.  Press \fBOK\fR to begin printing, or \fBCancel\fR to return to
-\fIwview\fR without printing.
+\fBwview\fR without printing.
 .SS Help
 .PP
 On-line help is available by selecting a topic from the \fBHelp\fR menu, or by
 selecting any control and pressing the \fBF1\fR key.  The \fBHelp\fR menu
-topics include most of the text of this \fIman\fR page.
+topics include most of the text of this \fBman\fR page.
 .SH ENVIRONMENT
 .TP
 \fBWFDB\fR
 The database path: a list of directories that contain database files.  An
 empty component is taken to refer to the current directory.  All applications
 built with the \fIwfdb\fR(3) library search for their database input files in
-the order specified by \fBWFDB\fR.  If \fBWFDB\fR is not set, searches are limited
-to the current directory.  Under MS-DOS, directory names are separated by
-semicolons (;), and the format of \fBWFDB\fR is that of the MS-DOS \fBPATH\fR
-variable (colons may be used following drive specifiers within \fBWFDB\fR in this
-case).
+the order specified by \fBWFDB\fR.  If \fBWFDB\fR is not set, searches are
+limited to the builtin WFDB path (see \fBsetwfdb\fR(3)).  Under
+MS-DOS/MS-Windows, directory names are separated by semicolons (;), and the
+format of \fBWFDB\fR is that of the MS-DOS \fBPATH\fR variable (colons may be
+used following drive specifiers within \fBWFDB\fR in this case).
 .TP
 \fBWFDBCAL\fR
-The name of the WFDB calibration file (see \fIwfdbcal\fR(5)), which must be in a
-directory named by \fBWFDB\fR (see immediately above).  This file is used by
-\fIwview\fR to determine standard scales for signals other than ECGs.  If
-\fBWFDBCAL\fR is not set, or if the file named by \fBWFDBCAL\fR is not readable,
-these signals may be drawn at incorrect scales.
+The name of the WFDB calibration file (see \fBwfdbcal\fR(5)), which must be in
+a directory named by \fBWFDB\fR (see immediately above).  This file is used by
+\fBwview\fR to determine standard scales for signals other than ECGs.  If
+\fBWFDBCAL\fR is not set, the default WFDB calibration file is used (see
+\fBsetwfdb\fR(3)).  If the calibration file is not readable, signals may be
+drawn at incorrect scales.
 .PP
 After determining appropriate values for these variables, you may wish to add
-commands for setting them to your \fIautoexec.bat\fR file.  The standard
-installation procedure determines appropriate values interactively and inserts
-the necessary commands into \fIdossetwfdb.bat\fR (see \fIsetwfdb\fR(1)).
+commands for setting them to your \fIautoexec.bat\fR file.
 .SH INSTALLATION
 .PP
-The current version of \fIwview\fR requires manual installation of a few
+The current version of \fBwview\fR requires manual installation of a few
 files:
 .br
 .TS
 center;
 l l.
-\fBwview.exe\fR	\fIwview\fR itself, in Windows executable form
-\fBwview.hlp\fR	the compressed MS Windows Help file for \fIwview\fR
-\fBwfdb.dll\fR	the WFDB library, compiled as a large model MS Windows DLL
+\fIwview.exe\fR	\fBwview\fR itself, in Windows executable form
+\fIwview.hlp\fR	the compressed MS Windows Help file for \fBwview\fR
+\fIwfdb.dll\fR	the WFDB library, compiled as a large model MS Windows DLL
 .TE
 .br
 All of these files should be installed in the same directory, which should be
@@ -262,23 +265,23 @@ somewhere in your \fBPATH\fR;  the main MS Windows directory (usually
 Windows applications, and is suitable for this purpose.  Be certain that you do
 not overwrite other files of the same names, however (I don't know of any
 commercial applications that use these file names, but check your system to be
-safe).  At this point, it is possible to start \fIwview\fR using the
+safe).  At this point, it is possible to start \fBwview\fR using the
 command-line interface.
 .PP
-To install \fIwview\fR icon in the Program Manager workspace, select (click
+To install a \fIwview\fR icon in the Program Manager workspace, select (click
 once on) a program group (such as `Applications').  Select \fBNew...\fR from
 the Program Manager's \fBFile\fR menu, choose \fBProgram item\fR from the
 \fBNew Program Object\fR dialog that appears, and click on \fBOK\fR.  The
-\fBProgram Item Properties\fR dialog then appears.  Enter ``\fBWFDB Browser\fR''
-in the \fBDescription:\fR field, and the full pathname of \fBwview.exe\fR in
-the \fBCommand line:\fR field, then click on \fBOK\fR.  It is now possible to
-start \fIwview\fR by clicking on its icon.
+\fBProgram Item Properties\fR dialog then appears.  Enter ``\fBWFDB
+Browser\fR'' in the \fBDescription:\fR field, and the full pathname of
+\fIwview.exe\fR in the \fBCommand line:\fR field, then click on \fBOK\fR.  It
+is now possible to start \fBwview\fR by clicking on its icon.
 .PP
 Finally, open the MS Windows File Manager and choose \fBAssociate...\fR from
 its \fBFile\fR menu.  Enter ``\fBhea\fR'' in the \fBFiles with extension:\fR
-field, and click on \fBBrowse\fR.  Find and select \fBwview.exe\fR using the
+field, and click on \fBBrowse\fR.  Find and select \fIwview.exe\fR using the
 \fBBrowse\fR dialog, and click on \fBOK\fR.  This procedure makes it possible
-to start \fIwview\fR simply by double-clicking on any WFDB header (\fB.hea\fR)
+to start \fBwview\fR simply by double-clicking on any WFDB header (\fB.hea\fR)
 file.
 .SH BUGS
 .PP
@@ -294,7 +297,7 @@ Cambridge, MA 02139 USA
 .br
 Internet: george@mit.edu
 .PP
-A significant known bug is that only one instance of \fIwview\fR may be run
+A significant known bug is that only one instance of \fBwview\fR may be run
 at any given time.  This is a consequence of using a large memory model DLL
 (in this case, \fBwfdb.dll\fR) under MS Windows 3.1.  Fixing this bug is a very
 low priority (i.e., not likely to happen soon unless it is fixed by a future
@@ -305,7 +308,8 @@ annotator, if any) are open in all instances\fR.  Exit cleanly by iconifying
 window.
 
 .SH SEE ALSO
-pschart(1) (for PostScript), view(1) (for MS-DOS), wave(1) (for X11)
+\fBpschart\fR(1) (for PostScript), \fBview\fR(1) (for MS-DOS), \fBwave\fR(1)
+(for X11), \fBgtkwave\fR(1) (for MS-Windows)
 .SH AUTHOR
 George B. Moody (george@mit.edu)
 .SH SOURCES

@@ -1,4 +1,9 @@
-This is wpg, produced by makeinfo version 4.0b from wpg.tex.
+This is wpg, produced by makeinfo version 4.1 from wpg.tex.
+
+INFO-DIR-SECTION Libraries
+START-INFO-DIR-ENTRY
+* WFDB library: (wpg).		The Waveform Database library.
+END-INFO-DIR-ENTRY
 
 
 File: wpg,  Node: Concept Index,  Next: Function and Macro Index,  Prev: Answers,  Up: Top
@@ -628,7 +633,7 @@ File: wpg,  Node: Copying,  Prev: Function and Macro Index,  Up: Top
    WFDB Programmer's Guide
 
    Tenth Edition (revised and with additions for WFDB library version
-10.2.6)
+10.2.7)
 
    George B. Moody
 

@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:	24 June 2002
+#				Last revised:	5 August 2002
 # Change the settings below as appropriate for your setup.
 
 # D2PARGS is a list of options for dvips.  Uncomment one of these to set the
@@ -23,12 +23,17 @@ LN = ln -sf
 # LN = cp
 
 # If you wish to install the info (GNU hypertext documentation) files from this
-# package, specify the command needed to format them from the texinfo source
-# files.  If you have the GNU 'makeinfo' utility (the preferred formatter),
-# uncomment the next line.
+# package, specify the commands needed to format them from the texinfo source
+# files, and to install them so that 'info' and related utilities can find
+# them.  If you have GNU 'makeinfo' and 'install-info' (preferred),
+# uncomment the next two lines.
 MAKEINFO = makeinfo --force --no-warn
-# Otherwise, you can use GNU emacs to do the job by uncommenting the next line.
+INSTALLINFO = /sbin/install-info --info-dir=$(INFODIR) $(INFODIR)/wpg
+
+# Otherwise, you can use GNU emacs to do the formatting, and standard utilities
+# to install the info files, by uncommenting the next two lines.
 # MAKEINFO = ./makeinfo.sh
+# INSTALLINFO = $(MAKE) install-wpg.info
 
 # PERL is the full pathname of your perl interpreter, needed for 'make htmlpg'.
 PERL = /usr/bin/perl
@@ -54,8 +59,7 @@ TROFF = groff
 .IGNORE:
 
 all:	wpg.html wpg.ps wpg.pdf
-	$(MAKE) INFODIR=../wpg/info wpg.info
-	rm -f ../wpg/info/dir
+	$(MAKE) INFODIR=../wpg/info INSTALLINFO=: wpg.info
 	cp -p wpg.ps wpg.pdf ../wpg
 
 install:
@@ -66,8 +70,12 @@ uninstall:
 
 # 'make wpg-book': print a copy of the WFDB Programmer's Guide
 wpg-book:	wpg.ps
-	$(TROFF) wpg.cover >wpgcover.ps
-	$(PSPRINT) wpgcover.ps wpg.ps
+	cp wpg.cover wpgcover
+	echo $(SHORTDATE) >>wpgcover
+	echo .bp >>wpgcover
+	$(TROFF) wpgcover >wpgcover.ps
+	$(PSPRINT) wpgcover.ps
+	$(PSPRINT) wpg.ps
 
 # 'make wpg.hlp': format the WFDB Programmer's Guide as an MS-Windows help file
 wpg.hlp:	wpg.tex
@@ -78,33 +86,33 @@ wpg.hlp:	wpg.tex
 	rm -f wpg.rtf wpg.hpj wpg.ph
 
 # 'make wpg.html': format the WFDB Programmer's Guide as HTML
-wpg.html:
+wpg.html:	wpg.tex
 	cp -p wpg.tex ../wpg
 	cd ../wpg; texi2html -short_ext -menu -split_node wpg.tex
 	mv ../wpg/wpg.htm ../wpg/wpg_btoc.htm	# use top page as brief TOC
-	cp wpg.ht0 ../wpg/wpg.htm
 	rm -f ../wpg/wpg.tex
 	./fixpg.sh ../wpg
-	date '+%e %B %Y' >>../wpg/wpg.htm
-	cat ../misc/foot.ht0 >>../wpg/wpg.htm
+	sed "s/LONGDATE/$(LONGDATE)/" <wpg.ht0 | \
+	  sed "s/VERSION/$(VERSION)/" >../wpg/wpg.htm
 	cd ../wpg; $(LN) wpg.htm index.html
 
 # 'make wpg.info': format the WFDB Programmer's Guide as info files
-wpg.info:	$(INFODIR)
-	test -d $(INFODIR) || \
-	 ( mkdir -p $(INFODIR); $(SETDPERMISSIONS $(INFODIR) )
+wpg.info:	wpg.tex
 	$(MAKEINFO) wpg.tex
-	test -s wpg && \
-         cp wpg wpg-* $(INFODIR); \
-         ( test -s $(INFODIR)/wpg && \
-	  ( $(SETPERMISSIONS) $(INFODIR)/wpg*; \
-	   ( test -s $(INFODIR)/dir || cp dir.top $(INFODIR)/dir ); \
-	   ( grep -s wpg $(INFODIR)/dir >/dev/null || \
-	     cat dir.wpg >>$(INFODIR)/dir ))); \
+	test -d $(INFODIR) || \
+	 ( mkdir -p $(INFODIR); $(SETDPERMISSIONS) $(INFODIR) )
+	cp wpg wpg-* $(INFODIR)
+	$(SETPERMISSIONS) $(INFODIR)/wpg*
 	rm -f wpg wpg-*
+	$(INSTALLINFO)
+
+# 'make install-wpg.info': install info entry (if install-info is unavailable)
+install-wpg.info:	wpg.info
+	test -s $(INFODIR)/dir || cp dir.top $(INFODIR)/dir
+	grep -s wpg $(INFODIR)/dir >/dev/null || cat dir.wpg >>$(INFODIR)/dir
 
 # 'make wpg.info.tar.gz': create a tarball of info files
-wpg.info.tar.gz:
+wpg.info.tar.gz:	wpg.tex
 	$(MAKEINFO) wpg.tex
 	mv wpg wpg-* info
 	tar cfv - info | gzip >info.tar.gz
@@ -120,8 +128,12 @@ wpg.ps:		wpg.tex
 	texi2dvi $(T2DARGS) wpg.tex
 	dvips $(D2PARGS) -o wpg.ps wpg.dvi
 
+wpg.tex:	wpg0.tex
+	sed 's/VERSION/$(VERSION)/' <wpg0.tex | \
+	 sed 's/LONGDATE/$(LONGDATE)/' >wpg.tex
+
 # 'make clean': remove intermediate and backup files
 clean:
-	rm -f info.tar.gz info/wpg* wpg.aux wpg.cp wpg.cps wpg.dvi wpg.fn \
-	 wpg.fns wpg.ky wpg.log wpg.pdf wpg.ps wpg.pg wpg.toc wpg.tp wpg.vr \
-	 wpgcover.ps *~ ../wpg/info/dir
+	rm -f info.tar.gz wpg wpg-* wpg.aux wpg.cp wpg.cps wpg.dvi wpg.fn \
+	 wpg.fns wpg.ky wpg.log wpg.pdf wpg.ps wpg.pg wpg.tex wpg.toc wpg.tp \
+	 wpg.vr wpgcover wpgcover.ps *~ ../wpg/info/dir

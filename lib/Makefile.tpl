@@ -1,5 +1,5 @@
-# file: Makefile.tpl		G. Moody		24 May 2000
-#				Last revised:		5 June 2000
+# file: Makefile.tpl		G. Moody	 24 May 2000
+#				Last revised:	18 July 2000
 # This section of the Makefile should not need to be changed.
 
 INCLUDES = $(INCDIR)/wfdb/wfdb.h $(INCDIR)/wfdb/ecgcodes.h \
@@ -34,7 +34,7 @@ compat:		$(INCLUDES) $(COMPAT_INCLUDES)
 
 # `make clean':  also remove previously compiled versions of the library
 clean:
-	rm -f $(WFDBLIB) $(SWFDBLIB) $(OFILES) *~
+	rm -f $(OFILES) libwfdb.* *~
 
 # `make TAGS':  make an `emacs' TAGS file
 TAGS:		$(HFILES) $(CFILES)

@@ -1,4 +1,4 @@
-.TH DFA 1 "11 November 2001" "DFA 4.2" "Time Series Analysis"
+.TH DFA 1  "31 July 2002" "DFA 4.2" "WFDB Applications Guide"
 .SH NAME
 dfa \- Detrended fluctuation analysis
 .SH SYNOPSIS
@@ -36,7 +36,7 @@ a line and measure its slope.
 .PP
 \fIOptions\fR may include:
 .TP
-\fB-d\fI k\fR
+\fB-d\fR \fIk\fR
 Detrend the data using a polynomial of degree \fIk\fR (1: linear, 2: quadratic,
 etc.).  Default: \fIk\fR = 1 (linear detrending).
 .TP
@@ -48,7 +48,7 @@ Do not integrate the input series.  Use this option if the input series is
 already integrated (for example, if it represents times of occurrence rather
 than intervals).
 .TP
-\fB-l\fI minbox\fR
+\fB-l\fR \fIminbox\fR
 Set the smallest box width.  The default, and the minimum allowed value for
 \fIminbox\fR, is \fI2k + 2\fR (where \fIk\fR is determined by the \fB-d\fR
 option, see above).
@@ -59,7 +59,7 @@ boxes at each box size).  By default, fluctuations are measured using
 non-overlapping boxes only.  Using the \fB-s\fR option will make the
 calculation much slower.
 .TP
-\fB-u\fI maxbox\fR
+\fB-u\fR \fImaxbox\fR
 Set the largest box width.  The default, and the maximum allowed value for
 \fImaxbox\fR, is one-fourth the length of the input series.
 .SH SEE ALSO
@@ -73,6 +73,9 @@ physiologic signals can be found in Peng C-K, Havlin S, Stanley HE,
 Goldberger AL. Quantification of scaling exponents and crossover
 phenomena in nonstationary heartbeat time series.
 \fIChaos\fR 1995;\fB5\fR:82-87.
+.SH AVAILABILITY
+\fBdfa\fR is available as part of PhysioToolkit under the GPL (see
+\fBSOURCE\fR below).
 .SH AUTHORS
 JE Mietus (joe@physionet.org), C-K Peng, and GB Moody, based on C-K Peng's
 original Fortran implementation.

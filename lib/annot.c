@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:    28 May 2002		wfdblib 10.2.6
+			Last revised:    20 July 2002		wfdblib 10.2.7
 WFDB library functions for annotations
 
 _______________________________________________________________________________
@@ -899,7 +899,8 @@ WFDB_Annotator n;
 	    }
 	}
 	if (oa->out_of_order) {
-	    wfdb_error("Use the command:\n  %s\n", cmdbuf);
+	    wfdb_error("Use the command:\n  sortann -r %s -a %s\n",
+		       oa->rname, oa->info.name);
 	    wfdb_error("to rearrange annotations in the correct order.\n");
 	}
 	(void)free(oa->info.name);

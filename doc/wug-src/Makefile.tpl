@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	24 May 2000
-#				Last revised:	20 June 2002
+#				Last revised:	18 July 2002
 # Change the settings below as appropriate for your setup.
 
 # Set COLORS to 'color' if you have a color printer and would like to print
@@ -54,8 +54,12 @@ uninstall:
 
 # 'make wug-book': print a copy of the WAVE User's Guide
 wug-book:	wug.ps
-	$(TROFF) wug.cover >wugcover.ps
-	$(PSPRINT) wugcover.ps wug.ps
+	cp wug.cover wugcover
+	echo $(SHORTDATE) >>wugcover
+	echo .bp >>wugcover
+	$(TROFF) wugcover >wugcover.ps
+	$(PSPRINT) wugcover.ps
+	$(PSPRINT) wug.ps
 
 # 'make wug.html': format the WAVE User's Guide as HTML
 #   'wug.aux' is listed as a prerequisite because the figure numbers are
@@ -114,8 +118,13 @@ wug.ps:		wug.tex
 wug.aux:	wug.tex
 	$(MAKE) wug.ps
 
+wug.tex:	wug0.tex
+	sed 's/WVRSN/$(WAVEVERSION)/' <wug0.tex | \
+	 sed 's/LONGDATE/$(LONGDATE)/' >wug.tex
+
 # 'make clean': remove intermediate and backup files
 clean:
 	wave/scripts/wugfigures -clean	# remove figures from this directory
 	rm -rf internals.pl labels.pl wug.aux wug.dvi wug.html wug.idx \
-	 wug.ilg wug.ind wug.log wug.out wug.pdf wug.ps wug.toc .xvpics *~
+	 wug.ilg wug.ind wug.log wug.out wug.pdf wug.ps wug.toc wug.tex \
+         .xvpics wugcover* *~

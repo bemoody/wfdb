@@ -1,53 +1,55 @@
-.TH SNIP 1 "11 January 2000" "WFDB software 10.0" "WFDB applications"
+.TH SNIP 1 "31 July 2002" "WFDB 10.2.7" "WFDB Applications Guide"
 .SH NAME
 snip \- copy an excerpt of a WFDB record
 .SH SYNOPSIS
-\fBsnip -i\fI input-record\fB -n\fI new-record [ \fIoptions\fR ]
+\fBsnip -i\fR \fIinput-record\fR \fB-n\fR \fInew-record\fR [ \fIoptions\fR ]
 .SH DESCRIPTION
-\fIsnip\fR copies the signal files (and, optionally, annotation files) of
+\fBsnip\fR copies the signal files (and, optionally, annotation files) of
 the specified \fIinput-record\fR, and generates a header file, thereby creating
-the specified \fInew-record\fR.  \fIsnip\fR is usually used to extract an
+the specified \fInew-record\fR.  \fBsnip\fR is usually used to extract an
 excerpt of its \fIinput-record\fR, using the \fB-f\fR and \fB-t\fR options (see
 below) to specify the segment to be copied.
 .PP
-The program \fIxform\fR(1) can also perform this task, but offers additional
+The program \fBxform\fR(1) can also perform this task, but offers additional
 flexibility (it can scale the signals, resample them at a different frequency,
 rearrange them, select subsets of them, or reformat them);  \fIsnip\fR is
-faster than \fIxform\fR, however.
+faster than \fBxform\fR, however.
 .PP
 \fIOptions\fR are:
 .TP
-\fB-a\fI annotator\fR
+\fB-a\fR \fIannotator\fR
 Copy the specified \fIannotator\fR as well as the signal files.  Two or more
 \fIannotator\fR arguments, separated by spaces, can follow \fB-a\fR.  An
-annotator supplied via the standard input may be specified using `-', but only
-immediately after `-a';  in this case only, annotations are copied to the
-standard output.
+annotator supplied via the standard input may be specified using `\fB-\fR', but
+only immediately after \fB-a\fR;  in this case only, annotations are copied
+to the standard output.
 .TP
-\fB-f\fI time\fR
+\fB-f\fR \fItime\fR
 Begin at the specified \fItime\fR in the input record (default: the
 beginning of the record).
 .TP
 \fB-h\fR
 Print a usage summary.
 .TP
-\fB-t\fI time\fR
+\fB-t\fR \fItime\fR
 Process until the specified \fItime\fR in the input record (default: continue
 to the end of the record).
+.SH ENVIRONMENT
 .PP
-The shell variable \fBWFDB\fR should be set and exported (see \fIsetwfdb\fR(1)).
+It may be necessary to set and export the shell variable \fBWFDB\fR (see
+\fBsetwfdb\fR(1)).
 .SH FILES
 .TP 22
+\fInew-record.annotator\fR
+output annotation file
+.TP
 \fInew-record\fR.dat
 output signal file
 .TP
-header.\fInew-record\fR
-output header file (under MS-DOS, \fInew-record\fR.hea)
-.TP
-\fIannotator.new-record\fR
-output annotation file (under MS-DOS, \fInew-record.ann\fR)
+\fInew-record\fR.hea
+output header file
 .SH SEE ALSO
-xform(1), setwfdb(1)
+\fBsetwfdb\fR(1), \fBxform\fR(1)
 .SH AUTHOR
 George B. Moody (george@mit.edu)
 .SH SOURCE

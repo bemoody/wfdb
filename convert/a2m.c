@@ -1,9 +1,9 @@
-/* file: a2m.c		G. Moody	 9 June 1983
-			Last revised:  13 February 2001
+/* file: a2m.c		G. Moody        9 June 1983
+			Last revised:  24 July 2002
 
 -------------------------------------------------------------------------------
 a2m: Convert an AHA format annotation file to MIT format
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -46,8 +46,10 @@ This program converts four types of AHA format annotation files to MIT format:
 	except that the test period begins 2.5 hours (2,225,000 sample
 	intervals) after the first sample.
 
-   3	`Compressed' (*.ano) annotation files from AHA DB floppy
-	diskettes.  Time is measured as for files of type 1.
+   3	`Compressed' (*.ANO) annotation files from AHA DB CD-ROMs or floppy
+        diskettes.  Time is measured as for files of type 1 or 2, depending
+	on the record name (x2xx or x3xx: short format, x0xx or x1xx: long
+	format).
 */
 
 #include <stdio.h>
@@ -76,8 +78,8 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-    char *ifname = NULL, *oann = NULL, *record = NULL, *prog_name();
-    int i, type = 0, getcann();
+    char *ifname = NULL, *oann = "atr", *p, *record = NULL, *prog_name();
+    int i, type = -1, getcann();
     long offset = 0L;
     unsigned int nann = 2;
     WFDB_Anninfo afarray[2];
@@ -109,6 +111,10 @@ char *argv[];
 		exit(1);
 	    }
 	    ifname = argv[i];
+	    p = ifname + strlen(ifname) - 4;
+	    if (type < 0 && p > ifname && 
+		(strcmp(p, ".ANO") == 0 || strcmp(p, ".ano") == 0))
+		type = 3;
 	    break;
 	  case 'r':	/* record name follows */
 	    if (++i >= argc) {
@@ -145,8 +151,8 @@ char *argv[];
 	}
     }
 
-    /* Quit if input filename, annotator, or record name was not specified. */
-    if (ifname == NULL || oann == NULL || record == NULL) {
+    /* Quit if input filename was not specified. */
+    if (ifname == NULL) {
 	help();
 	exit(1);
     }
@@ -157,6 +163,20 @@ char *argv[];
 		      ifname);
 	exit(2);
     }
+
+    /* If no output record name was specified, use the basename of the input
+       file (prog_name strips off any path info from ifname, and any extension
+       is stripped off in the 'for' loop. */
+    if (record == NULL) {
+	record = prog_name(ifname);
+	for (p = record+1; *p; p++)
+	    if (*p == '.') {
+		*p = '\0';
+		break;
+	    }
+    }
+
+    if (type < 0) type = 0;
 
     /* Open the annotation files. */
     afarray[0].name = oann;
@@ -179,11 +199,17 @@ char *argv[];
 	  case 0:
 	    break;
 	  case 1:
-	  case 3:
 	    offset = strtim("5:0");
 	    break;
 	  case 2:
 	    offset = strtim("2:30:0");
+	    break;
+	  case 3:
+	    if (strlen(record) == 4 && (record[1] == '0' || record[1] == '1'))
+		offset = strtim("2:30:0");  /* long format */
+	    else if (strlen(record) == 4 && (record[1] =='2'||record[1]=='3'))
+		offset = strtim("5:0");	/* short format */
+	    /* otherwise, leave offset at zero (unrecognized format) */
 	    break;
 	}
     }
@@ -227,7 +253,9 @@ WFDB_Annotation *ap;
     long h, m, l;
 
     if (fread(buf, 1, 6, stdin) != 6) {		/* hard EOF */
-	(void)fprintf(stderr, "unexpected EOF in input file\n");
+/*	(void)fprintf(stderr, "unexpected EOF in input file\n");	*/
+/*	The warning message was removed because the CD-ROM version of these
+	files does not include the soft EOF as on the floppies. */
 	return (-1);
     }
     /* Compressed AHA format:
@@ -244,6 +272,9 @@ WFDB_Annotation *ap;
 
     ap->anntyp = ammap(buf[0]);	     /* convert AHA label to annotation code */
 
+    if (ap->anntyp == 0)
+	return (-1);		     /* alternate soft EOF, used in a few AHA
+					DB CD-ROM annotation files */
     if (buf[0] == 'U')		     /* AHA `U' (unreadable data) label */
 	ap->subtyp = -1;		/* decode as NOISE, subtype = -1 */
     else
@@ -278,21 +309,24 @@ char *s;
 }
 
 static char *help_strings[] = {
-    "usage: %s -i AHAFILE -r RECORD -a ANNOTATOR [ OPTIONS ... ]\n",
-    "where AHAFILE is the name of the AHA-format input annotation file,",
-    "RECORD is the record name, ANNOTATOR is the output annotator,",
-    "and OPTIONS may include:",
-    " -h         print this usage summary",
-    " -s TIME    shift annotations by TIME",
-    "             (defaults: 0 for TYPE 0,",
-    "                      5:0 for TYPE 1 or 3,",
-    "                   2:30:0 for TYPE 2)",
-    " -t TYPE    specify type of file to be converted:",
-    "             0 for files produced by `putann',",
-    "             1 for short-format tape files,",
-    "             2 for long-format tape files, or",
-    "             3 for compressed files from diskettes",
-    NULL
+  "usage: %s -i AHAFILE [ OPTIONS ... ]\n",
+  "where AHAFILE is the name of the AHA-format input annotation file,",
+  "and OPTIONS may include:",
+  " -a ANNOTATOR  specify the output annotator name (default: 'atr')",
+  " -h            print this usage summary",
+  " -r RECORD     specify the name of the output RECORD (default: use the",
+  "                input file name, less path info and extension, as RECORD)",
+  " -s TIME       shift annotations by TIME",
+  "                (defaults: 0 for TYPE 0,",
+  "                      5:0 for TYPE 1, (or TYPE 3 if RECORD=x2xx or x3xx)",
+  "                   2:30:0 for TYPE 2, (or TYPE 3 if RECORD=x0xx or x1xx)",
+  " -t TYPE       specify type of file to be converted:",
+  "                0 for files produced by WFDB applications in AHA format,",
+  "                1 for short-format tape files,",
+  "                2 for long-format tape files, or",
+  "                3 for compressed files from AHA DB CD-ROMs or diskettes",
+  "                (defaults: 3 if AHAFILE ends in .ANO or .ano, else 0)",
+  NULL
 };
 
 void help()

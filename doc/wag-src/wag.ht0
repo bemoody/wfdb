@@ -8,11 +8,12 @@
 </HEAD>
 <BODY bgcolor="#FFFF80">
 <BR> <P>
+<B>Next:</B> <A HREF="intro.htm">Introduction</A>
 <B>Up:</B> <A HREF="../manuals.shtml">Books about PhysioToolkit</A>
 <H1 ALIGN=CENTER>WFDB Applications Guide</H1>
 <P ALIGN=CENTER><STRONG>Tenth Edition<BR>
-(Revised for release 10.2.6)<BR>
-24 June 2002<BR>
+(Revised for release VERSION)<BR>
+LONGDATE<BR>
 <BR> 
 <BR> 
 <BR> 
@@ -50,9 +51,10 @@ into another language, under the above conditions for modified versions.
 <BR> <HR>
 <H2>Contents</H2>
 <A HREF="intro.htm"><H3>Introduction</H3></A>
+<A HREF="faq.htm"><H3>FAQ</H3></A>
 <H3>Applications</H3>
 <UL> 
-<LI> <A HREF="a2m-1.htm">a2m, ad2m, m2a, md2a</A>: utilities for converting
+<LI> <A HREF="a2m-1.htm">a2m, ad2m, ahaconvert, m2a, md2a</A>: converting
 	between MIT and AHA DB formats
 <LI> <A HREF="ann2rr-1.htm">ann2rr, rr2ann</A>: convert annotation files to
 	interval lists and vice versa
@@ -64,6 +66,7 @@ into another language, under the above conditions for modified versions.
 <LI> <A HREF="dfa-1.htm">dfa</A>: detrended fluctuation analysis
 <LI> <A HREF="ecgeva-1.htm">ecgeval</A>: generate and run ECG analyzer
 	evaluation script
+<LI> <A HREF="edf2mi-1.htm">edf2mit</A>: converting from EDF to MIT format
 <LI> <A HREF="epic-1.htm">epic</A>: ANSI/AAMI-standard episode-by-episode
 	annotation comparator
 <LI> <A HREF="fft-1.htm">fft</A>: fast Fourier transform
@@ -87,6 +90,7 @@ into another language, under the above conditions for modified versions.
 	text files of data, using <I>gnuplot</I>
 <LI> <A HREF="plotst-1.htm">plotstm</A>: produce scatter plot of ST measurement
 	errors on a PostScript device
+<LI> <A HREF="plt-1.htm">plt</A>: make 2-D plots
 <LI> <A HREF="pschar-1.htm">pschart</A>: produce annotated `chart recordings'
 	on a PostScript device
 <LI> <A HREF="psfd-1.htm">psfd</A>: produce annotated `full disclosure' plots
@@ -113,8 +117,8 @@ into another language, under the above conditions for modified versions.
 	bxb, rxr, etc., line-format output
 <LI> <A HREF="tach-1.htm">tach</A>: heart rate tachometer
 <LI> <A HREF="view-1.htm">view, vsetup</A>: WFDB browser for MS-DOS
-<LI> <A HREF="wave-1.htm">wave</A>: waveform analyzer, viewer, and editor for
-	the X Window System
+<LI> <A HREF="wave-1.htm">wave, gtkwave</A>: waveform analyzer, viewer, and
+	editor
 <LI> <A HREF="wfdbca-1.htm">wfdbcat</A>: copy WFDB files to standard output
 <LI> <A HREF="wfdbco-1.htm">wfdbcollate</A>: collate WFDB records into a
 	multi-segment record
@@ -140,6 +144,10 @@ into another language, under the above conditions for modified versions.
 <LI> <A HREF="header-5.htm">header</A>: WFDB header file format
 <LI> <A HREF="signal-5.htm">signal</A>: WFDB signal file format
 <LI> <A HREF="wfdbca-5.htm">wfdbcal</A>: WFDB calibration file format
+</UL>
+<H3>Miscellaneous</H3>
+<UL>
+<LI> <A HREF="xview-7.htm">xview</a>: XView toolkit information
 </UL>
 <H3>Appendices</H3>
 <UL>
@@ -175,7 +183,24 @@ annotation editing and control of external analysis programs.
 <STRONG>WAVE</STRONG> runs on PCs under the free Linux operating system, and
 on SPARC-based systems under SunOS or Solaris.
 </UL>
-<BR> <HR>
-<P><I><ADDRESS>
-<A HREF="mailto:george@mit.edu">George B. Moody (<tt>george@mit.edu</tt>)</A>
-</ADDRESS></I><BR>
+<BR>
+
+<hr>
+
+<font size=-1><p>
+Please e-mail your comments and suggestions to
+<a href="mailto:webmaster@physionet.org?subject=http://www.physionet.org/physiotools/wag/wag.htm"><tt>webmaster@physionet.org</tt></a>,
+or post them to:
+<p>
+<i><address>
+PhysioNet<br>
+MIT Room E25-505A<br>
+77 Massachusetts Avenue<br>
+Cambridge, MA 02139 USA<br></address></i>
+<p>
+Updated 
+
+LONGDATE
+<font>
+</body>
+</html>

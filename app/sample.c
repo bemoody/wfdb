@@ -28,8 +28,7 @@ analog signals from database records.
 
 `sample' runs under MS-DOS on an ISA-bus (AT-bus) system that contains a
 Microstar DAP 1200 or 2400 series board (available from Microstar
-Laboratories, 2863 152nd Avenue NE, Redmond, WA 98052 USA; telephone +1 206
-881 4286).
+Laboratories, http://www.mstarlabs.com/).
 
 To compile `sample' successfully, you will need Microsoft C, version 5.0 or
 later, or Turbo C/C++, and four files supplied by Microstar with all versions

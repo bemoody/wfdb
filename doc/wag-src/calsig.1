@@ -1,14 +1,14 @@
-.TH CALSIG 1 "31 October 2001" "MIT DB software 10.2.1" "WFDB applications"
+.TH CALSIG 1 "28 July 2002" "WFDB 10.2.7" "WFDB Applications Guide"
 .SH NAME
 calsig \- calibrate signals of a WFDB record
 .SH SYNOPSIS
 \fBcalsig -r\fR \fIrecord\fR [ \fIoptions\fR ... ]
 .SH DESCRIPTION
 .PP
-\fIcalsig\fR (formerly known as \fIcalibrate\fR) rewrites the header file for a
+\fBcalsig\fR (formerly known as \fBcalibrate\fR) rewrites the header file for a
 WFDB record, setting the gain and baseline fields based on measurements it
 makes, and setting the units fields based on input from the user or from a
-calibration file.  Normally, \fIcalsig\fR is used by specifying a time interval
+calibration file.  Normally, \fBcalsig\fR is used by specifying a time interval
 for the measurements; best results will be achieved if the specified interval
 is restricted to one or more square-wave calibration pulses in each signal to
 be calibrated, although sine-wave pulses may be usable if the sampling
@@ -22,13 +22,13 @@ that replaces the contents of each bin by a weighted sum of fifteen bins
 centered on the bin of interest.  The two principal modes in the smoothed
 histogram must be separated by at least one bin with a count that is less than
 one-eighth the count of the larger mode.  If this criterion is not satisfied
-for a given signal, \fIcalsig\fR warns the user and does not adjust the gain
+for a given signal, \fBcalsig\fR warns the user and does not adjust the gain
 or baseline for the affected signal.
 .PP
 If a signal list is specified using the \fB-s\fR option (see below), only the
 specified signals are calibrated, and the gain, baseline, and units fields for
 any other signals are left unchanged.  Thus, if calibration pulses are not
-simultaneously available in all signals to be calibrated, \fIcalsig\fR may
+simultaneously available in all signals to be calibrated, \fBcalsig\fR may
 be run repeatedly with different time intervals and signal lists.
 .PP
 .PP
@@ -36,7 +36,7 @@ be run repeatedly with different time intervals and signal lists.
 .TP
 \fB-c\fI file\fR
 Obtain calibration pulse specifications from the specified \fIfile\fR (see
-\fIwfdbcal\fR(5); default: obtain this information from the file specified by
+\fBwfdbcal\fR(5); default: obtain this information from the file specified by
 the environment variable \fBWFDBCAL\fR, or interactively).
 .TP
 \fB-f\fI time\fR
@@ -73,22 +73,23 @@ the starting time).
 \fB-v\fR
 Ask for calibration pulse limits (default: read limits from the calibration
 file).
+.SH ENVIRONMENT
+.PP
+It may be necessary to set and export the shell variables \fBWFDB\fR
+and \fBWFDBCAL\fR (see \fBsetwfdb\fR(1)).
 .PP
 Calibration files must be located in one of the directories named in
-the database path (see \fIsetwfdb\fR(1)).  If the environment variable
+\fBWFDB\fR, the database path.  If the environment variable
 \fBWFDBCAL\fR is set, it names a calibration file that will be read
 unless the \fB-c\fR option is used to specify a different calibration
 file.  At most one calibration file is read; if more than one \fB-c\fR
 option is given, only the last one is effective.  If the calibration
 file does not contain an entry for the type of signal to be
-calibrated, \fIcalsig\fR obtains the information from the user
+calibrated, \fBcalsig\fR obtains the information from the user
 interactively.  If the calibration file contains two or more entries
 for the same signal type, only the first entry is used.
-.PP
-The shell variable \fBWFDB\fR should be set and exported (see
-\fIsetwfdb\fR(1)).
 .SH SEE ALSO
-setwfdb(1), wfdbcal(5)
+\fBsetwfdb\fR(1), \fBwfdbcal\fR(5)
 .SH AUTHOR
 George B. Moody (george@mit.edu)
 .SH SOURCE

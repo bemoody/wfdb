@@ -1,10 +1,10 @@
 # file: wave.info	G. Moody	21 August 1990
-#			Last revised:  7 September 1999		WAVE 6.5
+#			Last revised:    8 August 2002		WAVE 6.5
 # XView spot help file for `wave'
 #
 # -----------------------------------------------------------------------------
 # WAVE: Waveform analyzer, viewer, and editor
-# Copyright (C) 1999 George B. Moody
+# Copyright (C) 2002 George B. Moody
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -71,7 +71,7 @@ directory and you open the same annotator more
 than once.
 #
 
-:file.load.calibration_file:url_view /usr/local/help/html/dbag/wfdbcal-5.htm
+:file.load.calibration_file:url_view /usr/local/help/html/wag/wfdbcal-5.htm
 Specifies the name of the WFDB calibration file
 (a text file containing information on the
 relative scales of many types of signals).
@@ -593,13 +593,13 @@ about the current signal and annotation files
 and about this version of WAVE.
 #
 
-:prop.signals:url_view /usr/local/help/html/dbag/wfdbdesc-1.htm
+:prop.signals:url_view /usr/local/help/html/wag/wfdbde-1.htm
 This selection pops up a window containing
 information about the signals of the current
 record, obtained by running `wfdbdesc'.
 #
 
-:prop.annotations:url_view /usr/local/help/html/dbag/sumann-1.htm
+:prop.annotations:url_view /usr/local/help/html/wag/sumann-1.htm
 This selection pops up a window containing
 a summary of the contents of the annotation
 buffer, obtained by running `sumann' (after

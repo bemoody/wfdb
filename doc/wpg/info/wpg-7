@@ -1,4 +1,9 @@
-This is wpg, produced by makeinfo version 4.0b from wpg.tex.
+This is wpg, produced by makeinfo version 4.1 from wpg.tex.
+
+INFO-DIR-SECTION Libraries
+START-INFO-DIR-ENTRY
+* WFDB library: (wpg).		The Waveform Database library.
+END-INFO-DIR-ENTRY
 
 
 File: wpg,  Node: Extensions,  Next: Sources,  Prev: WFDB Applications,  Up: Top
@@ -423,7 +428,7 @@ _Compilers and software development systems_
      compiler.
 
 _Cygwin_
-     WWW: `http://source.redhat.com/cygwin/'
+     WWW: `http://www.cygwin.com/'
 
      This is a freely available software development platform for
      MS-Windows 9x/NT/2000/ME/XP, based on GNU `gcc' and a large set of

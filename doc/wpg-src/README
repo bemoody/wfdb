@@ -1,5 +1,5 @@
 file: README		G. Moody	7 September 1989
-			Last revised:	20 December 2001
+			Last revised:	  22 July 2002
 
 This directory contains the TeX (texinfo) source for the WFDB Programmer's
 Guide.  Under Unix, Linux, or under MS-Windows with the Cygwin toolkit,
@@ -32,7 +32,6 @@ ctotexi.c	formats a C program as texinfo (used to format programs from
 		 ../../examples for inclusion in the WFDB Programmer's Guide)
 dir.db		Text to be added (by `make info') to the top-level `info' menu
 dir.top		Template for top-level `info' menu
-fixpg.sed	sed commands for fixing HTML links (used by fixpg.sh)
 fixpg.sh	Script for postprocessing WFDB Programmer's Guide HTML files
 info/		directory for GNU info version of the WFDB Programmer's Guide
 makeinfo.sh	Script for converting dbu.tex to `info' hypertext files using

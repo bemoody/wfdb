@@ -33,8 +33,8 @@
 
 \title{\WAVE{} User's Guide}
 \author{Fifth Edition\\
-(revised and with corrections for \WAVE{} version 6.5)\\
-24 June 2002\\
+(revised and with corrections for \WAVE{} version WVRSN)\\
+LONGDATE\\
 \\
 \\
 \\
@@ -72,7 +72,7 @@ PhysioNet ({\tt http://www.physionet.org/}), or write to:
 
 \begin{quote}
 George B. Moody\\
-Massachusetts Institute of Technology
+Massachusetts Institute of Technology\\
 77 Massachusetts Avenue, Room E25-505A\\
 Cambridge, MA 02139\\
 USA\\
@@ -87,9 +87,8 @@ The latest versions can be downloaded from
 \end{htmlonly}
 \begin{latexonly}
 \noindent
-An HTML version of this guide is available; point your web browser to
-{\tt http://www.\-physio\-net.\-org/\-physio\-tools/\-wug/} to view
-it.
+An HTML version of this guide is available at
+{\tt http://www.\-physio\-net.\-org/\-physio\-tools/\-wug/}.
 \end{latexonly}
 
 \vspace{0.2 in}
@@ -220,7 +219,7 @@ USA\\
 Long time users of \WAVE{} will note that this edition has been greatly
 expanded over previous editions.  In part, this reflects more complete
 coverage of the original material, but \WAVE{} itself has also grown.
-\WAVE{} 6.5 is freely available from
+\WAVE{} WVRSN is freely available from
 \hyperref{PhysioNet}
 {PhysioNet (see section~}
 {, page~\pageref{sec:getting-wave})}
@@ -250,7 +249,7 @@ otherwise).
 \begin{htmlonly}
 This on-line version of the \WAVE{} User's Guide was prepared using
 \htmladdnormallink{\LaTeX 2\texttt{html}}
-{http://www-dsed.llnl.gov/files/programs/unix/latex2html/}
+{http://www.ctan.org/tex-archive/support/latex2html/}
 from the same \LaTeX{} sources used for the
 printed manual.  You can print your own copy from the PostScript version
 \htmladdnormallink{here}{wug.ps}.  The most recent \LaTeX{}, HTML, PDF, and
@@ -1102,7 +1101,7 @@ in the window menu.
 \index{WAVE User's Guide (on-line)@\WAVE{} User's Guide (on-line)}
 The third (and most comprehensive) form of on-line help can be used if
 a suitable web browser is available on the \WAVE{} host system.
-(\WAVE{} uses Mozilla by default.  Set the environment variable {\tt URLV}
+(\WAVE{} uses Mozilla by default.)  Set the environment variable {\tt URLV}
 to the name of your browser if you prefer a different browser.  See
 \hyperref{\WAVE{} and the Web}
 {section~}
@@ -2717,7 +2716,7 @@ process, and the remote process efficiently delivers its message and
 exits immediately).  If Mozilla was not running, the {\tt
 mozilla -remote} command fails, and (in this case only) {\tt url\_view}
 starts a new Mozilla browser process.
-/index{Mozilla}
+\index{Mozilla}
 
 The {\tt url\_view} script includes analogous commands for each of the other
 supported browsers.  If {\tt url\_view} does not recognize the browser named by
@@ -2738,11 +2737,12 @@ to modify the action in the \WAVE{} menu file, be careful not to change the
 {\tt <Open URL>} tag at the beginning of the line, since \WAVE{} uses this tag
 to identify the browser interface command within the menu file.)  Consult the
 documentation for your browser to see what commands will be needed.  (The {\tt
--remote} option is used by Mozilla, Netscape, and Opera; other browsers will
+-remote} option is used by Mozilla, Netscape, and Opera;  Galeon and
+Konqueror use variations on this approach, and other browsers will
 probably require different methods.)  Browsers that do not support any means of
 remote control are best avoided (since the only way to use them is to start a
 new browser for each new URL, a very inefficient solution).
-\index{Mozilla}\index{Netscape}\index{Opera}\index{web browser}
+\index{Galeon}\index{Konqueror}\index{Mozilla}\index{Netscape}\index{Opera}\index{web browser}
 
 \chapter{Printing from \WAVE{}}
 
@@ -4859,8 +4859,8 @@ available;  note, however, that Linux drivers for these boards are rare.
 The WFDB Software Package available separately from MIT includes an MS-DOS
 program (named {\tt sample}) for digitization and replay of analog signals
 using a DAP 1200- or 2400-series data acquisition board (available from
-Microstar Laboratories, 2863 152nd Avenue NE, Redmond, WA 98052 USA; telephone
-+1 206 881 4286).
+Microstar Laboratories,
+\htmladdnormallink{http://www.mstarlabs.com/).}{http://www.mstarlabs.com/}
 
 \index{CD-ROM}\index{MIT-BIH Arrhythmia Database}
 \index{European ST-T Database}\index{MIT-BIH Polysomnographic Database}
@@ -4886,7 +4886,7 @@ The data acquisition PC can be set up to boot either Linux
 or MS-DOS,
 \index{MS-DOS}
 and when running \WAVE{} under Linux, signal
-files written to MS-DOS file systems can be read directly.  (Newer
+files written to MS-DOS file systems can be read directly.  (Current
 versions of Linux can also read files in Windows NT, Windows 95, and
 OS/2 file systems.)
 
@@ -4924,13 +4924,10 @@ that can be used to drive a continuously updated time-delayed display
 for details).
 
 \item
-You can write digitized data to a removable disk, then read it on the
-\WAVE{} host.  Devices such as IOmega's 100 Mb Zip or 1 Gb Jaz drives
-are suitable for this purpose;  the SCSI versions of these devices are
-usable under Linux, Solaris, and SunOS.  For high-speed or high-volume
-digitization, the Jaz drive is a good choice.  An advantage of this
-approach is that the removable disks are inexpensive enough to be used
-for archival storage of the data.
+You can write digitized data to removable storage, then read the data on the
+\WAVE{} host.  Many devices are suitable for this purpose;  consider
+using writable CDs or DVDs, USB or Firewire disk drives, or compact
+flash memory cards.
 \end{itemize}
 
 \section{About Linux}
@@ -5020,7 +5017,7 @@ plotting package freely available from
 bare-bones command-line front end to {\tt gnuplot}, a fairly capable
 interactive plotting program that is included in most Linux distributions,
 and is also available from
-\htmladdnormallink{{\tt www.gnuplot.vt.edu}}{http://www.gnuplot.vt.edu/} and
+\htmladdnormallink{http://www.gnuplot.info/}{http://www.gnuplot.info/} and
 numerous other sites.
 {\tt plot2d} uses {\tt plt} rather than {\tt gnuplot} if {\tt plt} is
 installed.
@@ -5208,7 +5205,7 @@ send it to me
 
 Why would you not want to run Linux or Unix?  Any version of Linux or Unix is a
 much better choice for research than any version of MS-Windows. See
-\htmladdnormallink{{\tt http://\-www.dyncorp-is.com/\-darpa/\-meetings/\-win98aug/\-wars.html}}{http://www.dyncorp-is.com/darpa/meetings/win98aug/wars.html}
+\htmladdnormallink{{\tt http://\-srom.zgp.org/}}{http://srom.zgp.org/}
 for an independent perspective on this issue.  Linux can coexist on the same PC
 with MS-Windows if necessary.
 

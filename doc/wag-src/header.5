@@ -1,4 +1,4 @@
-.TH HEADER 5 "11 January 2000" "WFDB software 10.0" "WFDB File Formats"
+.TH HEADER 5 "1 August 2002" "WFDB software 10.2.7" "WFDB Applications Guide"
 .SH NAME
 header \- Waveform Database header file format
 .SH DESCRIPTION
@@ -6,7 +6,7 @@ header \- Waveform Database header file format
 For each database record, a header file specifies the names of the
 associated signal files and their attributes.  Programs compiled with
 the WFDB library (\fI-lwfdb\fP) can read header files created by \fInewheader\fP
-(see \fIwfdb\fP(3)).  Header files contain line- and field-oriented ASCII text.
+(see \fBwfdb\fR(3)).  Header files contain line- and field-oriented ASCII text.
 ASCII linefeed characters separate lines (which may not contain more than 255
 characters each, including the linefeed), and spaces or tabs separate fields
 (except as noted below).  Beginning with WFDB library version 6.1, an ASCII
@@ -50,7 +50,7 @@ signal files, since two or more signals can share a signal file.
 This number must not be negative;  a value of zero is legal, however.
 .TP
 \fIsampling frequency (in samples per second per signal)\fP [optional]
-This number can be expressed in any format legal for \fIscanf\fP(3)
+This number can be expressed in any format legal for \fBscanf\fR(3)
 input of floating point numbers (thus `360', `360.', `360.0', and
 `3.6e2' are all legal and equivalent).  The sampling frequency
 must be greater than zero;  if it is missing, a value of 250
@@ -131,7 +131,7 @@ This field is an integer that specifies the storage format of
 the signal.  All signals in a given group are stored in the
 same format.  The most common formats are format 8 (eight-bit
 first differences) and format 16 (sixteen-bit amplitudes);  see
-\fIsignal\fP(5) (or \fI<wfdb/wfdb.h>\fP) for a list of other supported formats.
+\fBsignal\fP(5) (or \fI<wfdb/wfdb.h>\fP) for a list of other supported formats.
 The following three optional fields, if present, are bound to the format
 field (i.e., not separated from it by whitespace);  they may be considered
 as format modifiers, since they further describe the encoding of samples
@@ -261,7 +261,7 @@ size, however, this field specifies the block size in bytes.
 (On UNIX systems, this is the case only for character special
 files, corresponding to certain tape and raw disk files. If
 necessary, the block size may be given as a negative number to indicate
-that the associated file lacks I/O driver support for \fIfseek\fP(3)
+that the associated file lacks I/O driver support for \fBfseek\fP(3)
 operations.)  All signals belonging to the same signal group
 have the same block size.
 .TP
@@ -343,7 +343,7 @@ samples (slightly over 30 minutes) long.  The starting time and date
 were not recorded; in the example, the defaults are shown, but they
 might be omitted without changing the meaning of the header file.
 Each signal is stored in 12-bit bit-packed format (2 samples per 3 bytes;
-see \fIsignal\fP(5) for details), and one file contains
+see \fBsignal\fR(5) for details), and one file contains
 both signals.  Since the filename given (\fI100.dat\fP) does not include
 path information, WFDB library-based programs will find the signal file
 only if it is located in one of the directories specified by the \fBWFDB\fP
@@ -484,6 +484,8 @@ from WFDB library version 5.0.  Obsolete-format header files can be brought
 up-to-date using \fIrevise\fR (in the \fIconvert\fR directory of the WFDB
 software distribution).
 .SH SEE ALSO
+\fBannot\fR(5), \fBsignal\fR(5), \fBwfdbcal\fR(5)
+.br
 \fIWFDB Programmer's Guide\fP
 .SH AUTHOR
 George B. Moody (george@mit.edu)

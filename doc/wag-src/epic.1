@@ -1,13 +1,13 @@
-.TH EPIC 1 "7 November 2001" "WFDB software 10.0" "WFDB applications"
+.TH EPIC 1  "28 July 2002" "WFDB 10.2.7" "WFDB Applications Guide"
 .SH NAME
 epic \- ANSI/AAMI-standard episode-by-episode annotation comparator
 .SH SYNOPSIS
-\fBepic -r \fIrecord\fB -a \fIreference-annotator test-annotator\fR [ \fIoptions ... \fR ]
+\fBepic -r\fR \fIrecord\fR \fB-a\fR \fIreference-annotator test-annotator\fR [ \fIoptions ... \fR ]
 .SH DESCRIPTION
 .PP
 This program implements the VF, AF, and ST episode-by-episode
 comparison algorithms specified by the current American National
-Standard for ambulatory ECG analyzers (ANSI/AAMI EC38:1998).  \fIepic\fR
+Standard for ambulatory ECG analyzers (ANSI/AAMI EC38:1998).  \fBepic\fR
 is the reference implementation of these algorithms, and must be used
 to obtain the episode-by-episode performance statistics cited in EC38
 in order to be in compliance with the standard (see EC38, section 5.2.14).
@@ -18,17 +18,17 @@ the other the \fItest\fR annotation file.
 .PP
 \fIOptions\fR include:
 .TP
-\fB-A \fIfile\fR
+\fB-A\fR \fIfile\fR
 Append atrial fibrillation detection reports to the specified \fIfile\fR.
 .TP
-\fB-f \fItime\fR
+\fB-f\fR \fItime\fR
 Begin the comparison at the specified \fItime\fR (default: 5 minutes after the
 beginning of the record).
 .TP
 \fB-h\fR
 Print a usage summary.
 .TP
-\fB-i \fItime\fR
+\fB-i\fR \fItime\fR
 Ignore episodes shorter than \fItime\fR (default: 0 seconds).
 .TP
 \fB-l\fR
@@ -37,17 +37,17 @@ Write reports in line format (default: matrix format).
 \fB-L\fR
 Same as \fB-l\fR.
 .TP
-\fB-S \fIfile1 file2\fR
+\fB-S\fR \fIfile1 file2\fR
 Append ischemic ST episode detection reports to \fIfile1\fR, and ST deviation
 measurements to \fIfile2\fR.
 .TP
-\fB-S0 \fIfile1 file2\fR
+\fB-S0\fR \fIfile1 file2\fR
 As for \fB-S\fR, but report on signal 0 only.
 .TP
-\fB-S1 \fIfile1 file2\fR
+\fB-S1\fR \fIfile1 file2\fR
 As for \fB-S\fR, but report on signal 1 only.
 .TP
-\fB-t \fItime\fR
+\fB-t\fR \fItime\fR
 Stop the comparison at the specified \fItime\fR (default: the end of the record
 if it is defined, the end of the reference annotation file otherwise;  if
 \fItime\fR is 0, the comparison ends when the end of either annotation file is
@@ -57,7 +57,7 @@ reached).
 Append ventricular flutter and fibrillation detection reports to the specified
 \fIfile\fR.
 .PP
-The episode and duration statistics gathered by \fIepic\fR are based on tallies
+The episode and duration statistics gathered by \fBepic\fR are based on tallies
 of overlapping episodes in the reference and test annotation files.
 Duration statistics give weight to each episode or detection in
 proportion to its duration.
@@ -65,7 +65,7 @@ Episode statistics give equal weight to each episode or detection,
 irrespective of length;  each test-annotated episode that meets the criteria
 for overlap (see below) with a reference-annotated episode is counted as
 a true positive.  Episodes are defined as follows (see
-\fB<wfdb/ecgcodes.h>\fR for definitions of annotation types):
+\fI<wfdb/ecgcodes.h>\fR for definitions of annotation types):
 .TP
 \fIAtrial fibrillation episodes\fR
 begin with a \fBRHYTHM\fR annotation, with the \fIaux\fR field containing
@@ -79,7 +79,7 @@ is sufficient to qualify a test episode as a true positive.
 \fIVentricular fibrillation or flutter episodes\fR
 begin with a \fBVFON\fR annotation, and end with a \fBVFOFF\fR annotation
 (or at the end of the record).  \fBRHYTHM\fR annotations are ignored in this
-context by \fIepic\fR.  Any amount of overlap is sufficient to qualify a test
+context by \fBepic\fR.  Any amount of overlap is sufficient to qualify a test
 episode as a true positive.
 .TP
 \fIIschemic ST episodes\fR
@@ -117,12 +117,12 @@ For purposes of comparison of ST deviation measurements, test ST measurements
 for each signal are read from the \fIaux\fR field of beat annotations, which
 should contain text of the format `\fIm n\fR' (where \fIm\fR and \fIn\fR
 are the measured ST deviations for signals 0 and 1 respectively).  If these
-measurements are missing from any test beat annotation, \fIepic\fR assumes that
-they have not changed since they last appeared.  \fIepic\fR ignores
+measurements are missing from any test beat annotation, \fBepic\fR assumes that
+they have not changed since they last appeared.  \fBepic\fR ignores
 `\fBAST\fR...' annotations in the test annotation file when making this
 comparison.  In the output file, any test measurements that deviate from the
 reference measurements by more than 100 microvolts are tagged with an asterisk
-(`\fB*\fR').  \fIplotstm\fR(1) can produce a scatter plot of these data using
+(`\fB*\fR').  \fBplotstm\fR(1) can produce a scatter plot of these data using
 this file as input.
 .PP
 At least one of the options `\fB-A\fR', `\fB-S\fR', `\fB-S0\fR', `\fB-S1\fR',
@@ -130,24 +130,26 @@ and `\fB-V\fR' must be used.  If `\fB-\fR' is given as a \fIfile\fR argument,
 reports are written on the standard output.  The output generated by selecting
 \fB-l\fR or \fB-L\fR includes column headings only if a \fIfile\fR other than
 `\fB-\fR' is specified, and only if the specified \fIfile\fR does not already
-exist.  In this way, \fIepic\fR can be used repeatedly to build up line-format
-tables for multiple records, for further processing by \fIsumstats\fR(1).
+exist.  In this way, \fBepic\fR can be used repeatedly to build up line-format
+tables for multiple records, for further processing by \fBsumstats\fR(1).
+.SH ENVIRONMENT
 .PP
-The shell variable \fBWFDB\fR should be set and exported (see \fIsetwfdb\fR(1)).
+It may be necessary to set and export the shell variable \fBWFDB\fR (see
+\fBsetwfdb\fR(1)).
 .SH DIAGNOSTICS
 .TP
 \fInon-standard comparison selected\fR
 The \fB-f\fR, \fB-i\fR, and \fB-t\fR options modify the comparison algorithms
-used by \fIepic\fR in ways not permitted by EC38.  These options are provided
+used by \fBepic\fR in ways not permitted by EC38.  These options are provided
 for the use of developers, who may find them useful for obtaining a more
 detailed understanding of algorithm errors.
 .SH BUGS
 .PP
-Since \fIepic\fR performs multiple passes over its input files, it cannot be
+Since \fBepic\fR performs multiple passes over its input files, it cannot be
 used at the end of a pipe.
 .PP
-It's not really an epic, it's just long.  By analogy to \fIbxb\fR and
-\fIrxr\fR, this program should have been called \fIexe\fR, which would have
+It's not really an epic, it's just long.  By analogy to \fBbxb\fR and
+\fBrxr\fR, this program should have been called \fBexe\fR, which would have
 created interesting possibilities for confusion.
 .SH SEE ALSO
 bxb(1), ecgeval(1), mxm(1), plotstm(1), rxr(1), setwfdb(1), sumstats(1)

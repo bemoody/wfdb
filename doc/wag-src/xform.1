@@ -1,20 +1,20 @@
-.TH XFORM 1 "8 October 2001" "WFDB software 10.2.0" "WFDB applications"
+.TH XFORM 1 "1 August 2002" "WFDB 10.2.7" "WFDB Applications Guide"
 .SH NAME
 xform \- sampling frequency, amplitude, and format conversion for WFDB records
 .SH SYNOPSIS
-\fBxform -i\fI input-record\fR [ \fIoptions\fR ... ]
+\fBxform -i\fR \fIinput-record\fR [ \fIoptions\fR ... ]
 .SH DESCRIPTION
-\fIxform\fR copies the signal files (and, optionally, annotation files) of the
+\fBxform\fR copies the signal files (and, optionally, annotation files) of the
 specified \fIinput-record\fR.  By default, all signals are copied in their
-entirety;  using appropriate options, \fIxform\fR can be used to copy only
+entirety;  using appropriate options, \fBxform\fR can be used to copy only
 a portion of the record, or only a subset of the signals, or both.
 \fIOptions\fR are:
 .TP
-\fB-a\fI annotator\fR
+\fB-a\fR \fIannotator\fR
 Copy the specified \fIannotator\fR as well as the signal files.  Two or more
 \fIannotator\fR arguments, separated by spaces, can follow \fB-a\fR.  An
 annotator supplied via the standard input may be specified using `-', but only
-immediately after `-a';  in this case only, annotations are copied to the
+immediately after \fB-a\fR;  in this case only, annotations are copied to the
 standard output.
 .TP
 \fB-c\fR
@@ -28,7 +28,7 @@ interpreted properly.  Clipping mode is appropriate for testing algorithms or
 devices that must operate using a more restricted amplitude range than was
 used when digitizing the original record.
 .TP
-\fB-f\fI time\fR
+\fB-f\fR \fItime\fR
 Begin at the specified \fItime\fR in the input record (default: the
 beginning of the record).
 .TP
@@ -48,19 +48,19 @@ record) is copied to the output record without changing its sampling frequency.
 In an ordinary record, this option has no effect other than to force the input
 and output sampling frequencies to be equal.
 .TP
-\fB-n\fI new-record\fR
+\fB-n\fR \fInew-record\fR
 Create a \fInew-record\fR for the output signal files.
 .TP
-\fB-N\fI new-record\fR
+\fB-N\fR \fInew-record\fR
 As above, but copy the signal descriptions from the header file for the
 record specified using the \fB-o\fR option (see below) rather than from
 the input record.
 .TP
-\fB-o\fI output-record\fR
+\fB-o\fR \fIoutput-record\fR
 The header file for \fIoutput-record\fR (which must exist before running
-\fIxform\fR) determines the names, sampling frequency, formats (see
-\fIsignal\fR(5)), gains, and ADC zero levels of the output signals.
-If the \fB-o\fR option is absent, \fIxform\fR prompts the user for the
+\fBxform\fR) determines the names, sampling frequency, formats (see
+\fBsignal\fR(5)), gains, and ADC zero levels of the output signals.
+If the \fB-o\fR option is absent, \fBxform\fR prompts the user for the
 output specifications.
 .TP
 \fB-s\fR \fIsignal-list\fR
@@ -68,7 +68,7 @@ Write only the signals named in the \fIsignal-list\fR (one or more input signal
 numbers, separated by spaces;  default: write all signals).  This option may be
 used to re-order or duplicate signals.
 .TP
-\fB-t\fI time\fR
+\fB-t\fR \fItime\fR
 Process until the specified \fItime\fR in the input record (default: continue
 to the end of the record).
 .TP
@@ -95,13 +95,13 @@ the interpolation/decimation parameters are determined).
 This interpolation method has the advantage of being reasonably fast, an
 important consideration since it is often necessary to operate on a million
 or more samples.  Resampling noise is not a significant problem for the
-typical applications of \fIxform\fR (changing the sampling frequency by
+typical applications of \fBxform\fR (changing the sampling frequency by
 factors of five or less).  Aliasing can be a problem, however, when the input
 sampling frequency is greater than the output sampling frequency.  In such
 cases, if the input signals contain frequency components at or above half of
 the output sampling frequency, the input signals should be low-pass filtered
-(using, for example \fIfir\fR(1)) to remove these components before processing
-them with \fIxform\fR.  Conversely, if the output sampling frequency is
+(using, for example \fBfir\fR(1)) to remove these components before processing
+them with \fBxform\fR.  Conversely, if the output sampling frequency is
 substantially greater than the input sampling frequency, resampling noise
 introduced at frequencies in excess of half of the input sampling frequency
 can be removed by low-pass filtering the output signals.
@@ -113,7 +113,7 @@ An exception to this rule occurs if both input and output gains are undefined;
 in this case, scaling is determined by the difference in the ADC resolution
 fields, if any.
 .PP
-Also note that \fIxform\fR writes over any existing data files named in 
+Also note that \fBxform\fR writes over any existing data files named in 
 the header file for \fIoutput-record\fR;  thus \fIoutput-record\fR should not
 be the name of an ordinary database record.  Normally, the database signal
 files are read-only, and attempts to overwrite them are futile.  For many
@@ -121,18 +121,19 @@ applications the "piped records" \fI8\fR and \fI16\fR and the "local records"
 \fI8l\fR and \fI16l\fR will be found useful as output records.
 .PP
 If signal selection, scaling, and sampling frequency conversion are not needed,
-\fIsnip\fR(1) is recommended as a faster alternative to \fIxform\fR.
+\fBsnip\fR(1) is recommended as a faster alternative to \fBxform\fR.
+.SH ENVIRONMENT
 .PP
-The shell variable \fBWFDB\fR should be set and exported (see
-\fIsetwfdb\fR(1)).
+It may be necessary to set and export the shell variable \fBWFDB\fR (see
+\fBsetwfdb\fR(1)).
 .SH DIAGNOSTICS
 .PP
-As \fIxform\fR runs, it prints a `.' on the standard error output for each
+As \fBxform\fR runs, it prints a `.' on the standard error output for each
 minute processed.  If any of the output samples fall outside the range of
 values that can be properly represented using the specified output format,
-\fIxform\fR issues warnings but continues to process the record.
+\fBxform\fR issues warnings but continues to process the record.
 .SH SEE ALSO
-fir(1), setwfdb(1), snip(1), signal(5)
+\fBfir\fR(1), \fBsetwfdb\fR(1), \fBsnip\fR(1), \fBsignal\fR(5)
 .SH AUTHOR
 George B. Moody (george@mit.edu)
 .SH SOURCE

@@ -1,104 +1,148 @@
-.TH A2M 1 "26 October 2001" "WFDB software 10.2" "WFDB applications"
+.TH A2M 1 "6 August 2002" "WFDB 10.2.7" "WFDB Applications Guide"
 .SH NAME
-a2m, ad2m, m2a, md2a \- utilities for converting between MIT and AHA DB formats
+a2m, ad2m, ahaconvert, m2a, md2a \- converting between MIT and AHA DB formats
 .SH SYNOPSIS
-\fBa2m -i \fIahafile\fB -r \fIrecord\fB -a \fIannotator\fR [ \fIoptions\fR ... ]
+\fBa2m -i\fR \fIahafile\fR \fB-r\fR \fIrecord\fR \fB-a\fR \fIannotator\fR [ \fIoptions\fR ... ]
 .br
-\fBad2m -i \fIahafile\fB -r \fIrecord\fR [ \fIoptions\fR ... ]
+\fBad2m -i\fR \fIahafile\fR \fB-r\fR \fIrecord\fR [ \fIoptions\fR ... ]
 .br
-\fBm2a -r \fIrecord\fB -a \fIMIT-annotator AHA-annotator\fR [ \fIoptions\fR ... ]
+\fBahaconvert\fR \fIahafile\fR ...
 .br
-\fBmd2a -o \fIahafile\fB -r \fIrecord\fR [ \fIoptions\fR ... ]
+\fBm2a -r\fR \fIrecord\fR \fB-a\fR \fIMIT-annotator AHA-annotator\fR [ \fIoptions\fR ... ]
+.br
+\fBmd2a -o\fR \fIahafile\fR \fB-r\fR \fIrecord\fR [ \fIoptions\fR ... ]
 .SH DESCRIPTION
-These programs can be used to convert AHA DB distribution files from half-inch
-9-track tape or floppy disks to MIT format (i.e., formats that can be read
-directly by programs compiled with the \fIwfdb\fR(3) library), or to convert
-files in MIT format into AHA DB tape distribution format (conversion to
-AHA DB floppy disk distribution format is not supported).  All four of these
-programs print a brief usage summary if invoked with no command-line arguments,
+These programs can be used to convert AHA DB distribution files from
+half-inch 9-track tape, CD-ROMs, or floppy disks to MIT (PhysioBank) format
+(i.e., formats that can be read directly by programs compiled with the
+\fBwfdb\fR(3) library), or to convert files in MIT format into AHA DB
+tape distribution format (conversion to AHA DB CD-ROM/floppy disk
+distribution format is not supported).  All of these programs
+print a brief usage summary if invoked with no command-line arguments,
 or with a \fB-h\fR option.
+.SS a2m
 .PP
-Use \fIa2m\fR to convert AHA-format annotation files into MIT format.  Options
-for \fIa2m\fR include:
+Use \fBa2m\fR to convert AHA-format annotation files into MIT format.  Options
+for \fBa2m\fR include:
 .TP
-\fB-s\fI time\fR
+\fB-s\fR \fItime\fR
 Shift annotations forward by the specified \fItime\fR (default: no shift for
-type 0 input files, 5 minutes for type 1 or 3, or 2 hours and 30 minutes for
-type 2).
+type 0 input files, 5 minutes for type 1, 2 hours and 30 minutes for
+type 2;  for type 3, the default is 5 minutes if \fIrecord\fR is of the form
+\fIn\fR2\fInn\fR or \fIn\fR3\fInn\fR, or 2 hours and 30 minutes if \fIrecord\fR
+is of the form \fIn\fR0\fInn\fR or \fIn\fR1\fInn\fR).
 .TP
-\fB-t\fI type\fR
+\fB-t\fR \fItype\fR
 Convert an input file of the specified \fItype\fR (0:
-a file produced by a DB application using \fIputann\fR and
-`WFDB_AHA_WRITE' mode; 1: an AHA DB `short format' tape file; 2: an
-AHA DB `long format' tape file; 3: an AHA DB compressed (\fI*.ano\fR)
-floppy disk file).  Input files of types 1, 2, and 3 are assumed to
+a file produced by a WFDB application using \fBputann\fR and
+\fBWFDB_AHA_WRITE\fR mode; 1: an AHA DB `short format' tape file; 2: an
+AHA DB `long format' tape file; 3: an AHA DB compressed (\fB.ano\fR)
+CD-ROM or floppy disk file).  Input files of types 1, 2, and 3 are assumed to
 contain annotation times in milliseconds, which are converted to
-sampling intervals based on an assumed sampling frequency of 250 Hz.
+sampling intervals based on an assumed sampling frequency of 250 Hz.  Default:
+type 3 is assumed if \fIahafile\fR ends with \fB.ANO\fR or \fB.ano\fR;  type
+0 is assumed otherwise.
+.SS ad2m
 .PP
-Use \fIad2m\fR to convert AHA-format signal files into MIT format.  Options
-for \fIad2m\fR include:
+Use \fBad2m\fR to convert AHA-format signal files into MIT format.  Options
+for \fBad2m\fR include:
 .TP
 \fB-c\fR
-Convert an AHA DB compressed (\fI*.cmp\fR) floppy disk file (default: convert a
-file in AHA DB tape format).
+Convert an AHA DB compressed (\fB.cmp\fR) floppy disk file (this is
+the default if \fIahafile\fR ends with \fB.CMP\fR or \fB.cmp\fR,
+otherwise \fBad2m\fR assumes that the input is a file in AHA DB tape
+format).
 .TP
-\fB-f\fI time\fR
+\fB-f\fR \fItime\fR
 Begin converting at the specified \fItime\fR relative to the beginning of the
 input file (default: 0, i.e., at the beginning of the input file)
 .TP
-\fB-t\fI time\fR
-Stop converting at the specified \fItime\fR relative to the beginning of the
-input file (default: 35 minutes after the starting time, or the end of the
-input file, whichever comes first).
+\fB-t\fR \fItime\fR
+Stop converting at the specified \fItime\fR relative to the beginning
+of the input file (default: 35 minutes after the starting time if
+\fIrecord\fR is of the form \fIn\fR2\fInn\fR or \fIn\fR3\fInn\fR, 3 hours
+if \fIrecord\fR is of the form \fIn\fR0\fInn\fR or \fIn\fR1\fInn\fR,
+or the end of the input file, whichever comes first).
+.SS ahaconvert
 .PP
-Use \fIm2a\fR to convert MIT-format annotation files into AHA tape format.
-Options for \fIm2a\fR include:
+Use \fBahaconvert\fR to convert one or more records from an AHA DB CD-ROM
+into MIT format.  Run \fBahaconvert\fR without any command-line arguments
+for instructions, or see the examples below.  Note: \fBahaconvert\fR is
+a shell script;  to use it successfully, you will need to have a shell
+(standard with all versions of Unix, and included in the free Cygwin package
+for MS-Windows) as well as \fBad2m\fR and \fBa2m\fR, which perform the
+actual work of the conversion.
+.SS m2a
+.PP
+Use \fBm2a\fR to convert MIT-format annotation files into AHA tape format.
+Options for \fBm2a\fR include:
 .TP
-\fB-s\fI time\fR
+\fB-s\fR \fItime\fR
 Shift annotation times backward by the specified \fItime\fR, and convert them
 from sample intervals to milliseconds.
+.SS md2a
 .PP
-Use \fImd2a\fR to convert MIT-format signal files into AHA tape format.
-Options for \fImd2a\fR include:
+Use \fBmd2a\fR to convert MIT-format signal files into AHA tape format.
+Options for \fBmd2a\fR include:
 .TP
-\fB-n\fI new-record\fR
+\fB-n\fR \fInew-record\fR
 Create a new header file for the AHA-format output signal file, so that it
 may be read as record \fInew-record\fR.
 .PP
 MIT-format files can be excerpted and reformatted in more generally useful ways
-using \fIsnip\fR(1) or \fIxform\fR(1).
+using \fBsnip\fR(1) or \fBxform\fR(1).
+.SH ENVIRONMENT
 .PP
-The shell variable \fBWFDB\fR should be set and exported (see
-\fIsetwfdb\fR(1)).
+It may be necessary to set and export the shell variable \fBWFDB\fR (see
+\fBsetwfdb\fR(1)).
 .SH EXAMPLES
+.SS "AHA Database CD-ROM"
+AHA DB CD-ROMs contain two verisons of each record:  a 35-minute "short-format"
+version, and a 3-hour "long-format" version.  In most cases, you will want to
+convert only one version of each record.  To convert the short-format records
+only, if the contents of the CD-ROM are available at \fB/mnt/cdrom\fR, type:
+.br
+	\fBahaconvert /mnt/cdrom/?[23]??.cmp\fR
+.br
+(The pattern '\fB?[23]2??\fR' matches the record names of the short-format
+records.)
+.PP
+To convert the long-format records only, type:
+.br
+	\fBahaconvert /mnt/cdrom/?[01]??.cmp\fR
+
 .SS "AHA DB floppy disk"
 To make a version of AHA DB record 1201 in MIT format, given the distribution
-floppy disk, copy the files \fI1201.ano\fR and \fI1201.cmp\fR to the current
+floppy disk, copy the files \fB1201.ano\fR and \fB1201.cmp\fR to the current
 directory, then type:
 .br
-	ad2m -i 1201.cmp -r 1201 -c
+	\fBad2m -i 1201.cmp -r 1201 -c\fR
 .br
-	a2m -i 1201.ano -r 1201 -a atr -t 3
+	\fBa2m -i 1201.ano -r 1201 -a atr -t 3\fR
 .br
-These commands produce files \fI1201.dat\fR (the signal file), \fI1201.hea\fR
-(the header file), and \fI1201.atr\fR (the reference annotation file), all in
-the current directory.  Run \fIad2m\fR first, so that the new header file is
-available for the use of \fIa2m\fR.
+These commands produce files \fB1201.dat\fR (the signal file),
+\fB1201.hea\fR (the header file), and \fB1201.atr\fR (the reference
+annotation file), all in the current directory.  Run \fBad2m\fR first,
+so that the new header file is available for the use of \fBa2m\fR.
+(In this example, note that the options '-r 1201', '-c', and '-t 3' are
+redundant unless you have renamed the input files, since \fBad2m\fR and
+\fBa2m\fR recognize the record name and file types from the suffixes
+otherwise.)
 .SS "AHA DB short format tape"
 .PP
 To obtain the same files given a `short format' 9-track distribution tape,
-copy the second and third files from the tape into files \fI1201.tap\fR and
-\fI1201.ann\fR in the current directory, then type:
+copy the second and third files from the tape into files \fB1201.tap\fR and
+\fB1201.ann\fR in the current directory, then type:
 .br
-	ad2m -i 1201.tap -r 1201
+	\fBad2m -i 1201.tap -r 1201\fR
 .br
-	a2m -i 1201.ann -r 1201 -a atr -t 1
+	\fBa2m -i 1201.ann -r 1201 -a atr -t 1\fR
 .br
 The names for the files copied from the tape are arbitrary, but do not
-use names of files to be generated by \fIad2m\fR or \fIa2m\fR (see the
+use names of files to be generated by \fBad2m\fR or \fBa2m\fR (see the
 previous example).  Note that the first and fourth files on the
 distribution tape contain an `id' block, which can be read by
-\fIreadid\fR (a program included in the \fIconvert\fR directory of the
+\fBreadid\fR (a program included in the \fBconvert\fR directory of the
 WFDB Software Package) to verify the record name. Distribution tapes
 that contain more than one record contain additional sets of four
 files, always in the same order within each set.
@@ -106,30 +150,30 @@ files, always in the same order within each set.
 .PP
 To make a version of the three-hour AHA DB record 1001 in MIT format,
 given the `long format' distribution tape, copy the second and third files
-from the tape into files \fI1001.tap\fR and \fI1001.ann\fR in the current
+from the tape into files \fB1001.tap\fR and \fB1001.ann\fR in the current
 directory, then type:
 .br
-	ad2m -i 1001.tap -r 1001 -t 3:0:0
+	\fBad2m -i 1001.tap -r 1001 -t 3:0:0\fR
 .br
-	a2m -i 1001.ann -r 1001 -a atr -t 2
+	\fBa2m -i 1001.ann -r 1001 -a atr -t 2\fR
 .br
-The \fB-t 3:0:0\fR option is necessary to prevent \fIad2m\fR from truncating
+The \fB-t 3:0:0\fR option is necessary to prevent \fBad2m\fR from truncating
 the signal file after the first 35 minutes.
 .SS "Converting AHA DB long format to short format"
 .PP
 To make a version of AHA DB record 1201 in MIT format, given a `long format'
 9-track distribution tape containing the corresponding three-hour record 1001,
-copy the second and third files from the tape into files \fI1001.tap\fR and
-\fI1001.ann\fR in the current directory, then type:
+copy the second and third files from the tape into files \fB1001.tap\fR and
+\fB1001.ann\fR in the current directory, then type:
 .br
-	ad2m -i 1001.tap -r 1201 -f 2:25:0
+	\fBad2m -i 1001.tap -r 1201 -f 2:25:0\fR
 .br
-	a2m -i 1001.ann -r 1201 -a atr -t 1
+	\fBa2m -i 1001.ann -r 1201 -a atr -t 1\fR
 .br
-In this case, the \fB-f\fR option instructs \fIad2m\fR to skip the first
+In this case, the \fB-f\fR option instructs \fBad2m\fR to skip the first
 two hours and 25 minutes of the `long-format' AHA signal file, and to reformat
 the remainder (equivalent to the 35-minute `short-format' record).  The
-\fB-t 1\fR option is used with \fIa2m\fR even though its input file comes from
+\fB-t 1\fR option is used with \fBa2m\fR even though its input file comes from
 a `long-format' tape, because the annotation times must be shifted only by
 the amount necessary for a `short-format' tape in this case.
 .SS "Sharing signal files for long format and short format AHA DB records"
@@ -137,38 +181,40 @@ the amount necessary for a `short-format' tape in this case.
 To keep both versions (1001 and 1201) on-line, make the `long format' version
 first (see above), then type:
 .br
-	a2m -i 1001.ann -r 1201 -a atr -t 1
+	\fBa2m -i 1001.ann -r 1201 -a atr -t 1\fR
 .br
 to make a `short format' reference annotation file.  Continue (under UNIX) by:
 .br
-	cp 1001.hea 1201.hea
+	\fBcp 1001.hea 1201.hea\fR
 .br
 or (under MS-DOS) by:
 .br
-	copy 1001.hea 1201.hea
+	\fBcopy 1001.hea 1201.hea\fR
 .br
-and edit the copy of the header file, replacing `1001' in the first line
-(only!) with `1201', and replacing `212' in the second and third lines by
+and edit \fB1201.hea\fR, replacing `1001' in the first line (only!) with
+`1201', and replacing `212' in the second and third lines by
 `212+6525000' (see the description of the `byte offset' field in
-\fIheader\fR(5)).  Although two header and reference annotation files are
+\fBheader\fR(5)).  Although two header and reference annotation files are
 needed, both versions can share the same signal file, allowing a substantial
 savings in storage requirements.  Note that WFDB application
 programs that read the `short format' record 1201 signal file may report
 signal checksum errors at the end of the record, unless you also recalculate
-the signal checksums (easily done using \fIsnip\fR(1) to copy the record;
+the signal checksums (easily done using \fBsnip\fR(1) to copy the record;
 delete the copy once the checksums have been obtained).
 .SH AVAILABILITY
-These programs are provided in the \fIconvert\fR directory of the WFDB Software
-Package.  Run \fImake\fR in that directory to compile and install them if they
+These programs are provided in the \fBconvert\fR directory of the WFDB Software
+Package.  Run \fBmake\fR in that directory to compile and install them if they
 have not been installed already.
 .SH SEE ALSO
-snip(1), xform(1), wfdb(3), header(5)
+\fBsnip\fR(1), \fBxform\fR(1), \fBwfdb\fR(3), \fBheader\fR(5)
 .SH AUTHOR
 George B. Moody (george@mit.edu)
 .SH SOURCES
 http://www.physionet.org/physiotools/wfdb/convert/a2m.c
 .br
 http://www.physionet.org/physiotools/wfdb/convert/ad2m.c
+.br
+http://www.physionet.org/physiotools/wfdb/convert/ahaconvert
 .br
 http://www.physionet.org/physiotools/wfdb/convert/m2a.c
 .br

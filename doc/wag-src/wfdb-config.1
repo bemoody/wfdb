@@ -1,4 +1,4 @@
-.TH WFDB-CONFIG 1 "30 May 2002" "WFDB software 10.2.6" "WFDB applications"
+.TH WFDB-CONFIG 1 "1 August 2002" "WFDB 10.2.7" "WFDB Applications Guide"
 .SH NAME
 wfdb-config \- print WFDB library version and configuration info
 .SH SYNOPSIS
@@ -8,12 +8,12 @@ This program prints information about the WFDB library installation.  Use
 it with one of these options:
 .TP
 \fB--cflags\fR
-Print options needed by \fIcc\fR(1) or \fIgcc\fR(1) to find the WFDB
+Print options needed by \fBcc\fR(1) or \fBgcc\fR(1) to find the WFDB
 library's 'include' (*.h) files.
 .TP
 \fB--libs\fR
-Print options needed by \fIcc\fR(1), \fIgcc\fR(1), or \fIld\fR(1) to find
-and link a program with the WFDB library (and, if NETFILES support is
+Print options needed by \fBcc\fR(1), \fBgcc\fR(1), or \fBld\fR(1) to find
+and link a program with the WFDB library (and, if \fBNETFILES\fR support is
 compiled into the WFDB library, with the \fIlibwww\fR libraries).
 .TP
 \fB--version\fR
@@ -24,7 +24,7 @@ that has been installed.
 .PP
 To compile \fIprog.c\fR with the WFDB library, use:
 .br
-   \fBgcc `wfdb-config --cflags` prog.c `wfdb-config --libs`\fR
+	\fBgcc `wfdb-config --cflags` prog.c `wfdb-config --libs`\fR
 .br
 Additional options may be added to the command if needed (for example,
 to link to other libraries).

@@ -1,11 +1,11 @@
-.TH COHERENCE 1 "11 January 2000" "PSD Estimation" "Signal processing"
+.TH COHERENCE 1  "24 July 2002" "WFDB 10.2.7" "WFDB Applications Guide"
 .SH NAME
 coherence \- estimate coherence and cross-spectrum of two time series
 .SH SYNOPSIS
-\fBcoherence -i\fI file\fR [ \fIoptions ...\fR ]
+\fBcoherence -i\fR \fIfile\fR [ \fIoptions ...\fR ]
 .SH DESCRIPTION
 .PP
-\fIcoherence\fR estimates the coherence and cross-spectrum of a pair
+\fBcoherence\fR estimates the coherence and cross-spectrum of a pair
 of real-valued time series;  as a byproduct of its calculation of
 coherence, it also estimates the autospectra of each of its input time
 series.  The \fIfile\fR argument specifies the name of a text file
@@ -27,17 +27,17 @@ Processing\fP.
 .PP
 \fIOptions\fR are:
 .TP
-\fB-f \fIfrequency\fR
+\fB-f\fR \fIfrequency\fR
 Specify the sampling frequency in Hz (default: 250).
 .TP
-\fB-n \fIn\fR
+\fB-n\fR \fIn\fR
 Process the input in overlapping chunks of \fIn\fR samples (default: 1024).
 For best results, \fIn\fR should be a power of two.
 .TP
 \fB-v\fR
 Print column headings.
 .TP
-\fB-x \fIsx sy\fR
+\fB-x\fR \fIsx sy\fR
 Specify multiplicative scale factors for the two time series
 (defaults: 1).  A reasonable choice is to use the reciprocals of the
 standard deviations of the respective time series if these differ
@@ -50,7 +50,7 @@ experimentation may be needed to determine an appropriate chunk size
 in each case.
 .SH SEE ALSO
 .PP
-fft(1)
+\fBfft\fR(1)
 .SH AUTHOR
 George B. Moody (george@mit.edu)
 .SH SOURCE

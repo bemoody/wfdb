@@ -1,11 +1,11 @@
-.TH SIGAMP 1 "9 October 2001" "WFDB software 10.2.0" "WFDB applications"
+.TH SIGAMP 1 "31 July 2002" "WFDB 10.2.7" "WFDB Applications Guide"
 .SH NAME
 sigamp \- measure signal amplitudes of a WFDB record
 .SH SYNOPSIS
-\fBsigamp -r \fIrecord\fR [ \fIoptions\fR ... ]
+\fBsigamp -r\fR \fIrecord\fR [ \fIoptions\fR ... ]
 .SH DESCRIPTION
 .PP
-\fIsigamp\fR measures either baseline-corrected RMS amplitudes or (for
+\fRsigamp\fR measures either baseline-corrected RMS amplitudes or (for
 suitably annotated ECG signals) normal QRS peak-to-peak amplitudes
 for all signals of the specified \fIrecord\fR.  It makes up to 300
 measurements (but see \fB-n\fR below) for each signal and calculates
@@ -14,29 +14,29 @@ and taking the mean of the remaining 90%).
 .PP
 \fIOptions\fR include:
 .TP
-\fB-a\fI annotator\fR
+\fB-a\fR \fIannotator\fR
 Measure QRS peak-to-peak amplitudes based on normal QRS annotations from the
 specified \fIannotator\fR.
 .TP
-\fB-d\fI dt1 dt2\fR
+\fB-d\fR \fIdt1 dt2\fR
 Set the measurement window relative to QRS annotations.  Defaults: \fIdt1\fR =
 0.05 (seconds before the annotation);  \fIdt2\fR = 0.05 (seconds after the
 annotation).
 .TP
-\fB-f\fI time\fR
+\fB-f\fR \fItime\fR
 Begin at the specified \fItime\fR in \fIrecord\fR (default: the beginning of
 \fIrecord\fR).
 .TP
 \fB-h\fR
 Print a usage summary.
 .TP
-\fB-n\fI nmax\fR
+\fB-n\fR \fInmax\fR
 Make up to \fInmax\fR measurements on each signal (default: 300).
 .TP
 \fB-p\fR
 Print results in physical units (default: ADC units).
 .TP
-\fB-t\fI time\fR
+\fB-t\fR \fItime\fR
 Process until the specified \fItime\fR in \fIrecord\fR (default: the end of
 the record).  Processing will be terminated prematurely if 250 measurements
 are made before reaching the specified \fItime\fR.
@@ -44,13 +44,14 @@ are made before reaching the specified \fItime\fR.
 \fB-v\fR
 Verbose mode: print individual measurements as well as trimmed means.
 .TP
-\fB-w\fI dtw\fR
+\fB-w\fR \fIdtw\fR
 Set RMS amplitude measurement window.  Default: \fIdtw\fR = 1 (second).
+.SH ENVIRONMENT
 .PP
-The shell variable \fBWFDB\fR should be set and exported (see
-\fIsetwfdb\fR(1)).
+It may be necessary to set and export the shell variable \fBWFDB\fR (see
+\fBsetwfdb\fR(1)).
 .SH SEE ALSO
-calsig(1), setwfdb(1)
+\fBcalsig\fR(1), \fBsetwfdb\fR(1)
 .SH AUTHOR
 George B. Moody (george@mit.edu)
 .SH SOURCE

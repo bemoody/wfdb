@@ -1,3 +1,22 @@
+10.2.7:
+	Added a workaround to wfdb_fclose() (in lib/wfdbio.c) so that
+	closing stdin after using freopen doesn't trigger a core dump.
+
+	If out-of-order annotations were written and automatic annotation
+	sorting was suppressed, the warning produced by oannclose() (in
+	lib/annot.c) once again includes the correct 'sortann' command
+	needed to put the annotations into order.  (This feature was broken
+        by a previous revision.)
+
+	Added 'ahaconvert', a shell script (in convert) that can reformat
+	all (or any subset) of the records on an AHA DB CD-ROM using a2m
+	and ad2m.  'a2m' and 'ad2m' now do a better job of automatically
+	recognizing their input file types, and 'ad2m' now converts
+	long-format as well as short-format AHA .CMP (signal) files
+	correctly.
+
+	Numerous updates and corrections in the WFDB Applications Guide.
+	
 10.2.6:
 	Added setifreq() and getifreq() to the WFDB library.  setifreq
 	allows the caller to resample an input record at any convenient

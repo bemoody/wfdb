@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	24 May 2000
-#				Last revised:  11 March 2002
+#				Last revised:  8 August 2002
 # This section of the Makefile should not need to be changed.
 
 # ARCH specifies the type of CPU and the operating system (e.g., 'i686-Linux').
@@ -132,7 +132,6 @@ doc-tarball:
 
 # 'make rpms': make source and binary RPMs
 RPMROOT=/usr/src/redhat
-RPMRELEASE=1
 
 rpms:		tarballs
 	cp -p ../$(PACKAGE).tar.gz $(RPMROOT)/SOURCES
@@ -142,3 +141,4 @@ rpms:		tarballs
 	rpm -ba $(PACKAGE)-$(RPMRELEASE).spec
 	mv $(RPMROOT)/RPMS/*/$(PACKAGE)-$(RPMRELEASE).*.rpm ..
 	mv $(RPMROOT)/SRPMS/$(PACKAGE)-$(RPMRELEASE).src.rpm ..
+	rm -f $(PACKAGE)-$(RPMRELEASE).spec

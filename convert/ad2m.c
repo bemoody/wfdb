@@ -1,9 +1,9 @@
 /* file: ad2m.c		G. Moody	26 August 1983
-			Last revised:     7 May 1999
+			Last revised:    24 July 2002
 
 -------------------------------------------------------------------------------
 ad2m: Convert an AHA format signal file to MIT format
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -24,8 +24,8 @@ please visit PhysioNet (http://www.physionet.org/).
 _______________________________________________________________________________
 
 This program converts AHA DB signal files in either the original tape format
-or the `compressed' diskette file format to MIT format.  It also generates
-header files.
+or the `compressed' CD-ROM/diskette file format to MIT format.  It also
+generates header files.
 */
 
 #include <stdio.h>
@@ -43,7 +43,8 @@ extern void exit();
 #include <wfdb/wfdb.h>
 
 #define EODF	0100000	/* AHA data file end-of-data marker */
-#define NSAMP	525000L	/* default number of samples per signal */
+#define NSAMPL 2700000L	/* long format length: 3 hours at 250 samp/sec */
+#define NSAMPS	525000L	/* short format length: 35 minutes at 250 samp/sec */
 #define FNLEN	12	/* maximum length for signal file name */
 
 char *pname;
@@ -52,9 +53,9 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-    char dfname[FNLEN], *ifname = NULL, *record = NULL, *prog_name();
+    char dfname[FNLEN], *ifname = NULL, *p, *record = NULL, *prog_name();
     int cflag = 0, i, v[2], getcvec();
-    long t = 0L, start_time = 0L, end_time = 0L, nsamp = NSAMP;
+    long t = 0L, start_time = 0L, end_time = 0L, nsamp = NSAMPS;
     static WFDB_Siginfo dfarray[2];
     void help();
 
@@ -113,17 +114,15 @@ char *argv[];
 	    exit(1);
 	}
     }
-    if (ifname == NULL || record == NULL ||
-	(0L < end_time && end_time <= start_time)) {
+    if (ifname == NULL || (0L < end_time && end_time <= start_time)) {
 	help();
 	exit(1);
     }
-    if (end_time != 0L)
-	nsamp = end_time - start_time;
+    if (cflag == 0 && strlen(ifname) > 4) {
+	char *p = ifname + strlen(ifname) - 4;
 
-    if (strlen(record) > FNLEN-4) {
-	(void)fprintf(stderr, "%s: record name too long\n", pname);
-	exit(1);
+	if (strcmp(p, ".CMP") == 0 || strcmp(p, ".cmp") == 0)
+	    cflag = 1;
     }
 
     /* Attach the input file to the standard input. */
@@ -132,6 +131,28 @@ char *argv[];
 		      ifname);
 	exit(2);
     }
+
+    /* If no output record name was specified, use the basename of the input
+       file (prog_name strips off any path info from ifname, and any extension
+       is stripped off in the 'for' loop. */
+    if (record == NULL) {
+	record = prog_name(ifname);
+	for (p = record+1; *p; p++)
+	    if (*p == '.') {
+		*p = '\0';
+		break;
+	    }
+    }
+
+    if (end_time == 0L && strlen(record) == 4) {      /* assume AHA DB input */
+	if (record[1] == '2' || record[1] == '3')     /* short format record */
+	    end_time = NSAMPS;
+	else if (record[1] == '0' || record[1] == '1') /* long format record */
+	    end_time = NSAMPL;
+    }
+
+    if (end_time != 0L)
+	nsamp = end_time - start_time;
 
     (void)sprintf(dfname, "%s.dat", record);
     dfarray[0].fname = dfarray[1].fname = dfname;
@@ -157,7 +178,9 @@ char *argv[];
     }
 
     else {		/* process compressed-format input file */
-	while (getcvec(v) == 2 && putvec(v) > 0 && ++t < NSAMP)
+	while (t < start_time && getcvec(v) == 2)
+	    ;
+	while (getcvec(v) == 2 && putvec(v) > 0 && ++t < nsamp)
 	    ;	/* continue to hard EOF, hard error, or specified time */
 
 	(void)newheader(record);	/* write header with correct signal
@@ -224,16 +247,19 @@ char *s;
 }
 
 static char *help_strings[] = {
-    "usage: %s -i AHAFILE -r RECORD [ OPTIONS ... ]\n",
+    "usage: %s -i AHAFILE [ OPTIONS ... ]\n",
     "where AHAFILE is the name of the AHA-format input signal file,",
-    "RECORD is the record name, and OPTIONS may include:",
-    " -c         process a compressed input file",
+    "and OPTIONS may include:",
+    " -c         process a compressed input file (default if AHAFILE ends",
+    "             with .CMP or .cmp;  otherwise old AHA tape format assumed)",
     " -f TIME    begin at specified TIME (default: 0, i.e., the beginning",
     "             of the input file)",
     " -h         print this usage summary",
+    " -r RECORD  specify the name of the output RECORD (default: use the,"
+    "            input file name, less path info and extension, as RECORD)",
     " -t TIME    stop at specified TIME (default: 35 minutes after the",
-    "             starting time, or the end of the input file)",
-    "Use the -c option to process files from AHA DB distribution diskettes.",
+    "             starting time if RECORD=x2xx or x3xx, 3 hours if",
+    "             RECORD=x0xx or x1xx, or the end of the input file)",
     NULL
 };
 

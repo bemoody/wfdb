@@ -1,4 +1,4 @@
-.TH WFDBF 3 "24 June 2002" "WFDB software 10.2.6" "WFDB library"
+.TH WFDBF 3 "1 August 2002" "WFDB software 10.2.7" "WFDB Applications Guide"
 .SH NAME
 wfdbf \- Waveform Database library wrappers for Fortran
 .SH SYNOPSIS
@@ -206,7 +206,7 @@ To use these wrappers, call them as shown above, then compile your
 code together with wfdbf.c and link to the WFDB library.  If you are
 using the GNU g77 compiler, do so using a command such as:
 .br
-g77 -o foo -fwritable-strings foo.f wfdbf.c -lwfdb
+	\fBg77 -o foo -fwritable-strings foo.f wfdbf.c -lwfdb\fR
 .br
 See 'fortran/README' for further information about using the WFDB Fortran
 wrappers.
@@ -214,7 +214,7 @@ wrappers.
 .TP
 \fIWFDB Programmer's Guide\fR
 On systems that support GNU emacs, the \fIGuide\fR may be available on-line
-using emacs \fIinfo\fR;  from within \fIemacs\fR, type control-H followed by
+using emacs \fIinfo\fR;  from within \fBemacs\fR, type control-H followed by
 \fIi\fR to find out.  An HTML version may be installed on your system (in
 \fI/usr/help/html/wpg\fP);  the most recent version can be viewed on-line at
 \fBhttp://www.physionet.org/physiotools/wpg/\fP.

@@ -1,20 +1,20 @@
-.TH SAMPLE 1 "11 January 2000" "WFDB software 10.0" "WFDB applications"
+.TH SAMPLE 1 "31 July 2002" "WFDB 10.2.7" "WFDB Applications Guide"
 .SH NAME
 sample \- digitize and replay analog signals (MS-DOS only)
 .SH SYNOPSIS
 \fBsample\fR [ \fIoptions\fR ... ] ]
 .SH DESCRIPTION
 .PP
-\fIsample\fR generates database records from analog signals, and generates
+\fBsample\fR generates database records from analog signals, and generates
 analog signals from database records.
 .PP
-When used to digitize analog signals, the outputs of \fIsample\fR are one or
+When used to digitize analog signals, the outputs of \fBsample\fR are one or
 more signal files and a header file.  The record name, the number of input
 signals, the sampling frequency, the duration of the record, and the storage
 format may be specified interactively or by command-line options and
 configuration files.
 .PP
-When used to play back database records, the outputs of \fIsample\fR are one or
+When used to play back database records, the outputs of \fBsample\fR are one or
 more analog signals.
 .PP
 \fIOptions\fR include:
@@ -22,77 +22,80 @@ more analog signals.
 \fB-b\fR
 Batch mode (do not prompt to begin digitization or playback).
 .TP
-\fB-d\fI type\fR
+\fB-d\fR \fItype\fR
 Set up for use with the specified device.
-\fIType\fR must be one of `1200/2', `1200/2B', `1200/3', `1200/3B', `1200/4',
+\fItype\fR must be one of `1200/2', `1200/2B', `1200/3', `1200/3B', `1200/4',
 `1200/4B', `2400/4', `2400/5', or `2400/6' (corresponding to Microstar DAP
 model numbers).  Use a \fItype\fR ending with `B' only if you have a DAP 1200
 series board configured for bipolar inputs.  Use the option \fB-d help\fR to
 get a list of supported device types.  If no \fB-d\fR option is given,
-\fIsample\fR uses the DAPL `hello' command to determine the device type
+\fBsample\fR uses the DAPL `hello' command to determine the device type
 automatically.
 .TP
-\fB-f\fI time\fR
+\fB-f\fR \fItime\fR
 Begin playback at the specified \fItime\fR (effective only in combination with
 the \fB-i\fR option).
 .TP
 \fB-h\fR
 Print on-line help (a brief description of options).
 .TP
-\fB-i\fI record\fR
+\fB-i\fR \fIrecord\fR
 Play back the specified \fIrecord\fR (may not be used with the \fB-n\fR,
 \fB-N\fR, or \fB-o\fR options).  Unless an analog output expansion board
-has been installed, and \fIsample\fR has been compiled with a suitably
-increased value of \fIDAPOUTPUTS\fR, or a DAPL program embedded in the header
+has been installed, and \fBsample\fR has been compiled with a suitably
+increased value of \fBDAPOUTPUTS\fR, or a DAPL program embedded in the header
 file for \fIrecord\fR (see below) specifies otherwise, playback is restricted
 to signals 0 and 1 only.  Except when using `raw' format, the analog outputs
-are determined by the 12 least significant bits of each sample.  (\fIsample\fR
+are determined by the 12 least significant bits of each sample.  (\fBsample\fR
 assumes that any record whose header file specifies format 16, ADC resolution
 16, and all signals in the same signal file, is a `raw' format record.)
 .TP
-\fB-n \fIrecord\fR
+\fB-n\fR \fIrecord\fR
 Create the specified \fIrecord\fR (both signal and header files).
 .TP
-\fB-N \fIrecord\fR
+\fB-N\fR \fIrecord\fR
 Create a header file for the specified \fIrecord\fR, but do not digitize.
 .TP
-\fB-o \fIrecord\fR
+\fB-o\fR \fIrecord\fR
 Digitize, using signal specifications in the existing header file for
 \fIrecord\fR.
 .TP
-\fB-p \fIfile\fR
+\fB-p\fR \fIfile\fR
 Use the DAPL program in the specified file.
 .TP
-\fB-s\fI n\fR
+\fB-s\fR \fIn\fR
 Record or play back 1 of every \fIn\fR samples in each signal (not effective
 with `raw' format I/O, see below).
 .TP
-\fB-t \fItime
+\fB-t\fR \fItime
 Stop digitization or playback at the specified \fItime\fR.
 .TP
-\fB-x \fIn\fR
+\fB-x\fR \fIn\fR
 Digitize or play back at \fIn\fR times real time (\fIn\fR > 0; default: 1).
 This option is not effective with \fB-p\fR, or when the header file specified
 by \fB-i\fR or \fB-o\fR contains a usable DAPL program (see below).
 .TP
 \fB-1\fR
 Play back only one signal (signal 0;  effective only with \fB-i\fR).
+.SH ENVIRONMENT
 .PP
-The shell variable \fBWFDB\fR should be set and exported (see \fIsetwfdb\fR(1)).
+It may be necessary to set and export the shell variable \fBWFDB\fR (see
+\fBsetwfdb\fR(1)).
 .SS HARDWARE REQUIREMENTS
 .PP
-\fIsample\fR runs under MS-DOS on an ISA-bus (AT-bus) system that contains a
-Microstar DAP 1200 or 2400 series board (available from Microstar
-Laboratories, 2265 116th Avenue NE, Bellevue, WA 98004 USA; telephone +1 206
-453 2345).  All DAP 1200 and 2400 series boards listed below include 12-bit
-analog-to-digital and digital-to-analog converters, analog multiplexers,
-programmable gain amplifiers, timers, and an Intel 80186 CPU; DAP 2400 series
-boards include a Motorola 56001 DSP and provisions for external triggering.
-All models have 8 differential (16 single-ended) analog inputs and 2 analog
-outputs, and 16 bits each of digital inputs and outputs.  With expansion
-boards, a single DAP can have up to 256 differential or 512 single-ended
-analog inputs, 66 analog outputs, and 128 bits of digital input and output;
-it is also possible to use up to seven DAP boards in a single system.
+\fBsample\fR runs under MS-DOS on an ISA-bus (AT-bus) system that
+contains a Microstar DAP 1200 or 2400 series board (available from
+Microstar Laboratories, http://www.mstarlabs.com/).  All DAP 1200 and
+2400 series boards listed below include 12-bit analog-to-digital and
+digital-to-analog converters, analog multiplexers, programmable gain
+amplifiers, timers, and an Intel 80186 CPU; DAP 2400 series boards
+include a Motorola 56001 DSP and provisions for external triggering.
+All models have 8 differential (16 single-ended) analog inputs and 2
+analog outputs, and 16 bits each of digital inputs and outputs.  With
+expansion boards, a single DAP can have up to 256 differential or 512
+single-ended analog inputs, 66 analog outputs, and 128 bits of digital
+input and output; it is also possible to use up to seven DAP boards in
+a single system.
 .PP
 The range of sampling frequencies available depends on the model.  DAP 1200/2
 and 1200/3 boards can digitize at aggregate rates of 31.25 to 50,000 Hz;
@@ -105,22 +108,22 @@ lower than the maximum sampling frequency specifications imply; using a 12 MHz
 msec disk, for example, the maximum sustained throughput is about 25 KHz (100
 KHz using `raw' format, see below).  The minimum sampling frequencies listed
 above refer only to those obtainable using the on-board timer and the DAPL
-program generated by \fIsample\fR (see below); if necessary, slower sampling
+program generated by \fBsample\fR (see below); if necessary, slower sampling
 can be achieved using an external clock with DAP 2400 boards, or by writing a
 special-purpose DAPL program.
 .PP
 The DAP 2400 is much better suited for playback than is the DAP 1200.  Each of
 the two analog outputs of the DAP 1200 can accept samples at 1, 2, 5, 10, 25,
-50, 125, or 250 Hz, but not at any other rates.  Note that \fIsample\fR
+50, 125, or 250 Hz, but not at any other rates.  Note that \fBsample\fR
 generates DAPL code for playback on DAP 2400 boards only, although DAP 1200
 playback code can be provided by the user at run time if necessary (see below).
-\fIsample\fR can generate analog signals using a DAP 2400 at sustained rates
+\fBsample\fR can generate analog signals using a DAP 2400 at sustained rates
 up to about 3 KHz;  much faster output (up to 250 KHz with a DAP 2400/6) is
 possible for short intervals (up to the amount that can be loaded into the
 DAP's local memory).
 .PP
 Microstar Laboratories produces DAP boards that do not include 
-analog-to-digital or digital-to-analog converters;  \fIsample\fR is not
+analog-to-digital or digital-to-analog converters;  \fBsample\fR is not
 intended for use with these boards, which have model designations ending in
 `D'.  DAP boards with protected analog inputs have model designations ending
 in `P';  these boards have slightly lower maximum sampling rates than the
@@ -137,18 +140,18 @@ is also band-limited \- it's probably not!
 During playback, you may wish to use similar low-pass filters to reduce the
 `staircase' effect characteristic of signals generated by D/A converters.
 .PP
-\fIsample\fR has been tested using DAPL version 3.3;  the digitization and
+\fBsample\fR has been tested using DAPL version 3.3;  the digitization and
 single-channel playback functions have also been tested using DAPL version 3.2
-(note that the multi-channel playback code generated by \fIsample\fR uses the
+(note that the multi-channel playback code generated by \fBsample\fR uses the
 `separate' command, which is new in DAPL 3.3).
 .SS PERFORMANCE HINTS
 .PP
-\fIsample\fR uses the WFDB library functions \fIgetvec\fR and \fIputvec\fR to
+\fBsample\fR uses the WFDB library functions \fIgetvec\fR and \fIputvec\fR to
 read and write signal files.  When digitizing, the advantages of using
 \fIputvec\fR are that it permits the use of a variety of standard, compact
 storage formats, and that it calculates signal checksums that are used
 subsequently by other WFDB applications to verify the integrity of the signal
-files.  During playback, the use of \fIgetvec\fR permits \fIsample\fR to read
+files.  During playback, the use of \fIgetvec\fR permits \fBsample\fR to read
 any existing WFDB record without the need to reformat it.  When digitizing or
 playing back `raw' format records (compatible with Microstar's DAPview or DLOG
 binary files), \fIgetvec\fR and \fIputvec\fR are bypassed with low-level
@@ -156,128 +159,117 @@ binary files), \fIgetvec\fR and \fIputvec\fR are bypassed with low-level
 `raw' format in digitization is that the generated header files for newly
 created records lack sample counts and checksums, since these are produced
 only by \fIputvec\fR.  `Raw' format files can be converted to any standard
-(`cooked'?) WFDB signal file format using \fIxform\fR, which will generate
-sample counts and checksums.  When using \fIxform\fR on `raw' format files, it
+(`cooked'?) WFDB signal file format using \fBxform\fR, which will generate
+sample counts and checksums.  When using \fBxform\fR on `raw' format files, it
 is advantageous to set its output signal gains to 1/16 of those specified in
 the header file for the `raw' format record, in order to obtain right-justified
 12-bit samples (DAP `raw' format consists of 12-bit samples left-justified in
-16-bit words).  If both \fIsample\fR and \fIxform\fR are allowed to use their
-default gain settings, this scaling is performed automatically by \fIxform\fR.
+16-bit words).  If both \fBsample\fR and \fBxform\fR are allowed to use their
+default gain settings, this scaling is performed automatically by \fBxform\fR.
 .SS COMPILATION
 .PP
-Please read this \fIentire\fR section before trying to compile \fIsample\fR!
+Please read this \fIentire\fR section before trying to compile \fBsample\fR!
 .PP
-To compile \fIsample\fR successfully, you will need Microsoft C, version 5.0
+To compile \fBsample\fR successfully, you will need Microsoft C, version 5.0
 or later, or Turbo C/C++, and four files supplied by Microstar with all
 versions of the DAP 1200 and 2400 (Microstar's Advanced Development Toolkit is
 \fInot\fR required in order to compile or use this program).  These files are
 \fIc_lib.c\fR, \fIclock.h\fR, and \fIioutil.h\fR, which should be installed in
 a directory searched by your C compiler for \fI#include <...>\fR files (for
-Microsoft C, one of the directories specified by the \fIINCLUDE\fR environment
+Microsoft C, one of the directories specified by the \fBINCLUDE\fR environment
 variable);  and \fIcdapl.lib\fR, which should be installed in a directory
 searched by your C compiler's link utility for libraries (for Microsoft C,
-one of the directories specified by the \fILIB\fR environment variable).  If
+one of the directories specified by the \fBLIB\fR environment variable).  If
 you are using Microsoft C, copy \fIcdapl5.lib\fR from the Microstar
 distribution diskettes into your library directory and rename it
 \fIcdapl.lib\fR.
 .PP
 If you have not already done so, you must also compile and install a
-large memory model version of the WFDB library (see \fImakefile.dos\fR in the
+large memory model version of the WFDB library (see \fIMakefile.dos\fR in the
 \fIlib\fR directory).  Although the program compiles and links successfully
 using the small memory model and Microstar's \fIcdaps5.lib\fR, there is
 apparently a bug in \fIcdaps5.lib\fR that wedges the DAP (a condition that
 can be remedied only by power-cycling the system).
 .PP
 If you have installed one or more analog expansion boards, modify the
-values of \fIDAPINPUTS\fR and \fIDAPOUTPUTS\fR as appropriate (see
+values of \fBDAPINPUTS\fR and \fBDAPOUTPUTS\fR as appropriate (see
 \fIsample.c\fR).  Note that these constants specify the number of
 available inputs and outputs, \fInot\fR the number of signals that can
-be digitized or played back at once using \fIsample\fR (determined by
-\fIMAXSIG\fR, defined in \fI<wfdb/wfdb.h>\fR).  If you need to
-digitize a larger number of signals than is permitted by the current
-value of \fIMAXSIG\fR, modify the definition of \fIMAXSIG\fR in the
-copy of \fIwfdb.h\fR that is in the \fIlib\fR directory, and recompile
-the WFDB library (as well as any applications that you wish to use
-with records created by \fIsample\fR).
+be digitized or played back at once using \fBsample\fR (which imposes
+no fixed limits if compiled with WFDB library version 10.2 or later).
 .PP
 Efficiency, hence maximum output rate, is improved by using large I/O buffer
-sizes.  By default, \fIsample\fR uses 10K-byte buffers;  depending on your
+sizes.  By default, \fBsample\fR uses 10K-byte buffers;  depending on your
 system's available memory and your disk controller, you may be able to improve
 your throughput by adjusting this value.  Do so by redefining the symbol
-\fIDBUFSIZE\fR.  Note that the default buffer size is overridden at run time
+\fBDBUFSIZE\fR.  Note that the default buffer size is overridden at run time
 by explicit (non-zero) block size specifications in the header file, if
-present (see \fIheader\fR(5)).
+present (see \fBheader\fR(5)).
 .PP
 This program has been successfully compiled and tested using Microsoft C 5.1,
 6.0, and 7.0, with the command
 .br
-    \fBcl -Ox -Ml sample.c -link wfdbl cdapl\fR
+	\fBcl -Ox -Ml sample.c -link wfdbl cdapl\fR
 .br
 and using Turbo C 2.01, and Turbo C++ 1.01, with the command
 .br
-    \fBtcc -O -A -ml sample.c wfdbl.lib cdapl.lib\fR
+	\fBtcc -O -A -ml sample.c wfdbl.lib cdapl.lib\fR
 .br
 Note that you may need to use \fB-I\fR and \fB-L\fR options to instruct your
 compiler where to find \fI#include\fR files and libraries;  see your compiler
-manual for further information.  The symbols \fIDAPINPUTS\fR, \fIDAPOUTPUTS\fR,
-and \fIDBUFSIZE\fR may be redefined using command-line \fB-D\fR options with
+manual for further information.  The symbols \fBDAPINPUTS\fR, \fBDAPOUTPUTS\fR,
+and \fBDBUFSIZE\fR may be redefined using command-line \fB-D\fR options with
 any of these compilers.  If you compile using Microsoft C/C++ 7.0 (or later)
 with the \fB-Za\fR (ANSI C) option, add \fBoldnames\fR as a final command-line
 argument, to link a library containing aliases for functions such as
 \fIopen()\fR, which have been renamed in the standard MSC 7.0 library to
 conform with ANSI namespace rules.
-.PP
-If you tell \fIinstall\fR (the MS-DOS installation program for the WFDB software
-package) to compile \fIsample\fR using Microsoft C, \fIinstall\fR looks for
-\fIcdapl5.lib\fR, and uses it in preference to \fIcdapl.lib\fR if both are
-present (thus you can have DAP libraries for both Microsoft C and Turbo C
-installed at the same time).  \fIinstall\fR also detects the presence of
-\fIoldnames.lib\fR and adds it to the command line if necessary.
-.SS DAPL PROGRAMS
+.SS "DAPL Programs"
 .PP
 DAP boards are controlled by programs written in Microstar's DAPL (DAP
 language), which are downloaded to the on-board 80186 for execution.
-\fIsample\fR follows this procedure for obtaining the DAPL program to be used:
+\fBsample\fR follows this procedure for obtaining the DAPL program to be used:
 .TP
-1.
-If you use the \fB-p\fR option to specify the name of a DAPL file, \fIsample\fR
+\fB1.\fR
+If you use the \fB-p\fR option to specify the name of a DAPL file, \fBsample\fR
 downloads the contents of that file.  The first line of the file should
 contain a DAPL comment line of the form `\fI; start a,b\fR',
 which specifies the DAPL command required to begin execution of the
-program once it has been downloaded.  If this line is missing, \fIsample\fR
+program once it has been downloaded.  If this line is missing, \fBsample\fR
 uses the command `\fIstart a\fR'.  Unless the DAPL file is unreadable or empty,
-\fIsample\fR skips steps 2 and 3, and the \fB-x\fR option has no effect.
+\fBsample\fR skips steps 2 and 3, and the \fB-x\fR option has no effect.
 .TP
-2.
-If you use the \fB-i\fR or \fB-o\fR options to specify the record name of an
-existing header file, \fIsample\fR will read info strings from the header
-file.  If \fI-i\fR has been specified, and any of the info strings begin
-with `<', the initial `<' character in each such string is discarded,
-and the remainder is treated in the same manner as for a DAPL program
-specified using \fB-p\fR.  Similarly, if \fB-o\fR has been specified,
-\fIsample\fR compiles the DAPL program from any info strings beginning with
-`>'.  If \fIsample\fR finds any DAPL code in this step, it does not execute
+\fB2.\fR
+If you use the \fB-i\fR or \fB-o\fR options to specify the record
+name of an existing header file, \fBsample\fR will read \fIinfo\fR
+strings from the header file.  If \fI-i\fR has been specified, and any
+of the \fIinfo\fR strings begin with `<', the initial `<' character in
+each such string is discarded, and the remainder is treated in the
+same manner as for a DAPL program specified using \fB-p\fR.
+Similarly, if \fB-o\fR has been specified, \fBsample\fR compiles the
+DAPL program from any \fIinfo\fR strings beginning with `>'.  If
+\fBsample\fR finds any DAPL code in this step, it does not execute
 step 3, and the \fB-x\fR option has no effect.
 .TP
-3.
-If \fIsample\fR has not obtained a DAPL program in steps 1 or 2, it generates
+\fB3.\fR
+If \fBsample\fR has not obtained a DAPL program in steps 1 or 2, it generates
 one based on the signal specifications obtained from the header file
 read in step 2, if any, or interactively from the user.  If specifications
 for digitization are obtained from a header file without an embedded DAPL
-program, \fIsample\fR assigns differential inputs D0, D1, ... to signals 0,
-1, ..., provided that the number of signals does not exceed \fIDAPINPUTS\fR/2;
-otherwise, \fIsample\fR assigns single-ended inputs S0, S1, ... to signals
+program, \fBsample\fR assigns differential inputs D0, D1, ... to signals 0,
+1, ..., provided that the number of signals does not exceed \fBDAPINPUTS\fR/2;
+otherwise, \fBsample\fR assigns single-ended inputs S0, S1, ... to signals
 0, 1, ....  Digital inputs (input `B') may be specified in a DAPL program or
-interactively.  In playback mode, \fIsample\fR generates DAP 2400-compatible
+interactively.  In playback mode, \fBsample\fR generates DAP 2400-compatible
 code only;  to play back a record using a DAP 1200, you must supply DAPL code
 either in the header file or using \fB-p\fR.
 .PP
-When \fIsample\fR is used to create a record, it writes a copy of the DAPL
+When \fBsample\fR is used to create a record, it writes a copy of the DAPL
 program that it uses into the newly-created header file, as a set of info
 strings formatted as described in step 2 above.  By using the \fB-N\fR option,
 a DAPL program may be written into a prototype header file without actually
 digitizing any signals.  This is an easy way to bootstrap the design of a
-custom DAPL program for use with \fIsample\fR.  Custom DAPL programs may be
+custom DAPL program for use with \fBsample\fR.  Custom DAPL programs may be
 used for applications that perform operations such as digital filtering
 on-the-fly, or for low frequency sampling.
 .PP
@@ -290,21 +282,21 @@ other than as a satisfied customer;  specifically, neither MIT nor the author
 assumes any responsibility whatsoever for the performance of Microstar
 hardware or software.
 .SH BUGS
-If no \fB-d\fR option is given, \fIsample\fR displays the diagnostic message
-``Testing DAP ...'' briefly before printing the DAP type.  If \fIsample\fR
+If no \fB-d\fR option is given, \fBsample\fR displays the diagnostic message
+``Testing DAP ...'' briefly before printing the DAP type.  If \fBsample\fR
 cannot establish communications with the DAP, however, it will stop after
 displaying the ``Testing DAP ...'' message;  in this case, it is usually
 necessary to power-cycle the DAP (a system reset is usually not sufficient)
-in order to restore communications.  This behavior of \fIsample\fR is not a
+in order to restore communications.  This behavior of \fBsample\fR is not a
 bug in itself;  the DAP board can be put into this uncommunicative (i.e.,
-wedged) state by \fIsample\fR and other programs, however.  The most likely
+wedged) state by \fBsample\fR and other programs, however.  The most likely
 reasons for the DAP to become wedged are attempting to use sampling frequencies
 that are too high (especially for playback) or improperly constructed custom
 DAPL programs in header files.  It is also possible to run DAPL programs
 that take a very long time to execute;  in this case, it may be difficult to
 know if the DAP is running or wedged.
 .SH SEE ALSO
-setwfdb(1), xform(1), header(5)
+\fBsetwfdb\fR(1), \fBxform\fR(1), \fBheader\fR(5)
 .SH AUTHOR
 George B. Moody (george@mit.edu)
 .SH SOURCE

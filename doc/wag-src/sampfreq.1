@@ -1,4 +1,4 @@
-.TH SAMPFREQ 1 "12 December 2000" "WFDB software 10.2" "WFDB applications"
+.TH SAMPFREQ 1 "31 July 2002" "WFDB 10.2.7" "WFDB Applications Guide"
 .SH NAME
 sampfreq \- show sampling frequency for a record
 .SH SYNOPSIS
@@ -9,15 +9,16 @@ By default, \fBsampfreq\fR shows the base sampling frequency (frame rate)
 for multi-frequency records;  if the \fB-H\fR option is present,
 \fBsampfreq\fR shows the highest sampling frequency used for any signal
 in a multi-frequency record.
+.SH ENVIRONMENT
 .PP
-The shell variable \fBWFDB\fR should be set and exported (see
-\fIsetwfdb\fR(1)).
+It may be necessary to set and export the shell variable \fBWFDB\fR (see
+\fBsetwfdb\fR(1)).
 .SH FILES
 .TP 22
 \fIrecord\fR.hea
 header file
 .SH SEE ALSO
-setwfdb(1)
+\fBsetwfdb\fR(1)
 .SH AUTHOR
 George B. Moody (george@mit.edu)
 .SH SOURCE

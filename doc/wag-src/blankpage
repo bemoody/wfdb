@@ -1,0 +1,9 @@
+%!PS-Adobe-2.0
+%%Title: blank
+%%Pages: 1
+%%EndProlog
+%%Page: 1 1
+0 0 moveto
+/Courier findfont 10 scalefont setfont
+( )show showpage
+%%EOF

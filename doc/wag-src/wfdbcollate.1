@@ -1,13 +1,13 @@
-.TH WFDBCOLLATE 1 "11 January 2000" "WFDB software 10.0" "WFDB applications"
+.TH WFDBCOLLATE 1 "1 August 2002" "WFDB 10.2.7" "WFDB Applications Guide"
 .SH NAME
 wfdbcollate \- collate WFDB records into a multi-segment record
 .SH SYNOPSIS
-\fBwfdbcollate -i \fIirec\fR [ \fIirec\fR ... ] \fB-o \fIorec\fR [ \fB-a
-\fIannotator\fR ]
+\fBwfdbcollate -i\fR \fIirec\fR [ \fIirec\fR ... ] \fB-o\fR \fIorec\fR
+[ \fB-a\fR \fIannotator\fR ]
 .br
-\fBwfdbcollate \fIorec first last\fR [ \fB-a \fIannotator\fR ]
+\fBwfdbcollate\fR \fIorec first last\fR [ \fB-a\fR \fIannotator\fR ]
 .br
-\fBwfdbcollate -s \fIirec\fB -o \fIorec\fR [ \fB-l \fIsegment-length\fR ]
+\fBwfdbcollate -s\fR \fIirec \fR \fB-o\fR \fIorec\fR [ \fB-l\fR \fIsegment-length\fR ]
 .SH DESCRIPTION
 A multi-segment record is the concatenation of one or more ordinary
 records.  A multi-segment record is a ``virtual'' record, in the sense
@@ -20,8 +20,8 @@ useful) to create a multi-segment record with only one segment; it is
 not permissible to use a multi-segment record as a segment within a
 multi-segment record, however.
 .PP
-\fIwfdbcollate\fR simply constructs an array of segment names, passing
-it to the WFDB library function \fIsetmsheader\fR (see \fIwfdb\fR(3))
+\fBwfdbcollate\fR simply constructs an array of segment names, passing
+it to the WFDB library function \fIsetmsheader\fR (see \fBwfdb\fR(3))
 to create a multi-segment header file.  In the first form of the
 command, \fIorec\fR is the name of the multi-segment (output) record
 to be created, and the \fIirec\fR arguments are the names of the
@@ -37,23 +37,23 @@ names of the input records are derived by appending \fIfirst\fR,
 \fIfirst\fR, ..., as 5-digit zero-padded decimal numbers).  Thus the
 command
 .br
-     \fBwfdbcollate xyz 9 12\fR
+	\fBwfdbcollate xyz 9 12\fR
 .br
 is equivalent to
 .br
-     \fBwfdbcollate -o xyz -i xyz00009 xyz00010 xyz00011 xyz00012\fR
+	\fBwfdbcollate -o xyz -i xyz00009 xyz00010 xyz00011 xyz00012\fR
 .PP
 Each segment must contain the same number of signals, and the sampling
 frequency must be the same for each segment.  Each input record header
-must specify its record length (use \fIwfdbdesc\fR(1) to determine the
+must specify its record length (use \fBwfdbdesc\fR(1) to determine the
 input record length if necessary, then edit the input record header to
-include this information before using \fIwfdbcollate\fR). In most cases
+include this information before using \fBwfdbcollate\fR). In most cases
 you will want to be sure that corresponding signals match in each
 segment, and that the gains, ADC zero levels, and numbers of samples
-per frame (see \fIheader\fR(5)) also match.  It is not necessary that
+per frame (see \fBheader\fR(5)) also match.  It is not necessary that
 the signal file formats match, however.
 .PP
-In the first two forms, \fB-a \fIannotator\fR is optional; if included, it
+In the first two forms, \fB-a\fR \fIannotator\fR is optional; if included, it
 specifies the annotator name of annotation files associated with the
 input records, files to be concatenated to form a similarly-named
 annotation file for \fIorec\fR.  Note that all of the files to be
@@ -62,7 +62,7 @@ that this annotator exist for each input record, however.
 .PP
 The third form of the command, which includes the \fB-s\fR option, can
 be used to split an existing record (\fIirec\fR) into multiple
-segments.  In this mode, \fIwfdbcollate\fR first creates a set of
+segments.  In this mode, \fBwfdbcollate\fR first creates a set of
 segments from \fIirec\fR, then collates them into a multi-segment
 record.  In this mode, the \fB-l\fR option may be used to specify a
 non-standard segment length, which must be no less than 15 seconds.
@@ -74,27 +74,28 @@ command.
 .PP
 In most cases, multi-segment records are indistinguishable from
 single-segment records, from the point of view of applications built
-using the WFDB library (version 9.1 or later).  Use \fIxform\fR(1) to
+using the WFDB library (version 9.1 or later).  Use \fBxform\fR(1) to
 generate a single-segment record from a multi-segment record if
 necessary (for example, to make it readable by an application built
 using an earlier version of the WFDB library).  Note, however, that
 older applications can generally be updated without source changes
 simply by recompiling them and linking them with the current WFDB
 library.
+.SH ENVIRONMENT
 .PP
-The shell variable \fBWFDB\fR should be set and exported (see
-\fIsetwfdb\fR(1)).
+It may be necessary to set and export the shell variable \fBWFDB\fR (see
+\fBsetwfdb\fR(1)).
 .SH FILES
 .TP 22
-header.\fIorec\fR
-output header file (\fIorec\fR.hea under MS-DOS)
+\fIorec\fR.hea
+output header file
 .TP
-header.\fIirec\fR or \fIirec\fR.hea
+\fIirec\fR.hea
 input header file(s)
 .SH BUGS
 Under MS-DOS, this program is known as \fIwfdbcoll8\fR.
 .SH SEE ALSO
-wfdbdesc(1), xform(1), wfdb(3), header(5)
+\fBwfdbdesc\fR(1), \fBxform\fR(1), \fBwfdb\fR(3), \fBheader\fR(5)
 .SH AUTHOR
 George B. Moody (george@mit.edu)
 .SH SOURCE

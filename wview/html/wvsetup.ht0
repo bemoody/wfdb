@@ -21,7 +21,7 @@
 
 <p>
 This document describes how to set up <tt>wvscript</tt>, a ``wrapper'' for <a
-href="../dbag/wview-1.htm"><strong>WVIEW</strong></a> that provides Windows
+href="../wag/wview-1.htm"><strong>WVIEW</strong></a> that provides Windows
 users with some of the functionality that <tt>wavescript</tt> and <a
 href="../wug/wug.htm"> <strong>WAVE</strong></a> provide to Linux, Solaris, and
 SunOS users.  Specifically, <tt>wvscript</tt> can be installed as a

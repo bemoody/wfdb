@@ -1,4 +1,4 @@
-.TH PLT 1 "17 May 2001" "Graphics" "Utilities"
+.TH PLT 1 "31 July 2002" "plt 1.99" "WFDB Applications Guide"
 .SH NAME
 plt \- make 2-D plots
 .SH SYNOPSIS
@@ -8,7 +8,7 @@ plt \- make 2-D plots
 This man page is intended as a supplement to the command-line help provided
 by \fBplt\fR itself (using the \fB-h\fR option, see below).  If you have not
 previously used \fBplt\fR, please look at the \fIplt Tutorial and Cookbook\fR,
-which is included in the \fBplt\fR package (see \fISOURCES\fR below).
+which is included in the \fBplt\fR package (see \fBSOURCES\fR below).
 .PP
 \fBplt\fR is a non-interactive (command line-driven) plotting utility.
 \fBplt\fR can produce publication-quality 2D plots in PostScript from
@@ -363,32 +363,35 @@ in a file or send it to a printer).
 .PP
 Create a text file with the following contents:
 .br
-    0  0  0
+	0  0  0
 .br
-    1  1  1
+	1  1  1
 .br
-    2  4  8
+	2  4  8
 .br
-    3  9 27
+	3  9 27
 .br
-    4 16 64
+	4 16 64
 .br
 and call the file \fIpowers\fR.  Plot the first column vs. the second by:
 .br
-    \fBplt powers 0 1 -t "Squares of small integers" -x "Integer" -y "Square"\fR
+	\fBplt powers 0 1 -t "Squares of small integers" -x "Integer" -y "Square"\fR
 .br
 The same file can be used to generate a number of different plots, by
 choosing different columns.  To plot the third column vs. the first, try:
-    \fBplt powers 2 0 -t "Marshmallows" -x "Mass (kg)" -y "Height (m)"\fR
-.PP
-The \fIplt Tutorial and Cookbook\fR contains many more examples.
+.br
+	\fBplt powers 2 0 -t "Marshmallows" -x "Mass (kg)" -y "Height (m)"\fR
 .SH FILES
 .TP
-\fB/usr/local/lib/ps/plt.pro\fR
+\fB/usr/lib/ps/plt.pro\fR
 PostScript prolog for plots printed using \fBlwcat\fR
 .SH SEE ALSO
-\fIplt Tutorial and Cookbook\fR (a book-length introduction to \fBplt\fR,
-included in the \fBplt\fR source package)
+.PP
+The \fIplt Tutorial and Cookbook\fR (a book-length introduction to \fBplt\fR,
+included in the \fBplt\fR source package) contains many more examples.
+.SH AVAILABILITY
+\fBplt\fR is available as part of PhysioToolkit (see \fBSOURCES\fR below) under
+the GPL.
 .SH AUTHORS
 \fBplt\fR was originally written by Paul Albrecht, and is currently maintained
 by George B. Moody (\fBgeorge@mit.edu\fR).

@@ -1,25 +1,27 @@
 '\" t
-.TH ECGEVAL 1 "11 January 2000" "WFDB software 10.0" "WFDB applications"
+.TH ECGEVAL 1  "28 July 2002" "WFDB 10.2.7" "WFDB Applications Guide"
 .SH NAME
 ecgeval \- generate and run ECG analyzer evaluation script
 .SH SYNOPSIS
 \fBecgeval\fR
 .SH DESCRIPTION
 .PP
-This program generates a Bourne shell (\fIsh\fR(1)) script under UNIX, or
+This program generates a Bourne shell (\fBsh\fR(1)) script under UNIX, or
 a batch file under MS-DOS, to compare a set of test annotation files with
 a set of reference annotation files and a set of reference heart rate
-measurement files using the programs \fIbxb\fR(1), \fIrxr\fR(1), \fImxm\fR(1),
-and \fIepic\fR(1), and then to produce summary reports by passing the outputs
-of these programs to \fIsumstats\fR(1) and \fIplotstm\fR(1).
+measurement files using the programs \fBbxb\fR(1), \fBrxr\fR(1), \fBmxm\fR(1),
+and \fBepic\fR(1), and then to produce summary reports by passing the outputs
+of these programs to \fBsumstats\fR(1) and \fBplotstm\fR(1).
 .PP
-\fIecgeval\fR asks interactively for the annotator names, the name of
+\fBecgeval\fR asks interactively for the annotator names, the name of
 the database to be used, and which optional analyzer outputs are to be
 evaluated.  It then creates the evaluation script, and offers the user a
 choice of running the script immediately, or exiting (in order to review
 and perhaps edit the script before running it).
+.SH ENVIRONMENT
 .PP
-The shell variable \fBWFDB\fR should be set and exported (see \fIsetwfdb\fR(1)).
+It may be necessary to set and export the shell variable \fBWFDB\fR (see
+\fBsetwfdb\fR(1)).
 .SH FILES
 .TP
 dblist	
@@ -43,7 +45,8 @@ NST DB	nstlist	Noise Stress Test Database
 CU DB	culist	Creighton University Sustained Ventricular Arrhythmia Database
 .TE
 .SH SEE ALSO
-bxb(1), epic(1), mxm(1), plotstm(1), rxr(1), setwfdb(1), sumstats(1)
+\fBbxb\fR(1), \fBepic\fR(1), \fBmxm\fR(1), \fBplotstm\fR(1), \fBrxr\fR(1),
+\fBsetwfdb\fR(1), \fBsumstats\fR(1)
 .br
 \fIEvaluating ECG Analyzers\fR
 .SH AUTHOR

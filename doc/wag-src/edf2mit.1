@@ -1,0 +1,54 @@
+.TH EDF2MIT 1  "31 July 2002" "WFDB 10.2.7" "WFDB Applications Guide"
+.SH NAME
+edf2mit \- converting from EDF to MIT format
+.SH SYNOPSIS
+\fBedf2mit -i\fR \fIedffile\fR [ \fIoptions\fR ... ]
+.SH DESCRIPTION
+.PP
+This program reads the specified \fIedffile\fR, an EDF (European Data Format)
+file, and creates MIT-format signal and header files containing the same data.
+European Data Format was originally designed for storage of polysomnograms.
+.PP
+Options include:
+.TP
+\fB-b\fR
+Input is in big-endian byte order (default: little-endian).
+.TP
+\fB-h\fR
+Print a brief usage summary.
+.TP
+\fB-r\fR \fIrecord\fR
+Create the specified \fIrecord\fR (default: use the patient ID field from
+the input file as the record name).
+.TP
+\fB-s\fR \fIsignal-list\fR
+Copy only the signals named in the \fIsignal-list\fR (one or more input signal
+numbers, separated by spaces;  default: copy all signals).  Signals are
+numbered consecutively beginning with zero.  This option may be used to
+re-order or duplicate signals.
+.TP
+\fB-v\fR
+Verbose mode (print debugging output).
+.SH ENVIRONMENT
+.PP
+It may be necessary to set and export the shell variable \fBWFDB\fR (see
+\fBsetwfdb\fR(1)).
+.SH AVAILABILITY
+This program is provided in the \fIconvert\fR directory of the WFDB Software
+Package.  Run \fBmake\fR in that directory to compile and install it if it
+has not been installed already.
+.SH SEE ALSO
+\fBa2m\fR(1), \fBsnip\fR(1), \fBxform\fR(1), \fBwfdb\fR(3), \fBheader\fR(5)
+.HP
+Bob Kemp, Alpo Värri, Agostinho C. Rosa, Kim D. Nielsen and John Gade.
+A simple format for exchange of digitized polygraphic recordings.
+\fIElectroencephalography and Clinical Neurophysiology\fB 82\fR:391-393 (1992).
+.HP
+Bob Kemp's EDF web site (http://www.hsr.nl/bobkemp/edf/edf.htm).
+The definitive reference on the format;  it includes the full specification of
+EDF from the 1992 paper, sample EDF files, software for reading and viewing
+them, FAQs, and much more.
+.SH AUTHOR
+George B. Moody (george@mit.edu)
+.SH SOURCES
+http://www.physionet.org/physiotools/wfdb/convert/edf2mit.c

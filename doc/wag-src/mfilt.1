@@ -1,10 +1,10 @@
-.TH MFILT 1 "11 January 2000" "WFDB software 10.0" "WFDB applications"
+.TH MFILT 1 "30 July 2002" "WFDB 10.2.7" "WFDB Applications Guide"
 .SH NAME
 mfilt \- general-purpose median filter for WFDB records
 .SH SYNOPSIS
-\fBmfilt -l\fI length\fR [ \fIoptions\fR ... ]
+\fBmfilt -l\fR \fIlength\fR [ \fIoptions\fR ... ]
 .SH DESCRIPTION
-\fImfilt\fR can be used to apply a median filter of any desired \fIlength\fR to
+\fBmfilt\fR can be used to apply a median filter of any desired \fIlength\fR to
 any desired section of a database record.  The \fIlength\fR is expressed in
 samples (i.e., each output sample is the median of \fIlength\fR input samples).
 Median filters can be much more effective than any type of linear filter for
@@ -15,31 +15,31 @@ resulting from the non-linear characteristics of the filter.
 .PP
 \fIOptions\fR are:
 .TP
-\fB-f\fI time\fR
-Filter from the specified time on the input record (default: start at the
+\fB-f\fR \fItime\fR
+Filter from the specified \fItime\fR on the input record (default: start at the
 beginning of the record).
 .TP
 \fB-h\fR
 Print a usage summary.
 .TP
-\fB-i\fI record\fR
+\fB-i\fR \fIrecord\fR
 Use the specified \fIrecord\fR for input (default: record 16).
 .TP
-\fB-l\fI n\fR
+\fB-l\fR \fIn\fR
 Use an \fIn\fR-point median.
 .TP
-\fB-n\fI record\fR
+\fB-n\fR \fIrecord\fR
 Write the output signals to \fIrecord\fB.dat\fR, using the same
 specifications as the input signals, and create a header file for the
 specified \fIrecord\fR.  This option overrides \fB-o\fR if both are used.
 .TP
-\fB-o\fI record\fR
+\fB-o\fR \fIrecord\fR
 Use the specified \fIrecord\fR for output (default: record 16).  If the output
 record header file specifies fewer signals than are present in the input, any
 extra input signals are discarded.
 .TP
-\fB-t\fI time\fR
-Filter until the specified time on the input record (default: go to the
+\fB-t \fItime\fR
+Filter until the specified \fItime\fR on the input record (default: go to the
 end of the record).
 .PP
 In the present implementation, the same filter is applied to each input signal.
@@ -51,9 +51,10 @@ value from the sorted array and there is no phase shift; otherwise, the output
 is the average of the two middle values from the array and there is a phase
 shift of one-half of the sampling interval.  If necessary, the output is
 padded at the end to obtain equal numbers of input and output samples.
+.SH ENVIRONMENT
 .PP
-The shell variable \fBWFDB\fR should be set and exported (see
-\fIsetwfdb\fR(1)).
+It may be necessary to set and export the shell variable \fBWFDB\fR (see
+\fBsetwfdb\fR(1)).
 .SS Example
 .PP
 A 3-point median filter, applied to the first 5 minutes of record 100
@@ -61,7 +62,7 @@ to produce a new record 100m:
 .br
 	\fBmfilt -l 3 -i 100 -n 100m\fR
 .SH SEE ALSO
-fir(1)
+\fBfir\fR(1)
 .SH AUTHOR
 George B. Moody (george@mit.edu)
 .SH SOURCE

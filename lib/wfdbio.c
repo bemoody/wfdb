@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-			Last revised:	  2 June 2002		wfdblib 10.2.6
+			Last revised:	  12 July 2002		wfdblib 10.2.7
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -1542,7 +1542,8 @@ int wfdb_fclose(WFDB_FILE *wp)
 #else
     status = fclose(wp->fp);
 #endif
-    (void)free(wp);
+    if (wp->fp != stdin)
+	(void)free(wp);
     return (status);
 }
 

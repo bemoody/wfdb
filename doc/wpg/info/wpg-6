@@ -1,4 +1,9 @@
-This is wpg, produced by makeinfo version 4.0b from wpg.tex.
+This is wpg, produced by makeinfo version 4.1 from wpg.tex.
+
+INFO-DIR-SECTION Libraries
+START-INFO-DIR-ENTRY
+* WFDB library: (wpg).		The Waveform Database library.
+END-INFO-DIR-ENTRY
 
 
 File: wpg,  Node: Glossary,  Next: Installation,  Prev: Exercises,  Up: Top
@@ -543,7 +548,7 @@ software, using the commands:
 If you accept the default (`/usr'), you will need root permissions when
 runnning `make install'.  If you choose another location, follow the
 instructions given by `configure' for setting your `PATH' and
-`LD\_LIBRARY\_PATH' environment variables.
+`LD_LIBRARY_PATH' environment variables.
 
    Depending on the speed of your system and of your C compiler, `make'
 will generally require between 1 and 10 minutes.
@@ -555,11 +560,10 @@ MS-Windows
 ==========
 
    If you have not already done so, install the Cygwin development
-environment (freely available from
-`http://sources.redhat.com/cygwin/').  This includes `gcc' (the GNU
-C/C++ compiler) as well as a comprehensive assortment of other Unix
-utilities ported to MS-Windows.  Accept the defaults suggested by the
-installer.
+environment (freely available from `http://www.cygwin.com').  This
+includes `gcc' (the GNU C/C++ compiler) as well as a comprehensive
+assortment of other Unix utilities ported to MS-Windows.  Accept the
+defaults suggested by the installer.
 
    _Important:_ Although you may be able to compile the WFDB software
 package using a proprietary compiler, this is _not supported_.  The
@@ -686,15 +690,16 @@ to include the directory in which they are kept in your search path.
 
    To use any of these programs, you will need to set the database path
 first (*note WFDB path::), unless the default database path (`.
-http://www.physionet.org/physiobank/database') is suitable.  Programs
-that accept _time_ arguments or commands (usually shown as FROM and TO
-below) use `strtim' to convert these strings into sample intervals;
-hence they accept any of the varieties of standard time format
-described earlier (*note timstr and strtim::).  Programs that accept
-annotation mnemonics as arguments or commands (usually shown as CODE
-below) use `strann' to interpret them; for a list of legal mnemonics,
-*note Annotation Codes::.  Where record or annotator names are required
-as command arguments, they are indicated below as RECORD or ANNOTATOR.
+/usr/database http://www.physionet.org/physiobank/database') is
+suitable. Programs that accept _time_ arguments or commands (usually
+shown as FROM and TO below) use `strtim' to convert these strings into
+sample intervals; hence they accept any of the varieties of standard
+time format described earlier (*note timstr and strtim::).  Programs
+that accept annotation mnemonics as arguments or commands (usually
+shown as CODE below) use `strann' to interpret them; for a list of
+legal mnemonics, *note Annotation Codes::.  Where record or annotator
+names are required as command arguments, they are indicated below as
+RECORD or ANNOTATOR.
 
    In the remainder of this appendix, you will find usage examples and
 capsule descriptions of the standard WFDB application programs.  The

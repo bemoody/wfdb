@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:    24 June 2002
+#				Last revised:   8 August 2002
 # Change the settings below as appropriate for your setup.
 
 # D2PARGS is a list of options for dvips.  Uncomment one of these to set the
@@ -84,7 +84,7 @@ TMS = -mgs
 # wag0.ps, and takes longer to render as a result.  To enable creation of
 # PostScript with DSCs in this way, uncomment the next two lines:
 WAGPSREQ = wag.pdf
-MAKEWAGPS = acroread -toPostScript wag.pdf
+MAKEWAGPS = acroread -toPostScript -level1 -fast wag.pdf
 # You can use pdftops instead of acroread by commenting out the previous line
 # and uncommenting the next one.
 # MAKEWAGPS = pdftops wag.pdf
@@ -104,7 +104,7 @@ install:	wag.man
 
 uninstall:
 	../../uninstall.sh $(MAN1) *.1 ad2m.1 ann2rr.1 m2a.1 md2a.1 hrlomb.1 \
-	 hrmem.1 hrplot.1 plot3d.1 cshsetwfdb.1 vsetup.1 rr2ann.1
+	 hrmem.1 hrplot.1 plot3d.1 cshsetwfdb.1 vsetup.1 rr2ann.1 gtkwave.1
 	../../uninstall.sh $(MAN3) *.3
 	../../uninstall.sh $(MAN5) *.5
 	../../uninstall.sh $(MAN7) *.7
@@ -112,8 +112,12 @@ uninstall:
 
 # 'make wag-book': print a copy of the WFDB Applications Guide
 wag-book:	wag0.ps
-	$(TROFF) wag.cover >wagcover.ps
-	$(PSPRINT) wagcover.ps wag0.ps
+	cp wag.cover wagcover
+	echo $(SHORTDATE) >>wagcover
+	echo .bp >>wagcover
+	$(TROFF) wagcover >wagcover.ps
+	$(PSPRINT) wagcover.ps
+	$(PSPRINT) wag0.ps
 
 # 'make wag.html': format the WFDB Applications Guide as HTML
 wag.html:
@@ -123,14 +127,14 @@ wag.html:
 	 -up_url="wag.htm" -up_title="WFDB Applications Guide" install
 	latex2html -dir ../wag -local_icons -prefix ev \
 	 -up_url="wag.htm" -up_title="WFDB Applications Guide" eval
-	rm -f ../wag/index.html
-	cd ../wag; ./fixag.sh *.html; rm -f fixag.sh images.*
+	cd ../wag; rm -f index.html WARNINGS *.aux *.log *.tex
+	sed "s/LONGDATE/$(LONGDATE)/" <intro.ht0 >../wag/intro.htm
+	sed "s/LONGDATE/$(LONGDATE)/" <faq.ht0 >../wag/faq.htm
+	cd ../wag; ./fixag.sh "$(LONGDATE)" *.html; rm -f fixag.sh images.*
 	cd ../wag; rm -f .I* .ORIG_MAP *.html *.pl fixag.sed
-	cp wag.ht0 ../wag/wag.htm
-	date '+%e %B %Y' >>../wag/wag.htm
-	cat ../misc/foot.ht0 >>../wag/wag.htm
+	sed "s/LONGDATE/$(LONGDATE)/" <wag.ht0 | \
+	  sed "s/VERSION/$(VERSION)/" >../wag/wag.htm
 	cd ../wag; ln -s wag.htm index.html
-	cp intro.ht0 ../wag/intro.htm
 
 # 'make wag.man': install the man pages from the WFDB Applications Guide
 wag.man:
@@ -140,6 +144,7 @@ wag.man:
 	test -d $(MAN7) || ( mkdir -p $(MAN7); $(SETDPERMISSIONS) $(MAN7) )
 	./maninst.sh $(MAN1) $(MAN3) $(MAN5) $(MAN7) "$(SETPERMISSIONS)"
 	$(LN) $(MAN1)/a2m.1 $(MAN1)/ad2m.1
+	$(LN) $(MAN1)/a2m.1 $(MAN1)/ahaconvert.1
 	$(LN) $(MAN1)/a2m.1 $(MAN1)/m2a.1
 	$(LN) $(MAN1)/a2m.1 $(MAN1)/md2a.1
 	$(LN) $(MAN1)/ann2rr.1 $(MAN1)/rr2ann.1
@@ -149,6 +154,7 @@ wag.man:
 	$(LN) $(MAN1)/plot2d.1 $(MAN1)/plot3d.1
 	$(LN) $(MAN1)/setwfdb.1 $(MAN1)/cshsetwfdb.1
 	$(LN) $(MAN1)/view.1 $(MAN1)/vsetup.1
+	$(LN) $(MAN1)/wave.1 $(MAN1)/gtkwave.1
 
 # 'make wag.pdf': format the WFDB Applications Guide as PDF
 wag.pdf:	wag0.ps
@@ -158,19 +164,27 @@ wag.pdf:	wag0.ps
 wag.ps:		$(WAGPSREQ)
 	$(MAKEWAGPS)
 
-wag0.ps:
-	latex wag
-	dvips -o wag1.ps wag.dvi
-	tbl appguide.int | $(TROFF) $(TMS) >wag2.ps
+wag0.ps:	wag.tex appguide.int install.tex eval.tex
+	sed 's/VERSION/$(VERSION)/' <wag.tex | \
+	 sed 's/LONGDATE/$(LONGDATE)/' >wag1.tex
+	latex wag1
+	dvips -o wag1.ps wag1
+	sed "s/LONGDATE/$(LONGDATE)/" <appguide.int | \
+	  sed "s/VERSION/$(VERSION)/" | \
+	  tbl | \
+	  $(TROFF) $(TMS) -o3- >wag2.ps
 	tbl *.1 *.3 *.5 | $(TROFF) $(TMAN) >wag3.ps
-	latex blankpage
-	dvips $(D2PARGS) -o blankpage.ps blankpage.dvi
-	latex install
-	dvips $(D2PARGS) -o wag4.ps install.dvi
-	latex eval
-	dvips $(D2PARGS) -o wag5.ps eval.dvi
-	cat wag[123].ps blankpage.ps wag4.ps blankpage.ps wag5.ps | grep -v '^%%' >wag0.ps
+	sed "s/LONGDATE/$(LONGDATE)/" <install.tex | \
+	  sed "s/VERSION/$(VERSION)/" >wag4.tex
+	latex wag4
+	dvips $(D2PARGS) -o wag4.ps wag4.dvi
+	sed "s/LONGDATE/$(LONGDATE)/" <eval.tex | \
+	  sed "s/VERSION/$(VERSION)/" >wag5.tex
+	latex wag5
+	dvips $(D2PARGS) -o wag5.ps wag5.dvi
+	cat wag[123].ps blankpage wag4.ps blankpage wag5.ps | grep -v '^%%' >wag0.ps
 
 # 'make clean': remove intermediate and backup files
 clean:
-	rm -f *.aux *.dvi *.log *.ps *.toc wag.pdf *~
+	rm -f *.aux *.dvi *.log *.ps *.toc intro.htm faq.htm wag.pdf wagcover \
+	      wag[145].tex *~

@@ -30,7 +30,7 @@ $NO_SUBDIR = 0;
 
 # Supply your own string if you don't like the default <Name> <Date>
 #$ADDRESS = "<I>$address_data[0] <BR>\n$address_data[1]</I>";
-$ADDRESS = "<I><A HREF=\"mailto:george\@mit.edu\">George B. Moody (<tt>george\@mit.edu</tt>)</A><BR>\n$address_data[1]</I>";
+$ADDRESS = "";
 
 $NO_NAVIGATION = 0;	# 1 = do not put a navigation panel at the top of each page
 
@@ -59,7 +59,7 @@ $REUSE = 2;
 # then match those that would have bee produced by LaTeX.
 # The correct section numbers are obtained from the $FILE.aux file generated 
 # by LaTeX.
-# Hiding the seciton numbers encourages use of particular sections 
+# Hiding the section numbers encourages use of particular sections 
 # as standalone documents. In this case the cross reference to a section 
 # is shown using the default symbol rather than the section number.
 $SHOW_SECTION_NUMBERS = 0;

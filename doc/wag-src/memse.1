@@ -1,20 +1,20 @@
-.TH MEMSE 1 "11 January 2000" "PSD Estimation" "Signal processing"
+.TH MEMSE 1 "30 July 2002" "WFDB 10.2.7" "WFDB Applications Guide"
 .SH NAME
 memse \- estimate power spectrum using maximum entropy (all poles) method
 .SH SYNOPSIS
 \fBmemse\fR [ \fIoptions ...\fR ] \fIinput-file\fR
 .SH DESCRIPTION
 .PP
-\fImemse\fR transforms a real-valued time series (from the specified
+\fBmemse\fR transforms a real-valued time series (from the specified
 \fIinput-file\fR, or from the standard input if \fIinput-file\fR is
 specified as ``-''; \fIinput-file\fR must be in text form) into a power
-spectrum (on the standard output).  \fImemse\fR is designed to be used
-in much the same way as \fIfft\fR(1); it accepts the same input,
+spectrum (on the standard output).  \fBmemse\fR is designed to be used
+in much the same way as \fBfft\fR(1); it accepts the same input,
 produces output in the same format, and accepts many of the same
-options used with \fIfft\fR.
+options used with \fBfft\fR.
 .PP
-Unlike \fIfft\fR, which bases its spectral estimates on the discrete Fourier
-transform, \fImemse\fR uses the maximum entropy (all poles) method, also known
+Unlike \fBfft\fR, which bases its spectral estimates on the discrete Fourier
+transform, \fBmemse\fR uses the maximum entropy (all poles) method, also known
 as autoregressive (AR) spectral estimation.  This method models the spectrum
 by a series expansion in which the free parameters are all in the denominators
 of its terms;  hence each term may represent a pole (corresponding to infinite
@@ -25,25 +25,25 @@ series may represent a zero.  All-poles models are particularly useful for
 analysis of spectra which have discrete peaks (in the terminology of optical
 spectra, ``lines'').
 .PP
-In order to use \fImemse\fR, you should have some idea of the order of the
+In order to use \fBmemse\fR, you should have some idea of the order of the
 model you wish to use (i.e., the number of poles).  Although this may be any
 number up to the number of input points, the number of poles generally should
 not exceed the square root of the number of input points, and usually should
 be considerably less than that number.  Large numbers of poles lead to lengthy
 computations (much slower than the FFT) in which accumulated roundoff error
 becomes a serious problem.  This problem may also occur if the length of the
-input series becomes excessive.  The recommended way to use \fImemse\fR is
-to begin by using \fIfft\fR, in order to estimate the model order.  Typically
+input series becomes excessive.  The recommended way to use \fBmemse\fR is
+to begin by using \fBfft\fR, in order to estimate the model order.  Typically
 this should be a small multiple of the number of peaks which you \fIbelieve\fR
-are present.  Beware!  \fImemse\fR will produce smooth spectral estimates for
+are present.  Beware!  \fBmemse\fR will produce smooth spectral estimates for
 whatever model order you choose -- and they may be totally bogus if you choose
 incorrectly.  Varying the model order can help to weed out some spurious
-features, but use extreme care when interpreting \fImemse\fR output given noisy
+features, but use extreme care when interpreting \fBmemse\fR output given noisy
 input.
 .PP
 \fIOptions\fR are:
 .TP
-\fB-f \fIfrequency\fR
+\fB-f\fR \fIfrequency\fR
 Show the center frequency for each bin in the first column.  The
 \fIfrequency\fR argument specifies the input sampling frequency;  the center
 frequencies are given in the same units.
@@ -51,28 +51,28 @@ frequencies are given in the same units.
 \fB-h\fR
 Print a usage summary.
 .TP
-\fB-l \fIn\fR
+\fB-l\fR \fIn\fR
 Handle input series up to \fIn\fR points in length.  Default: \fIn\fR = 16384,
 although you should be cautious about using \fImemse\fR with such long input
 series.
 .TP
-\fB-n \fIn\fR
+\fB-n\fR \fIn\fR
 Produce exactly \fIn\fR power estimates, evenly spaced in frequency from 0
 up to half the input sampling frequency inclusive.  The default depends on
 the length of the input series;  it is designed to match \fIfft\fR's defaults,
 to make it easy to compare outputs.  You may wish to use values of \fIn\fR
 which are higher than the default in order to improve your estimates of the
 locations of sharp features in the spectrum;  since this is not possible using
-\fIfft\fR, this feature is one of the main advantages of \fImemse\fR.
+\fBfft\fR, this feature is one of the main advantages of \fImemse\fR.
 .TP
-\fB-o \fIn\fR
+\fB-o\fR \fIn\fR
 Use an \fIn\fRth order model (i.e., up to \fIn\fR poles).  Default:  the
 square root of the number of input samples.
 .TP
-\fB-P \fIn\fR
+\fB-P\fR \fIn\fR
 Generate a power spectrum (print squared magnitudes).
 .TP
-\fB-w \fIwindow-type\fR
+\fB-w\fR \fIwindow-type\fR
 Apply the specified window to the input data.  \fIwindow-type\fR may be
 one of: `Bartlett', `Blackman', `Blackman-Harris', `Hamming', `Hanning',
 `Parzen', `Square', and `Welch'.  The `Square' window type is equivalent to
@@ -88,11 +88,11 @@ Set the mean value of the inputs to zero as for \fB-z\fR, and detrend the
 series (set its mean first derivative to zero).  This is equivalent to
 subtracting a best-fit (by least squares) line from the input data.
 .SH NOTES
-Versions of \fImemse\fR released prior to September 1999 did not support the
+Versions of \fBmemse\fR released prior to September 1999 did not support the
 \fB-P\fR option, and did not normalize amplitudes with respect to the number
 of output points.
 .SH SEE ALSO
-fft(1), hrfft(1), lomb(1)
+\fBfft\fR(1), \fBhrfft\fR(1), \fBlomb\fR(1)
 .SH AUTHOR
 George B. Moody (george@mit.edu)
 .SH SOURCE
