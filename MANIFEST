@@ -116,6 +116,7 @@ checkpkg/Makefile.top
 checkpkg/Makefile.tpl
 conf/
 conf/cygwin.def
+conf/exechmod
 conf/exestrip
 conf/generic.def
 conf/generic-slib.def

@@ -1,12 +1,13 @@
-: file: maninst.sh	G. Moody	16 October 1989
-:			Last revised:	25 November 2001
-: Bourne shell script for installing WFDB software man pages
-
-: Copyright[C] Massachusetts Institute of Technology 2001. All rights reserved.
-
-: This script is normally invoked by make -- see the Makefile in this
-: directory.  If you want to put your man pages in a non-standard location,
-: edit the case statements below first, or just copy the pages manually.
+#!/bin/sh
+# file: maninst.sh	G. Moody	16 October 1989
+#			Last revised:	29 November 2001
+# Bourne shell script for installing WFDB software man pages
+#
+# Copyright (C) 2001 George B. Moody
+#
+# This script is normally invoked by make -- see the Makefile in this
+# directory.  If you want to put your man pages in a non-standard location,
+# edit the case statements below first, or just copy the pages manually.
 
 MAN1=$1
 MAN3=$2
@@ -58,7 +59,7 @@ esac
 
 for FILE in *.7
 do
-   cp $FILE $MAN5/`basename $FILE .7`.$EXT
-   $SETPERMISSIONS $MAN5/`basename $FILE .7`.$EXT
+   cp $FILE $MAN7/`basename $FILE .7`.$EXT
+   $SETPERMISSIONS $MAN7/`basename $FILE .7`.$EXT
 done
 exit 0

@@ -222,6 +222,7 @@ then
     echo "To compile WAVE, install XView, add the directory containing the"
     echo "XView textedit application to your PATH, and run ./configure again."
     cp -p wave/nomake wave/Makefile
+    cp -p wave/nomake waverc/Makefile
     echo "WAVE=0" >>config.cache
 else
     echo "WAVE will be compiled."

@@ -255,7 +255,7 @@ htmlpg:	makehtmldirs dbpg.ps
 	cp -p dbu.tex dbpg.ps $(HTMLDIR)/dbpg
 	echo '#!$(PERL)' >$(HTMLDIR)/dbpg/texi2html
 	cat texi2html >>$(HTMLDIR)/dbpg/texi2html
-	chmod +x $(HTMLDIR)/dbpg/texi2html
+	$(SETXPERMISSIONS) $(HTMLDIR)/dbpg/texi2html
 	cp dbu.ht0 $(HTMLDIR)/dbpg/dbpg.htm
 	cd $(HTMLDIR)/dbpg; ./texi2html -short_ext -menu -split_node dbu.tex
 	rm -f $(HTMLDIR)/dbpg/dbu.tex $(HTMLDIR)/dbpg/texi2html

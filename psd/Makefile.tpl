@@ -1,5 +1,5 @@
-# file: Makefile.tpl		G. Moody		24 May 2000
-#				Last revised:		6 June 2000
+# file: Makefile.tpl		G. Moody	  24 May 2000
+#				Last revised:	29 November 2001
 # This section of the Makefile should not need to be changed.
 
 # Programs to be compiled.
@@ -25,7 +25,8 @@ scripts:
 	sed s+/usr/local/bin+$(BINDIR)+g <hrmem >$(BINDIR)/hrmem
 	sed s+/usr/local/bin+$(BINDIR)+g <hrplot >$(BINDIR)/hrplot
 	cp plot2d plot3d $(BINDIR)
-	cd $(BINDIR); $(SETXPERMISSIONS) $(SCRIPTS)
+	$(SETXPERMISSIONS) $(BINDIR)/hrfft $(BINDIR)/hrlomb $(BINDIR)/hrmem \
+	 $(BINDIR)/hrplot $(BINDIR)/plot2d $(BINDIR)/plot3d
 
 uninstall:
 	../uninstall.sh $(BINDIR) $(XFILES) $(SCRIPTS)

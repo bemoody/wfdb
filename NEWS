@@ -6,6 +6,10 @@
 	the process of formatting it is now better integrated with that for
 	the other WFDB guides.
 
+	In 'ihr', the use of an uninitialized variable ('lasttime') caused
+	some non-outlier data in the first few samples to be rejected
+	incorrectly.  This has now been fixed.
+
 10.2.1:
 	Most users will no longer need to set the WFDB path explicitly, as a
 	result of several minor changes in the default path and in the

@@ -1,5 +1,5 @@
 /* file: pschart.c	G. Moody	 15 March 1988
-			Last revised:  12 October 2001
+			Last revised:  29 November 2001
 
 -------------------------------------------------------------------------------
 pschart: Produce annotated `chart recordings' on a PostScript device
@@ -636,8 +636,6 @@ FILE *cfile;
 	    if (tokptr) (void)strncpy(record, tokptr, sizeof(record)-1);
 	    tstring = strtok((char *)NULL, " \t\n");
 	    title = strtok((char *)NULL, "\n");
-	    for (i = 0; i < nisig; i++)
-		uncal[i] = 0;
 	    if (tokptr == NULL || tstring == NULL ||
 		(nisig = isigopen(record, NULL, 0)) < 0) continue;
 	    if (nisig > nimax) {
@@ -664,6 +662,8 @@ FILE *cfile;
 	    }
 	    if (isigopen(record, s, nisig) != nisig)
 		continue;
+	    for (i = 0; i < nisig; i++)
+		uncal[i] = 0;
 	    (void)setpagetitle(0L);
 	    if (!sflag) {
 		for (i = 0; i < nisig; i++)

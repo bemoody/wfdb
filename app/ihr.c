@@ -1,9 +1,9 @@
 /* file ihr.c		G. Moody      12 November 1992
-			Last revised:  9 November 1999
+			Last revised: 27 November 2001
 
 -------------------------------------------------------------------------------
 ihr: Generate instantaneous heart rate data from annotation file
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -46,7 +46,7 @@ char *argv[];
     char *record = NULL, *prog_name();
     double ihr, ihrlast, mhr = 70., sps, tol = 10.0, atof(), fabs();
     int i, j, lastann = NOTQRS, lastint = 1, xflag = 0;
-    long from = 0L, to = 0L, lasttime;
+    long from = 0L, to = 0L, lasttime = -9999L;
     static WFDB_Anninfo ai;
     WFDB_Annotation annot;
     void help();
@@ -96,7 +96,7 @@ char *argv[];
 	  case 't':	/* ending time follows */
 	    if (++i >= argc) {
 		(void)fprintf(stderr, "%s: end time must follow -t\n", pname);
-		exit(1);
+  		exit(1);
 	    }
 	    to = i;
 	    break;
