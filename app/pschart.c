@@ -1,5 +1,5 @@
 /* file: pschart.c	G. Moody	 15 March 1988
-			Last revised:  29 November 2001
+			Last revised:  17 December 2001
 
 -------------------------------------------------------------------------------
 pschart: Produce annotated `chart recordings' on a PostScript device
@@ -138,7 +138,7 @@ double omargin;			/* outside margin (mm) */
 FILE *infofile;			/* file to print instead of title */
 
 /* User-settable parameters */
-char aname[41] = "atruth";	/* annotator name */
+char aname[41] = "atr";		/* annotator name */
 char aname2[41] = "";		/* second annotator name */
 int aux_shorten = 0;		/* if non-zero, print first char of aux only */
 double boff = 0.;		/* binding offset (mm) */
@@ -662,8 +662,10 @@ FILE *cfile;
 	    }
 	    if (isigopen(record, s, nisig) != nisig)
 		continue;
-	    for (i = 0; i < nisig; i++)
+	    for (i = 0; i < nisig; i++) {
+		vbuf[i] = NULL;
 		uncal[i] = 0;
+	    }
 	    (void)setpagetitle(0L);
 	    if (!sflag) {
 		for (i = 0; i < nisig; i++)

@@ -1,5 +1,5 @@
 /* file: psfd.c		G. Moody         9 August 1988
-			Last revised:  29 November 2001
+			Last revised:  17 December 2001
 
 -------------------------------------------------------------------------------
 psfd: Produces annotated full-disclosure ECG plots on a PostScript device
@@ -589,8 +589,10 @@ FILE *cfile;
 	    }
 	    if (isigopen(record, s, nisig) != nisig)
 		continue;
-	    for (i = 0; i < nisig; i++)
+	    for (i = 0; i < nisig; i++) {
+		vbuf[i] = NULL;
 		uncal[i] = 0;
+	    }
 	    (void)setpagetitle(0L);
 	    if (!sflag) {
 		for (i = 0; i < nisig; i++)

@@ -1,3 +1,7 @@
+10.2.4:
+	Bug fixes in 'pschart' and 'psfd' (vbuf was not properly initialized
+	before its first use).
+
 10.2.3:
 	Portability fixes in 'configure', 'install.sh', 'wave/Makefile.tpl',
 	'psd/hr*', 'doc/*.sh', 'lib/wfdblib.h', and 'checkpkg/*check'.

@@ -4,7 +4,7 @@
 # version number, defined here:
 MAJOR = 10
 MINOR = 2
-RELEASE = 3
+RELEASE = 4
 VERSION = $(MAJOR).$(MINOR).$(RELEASE)
 
 # VDEFS is the set of C compiler options needed to set version number variables
