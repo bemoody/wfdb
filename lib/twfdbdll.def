@@ -1,0 +1,79 @@
+LIBRARY	TWFDB
+
+DESCRIPTION 'WFDB library, version 10.0.0  Copyright (C) George B. Moody 1999.'
+
+EXETYPE	WINDOWS
+
+STUB	'WINSTUB.EXE'
+
+CODE	PRELOAD MOVEABLE DISCARDABLE
+
+DATA	PRELOAD MOVEABLE SINGLE
+
+HEAPSIZE	0
+
+EXPORTS
+    annopen	 @1
+    isigopen	 @2
+    osigopen	 @3
+    osigfopen	 @4
+    wfdbinit	 @5
+    getvec	 @6
+    putvec	 @7
+    getann	 @8
+    ungetann	 @9
+    putann	@10
+    isigsettime	@11
+    isgsettime	@12
+    iannsettime	@13
+    ecgstr	@14
+    strecg	@15
+    setecgstr	@16
+    annstr	@17
+    strann	@18
+    setannstr	@19
+    anndesc	@20
+    setanndesc	@21
+    timstr	@22
+    mstimstr	@23
+    strtim	@24
+    datstr	@25
+    strdat	@26
+    adumuv	@27
+    muvadu	@28
+    aduphys	@29
+    physadu	@30
+    calopen	@31
+    getcal	@32
+    putcal	@33
+    newcal	@34
+    flushcal	@35
+    getinfo	@36
+    putinfo	@37
+    newheader	@38
+    setheader	@39
+    wfdbquit	@40
+    sampfreq	@41
+    setsampfreq	@42
+    getcfreq	@43
+    setcfreq	@44
+    getbasecount @45
+    setbasecount @46
+    setbasetime	@47
+    wfdbquiet	@48
+    wfdbverbose	@49
+    wfdberror	@50
+    setwfdb	@51
+    getwfdb	@52
+    setibsize	@53
+    setobsize	@54
+    wfdbfile	@55
+    wfdbflush	@56
+    setgvmode	@57
+    getframe	@58
+    wfdbgetskew	@59
+    wfdbsetskew @60
+    wfdbgetstart @61
+    wfdbsetstart @62
+    getspf	@63
+    WEP		@64 RESIDENTNAME

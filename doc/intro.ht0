@@ -1,0 +1,103 @@
+<HTML>
+<HEAD>
+<TITLE>WFDB Applications Guide: Introduction</TITLE>
+</HEAD>
+<BODY bgcolor="#FFFFFF">
+<BR> <P>
+<B>Up:</B> <A HREF="dbag.htm">WFDB Applications Guide</A>
+<H1 ALIGN=CENTER>Introduction</H1>
+
+<P>
+Most of this guide consists of UNIX <I>man</I> pages that describe the
+applications included in the WFDB (Waveform Database) Software
+Package.  If you are unfamiliar with the format of UNIX <I>man</I>
+pages, it may be helpful to refer to the introduction of a UNIX
+reference manual for orientation.  The descriptions are intentionally
+terse; this is a reference manual and not a tutorial introduction to
+the software described within.  In those cases for which relevant
+tutorial material exists elsewhere, references appear in the <I>SEE
+ALSO</I> sections of each <I>man</I> page.
+
+<P>
+The organization follows the traditional arrangement of the UNIX Reference
+Manual:  section 1 contains programs, section 3 contains libraries, and
+section 5 contains file formats.  In the UNIX Reference Manual, sections
+2 and 4 are reserved for system calls and device interfaces respectively;
+these sections do not exist in this guide.
+
+<P>
+If you have not used any of these programs before, you should be sure that
+your environment is set up properly so that WFDB applications can find their
+input files.  See <A HREF="setwfd-1.htm">setwfdb(1)</A> for information about
+doing this;  a more detailed discussion may be found in the first chapter of
+the <A HREF="../dbpg/dbpg.htm"><I>WFDB Programmer's Guide</I></A>, in
+the section about the database path.
+
+<P>
+Certain types of command arguments are used by many of the applications
+described in this guide.  These include:
+<DL>
+<DT><I>record</I>
+<DD>Where this appears, substitute the name of a WFDB record.  MIT-BIH
+Arrhythmia Database record names are 3-digit numbers, AHA Database
+record names are 4-digit numbers, and European ST-T Database record
+names begin with lowercase `<TT>e</TT>', followed by a 4-digit number.
+Record names may contain letters, digits, and underscores.  Case is
+significant in record names that contain letters, even in environments
+such as MS-DOS for which case translation is normally performed by the
+operating system on file names; thus `<TT>e0104</TT>' is the name of a record
+found in the European ST-T Database, whereas `<TT>E0104</TT>' is not.  Under
+MS-DOS, furthermore, only the first eight characters of a record name
+are significant. A record name is <STRONG>not</STRONG> a file name.  See the
+<A HREF="../dbpg/dbpg.htm"><I>WFDB Programmer's Guide</I></A> for
+further details on record names.
+
+<DT><I>annotator</I>
+<DD>Where this appears, substitute an annotator name.  The annotator name
+`<TT>atruth</TT>' (shortened to `<TT>atr</TT>' under MS-DOS and on CD-ROMs)
+is used to name the set of <I>reference annotations</I> supplied by the
+database developers.  Annotator names may contain letters, digits, and
+underscores, as for record names.  Note that, under MS-DOS, only the first
+three characters of an annotator name are significant.
+
+<DT><I>time</I>
+<DD>Where this appears, substitute a string in <I>standard time format</I>.
+<I>Time</I> arguments generally specify elapsed times from the beginning
+of the record (for exceptions to this rule, see the section on the
+<TT>strtim</TT> function in the <A HREF="../dbpg/dbpg.htm">
+<I>WFDB Programmer's Guide</I></A>).  Examples of standard time format:
+<TABLE>
+<tr><td>2:14.875</td><td>2 minutes + 14.875 seconds</td></tr>
+<tr><td>143</td><td>143 seconds (2 minutes + 23 seconds)</td></tr>
+<tr><td>4:02:01</td><td>4 hours + 2 minutes + 1 second</td></tr>
+<tr><td>4:2:1</td><td>same as above</td></tr>
+<tr><td>s12345</td><td>12345 sample intervals</td></tr>
+<tr><td>e</td><td>time of the end of the record</td></tr>
+</TABLE>
+
+<DT><I>signal</I>
+<DD>Where this appears, substitute a signal number.  Signal numbers
+are integers; the first signal in each record is signal 0.  In printed
+documentation for the databases, signals always appear with signal 0
+at the top, signal 1 beneath, etc.  Where the notation
+`<I>signal-list</I>' (or `<I>signal ...</I>') appears in this guide,
+you may specify more than one signal in any desired order; separate
+the signal numbers using spaces.
+</DL>
+
+<P>
+Under UNIX, if the WFDB Software Package has been installed on your
+system, you can also access the information contained in this guide
+using <TT>man</TT> and related programs.  In some cases you may need
+to add <TT>/usr/local/man</TT> to your <TT>MANPATH</TT> environment variable,
+in order to make these pages accessible to <TT>man</TT>.
+
+<BR> <HR>
+<P>
+Your comments on this guide, and on the software that it documents, are
+welcome.  Please send them to:
+<P><I><ADDRESS>
+<A HREF="mailto:george@mit.edu">George B. Moody (<tt>george@mit.edu</tt>)</A></ADDRESS></I><BR>
+20 May 1999
+</BODY>
+</HTML>

@@ -1,0 +1,238 @@
+/* file: wview.rc	G. Moody	20 January 1993
+                        Last revised:     7 May 1999
+
+-------------------------------------------------------------------------------
+Resources for wview
+Copyright (C) 1999 George B. Moody
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place - Suite 330, Boston, MA 02111-1307, USA.
+
+You may contact the author by e-mail (george@mit.edu) or postal mail
+(MIT Room E25-505A, Cambridge, MA 02139 USA).  For updates to this software,
+please visit the author's web site (http://ecg.mit.edu/).
+_______________________________________________________________________________
+
+*/
+
+#include "windows.h"
+#include "wview.h"
+
+ecgicon ICON ecg.ico
+
+wviewmenu MENU
+{
+    POPUP "&File" {
+	MENUITEM "&New",	IDM_NEW, GRAYED
+        MENUITEM "&Open...",	IDM_OPEN
+	MENUITEM "&Save",	IDM_SAVE, GRAYED
+	MENUITEM "Save &As...",	IDM_SAVEAS, GRAYED
+	MENUITEM "&Print...",	IDM_PRINT
+	MENUITEM SEPARATOR
+	MENUITEM "E&xit",	IDM_EXIT
+    }
+
+    POPUP "&Edit" {
+	MENUITEM "&Undo",	IDM_UNDO, GRAYED
+	MENUITEM SEPARATOR
+	MENUITEM "Cu&t",	IDM_CUT, GRAYED
+	MENUITEM "&Copy",	IDM_COPY, GRAYED
+	MENUITEM "&Paste",	IDM_PASTE, GRAYED
+	MENUITEM "De&lete",	IDM_DEL, GRAYED
+	MENUITEM SEPARATOR
+	MENUITEM "&Find...",	IDM_FIND
+    }
+
+    POPUP "&Options" {
+	MENUITEM "&View Options...",	IDM_VIEW
+	MENUITEM "&Print Options...",	IDM_PROPT
+    }
+
+    POPUP "&Help"
+    {
+	MENUITEM "&Index...",		 IDM_HELP_INDEX
+	MENUITEM "&Choosing Inputs...",	 IDM_HELP_CHOOSING
+	MENUITEM "&Browsing...",	 IDM_HELP_BROWSING
+	MENUITEM "&Options...",		 IDM_HELP_OPTIONS
+	MENUITEM "&Searching...",	 IDM_HELP_SEARCHING
+	MENUITEM "&Printing...",	 IDM_HELP_PRINTING
+	MENUITEM SEPARATOR
+        MENUITEM "&About WVIEW...", IDM_ABOUT
+    }
+}
+
+AboutBox DIALOG 20, 20, 160, 80
+STYLE DS_MODALFRAME | WS_CAPTION | WS_SYSMENU
+CAPTION "About WVIEW"
+{
+    CTEXT "WVIEW"     -1,       0, 12, 160,  8
+    ICON "ecgicon"	   -1,	     8, 8, 0, 0
+    CTEXT VERSION	   -1,       0, 36, 160,  8
+    CTEXT "Copyright © George B. Moody 1999."  -1,       0, 48, 160,  8
+    DEFPUSHBUTTON "OK"          IDOK,      64, 60,  32, 14,      WS_GROUP
+}
+
+ChooseBox DIALOG 20, 20, 160, 114
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "WVIEW -- Choose Inputs"
+FONT 8, "MS Sans Serif"
+{
+    LTEXT           "Record name:", 101, 10, 6, 50, 8
+    EDITTEXT        IDD_RECORD, 80, 4, 70, 12, ES_AUTOHSCROLL
+    LTEXT           "Annotator name:", 103, 10, 21, 60, 8
+    EDITTEXT        IDD_ANNOTATOR, 80, 19, 70, 12, ES_AUTOHSCROLL
+    LTEXT           "WFDB path:", 105, 10, 56, 40, 8
+    EDITTEXT        IDD_WFDBPATH, 50, 54, 100, 12, ES_AUTOHSCROLL
+    LTEXT           "WFDB calibration file:", 107, 10, 71, 70, 8
+    EDITTEXT        IDD_WFDBCAL, 80, 69, 70, 12, ES_AUTOHSCROLL
+    GROUPBOX        "WFDB Environment", 109, 0, 40, 160, 49
+    DEFPUSHBUTTON   "OK", IDOK, 30, 95, 40, 14, WS_GROUP
+    PUSHBUTTON      "Cancel", IDCANCEL, 90, 95, 40, 14
+}
+
+FindBox DIALOG 20, 20, 104, 85
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Find"
+FONT 8, "MS Sans Serif"
+{
+    CONTROL         "Find next", IDD_FINDN, "Button", BS_RADIOBUTTON | 
+                    WS_TABSTOP | WS_GROUP, 0, 9, 40, 10
+    CONTROL         "Find previous", IDD_FINDP, "Button", BS_RADIOBUTTON,
+                    0, 28, 60, 10
+    CONTROL         "Recenter at", IDD_RECENTER,"Button", BS_RADIOBUTTON, 
+                    0, 47, 50, 10
+    EDITTEXT        IDD_FNTYPE, 60,  7, 40, 12, ES_AUTOHSCROLL | WS_TABSTOP
+    EDITTEXT        IDD_FPTYPE, 60, 27, 40, 12, ES_AUTOHSCROLL | WS_TABSTOP
+    EDITTEXT        IDD_RCTIME, 60, 46, 40, 12, ES_AUTOHSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "OK", IDOK, 10, 66, 30, 14, WS_GROUP
+    PUSHBUTTON      "Cancel", IDCANCEL, 50, 66, 40, 14
+}
+
+PrintBox DIALOG 5, 25, 230, 115
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Print"
+FONT 8, "MS Sans Serif"
+{
+    LTEXT           "&Printer:", IDD_PPRLABEL, 2, 7, 26, 8
+    COMBOBOX        IDD_PPRINTER, 28, 5, 134, 45, CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Range", IDD_PRANGE, 2, 19, 160, 72
+    CONTROL         "Entire &Record", IDD_PRREC, "Button", BS_AUTORADIOBUTTON,
+		    9, 30, 60, 10
+    CONTROL         "Current Contents of &Window", IDD_PRWIN, "Button", 
+                    BS_AUTORADIOBUTTON, 9, 45, 112, 10
+    CONTROL         "S&egment", IDD_PRSEG, "Button", BS_AUTORADIOBUTTON, 9, 60,
+		    39, 10
+    LTEXT           "&From:", IDD_PRFLABEL, 19, 75, 20, 8
+    EDITTEXT        IDD_PRFROM, 39, 74, 40, 12, ES_AUTOHSCROLL
+    LTEXT           "&To:", IDD_PRTLABEL, 89, 76, 20, 8
+    EDITTEXT        IDD_PRTO, 109, 74, 40, 12, ES_AUTOHSCROLL
+    CONTROL         "Print to Fi&le", IDD_PFILE, "Button", BS_AUTOCHECKBOX | 
+                    WS_TABSTOP, 4, 100, 50, 10
+    RTEXT           "&Copies:", IDD_PCLABEL, 106, 101, 30, 8
+    EDITTEXT        IDD_PCOPIES, 139, 99, 22, 12, ES_AUTOHSCROLL
+    CONTROL         "Coll&ate Copies",IDD_PCOLLATE, "Button", BS_AUTOCHECKBOX |
+                    WS_TABSTOP, 169, 100, 60, 10
+    PUSHBUTTON      "OK", IDOK, 179, 4, 40, 14
+    PUSHBUTTON      "Cancel", IDCANCEL, 179, 26, 40, 14
+    PUSHBUTTON      "&Setup...", IDD_PSETUP, 179, 48, 40, 14
+    PUSHBUTTON      "&Options...", IDD_POPTIONS, 179, 71, 40, 14
+}
+
+PrintOptionsBox DIALOG 2, 18, 226, 164
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Print Options"
+FONT 8, "MS Sans Serif"
+{
+    CONTROL         "&Use current display scales and options", IDD_PODEF,
+		    "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 1, 3, 141, 10
+    GROUPBOX        "Scales", IDD_POSCALES, 1, 20, 109, 45
+    LTEXT           "&Time", IDD_POSTLABEL, 20, 32, 19, 8
+    COMBOBOX        IDD_POSTIME, 42, 30, 64, 85, CBS_DROPDOWNLIST |
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "&Amplitude", IDD_POSALABEL, 4, 48, 35, 8
+    COMBOBOX        IDD_POSAMP, 42, 47, 64, 70, CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Grid", IDD_POGRID, 118, 20, 60, 45
+    CONTROL         "T&ime", IDD_POGTIME, "Button", BS_AUTOCHECKBOX |
+		    WS_TABSTOP, 126, 31, 40, 10
+    CONTROL         "Am&plitude", IDD_POGAMP, "Button", BS_AUTOCHECKBOX |
+		    WS_TABSTOP, 126, 46, 44, 10
+    GROUPBOX        "Annotations", IDD_POANN, 1, 70, 179, 40
+    CONTROL         "&Markers", IDD_POAMARK, "Button", BS_AUTOCHECKBOX |
+		    WS_TABSTOP, 10, 85, 40, 10
+    CONTROL         "&Subtypes", IDD_POASUB, "Button", BS_AUTOCHECKBOX |
+		    WS_TABSTOP, 10, 95, 40, 10
+    CONTROL         "&Chan fields", IDD_POACHAN, "Button", BS_AUTOCHECKBOX | 
+                    WS_TABSTOP, 67, 85, 48, 10
+    CONTROL         "&Num fields", IDD_POANUM, "Button", BS_AUTOCHECKBOX | 
+                    WS_TABSTOP, 67, 95, 47, 10
+    CONTROL         "Au&x fields", IDD_POAAUX, "Button", BS_AUTOCHECKBOX | 
+                    WS_TABSTOP, 126, 85, 43, 10
+    GROUPBOX        "Other", IDD_POOTHER, 1, 116, 178, 46
+    CONTROL         "Signal &baselines", IDD_POOSB, "Button", 
+                    BS_AUTOCHECKBOX | WS_TABSTOP, 10, 127, 106, 10
+    CONTROL         "Si&gnal names", IDD_POOSN, "Button", BS_AUTOCHECKBOX | 
+                    WS_TABSTOP, 119, 127, 56, 10
+    CONTROL         "A&bsolute time", IDD_POTMODE, "Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP, 10, 137, 69, 10
+    LTEXT           "C&omments:", IDD_POOCLABEL, 10, 147, 36, 8
+    EDITTEXT        IDD_POOCOM, 49, 147, 125, 12, ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK", IDOK, 185, 5, 40, 14
+    PUSHBUTTON      "Cancel", IDCANCEL, 185, 25, 40, 14
+    PUSHBUTTON      "Ca&librate...", IDD_POCALIB, 185, 45, 40, 14
+    PUSHBUTTON      "&Help...", IDD_POHELP, 185, 65, 40, 14
+}
+
+ViewOptionsBox DIALOG 2, 18, 226, 159
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "View Options"
+FONT 8, "MS Sans Serif"
+{
+    CONTROL         "&Use default display scales and options", IDD_VODEF,
+		    "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 1, 3, 141, 10
+    GROUPBOX        "Scales", IDD_VOSCALES, 1, 20, 109, 45
+    LTEXT           "&Time", IDD_VOSTLABEL, 20, 32, 19, 8
+    COMBOBOX        IDD_VOSTIME, 42, 30, 64, 85, CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "&Amplitude", IDD_VOSALABEL, 4, 48, 35, 8
+    COMBOBOX        IDD_VOSAMP, 42, 47, 64, 70, CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Grid", IDD_VOGRID, 118, 20, 60, 45
+    CONTROL         "T&ime", IDD_VOGTIME, "Button", BS_AUTOCHECKBOX |
+		    WS_TABSTOP, 126, 31, 40, 10
+    CONTROL         "Am&plitude", IDD_VOGAMP, "Button", BS_AUTOCHECKBOX |
+		    WS_TABSTOP, 126, 46, 44, 10
+    GROUPBOX        "Annotations", IDD_VOANN, 1, 70, 179, 40
+    CONTROL         "&Markers", IDD_VOAMARK, "Button", BS_AUTOCHECKBOX |
+		    WS_TABSTOP, 10, 85, 40, 10
+    CONTROL         "&Subtypes", IDD_VOASUB, "Button", BS_AUTOCHECKBOX |
+		    WS_TABSTOP, 10, 95, 40, 10
+    CONTROL         "&Chan fields", IDD_VOACHAN, "Button", BS_AUTOCHECKBOX | 
+                    WS_TABSTOP, 67, 85, 48, 10
+    CONTROL         "&Num fields", IDD_VOANUM, "Button", BS_AUTOCHECKBOX | 
+                    WS_TABSTOP, 67, 95, 47, 10
+    CONTROL         "Au&x fields", IDD_VOAAUX, "Button", BS_AUTOCHECKBOX | 
+                    WS_TABSTOP, 126, 85, 43, 10
+    GROUPBOX        "Other", IDD_VOOTHER, 1, 116, 178, 41
+    CONTROL         "Signal &baselines", IDD_VOOSB, "Button", 
+                    BS_AUTOCHECKBOX | WS_TABSTOP, 10, 127, 106, 10
+    CONTROL         "Si&gnal names", IDD_VOOSN, "Button", BS_AUTOCHECKBOX | 
+                    WS_TABSTOP, 119, 127, 56, 10
+    CONTROL         "A&bsolute time", IDD_VOTMODE, "Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP, 10, 137, 69, 10
+    DEFPUSHBUTTON   "OK", IDOK, 185, 5, 40, 14
+    PUSHBUTTON      "Cancel", IDCANCEL, 185, 25, 40, 14
+    PUSHBUTTON      "Ca&librate...", IDD_VOCALIB, 185, 45, 40, 14
+    PUSHBUTTON      "&Help...", IDD_VOHELP, 185, 65, 40, 14
+}

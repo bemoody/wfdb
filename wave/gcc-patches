@@ -1,0 +1,204 @@
+The GNU C compiler (gcc), version 2.1.x and later, may be used to compile
+`wave'.  If you are not sure what version of gcc you have, type `gcc -v' to
+find out.
+
+Several bugs in the standard XView include (.h) files cause problems for gcc,
+however.  This file contains patches that correct these bugs.  Note that gcc
+uses private versions of these files if available, so the originals in
+/usr/openwin/include/xview (or /usr/include/xview) need not be changed.
+
+If you have installed gcc version 2.5.x or later, the gcc installation
+procedure has already fixed these bugs in gcc's private copies of the standard
+.h files, and you should not attempt to install the patches below.
+
+If you have an earlier version of gcc (2.1.x, 2.2.x, 2.3.x, or 2.4.x), however,
+it is necessary to make the following patches to <xview/defaults.h>,
+<xview/notify.h>, <xview/openmenu.h>, and <xview/sun.h>.  (The patches to
+<xview/sun.h> are needed for gcc 2.2.x and 2.3.x only; they are optional for
+2.1.x or 2.4.x versions of gcc.)
+
+To apply these patches, do the following:
+ 1. Set the shell variable A to the name of the private xview directory:
+      set A /usr/local/lib/gcc-lib/.../include/xview
+ (replacing `...' by the correct intermediate directory names for your system).
+
+ 2. If you have gcc 2.3.x or earlier, set shell variable B to the name of
+ the directory in which the original versions of these files are found:
+      set B /usr/openwin/include/xview
+ or
+      set B /usr/include/xview
+ If you have gcc 2.4.x, you must patch gcc's copies of these files;  in this
+ case,
+      set B $A
+
+ 3. Copy the files to be patched into this directory:
+      cp $B/defaults.h $B/notify.h $B/openmenu.h $B/sun.h .
+
+ 4. Patch the copies, using this file as input to `patch':
+      patch <gcc-patches
+    If you don't have `patch', read the rest of this file and apply the edits
+    manually.
+
+ 5. Install the patched files where gcc will find them:
+      cp defaults.h notify.h openmenu.h sun.h $A
+
+The patches themselves begin here:
+
+*** /usr/include/xview/defaults.h	Wed Jun 20 02:43:21 1990
+--- /usr/local/lib/gcc-lib/sparc-sun-sunos4.1.1/2.1/include/xview/defaults.h	Thu May  7 17:46:35 1992
+***************
+*** 62,74 ****
+   * "Deactivated", or "0".  If the value is none of the above, a warning
+   * message will be displayed and Default will be returned.
+   */
+! EXTERN_FUNCTION (Bool 	defaults_get_boolean, (char *name, char *class, Bool default));
+  /*
+   * defaults_get_character(name, class, default) will lookup name and class in
+   * the defaults database and return the resulting character value.  Default
+   * will be returned if any error occurs.
+   */
+! EXTERN_FUNCTION (char 	defaults_get_character, (char *name, char *class, char default));
+  /*
+   * defaults_get_enum(name, class, pairs) will lookup the value associated
+   * with name and class, scan the Pairs table and return the associated value.
+--- 62,74 ----
+   * "Deactivated", or "0".  If the value is none of the above, a warning
+   * message will be displayed and Default will be returned.
+   */
+! EXTERN_FUNCTION (Bool 	defaults_get_boolean, (char *name, char *class, Bool _default));
+  /*
+   * defaults_get_character(name, class, default) will lookup name and class in
+   * the defaults database and return the resulting character value.  Default
+   * will be returned if any error occurs.
+   */
+! EXTERN_FUNCTION (char 	defaults_get_character, (char *name, char *class, char _default));
+  /*
+   * defaults_get_enum(name, class, pairs) will lookup the value associated
+   * with name and class, scan the Pairs table and return the associated value.
+***************
+*** 81,87 ****
+   * the defaults database and return the resulting integer value. Default will
+   * be returned if any error occurs.
+   */
+! EXTERN_FUNCTION (int 	defaults_get_integer, (char *name, char *class, int default));
+  
+  /*
+   * defaults_get_integer_check(name, class, default, mininum, maximum) will
+--- 81,87 ----
+   * the defaults database and return the resulting integer value. Default will
+   * be returned if any error occurs.
+   */
+! EXTERN_FUNCTION (int 	defaults_get_integer, (char *name, char *class, int _default));
+  
+  /*
+   * defaults_get_integer_check(name, class, default, mininum, maximum) will
+***************
+*** 90,96 ****
+   * Maximum (inclusive), an error message will be printed.  Default will be
+   * returned if any error occurs.
+   */
+! EXTERN_FUNCTION (int 	defaults_get_integer_check, (char *name, char *class, int default, int minimum, int maximum));
+  
+  /*
+   * defaults_get_string(name, class, default) will lookup and return the
+--- 90,96 ----
+   * Maximum (inclusive), an error message will be printed.  Default will be
+   * returned if any error occurs.
+   */
+! EXTERN_FUNCTION (int 	defaults_get_integer_check, (char *name, char *class, int _default, int minimum, int maximum));
+  
+  /*
+   * defaults_get_string(name, class, default) will lookup and return the
+***************
+*** 97,103 ****
+   * null-terminated string value assocatied with name and class in the
+   * defaults database.  Default will be returned if any error occurs.
+   */
+! EXTERN_FUNCTION (char *	defaults_get_string, (char *name, char *class, char *default));
+  
+  /*
+   * defaults_init_db() initializes the X11 Resource Manager.
+--- 97,103 ----
+   * null-terminated string value assocatied with name and class in the
+   * defaults database.  Default will be returned if any error occurs.
+   */
+! EXTERN_FUNCTION (char *	defaults_get_string, (char *name, char *class, char *_default));
+  
+  /*
+   * defaults_init_db() initializes the X11 Resource Manager.
+*** /usr/include/xview/notify.h	Wed Jun 20 02:43:50 1990
+--- /usr/local/lib/gcc-lib/sparc-sun-sunos4.1.1/2.1/include/xview/notify.h	Thu May  7 17:41:42 1992
+***************
+*** 203,209 ****
+  
+  #ifndef _NOTIFY_MIN_SYMBOLS
+  
+! EXTERN_FUNCTION (Notify_value 	notify_default_wait3, (Notify_client nclient, int pid, union wait *status, struct rusage *rusage));
+  EXTERN_FUNCTION (Notify_error 	notify_dispatch, (void));
+  EXTERN_FUNCTION (Notify_error	notify_do_dispatch, (void));
+  EXTERN_FUNCTION (Notify_error 	notify_itimer_value, (Notify_client nclient, int which, struct itimerval *value));
+--- 203,209 ----
+  
+  #ifndef _NOTIFY_MIN_SYMBOLS
+  
+! EXTERN_FUNCTION (Notify_value 	notify_default_wait3, (Notify_client nclient, int pid, void *status, void *rusage));
+  EXTERN_FUNCTION (Notify_error 	notify_dispatch, (void));
+  EXTERN_FUNCTION (Notify_error	notify_do_dispatch, (void));
+  EXTERN_FUNCTION (Notify_error 	notify_itimer_value, (Notify_client nclient, int which, struct itimerval *value));
+***************
+*** 270,276 ****
+  EXTERN_FUNCTION (Notify_value 	notify_next_itimer_func, (Notify_client nclient, int which));
+  EXTERN_FUNCTION (Notify_value	notify_next_output_func, (Notify_client nclient, int fd));
+  EXTERN_FUNCTION (Notify_value 	notify_next_signal_func, (Notify_client nclient, int signal, Notify_signal_mode mode));
+! EXTERN_FUNCTION (Notify_value 	notify_next_wait3_func, (Notify_client nclient, int pid, union wait *status, struct rusage *rusage));
+  EXTERN_FUNCTION (Notify_value	notify_nop, (void));
+  EXTERN_FUNCTION (Notify_error 	notify_output, (Notify_client nclient, int fd));
+  EXTERN_FUNCTION (Notify_error	notify_post_destroy, (Notify_client nclient, Destroy_status status, Notify_event_type type));
+--- 270,276 ----
+  EXTERN_FUNCTION (Notify_value 	notify_next_itimer_func, (Notify_client nclient, int which));
+  EXTERN_FUNCTION (Notify_value	notify_next_output_func, (Notify_client nclient, int fd));
+  EXTERN_FUNCTION (Notify_value 	notify_next_signal_func, (Notify_client nclient, int signal, Notify_signal_mode mode));
+! EXTERN_FUNCTION (Notify_value 	notify_next_wait3_func, (Notify_client nclient, int pid, void *status, void *rusage));
+  EXTERN_FUNCTION (Notify_value	notify_nop, (void));
+  EXTERN_FUNCTION (Notify_error 	notify_output, (Notify_client nclient, int fd));
+  EXTERN_FUNCTION (Notify_error	notify_post_destroy, (Notify_client nclient, Destroy_status status, Notify_event_type type));
+*** /usr/include/xview/openmenu.h	Wed Jun 20 02:45:01 1990
+--- /usr/local/lib/gcc-lib/sparc-sun-sunos4.1.1/2.1/include/xview/openmenu.h	Thu May  7 17:08:55 1992
+***************
+*** 263,269 ****
+   
+  EXTERN_FUNCTION (Menu 		menu_create, (DOTDOTDOT));
+  EXTERN_FUNCTION (Menu_item 	menu_create_item, (DOTDOTDOT));
+! EXTERN_FUNCTION (Menu_item 	menu_find, (Menu menu DOTDOTDOT));
+  EXTERN_FUNCTION (Xv_opaque 	menu_get, (Menu menu, Xv_opaque attr, Xv_opaque v1));
+  EXTERN_FUNCTION (Xv_opaque 	menu_set, (Menu menu, DOTDOTDOT));
+  EXTERN_FUNCTION (void 		menu_destroy_with_proc, (Menu menu, void (*proc)()));
+--- 263,269 ----
+   
+  EXTERN_FUNCTION (Menu 		menu_create, (DOTDOTDOT));
+  EXTERN_FUNCTION (Menu_item 	menu_create_item, (DOTDOTDOT));
+! EXTERN_FUNCTION (Menu_item 	menu_find, (Menu menu, DOTDOTDOT));
+  EXTERN_FUNCTION (Xv_opaque 	menu_get, (Menu menu, Xv_opaque attr, Xv_opaque v1));
+  EXTERN_FUNCTION (Xv_opaque 	menu_set, (Menu menu, DOTDOTDOT));
+  EXTERN_FUNCTION (void 		menu_destroy_with_proc, (Menu menu, void (*proc)()));
+*** /usr/include/xview/sun.h	Wed Jun 20 02:43:44 1990
+--- /usr/local/lib/gcc-lib/sparc-sun-sunos4.1.1/2.2.2/include/xview/sun.h	Mon Jun 29 15:59:18 1992
+***************
+*** 20,27 ****
+  int atoi();
+  double atof();
+  char *ctime();
+! char *malloc();
+! char *calloc();
+  char *strcpy();
+  #ifndef SVR4
+  char *sprintf();
+--- 20,27 ----
+  int atoi();
+  double atof();
+  char *ctime();
+! void *malloc();
+! void *calloc();
+  char *strcpy();
+  #ifndef SVR4
+  char *sprintf();

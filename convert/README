@@ -1,0 +1,73 @@
+file: README		G. Moody	28 July 1989
+			Last revised:	 7 May 1999
+
+This directory contains sources for DB applications which convert database
+files in various unsupported formats to and from MIT format, including to and
+from AHA DB formats.
+
+Note that many commonly used formats are supported by the DB library.  The
+program `xform' (in the `app' directory) is a flexible application for
+converting between any pair of supported formats, in addition to offering
+other capabilities such as resampling (to change the sampling frequency),
+deletion or rearrangement of signals, and removal of unwanted material at
+the beginning or end of a record.
+
+Programs `rdsamp' and `wrsamp' in the `app' directory convert signals between
+supported (binary) formats and text;  programs `rdann' and `wrann', also in
+the `app' directory, perform similar conversions for annotation files.
+
+If you need to convert digital data to analog form, or vice versa, see program
+`sample' (for MS-DOS only) in the `app' directory.
+
+AHA DB tape distribution format was used for both the AHA DB and the MIT-BIH
+DB between 1980 and 1990.  AHA DB tape distribution format requires more space
+than the other formats supported by the DB library and applications, however,
+so it is not recommended for on-line storage.  Programs `a2m' and `ad2m' can
+also convert AHA DB diskette distribution format files into standard DB files;
+the reverse conversion is not supported, however.
+
+European Data Format (EDF) has been used for storage of multiparameter,
+multifrequency data (such as polysomnograms) since 1990.  Program `edf2mit'
+reads an EDF file and generates MIT-format header and signal files from it.
+
+This directory also contains the program `revise', which converts obsolete MIT
+header files into new-format MIT header files.
+
+Contributions to this set of format converters are welcome.  If you have
+written a format converter, please send it together with a short input file and
+the output generated from the input to george@mit.edu.  (Don't omit the
+output;  I need to see that I can compile your converter and generate the same
+output that you do.)
+
+If a `make' utility is available, follow the instructions in the appropriate
+`make' description file (see the list below) to compile and install these
+applications on your system.  If you do not have a `make' utility, you will
+have to perform the installation manually;  the comments in the `make' files
+may be helpful in determining how to proceed.  For information about using
+these applications, look in the respective source files.  You can also obtain a
+brief usage summary for each application by running it without command-line
+arguments.
+
+Note that you must set the DB environment variable (the database path) before
+using these applications.  Select and customize the appropriate script for
+doing so from among the templates in the `app' directory on the same level
+as this one.
+
+The following files will be found in this directory:
+
+README		this file
+
+a2m.c		Converts an AHA format annotation file to MIT format
+ad2m.c		Converts an AHA format signal file to MIT format
+m2a.c		Converts an MIT format annotation file to AHA format
+md2a.c		Converts an MIT format signal file to AHA format
+readid.c	Extracts record name and file lengths from AHA-format ID block
+makeid.c	Makes an AHA-format ID block for a database record
+
+edf2mit.c	Converts an EDF file to MIT format
+
+revise.c	Converts an obsolete MIT header to a new-format MIT header
+
+Makefile	UNIX `make' description file for compiling these applications
+makefile.dos	MS-DOS `make' description file for compiling these applications
+		 using Microsoft `make' or `nmake', Borland `make', etc.

@@ -1,0 +1,72 @@
+.TH HRFFT 1 "12 June 1995" "PSD Estimation" "Signal processing"
+.SH NAME
+hrfft, hrlomb, hrmem \- calculate and plot heart rate power spectra
+.br
+hrplot \- plot heart rate time series
+.SH SYNOPSIS
+\fBhrfft\fR [ \fIoptions ...\fR ]
+.br
+\fBhrlomb\fR [ \fIoptions ...\fR ]
+.br
+\fBhrmem\fR [ \fIoptions ...\fR ]
+.br
+\fBhrplot\fR [ \fIoptions ...\fR ]
+.SH DESCRIPTION
+.PP
+The first three of these UNIX shell scripts are intended to illustrate the use
+of \fIfft\fR(1), \fIlomb\fR(1), and \fImemse\fR(1) by producing heart rate
+power spectra using the fast Fourier transform, the Lomb periodogram,
+and the maximum entropy (all poles) method (also known as autoregressive,
+or AR, power spectral density estimation).  All four programs derive heart
+rate time series from beat annotation files.  \fIhrfft\fR and \fIhrmem\fR use
+\fItach\fR(1) to obtain a uniformly resampled heart rate time series from the
+annotation file, which is then used as input to \fIfft\fR or \fImemse\fR,
+and the spectrum thereby obtained is then plotted.  \fIhrlomb\fR and
+\fIhrplot\fR use \fIihr\fR to obtain an irregularly sampled heart rate time
+series.  \fIhrplot\fR plots this time series directly, and \fIhrlomb\fR uses
+it as input to \fIlomb\fR, and then plots the spectrum.
+.PP
+All four programs accept the same \fIoptions\fR:
+.TP
+\fB-a \fIannotator\fR
+Read annotations from the specified \fIannotator\fR (default: the value of
+the environment variable \fBANNOTATOR\fR, if set).
+.TP
+\fB-f \fItime\fR
+Begin at the specified \fItime\fR within the annotation file (default: the
+value of the environment variable \fBSTART\fR, if set, or the beginning of the
+file otherwise).
+.TP
+\fB-p \fIplot-utility\fR
+Use the specified \fIplot-utility\fR to generate the output (default: the
+value of the environment variable \fBPLOT\fR, if set, or
+\fI/usr/local/bin/plt\fR, if it exists, or \fI/usr/local/bin/plot2d\fR
+otherwise). 
+.TP
+\fB-r \fIrecord\fR
+Produce a heart rate power spectrum for the specified \fIrecord\fR (default:
+the value of the environment variable \fBRECORD\fR, if set).
+.TP
+\fB-t \fItime\fR
+Stop at the specified \fItime\fR within the annotation file (default: the
+value of the environment variable \fBEND\fR, if set, or the end of the file
+otherwise).
+.TP
+\fB-T \fIdevice\fR
+Produce output on the specified \fIdevice\fR (default: the screen).  The
+\fIdevice\fR must be among those supported by the \fIplot-utility\fR (see
+above).
+.PP
+If \fIannotator\fR or \fIrecord\fR are not specified using environment
+variables or command-line options, these programs obtain values from the user
+interactively.
+.PP
+Although \fIhrfft\fR, \fIhrlomb\fR, and \fIhrmem\fR all produce power spectra,
+the units of power differ among them.  Absolute comparisons can be made only
+between spectra produced using the same method, from time series of the same
+length.
+.PP
+Note that these shell scripts can be run under MS-DOS using a suitable set
+of UNIX-like utilities, such as the MKS Toolkit or the GNUish MS-DOS utilities.
+.SH SEE ALSO
+fft(1), ihr(1), lomb(1), memse(1), plot2d(1), tach(1)

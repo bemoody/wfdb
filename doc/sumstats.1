@@ -1,0 +1,32 @@
+.TH SUMSTATS 1 "24 May 1999" "WFDB software 10.0" "WFDB applications"
+.SH NAME
+sumstats \- derive aggregate statistics from bxb, rxr, etc., line-format output
+.SH SYNOPSIS
+\fBsumstats\fR \fIfile\fR
+.SH DESCRIPTION
+.PP
+This program derives the aggregate statistics described in sections 4.6.1 and
+5.6 of \fITesting and Reporting Performance Results of Ventricular
+Arrhythmia Detection Algorithms\fR (AAMI ECAR-1987), and
+additional statistics specified by the \fIAmerican National Standard for
+Ambulatory Electrocardiographs\fR (ANSI/AAMI EC38-1994).
+.PP
+To use this program, first generate a line-format report \fIfile\fR using the
+\fB-l\fR or \fB-L\fR options of \fIbxb\fR(1), \fIepic\fR(1), \fImxm\fR(1), or
+\fIrxr\fR(1).  This file must include column headings so that \fIsumstats\fR
+can recognize the file type.  Output is written to the standard output;  it
+includes a copy of the input file, with aggregate statistics appended at the
+end.
+.SH SEE ALSO
+bxb(1), ecgeval(1), epic(1), mxm(1), plotstm(1), rxr(1)
+.br
+\fIEvaluating ECG Analyzers\fR (in the \fIWFDB Applications Guide\fR)
+.br
+\fITesting and Reporting Performance Results of Ventricular Arrhythmia
+Detection Algorithms\fR (publication AAMI ECAR-1987)
+.br
+\fIAmerican National Standard for Ambulatory Electrocardiographs\fR
+(publication ANSI/AAMI EC38-1994)
+.br
+The last two publications are available from AAMI, 3330 Washington Blvd.,
+Suite 400, Arlington, VA 22201 USA.

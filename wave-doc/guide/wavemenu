@@ -1,0 +1,98 @@
+# file: wavemenu.def	G. Moody	17 August 1990
+#			Last revised:	2 February 1995
+# Copyright(C) Massachusetts Institute of Technology 1995. All rights reserved.
+
+# This is the default analysis menu for WAVE.  If you wish to use a
+# customized version, copy this file to another directory, edit it,
+# and set the value of the environment variable WAVEMENU to the name of
+# the edited version before starting WAVE.  The contents of this file,
+# or of your customized version of it, determine the appearance of the
+# panel that WAVE displays when you select its `Analyze' button, and the
+# actions that are taken when you select a button on the `Analyze' panel.
+
+# Comment lines begin with `#', and may appear anywhere in this file.
+# Lines that specify menu items contain a button label, followed by
+# one or more tab characters, followed by the action to be taken when the
+# button is selected.  The action may be any command acceptable to your
+# shell.  Note that several strings found in commands are interpreted by
+# WAVE before they are passed to the shell;  these are:
+#	$RECORD		the current record name
+#	$ANNOTATOR	the current input annotator name
+#	$START		the current `Start' time as shown in the Analyze panel
+#			 (the time of the `<' marker, if any)
+#	$END		the current `End' time as shown in the Analyze panel
+#			 (the time of the `>' marker, if any)
+#	$DURATION	the time interval between $END and $START
+#	$LEFT		the time of the left edge of the signal display window
+#	$RIGHT		the time of the right edge of the signal display window
+#	$WIDTH		the time interval between $RIGHT and $LEFT
+#	$SIGNAL		the number of the selected signal
+#	$SIGNALS	the signal list
+#	$LOG		the name of the current log file
+#	$DB		the DB path (from the Load panel)
+#	$DBCAL		the name of the DB calibration file (from the Load
+#			 panel)
+# Other strings that begin with `$' are passed to the shell unchanged.
+# The character `\', if immediately followed by a newline, causes the
+# next line to be treated as a continuation of the current line.
+
+# Default menu entries.  Delete or change any of these as you wish.  If `lpr'
+# is not the proper command for printing a PostScript file on your system,
+# replace it as appropriate below.
+
+# Button labels		Commands
+# -------------		--------
+Mark QRS complexes	sqrs -r $RECORD -f $START -t $END -s $SIGNAL
+Calibrate		calibrate -r $RECORD -f $START -t $END -s $SIGNALS
+Extract segment		snip -i $RECORD -f $START -t $END -n n_$RECORD \
+                         -a $ANNOTATOR
+List annotations	rdann -r $RECORD -a $ANNOTATOR -f $START -t $END
+List samples		rdsamp -r $RECORD -f $START -t $END -s $SIGNALS
+Print chart		echo $RECORD $START-$END | \
+                         pschart -a $ANNOTATOR -g -l -R -s $SIGNALS - | lpr
+Print full disclosure	echo $RECORD $START-$END | \
+                         psfd -a $ANNOTATOR -g -l -R -s $SIGNALS - | lpr
+
+# Here are alternate versions of the two previous entries, for some BSD systems
+# that have small /tmp partitions:
+#Print chart		echo $RECORD $START-$END | pschart -a $ANNOTATOR -g \
+#                         -l -R -s $SIGNALS - >~/.pschart.$$; \
+#                         lpr -r -s ~/.pschart.$$
+#Print full disclosure	echo $RECORD $START-$END | psfd -a $ANNOTATOR -g \
+#                         -l -R -s $SIGNALS - >~/.psfd.$$; \
+#                         lpr -r -s ~/.psfd.$$
+
+# Use the following entry to export WAVE's variables to your shell environment.
+# This version is usable if your shell is `csh' or `tcsh':
+#Set variables		setenv RECORD $RECORD; setenv ANNOTATOR $ANNOTATOR; \
+#                         setenv START $START; setenv END $END; \
+#                         setenv DURATION $DURATION; setenv LEFT $LEFT; \
+#                         setenv RIGHT $RIGHT; setenv WIDTH $WIDTH; \
+#                         setenv SIGNAL $SIGNAL; setenv SIGNALS "$SIGNALS"; \
+#                         setenv LOG $LOG; setenv DB $DB; setenv DBCAL $DBCAL
+
+# Here is an alternate version of the previous entry, for use with `sh', `ksh',
+# or `bash':
+Set variables		RECORD=$RECORD; ANNOTATOR=$ANNOTATOR; START=$START; \
+                         END=$END; DURATION=$DURATION; LEFT=$LEFT; \
+                         RIGHT=$RIGHT; WIDTH=$WIDTH; SIGNAL=$SIGNAL; \
+                         SIGNALS="$SIGNALS"; LOG=$LOG; DB=$DB; DBCAL=$DBCAL; \
+                         export RECORD ANNOTATOR START END DURATION LEFT \
+                         RIGHT WIDTH SIGNAL SIGNALS LOG DB DBCAL
+
+# The label `<Print>' defines the command that is executed when the `Print'
+# button in the File menu is selected.  If you wish to have a button with the
+# same function appear in the Analysis menu, copy the command and use a
+# different button label (for example, `Print window').
+
+<Print>			echo $RECORD $LEFT-$RIGHT | pschart -a $ANNOTATOR -g \
+                         -l -L -n 0 -R -s $SIGNALS -t 20 -v 8 - | lpr
+
+# The next entry is disabled by default, since many users don't use the logs
+# and might find it confusing.  Remove the comment characters at the beginning
+# of the next line to enable it.
+Print log with charts	pschart -a $ANNOTATOR -g -l -R $LOG | lpr
+
+# Add additional entries below.  If you use `bash', avoid using tabs on
+# continuation lines for indentation (they may trigger command completion when
+# executed).

@@ -1,0 +1,86 @@
+# file: Makefile-dos-gcc	G. Moody	24 April 1997
+#				Last revised:	  7 May 1999
+# GCC-DOS 'make' description file for DB format-conversion applications
+#
+
+# This file is used with the UNIX `make' command to cross-compile MSDOS
+# binaries of the format-conversion applications which come with the ECG DB
+# software package.  Before using it for the first time, check that the
+# site-specific variables below are appropriate for your system.  To build and
+# install the applications, just type `make -f Makefile-dos-gcc' (from within
+# this directory).
+
+# Site-specific variables
+# -----------------------
+
+# CCDIR is the directory containing the cross-compiler and the binary
+# file utilities for MSDOS.
+CCDIR = /usr/lib/gcc-lib/i386-go32-msdos/2.7.2
+
+# CC is the name of the cross-compiler.
+CC = $(CCDIR)/gcc
+
+# CCDEFS is the set of C compiler options needed to set preprocessor variables
+# while compiling the DB Software Package.  You should include definitions of
+# the major, minor, and release numbers, and of MSDOS, as shown below.  Other
+# definitions are needed only for various versions of UNIX and should be
+# omitted here.
+CCDEFS = -DDB_MAJOR=$(MAJOR) -DDB_MINOR=$(MINOR) -DDB_RELEASE=$(RELEASE) -DMSDOS
+
+# CFLAGS is the list of C compiler options used when compiling programs in the
+# `app', `convert', and `example' directories.  Add the following options to
+# CFLAGS as appropriate (separating them by spaces if you use more than one):
+#   -g		  to save symbols for debugging
+#   -O		  to use the optimizer
+#   -I$(INCDIR)   needed if INCDIR is not in the normal search path for
+#		   `#include' files;  harmless otherwise
+#   -L$(LIBDIR)   needed if LIBDIR is not in the normal library search path;
+#		   harmless if LIBDIR is in the normal library search path
+# As noted above, gcc-dos allows you to use both -g and -O if you wish.
+CFLAGS = -O -I/usr/local/dos/include $(CCDEFS) -L/usr/local/dos/lib
+
+# LDFLAGS is appended to the C compiler command line to specify loading the
+# WFDB library.  Unless you have changed the value of WFDBLIB in the `Makefile'
+# for the WFDB library, `-lwfdb' should be correct.
+LDFLAGS = -lwfdb
+
+# BINDIR specifies the directory in which the applications will be installed;
+# it should be a directory in the PATH of those who will use the applications.
+# You will need to have write permission in BINDIR.  Users of this software
+# will need to have search (execute) permission in BINDIR.
+BINDIR = /usr/local/dos/bin
+
+# STRIP is the command used to compact the compiled binaries by removing their
+# symbol tables.  The next line is commented out because $(CCDIR)/strip fails.
+# STRIP = $(CCDIR)/strip
+# To retain the symbol tables for debugging, comment out the previous line, and
+# uncomment the next line.
+STRIP = :
+
+# It should not be necessary to modify anything below this line.
+# -----------------------------------------------------------------------------
+
+CFILES = a2m.c ad2m.c m2a.c md2a.c readid.c makeid.c edf2mit.c revise.c
+XFILES = a2m.exe ad2m.exe m2a.exe md2a.exe readid.exe makeid.exe edf2mit.exe \
+ revise.exe
+
+# General rule for compiling C sources into executable files.
+.SUFFIXES: .exe
+.c.exe:
+	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
+
+revise.exe:	revise.c
+	$(CC) $(CFLAGS) -I../lib revise.c -o revise $(LDFLAGS)
+
+# `make' or `make install':  build and install applications, clean up
+install:	all
+	cp $(XFILES) $(BINDIR)
+	$(MAKE) clean
+
+# `make all': build applications
+all:	$(XFILES)
+	$(STRIP) $(XFILES)
+
+# `make clean':  remove intermediate and backup files
+clean:
+	rm -f $(XFILES) *.o *~

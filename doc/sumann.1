@@ -1,0 +1,26 @@
+.TH SUMANN 1 "24 May 1999" "WFDB software 10.0" "WFDB applications"
+.SH NAME
+sumann \- summarize the contents of a WFDB annotation file
+.SH SYNOPSIS
+\fBsumann -r\fI record\fB -a \fIannotator\fR [ \fIoptions\fR ... ]
+.SH DESCRIPTION
+\fIsumann\fR reads the annotation file specified by \fIrecord\fR and
+\fIannotator\fR and produces a tabular summary of its contents, including
+the number of annotations of each type as well the duration and number of
+episodes of each rhythm and signal quality.
+.PP
+\fIOptions\fR include:
+.TP
+\fB-f\fI time\fR
+Begin at the specified \fItime\fR.
+.TP
+\fB-h\fR
+Print a usage summary.
+.TP
+\fB-t\fI time\fR
+Stop at the specified \fItime\fR.
+.PP
+The shell variable \fBWFDB\fR should be set and exported (see
+\fIsetwfdb\fR(1)).
+.SH SEE ALSO
+rdann(1), setwfdb(1)

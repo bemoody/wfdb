@@ -1,0 +1,56 @@
+file: README		G. Moody	7 September 1989
+			Last revised:	  25 May 1999
+
+This directory contains UNIX man pages in troff source format for the WFDB
+software, and the TeX source for the WFDB Programmer's Guide.  On a UNIX
+system, this material can be printed or installed on-line by following the
+instructions in `Makefile'.  Both TeX and troff are available for MS-DOS as
+well.  See the beginning of `dbu.tex' for information on obtaining printed
+copies of the material in this directory.
+
+The following files will be found in this directory:
+
+.latex2html-init  Customized startup file for converting the appendices of the
+		 Applications Guide into HTML using latex2html
+Makefile	UNIX `make' description file for printing the WFDB software
+		 documentation and installing it on-line
+README		this file
+
+appguide.int	table of contents and introduction for the Applications Guide
+cover.ag	troff source for the cover of the Applications Guide
+cover.pg	troff source for the cover of the Progammer's Guide
+dbag.htm	HTML-format table of contents for the Applications Guide
+dbag.tex	TeX source for the title page of the Applications Guide
+dbu.hlp		the WFDB Programmer's Guide in Microsoft help file format
+		 (this file may not be up-to-date)
+dbu.htm		HTML-format introduction for the Programmer's Guide
+dbu.tex		TeX source for the WFDB Programmer's Guide
+dir.db		Text to be added (by `make') to the top-level `info' menu
+dir.top		Template for top-level `info' menu
+eval.tex	TeX source for "Evaluating ECG Analyzers" (an appendix in
+		 the Applications Guide)
+fixag.sed	sed commands for fixing HTML links (used by fixag.sh)
+fixag.sh	Script for postprocessing Applications Guide HTML files
+fixpg.sed	sed commands for fixing HTML links (used by fixpg.sh)
+fixpg.sh	Script for postprocessing Programmer's Guide HTML files
+foot.htm	final lines for HTML files, appended after address and date
+icons		directory containing navigational icons for HTML files
+index.htm	top-level HTML introduction to WFDB documentation
+install.tex	Tex source for "Installing the WFDB Software Package" (an
+		 appendix in the Applications Guide)
+intro.htm	HTML-format introduction for the Applications Guide
+makeinfo.sh	Script for using GNU emacs to convert dbu.tex to emacs-usable
+		 `info' hypertext files (if you don't have the GNU `makeinfo'
+		 utility)
+manhtml.sh	Script for converting man pages to HTML using `rman'
+maninst.sh	Script for installing man pages (to be invoked by `make' using
+		 `Makefile')
+texi2htm	Perl script for converting texinfo to HTML format
+texindex.c	C source for TeX index generation program
+texinfo.tex	TeX macros for formatting dbu.tex
+tmac.dif	notes on troff macros for printing the Applications Guide
+
+*.1		troff sources for man pages for the programs in app, convert,
+		 psd, wave, and wview
+*.3		troff sources for man pages for the WFDB library functions
+*.5		troff sources for man pages for WFDB file format specifications

@@ -1,0 +1,55 @@
+.TH RDSAMP 1 "24 May 1999" "WFDB software 10.0" "WFDB applications"
+.SH NAME
+rdsamp \- read WFDB signal files
+.SH SYNOPSIS
+\fBrdsamp -r \fIrecord\fR [ \fIoptions\fR ... ]
+.SH DESCRIPTION
+\fIrdsamp\fR reads signal files for the specified \fIrecord\fR and writes the
+samples as decimal numbers on the standard output.  If no \fIoptions\fR are
+provided, \fIrdsamp\fR starts at the beginning of the record and prints all
+samples.  Each line of output contains the sample number and samples from each
+signal, beginning with channel 0, separated by tabs.
+.PP
+\fIOptions\fR include:
+.TP
+\fB-f\fI time\fR
+Begin at the specified \fItime\fR.  By default, \fIrdsamp\fR starts at the
+beginning of the record.
+.TP
+\fB-h\fR
+Print a usage summary.
+.TP
+\fB-H\fR
+Read the signal files in high-resolution mode (default: standard mode).
+These modes are identical for ordinary records.  For multifrequency records,
+the standard decimation of oversampled signals to the frame rate is suppressed
+in high-resolution mode (rather, all other signals are resampled at the highest
+sampling frequency).
+.TP
+\fB-p\fR
+Print times in seconds and milliseconds, and values in physical units.  By
+default, \fIrdsamp\fR prints times in sample intervals and values in A/D units.
+.TP
+\fB-s\fR \fIsignal-list\fR
+Print only the signals named in the \fIsignal-list\fR (one or more input signal
+numbers, separated by spaces;  default: print all signals).  This option may be
+used to re-order or duplicate signals.
+.TP
+\fB-t\fI time\fR
+Stop at the specified \fItime\fR.  By default, \fIrdsamp\fR stops at the end
+of the record.
+.TP
+\fB-v\fR
+Print column headings.
+.PP
+The shell variable \fBWFDB\fR should be set and exported (see
+\fIsetwfdb\fR(1)).
+.SH CD-ROM VERSIONS
+The first edition of the MIT-BIH Arrhythmia Database CD-ROM, the first and
+second editions of the European ST-T Database CD-ROM, and the first edition of
+the MIT-BIH Polysomnographic Database CD-ROM contain versions of \fIrdsamp\fR
+that use an older command syntax (still supported by the current version but
+not described here).  Refer to \fIbin.doc\fR in the CD-ROM directory that
+contains \fIrdsamp\fR for further information.
+.SH SEE ALSO
+rdann(1), setwfdb(1), wrsamp(1)

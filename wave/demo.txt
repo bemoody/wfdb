@@ -1,0 +1,9 @@
+Please try out this demonstration!  Move the mouse pointer
+over any control and press the `Help' key (at the lower
+left corner of the keyboard), or the `F1' key if there is
+no `Help' key, for information about that control.  Most
+controls are activated using the left mouse button;  menus
+are opened using the right mouse button.
+
+For information about obtaining the software being demonstrated,
+please visit http://ecg.mit.edu/.

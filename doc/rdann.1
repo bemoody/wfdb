@@ -1,0 +1,85 @@
+.TH RDANN 1 "24 May 1999" "WFDB software 10.0" "WFDB applications"
+.SH NAME
+rdann \- read a WFDB annotation file
+.SH SYNOPSIS
+\fBrdann -r \fIrecord\fB -a \fIannotator\fR [ \fIoptions\fR ... ]
+.SH DESCRIPTION
+\fIrdann\fR reads the annotation file specified by \fIrecord\fR and
+\fIannotator\fR, and writes a text-format translation of it on the standard
+output, one annotation per line.  The output contains (from left to
+right) the time of the annotation in hours, minutes, seconds, and
+milliseconds; the time of the annotation in samples; a mnemonic for
+the annotation type; the annotation \fBsubtyp\fR, \fBchan\fR, and
+\fBnum\fR fields; and the auxiliary information string, if any
+(assumed to be a null-terminated ASCII string).
+.PP
+\fIOptions\fR include:
+.TP
+\fB-c\fI chan\fR
+Print only those annotations with \fBchan\fR fields that match \fIchan\fR.
+.TP
+\fB-f\fI time\fR
+Begin at the specified \fItime\fR.  By default, \fIrdann\fR starts at the
+beginning of the record;  if modification labels are present, they are not
+printed unless \fB-f 0\fR is given explicitly, however.
+.TP
+\fB-h\fR
+Print a usage summary.
+.TP
+\fB-n\fI num\fR
+Print only those annotations with \fBnum\fR fields that match \fInum\fR.
+.TP
+\fB-p\fI type\fR [ \fItype\fR ... ]
+Print annotations of the specified \fItypes\fR only.  The \fItype\fR arguments
+should be annotation mnemonics (e.g., \fBN\fR) as normally printed by
+\fIrdann\fR in the third column.  More than one \fB-p\fR option may be used
+in a single command, and each \fB-p\fR option may have more than one \fItype\fR
+argument following it.  If \fItype\fR begins with ``-'', however, it must
+immediately follow \fB-p\fR (standard annotation mnemonics do not begin with
+``-'', but modification labels in an annotation file may define such
+mnemonics).
+.TP
+\fB-s\fI sub\fR
+Print only those annotations with \fBsubtyp\fR fields that match \fIsub\fR.
+.TP
+\fB-t\fI time\fR
+Stop at the specified \fItime\fR.
+.TP
+\fB-x\fR
+Use an alternate time format for output (the first three columns are the
+elapsed times in seconds, in minutes, and in hours, replacing the
+\fIhh:mm:ss\fR and sample number columns in the default output).
+.PP
+The \fB-f\fR and \fB-t\fR options may be used to select a portion
+of an annotation file for printing.  Their arguments are usually given as
+times in \fIhh:mm:ss\fR format;  see the description of \fIstrtim\fR in the
+\fIWFDB Programmer's Guide\fR, as well as the comments below, for other
+formats.
+.PP
+Beat numbers beginning with 0 are implicitly assigned by \fIrdann\fR to each
+QRS annotation in an annotation file.  If the argument of the \fB-f\fR option
+begins with `#', it is taken to be the beat number of the first QRS annotation
+to be printed (any non-QRS annotations that immediately precede this annotation
+are also printed).  If the argument of the \fB-t\fR option begins with `#', it
+is taken as the number of QRS annotations to be processed;  note that not all
+of those processed will necessarily be printed, if the \fB-p\fR option is used
+to select only a subset of annotation types to be printed.  
+.PP
+The shell variable \fBWFDB\fR should be set and exported (see
+\fIsetwfdb\fR(1)).
+.SS Example
+.br
+	\fBrdann -a atruth -r 200 -f 0 -t 5:0 -p V\fR
+.br
+This command prints on the standard output all ``V'' (PVC) annotations in
+the first five minutes of the \fIatruth\fR (reference annotation) file for
+record 200.
+.SH CD-ROM VERSIONS
+The first edition of the MIT-BIH Arrhythmia Database CD-ROM, the first and
+second editions of the European ST-T Database CD-ROM, and the first edition of
+the MIT-BIH Polysomnographic Database CD-ROM contain versions of \fIrdann\fR
+that use an older command syntax (still supported by the current version but
+not described here).  Refer to \fIbin.doc\fR in the CD-ROM directory that
+contains \fIrdann\fR for further information.
+.SH SEE ALSO
+setwfdb(1), wrann(1)

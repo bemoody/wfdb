@@ -1,0 +1,71 @@
+.TH SIGNAL 5 "25 May 1999" "WFDB software 10.0" "WFDB File Formats"
+.SH NAME
+signal \- Waveform Database signal file formats
+.SH DESCRIPTION
+WFDB signal files exist in several formats.  Any of these formats
+can be used for multiplexed signal files, in which samples from two or more
+signals are stored alternately.  See \fIheader\fR(5) for information on how to
+identify which of the formats below is used for a particular signal file.
+.SS Format 8
+.PP
+Each sample is represented as an 8-bit first difference;  i.e.,
+to get the value of sample \fIn\fR, sum the first \fIn\fR bytes of the
+sample data file together with the initial value from the header file.
+When format 8 files are created, first differences which cannot be
+represented in 8 bits are represented instead by the largest difference
+of the appropriate sign (-128 or +127), and subsequent differences are
+adjusted such that the correct amplitude is obtained as quickly as
+possible.  Thus the samples read from a format 8 file may not always
+be identical to those read from an equivalent format 16 file.
+On-line signal files on magnetic disk are often kept in format 8 to save
+space.  Note that the first differences stored in multiplexed format 8
+files are always determined by subtraction of successive samples from
+the same signal (otherwise signals with baselines which differ by 128
+units or more could not be represented this way).
+.SS Format 16
+.PP
+Each sample is represented by a 16-bit two's complement amplitude stored
+least significant byte first.
+Any unused high-order bits are sign-extended from the most significant bit.
+The format used for MIT\-BIH and AHA database distribution 9-track tapes
+is format 16, with the addition of a logical EOF (octal 0100000) and
+null-padding after the logical EOF.
+.SS Format 61
+.PP
+Each sample is represented by a 16-bit two's complement amplitude stored
+most significant byte first.
+.SS Format 80
+.PP
+Each sample is represented by an 8-bit amplitude in offset binary form
+(i.e., 128 must be subtracted from each unsigned byte to obtain a signed
+8-bit amplitude).
+.SS Format 160
+.PP
+Each sample is represented by a 16-bit amplitude in offset binary form
+(i.e., 32,768 must be subtracted from each unsigned byte pair to
+obtain a signed 16-bit amplitude).  As for format 16, the least significant
+byte of each pair is first.
+.SS Format 212
+.PP
+Each sample is represented by a 12-bit two's complement amplitude.  The first
+sample is obtained from the 12 least significant bits of the first byte pair
+(stored least significant byte first).  The second sample is formed from the
+4 remaining bits of the first byte pair (which are the 4 high bits of the
+12-bit sample) and the next byte (which contains the remaining 8 bits of the
+second sample).  The process is repeated for each successive pair of samples.
+Most of the signal files on the second edition of the MIT\-BIH Arrhythmia
+Database CD-ROM are format 212 files.
+.SS Format 310
+.PP
+Each sample is represented by a 10-bit two's-complement amplitude.  The first
+sample is obtained from the 11 least significant bits of the first byte pair
+(stored least significant byte first), with the low bit discarded.  The second
+sample comes from the 11 least significant bits of the second byte pair, in the
+same way as the first.  The third sample is formed from the 5 most significant
+bits of each of the first two byte pairs (those from the first byte pair are
+the least significant bits of the third sample).  The entire process is then
+repeated for each successive set of three samples.
+.SH SEE ALSO
+header(5)
+.br
+\fIWFDB Programmer's Guide\fP

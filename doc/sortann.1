@@ -1,0 +1,80 @@
+.TH SORTANN 1 "24 May 1999" "WFDB software 10.0" "WFDB applications"
+.SH NAME
+sortann \- rearrange annotations in canonical order
+.SH SYNOPSIS
+\fBsortann -r \fIrecord\fB -a \fIannotator\fR [ \fIoptions\fR ... ]
+.SH DESCRIPTION
+Applications that use the WFDB library (version 9.7 and later versions) may
+write annotations in any order.  Most applications that read annotations,
+however, expect to find them in \fItime\fR order (with simultaneous annotations
+ordered by their \fIchan\fR attributes).
+.PP
+\fIsortann\fR rewrites the annotation file specified by \fIrecord\fR and
+\fIannotator\fR, arranging its contents in canonical (\fItime\fR and
+\fIchan\fR) order.  By default, WFDB applications run \fIsortann\fR as
+needed (from within \fIwfdbquit\fR or \fIoannclose\fR).  If the environment
+variable \fBWFDBNOSORT\fR has been set (to any value), \fIsortann\fR will not
+be run automatically, and a warning message will be printed instead.  In most
+such cases, you should run \fIsortann\fR as instructed by the warning message
+before reading the annotation file with any other WFDB application.
+.PP
+If the input contains two or more annotations with the same \fItime\fR and
+\fIchan\fR fields, only the last one is copied.  As a special case of this
+policy, if the last such annotation has \fIanntyp\fR = 0 (\fBNOTQRS\fR), no
+annotation is written at that location.  Thus a program that generates input
+for \fIsortann\fR can effectively delete a previously written annotation by
+writing a \fBNOTQRS\fR annotation at the same location.
+.PP
+The sorted (output) annotation file is always written to the current directory.
+If the input annotation file is in the current directory, \fIsortann\fR
+replaces it unless you specify a different output annotator name (using the 
+\fB-o\fR option).  Note that the output annotation file is likely to be
+slightly shorter than the input file, since more compact storage is usually
+possible when all annotations are sorted.
+.PP
+If the input annotations are already in the correct order, no output is written
+unless you have used the \fB-o\fR option.
+.PP
+If you attempt to sort a very large annotation file, \fIsortann\fR may run out
+of memory.  If this happens, use the \fB-f\fR and \fB-t\fR options to work on
+the file in sections of any convenient size, one at a time, then use
+\fImrgann\fR(1) to concatenate the sections.  Note that you must specify an
+output annotator name (with \fB-o\fR) when using the \fB-f\fR or \fB-t\fR
+options (to avoid replacing the entire input file with a sorted subset of its
+contents).
+.PP
+Running out of memory is unlikely unless:
+.TP
+1.
+you have less than 2 Mb of memory and you are attempting to sort a 24-hour
+or longer annotation file.
+.TP
+2.
+you have compiled \fIsortann\fR using a 16-bit compiler and you are
+attempting to sort more than about 4000 annotations (note that the precompiled
+versions of \fIsortann\fR for MS-DOS and UNIX do not have this limitation).
+.PP
+\fIOptions\fR include:
+.TP
+\fB-f\fI time\fR
+Begin at the specified \fItime\fR.  By default, \fIsortann\fR starts at the
+beginning of the record.
+.TP
+\fB-h\fR
+Print a usage summary.
+.TP
+\fB-o\fI output-annotator\fR
+Write output to the annotation file specified by \fIoutput-annotator\fR and
+(as specified using \fB-r\fR) \fIrecord\fR.  By default, \fIsortann\fR
+replaces the input annotation file.
+.TP
+\fB-t\fI time\fR
+Stop at the specified \fItime\fR.
+.PP
+The \fB-f\fR and \fB-t\fR options may be used to select a portion
+of an annotation file for processing.
+.PP
+The shell variable \fBWFDB\fR should be set and exported (see
+\fIsetwfdb\fR(1)).
+.SH SEE ALSO
+mrgann(1), setwfdb(1)

@@ -1,0 +1,25 @@
+file: README		G. Moody	9 August 1989
+			Last revised:	  7 May 1999
+
+This directory contains a "micro-database" which can be used to test
+programs compiled with the WFDB library.  To make the files in this directory
+accessible to such programs, add the name of this directory to the database
+path, or copy them into a directory which is already in the database path
+(for more information, see the WFDB Programmer's Guide).
+	
+The following files will be found in this directory:
+
+README		this file
+
+100s.hea	header file for record `100s'
+100s.dat	signal file for record `100s'
+100s.atr	reference annotation file for record `100s'
+
+multi.hea	header file for record `multi'
+null.hea	header file for record `null'
+
+Makefile	UNIX `make' description file for installing these files
+makefile.dos	MS-DOS `make' description file for installing these files
+
+Note that there are no signal or annotation files associated with `multi.hea'
+and `null.hea';  see the comments in these files for details.

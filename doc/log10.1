@@ -1,0 +1,15 @@
+.TH LOG10 1 "15 June 1995" "Utilities" "Utilities"
+.SH NAME
+log10 \- calculate common logarithms of two-column data
+.SH SYNOPSIS
+\fBlog10\fR
+.SH DESCRIPTION
+.PP
+\fIlog10\fR reads its standard input, which should be in text form and
+should contain two positive numbers (x and y) on each line, separated by
+spaces or tabs.  The standard output of \fIlog10\fR contains four columns of
+numbers, separated by spaces:  the common (base 10) logarithms of x and y, and
+the x and y values.  To avoid underflow, if any input is less than MINDOUBLE
+(defined in \fI<values.h>\fR as the smallest positive value that can be
+represented as a double-precision floating point quantity), it is replaced by
+that value.

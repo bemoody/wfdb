@@ -1,0 +1,81 @@
+#! /bin/sh
+# file: hrlomb		G. Moody	14 June 1995
+#			Last revised:    5 May 1999
+#
+# -----------------------------------------------------------------------------
+# Derive a heart rate power spectrum (using ihr and lomb) and plot it
+# Copyright (C) 1999 George B. Moody
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+# Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+# You may contact the author by e-mail (george@mit.edu) or postal mail
+# (MIT Room E25-505A, Cambridge, MA 02139 USA).  For updates to this software,
+# please visit the author's web site (http://ecg.mit.edu/).
+# _____________________________________________________________________________
+
+while [ $# -gt 1 ]
+do
+  case $1 in
+    -a) ANNOTATOR=$2 ;;
+    -f) START=$2 ;;
+    -p) PLOT=$2 ;;
+    -r) RECORD=$2 ;;
+    -t) END=$2 ;; 
+    -T) DEVICE=$2 ;;
+  esac
+  shift
+  shift
+done
+
+if [ x$PLOT = x ]; then
+  if [ -x /usr/local/bin/plt ]; then
+    PLOT=/usr/local/bin/plt
+  elif [ -x /usr/local/bin/plot2d ]; then
+    PLOT=/usr/local/bin/plot2d
+  else
+    echo "No plot utility found -- exiting"
+    exit 1
+  fi
+fi
+
+if [ x$RECORD = x ]; then
+  echo -n "Enter the record name: "
+  read RECORD
+fi
+
+if [ x$ANNOTATOR = x ]; then
+  echo -n "Enter the annotator name: "
+  read ANNOTATOR
+fi
+
+if [ x$START = x ]; then
+  START=0
+fi
+
+if [ x$END = x ]; then
+  END=e
+fi
+
+if [ x$DEVICE = x ]; then
+  PLOTOUT=""
+else
+  PLOTOUT="-T $DEVICE"
+fi
+
+ihr -r $RECORD -a $ANNOTATOR -f $START -t $END -x | \
+ lomb -s - | \
+ $PLOT 0 1 -x "Frequency (Hz)" -y "Power" \
+  -t "Record $RECORD ($START - $END): Heart rate spectrum (Lomb)" \
+  -X 0 1 $PLOTOUT

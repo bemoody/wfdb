@@ -1,0 +1,143 @@
+# file: Makefile-dos-gcc	G. Moody	23 April 1997
+#				Last revised:	29 April 1998	Version 10.0.0
+# GCC-DOS 'make' description file for compiling the WFDB library
+
+# _____________________________________________________________________________
+# wfdb: a library for reading and writing annotated waveforms(time series data)
+# Copyright (C) 1999 George B. Moody
+#
+# This library is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Library General Public License as published by the Free
+# Software Foundation; either version 2 of the License, or (at your option) any
+# later version.
+#
+# This library is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Library General Public License for
+# more details.
+#
+# You should have received a copy of the GNU Library General Public License
+# along with this library; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+# You may contact the author by e-mail (george@mit.edu) or postal mail
+# (MIT Room E25-505A, Cambridge, MA 02139 USA).  For updates to this software,
+# please visit the author's web site (http://ecg.mit.edu/).
+# _____________________________________________________________________________
+
+# This file is used with the UNIX `make' command to cross-compile the WFDB
+# library.  Before using it for the first time, check that the site-specific
+# variables below are appropriate for your system.  To build and install the
+# MS-DOS WFDB library, just type `make -f Makefile-dos-gcc' (from within this
+# directory).
+
+# Version numbers
+# ---------------
+
+# Each release of the WFDB Software Package is identified by a three-part
+# version number, defined in this section (unless overridden by settings in
+# the top-level Makefile for the WFDB Software Package).  See the top-level
+# Makefile (in the parent of this directory) for details.
+MAJOR = 10
+MINOR = 0
+RELEASE = 0
+VERSION = $(MAJOR).$(MINOR).$(RELEASE)
+
+# Site-specific variables
+# -----------------------
+
+# CCDIR is the directory containing the cross-compiler and the binary
+# file utilities for MSDOS.
+CCDIR = /usr/lib/gcc-lib/i386-go32-msdos/2.7.2
+
+# CC is the name of the cross-compiler.
+CC = $(CCDIR)/gcc
+
+# INCDIR should be one of the directories searched by CC for #include <...>
+# files.
+INCDIR = /usr/local/dos/include
+
+# CCDEFS is the set of C compiler options needed to set preprocessor variables
+# while compiling the WFDB Software Package.  You should include definitions of
+# the major, minor, and release numbers, and of MSDOS as shown below.  Other
+# definitions are needed only for various versions of UNIX and should be
+# omitted here.
+CCDEFS = -DWFDB_MAJOR=$(MAJOR) -DWFDB_MINOR=$(MINOR) -DWFDB_RELEASE=$(RELEASE) -DMSDOS
+
+# CFLAGS is the set of C compiler options.  CFLAGS should always include
+# CCDEFS.  Add the following options to CFLAGS as appropriate (separating them
+# by spaces if you use more than one):
+#   -g		  to save symbols for debugging
+#   -O		  if you trust your C compiler's optimizer
+#   -I$(INCDIR)   needed if INCDIR is not in the normal search path for
+#		   `#include' files;  harmless otherwise
+# `gcc-dos' is able to accept both -g and -O simultaneously; using a debugger
+# on optimized code can be tricky, though, and you may prefer to compile with
+# -g and not -O if you need to use a symbolic debugger.  For normal use,
+# optimized code is preferable (the gcc optimizer is solid and effective).
+CFLAGS = -O -I$(INCDIR) $(CCDEFS)
+
+# LIBDIR should be one of the directories searched by CC's loader for -l...
+# libraries.  You will also need to have write permission in LIBDIR.  If you
+# plan to make a shared WFDB library (see below), note that WFDB application
+# users will need to have read permission in LIBDIR.
+LIBDIR = /usr/local/dos/lib
+
+# WFDBLIB is the name of the standard WFDB library.  In order to access it via
+# `-lwfdb', WFDBLIB should be `libwfdb.a'.
+WFDBLIB = libwfdb.a
+
+# MAKE is the name of the `make' utility itself, in this case with an option
+# to use the special gcc-dos Makefiles by default when running a recursive
+# make.
+MAKE = make -f Makefile-dos-gcc
+
+# AR is the name of the command used to build a `.a' library from `.o'
+# files, and ARFLAGS is the set of options used when doing so.
+AR = $(CCDIR)/ar
+# ARFLAGS = rv
+
+# BUILDLIB is the command to be used to create WFDBLIB once all of its
+# components have been compiled separately.  This will not usually need to be
+# changed.
+BUILDLIB = $(AR) $(ARFLAGS) $(WFDBLIB) $(OFILES)
+
+# It should not be necessary to modify anything below this line.
+# -----------------------------------------------------------------------------
+
+HEADERS = $(INCDIR)/ecg/wfdb.h $(INCDIR)/ecg/ecgcodes.h $(INCDIR)/ecg/ecgmap.h
+HFILES = wfdb.h ecgcodes.h ecgmap.h wfdblib.h
+CFILES = wfdbinit.c annot.c signal.c calib.c wfdbio.c
+OFILES = wfdbinit.o annot.o signal.o calib.o wfdbio.o
+MFILES = Makefile makefile.dos
+
+# `make' or `make install':  build and install the WFDB library and headers
+install:	$(LIBDIR)/$(WFDBLIB)
+$(LIBDIR)/$(WFDBLIB):	$(HEADERS) $(OFILES)
+	$(BUILDLIB)
+	cp $(WFDBLIB) $(LIBDIR) 
+
+# `make lib': build the library in the current directory
+lib:		$(HEADERS) $(OFILES)
+	$(BUILDLIB)
+
+# `make clean':  remove intermediate and backup files
+clean:
+	rm -f $(OFILES) *~
+
+# Rules for installing the header files
+$(INCDIR)/ecg:
+	mkdir $(INCDIR)/ecg
+$(INCDIR)/ecg/wfdb.h:		$(INCDIR)/ecg wfdb.h
+	cp -p wfdb.h $(INCDIR)/ecg
+$(INCDIR)/ecg/ecgcodes.h:	$(INCDIR)/ecg ecgcodes.h
+	cp -p ecgcodes.h $(INCDIR)/ecg
+$(INCDIR)/ecg/ecgmap.h:		$(INCDIR)/ecg ecgmap.h
+	cp -p ecgmap.h $(INCDIR)/ecg
+
+# Prerequisites for the library modules
+wfdbinit.o:	$(INCDIR)/ecg/wfdb.h wfdblib.h wfdbinit.c
+annot.o:	$(HEADERS) wfdblib.h annot.c
+signal.o:	$(INCDIR)/ecg/wfdb.h wfdblib.h signal.c
+calib.o:	$(INCDIR)/ecg/wfdb.h wfdblib.h calib.c
+wfdbio.o:		$(INCDIR)/ecg/wfdb.h wfdblib.h wfdbio.c

@@ -1,0 +1,22 @@
+NAME	     wview
+
+DESCRIPTION  'WFDB Browser -- Copyright (C) George B. Moody 1999.'
+
+EXETYPE      WINDOWS
+
+STUB	     'WINSTUB.EXE'
+
+CODE	     PRELOAD MOVEABLE DISCARDABLE
+DATA	     PRELOAD MOVEABLE MULTIPLE
+
+HEAPSIZE     1024
+STACKSIZE    5120
+
+EXPORTS
+	MainWndProc   @1
+	About	      @2
+	Choose	      @3
+	Find	      @4
+	Print	      @5
+	PrintOptions  @6
+	ViewOptions   @7

@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+
+&init_labels;
+&fixinfo;
+
+sub init_labels {
+    open(LABELS, "labels.pl");
+    <LABELS>;
+    <LABELS>;
+    <LABELS>;
+    while (<LABELS>) {
+	@words = split(/\//);
+	$key = @words[1];
+	$_ = <LABELS>;
+	@words = split(/'/);
+	$node = @words[1];
+	chop($node);
+	if ($key =~ /..*/) {
+		$label{$key} = $node;
+	}
+    }
+    close(LABELS);
+}
+
+sub fixinfo {
+    open(INFO, "wave.inf");
+    while (<INFO>) {
+	if ($_ =~ /:.*:%*%/) {
+	    @words = split(/%/);
+	    $key = @words[1];
+	    print "@words[0]urlview /usr/local/help/html/wug/$label{$key}\n";
+	}
+	else {
+	   print $_;
+        }
+    }
+    close(INFO);
+}

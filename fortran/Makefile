@@ -1,0 +1,43 @@
+# file: Makefile		G. Moody	23 August 1995
+#				Last revised:	  7 May 1999
+#
+# -----------------------------------------------------------------------------
+# UNIX 'make' description file for compiling the Fortran example program
+# Copyright (C) 1999 George B. Moody
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+# Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+# You may contact the author by e-mail (george@mit.edu) or postal mail
+# (MIT Room E25-505A, Cambridge, MA 02139 USA).  For updates to this software,
+# please visit the author's web site (http://ecg.mit.edu/).
+# _____________________________________________________________________________
+
+# This file is used with the UNIX `make' command to compile the example
+# program in this directory.  Since this program is intended for instruction
+# rather than `production' use, this `makefile' does not include a procedure
+# for installing it.  To compile the example, just type `make' (from within
+# this directory);  the executable file will be left in this directory.  Type
+# `make clean' to remove it.
+
+example:	example.f wfdbf.c
+	f77 -o example example.f wfdbf.c -lwfdb
+
+# If you have `f2c', but not `f77', use `make example-alt' instead of `make'.
+example-alt:	example.f wfdbf.c
+	f2c example.f
+	cc -o example example.c wfdbf.c -lf2c -lm -lwfdb
+
+clean:
+	rm -f example example.c *.o *~

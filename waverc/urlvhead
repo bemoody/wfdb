@@ -1,0 +1,10 @@
+#!/bin/sh
+# file: urlview		G. Moody	16 April 1997
+#
+# Use this script to view an HTML document or any other URL, either by starting
+# your web browser or by instructing an already-running copy of your browser to
+# open the URL.
+
+if [ $# -lt 1 ]; then
+  echo usage: urlview URL; exit
+fi

@@ -1,0 +1,137 @@
+\documentstyle[twocolumn]{article}
+
+\title{Installing the WFDB Software Package}
+\author{}
+\date{}
+
+\begin{document}
+\topmargin -0.5625in
+\oddsidemargin -0.25in
+\evensidemargin -0.25in
+\def\columnsep{0.3125 in}
+\def\textwidth{6.875 in}
+\def\textheight{224 mm}
+\flushbottom
+% \pagestyle{empty}	% uncomment to suppress page numbering
+\setcounter{page}{98}
+
+\maketitle
+
+\subsection*{Obtaining the WFDB Software Package}
+
+Several versions of the WFDB Software Package, differing in their completeness,
+are available.  From our web site ({\tt http://ecg.mit.edu}) you may obtain
+up-to-date sources for the WFDB Software Package, as well as binary versions for
+various popular operating systems.  (Currently these include x86 Linux, Sparc
+Solaris, Sparc SunOS, and MS-DOS/MS-Windows.)  If you have been using earlier
+versions of this software included on the first, second, or third editions of
+the {\it MIT-BIH Arrhythmia Database CD-ROM}, the {\it MIT-BIH PolysomnographicDatabase CD-ROM}, the {\it European Society of Cardiology ST-T Database
+CD-ROM}, or the {\it Massachusetts General Hospital/Marquette Foundation
+Waveform Database CD-ROMs}, you should update your software by downloading the
+newer versions available from our web site (or from one of our more recent
+CD-ROMs, see below).
+
+The complete WFDB Software Package (both sources and binaries for
+Linux, Solaris, SunOS, and MS-DOS/MS-Windows) is included on the {\it
+MIT-BIH Arrhythmia Database CD-ROM} (fourth edition), and also on the
+{\it Software for Physiologic Databases with Samples CD-ROM},
+available from MIT (see {\tt http://ecg.mit.edu/} for information
+about these CD-ROMs).  Installation instructions are included in {\tt
+software/README.TXT} on these CD-ROMs.
+
+\subsection*{Choosing an installation method}
+
+From within the {\tt software} directory of your hard disk (if you have
+downloaded the WFDB Software Package from our web site or FTP server), or from
+within the {\tt software} directory of your CD-ROM, follow the instructions
+appropriate for your operating system.
+
+\subsection*{If you use Linux, SunOS, or Solaris}
+
+Examine the script {\tt install.unx} in the {\tt software} directory,
+then run it (you will need root permissions to do so successfully on
+most systems).  This script will identify your operating system and
+install the appropriate binaries in {\tt /usr/local/bin} (other files
+needed by the WFDB Software Package will be installed in other
+subdirectories of {\tt /usr/local}).
+
+If you wish to customize or recompile the WFDB Software Package, follow the
+instructions in the next paragraph, for users of other Unices.
+
+\subsection*{If you use another version of Unix}
+
+The WFDB Software Package has been successfully compiled on dozens of Unix
+variants, using both ANSI/ISO and K\&R C compilers.
+
+Copy the source files (in the {\tt software/wfdb} directory) to a working
+directory on your hard disk, then examine {\tt wfdb/Makefile} for information
+about compiling the WFDB Software Package on your system.  In most cases, you
+will need to change a few settings in {\tt wfdb/Makefile} to configure the
+software for your system, then type {\tt make} to compile the software, and
+{\tt make install} to install it.  You will need root permissions to install
+the software in the standard locations.  
+
+If you would like to use {\sf WAVE} on a UNIX system other than Linux,
+Solaris, or SunOS, you will need to port XView to your system first
+(or purchase a commercial port if one is available).  Sources for
+XView are supplied on our CD-ROMs, and are also available from our
+web/FTP server ({\tt ecg.mit.edu}) as well as from {\tt
+sunsite.unc.edu}, {\tt tsx-11.mit.edu}, and their mirrors.  \emph{We
+cannot offer assistance in porting XView; if you wish to try this, you
+are on your own.}  If you successfully port the {\tt cmdtool} terminal
+emulator application included in the XView sources, we will assist you
+in porting {\sf WAVE} (this is much simpler than the XView port).
+
+\subsection*{If you use MS-DOS or MS-Windows}
+
+Run {\tt install.exe} from the {\tt software} directory.  Follow the
+on-screen directions to choose the installation directories, to set up
+your WFDB path, and to calibrate your display.  Detailed instructions
+may be found in {\tt software/MSDOS.TXT}.
+
+The source files within the {\tt wfdb} directory are in UNIX text format
+(newlines are marked by ASCII line feed characters only).  Most MS-DOS C and
+C++ compilers and text editors can process UNIX-format text files without
+difficulty; if you wish to convert these files to MS-DOS native text file
+format, however, first install {\tt msdos/bin/u2d.exe} into a directory in your
+{\tt PATH}, copy the UNIX-format files to a writable directory, change to that
+directory, and type `{\tt u2d *.*}'.   (You may name individual files to be
+converted if you prefer. `{\tt u2d}' does not modify binary files or files
+that are already in MS-DOS text format.) 
+ 
+If you wish, you can compile the sources using Microsoft or Borland C or C++
+compilers without modification; see the files named {\tt makefile.dos} in the
+subdirectories of `wfdb' for details.  If you have Microsoft or Turbo C or C++,
+and a Microstar Laboratories DAP 1200- or 2400-series analog interface board,
+you can recompile {\tt sample} (a program for creating database records from
+analog signals, and for replaying them in analog form).  To do so successfully,
+you must first have installed the appropriate Microstar {\tt \#include} files
+and DAP interface library for use with your C compiler.  Specifically, files
+{\tt c\_lib.c}, {\tt clock.h}, and {\tt ioutil.h} must be installed in your
+{\tt include} directory, and file {\tt cdapl.lib} must be installed in a
+directory in which libraries are found by your linker.
+
+\subsection*{If you use a Macintosh or another system}
+
+The WFDB Software Package is written in highly portable C, and (with
+the exception of a few MS-DOS or UNIX-specific display or
+data-acquisition programs) should be easy to compile with any K\&R or
+ANSI C compiler.  The UNIX and MS-DOS {\tt make} description files
+({\tt Makefile} and {\tt makefile.dos} in {\tt software/wfdb} and in
+each of its subdirectories) should get you started.
+
+Notes for Macintosh users can be found in {\tt software/MAC.TXT}, and
+in {\tt software/wfdb/MAC.TXT}.  These include detailed instructions
+for compiling the WFDB library using Symantec's Think C.  Since most
+of the applications are command-line oriented, they will require minor
+modifications to run under the Mac OS.
+
+\section*{Your comments are requested}
+
+I would greatly appreciate a report of any problems you encounter in installing
+or using this software, if possible by e-mail to {\tt george@mit.edu},
+or to:
+\begin{center}
+George B. Moody\\MIT Room E25-505A\\Cambridge, MA 02139 USA
+\end{center}
+\end{document}

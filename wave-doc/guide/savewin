@@ -1,0 +1,10 @@
+sleep 20; xwd -frame >$1.xwd
+echo $1.xwd captured.  Starting xv ...
+echo Crop and save $1.gif and $1.ppm, then exit from xv to finish saving figure.
+xv $1.xwd
+mv $1.gif ../gif/$1.gif
+pnmdepth 255 <$1.ppm | pnmtops -noturn -rle -scale .5 >../color/$1.ps
+pnmdepth 255 <$1.ppm | ppmtopgm | pnmtops -noturn -rle -scale .5 >../grey/$1.ps
+mv $1.ppm ../ppm/$1.ppm
+rm -i $1.xwd
+cp -p ../grey/$1.ps .

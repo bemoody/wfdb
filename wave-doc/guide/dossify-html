@@ -1,0 +1,10 @@
+for i in $*
+do
+  F=`basename $i .html`
+  G=`echo $F | sed 's/\./-/g'`
+  echo -n processing $F ...
+  sed -f fixlinks <$F.html >$G.htm
+  echo " done"
+done
+sed 's/FFFFFF/FFD0B0/' <wug.htm >foo
+mv foo wug.htm

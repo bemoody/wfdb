@@ -1,0 +1,74 @@
+.TH SQRS 1 "24 May 1999" "WFDB software 10.0" "WFDB applications"
+.SH NAME
+sqrs \- single-channel QRS detector
+.SH SYNOPSIS
+\fBsqrs -r \fIrecord\fR [ \fIoptions\fR ... ] ]
+\fBsqrs125 -r \fIrecord\fR [ \fIoptions\fR ... ] ]
+.SH DESCRIPTION
+.PP
+\fIsqrs\fR attempts to locate QRS complexes in an ECG signal in the specified
+\fIrecord\fR.  The detector algorithm is based on example 10 in the \fIWFDB
+Programmer's Guide\fR, which in turn is based on a Pascal program
+written by W.A.H. Engelse and C. Zeelenberg, ``A single scan algorithm for
+QRS-detection and feature extraction'', \fIComputers in Cardiology\fB
+6\fR:37-42 (1979).  \fIsqrs\fP does not include the feature extraction
+capability of the Pascal program.  The output of \fIsqrs\fR is an annotation
+file (with annotator name \fIqrs\fR) in which all detected beats are labelled
+normal; the annotation file may also contain `artifact' annotations at
+locations that \fIsqrs\fR believes are noise-corrupted.
+.PP
+\fIsqrs\fR can process records containing any number of signals, but it uses
+only one signal for QRS detection (signal 0 by default;  this can be changed
+using the \fB-s\fR option, see below).  For best results on adult human ECGs,
+use \fIxform\fR to resample the input signal at 250 Hz if a different sampling
+frequency was used originally (or use \fIsqrs125\fR, a variant of \fIsqrs\fR
+designed for signals sampled at 125 Hz). For other ECGs, it may be necessary to
+experiment with the input sampling frequency and the time constants indicated
+in the source file.
+.PP
+This program is provided as an example only, and is not intended for any
+clinical application.  At the time the algorithm was originally published,
+its performance was typical of state-of-the-art QRS detectors.  Recent designs,
+particularly those that can analyze two or more input signals, may exhibit
+significantly better performance.
+.PP
+\fIOptions\fR include:
+.TP
+\fB-f\fI time\fR
+Begin at the specified \fItime\fR in \fIrecord\fR (default: the beginning of
+\fIrecord\fR).
+.TP
+\fB-m\fI threshold\fR
+Specify the detection \fIthreshold\fR (default: 500 units);  use higher values
+to reduce false detections, or lower values to reduce the number of missed
+beats.
+.TP
+\fB-s\fI signal\fR
+Specify the \fIsignal\fR to be used for QRS detection (default: 0).
+.TP
+\fB-t\fI time\fR
+Process until the specified \fItime\fR in \fIrecord\fR (default: the end of the
+\fIrecord\fR).
+.PP
+The shell variable \fBWFDB\fR should be set and exported (see
+\fIsetwfdb\fR(1)).
+.SH EXAMPLES
+.PP
+To mark QRS complexes in record 100 beginning 5 minutes from the start, ending
+10 minutes and 35 seconds from the start, and using signal 1, use the command:
+.br
+\fBsqrs -r 100 -f 5:0 -t 10:35 -s 1\fR
+.br
+The output annotations may be read using (for example):
+.br
+\fBrdann -a qrs -r 100\fR
+.PP
+To evaluate the performance of this program, run it on the entire record, by:
+.br
+\fBsqrs -r 100\fR
+.br
+and then compare its output with the reference annotations by:
+.br
+\fBbxb -r 100 -a atruth qrs\fR
+.SH SEE ALSO
+bxb(1), rdann(1), setwfdb(1), xform(1)

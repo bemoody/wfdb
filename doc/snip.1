@@ -1,0 +1,50 @@
+.TH SNIP 1 "24 May 1999" "WFDB software 10.0" "WFDB applications"
+.SH NAME
+snip \- copy an excerpt of a WFDB record
+.SH SYNOPSIS
+\fBsnip -i\fI input-record\fB -n\fI new-record [ \fIoptions\fR ]
+.SH DESCRIPTION
+\fIsnip\fR copies the signal files (and, optionally, annotation files) of
+the specified \fIinput-record\fR, and generates a header file, thereby creating
+the specified \fInew-record\fR.  \fIsnip\fR is usually used to extract an
+excerpt of its \fIinput-record\fR, using the \fB-f\fR and \fB-t\fR options (see
+below) to specify the segment to be copied.
+.PP
+The program \fIxform\fR(1) can also perform this task, but offers additional
+flexibility (it can scale the signals, resample them at a different frequency,
+rearrange them, select subsets of them, or reformat them);  \fIsnip\fR is
+faster than \fIxform\fR, however.
+.PP
+\fIOptions\fR are:
+.TP
+\fB-a\fI annotator\fR
+Copy the specified \fIannotator\fR as well as the signal files.  Two or more
+\fIannotator\fR arguments, separated by spaces, can follow \fB-a\fR.  An
+annotator supplied via the standard input may be specified using `-', but only
+immediately after `-a';  in this case only, annotations are copied to the
+standard output.
+.TP
+\fB-f\fI time\fR
+Begin at the specified \fItime\fR in the input record (default: the
+beginning of the record).
+.TP
+\fB-h\fR
+Print a usage summary.
+.TP
+\fB-t\fI time\fR
+Process until the specified \fItime\fR in the input record (default: continue
+to the end of the record).
+.PP
+The shell variable \fBWFDB\fR should be set and exported (see \fIsetwfdb\fR(1)).
+.SH FILES
+.TP 22
+\fInew-record\fR.dat
+output signal file
+.TP
+header.\fInew-record\fR
+output header file (under MS-DOS, \fInew-record\fR.hea)
+.TP
+\fIannotator.new-record\fR
+output annotation file (under MS-DOS, \fInew-record.ann\fR)
+.SH SEE ALSO
+xform(1), setwfdb(1)

@@ -1,0 +1,6 @@
+setenv WFDB :${HOME}/database:${HOME}/database/%3r:/usr/local/database:/usr/local/database/%3r:/cdrom:/cdrom/mimicdb:/cdrom/mimicdb/%3r:/cdrom/mitdb:/cdrom/cudb:/cdrom/nstdb:/cdrom/stdb:/cdrom/vfdb:/cdrom/afdb:/cdrom/cdb:/cdrom/svdb:/cdrom/ltdb:/cdrom/odb:/cdrom/udb:/cdrom/edb:/cdrom/valedb:/cdrom/slpdb:/cdrom/mghdb:/cdrom/database:/cdrom/database/%3r:/usr/local/ahadb
+setenv WFDBCAL wfdbcal
+
+# For compatibility with older applications only
+setenv DB $WFDB
+setenv DBCAL $WFDBCAL

@@ -1,0 +1,4 @@
+s/\.html/\.htm/g
+s/mit.edu\/order-form.htm/mit.edu\/order-form.html/g
+s/\.\(.\)\.htm/-\1.htm/g
+s/<BODY /<BODY bgcolor="FFFFFF" /
