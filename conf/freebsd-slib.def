@@ -1,5 +1,5 @@
 # file: freebsd-slib.def	G. Moody	5 March 2002
-#				Last revised: 21 November 2002
+#				Last revised: 28 November 2004
 # Based on 'linux-slib.def'.
 
 # This section contains settings suitable for generating an ELF-format shared
@@ -27,6 +27,10 @@ WFDBROOT = /usr
 # LWC to ':' (a program that does nothing, successfully).
 LWC = libwww-config
 
+# BINDIR specifies the directory in which the applications will be installed;
+# it should be a directory in the PATH of those who will use the applications.
+BINDIR = $(WFDBROOT)/bin
+
 # INCDIR specifies the name of a directory in which to install the WFDB
 # library's #include <...> files.
 INCDIR = $(WFDBROOT)/include
@@ -34,6 +38,19 @@ INCDIR = $(WFDBROOT)/include
 # LIBDIR specifies the name of a directory in which to install the WFDB
 # library.
 LIBDIR = $(WFDBROOT)/lib
+
+# LDLIBWWW, which is appended to LDFLAGS below, is the set of options needed
+# to link with libwww.  If libwww is not installed, or if libwfdb is a shared
+# library, LDLIBWWW can be empty (if there is a '#' immediately after the '='
+# below, the remainder of the line is ignored, so LDLIBWWW is empty in this
+# case).  Otherwise, it is generated from the output of LWC.  Note that up to
+# three passes through the option list are necessary to satisfy all
+# dependencies when linking to the static libwww libraries.
+LDLIBWWW = # `$(LWC) --libs` `$(LWC) --libs` `$(LWC) --libs`
+
+# LDFLAGS is appended to the C compiler command line to specify loading the
+# WFDB library.
+LDFLAGS = -L$(LIBDIR) -lwfdb $(LDLIBWWW)
 
 # CC is the name of your C compiler.
 CC = gcc

@@ -1,3 +1,29 @@
+10.3.14:
+	Use rdann's new -v option to add column headings to its standard
+	output.
+
+	A gain dependency in wqrs has been removed.  As a result, wqrs
+	now works better on low-resolution input than previous versions.
+	The change results in occasional shifts of one sampling interval
+	in the placement of annotations for typical (higher resolution)
+	records, relative to previous versions.	
+
+	The 'make' rules for creating a binary tarball have been improved,
+	and when making one on the Cygwin platform, the Cygwin DLLs are now
+	included automatically. 
+
+	Guido Muesch reported that the WFDB library function getspf() did
+	not always return correct results if the frame frequency does not
+	have an exact representation as a double precision floating point
+	number.  This problem has now been corrected.
+
+	To simplify installation of the WFDB software package, wfdb-config
+	has been moved from app to lib.
+
+	Carlos AS Felgueiras provided a patch to correct several problems
+	related to compiling the WFDB software package and building the
+	WFDB rpms.
+
 10.3.13:
 	Using an indirect WFDB path (i.e., setting the WFDB environment
 	variable to a value such as '@FILE', where FILE contains the

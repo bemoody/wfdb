@@ -1,9 +1,9 @@
 /* file: edf2mit.c		G. Moody       16 October 1996
-				Last revised:  13 February 2003
+				Last revised:    4 June 2004
 
 -------------------------------------------------------------------------------
 Convert EDF (European Data Format) file to MIT format header and signal files
-Copyright (C) 2003 George B. Moody
+Copyright (C) 1996-2004 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -116,6 +116,18 @@ char **argv;
 
     if (ifile == NULL) {
 	help();
+	exit(1);
+    }
+
+    if (record[0] == '\0' || newheader(record) < 0) {
+	fprintf(stderr, "\n");
+	help();
+	(void)fprintf(stderr,
+  "\nRun %s again, specifying a valid name for the output record,\n", argv[0]);
+	(void)fprintf(stderr,
+		      "using the -r option as described above.\n\n");
+	(void)fprintf(stderr,
+  "  Valid record names may include letters, digits, and underscores only.\n");
 	exit(1);
     }
 
@@ -443,7 +455,8 @@ static char *help_strings[] = {
  " -b          input is in big-endian byte order (default: little-endian)",
  " -h          print this usage summary",
  " -i EDFILE   read the specified European Data Format file",
- " -r RECORD   create the specified RECORD (default: use patient id)",
+ " -r RECORD   create the specified RECORD (default: input file name without",
+ "              suffix)",
  " -s SIGNAL [SIGNAL ...]  copy only the specified signal(s) (use signal",
  "              numbers, beginning with zero;  default: copy all signals)",
  " -v          print debugging output",

@@ -1,10 +1,10 @@
 # file: Makefile.dos	G. Moody	2 November 1989
-#			Last revised:	26 October 2002		wfdblib 10.2.9
+#			Last revised:  28 November 2004		wfdblib 10.3.14
 # MSDOS/Windows `make' description file template for compiling the WFDB library
 #
 # _____________________________________________________________________________
 # wfdb: a library for reading and writing annotated waveforms(time series data)
-# Copyright (C) 2000 George B. Moody
+# Copyright (C) 1989-2004 George B. Moody
 #
 # This library is free software; you can redistribute it and/or modify it under
 # the terms of the GNU Library General Public License as published by the Free
@@ -25,7 +25,6 @@
 # please visit PhysioNet (http://www.physionet.org/).
 # _____________________________________________________________________________
 #
-#
 # WARNING: NO SUPPORT FOR PROPRIETARY COMPILERS.  Previous versions of the WFDB
 # software package have been compiled successfully by other users using various
 # proprietary compilers including those mentioned below.  You may find this
@@ -39,6 +38,7 @@
 # compiler (see below for suitable settings for several popular C/C++
 # compilers):
 #
+#   BINDIR	The directory in which the applications will be installed.
 #   CC		The name of the command-line C compiler.
 #   CDFLAGS	Optional arguments to be supplied to CC to produce object files
 #		 with debugging symbols.
@@ -47,14 +47,6 @@
 #   COFLAGS	Optional arguments to be supplied to CC to produce optimized
 #		 object files (or normal object files if no optimization is
 #		 available).
-#   WFDBLIB	The name of the static (large memory model) WFDB library.
-#   WFDBDLL	The name of the large memory model WFDB dynamic link library
-#		 (DLL) for use with MS Windows applications.
-#   WFDBDLLDEF	The name of the WFDB DLL export definition file.  If you
-#                compile versions of the WFDB DLL using mutually incompatible
-#		 compilers, make sure that the library name in the first line
-#		 of this file is unique for each version.
-#   WFDBILIB	The name of the import library corresponding to WFDBDLL.
 #   INCDIR 	One of the directories searched by CC for #include <...>
 #		 files.  For Microsoft C, use one of the directories specified
 #		 by the INCLUDE environment variable.  If you are using Turbo
@@ -72,6 +64,14 @@
 #		 find it most convenient to use the directory in which the
 #		 standard libraries reside (e.g., \tc\lib or \bc4\lib).
 #		 The WFDB libraries will be installed in LIBDIR.
+#   WFDBLIB	The name of the static (large memory model) WFDB library.
+#   WFDBDLL	The name of the large memory model WFDB dynamic link library
+#		 (DLL) for use with MS Windows applications.
+#   WFDBDLLDEF	The name of the WFDB DLL export definition file.  If you
+#                compile versions of the WFDB DLL using mutually incompatible
+#		 compilers, make sure that the library name in the first line
+#		 of this file is unique for each version.
+#   WFDBILIB	The name of the import library corresponding to WFDBDLL.
 
 INCDIR = c:\include
 LIBDIR = c:\lib
@@ -157,6 +157,9 @@ CFLAGS = $(COFLAGS)
 $(LIBDIR):
 	-mkdir $(LIBDIR)
 
+$(BINDIR)
+	-mkdir $(BINDIR)
+
 # Build the static library
 buildstatic:
 	del $(WFDBLIB)
@@ -190,12 +193,17 @@ headers:
 	copy ecgcodes.h $(INCDIR)\wfdb
 	copy ecgmap.h $(INCDIR)\wfdb
 
-install:	$(LIBDIR) $(TARGETS) headers
+wfdb-config.exe:	headers wfdb-config.c
+	$(CC) $(CFLAGS) wfdb-config.c
+
+install:	$(LIBDIR) $(BINDIR) $(TARGETS) headers wfdb-config.exe
+	copy wfdb-config.exe $(BINDIR)
 
 # If you are using Microsoft `make' (not `nmake'), you may wish to comment out
-# the next five lines to avoid having `make' clean up automatically.
+# the next six lines to avoid having `make' clean up automatically.
 clean:
 	-del $(WFDBLIB)
 	-del $(WFDBDLL)
 	-del $(WFDBILIB)
 	-del *.obj
+	-del wfdb-config.exe

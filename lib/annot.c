@@ -1,10 +1,10 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:    3 August 2003		wfdblib 10.3.10
+			Last revised:    14 November 2004	wfdblib 10.3.14
 WFDB library functions for annotations
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 2003 George B. Moody
+Copyright (C) 1989-2004 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -147,7 +147,8 @@ WFDB_Annotator i;
 
     if (getann(i, &annot) < 0)	/* prime the pump */
 	return (-1);
-    while (getann(i,&annot) == 0 && annot.time == 0L && annot.anntyp == NOTE) {
+    while (getann(i,&annot) == 0 && annot.time == 0L &&
+	   annot.anntyp == NOTE && annot.subtyp == 0) {
 	if (annot.aux == NULL || *annot.aux < 1 || *(annot.aux+1) == '#')
 	    continue;
 	p1 = strtok(annot.aux+1, " \t");
@@ -171,7 +172,10 @@ WFDB_Annotator i;
 	}
 
     }
-    (void)ungetann(i, &annot);
+    if (annot.time != 0L || annot.anntyp != NOTE || annot.subtyp != 0 ||
+	annot.aux == NULL ||
+	strncmp(annot.aux + 1, "## sampling frequency: ", 23))
+	(void)ungetann(i, &annot);
     return (0);
 }
 
@@ -182,7 +186,7 @@ static char modified[ACMAX+1];	/* modified[i] is non-zero if setannstr() or
 static int put_ann_table(i)
 WFDB_Annotator i;
 {
-    int a;
+    int a, flag = 0;
     char buf[256];
     WFDB_Annotation annot;
 
@@ -192,10 +196,21 @@ WFDB_Annotator i;
     annot.aux = buf;
     for (a = 0; a <= ACMAX; a++)
 	if (modified[a]) {
+	    if (flag == 0) { /* mark the beginning of the table */
+		(void)sprintf(buf+1, "## annotation type definitions");
+		buf[0] = strlen(buf+1);
+		if (putann(i, &annot) < 0) return (-1);
+	    }
 	    (void)sprintf(buf+1, "%d %s %s", a, annstr(a), anndesc(a));
 	    buf[0] = strlen(buf+1);
 	    if (putann(i, &annot) < 0) return (-1);
+	    flag = 1;
 	}
+    if (flag) {	/* if a table was written, mark its end */
+	(void)sprintf(buf+1, "## end of definitions");
+	buf[0] = strlen(buf+1);
+	if (putann(i, &annot) < 0) return (-1);
+    }
     return (0);
 }
 

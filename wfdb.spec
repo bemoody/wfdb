@@ -51,8 +51,10 @@ cd ../wug-src; make
 %install
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/usr/lib $RPM_BUILD_ROOT/usr/include/wfdb
+mkdir -p $RPM_BUILD_ROOT/usr/bin
 cd lib; cp -p libwfdb.so* $RPM_BUILD_ROOT/usr/lib
     cp -p wfdb.h ecgcodes.h ecgmap.h wfdblib.h $RPM_BUILD_ROOT/usr/include/wfdb
+    cp -p wfdb-config $RPM_BUILD_ROOT/usr/bin
 cd ../wave; make WFDBROOT=$RPM_BUILD_ROOT/usr install
 cd ../waverc; make WFDBROOT=$RPM_BUILD_ROOT/usr install
 cd ../app; make WFDBROOT=$RPM_BUILD_ROOT/usr install

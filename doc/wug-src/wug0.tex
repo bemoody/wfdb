@@ -5442,7 +5442,7 @@ happen:
 \index{WFDB environment variable}\index{environment variables!WFDB}
 \index{DISPLAY environment variable}\index{environment variables!DISPLAY}
 If you see a summary of options, rather than the \WAVE{} main window, read
-the message carefully;  you may not have set the {\tt DISPLAY} or {\tt WFDB}
+the message carefully;  you may need to set the {\tt DISPLAY} or {\tt WFDB}
 environment variables, or the X server may not be running.
 
 \item
@@ -5467,10 +5467,14 @@ directory (probably {\tt /usr/database}) containing a file named
 
 \item
 \index{signal!window}
-If \WAVE{}'s signal window appears, but is solid white, your X server has a
-bug. Click on any of the navigation controls (e.g., \button{\tt <<},
+If \WAVE{}'s signal window appears, but is solid white or light grey,
+your X server does not have backing store enabled.
+Click on any of the navigation controls (e.g., \button{\tt <<},
 \button{\tt <}, \button{\tt >}, or \button{\tt >>}), or resize the window,
-to make the signals appear.  If the signal window is solid (or nearly solid)
+to make the signals appear.  To avoid this problem entirely (until
+the next time you upgrade your X server), turn on backing store in
+your X server.  For instructions for doing this, and for what to do if the
+signal window is solid (or nearly solid)
 blue or black, or has only horizontal lines across it, see
 \hyperref{``I can't see the signals!''}
 {``I can't see the signals!'' (section~}
@@ -5481,8 +5485,8 @@ blue or black, or has only horizontal lines across it, see
 \index{command-line options!{\tt -S}}\index{options!{\tt -S}}
 \item
 If the signals appear, but there are no annotations or time stamps in the
-signal window, your X server has a (different) bug.  Restart \WAVE{}, adding
-the `{\tt -S}' option to the `wave' command.  Also see
+signal window, your X server has defective support for overlay graphics.
+Restart \WAVE{}, adding the `{\tt -S}' option to the `wave' command.  Also see
 \hyperref{``I can't see text in the signal window!''}
 {``I can't see text in the signal window!'' (section~}
 {, page~\pageref{faq:cannot-see-text})}
@@ -5511,7 +5515,7 @@ suffer from the same limitation.  If possible, use a web server that supports
 HTTP range requests, such as Apache, or download a copy of the record to your
 local disk.
 
-PhysioNet and its mirrors support HTTL range requests, so if you experience
+PhysioNet and its mirrors support HTTP range requests, so if you experience
 this problem when reading data from PhysioNet, the cause may be network
 congestion;  in this case, try using a different mirror.
 
@@ -5572,9 +5576,24 @@ exits and will need to be repeated afterwards.
 
 \label{faq:cannot-see-signals}
 \index{signal!window}
-If the signal window is solid white, your X server has a bug.  Click on any of
-the navigation controls (e.g., \button{\tt <<}, \button{\tt <}, \button{\tt >},
-or \button{\tt >>}), or resize the window, to make the signals appear.
+If the signal window is solid white or light grey, your X server does not have
+backing store enabled.
+Click on any of the navigation controls (e.g., \button{\tt <<},
+\button{\tt <}, \button{\tt >}, or \button{\tt >>}), or resize the window, to
+make the signals appear.  If this works, the problem is almost certainly that
+backing store has been disabled in the X server's configuration file.  You can
+verify this by running the command
+\begin{verbatim}
+	xdpyinfo | grep backing
+\end{verbatim}
+To enable backing store, insert the line
+\begin{verbatim}
+	Option "backingstore"
+\end{verbatim}
+in the {\tt Device} section of your X server's configuration file
+(usually {\tt /etc/X11/xorg.conf} or {\tt /etc/X11/XF86Config}),
+or run the server with the option ``{\tt +bs}'' to obtain the same result.
+See the documentation for your X server for further information.
 
 \index{format!of signal files}
 If the signal window is solid or nearly solid blue (or black if you have
@@ -5634,6 +5653,28 @@ option to the end of the `{\tt wave}' command.
 This problem may also occur on 8-bit `pseudo-color' displays, if another
 application such as Netscape has already allocated most of the color map.
 To avoid this problem, start \WAVE{} before starting Netscape.
+
+\subsection{Why does \WAVE{} crash, saying ``All pty's in use''?}
+
+\index{pty problems}
+This problem occurs if the installed version of the XView library requires
+BSD ptys, and if your operating system does not support BSD ptys. \WAVE{}
+may operate without problems until you attempt to open a text or terminal
+window (by selecting {\sf Analyze...} from the {\sf File} menu, or by
+various selections from the {\sf Properties} and {\sf Help menus}.  Typically,
+\WAVE{} then exits with the error ``{\tt All pty's in use}''.
+
+Two types of ptys (pseudo-terminal devices) have been supported by most Linux
+distributions until recently. Traditionally, XView has used BSD-style ptys
+(pseudo-terminal devices) to implement text windows and terminal emulator
+objects such as WAVE's analysis commands window. Most recent Linux
+distributions based on version 2.6 kernels, including Fedora Core 2 and later,
+support only the newer UNIX98 (SVR4-style) ptys. Although some older XView
+libraries can be installed on these platforms, they will cause WAVE (and other
+XView-based applications) to crash whenever a text or terminal window is
+opened.  The recommended solution is to install XView libraries that use UNIX98
+(SVR4) ptys rather than the older BSD (``legacy'') ptys; these are available
+from PhysioNet.
 
 \subsection{\WAVE{} doesn't draw/erase properly in the scope window!}
 

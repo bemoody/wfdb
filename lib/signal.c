@@ -1,10 +1,10 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   17 October 2003		wfdblib 10.3.11
+			Last revised:   14 November 2004	wfdblib 10.3.14
 WFDB library functions for signals
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 2003 George B. Moody
+Copyright (C) 1989-2004 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -1897,11 +1897,19 @@ invocations of getvec as appropriate.  Function setgvmode can be used to change
 getvec's operating mode, which is determined by environment variable
 WFDBGVMODE or constant DEFWFDBGVMODE by default.  When reading
 ordinary records (with all signals sampled at the same frequency), getvec's
-behavior is independent of its operating mode. */
+behavior is independent of its operating mode.
+
+Since sfreq and ffreq are always positive, the effect of adding 0.5 to their
+quotient before truncating it to an int (see below) is to round the quotient
+to the nearest integer.  Although sfreq should always be an exact multiple
+of ffreq, loss of precision in representing non-integer frequencies can cause
+problems if this rounding is omitted.  Thanks to Guido Muesch for pointing out
+this problem.
+ */
 
 FINT getspf()
 {
-    return ((sfreq != ffreq) ? (int)(sfreq/ffreq) : 1);
+    return ((sfreq != ffreq) ? (int)(sfreq/ffreq + 0.5) : 1);
 }
 
 FVOID setgvmode(mode)

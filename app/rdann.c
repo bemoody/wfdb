@@ -1,9 +1,9 @@
 /* file rdann.c	    T. Baker and G. Moody	27 July 1981
-		    Last revised:	        20 May 2002
+		    Last revised:	        28 November 2004
 
 -------------------------------------------------------------------------------
 rdann: Print an annotation file in ASCII form
-Copyright (C) 2002 George B. Moody
+Copyright (C) 1981-2004 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -40,26 +40,6 @@ extern void exit();
 #define annpos
 #include <wfdb/ecgmap.h>
 
-/* Define the default WFDB path for CD-ROM versions of this program (the MS-DOS
-   executables found in the `bin' directories of the various CD-ROMs).  This
-   program has been revised since the appearance of these CD-ROMs; compiling
-   this file will not produce executables identical to those on the CD-ROMs.
-   Note that the drive letter is not included in these WFDB path definitions,
-   since it varies among systems.
- */
-#ifdef MITCDROM
-#define WFDBP ";\\mitdb;\\nstdb;\\stdb;\\vfdb;\\afdb;\\cdb;\\svdb;\\ltdb;\\cudb"
-#endif
-#ifdef STTCDROM
-#define WFDBP ";\\edb;\\valedb"
-#endif
-#ifdef SLPCDROM
-#define WFDBP ";\\slpdb"
-#endif
-#ifdef MGHCDROM
-#define WFDBP ";\\mghdb"
-#endif
-
 char *pname;
 
 main(argc, argv)	
@@ -69,18 +49,12 @@ char *argv[];
     char *record = NULL, *prog_name();
     signed char cflag = 0, chanmatch, nflag = 0, nummatch, sflag = 0, submatch;
     double sps, spm, sph;
-    int eflag = 0, i, j, xflag = 0;
+    int eflag = 0, i, j, vflag = 0, xflag = 0;
     long beat_number = 0L, from = 0L, to = 0L, atol();
     static char flag[ACMAX+1];
     static WFDB_Anninfo ai;
     WFDB_Annotation annot;
     void help();
-
-#ifdef WFDBP
-    char *wfdbp = getwfdb();
-    if (*wfdbp == '\0')
-	setwfdb(WFDBP);
-#endif
 
     pname = prog_name(argv[0]);
 
@@ -191,6 +165,9 @@ char *argv[];
 	    }
 	    to = i;
 	    break;
+	  case 'v':	/* show column headings */
+	    vflag = 1;
+	    break;
 	  case 'x':	/* use alternate time format */
 	    xflag = 1;
 	    eflag = 0;
@@ -241,6 +218,20 @@ char *argv[];
 	}
     }
 
+    if (vflag) {	/* print column headings */
+      if (eflag)
+	(void)printf("Elapsed time  Sample #  ");
+      else if (xflag)
+	(void)printf("  Seconds   Minutes     Hours  ");
+      else {
+	if (*(mstimstr((WFDB_Time)(-1))) == '[')
+	  (void)printf("      Time       Date     Sample #  ");
+	else
+	  (void)printf("      Time   Sample #  ");
+      }
+      (void)printf("Type  Sub Chan  Num\tAux\n");
+    }
+
     while (getann(0, &annot) == 0 && (to == 0L || annot.time <= to)) {
 	if ((flag[0] || (isann(annot.anntyp) && flag[annot.anntyp])) &&
 	    (cflag == 0 || annot.chan == chanmatch) &&
@@ -249,7 +240,7 @@ char *argv[];
 	    if (eflag)
 		(void)printf("%s  %7ld", mstimstr(annot.time), annot.time);
 	    else if (xflag)
-		(void)printf("%.3lf %.5lf %.7lf",
+		(void)printf("%9.3lf %9.5lf %9.7lf",
 			     annot.time/sps, annot.time/spm, annot.time/sph);
 	    else
 		(void)printf("%s  %7ld", mstimstr(-annot.time), annot.time);
@@ -295,6 +286,7 @@ static char *help_strings[] = {
  " -p TYPE [TYPE ...]  print annotations of specified TYPEs only",
  " -s SUBTYPE          print annotations with specified SUBTYPE only",
  " -t TIME             stop at specified TIME",
+ " -v                  print column headings",
  " -x                  * use alternate time format (seconds, minutes, hours)",
  "* Only one of -e and -x can be used.",
 NULL

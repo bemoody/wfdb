@@ -1,5 +1,5 @@
 # file: cygwin-slib.def	I. Henry and G. Moody	19 November 2002
-#				Last revised:	21 November 2002
+#				Last revised:	28 November 2004
 
 # This section contains settings suitable for generating a DLL (shared library)
 # under MS Windows using the free Cygwin/gcc ANSI C compiler, available from
@@ -28,6 +28,10 @@ WFDBROOT = /usr
 # LWC to ':' (a program that does nothing, successfully).
 LWC = libwww-config
 
+# BINDIR specifies the name of a directory in which to install the WFDB
+# DLL and the WFDB applications.
+BINDIR = $(WFDBROOT)/bin
+
 # INCDIR specifies the name of a directory in which to install the WFDB
 # library's #include <...> files.
 INCDIR = $(WFDBROOT)/include
@@ -36,9 +40,18 @@ INCDIR = $(WFDBROOT)/include
 # library.
 LIBDIR = $(WFDBROOT)/lib
 
-# BINDIR specifies the name of a directory in which to install the WFDB
-# DLL.
-BINDIR = $(WFDBROOT)/bin
+# LDLIBWWW, which is appended to LDFLAGS below, is the set of options needed
+# to link with libwww.  If libwww is not installed, or if libwfdb is a shared
+# library, LDLIBWWW can be empty (if there is a '#' immediately after the '='
+# below, the remainder of the line is ignored, so LDLIBWWW is empty in this
+# case).  Otherwise, it is generated from the output of LWC.  Note that up to
+# three passes through the option list are necessary to satisfy all
+# dependencies when linking to the static libwww libraries.
+LDLIBWWW = # `$(LWC) --libs` `$(LWC) --libs` `$(LWC) --libs`
+
+# LDFLAGS is appended to the C compiler command line to specify loading the
+# WFDB library.
+LDFLAGS = -L$(LIBDIR) -lwfdb $(LDLIBWWW)
 
 # CC is the name of your C compiler.
 CC = gcc
@@ -112,6 +125,11 @@ make-all:	all
 lib-post-install:
 	cd $(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_BASENAME)
 	cd $(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_SONAME)
+	test -d $(BINDIR) || \
+	 ( mkdir -p $(BINDIR); $(SETDPERMISSIONS) $(BINDIR) )
+	test /usr/bin = $(BINDIR) || \
+ 	 ( cp -p /usr/bin/cygwin1.dll $(BINDIR); \
+	   cp -p /usr/bin/cygz.dll $(BINDIR) )
 	cp $(WFDBLIB_DLLNAME) $(BINDIR)
 
 lib-post-uninstall:

@@ -1,8 +1,8 @@
 /* file: wqrs.c		Wei Zong      23 October 1998
-			Last revised:  % December 2002 (by W.Zong and G. Moody)
+			Last revised:  8 December 2004 (by W.Zong and G. Moody)
 -----------------------------------------------------------------------------
 wqrs: Single-lead QRS detector based on length transform
-Copyright (C) 2002 Wei Zong
+Copyright (C) 1998-2004 Wei Zong
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -157,6 +157,7 @@ main(int argc, char **argv)
     int Ta, T0;			     /* high and low detection thresholds */
     WFDB_Anninfo a;
     WFDB_Annotation annot;
+    WFDB_Gain gain;
     WFDB_Sample *v;
     WFDB_Siginfo *s;
     WFDB_Time from = 0L, next_minute, now, spm, t, tj, tpq, to = 0L, tt, t1;
@@ -252,6 +253,7 @@ main(int argc, char **argv)
     a.name = "wqrs"; a.stat = WFDB_WRITE;
     if ((nsig = wfdbinit(record, &a, 1, s, nsig)) < 1) exit(2);
     if (signal < 0 || signal >= nsig) signal = 0;
+    if ((gain = s[signal].gain) == 0.0) gain = WFDB_DEFGAIN;
     sps = sampfreq((char *)NULL);
     if (Rflag) {
     	if (PWFreq == 60.0) setifreq(sps = 120.);
@@ -271,7 +273,7 @@ main(int argc, char **argv)
     annot.aux = NULL;
     Tm = muvadu((unsigned)signal, Tm);
     samplingInterval = 1000.0/sps;
-    lfsc = 5.0e6/sps;	/* length function scale constant */
+    lfsc = 1.25*gain*gain/sps;	/* length function scale constant */
     spm = 60 * sps;
     next_minute = from + spm;
     LPn = sps/PWFreq;   /* The LP filter will have a notch at the

@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised: 17 December 2002
+#				Last revised:	 30 May 2004
 # This section of the Makefile should not need to be changed.
 
 # ARCH specifies the type of CPU and the operating system (e.g., 'i686-Linux').
@@ -125,7 +125,8 @@ tarballs:	clean
 # 'make bin-tarball': make a gzipped tar archive of the WFDB software package
 # binaries and other installed files
 bin-tarball:	test-install
-	cd $(HOME)/wfdb-test;  tar cfvz ../$(PACKAGE)-$(ARCH).tar.gz .
+	cd $(HOME); mv wfdb-test $(PACKAGE)-$(ARCH)
+	cd $(HOME); tar cfvz $(PACKAGE)-$(ARCH).tar.gz $(PACKAGE)-$(ARCH)
 
 # 'make doc-tarball': make a gzipped tar archive of formatted documents
 # (requires many freely-available utilities that are not part of this

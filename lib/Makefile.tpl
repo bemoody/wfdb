@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:	21 November 2002
+#				Last revised:   28 November 2004
 # This section of the Makefile should not need to be changed.
 
 INCLUDES = $(INCDIR)/wfdb/wfdb.h $(INCDIR)/wfdb/ecgcodes.h \
@@ -11,22 +11,29 @@ CFILES = wfdbinit.c annot.c signal.c calib.c wfdbio.c
 OFILES = wfdbinit.o annot.o signal.o calib.o wfdbio.o
 MFILES = Makefile Makefile.dos
 
-# `make' or `make all':  build the WFDB library
-all:	$(OFILES)
+# `make' or `make all':  build the WFDB library and wfdb-config
+all:	$(OFILES) wfdb-config
 	$(BUILDLIB) $(OFILES) $(BUILDLIB_LDFLAGS)
 
 # `make install':  install the WFDB library and headers
-install:	$(INCLUDES) $(LIBDIR) all
+install:	$(INCLUDES) $(LIBDIR) $(BINDIR) all
 	cp $(WFDBLIB) $(LIBDIR) 
 	$(SETLPERMISSIONS) $(LIBDIR)/$(WFDBLIB)
 	$(MAKE) lib-post-install
+	../install.sh $(BINDIR) wfdb-config
 
 uninstall:
+	../uninstall.sh $(BINDIR) wfdb-config
+	../uninstall.sh $(BINDIR)
 	../uninstall.sh $(INCDIR)/wfdb $(HFILES)
 	../uninstall.sh $(INCDIR)
 	../uninstall.sh $(LIBDIR) $(WFDBLIB)
 	$(MAKE) lib-post-uninstall
 	../uninstall.sh $(LIBDIR)
+
+wfdb-config:	wfdb-config.c Makefile
+	$(CC) -DVERSION='"$(VERSION)"' -DCFLAGS='"-I$(INCDIR)"' \
+	  -DLDFLAGS='"$(LDFLAGS)"' -I$(INCDIR) -o $@ wfdb-config.c
 
 # `make compat':  install the includes needed for source compatibility with
 # applications written for pre-version 10.0.0 versions of this library
@@ -34,7 +41,7 @@ compat:		$(INCLUDES) $(COMPAT_INCLUDES)
 
 # `make clean':  also remove previously compiled versions of the library
 clean:
-	rm -f $(OFILES) libwfdb.* *~ wfdb.h wfdblib.h
+	rm -f $(OFILES) libwfdb.* *.dll *~ wfdb.h wfdblib.h wfdb-config
 
 # `make TAGS':  make an `emacs' TAGS file
 TAGS:		$(HFILES) $(CFILES)
@@ -42,9 +49,11 @@ TAGS:		$(HFILES) $(CFILES)
 
 # `make listing':  print a listing of WFDB library sources
 listing:
-	$(PRINT) README $(MFILES) $(HFILES) $(CFILES)
+	$(PRINT) README $(MFILES) $(HFILES) $(CFILES) wfdb-config.c
 
 # Rules for creating installation directories
+$(BINDIR):
+	mkdir -p $(BINDIR); $(SETDPERMISSIONS) $(BINDIR)
 $(INCDIR):
 	mkdir -p $(INCDIR); $(SETDPERMISSIONS) $(INCDIR)
 $(INCDIR)/wfdb:	$(INCDIR)

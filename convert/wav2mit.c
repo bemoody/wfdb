@@ -1,8 +1,8 @@
 /* file: wav2mit.c	G. Moody	12 February 2003
-
+			Last revised:	23 December 2004
 -------------------------------------------------------------------------------
 wav2mit: Convert a .wav format file to WFDB format
-Copyright (C) 2003 George B. Moody
+Copyright (C) 2003-2004 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -306,7 +306,7 @@ char *prog_name(char *s)
 
 static char *help_strings[] = {
     "usage: %s -i FILE.wav -r RECORD [ OPTIONS ... ]\n",
-    "where FILE.wav is the name of the wav-format output signal file,",
+    "where FILE.wav is the name of the wav-format input signal file,",
     "and OPTIONS may include:",
     " -h         print this usage summary",
     " -r RECORD  create RECORD.hea (default: FILE.hea)",

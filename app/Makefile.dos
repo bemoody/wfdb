@@ -1,10 +1,10 @@
 # file: Makefile.dos	G. Moody	2 November 1989
-#			Last revised:  22 November 2002
+#			Last revised:  28 November 2004		wfdblib 10.3.14
 # MSDOS/Windows `make' description file template for WFDB applications
 #
 # -----------------------------------------------------------------------------
 # WFDB applications: programs for working with annotated signals
-# Copyright (C) 2002 George B. Moody
+# Copyright (C) 1989-2004 George B. Moody
 #
 # These programs are free software; you can redistribute them and/or modify
 # them under the terms of the GNU General Public License as published by the
@@ -105,7 +105,7 @@ XFILES = ann2rr.exe bxb.exe calsig.exe ecgeval.exe epicmp.exe fir.exe ihr.exe \
  mfilt.exe mrgann.exe mxm.exe nst.exe plotstm.exe pscgen.exe pschart.exe \
  psfd.exe rdann.exe rdsamp.exe rr2ann.exe rxr.exe sampfreq.exe sigamp.exe \
  skewedit.exe snip.exe sortann.exe sqrs.exe sqrs125.exe sumann.exe \
- sumstats.exe tach.exe wfdbcat.exe wfdbcollate.exe wfdb-config.exe \
+ sumstats.exe tach.exe wfdbcat.exe wfdbcollate.exe \
  wfdbdesc.exe wfdbwhich.exe wqrs.exe wrann.exe wrsamp.exe wvscript.exe \
  xform.exe \
  $(XXFILES)

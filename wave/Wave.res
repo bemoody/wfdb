@@ -1,5 +1,5 @@
-! file: Wave.res		G. Moody	  April 1990
-!				Last revised:	8 March 2004
+! file: Wave.res		G. Moody	   April 1990
+!				Last revised:	13 December 2004
 ! X11 resources for WAVE
 !
 ! You can control many aspects of WAVE's appearance and behavior by setting
@@ -25,8 +25,12 @@
 ! Here are two WAVE resources that most users will want to set (although you
 ! may prefer a different setting than those shown here).
 
-Wave.SignalWindow.font:			lucidasans-bold-14
-Wave*background:			white
+Wave*background:	white
+Wave.SignalWindow.font:	-*-lucida-bold-r-normal-sans-14-*
+! If WAVE complains it can't find the font above, try this one instead:
+!	Wave.SignalWindow.font: lucidasans-bold-14
+! (or use xlsfonts to find an alternative that you like).
+
 
 ! -----------------------------------------------------------------------------
 

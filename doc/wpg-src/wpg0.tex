@@ -489,6 +489,13 @@ guide in June, 1999.  See @file{NEWS}, in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
+@unnumberedsubsec Changes in version 10.3.14
+
+Guido Muesch reported that the WFDB library function getspf() did not always
+return correct results if the frame frequency does not have an exact
+representation as a double precision floating point number.  This problem has
+now been corrected.
+
 @unnumberedsubsec Changes in version 10.3.13
 
 Using an indirect WFDB path (i.e., setting the WFDB environment
