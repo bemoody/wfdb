@@ -1,4 +1,4 @@
-This is wpg, produced by makeinfo version 4.0b from wpg.tex.
+This is wpg, produced by makeinfo version 4.0 from wpg.tex.
 
 INFO-DIR-SECTION Libraries
 START-INFO-DIR-ENTRY
@@ -7,146 +7,146 @@ END-INFO-DIR-ENTRY
 
 
 Indirect:
-wpg-1: 185
-wpg-2: 49163
-wpg-3: 95808
-wpg-4: 141315
-wpg-5: 190060
-wpg-6: 236874
-wpg-7: 285820
-wpg-8: 314934
+wpg-1: 184
+wpg-2: 49950
+wpg-3: 96595
+wpg-4: 142102
+wpg-5: 190847
+wpg-6: 237661
+wpg-7: 286607
+wpg-8: 315709
 
 Tag Table:
 (Indirect)
-Node: Top185
-Node: Overview2012
-Node: Concepts 14380
-Node: Concepts 26367
-Node: Concepts 38346
-Node: Applications10298
-Node: Guide12189
-Node: Recent changes19535
-Node: Usage34876
-Node: print samples35917
-Node: compiling37586
-Node: other languages42362
-Node: WFDB path45814
-Node: running example48489
-Node: name restrictions49163
-Node: WFDB path syntax50200
-Node: exercises 156241
-Node: Functions58646
-Node: introduction to functions59637
-Node: selecting62542
-Node: annopen62965
-Node: isigopen65570
-Node: osigopen70203
-Node: osigfopen72417
-Node: wfdbinit74073
-Node: special input modes75358
-Node: setifreq75838
-Node: getifreq78047
-Node: setgvmode78532
-Node: getspf80007
-Node: signal and annotation I/O80550
-Node: getvec81033
-Node: getframe83829
-Node: putvec85152
-Node: getann87276
-Node: ungetann88746
-Node: putann89442
-Node: non-sequential90476
-Node: isigsettime91035
-Node: isgsettime91768
-Node: iannsettime92276
-Node: sample93485
-Node: conversion95178
-Node: annstr and strann95808
-Node: timstr and strtim100740
-Node: datstr and strdat105490
-Node: aduphys and physadu106530
-Node: calibration109116
-Node: calopen109780
-Node: getcal110676
-Node: putcal111875
-Node: newcal112237
-Node: flushcal112756
-Node: miscellaneous functions113102
-Node: newheader114669
-Node: setheader115971
-Node: setmsheader117535
-Node: wfdbquit119075
-Node: iannclose and oannclose120275
-Node: wfdbquiet and wfdbverbose121166
-Node: wfdberror121656
-Node: sampfreq122647
-Node: setsampfreq123575
-Node: setbasetime124111
-Node: counter conversion124943
-Node: setwfdb127551
-Node: getwfdb129585
-Node: wfdbfile130309
-Node: wfdbflush131435
-Node: getinfo131730
-Node: putinfo132607
-Node: setibsize133348
-Node: setobsize134350
-Node: wfdbgetskew135372
-Node: wfdbsetskew136937
-Node: wfdbgetstart137579
-Node: wfdbsetstart138681
-Node: Data Types139319
-Node: WFDB_Siginfo structures141315
-Node: WFDB_Calinfo structures147658
-Node: WFDB_Anninfo structures149703
-Node: WFDB_Annotation structures152459
-Node: Annotation Codes155343
-Node: Mapping macros160003
-Node: Database Files161950
-Node: Header Files164637
-Node: Signal Files165504
-Node: Annotation Files166323
-Node: Calibration Files166732
-Node: AHA Format Files167497
-Node: Standard I/O168966
-Node: Multiplexed Signal Files170210
-Node: Multi-Frequency Records171391
-Node: Multi-Segment Records174641
-Node: Multiple Record Access176594
-Node: Special Files178039
-Node: Piped and Local Records180943
-Node: NETFILES182794
-Node: Annotation Order185419
-Node: Examples188822
-Node: Example 1190060
-Node: Example 2194114
-Node: Example 3196454
-Node: Example 4198366
-Node: Example 5201346
-Node: Example 6205562
-Node: Example 7208762
-Node: Example 8214303
-Node: Example 9222666
-Node: Example 10229434
-Node: Exercises236874
-Node: Glossary245081
-Node: Installation265416
-Node: Distribution266399
-Node: Unix installation266946
-Node: MacOS/X installation269340
-Node: MS-Windows installation270304
-Node: Other installation273296
-Node: WFDB Applications274455
-Node: Using275451
-Node: Annotation I/O277256
-Node: Evaluation278897
-Node: Signal processing285820
-Node: Graphics288812
-Node: Extensions290342
-Node: Sources299206
-Node: Answers311172
-Node: Concept Index314934
-Node: Function and Macro Index345254
-Node: Copying350299
+Node: Top184
+Node: Overview2015
+Node: Concepts 14383
+Node: Concepts 26370
+Node: Concepts 38349
+Node: Applications10301
+Node: Guide12192
+Node: Recent changes19538
+Node: Usage35663
+Node: print samples36704
+Node: compiling38373
+Node: other languages43149
+Node: WFDB path46601
+Node: running example49276
+Node: name restrictions49950
+Node: WFDB path syntax50987
+Node: exercises 157028
+Node: Functions59433
+Node: introduction to functions60424
+Node: selecting63329
+Node: annopen63752
+Node: isigopen66357
+Node: osigopen70990
+Node: osigfopen73204
+Node: wfdbinit74860
+Node: special input modes76145
+Node: setifreq76625
+Node: getifreq78834
+Node: setgvmode79319
+Node: getspf80794
+Node: signal and annotation I/O81337
+Node: getvec81820
+Node: getframe84616
+Node: putvec85939
+Node: getann88063
+Node: ungetann89533
+Node: putann90229
+Node: non-sequential91263
+Node: isigsettime91822
+Node: isgsettime92555
+Node: iannsettime93063
+Node: sample94272
+Node: conversion95965
+Node: annstr and strann96595
+Node: timstr and strtim101527
+Node: datstr and strdat106277
+Node: aduphys and physadu107317
+Node: calibration109903
+Node: calopen110567
+Node: getcal111463
+Node: putcal112662
+Node: newcal113024
+Node: flushcal113543
+Node: miscellaneous functions113889
+Node: newheader115456
+Node: setheader116758
+Node: setmsheader118322
+Node: wfdbquit119862
+Node: iannclose and oannclose121062
+Node: wfdbquiet and wfdbverbose121953
+Node: wfdberror122443
+Node: sampfreq123434
+Node: setsampfreq124362
+Node: setbasetime124898
+Node: counter conversion125730
+Node: setwfdb128338
+Node: getwfdb130372
+Node: wfdbfile131096
+Node: wfdbflush132222
+Node: getinfo132517
+Node: putinfo133394
+Node: setibsize134135
+Node: setobsize135137
+Node: wfdbgetskew136159
+Node: wfdbsetskew137724
+Node: wfdbgetstart138366
+Node: wfdbsetstart139468
+Node: Data Types140106
+Node: WFDB_Siginfo structures142102
+Node: WFDB_Calinfo structures148445
+Node: WFDB_Anninfo structures150490
+Node: WFDB_Annotation structures153246
+Node: Annotation Codes156130
+Node: Mapping macros160790
+Node: Database Files162737
+Node: Header Files165424
+Node: Signal Files166291
+Node: Annotation Files167110
+Node: Calibration Files167519
+Node: AHA Format Files168284
+Node: Standard I/O169753
+Node: Multiplexed Signal Files170997
+Node: Multi-Frequency Records172178
+Node: Multi-Segment Records175428
+Node: Multiple Record Access177381
+Node: Special Files178826
+Node: Piped and Local Records181730
+Node: NETFILES183581
+Node: Annotation Order186206
+Node: Examples189609
+Node: Example 1190847
+Node: Example 2194901
+Node: Example 3197241
+Node: Example 4199153
+Node: Example 5202133
+Node: Example 6206349
+Node: Example 7209549
+Node: Example 8215090
+Node: Example 9223453
+Node: Example 10230221
+Node: Exercises237661
+Node: Glossary245868
+Node: Installation266203
+Node: Distribution267186
+Node: Unix installation267733
+Node: MacOS/X installation270127
+Node: MS-Windows installation271091
+Node: Other installation274083
+Node: WFDB Applications275242
+Node: Using276238
+Node: Annotation I/O278043
+Node: Evaluation279684
+Node: Signal processing286607
+Node: Graphics289599
+Node: Extensions291129
+Node: Sources299993
+Node: Answers311947
+Node: Concept Index315709
+Node: Function and Macro Index346029
+Node: Copying351074
 
 End Tag Table

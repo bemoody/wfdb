@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   16 July 2003		wfdblib 10.3.9
+			Last revised:   17 October 2003		wfdblib 10.3.11
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -1451,7 +1451,7 @@ WFDB_Sample *vector;
     if (ispfmax < 2)	/* all signals at the same frequency */
 	return (getframe(vector));
 
-    if (gvmode == WFDB_LOWRES) {/* return one sample per frame, decimating
+    if (gvmode != WFDB_HIGHRES) {/* return one sample per frame, decimating
 				   (by averaging) if necessary */
 	unsigned c;
 	long v;
@@ -1604,8 +1604,11 @@ int nsig;
 	    }
 	    is->info.group = nigroups + g;
 	    is->skew = hs->skew;
-	    hs = hsd[++si];
-	    is = isd[nisig + ++s];
+	    ++s;
+	    if (++si < sj) {
+		hs = hsd[si];
+		is = isd[nisig + s];
+	    }
 	}
 	g++;
     }
@@ -2152,7 +2155,7 @@ WFDB_Time t;
 	}
     }
 
-    if (tr != t) {
+    if (ifreq > (WFDB_Frequency)0 && tr != t) {
 	t = (WFDB_Time)(t * ifreq/sfreq);
 
 	while (t++ < tr)
@@ -2690,9 +2693,10 @@ char *string;
       case 'c': return (cfreq > 0. ?
 			(WFDB_Time)((atof(string+1)-bcount)*f/cfreq) :
 			(WFDB_Time)atol(string+1));
-      case 'e':	return (in_msrec ? msnsamples : nsamples);
+      case 'e':	return ((in_msrec ? msnsamples : nsamples) * 
+		        ((gvmode == WFDB_HIGHRES) ? ispfmax : 1));
       case 'f': return ((WFDB_Time)(atol(string+1)*f/ffreq));
-      case 'i':	return (istime * (gvmode==WFDB_LOWRES ? 1: ispfmax));
+      case 'i':	return (istime * ((gvmode == WFDB_HIGHRES) ? ispfmax : 1));
       case 'o':	return (ostime);
       case 's':	return ((WFDB_Time)atol(string+1));
       case '[':	  /* time of day, possibly with date or days since start */

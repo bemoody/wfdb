@@ -1,4 +1,4 @@
-This is wpg, produced by makeinfo version 4.0b from wpg.tex.
+This is wpg, produced by makeinfo version 4.0 from wpg.tex.
 
 INFO-DIR-SECTION Libraries
 START-INFO-DIR-ENTRY
@@ -10,8 +10,8 @@ File: wpg,  Node: Top,  Next: Overview,  Prev: (dir),  Up: (dir)
 
    This guide documents the Waveform Database interface library (the
 WFDB library).  This file contains the text of the Tenth Edition of the
-`WFDB Programmer's Guide' (16 July 2003), with revisions for release
-10.3.9 of the WFDB library.
+`WFDB Programmer's Guide' (17 October 2003), with revisions for release
+10.3.11 of the WFDB library.
 
 * Menu:
 
@@ -388,6 +388,24 @@ and to this guide since the first printing of the tenth edition of this
 guide in June, 1999.  See `NEWS', in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
+
+Changes in version 10.3.11
+--------------------------
+
+   In `signal.c', several bugs have been identified and fixed.  Thanks
+to Piotr Wlodarek, who found a buffer overrun in `isigopen'.  Also,
+`isgsettime' sometimes performed incorrect seeks on multifrequency
+records that had been opened in high-resolution mode;  this has been
+fixed, together with a related bug that caused the value returned by
+`strtim("e")' to be calculated incorrectly in some such cases.
+
+Changes in version 10.3.10
+--------------------------
+
+   In version 10.3.9, the functions `setannstr', `setanndesc', and
+`setecgstr' did not contain necessary checks to avoid invoking `strcmp'
+with a `NULL' argument.  These checks have been added in version
+10.3.10.  Thanks to Thomas Heldt for reporting this problem.
 
 Changes in version 10.3.9
 -------------------------

@@ -2,6 +2,16 @@
 	Isaac Henry provided a fix for 'configure' to avoid a problem that
 	may occur in a non-standard Cygwin installation. 
 
+	In lib/signal.c, several bugs have been identified and fixed.  Thanks
+	to Piotr Wlodarek, who found a buffer overrun in isigopen.  Also,
+       	isgsettime sometimes performed incorrect seeks on multifrequency
+	records that had been opened in high-resolution mode;  this has been
+	fixed, together with a related bug that caused the value returned by
+	strtim("e") to be calculated incorrectly in some such cases.
+
+	New signal types and units have been added to the WFDB calibration
+	database (data/wfdbcal).
+
 10.3.10:
 	In version 10.3.9, the functions setannstr, setanndesc, and setecgstr
 	(in lib/annot.c) did not contain necessary checks to avoid invoking

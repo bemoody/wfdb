@@ -1,4 +1,5 @@
 ECG	- 1 sine 1 mV
+ECG	- 1 sine 1000 uV
 EEG	- - undefined 0.1 mV
 EEG	- - undefined 100 uV
 EOG	- - undefined 0.1 mV
@@ -9,7 +10,11 @@ BP	0 100 square 100 mmHg
 ABP	0 - square 100 mmHg
 Resp	- - undefined 1 l
 RESP	- - undefined 1 l
+AIRFLOW	- - undefined 10 V
+THOR	- - undefined 10 V
+ABDO	- - undefined 10 V
 SO2	0 - undefined 2 %
+SaO2	0 - undefined 2 %
 SV	0 - undefined 100 ml
 IBP	0 - square 100 mmHg
 NBP	0 100 square 100 mmHg
@@ -18,9 +23,11 @@ PAP	0 - square 25 mmHg
 CVP	0 - square 10 mmHg
 HR	0 100 square 100 bpm
 PULSE	0 - undefined 100 bpm
+PR	0 - undefined 100 BPM
 RESP	0 - undefined 50 bpm
 SpO2	0 - undefined 10 %
 Tblood	0 - undefined 1 degC
+Temp	0 - undefined 1 degC
 C.O.	0 - undefined 1 lpm
 PAWP	0 - undefined 10 mmHg
 MCL	- 2 square 1 mV
@@ -29,6 +36,12 @@ I	- 2 square 1 mV
 V	- 2 square 1 mV
 PLETH	- - undefined 1 mV
 P	- - undefined 100 mmHg
+Atip	- - undefined 1 mV
+HVA	- - undefined 5 mV
+Vtip	- - undefined 10 mV
 record	- - undefined 1 mV
+record	- - undefined 10 V
 record	- - undefined 100 mmHg
+record	0 - undefined 100 bpm
+record	0 - undefined 100 BPM
 foobar	0 100 square 100 mmHg

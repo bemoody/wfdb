@@ -488,12 +488,21 @@ guide in June, 1999.  See @file{NEWS}, in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
+@unnumberedsubsec Changes in version 10.3.11
+
+In @file{signal.c}, several bugs have been identified and fixed.  Thanks
+to Piotr Wlodarek, who found a buffer overrun in @code{isigopen}.  Also,
+@code{isgsettime} sometimes performed incorrect seeks on multifrequency
+records that had been opened in high-resolution mode;  this has been
+fixed, together with a related bug that caused the value returned by
+@code{strtim("e")} to be calculated incorrectly in some such cases.
+
 @unnumberedsubsec Changes in version 10.3.10
 
 In version 10.3.9, the functions @code{setannstr}, @code{setanndesc},
 and @code{setecgstr} did not contain necessary checks to avoid invoking
 @code{strcmp} with a @code{NULL} argument.  These checks have been added in
-version 10.3.10.
+version 10.3.10.  Thanks to Thomas Heldt for reporting this problem.
 
 @unnumberedsubsec Changes in version 10.3.9
 

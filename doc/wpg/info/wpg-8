@@ -1,4 +1,4 @@
-This is wpg, produced by makeinfo version 4.0b from wpg.tex.
+This is wpg, produced by makeinfo version 4.0 from wpg.tex.
 
 INFO-DIR-SECTION Libraries
 START-INFO-DIR-ENTRY
@@ -653,11 +653,11 @@ File: wpg,  Node: Copying,  Prev: Function and Macro Index,  Up: Top
    WFDB Programmer's Guide
 
    Tenth Edition (revised and with additions for WFDB library version
-10.3.9) 16 July 2003
+10.3.11) 17 October 2003
 
    George B. Moody
 
-   Copyright (C) 1989 - 2002 George B. Moody
+   Copyright (C) 1989 - 2003 George B. Moody
 
    Permission is granted to make and distribute verbatim copies of this
 guide provided that the copyright notice and this permission notice are
