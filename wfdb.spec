@@ -15,10 +15,53 @@ BuildRoot: /var/tmp/%{name}-root
 
 %changelog
 * Wed Dec 18 2002 George B Moody <george@mit.edu>
-- split into wfdb, wfdb-devel, wfdb-app, wfdb-doc, wfdb-wave packages
+- split into wfdb, wfdb-devel, wfdb-app, wfdb-wave, wfdb-doc subpackages
 
 * Sun Dec 8 2002 George B Moody <george@mit.edu>
 - paths now use rpm's variables where possible
+
+# ---- common prep/build/install/clean/post/postun ----------------------------
+
+%prep
+%setup
+
+%build
+PATH=$PATH:/usr/openwin/bin ./configure --prefix=/usr
+make
+
+# The 'make' command above actually *installs* the WFDB library and its *.h
+# files in /usr/lib and /usr/include/wfdb/, because it is not possible
+# otherwise to compile the apps and link them to the shared WFDB library.  As
+# far as I can tell, there is no way to avoid this given the way RPM works.
+
+# The 'make' commands below create HTML, PDF, and PostScript versions of the
+# WFDB Programmer's Guide, WFDB Applications Guide, and WAVE User's Guide.
+cd doc/wpg-src; make
+cd ../wag-src; make
+cd ../wug-src; make
+
+%install
+rm -rf $RPM_BUILD_ROOT
+mkdir -p $RPM_BUILD_ROOT/usr/lib $RPM_BUILD_ROOT/usr/include/wfdb
+cd lib; cp -p libwfdb.so* $RPM_BUILD_ROOT/usr/lib
+    cp -p wfdb.h ecgcodes.h ecgmap.h wfdblib.h $RPM_BUILD_ROOT/usr/include/wfdb
+cd ../wave; make WFDBROOT=$RPM_BUILD_ROOT/usr install
+cd ../waverc; make WFDBROOT=$RPM_BUILD_ROOT/usr install
+cd ../app; make WFDBROOT=$RPM_BUILD_ROOT/usr install
+cd ../psd; make WFDBROOT=$RPM_BUILD_ROOT/usr install
+cd ../convert; make WFDBROOT=$RPM_BUILD_ROOT/usr install
+cd ../data; make WFDBROOT=$RPM_BUILD_ROOT/usr install
+cd ../doc; make WFDBROOT=$RPM_BUILD_ROOT/usr install
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+make clean
+
+%post -p /sbin/ldconfig
+
+%postun -p /sbin/ldconfig
+
+# ---- wfdb [shared library] package ------------------------------------------
 
 %description
 The WFDB (Waveform Database) library supports creating, reading, and annotating
@@ -31,6 +74,12 @@ created for use with physiologic signals such as those in PhysioBank
 (http://www.physionet.org/physiobank/), the WFDB library supports a broad
 range of general-purpose signal processing applications.
 
+%files
+%defattr(-,root,root)
+%{_libdir}/libwfdb.so*
+
+# ---- wfdb-devel package -----------------------------------------------------
+
 %package devel
 Summary: WFDB developer's toolkit
 Group: Development/Libraries
@@ -40,8 +89,17 @@ Requires: wfdb = VERSION
 This package includes files needed to develop new WFDB applications in C, C++,
 and Fortran, examples in C and in Fortran, and miscellaneous documentation.
 
+%files devel
+%defattr(-,root,root)
+%{_bindir}/wfdb-config
+%{_prefix}/database
+%{_prefix}/include/wfdb
+%doc checkpkg examples fortran lib/COPYING.LIB COPYING INSTALL MANIFEST NEWS README README.NETFILES
+
+# ---- wfdb-app package -------------------------------------------------------
+
 %package app
-Summary: WFDB applications.
+Summary: WFDB applications
 Group: Applications/Scientific
 URL: http://www.physionet.org/physiotools/wag/
 Requires: wfdb >= VERSION
@@ -51,75 +109,6 @@ About 60 applications for creating, reading, transforming, analyzing,
 annotating, and viewing digitized signals, especially physiologic signals.
 Applications include digital filtering, event detection, signal averaging,
 power spectrum estimation, and many others.
-
-%package wave
-Summary: Waveform Analyzer, Viewer, and Editor.
-Group: X11/Applications/Science
-URL: http://www.physionet.org/physiotools/wug/
-Requires: wfdb >= VERSION
-Requires: wfdb-app
-Requires: xview >= 3.2
-Requires: xview-devel >= 3.2
-
-%description wave
-WAVE provides an environment for exploring digitized signals and time series.
-It provides fast, high-quality views of data stored locally or on remote
-web or FTP servers, flexible control of standard and user-provided analysis
-modules, efficient interactive annotation editing, and support for multiple
-views on the same or different displays to support collaborative analysis and
-annotation projects.  WAVE has been used to develop annotations for most of
-the PhysioBank databases (http://www.physionet.org/physiobank/).
-
-WAVE uses the XView graphical user interface.  A (beta) version of WAVE that
-uses GTK+ is available at http://www.physionet.org/physiotools/beta/gtkwave/.
-
-#%package doc
-#Summary: WFDB documentation.
-#Group: Documentation
-#URL: http://www.physionet.org/physiotools/manuals.shtml
-#
-#%description doc
-#This package includes HTML, PostScript, and PDF versions of the WFDB
-#Programmer's Guide, the WFDB Applications Guide, and the WAVE User's Guide.
-
-%prep
-%setup
-PATH=$PATH:/usr/openwin/bin ./configure --prefix=%{_prefix}
-
-%build
-make
-#( cd doc/wag-src; make )
-#( cd doc/wpg-src; make )
-#( cd doc/wug-src; make )
-
-%install
-rm -rf $RPM_BUILD_ROOT
-make WFDBROOT=$RPM_BUILD_ROOT/usr install
-mkdir -p $RPM_BUILD_ROOT/usr/lib/X11/app-defaults
-cp -p /usr/lib/wavemenu.def $RPM_BUILD_ROOT/usr/lib
-cp -p /usr/lib/X11/app-defaults/Wave $RPM_BUILD_ROOT/usr/lib/X11/app-defaults
-mkdir -p $RPM_BUILD_ROOT/usr/lib/ps
-cp -pr /usr/lib/ps/pschart.pro /usr/lib/ps/12lead.pro /usr/lib/ps/psfd.pro \
- $RPM_BUILD_ROOT/usr/lib/ps
-mkdir -p $RPM_BUILD_ROOT/usr/help
-cp -pr /usr/help/wave $RPM_BUILD_ROOT/usr/help
-
-%clean
-rm -rf $RPM_BUILD_ROOT
-make clean
-
-%post -p /sbin/ldconfig
-
-%postun -p /sbin/ldconfig
-
-%files
-%defattr(-,root,root)
-%{_libdir}/libwfdb.so*
-
-%files devel
-%{_bindir}/wfdb-config
-%{_prefix}/include/wfdb
-%doc checkpkg examples fortran lib/COPYING.LIB COPYING INSTALL MANIFEST NEWS README README.NETFILES
 
 %files app
 %defattr(-,root,root)
@@ -152,6 +141,7 @@ make clean
 %{_bindir}/mit2wav
 %{_bindir}/mrgann
 %{_bindir}/mxm
+%{_bindir}/nguess
 %{_bindir}/nst
 %{_bindir}/plot2d
 %{_bindir}/plot3d
@@ -188,32 +178,58 @@ make clean
 %{_bindir}/wrann
 %{_bindir}/wrsamp
 %{_bindir}/xform
-%{_prefix}/database
-/usr/lib/ps/12lead.pro
-/usr/lib/ps/pschart.pro
-/usr/lib/ps/psfd.pro
-%{_prefix}/local/man
+%{_libdir}/ps
+%{_mandir}
+
+# ---- wfdb-wave package ------------------------------------------------------
+
+%package wave
+Summary: Waveform Analyzer, Viewer, and Editor.
+Group: X11/Applications/Science
+URL: http://www.physionet.org/physiotools/wug/
+Requires: wfdb >= VERSION
+Requires: wfdb-app
+Requires: xview >= 3.2
+Requires: xview-devel >= 3.2
+
+%description wave
+WAVE provides an environment for exploring digitized signals and time series.
+It provides fast, high-quality views of data stored locally or on remote
+web or FTP servers, flexible control of standard and user-provided analysis
+modules, efficient interactive annotation editing, and support for multiple
+views on the same or different displays to support collaborative analysis and
+annotation projects.  WAVE has been used to develop annotations for most of
+the PhysioBank databases (http://www.physionet.org/physiobank/).
+
+WAVE uses the XView graphical user interface.  A (beta) version of WAVE that
+uses GTK+ is available at http://www.physionet.org/physiotools/beta/gtkwave/.
 
 %files wave
 %defattr(-,root,root)
 %{_bindir}/wave
 %{_bindir}/wave-remote
 %{_bindir}/wavescript
-/usr/help/wave/analysis.hlp
-/usr/help/wave/buttons.hlp
-/usr/help/wave/demo.txt
-/usr/help/wave/editing.hlp
-/usr/help/wave/intro.hlp
-/usr/help/wave/log.hlp
-/usr/help/wave/news.hlp
-/usr/help/wave/printing.hlp
-/usr/help/wave/resource.hlp
-/usr/help/wave/wave.hlp
-/usr/help/wave/wave.info
-%config /usr/lib/wavemenu.def
-%config /usr/lib/X11/app-defaults/Wave
+%{_prefix}/help/
+%config %{_prefix}/lib/wavemenu.def
+%config %{_prefix}/lib/X11/app-defaults/Wave
 %doc wave/anntab
 
-#%files doc
-#%defattr(-,root,root)
-#%doc doc/wag doc/wpg doc/wug
+# ---- wfdb-doc package -------------------------------------------------------
+
+%package doc
+Summary: WFDB documentation.
+Group: Documentation
+URL: http://www.physionet.org/physiotools/manuals.shtml
+
+%description doc
+This package includes HTML, PostScript, and PDF versions of the WFDB
+Programmer's Guide, the WFDB Applications Guide, and the WAVE User's Guide.
+
+%files doc
+%defattr(-,root,root)
+%doc doc/wag doc/wpg doc/wug
+
+
+
+
+

@@ -1,8 +1,8 @@
 # file: Makefile.tpl		G. Moody	  23 May 2000
-#				Last revised:	13 December 2001
+#				Last revised:	23 February 2003
 # This section of the Makefile should not need to be changed.
 
-DBFILES = 100s.dat 100s.atr *.hea *list wfdbcal
+DBFILES = 100a.atr 100s.atr 100s.dat *.hea *list wfdbcal
 
 all:
 	@echo Nothing to be made in `pwd`.

@@ -1,5 +1,5 @@
-# file: Makefile.tpl		G. Moody	24 May 2000
-#				Last revised:  11 March 2002
+# file: Makefile.tpl		G. Moody	 24 May 2000
+#				Last revised:  24 February 2003
 # Change the settings below as appropriate for your setup.
 
 # Set COLORS to 'color' if you have a color printer and would like to print
@@ -46,7 +46,7 @@ MAKEINFO = makeinfo --force --no-warn
 
 # MANDIR is the root of the man page directory tree.  On most systems, this is
 # something like /usr/man or /usr/local/man (type 'man man' to find out).
-MANDIR = /usr/local/man
+MANDIR = $(WFDBROOT)/local/man
 
 # MAN1, MAN3, MAN5, and MAN7 are the directories in which local man pages for
 # section 1 (commands), section 3 (libraries), section 5 (formats), and

@@ -1,10 +1,10 @@
 #! /bin/sh
 # file: hrlomb		G. Moody	14 June 1995
-#			Last revised: 10 December 2001
+#			Last revised: 19 February 2003
 #
 # -----------------------------------------------------------------------------
 # Derive a heart rate power spectrum (using ihr and lomb) and plot it
-# Copyright (C) 1999 George B. Moody
+# Copyright (C) 2003 George B. Moody
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -41,10 +41,14 @@ done
 
 
 if [ x$PLOT = x ]; then
-  if [ -x /usr/local/bin/plt ]; then
+  if [ -x BINDIR/plt ]; then
+    PLOT=BINDIR/plt
+  elif [ -x /usr/local/bin/plt ]; then
     PLOT=/usr/local/bin/plt
   elif [ -x /usr/bin/plt ]; then
     PLOT=/usr/bin/plt
+  elif [ -x BINDIR/plot2d ]; then
+    PLOT=BINDIR/plot2d
   elif [ -x /usr/local/bin/plot2d ]; then
     PLOT=/usr/local/bin/plot2d
   elif [ -x /usr/bin/plot2d ]; then

@@ -16,6 +16,7 @@ app/Makefile.tpl
 app/mfilt.c
 app/mrgann.c
 app/mxm.c
+app/nguess.c
 app/nst.c
 app/plotstm.c
 app/pscgen.c
@@ -61,8 +62,10 @@ checkpkg/
 checkpkg/appcheck
 checkpkg/checkfile
 checkpkg/expected/
+checkpkg/expected/100a.nguess
 checkpkg/expected/100s.a2r
 checkpkg/expected/100s.mix
+checkpkg/expected/100s.mrg
 checkpkg/expected/100s.qrs
 checkpkg/expected/100s.sigavg
 checkpkg/expected/100s.wqrs
@@ -112,6 +115,7 @@ checkpkg/expected/xform-2.out
 checkpkg/expected/xform.all
 checkpkg/expected/xform.dat
 checkpkg/expected/xform.hea
+checkpkg/expected/xform.wabp
 checkpkg/input/
 checkpkg/input/100x.hea
 checkpkg/input/ecgeval
@@ -122,6 +126,7 @@ checkpkg/libcheck
 checkpkg/Makefile
 checkpkg/Makefile.top
 checkpkg/Makefile.tpl
+checkpkg/mitdb/
 conf/
 conf/cygwin.def
 conf/cygwin-slib.def
@@ -163,6 +168,8 @@ convert/revise.c
 convert/wav2mit.c
 COPYING
 data/
+data/100a.atr
+data/100a.hea
 data/100s.atr
 data/100s.dat
 data/100s.hea
@@ -289,11 +296,13 @@ doc/wag-src/memse.1
 doc/wag-src/mfilt.1
 doc/wag-src/mrgann.1
 doc/wag-src/mxm.1
+doc/wag-src/nguess.1
 doc/wag-src/nst.1
 doc/wag-src/plot2d.1
 doc/wag-src/plotstm.1
 doc/wag-src/plt.1
 doc/wag-src/pltf.1
+doc/wag-src/pnnlist.1
 doc/wag-src/pschart.1
 doc/wag-src/psfd.1
 doc/wag-src/rdann.1
@@ -314,7 +323,7 @@ doc/wag-src/sumann.1
 doc/wag-src/sumstats.1
 doc/wag-src/tach.1
 doc/wag-src/tmac.dif
-doc/wag-src/view.1
+doc/wag-src/view-dos.1
 doc/wag-src/wabp.1
 doc/wag-src/wag.cover
 doc/wag-src/wag.ht0

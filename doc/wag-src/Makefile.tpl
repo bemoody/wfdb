@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:	7 November 2002
+#				Last revised:	24 February 2003
 # Change the settings below as appropriate for your setup.
 
 # D2PARGS is a list of options for dvips.  Uncomment one of these to set the
@@ -18,7 +18,7 @@ LN = ln -sf
 
 # MANDIR is the root of the man page directory tree.  On most systems, this is
 # something like /usr/man or /usr/local/man (type 'man man' to find out).
-MANDIR = /usr/local/man
+MANDIR = $(WFDBROOT)/share/man
 
 # MAN1, MAN3, MAN5, and MAN7 are the directories in which local man pages for
 # section 1 (commands), section 3 (libraries), section 5 (formats), and
@@ -141,20 +141,21 @@ wag.man:
 	test -d $(MAN5) || ( mkdir -p $(MAN5); $(SETDPERMISSIONS) $(MAN5) )
 	test -d $(MAN7) || ( mkdir -p $(MAN7); $(SETDPERMISSIONS) $(MAN7) )
 	./maninst.sh $(MAN1) $(MAN3) $(MAN5) $(MAN7) "$(SETPERMISSIONS)"
-	$(LN) $(MAN1)/a2m.1 $(MAN1)/ad2m.1
-	$(LN) $(MAN1)/a2m.1 $(MAN1)/ahaconvert.1
-	$(LN) $(MAN1)/a2m.1 $(MAN1)/m2a.1
-	$(LN) $(MAN1)/a2m.1 $(MAN1)/md2a.1
-	$(LN) $(MAN1)/ann2rr.1 $(MAN1)/rr2ann.1
-	$(LN) $(MAN1)/edf2mit.1 $(MAN1)mit2edf.1
-	$(LN) $(MAN1)/hrfft.1 $(MAN1)/hrlomb.1
-	$(LN) $(MAN1)/hrfft.1 $(MAN1)/hrmem.1
-	$(LN) $(MAN1)/hrfft.1 $(MAN1)/hrplot.1
-	$(LN) $(MAN1)/plot2d.1 $(MAN1)/plot3d.1
-	$(LN) $(MAN1)/setwfdb.1 $(MAN1)/cshsetwfdb.1
-	$(LN) $(MAN1)/view.1 $(MAN1)/vsetup.1
-	$(LN) $(MAN1)/wav2mit.1 $(MAN1)/mit2wav.1
-	$(LN) $(MAN1)/wave.1 $(MAN1)/gtkwave.1
+	cd $(MAN1); $(LN) a2m.1 ad2m.1
+	cd $(MAN1); $(LN) a2m.1 ahaconvert.1
+	cd $(MAN1); $(LN) a2m.1 m2a.1
+	cd $(MAN1); $(LN) a2m.1 md2a.1
+	cd $(MAN1); $(LN) ann2rr.1 rr2ann.1
+	cd $(MAN1); $(LN) edf2mit.1 $(MAN1)mit2edf.1
+	cd $(MAN1); $(LN) hrfft.1 hrlomb.1
+	cd $(MAN1); $(LN) hrfft.1 hrmem.1
+	cd $(MAN1); $(LN) hrfft.1 hrplot.1
+	cd $(MAN1); $(LN) plot2d.1 plot3d.1
+	cd $(MAN1); $(LN) pnnlist.1 pNNx.1
+	cd $(MAN1); $(LN) setwfdb.1 cshsetwfdb.1
+	cd $(MAN1); $(LN) view.1 vsetup.1
+	cd $(MAN1); $(LN) wav2mit.1 mit2wav.1
+	cd $(MAN1); $(LN) wave.1 gtkwave.1
 
 # 'make wag.pdf': format the WFDB Applications Guide as PDF
 wag.pdf:	wag0.ps

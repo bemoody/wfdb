@@ -1,6 +1,6 @@
 #!/bin/sh
 # file: appcheck		G. Moody       7 September 2001
-#                               Last revised:  5 December 2002
+#                               Last revised:  23 February 2003
 #
 # This script checks the functionality of the WFDB applications in the 'app'
 # directory.
@@ -225,6 +225,31 @@ do
   TESTS=`expr $TESTS + 1`
 done
 
+echo Testing mrgann ...
+F=100s.mrg
+cp expected/100s.qrs expected/100s.wqrs .
+mrgann -r 100s -i qrs wqrs -o mrg -m0 10 -m1 20 -m2 30 -m3 40
+if ( ./checkfile $F )
+then
+    PASS=`expr $PASS + 1`
+    rm -f $F 100s.qrs 100s.wqrs
+else
+    FAIL=`expr $FAIL + 1`
+fi
+TESTS=`expr $TESTS + 1`
+
+echo Testing nguess ...
+F=100a.nguess
+nguess -r 100a -a atr
+if ( ./checkfile $F )
+then
+    PASS=`expr $PASS + 1`
+    rm -f $F
+else
+    FAIL=`expr $FAIL + 1`
+fi
+TESTS=`expr $TESTS + 1`
+
 echo Testing pschart ...
 F=pschart.ps
 pschart -a atr -c "" -g -l -T Test - >$F <<EOF
@@ -381,6 +406,19 @@ else
 fi
 TESTS=`expr $TESTS + 1`
 
+echo Testing wabp ...
+F=xform.wabp
+cp expected/xform.hea expected/xform.dat .
+wabp -r xform 2>wabp.log
+if ( ./checkfile $F )
+then
+    PASS=`expr $PASS + 1`
+    rm -f $F wabp.log xform.dat xform.hea
+else
+    FAIL=`expr $FAIL + 1`
+fi
+TESTS=`expr $TESTS + 1`
+
 echo Testing wqrs ...
 F=100s.wqrs
 wqrs -r 100s -j 2>wqrs.log
@@ -432,14 +470,12 @@ These programs are not (yet) tested by this script:
 
 calsig
 epicmp
-mrgann
 mxm
 nst
 plotstm
 pscgen
 skewedit
 sqrs125
-wabp
 
 EOF
 

@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	31 May 2000
-#				Last revised: 18 December 2002
+#				Last revised: 23 February 2003
 # Change the settings below as appropriate for your setup.
 
 # Choose directories in which to install WAVE and its ancillary files by
@@ -20,14 +20,14 @@
 # HELPDIR specifies the directory in which the on-line help files are kept.
 # The installation procedure creates a subdirectory, `wave', in HELPDIR, and
 # installs several files there.
-HELPDIR = /usr/help
+HELPDIR = $(WFDBROOT)/help
 
 # MENUDIR specifies the directory in which the default analysis menu file is
 # kept.
-MENUDIR = /usr/lib
+MENUDIR = $(WFDBROOT)/lib
 
 # RESDIR specifies the directory in which X11 client resource files are kept.
-RESDIR = /usr/lib/X11/app-defaults
+RESDIR = $(WFDBROOT)/lib/X11/app-defaults
 
 # It should not be necessary to modify anything below this line.
 # -----------------------------------------------------------------------------

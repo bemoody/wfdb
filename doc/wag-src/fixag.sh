@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: fixag.sh	G. Moody	10 April 1997
-#			Last revised:	7 August 2002
+#			Last revised: 24 February 2003
 #
 # Post-process WFDB Applications Guide HTML files
 
@@ -20,6 +20,7 @@ do
   sed 's/\.\(.\)\.htm/-\1.htm/g' >$G.htm
 done
 mv -f evfootnode.htm evfoot.htm
+mv -f view-d-1.htm view-1.htm
 
 for i in *.htm
 do
