@@ -1,13 +1,8 @@
 @echo off
 : file: setwfdb.bat	G. Moody	11 September 1989
-:			Last revised:	30 April 1999
+:			Last revised:	22 November 2002
 
 : This script sets environment variables used by WFDB applications.
-
-: Note: the MS-DOS/MS-Windows installation program, software\install.exe,
-: creates a customized version of this batch file for your system.  In most
-: cases you should use the version created by install.exe rather than this
-: one, which is included here for reference only.
 
 : If you are already near the limit of your available environment space, you
 : may not be able to set these variables successfully.  You may get an error
@@ -19,10 +14,9 @@
 : the environment in bytes.  See your MS-DOS manual for further information.
 
 : If you use the WFDB Software Package regularly, you will find it easiest to
-: invoke this batch file -- most likely the version of it created by install --
-: from your autoexec.bat, so that the WFDB environment is set automatically
-: whenever you reboot your PC.  In modern versions of MS-DOS, and under any
-: version of MS-Windows, do this by adding
+: invoke this batch file from your autoexec.bat, so that the WFDB environment
+: is set automatically whenever you reboot your PC.  In modern versions of
+: MS-DOS, and under any version of MS-Windows, do this by adding
 :    call c:\bin\setwfdb
 : to your autoexec.bat.  Do not omit the _call_ from this command, or any
 : commands that follow setwfdb in your autoexec.bat will not be executed.
@@ -32,7 +26,10 @@
 : The WFDB path, by analogy to the MS-DOS PATH variable, is a list of
 : directories in which WFDB applications search for their input files.  You may
 : define it directly, as the value of the WFDB environment variable, or
-: indirectly, within a file named by the WFDB environment variable.
+: indirectly, within a file named by the WFDB environment variable.  If you
+: do none of these, the WFDB path is given by the value of DEFWFDB, which is
+: defined in wfdblib.h at the time the WFDB library is compiled.  For most
+: users, the default value may not need to be changed.
 
 : Here is a simple example of a direct definition of the WFDB path:
 :set WFDB=;c:\database

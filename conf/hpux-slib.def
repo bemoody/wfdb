@@ -1,5 +1,5 @@
 # file: hpux-slib.def	G. Moody	31 May 2000
-#			Last revised: 17 December 2001
+#			Last revised: 21 November 2002
 # This section contains settings suitable for generating a shared library under
 # HP-UX.
 
@@ -71,6 +71,10 @@ WFDBLIB = $(WFDBLIB_SONAME).$(MINOR)
 # components have been compiled separately;  the list of *.o files that
 # make up the library will be appended to BUILDLIB.
 BUILDLIB = ld -b `$(LWC) --libs` -o $(WFDBLIB)
+
+# BUILDLIB_LDFLAGS is a list of arguments appended to BUILDLIB following
+# the list of *.o files (for most platforms, BUILDLIB_LDFLAGS is empty).
+BUILDLIB_LDFLAGS =
 
 # PRINT is the name of the program used to produce listings (including any
 # options for the desired formatting).

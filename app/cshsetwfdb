@@ -1,6 +1,7 @@
-setenv WFDB :${HOME}/database:${HOME}/database/%3r:/usr/local/database:/usr/local/database/%3r:/cdrom:/cdrom/mimicdb:/cdrom/mimicdb/%3r:/cdrom/mitdb:/cdrom/cudb:/cdrom/nstdb:/cdrom/stdb:/cdrom/vfdb:/cdrom/afdb:/cdrom/cdb:/cdrom/svdb:/cdrom/ltdb:/cdrom/odb:/cdrom/udb:/cdrom/edb:/cdrom/valedb:/cdrom/slpdb:/cdrom/mghdb:/cdrom/database:/cdrom/database/%3r:/usr/local/ahadb
-setenv WFDBCAL wfdbcal
+setenv WFDB ". ${HOME}/database /usr/local/database /cdrom http://www.physionet.org/physiobank/database"
+# Change www.physionet.org above to your favorite mirror if you wish
+setenv WFDBCAL wfdbcalx
 
 # For compatibility with older applications only
-setenv DB $WFDB
+setenv DB "$WFDB"
 setenv DBCAL $WFDBCAL

@@ -1,6 +1,6 @@
 #!/bin/sh
-# file: appcheck		G. Moody	7 September 2001
-#                               Last revised:     23 May 2002
+# file: appcheck		G. Moody       7 September 2001
+#                               Last revised:  22 November 2002
 #
 # This script checks the functionality of the WFDB applications in the 'app'
 # directory.
@@ -131,12 +131,12 @@ rm -f rr2ann.in
 
 echo Testing sqrs ...
 F=100s.qrs
-sqrs -r 100s 2>/dev/null
+sqrs -r 100s 2>sqrs.log
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
     cp $F 100s.ann
-    rm -f $F
+    rm -f $F sqrs.log
 else
     FAIL=`expr $FAIL + 1`
     cp expected/$F 100s.ann
@@ -210,13 +210,13 @@ fi
 TESTS=`expr $TESTS + 1`
 
 echo Testing mfilt ...
-mfilt -l 5 -i 100s -n mfilt -f 10 -t 15 2>/dev/null
+mfilt -l 5 -i 100s -n mfilt -f 10 -t 15 2>mfilt.log
 for F in mfilt.dat mfilt.hea
 do
   if ( ./checkfile $F )
   then
     PASS=`expr $PASS + 1`
-    rm -f $F
+    rm -f $F mfilt.log
   else
     FAIL=`expr $FAIL + 1`
   fi
@@ -292,14 +292,14 @@ done
 echo Testing sortann ...
 rdann -r 100s -a atr -f 30 >foo
 rdann -r 100s -a atr -t 30 >>foo
-( WFDBANNSORT=0; export WFDBANNSORT; wrann -r 100s -a mix <foo 2>/dev/null )
+( WFDBANNSORT=0; export WFDBANNSORT; wrann -r 100s -a mix <foo 2>wrann.log )
 rm -f foo
 sortann -r 100s -a mix
 F=100s.mix
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
-    rm -f $F
+    rm -f $F wrann.log
 else
     FAIL=`expr $FAIL + 1`
 fi
@@ -342,13 +342,13 @@ fi
 TESTS=`expr $TESTS + 1`
 
 echo Testing wfdbcollate ...
-wfdbcollate -s 100s -o wfd -l 30 2>/dev/null
+wfdbcollate -s 100s -o wfd -l 30 2>wfdbcollate.log
 for F in wfd*hea wfd*dat
 do
   if ( ./checkfile $F )
   then
     PASS=`expr $PASS + 1`
-    rm -f $F
+    rm -f $F wfdbcollate.log
   else
     FAIL=`expr $FAIL + 1`
   fi
@@ -362,6 +362,18 @@ if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
     rm -f $F
+else
+    FAIL=`expr $FAIL + 1`
+fi
+TESTS=`expr $TESTS + 1`
+
+echo Testing wqrs ...
+F=100s.wqrs
+wqrs -r 100s -j 2>wqrs.log
+if ( ./checkfile $F )
+then
+    PASS=`expr $PASS + 1`
+    rm -f $F wqrs.log
 else
     FAIL=`expr $FAIL + 1`
 fi
@@ -381,7 +393,7 @@ do
   TESTS=`expr $TESTS + 1`
 done
 
-if ( grep "WFDB_NETFILES 1" /usr/include/wfdb/wfdb.h >/dev/null 2>&1 )
+if ( grep "WFDB_NETFILES 1" /usr/include/wfdb/wfdb.h >grep.out 2>&1 )
 then
   echo "Testing xform (with NETFILES) ..."
   xform -i mimicdb/237/237 -s 1 2 0 3 -f 9:19:45 -t "[22:01:23 20/07/1995]" \
@@ -398,13 +410,14 @@ then
     TESTS=`expr $TESTS + 1`
   done 
 fi
+rm -f grep.out
 
 cat <<EOF
 
 These programs are not (yet) tested by this script:
 
 calsig
-epic
+epicmp
 mrgann
 mxm
 nst

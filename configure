@@ -1,6 +1,6 @@
 #! /bin/sh
-# file: configure             G. Moody               24 May 2000
-#                             Last revised:         18 July 2002
+# file: configure             G. Moody         24 May 2000
+#                             Last revised:  21 November 2002
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -86,7 +86,14 @@ case `uname` in
     cat conf/hpux.def >>conf/site.def
     cat conf/version.def conf/hpux-slib.def >conf/site-slib.def ;;
   CYGWIN*) OS=cygwin
-    cat conf/cygwin.def >>conf/site.def ;;
+    cat conf/cygwin.def >>conf/site.def
+    cat conf/version.def conf/cygwin-slib.def >conf/site-slib.def ;;
+  Darwin*) OS=Darwin
+    LIBTYPE=dynamic
+    cat conf/darwin.def >>conf/site.def
+    cat conf/version.def conf/darwin-slib.def > conf/site-slib.def
+    echo "It is normal for Mac OS X to be recognized as Darwin."
+    echo "Building static libraries is not supported on Darwin." ;;
   *)      OS=generic
     cat conf/generic.def >>conf/site.def
     cat conf/version.def conf/generic-slib.def >conf/site-slib.def

@@ -492,7 +492,25 @@ changes that may not be described here.
 
 Fixed bugs in @file{lib/sample.c} that caused improper accounting of signal
 group numbers when reading from two or more records at the same time (as in
-@file{nst}).
+@file{nst}), a bug that caused a segfault in @file{nst}, and a bug that
+referenced uninitialized memory in @code{newheader} if @code{nsig} = 0.
+
+The WFDB Software Package has been ported to MacOS/X (Darwin),
+version 10.2 (the port should also work under 10.1 but this
+has not been tested and will not be supported).	
+
+It is now possible to generate a shared WFDB library (DLL)
+under MS-Windows using Cygwin/gcc.
+
+Added functions @code{sample} and @code{sample_valid} to the WFDB library
+(in @file{lib/signal.c}).  @code{sample(s, t)} returns the sample at
+time (sample number) @code{t} from signal @code{s}, handling all
+necessary buffering internally and allowing the caller to treat the
+signal file as a virtual array of randomly accessible samples.
+@code{sample_valid} can be invoked to check if the most recent value
+returned by @code{sample} was valid (e.g., to see if the end of the
+input was reached).  For an example of the use of these functions, see
+@file{app/wqrs.c}.
 
 @unnumberedsubsec Changes in version 10.2.9
 
@@ -550,7 +568,7 @@ Previous versions rounded negative values toward zero;  to obtain consistent
 conversions, however, it is necessary to round all values down (e.g., from
 -1.5 to -2 rather than up to -1).
 
-Fixed a memory leak in wfdb_fclose() (in lib/wfdbio.h).  Thanks to
+Fixed a memory leak in @code{wfdb_fclose} (in @file{lib/wfdbio.h}).  Thanks to
 Ion Gazta@~naga.
 
 @unnumberedsubsec Changes in version 10.2.5

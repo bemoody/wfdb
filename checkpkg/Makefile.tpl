@@ -1,7 +1,7 @@
 all:
 	@rm -f lcheck
 	@make lcheck	
-	@./libcheck
+	@./libcheck $(DBDIR)
 	@../conf/prompt "Press <Enter> to continue ... "
 	@read a
 	@./appcheck

@@ -1,15 +1,9 @@
-# file: generic.def		G. Moody	31 May 2000
-#				Last revised: 21 November 2002
-# This file contains default 'make' definitions for compiling the WFDB Software
-# Package under versions of UNIX that are not otherwise recognized by
-# 'configure'.
+# file: darwin.def	G. Moody and I. Henry	14 November 2002
+#				Last revised:  21 November 2002
+# 'make' definitions for compiling the WFDB Software Package under Darwin
 #
-# If you find that changes are needed in order to compile successfully, please
-# send a copy of your modifications together with the name of your operating
-# system (as reported by the 'uname' command) to george@mit.edu, so that
-# support for your operating system can be incorporated in future versions of
-# this package.  Thanks!
-
+# Based on 'freebsd.def'.
+#
 # Choose a value for WFDBROOT to determine where the WFDB Software Package will
 # be installed.  One of the following is usually a reasonable choice.
 # Installing in /usr generally requires root permissions, but will be easiest
@@ -24,7 +18,7 @@ WFDBROOT = /usr
 # WFDBROOT = /usr/local
 # To install without root permissions, a good choice is to set WFDBROOT to the
 # name of your home directory, as in the example below (change as needed).
-# WFDBROOT = /home/frodo
+# WFDBROOT = /Users/frodo
 
 # If the W3C's libwww library of HTTP and FTP client code is available, and
 # you wish to compile a WFDB library with NETFILES support, set LWC to
@@ -52,17 +46,9 @@ DBDIR = $(WFDBROOT)/database
 # INCDIR specifies the name of a directory in which to install the WFDB
 # library's #include <...> files.
 INCDIR = $(WFDBROOT)/include
-# Note: if you have both gcc and a vendor-supplied C compiler, and if INCDIR
-# is /usr/include, CFLAGS should *not* contain -I$(INCDIR) (if it does, gcc may
-# read the wrong version of files such as stdio.h when compiling WFDB
-# applications).
 
-# INFODIR is the GNU info directory (optional, needed to `make info').  One of
-# the following definitions should be correct.
-INFODIR = /usr/info
-# INFODIR = /usr/local/info
-# INFODIR = /usr/local/emacs/info
-# INFODIR = /usr/share/info
+# INFODIR is the GNU info directory (optional, needed to `make info').
+INFODIR = /usr/local/info
 
 # LIBDIR specifies the name of a directory in which to install the WFDB
 # library.
@@ -72,41 +58,17 @@ LIBDIR = $(WFDBROOT)/lib
 # prolog (*.pro) files from the 'app' directory.
 PSPDIR = $(WFDBROOT)/lib/ps
 
-# CC is the name of your C compiler.  The WFDB library can be compiled with K&R
-# C compilers (`cc' on most if not all UNIX systems) as well as with ANSI C
-# compilers such as GNU C (`gcc').
+# CC is the name of your C compiler.
 CC = gcc
-# On systems where `gcc' is the standard C compiler, `gcc' may also be known as
-# `cc'; in such cases, it doesn't matter if CC is cc or gcc.
 
 # CCDEFS is the set of C compiler options needed to set preprocessor variables
 # while compiling the WFDB Software Package.  CCDEFS should always include
-# VDEFS.  Add the following options to CCDEFS as appropriate (separating them
-# by spaces if you use more than one):
-#   -DISPRINTF	  if you do not have `stdlib.h' and your `sprintf' returns an
-#		   int (see wfdblib.h)
-#   -DNETFILES	  if you have libwww and want to be able to access WFDB files
-#		   remotely via http or ftp (as well as local files)
-#   -DNOMALLOC_H  if you have neither `stdlib.h' nor `malloc.h' (see wfdblib.h)
-#   -DNOSTRTOK	  if your standard C library does not include function `strtok'
-#		   (see wfdbio.c)
-#   -DNOTIME	  if you do not have `time.h' (see signal.c)
-#   -DNOVALUES_H  if you do not have `values.h' (see psd/log10.c)
-#   -DOLDC	  if you have neither `stdarg.h' nor `varargs.h' (see wfdbio.c)
-# If your C compiler fails to compile `signal.c', add -DBROKEN_CC to CCDEFS
-# and try again (see signal.c).
-CCDEFS = $(VDEFS)
+# VDEFS.
+CCDEFS = $(VDEFS)  -DNOVALUES_H
 
 # CFLAGS is the set of C compiler options.  CFLAGS should always include
-# CCDEFS.  Add the following options to CFLAGS as appropriate (separating them
-# by spaces if you use more than one):
-#   -g		  to save symbols for debugging
-#   -O		  if you trust your C compiler's optimizer
-# With the exception of `gcc', most C compilers do not allow you to use -g and
-# -O simultaneously.
-CFLAGS = -g $(CCDEFS) `$(LWC) --cflags` -I$(INCDIR)
-# `gcc' users may comment out the previous line, and uncomment the next one.
-# CFLAGS = -g -O $(CCDEFS) `$(LWC) --cflags` -I$(INCDIR)
+# CCDEFS.
+CFLAGS = -g -O $(CCDEFS) `$(LWC) --cflags` -I$(INCDIR)
 
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.
@@ -115,19 +77,6 @@ LDFLAGS = -L$(LIBDIR) -lwfdb $(LDLIBWWW)
 # WFDBLIB is the name of the standard WFDB library.  In order to access it via
 # `-lwfdb', WFDBLIB should be `libwfdb.a'.
 WFDBLIB = libwfdb.a
-
-# If your system requires indexed libraries, uncomment the next line.
-RANLIB = ranlib
-# Otherwise, uncomment the next line.
-# RANLIB = :
-
-# AR is the name of the command used to build a standard library from `.o'
-# files, and ARFLAGS is the set of options used when doing so.  AR and ARFLAGS
-# are usually `make' builtins and need not be defined here;  under HP UX, and
-# perhaps other versions of UNIX, however, you will need to define these
-# variables by uncommenting the next two lines.
-# AR = ar
-# ARFLAGS = rv
 
 # BUILDLIB is the command that creates the static WFDB library once its
 # components have been compiled separately;  the list of *.o files that
@@ -197,9 +146,8 @@ make-all:	all
 
 # `make lib-post-install' should be run after installing the WFDB library.
 lib-post-install:
-	echo "Nothing to be done for lib-post-install"
+	ranlib $(LIBDIR)/$(WFDBLIB)
 
 lib-post-uninstall:
 	echo "Nothing to be done for lib-post-uninstall"
 # _____________________________________________________________________________
-

@@ -1,5 +1,5 @@
 # file: Makefile.dos	G. Moody	2 November 1989
-#			Last revised:	26 October 2002
+#			Last revised:  22 November 2002
 # MSDOS/Windows `make' description file template for WFDB applications
 #
 # -----------------------------------------------------------------------------
@@ -101,12 +101,13 @@ CFLAGS = $(COFLAGS)
 # anything below this line.
 # -----------------------------------------------------------------------------
 
-XFILES = ann2rr.exe bxb.exe calsig.exe ecgeval.exe epic.exe fir.exe ihr.exe \
+XFILES = ann2rr.exe bxb.exe calsig.exe ecgeval.exe epicmp.exe fir.exe ihr.exe \
  mfilt.exe mrgann.exe mxm.exe nst.exe plotstm.exe pscgen.exe pschart.exe \
  psfd.exe rdann.exe rdsamp.exe rr2ann.exe rxr.exe sampfreq.exe sigamp.exe \
  skewedit.exe snip.exe sortann.exe sqrs.exe sqrs125.exe sumann.exe \
  sumstats.exe tach.exe wfdbcat.exe wfdbcollate.exe wfdb-config.exe \
- wfdbdesc.exe wfdbwhich.exe wrann.exe wrsamp.exe wvscript.exe xform.exe \
+ wfdbdesc.exe wfdbwhich.exe wqrs.exe wrann.exe wrsamp.exe wvscript.exe \
+ xform.exe \
  $(XXFILES)
 
 # General rule for compiling C sources into executable files

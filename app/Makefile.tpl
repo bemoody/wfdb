@@ -1,18 +1,18 @@
-# file: Makefile.tpl		G. Moody	  23 May 2000
-#				Last revised:	26 October 2002
+# file: Makefile.tpl		G. Moody	23 May 2000
+#				Last revised: 22 November 2002
 # This section of the Makefile should not need to be changed.
 
-CFILES = ann2rr.c bxb.c calsig.c ecgeval.c epic.c fir.c ihr.c mfilt.c \
+CFILES = ann2rr.c bxb.c calsig.c ecgeval.c epicmp.c fir.c ihr.c mfilt.c \
  mrgann.c mxm.c nst.c plotstm.c pscgen.c pschart.c psfd.c rdann.c rdsamp.c \
  rr2ann.c rxr.c sampfreq.c sample.c sigamp.c skewedit.c snip.c sortann.c \
  sqrs.c sqrs125.c sumann.c sumstats.c tach.c view.c vsetup.c wfdbcat.c \
- wfdbcollate.c wfdb-config.c wfdbdesc.c wfdbwhich.c wrann.c wrsamp.c \
+ wfdbcollate.c wfdb-config.c wfdbdesc.c wfdbwhich.c wqrs.c wrann.c wrsamp.c \
  wvscript.c xform.c
-XFILES = ann2rr bxb calsig ecgeval epic fir ihr mfilt \
+XFILES = ann2rr bxb calsig ecgeval epicmp fir ihr mfilt \
  mrgann mxm nst plotstm pscgen pschart psfd rdann rdsamp \
  rr2ann rxr sampfreq sigamp skewedit snip sortann \
  sqrs sqrs125 sumann sumstats tach wfdbcat \
- wfdbcollate wfdb-config wfdbdesc wfdbwhich wrann wrsamp xform
+ wfdbcollate wfdb-config wfdbdesc wfdbwhich wqrs wrann wrsamp xform
 SCRIPTS = cshsetwfdb setwfdb
 PSFILES = pschart.pro psfd.pro 12lead.pro
 OTHERFILES = cshsetwfdb setwfdb setwfdb.bat sample8.hea

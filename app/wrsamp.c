@@ -1,5 +1,5 @@
 /* file: wrsamp.c	G. Moody	10 August 1993
-			Last revised:  14 November 2002
+			Last revised:  21 November 2002
 -------------------------------------------------------------------------------
 wrsamp: Select fields or columns from a file and generate a WFDB record
 Copyright (C) 2002 George B. Moody
@@ -254,8 +254,11 @@ char *argv[];
 				      pname, t, fv[i]);
 			vout[i] = 0;
 		    }
-		    else
-			vout[i] = (int)(scale * v);
+		    else {
+			v *= scale;
+			if (v >= 0) vout[i] = (int)(v + 0.5);
+			else vout[i] = (int)(v - 0.5);
+		    }
 		}
 		if (putvec(vout) < 0) break;
 		for (i = 0; i <= nf; i++)

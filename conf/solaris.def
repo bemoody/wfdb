@@ -1,5 +1,5 @@
 # file: solaris.def		G. Moody	31 May 2000
-#				Last revised: 17 December 2001
+#				Last revised: 21 November 2002
 # 'make' definitions for compiling the WFDB Software Package under Solaris
 
 # Choose a value for WFDBROOT to determine where the WFDB Software Package will
@@ -116,6 +116,36 @@ STRIP = strip
 # To retain the symbol tables for debugging, comment out the previous line, and
 # uncomment the next line.
 # STRIP = :
+
+# ...........................................................................
+# This section of definitions is used only when compiling WAVE, which is
+# possible only if the XView and Xlib libraries and include files have been
+# installed.
+
+# OPENWINHOME specifies the root directory of the OpenWindows hierarchy.
+# This is usually /usr/openwin.
+OPENWINHOME = /usr/openwin
+
+# OWINCDIR is the directory in which the `xview' directory containing XView
+# *.h files is found.
+OWINCDIR = $(OPENWINHOME)/include
+
+# OWLIBDIR is the directory in which the XView library is found.
+OWLIBDIR = $(OPENWINHOME)/lib
+
+# WCFLAGS is the set of C compiler options to use when compiling WAVE.
+WCFLAGS = $(CFLAGS) -I$(OWINCDIR) -DOWTOOLKIT_WARNING_DISABLED
+
+# HELPOBJ can be set to "help.o" if you wish to recompile the XView spot help
+# functions in "wave/help.c" (recommended under Linux).
+# HELPOBJ = help.o
+# Otherwise, use the version in libxview by uncommenting the next line:
+HELPOBJ =
+
+# WLDFLAGS is the set of loader options appended to the C compiler command line
+# to specify loading the WFDB, XView, and Xlib libraries.
+WLDFLAGS = $(LDFLAGS) -L$(OWLIBDIR) -L/usr/X11R6/lib -lxview -lolgx -lX11
+# ...........................................................................
 
 # `make' (with no target specified) will be equivalent to `make all'.
 make-all:	all

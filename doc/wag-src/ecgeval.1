@@ -1,5 +1,5 @@
 '\" t
-.TH ECGEVAL 1  "28 July 2002" "WFDB 10.2.7" "WFDB Applications Guide"
+.TH ECGEVAL 1 "22 November 2002" "WFDB 10.3.0" "WFDB Applications Guide"
 .SH NAME
 ecgeval \- generate and run ECG analyzer evaluation script
 .SH SYNOPSIS
@@ -10,7 +10,7 @@ This program generates a Bourne shell (\fBsh\fR(1)) script under UNIX, or
 a batch file under MS-DOS, to compare a set of test annotation files with
 a set of reference annotation files and a set of reference heart rate
 measurement files using the programs \fBbxb\fR(1), \fBrxr\fR(1), \fBmxm\fR(1),
-and \fBepic\fR(1), and then to produce summary reports by passing the outputs
+and \fBepicmp\fR(1), and then to produce summary reports by passing the outputs
 of these programs to \fBsumstats\fR(1) and \fBplotstm\fR(1).
 .PP
 \fBecgeval\fR asks interactively for the annotator names, the name of
@@ -45,7 +45,7 @@ NST DB	nstlist	Noise Stress Test Database
 CU DB	culist	Creighton University Sustained Ventricular Arrhythmia Database
 .TE
 .SH SEE ALSO
-\fBbxb\fR(1), \fBepic\fR(1), \fBmxm\fR(1), \fBplotstm\fR(1), \fBrxr\fR(1),
+\fBbxb\fR(1), \fBepicmp\fR(1), \fBmxm\fR(1), \fBplotstm\fR(1), \fBrxr\fR(1),
 \fBsetwfdb\fR(1), \fBsumstats\fR(1)
 .br
 \fIEvaluating ECG Analyzers\fR

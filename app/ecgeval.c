@@ -1,5 +1,5 @@
 /* file: ecgeval.c	G. Moody	22 March 1992
-			Last revised:  14 November 2002
+			Last revised:  22 November 2002
 
 -------------------------------------------------------------------------------
 ecgeval: Generate and run a script of commands to compare sets of annotations
@@ -119,14 +119,14 @@ main()
     int evalsv = 1, evalvf = 1, evalaf = 1, evalst = 1, evalst2 = 1;
     struct tm *now;
     static char rhrname[20], tname[20], tans[20], *dbfn, dbtn[5],
-        reportname[30], scriptname[20], *epicSoption, evalcommand[30];
+        reportname[30], scriptname[20], *epicmpSoption, evalcommand[30];
     static char bxbcommand[256], rxrcommand[256], mxmcommand[256],
-		epiccommand[256];
+		epicmpcommand[256];
     static char bxbfile1[40] = "bxb.out", bxbfile2[40] = "sd.out",
 	        rxrfile1[40] = "vruns.out", rxrfile2[40] = "sruns.out",
-		mxmfile[40] = "hr%d.out", epicaffile[40] = "af.out",
-		epicvffile[40] = "vf.out", epicstfile1[40] = "st.out",
-		epicstfile2[40] = "stm.out", plotstmfile[40] = "stm.ps";
+		mxmfile[40] = "hr%d.out", epicmpaffile[40] = "af.out",
+		epicmpvffile[40] = "vf.out", epicmpstfile1[40] = "st.out",
+		epicmpstfile2[40] = "stm.out", plotstmfile[40] = "stm.ps";
     static char *rname = "atr";
 
 #ifdef __STDC__
@@ -320,10 +320,10 @@ main()
 	if (!evalst2) {
 	    (void)fprintf(stderr,
 		  "ST episodes will be defined for signal 0 only.\n");
-	    epicSoption = " -S0 ";
+	    epicmpSoption = " -S0 ";
 	}
 	else
-	    epicSoption = " -S ";
+	    epicmpSoption = " -S ";
     }
     (void)fprintf(stderr,
 		  "\nDo you wish to change any of your answers? [y]: ");
@@ -469,24 +469,24 @@ main()
 
     if (evalvf) {
 	(void)fprintf(stderr,
-		  "Ventricular fibrillation file [%s]: ", epicvffile);
-	getans(epicvffile, 40);
+		  "Ventricular fibrillation file [%s]: ", epicmpvffile);
+	getans(epicmpvffile, 40);
     }
 
     if (evalaf) {
 	(void)fprintf(stderr,
-		  "Atrial fibrillation file [%s]: ", epicaffile);
-	getans(epicaffile, 40);
+		  "Atrial fibrillation file [%s]: ", epicmpaffile);
+	getans(epicmpaffile, 40);
     }
 
     if (evalst) {
 	(void)fprintf(stderr,
-		  "ST analysis file [%s]: ", epicstfile1);
-	getans(epicstfile1, 40);
+		  "ST analysis file [%s]: ", epicmpstfile1);
+	getans(epicmpstfile1, 40);
 
 	(void)fprintf(stderr,
-		  "ST measurement file [%s]: ", epicstfile2);
-	getans(epicstfile2, 40);
+		  "ST measurement file [%s]: ", epicmpstfile2);
+	getans(epicmpstfile2, 40);
 
 	(void)fprintf(stderr,
 	  "PostScript scatter plot of ST measurements [%s]: ", plotstmfile);
@@ -524,22 +524,22 @@ main()
     (void)sprintf(mxmcommand, "mxm -r %%s -a %s %s -L %s -m %%d\n",
 		  rhrname, tname, mxmfile);
     if (evalaf || evalvf || evalst) {
-	(void)sprintf(epiccommand, "epic -r %%s -a %s %s -L", rname, tname);
+	(void)sprintf(epicmpcommand,"epicmp -r %%s -a %s %s -L", rname, tname);
 	if (evalaf) {
-	    (void)strcat(epiccommand, " -A ");
-	    (void)strcat(epiccommand, epicaffile);
+	    (void)strcat(epicmpcommand, " -A ");
+	    (void)strcat(epicmpcommand, epicmpaffile);
 	}
 	if (evalvf) {
-	    (void)strcat(epiccommand, " -V ");
-	    (void)strcat(epiccommand, epicvffile);
+	    (void)strcat(epicmpcommand, " -V ");
+	    (void)strcat(epicmpcommand, epicmpvffile);
 	}
 	if (evalst) {
-	    (void)strcat(epiccommand, epicSoption);
-	    (void)strcat(epiccommand, epicstfile1);
-	    (void)strcat(epiccommand, " ");
-	    (void)strcat(epiccommand, epicstfile2);
+	    (void)strcat(epicmpcommand, epicmpSoption);
+	    (void)strcat(epicmpcommand, epicmpstfile1);
+	    (void)strcat(epicmpcommand, " ");
+	    (void)strcat(epicmpcommand, epicmpstfile2);
 	}
-	(void)strcat(epiccommand, "\n");
+	(void)strcat(epicmpcommand, "\n");
     }
 
 #ifdef MSDOS
@@ -571,7 +571,7 @@ main()
 	for (i = 0; i < nhr; i++)
 	    (void)fprintf(sfile, mxmcommand, record, i, i);
 	if (evalaf || evalvf || evalst)
-	    (void)fprintf(sfile, epiccommand, record);
+	    (void)fprintf(sfile, epicmpcommand, record);
     }
     (void)fclose(dbf);
 
@@ -621,7 +621,7 @@ main()
 	      "echo Ventricular fibrillation detection performance >>%s\n",
 		      reportname);
 	(void)fprintf(sfile, ECHONOTHING, reportname);
-	(void)fprintf(sfile, "sumstats %s >>%s\n", epicvffile, reportname);
+	(void)fprintf(sfile, "sumstats %s >>%s\n", epicmpvffile, reportname);
 	(void)fprintf(sfile, ECHONOTHING, reportname);
     }
 
@@ -630,7 +630,7 @@ main()
 	      "echo Atrial fibrillation detection performance >>%s\n",
 		      reportname);
 	(void)fprintf(sfile, ECHONOTHING, reportname);
-	(void)fprintf(sfile, "sumstats %s >>%s\n", epicaffile, reportname);
+	(void)fprintf(sfile, "sumstats %s >>%s\n", epicmpaffile, reportname);
 	(void)fprintf(sfile, ECHONOTHING, reportname);
     }
 
@@ -639,12 +639,12 @@ main()
 	      "echo Ischemic ST detection performance >>%s\n",
 		      reportname);
 	(void)fprintf(sfile, ECHONOTHING, reportname);
-	(void)fprintf(sfile, "sumstats %s >>%s\n", epicstfile1, reportname);
+	(void)fprintf(sfile, "sumstats %s >>%s\n", epicmpstfile1, reportname);
 	(void)fprintf(sfile, ECHONOTHING, reportname);
 
 	(void)fprintf(sfile,
 		   ": Generate PostScript scatter plot of ST measurements\n");
-	(void)fprintf(sfile, "plotstm %s >%s\n", epicstfile2, plotstmfile);
+	(void)fprintf(sfile, "plotstm %s >%s\n", epicmpstfile2, plotstmfile);
     }
 
     (void)fprintf(sfile,

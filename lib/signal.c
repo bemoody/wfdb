@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  8 November 2002		wfdblib 10.3.0
+			Last revised:  22 November 2002		wfdblib 10.3.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -87,7 +87,8 @@ This file also contains definitions of the following WFDB library functions:
  muvadu		(converts microvolts to ADC units)
  aduphys [6.0]	(converts ADC units to physical units)
  physadu [6.0]	(converts physical units to ADC units)
-
+ sample [10.3.0](get a sample from a given signal at a given time)
+ sample_valid [10.3.0](verify that last value returned by sample was valid)
 (Numbers in brackets in the list above indicate the first version of the WFDB
 library that included the corresponding function.  Functions not so marked
 have been included in all published versions of the WFDB library.)
@@ -275,6 +276,9 @@ static unsigned framelen;	/* total number of samples per frame */
 static int gvmode = -1;		/* getvec mode (WFDB_HIGHRES or WFDB_LOWRES
 				   once initialized) */
 static int gvc;			/* getvec sample-within-frame counter */
+WFDB_Sample *sbuf = NULL;	/* buffer used by sample() */
+static int sample_vflag;	/* if non-zero, last value returned by sample()
+				   was valid */
 
 /* These variables relate to output signals. */
 static unsigned maxosig;	/* max number of output signals */
@@ -874,6 +878,11 @@ static void isigclose()
     struct igdata *ig;
 
     if (nisig == 0) return;
+    if (sbuf) {
+	(void)free(sbuf);
+	sbuf = NULL;
+	sample_vflag = 0;
+    }
     if (isd) {
 	while (nisig)
 	    if (is = isd[--nisig]) {
@@ -2236,7 +2245,7 @@ unsigned int nsig;
 	if (bcount != 0.0)
 	    (void)wfdb_fprintf(oheader, "(%g)", bcount);
     }
-    (void)wfdb_fprintf(oheader, " %ld", siarray[0].nsamp);
+    (void)wfdb_fprintf(oheader, " %ld", nsig > 0 ? siarray[0].nsamp : 0L);
     if (btime != 0L || bdate != (WFDB_Date)0) {
         if (btime % 1000 == 0)
 	    (void)wfdb_fprintf(oheader, " %s",
@@ -2815,6 +2824,61 @@ double v;
 	return ((int)(v + 0.5) + b);
     else
 	return ((int)(v - 0.5) + b);
+}
+
+/* sample(s, t) provides buffered random access to the input signals.  The
+arguments are the signal number (s) and the sample number (t); the returned
+value is the sample from signal s at time t.  On return, the global variable
+sample_vflag is true (non-zero) if the returned value is valid, false (zero)
+otherwise.  The caller must open the input signals and must set the global
+variable nisig to the number of input signals before invoking sample().  Once
+this has been done, the caller may request samples in any order. */
+
+#define BUFLN   4096	/* must be a power of 2, see sample() */
+
+WFDB_Sample sample(WFDB_Signal s, WFDB_Time t)
+{
+    static WFDB_Time tt;
+
+    /* Allocate the sample buffer on the first call. */
+    if (sbuf == NULL) {
+	sbuf= (WFDB_Sample *)malloc((unsigned)nisig*BUFLN*sizeof(WFDB_Sample));
+	if (sbuf) tt = (WFDB_Time)-1L;
+	else {
+	    (void)fprintf(stderr, "sample(): insufficient memory\n");
+	    exit(2);
+	}
+    }
+    if (t < 0L) t = 0L;
+    /* If the caller has requested a sample that is no longer in the buffer,
+       or if the caller has requested a sample that is further ahead than the
+       length of the buffer, we need to reset the signal file pointer(s).
+       If we do this, we must be sure that the buffer is refilled so that
+       any subsequent requests for samples between t - BUFLN+1 and t will
+       receive correct responses. */
+    if (t <= tt - BUFLN || t > tt + BUFLN) {
+	tt = t - BUFLN;
+	if (tt < 0L) tt = -1L;
+	else if (isigsettime(tt-1) < 0) exit(2);
+    }
+    /* If the requested sample is not yet in the buffer, read and buffer
+       more samples.  If we reach the end of the record, clear sample_vflag
+       and return the last valid value. */
+    while (t > tt)
+        if (getvec(sbuf + nisig * ((++tt)&(BUFLN-1))) < 0) {
+	    --tt;
+	    sample_vflag = 0;
+	    return (*(sbuf + nisig * (tt&(BUFLN-1)) + s));
+	}
+    /* The requested sample is in the buffer.  Set sample_vflag and
+       return the requested sample. */
+    sample_vflag = 1;
+    return (*(sbuf + nisig * (t&(BUFLN-1)) + s));
+}
+
+int sample_valid(void)
+{
+    return (sample_vflag);
 }
 
 /* Private functions (for use by other WFDB library functions only). */

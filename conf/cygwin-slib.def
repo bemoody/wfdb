@@ -1,15 +1,10 @@
-# file: generic-slib.def	G. Moody	31 May 2000
-#				Last revised: 21 November 2002
-# This section contains settings suitable for compiling a shared version of the
-# WFDB library under versions of UNIX that are not otherwise recognized by
-# 'configure'.  Not all versions of UNIX support shared libraries, so you may
-# not need to use this file.
-#
-# If you find that changes are needed in order to compile successfully, please
-# send a copy of your modifications together with the name of your operating
-# system (as reported by the 'uname' command) to george@mit.edu, so that
-# support for your operating system can be incorporated in future versions of
-# this package.  Thanks!
+# file: cygwin-slib.def	I. Henry and G. Moody	19 November 2002
+#				Last revised:	21 November 2002
+
+# This section contains settings suitable for generating a DLL (shared library)
+# under MS Windows using the free Cygwin/gcc ANSI C compiler, available from
+# http://www.cygwin.com/.  To use this successfully, you need to have installed
+# Cygwin 1.x or later.
 
 # Choose a value for WFDBROOT to determine where the WFDB Software Package will
 # be installed.  One of the following is usually a reasonable choice.
@@ -41,30 +36,21 @@ INCDIR = $(WFDBROOT)/include
 # library.
 LIBDIR = $(WFDBROOT)/lib
 
+# BINDIR specifies the name of a directory in which to install the WFDB
+# DLL.
+BINDIR = $(WFDBROOT)/bin
+
 # CC is the name of your C compiler.
 CC = gcc
 
 # CCDEFS is the set of C compiler options needed to set preprocessor variables
 # while compiling the WFDB Software Package.  CCDEFS should always include
-# VDEFS.  Add the following options to CCDEFS as appropriate (separating them
-# by spaces if you use more than one):
-#   -DISPRINTF	  if you do not have `stdlib.h' and your `sprintf' returns an
-#		   int (see wfdblib.h)
-#   -DNETFILES	  if you have libwww and want to be able to access WFDB files
-#		   remotely via http or ftp (as well as local files)
-#   -DNOMALLOC_H  if you have neither `stdlib.h' nor `malloc.h' (see wfdblib.h)
-#   -DNOSTRTOK	  if your standard C library does not include function `strtok'
-#		   (see wfdbio.c)
-#   -DNOTIME	  if you do not have `time.h' (see signal.c)
-#   -DNOVALUES_H  if you do not have `values.h' (see psd/log10.c)
-#   -DOLDC	  if you have neither `stdarg.h' nor `varargs.h' (see wfdbio.c)
-# If your C compiler fails to compile `signal.c', add -DBROKEN_CC to CCDEFS
-# and try again (see signal.c).
-CCDEFS = $(VDEFS)
+# VDEFS.
+CCDEFS = $(VDEFS) -DNOVALUES_H
 
 # CFLAGS is the set of C compiler options used when compiling the shared
 # library.  CFLAGS should always include CCDEFS.
-CFLAGS = -fpic -g -O $(CCDEFS) `$(LWC) --cflags` -I$(INCDIR)
+CFLAGS = -g -O $(CCDEFS) `$(LWC) --cflags` -I$(INCDIR)
 
 # WFDBLIB_BASENAME is the name, without version numbers, of the alternate
 # library.  WFDBLIB_SONAME is the shared object name ("soname") of the
@@ -73,7 +59,8 @@ CFLAGS = -fpic -g -O $(CCDEFS) `$(LWC) --cflags` -I$(INCDIR)
 # version number.  Symbolic links from WFDBLIB to WFDBLIB_BASENAME and
 # WFDBLIB_SONAME will be created as the final step in building the alternate
 # library.
-WFDBLIB_BASENAME = libwfdb.so
+WFDBLIB_DLLNAME  = wfdb-cyg-$(MAJOR)-$(MINOR).dll
+WFDBLIB_BASENAME = libwfdb.dll.a
 WFDBLIB_SONAME = $(WFDBLIB_BASENAME).$(MAJOR)
 WFDBLIB = $(WFDBLIB_SONAME).$(MINOR)
 # For a shared library, the soname is significant for proper run-time binding.
@@ -86,15 +73,19 @@ WFDBLIB = $(WFDBLIB_SONAME).$(MINOR)
 
 # BUILDLIB is the command that creates the shared WFDB library once its
 # components have been compiled separately;  the list of *.o files that
-# make up the library will be appended to BUILDLIB.  This command varies
-# considerably depending on the operating system;  the setting here works
-# if gcc and the GNU binutils are installed.
-BUILDLIB = gcc -shared -Wl,-soname,$(SWFDBLIB_SONAME) \
- `$(LWC) --libs` -o $(SWFDBLIB)
+# make up the library will be appended to BUILDLIB.
+BUILDLIB = gcc -shared -o $(WFDBLIB_DLLNAME) \
+  -Wl,--out-implib=$(WFDBLIB) \
+  -Wl,--export-all-symbols \
+  -Wl,--enable-auto-import
 
 # BUILDLIB_LDFLAGS is a list of arguments appended to BUILDLIB following
-# the list of *.o files (for most platforms, BUILDLIB_LDFLAGS is empty).
-BUILDLIB_LDFLAGS =
+# the list of *.o files.
+BUILDLIB_LDFLAGS = `$(LWC) --libs` `$(LWC) --libs` `$(LWC) --libs`
+ 
+# LDCONFIG is the name of the program needed to refresh the system's cached
+# index of shared libraries.
+LDCONFIG = /sbin/ldconfig
 
 # PRINT is the name of the program used to produce listings (including any
 # options for the desired formatting).
@@ -111,21 +102,8 @@ SETPERMISSIONS = chmod 644
 SETDPERMISSIONS = chmod 755
 
 # SETLPERMISSIONS is the command needed to make the WFDB library usable by
-# programs linked to it.  Some versions of Unix require shared libraries to
-# be marked as executable;  those that do not generally don't care.
+# programs linked to it.
 SETLPERMISSIONS = chmod 755
-
-# SRANLIB is the name of the program used to index the alternate library.
-# Shared libraries are not generally indexed.
-SRANLIB = :
-
-# LDCONFIG is the name of the program needed to refresh the system's cached
-# index of shared libraries.  Not all operating systems that support shared
-# libraries have such an index, so this may be unnecessary.
-LDCONFIG = ldconfig
-# Under operating systems that do not maintain a cached index of shared
-# libraries, uncomment the next line.
-# LDCONFIG = :
 
 # `make' (with no target specified) will be equivalent to `make all'.
 make-all:	all
@@ -134,11 +112,21 @@ make-all:	all
 lib-post-install:
 	cd $(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_BASENAME)
 	cd $(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_SONAME)
-	$(RANLIB) $(LIBDIR)/$(WFDBLIB)
-	@$(LDCONFIG) || echo Warning: "$(LDCONFIG)" was unsuccessful
+	cp $(WFDBLIB_DLLNAME) $(BINDIR)
 
 lib-post-uninstall:
 	rm -f $(LIBDIR)/$(WFDBLIB_BASENAME)
 	rm -f $(LIBDIR)/$(WFDBLIB_SONAME)
-	@$(LDCONFIG) || echo Warning: "$(LDCONFIG)" was unsuccessful
+	rm -f $(BINDIR)/$(WFDBLIB_DLLNAME)
+	
 #______________________________________________________________________________
+
+
+
+
+
+
+
+
+
+

@@ -1,13 +1,42 @@
 10.3.0:
-	Fixed bugs in lib/sample.c that caused improper accounting of
+	The WFDB Software Package has been ported to MacOS/X (Darwin),
+	version 10.2 (the port should also work under 10.1 but this
+	has not been tested and will not be supported).	
+
+	It is now possible to generate a shared WFDB library (DLL)
+	under MS-Windows using Cygwin/gcc.
+
+	Fixed bugs in lib/signal.c that caused improper accounting of
 	signal group numbers when reading from two or more records at
-	the same time (as in 'nst'), and a bug that caused a segfault
-	in 'nst'.
+	the same time (as in 'nst'), a bug that caused a segfault in
+	'nst', and a bug that referenced uninitialized memory in
+	newheader() if nsig = 0.
+
+	Added functions sample() and sample_valid() to the WFDB library
+	(in lib/signal.c).  sample(s, t) returns the sample at time (sample
+	number) t from signal s, handling all necessary buffering
+	internally and allowing the caller to treat the signal file
+	as a virtual array of randomly accessible samples.  sample_valid()
+	can be invoked to check if the most recent value returned by
+	sample() was valid (e.g., to see if the end of the input was
+	reached).  For an example of the use of these functions, see
+	app/wqrs.c .
 
 	Use -p -p to obtain higher precision in 'rdsamp' output.
 
 	New -w option for 'ann2rr' and 'rr2ann' for attaching annotation
 	types to intervals.
+
+	The application formerly known as 'epic' has be renamed 'epicmp'
+	(episode comparator), to avoid conflicts with a new but widely
+	distributed IRC chat client named 'epic'.
+
+	Conversion of floating-point values to integer samples has been
+	modified to obtain better cross-platform consistency in psfd and
+	wrsamp.
+
+	Wei Zong's length-transform-based QRS detector, wqrs, has been
+	added to the package.
 
 	New 'mit2edf' application converts records to European Data Format.
 

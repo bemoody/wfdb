@@ -1,13 +1,10 @@
 # file: cygwin.def		G. Moody	6 June 2000
-#				Last revised: 13 December 2001
+#				Last revised: 21 November 2002
 #
 # This file contains default 'make' definitions for compiling the WFDB Software
 # Package under MS Windows using the free Cygwin/gcc ANSI C compiler, available
-# from http://www.cygnus.com/cygwin/.
-#
-# To use this successfully, you need to have installed Cygwin B20 or later,
-# as well as `which.exe' (which should be installed somewhere in your PATH;
-# get it from http://www.physionet.org/physiotools/utilities/which/which.exe).
+# from http://www.cygwin.com/.  To use this successfully, you need to have
+# installed Cygwin 1.x or later.
 #
 # Choose a value for WFDBROOT to determine where the WFDB Software Package will
 # be installed.  One of the following is usually a reasonable choice.
@@ -153,6 +150,36 @@ STRIP = ../conf/exestrip
 # To retain the symbol tables for debugging, comment out the previous line, and
 # uncomment the next line.
 # STRIP = :
+
+# ...........................................................................
+# This section of definitions is used only when compiling WAVE, which is
+# possible only if the XView and Xlib libraries and include files have been
+# installed.
+
+# OPENWINHOME specifies the root directory of the OpenWindows hierarchy.
+# This is usually /usr/openwin.
+OPENWINHOME = /usr/openwin
+
+# OWINCDIR is the directory in which the `xview' directory containing XView
+# *.h files is found.
+OWINCDIR = $(OPENWINHOME)/include
+
+# OWLIBDIR is the directory in which the XView library is found.
+OWLIBDIR = $(OPENWINHOME)/lib
+
+# WCFLAGS is the set of C compiler options to use when compiling WAVE.
+WCFLAGS = $(CFLAGS) -I$(OWINCDIR)
+
+# HELPOBJ can be set to "help.o" if you wish to recompile the XView spot help
+# functions in "wave/help.c" (recommended under Linux).
+# HELPOBJ = help.o
+# Otherwise, use the version in libxview by uncommenting the next line:
+HELPOBJ =
+
+# WLDFLAGS is the set of loader options appended to the C compiler command line
+# to specify loading the WFDB, XView, and Xlib libraries.
+WLDFLAGS = $(LDFLAGS) -L$(OWLIBDIR) -L/usr/X11R6/lib -lxview -lolgx -lX11
+# ...........................................................................
 
 # `make' (with no target specified) will be equivalent to `make all'.
 make-all:	all

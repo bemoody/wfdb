@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	31 May 2000
-#				Last revised:	18 July 2002
+#				Last revised: 21 November 2002
 # Change the settings below as appropriate for your setup.
 
 # Choose directories in which to install WAVE and its ancillary files by
@@ -28,37 +28,6 @@ MENUDIR = $(WFDBROOT)/lib
 
 # RESDIR specifies the directory in which X11 client resource files are kept.
 RESDIR = $(WFDBROOT)/lib/X11/app-defaults
-
-# OPENWINHOME specifies the root directory of the OpenWindows hierarchy.
-# This is usually /usr/openwin.
-OPENWINHOME = /usr/openwin
-
-# OWINCDIR is the directory in which the `xview' directory containing XView
-# *.h files is found.
-OWINCDIR = $(OPENWINHOME)/include
-
-# OWLIBDIR is the directory in which the XView library is found.
-OWLIBDIR = $(OPENWINHOME)/lib
-
-# WCFLAGS is the set of C compiler options.
-WCFLAGS = $(CFLAGS) -I$(OWINCDIR)
-
-# HELPOBJ can be set to "help.o" if you wish to recompile the XView spot help
-# functions in "help.c" (recommended under Linux).
-HELPOBJ = help.o
-# Otherwise, use the version in libxview by uncommenting the next line:
-# HELPOBJ =
-
-# WLDFLAGS is the set of loader options appended to the C compiler command line
-# to specify loading the WFDB, XView, and Xlib libraries.
-WLDFLAGS = $(LDFLAGS) -L$(OWLIBDIR) -L/usr/X11R6/lib -lxview -lolgx -lX11
-# Users of Red Hat Linux 5.0 or 5.1 (not later versions), use this instead:
-# WLDFLAGS = $(LDFLAGS) -L$(OWLIBDIR) -L/usr/X11R6/lib \
-#  /usr/openwin/lib/libxview.a /usr/openwin/lib/libolgx.a -lX11
-# This setting avoids incompatibilities with the shared (dynamic) libraries.
-# If you use another version of Linux, or another OS, and have difficulty
-# related to WAVE's Analysis commands window, try this workaround, and let
-# me know if it works (or if it doesn't work).
 
 # It should not be necessary to modify anything below this line.
 # -----------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 /* file: psfd.c		G. Moody         9 August 1988
-			Last revised:  14 November 2002
+			Last revised:  21 November 2002
 
 -------------------------------------------------------------------------------
 psfd: Produces annotated full-disclosure ECG plots on a PostScript device
@@ -635,8 +635,9 @@ FILE *cfile;
     }
 }
 
+static double __mt;	/* temporary variable for adu macro */
+#define adu(A)	((__mt=(A)*dpadu), (int)(__mt>=0 ? __mt+0.5 : __mt-0.5))
 #define si(A)	((int)((A)*dpsi))    /* convert sample intervals to pixels */
-#define adu(A)	((int)((A)*dpadu))   /* convert adus to pixels */
 #define pt(A)	((int)((A)*dppt))    /* convert PostScript points to pixels */
 
 double dpadu;	/* pixels per adu.  This quantity must be recalculated for each

@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:	26 October 2002
+#				Last revised:	21 November 2002
 # This section of the Makefile should not need to be changed.
 
 INCLUDES = $(INCDIR)/wfdb/wfdb.h $(INCDIR)/wfdb/ecgcodes.h \
@@ -13,7 +13,7 @@ MFILES = Makefile Makefile.dos
 
 # `make' or `make all':  build the WFDB library
 all:	$(OFILES)
-	$(BUILDLIB) $(OFILES)
+	$(BUILDLIB) $(OFILES) $(BUILDLIB_LDFLAGS)
 
 # `make install':  install the WFDB library and headers
 install:	$(INCLUDES) $(LIBDIR) all

@@ -1,5 +1,5 @@
 # file: solaris-slib.def	G. Moody	31 May 2000
-#				Last revised: 17 December 2001
+#				Last revised: 21 November 2002
 # This section contains settings suitable for generating a shared library under
 # Solaris.
 
@@ -18,7 +18,6 @@ WFDBROOT = /usr
 # To install without root permissions, a good choice is to set WFDBROOT to the
 # name of your home directory, as in the example below (change as needed).
 # WFDBROOT = /home/frodo
-
 
 # If the W3C's libwww library of HTTP and FTP client code is available, and
 # you wish to compile a WFDB library with NETFILES support, set LWC
@@ -74,6 +73,10 @@ WFDBLIB = $(WFDBLIB_SONAME).$(MINOR)
 # make up the library will be appended to BUILDLIB.
 BUILDLIB = ld -o $(WFDBLIB) -G -z text `$(LWC) --libs`
 
+# BUILDLIB_LDFLAGS is a list of arguments appended to BUILDLIB following
+# the list of *.o files (for most platforms, BUILDLIB_LDFLAGS is empty).
+BUILDLIB_LDFLAGS =
+
 # PRINT is the name of the program used to produce listings (including any
 # options for the desired formatting).
 PRINT = lpr
@@ -97,8 +100,9 @@ make-all:	all
 
 # `make lib-post-install' should be run after installing the WFDB library.
 lib-post-install:
-	cd $(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_BASENAME)
-	cd $(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_SONAME)
+	cd $(LIBDIR); rm $(WFDBLIB_BASENAME) $(WFDBLIB_SONAME); \
+	 ln -s $(WFDBLIB) $(WFDBLIB_BASENAME); \
+	 ln -s $(WFDBLIB) $(WFDBLIB_SONAME)
 
 lib-post-uninstall:
 	rm -f $(LIBDIR)/$(WFDBLIB_BASENAME)

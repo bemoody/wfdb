@@ -1,8 +1,8 @@
-/* file: epic.c		G. Moody	 3 March 1992
+/* file: epicmp.c	G. Moody	 3 March 1992
 			Last revised:  14 November 2002
 
 -------------------------------------------------------------------------------
-epic: ANSI/AAMI-standard episode-by-episode annotation file comparator
+epicmp: ANSI/AAMI-standard episode-by-episode annotation file comparator
 Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
@@ -23,18 +23,18 @@ You may contact the author by e-mail (george@mit.edu) or postal mail
 please visit PhysioNet (http://www.physionet.org/).
 _______________________________________________________________________________
 
-This program implements the VF, AF, and ST episode-by-episode comparison
-algorithms described in ANSI/AAMI EC38:1998, the American National Standard for
-Ambulatory electrocardiographs and ANSI/AAMI EC57:1998, the American National
-Standard for Testing and reporting performance results of cardiac rhythm and
-ST segment measurement algorithms;  both standards are available from AAMI,
-1110 N Glebe Road, Suite 220, Arlington, VA 22201 USA (http://www.aami.org/).
-The relevant provisions of these standards are described in file `eval.tex',
-and information about using this program is contained in file `epic.1' (both
-of these files are included in the 'doc' directory of the WFDB Software
-Package).
+This program (formerly known as 'epic') implements the VF, AF, and ST episode-
+by-episode comparison algorithms described in ANSI/AAMI EC38:1998, the American
+National Standard for Ambulatory electrocardiographs and ANSI/AAMI EC57:1998,
+the American National Standard for Testing and reporting performance results of
+cardiac rhythm and ST segment measurement algorithms;  both standards are
+available from AAMI, 1110 N Glebe Road, Suite 220, Arlington, VA 22201 USA
+(http://www.aami.org/).  The relevant provisions of these standards are
+described in file `eval.tex', and information about using this program is
+contained in file `epicmp.1' (both of these files are included in the
+'doc/wag-src/' directory of the WFDB Software Package).
 
-The -f and -t options modify the comparison algorithm used by epic in ways
+The -f and -t options modify the comparison algorithm used by epicmp in ways
 not permitted by these standards.  These options are provided for the use of
 developers, who may find them useful for obtaining a more detailed
 understanding of algorithm errors.
@@ -66,40 +66,40 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-    void epic(), init(), print_results(), stdc();
+    void epicmp(), init(), print_results(), stdc();
 
     /* Read and interpret command-line arguments. */
     init(argc, argv);
 
     if (aflag) {
-	epic(0, AFE);		/* check AF Se */
-	epic(1, AFE);		/* check AF +P */
+	epicmp(0, AFE);		/* check AF Se */
+	epicmp(1, AFE);		/* check AF +P */
 	print_results(AFE);	/* print AF statistics */
     }
 
     if (vflag) {
-	epic(0, VFE);		/* check VF Se */
-	epic(1, VFE);		/* check VF +P */
+	epicmp(0, VFE);		/* check VF Se */
+	epicmp(1, VFE);		/* check VF +P */
 	print_results(VFE);	/* print VF statistics */
     }
 
     if (s0flag) {
-	epic(0, ST0E);		/* check signal 0 ischemic ST Se */
-	epic(1, ST0E);		/* check signal 0 ischemic ST +P */
+	epicmp(0, ST0E);	/* check signal 0 ischemic ST Se */
+	epicmp(1, ST0E);	/* check signal 0 ischemic ST +P */
 	stdc(0);	       	/* check signal 0 ST deviation measurements */
 	print_results(ST0E);	/* print signal 0 ischemic ST statistics */
     }
 
     if (s1flag) {
-	epic(0, ST1E);		/* check signal 1 ischemic ST Se */
-	epic(1, ST1E);		/* check signal 1 ischemic ST +P */
+	epicmp(0, ST1E);	/* check signal 1 ischemic ST Se */
+	epicmp(1, ST1E);	/* check signal 1 ischemic ST +P */
 	stdc(1);	       	/* check signal 1 ST deviation measurements */
 	print_results(ST1E);	/* print signal 1 ischemic ST statistics */
     }
 
     if (sflag) {
-	epic(0, STE);		/* check two-signal ischemic ST Se */
-	epic(1, STE);		/* check two-signal ischemic ST +P */
+	epicmp(0, STE);		/* check two-signal ischemic ST Se */
+	epicmp(1, STE);		/* check two-signal ischemic ST +P */
 	stdc(2);	       	/* check all ST deviation measurements */
 	print_results(STE);	/* print two-signal ischemic ST statistics */
     }
@@ -118,7 +118,7 @@ long ref_duration, test_duration, STP, FN, PTP, FP;
 WFDB_Anninfo an[2];
 
 /* Perform an episode-by-episode comparison. */
-void epic(stat, type)
+void epicmp(stat, type)
 unsigned int stat, type;
 {
     int i;

@@ -1,5 +1,5 @@
 # file: linux-slib.def		G. Moody	31 May 2000
-#                               Last revised: 17 December 2001
+#                               Last revised: 21 November 2002
 # This section contains settings suitable for generating an ELF-format shared
 # library under Linux.
 
@@ -68,6 +68,10 @@ WFDBLIB = $(WFDBLIB_SONAME).$(MINOR)
 # make up the library will be appended to BUILDLIB.
 BUILDLIB = gcc -shared -Wl,-soname,$(WFDBLIB_SONAME) `$(LWC) --libs` \
  -o $(WFDBLIB)
+
+# BUILDLIB_LDFLAGS is a list of arguments appended to BUILDLIB following
+# the list of *.o files (for most platforms, BUILDLIB_LDFLAGS is empty).
+BUILDLIB_LDFLAGS =
 
 # LDCONFIG is the name of the program needed to refresh the system's cached
 # index of shared libraries.
