@@ -1,5 +1,5 @@
 /* file: sample.c	G. Moody	10 January 1991
-			Last revised:  14 November 2002
+			Last revised:  30 November 2002
 
 -------------------------------------------------------------------------------
 sample: digitize or play back signals on a PC using a Microstar DAP board
@@ -64,7 +64,7 @@ option, add `oldnames' as a final command-line argument, to link a library
 containing aliases for functions such as open(), which have been renamed in
 the standard MSC 7.0 library to conform with ANSI namespace rules.
 
-Refer to `../doc/sample.1' for further information.  */
+Refer to `../doc/wag-src/sample.1' for further information.  */
 
 #include <stdio.h>
 #include <fcntl.h>
