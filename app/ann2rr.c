@@ -1,8 +1,8 @@
 /* file: ann2rr.c		G. Moody	 16 May 1995
-				Last revised:  19 February 2001
+				Last revised:  15 January 2002
 -------------------------------------------------------------------------------
 ann2rr: Calculate RR intervals from an annotation file
-Copyright (C) 2000 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -44,7 +44,7 @@ char *argv[];
 {
     char *record = NULL, *prog_name();
     double sps, spm, sph, rrsec;
-    int cflag=0, i, j, pflag=0, previous_annot_valid=0, vflag=0, xflag=0;
+    int cflag=0, i, j, pflag=0, previous_annot_valid=0, tformat=0, vflag=0;
     long beat_number = 0L, from = 0L, to = 0L, rr, tp = 0L, atol();
     static char flag[ACMAX+1];
     static WFDB_Anninfo ai;
@@ -114,15 +114,14 @@ char *argv[];
 	    }
 	    to = i;
 	    break;
-	  case 'v':	/* verbose mode: include time as well as RR */
-	    vflag = 1;
-	    break;
-	  case 'x':	/* use alternate time format */
+	  case 'v':	/* output times of beginnings of intervals */
+	  case 'V':	/* output times of ends of intervals */
+	    vflag = (*(argv[i]+1) == 'v') ? 1 : -1;
 	    switch (*(argv[i]+2)) {
-	      case 'h': xflag = 3; break;
-	      case 'm': xflag = 2; break;
-	      case 's':
-	      default:  xflag = 1; break;
+	      case 'h': tformat = 3; break;	/* use hours */
+	      case 'm': tformat = 2; break;	/* use minutes */
+	      case 's': tformat = 1; break;	/* use seconds */
+	      default:  tformat = 0; break;	/* use sample intervals */
 	    }
 	    break;
 	  default:
@@ -177,16 +176,17 @@ char *argv[];
 	    if (cflag == 0 || previous_annot_valid == 1) {
 		rr = annot.time - tp;
 		if (vflag) {	/* print elapsed time */
-		  switch (xflag) {
+		    long tt = (vflag > 0) ? tp : annot.time;
+		  switch (tformat) {
 		    default:
-		    case 0: (void)printf("%ld\t", annot.time); break;
-		    case 1: (void)printf("%.3lf\t", annot.time/sps); break;
-		    case 2: (void)printf("%.3lf\t", annot.time/spm); break;
-		    case 3: (void)printf("%.3lf\t", annot.time/sph); break;
+		    case 0: (void)printf("%ld\t", tt); break;
+		    case 1: (void)printf("%.3lf\t", tt/sps); break;
+		    case 2: (void)printf("%.5lf\t", tt/spm); break;
+		    case 3: (void)printf("%.7lf\t", tt/sph); break;
 		  }
 		}	
 		/* print RR interval */
-		if (xflag) (void)printf("%.3lf\n", rr/sps);
+		if (tformat) (void)printf("%.3lf\n", rr/sps);
 		else (void)printf("%ld\n", rr);
 	    }
 	    tp = annot.time;
@@ -223,17 +223,22 @@ char *s;
 static char *help_strings[] = {
  "usage: %s -r RECORD -a ANNOTATOR [OPTIONS ...]\n",
  "where RECORD and ANNOTATOR specify the input, and OPTIONS may include:",
- " -c       print intervals between consecutive valid annotations only",
- " -f TIME  start at specified TIME",
- " -h       print this usage summary",
- " -p TYPE [TYPE ...]  print intervals between annotations of specified TYPEs",
- "                      only",
- " -t TIME  stop at specified TIME",
- " -v       print elapsed times as well as RR intervals",
- " -x       use alternate format (times and RR intervals in seconds)",
- " -xh      use alternate format (times in hours, RR intervals in seconds)",
- " -xm      use alternate format (times in minutes, RR intervals in seconds)",
- " -xs      same as -x",
+ " -c      print intervals between consecutive valid annotations only",
+ " -f TIME start at specified TIME",
+ " -h      print this usage summary",
+ " -p TYPE [TYPE ...]  print intervals ending with annotations of specified",
+ "                      TYPEs only (use mnemonics such as N or V for TYPE)",
+ " -t TIME stop at specified TIME",
+ "The output contains the RR intervals (in units of sample intervals) only,",
+ "unless one of the additional options below is used:",
+ " -v      print times of beginnings of intervals before each interval",
+ " -vh     same as -v, but print times in hours and RR intervals in seconds",
+ " -vm     same as -v, but print times in minutes and RR intervals in seconds",
+ " -vs     same as -v, but print times and RR intervals in seconds",
+ " -V      print times of ends of intervals before each interval",
+ " -Vh     same as -V, but print times in hours and RR intervals in seconds",
+ " -Vm     same as -V, but print times in minutes and RR intervals in seconds",
+ " -Vs     same as -V, but print times and RR intervals in seconds",
 NULL
 };
 

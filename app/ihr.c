@@ -1,9 +1,9 @@
 /* file ihr.c		G. Moody      12 November 1992
-			Last revised: 27 November 2001
+			Last revised: 15 January 2002
 
 -------------------------------------------------------------------------------
 ihr: Generate instantaneous heart rate data from annotation file
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -44,14 +44,17 @@ int argc;
 char *argv[];
 {
     char *record = NULL, *prog_name();
-    double ihr, ihrlast, mhr = 70., sps, tol = 10.0, atof(), fabs();
-    int i, j, lastann = NOTQRS, lastint = 1, xflag = 0;
+    double ihr, ihrlast, mhr = 70.0, sph, spm, sps, tol = 10.0, atof(), fabs();
+    int i, j, lastann = NOTQRS, last2ann = NOTQRS, tformat = 1, vflag = 1,
+	xflag = 0, lastint = 1, thisint = 0;
     long from = 0L, to = 0L, lasttime = -9999L;
+    static char flag[ACMAX+1];
     static WFDB_Anninfo ai;
     WFDB_Annotation annot;
     void help();
 
     pname = prog_name(argv[0]);
+    flag[0] = 1;
 
     /* Interpret command-line options. */
     for (i = 1; i < argc; i++) {
@@ -84,6 +87,29 @@ char *argv[];
 	    help();
 	    exit(0);
 	    break;
+	  case 'i':	/* include intervals bounded by any QRS annotations */
+	    for (j = 0; j <= ACMAX; j++)
+		flag[j] = isqrs(j);
+	    break;
+	  case 'p':	/* include intervals bounded by specific annotations
+			   only; annotation mnemonic(s) follow */
+	    if (++i >= argc || !isann(j = strann(argv[i]))) {
+		(void)fprintf(stderr,
+			      "%s: annotation mnemonic(s) must follow -p\n",
+			      pname);
+		exit(1);
+	    }
+	    flag[j] = 1;
+	    /* The code above not only checks that there is a mnemonic where
+	       there should be one, but also allows for the possibility that
+	       there might be a (user-defined) mnemonic beginning with `-'.
+	       The following lines pick up any other mnemonics, but assume
+	       that arguments beginning with `-' are options, not mnemonics. */
+	    while (++i < argc && argv[i][0] != '-')
+		if (isann(j = strann(argv[i]))) flag[j] = 1;
+	    if (i == argc || argv[i][0] == '-') i--;
+	    flag[0] = 0;
+	    break;
 	  case 'r':	/* input record name follows */
 	    if (++i >= argc) {
 		(void)fprintf(stderr,
@@ -100,7 +126,19 @@ char *argv[];
 	    }
 	    to = i;
 	    break;
-	  case 'x':	/* exclude intervals adjacent to abnormal beats */
+	  case 'V':	/* output times of ends of intervals */
+	      vflag = -1;
+	      /* no 'break': fall through case 'v' */
+	  case 'v':	/* output times of beginnings of intervals */
+	    switch (*(argv[i]+2)) {
+	      case 'h': tformat = 3; break;	/* use hours */
+	      case 'm': tformat = 2; break;	/* use minutes */
+	      case 's': tformat = 1; break;	/* use seconds */
+	      default:  tformat = 0; break;	/* use sample intervals */
+	    }
+	    break;
+	  case 'x':	/* exclude intervals following those adjacent to
+			   excluded beats */
 	    xflag = 1;
 	    break;
 	  default:
@@ -121,6 +159,8 @@ char *argv[];
 
     if ((sps = sampfreq(record)) < 0.)
 	(void)setsampfreq(sps = WFDB_DEFFREQ);
+    spm = 60.0*sps;
+    sph = 60.0*spm;
 
     ai.stat = WFDB_READ;
     if (annopen(record, &ai, 1) < 0) /* open annotation file */
@@ -129,32 +169,37 @@ char *argv[];
     if (from && iannsettime(strtim(argv[(int)from])) < 0) exit(2);
     if (to) to = strtim(argv[(int)to]);
 
+    if (flag[0])    /* neither -i nor -p used -- include only normal beats */
+	for (j = 0; j <= ACMAX; j++)
+	    flag[j] = (map1(j) == NORMAL);
+
     while (getann(0, &annot) == 0 && (to == 0L || annot.time <= to)) {
-	if (!isqrs(annot.anntyp)) continue;
-	if (map1(annot.anntyp) == NORMAL) {
+	if (flag[annot.anntyp]) {
 	    ihr = sps*60./(annot.time - lasttime);
 	    mhr += (ihr - mhr)/10.;
-	    if (lastann == NORMAL &&
-		fabs(ihr - ihrlast) < tol &&
-		fabs(ihr - mhr) < tol) {
-		if (xflag) {
-		    if (lastint == 0)
-			(void)printf("%g %g\n", lasttime/sps, ihr);
+	    if (flag[lastann] && fabs(ihr-ihrlast)<tol && fabs(ihr-mhr)<tol) {
+		if (flag[last2ann] || !xflag) {
+		    long tt = (vflag > 0) ? lasttime : annot.time;
+		    switch (tformat) {
+		      case 0: (void)printf("%ld\t", tt); break;
+		      default:
+		      case 1: (void)printf("%.3lf\t", tt/sps); break;
+		      case 2: (void)printf("%.5lf\t", tt/spm); break;
+		      case 3: (void)printf("%.7lf\t", tt/sph); break;
+		    }
+		    if (xflag) (void)printf("%g\n", ihr);
+		    else (void)printf("%g\t%d\n", ihr, lastint);
+		    thisint = 0;
 		}
-		else
-		    (void)printf("%g %g %d\n", lasttime/sps, ihr, lastint);
-		lastint = 0;
 	    }
-	    else
-		lastint = 1;
-	    lastann = NORMAL;
-	    lasttime = annot.time;
 	    ihrlast = ihr;
 	}
-	else {
-	    lastint = 1;
-	    lastann = NOTQRS;
-	}
+	else if (!isqrs(annot.anntyp)) continue;
+	last2ann = lastann;
+	lastann = annot.anntyp;
+	lasttime = annot.time;
+	lastint = thisint;
+	thisint = 1;
     }
     exit(0);			/*NOTREACHED*/
 }
@@ -180,13 +225,31 @@ char *s;
 }
 
 static char *help_strings[] = {
-    "usage: %s -r RECORD -a ANNOTATOR [OPTIONS ...]\n",
-    "where RECORD and ANNOTATOR specify the input, and OPTIONS may include:",
-    " -d TOL   reject beat-to-beat HR changes > TOL bpm (default: TOL = 10)",
-    " -f TIME  start at specified TIME",
-    " -h       print this usage summary",
-    " -t TIME  stop at specified TIME",
-    " -x       exclude intervals adjacent to abnormal beats",
+ "usage: %s -r RECORD -a ANNOTATOR [OPTIONS ...]\n",
+ "where RECORD and ANNOTATOR specify the input, and OPTIONS may include:",
+ " -d TOL   reject beat-to-beat HR changes > TOL bpm (default: TOL = 10)",
+ " -f TIME  start at specified TIME",
+ " -h       print this usage summary",
+ " -i       include intervals bounded by any QRS annotations",
+ " -p TYPE [ TYPE ... ]  include intervals bounded by annotations of listed",
+ "                        TYPEs only",
+ " -t TIME  stop at specified TIME",
+ " -x       exclude intervals adjacent to abnormal beats",
+ "Each line of output contains data derived from a single interbeat interval:",
+ "  * Elapsed time (in seconds) from the beginning of the record to the",
+ "    beginning of the interval (may be modified by -v or -V options below)",
+ "  * Instantaneous heart rate (in beats per minute)",
+ "  * Interval type (1 if the interval was bounded by normal beats, otherwise
+      0 (this column does not appear in the output if the -x option is used)",
+ "Use one of the following options to modify the format of the first column:",
+ " -v       print times of beginnings of intervals as sample numbers",
+ " -vh      same as -v, but print times in hours",
+ " -vm      same as -v, but print times in minutes",
+ " -vs      same as -v, but print times in seconds [default]",
+ " -V       print times of ends of intervals as sample numbers",
+ " -Vh      same as -V, but print times in hours",
+ " -Vm      same as -V, but print times in minutes",
+ " -Vs      same as -V, but print times in seconds",
     NULL
 };
 

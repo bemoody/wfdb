@@ -1,4 +1,4 @@
-.TH ANN2RR 1 "19 February 2001" "WFDB software 10.2" "WFDB applications"
+.TH ANN2RR 1 "15 January 2002" "WFDB software 10.2.4" "WFDB applications"
 .SH NAME
 ann2rr, rr2ann \- convert annotation files to interval lists and vice versa
 .SH SYNOPSIS
@@ -39,22 +39,16 @@ file may define such mnemonics).
 \fB-t\fI time\fR
 Stop at the specified \fItime\fR.
 .TP
-\fB-v\fR
-Print elapsed times as well as intervals.
-.TP
-\fB-x\fR
-.TP
-\fB-xs\fR
-Use an alternate time format for output (times and intervals in seconds
-rather than sample intervals).
-.TP
-\fB-xh\fR
-Use a different alternate format (times in hours, intervals in seconds).
-.TP
-\fB-xm\fR
-Use a different alternate format (times in minutes, intervals in seconds).
-
-
+\fB-v\fR, \fB-vs\fR, \fB-vm\fR, \fB-vh\fR, \fB-V\fR, \fB-Vs\fR, \fB-Vm\fR, \fB-Vh\fR
+Print the elapsed times from the beginning of the record to the annotations
+that begin each interval, as sample number (using \fB-v\fR), or in seconds
+(using \fB-vs\fR), minutes (using \fB-vm\fR), or hours (using \fB-vh\fR)
+before each heart rate value.  The options \fB-V\fR, \fB-Vs\fR, \fB-Vm\fR, and
+\fB-Vh\fR work in the same way, but the printed times are those for the
+annotations that end the intervals.  Only one of these options can be used at
+a time;  if none is chosen, only the RR intervals are printed, in units of
+sample intervals.  When using \fB-vs\fR, \fB-vm\fR, \fB-vh\fR, \fB-Vs\fR,
+\fB-Vm\fR, or \fB-Vh\fR, intervals are printed in units of seconds.
 .PP
 The \fB-c\fR option, used without the \fB-p\fR option, causes \fBann2rr\fR to
 filter out intervals between beats that have intervening non-beat annotations,

@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:  18 December 2001
+#				Last revised:  15 January 2002
 # This section of the Makefile should not need to be changed.
 
 # ARCH specifies the type of CPU and the operating system (e.g., 'i686-Linux').
@@ -130,6 +130,8 @@ RPMRELEASE=1
 
 rpms:		tarballs
 	cp -p ../$(PACKAGE).tar.gz $(RPMROOT)/SOURCES
+	sed s/VERSION/$(VERSION)/ <wfdb.spec | \
+	 sed s/RPMRELEASE/$(RPMRELEASE)/ >$(PACKAGE)-$(RPMRELEASE).spec
 	cp -p $(PACKAGE)-$(RPMRELEASE).spec $(RPMROOT)/SPECS
 	rpm -ba $(PACKAGE)-$(RPMRELEASE).spec
 	mv $(RPMROOT)/RPMS/*/$(PACKAGE)-$(RPMRELEASE).*.rpm ..

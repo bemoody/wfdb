@@ -1,10 +1,10 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised:   17 December 2001	wfdblib 10.2.4
+			Last revised:   15 January 2002	wfdblib 10.2.5
 WFDB library type, constant, structure, and function interface definitions
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -33,7 +33,7 @@ _______________________________________________________________________________
 /* WFDB library version. */
 #define WFDB_MAJOR   10
 #define WFDB_MINOR   2
-#define WFDB_RELEASE 4
+#define WFDB_RELEASE 5
 #define WFDB_NETFILES 1	/* if 1, library includes code for HTTP, FTP clients */
 
 /* Determine what type of compiler is being used. */

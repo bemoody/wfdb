@@ -1,10 +1,10 @@
 Summary: Waveform Database library and applications
 Name: wfdb
-Version: 10.2.4
-Release: 1
+Version: VERSION
+Release: RPMRELEASE
 Copyright: GPL
 Group: Applications/Engineering
-Source: http://www.physionet.org/physiotools/archives/wfdb-10.2.4.tar.gz
+Source: http://www.physionet.org/physiotools/archives/wfdb-VERSION.tar.gz
 URL: http://www.physionet.org/physiotools/wfdb.shtml
 Packager: George Moody <george@mit.edu>
 Requires: w3c-libwww >= 5.2
