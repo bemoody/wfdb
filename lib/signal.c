@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  28 February 2001		wfdblib 10.1.6
+			Last revised:   17 July 2001		wfdblib 10.1.6
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -242,11 +242,29 @@ WFDB_Siginfo *siarray;
 	segments = atoi(q+1);
 	*q = '\0';
     }
+
+    /* For local files, be sure that the name (p) within the header file
+       matches the name (record) provided as an argument to this function --
+       if not, the header file may have been renamed in error or its contents
+       may be corrupted.  The requirement for a match is waived for remote
+       files since the user may not be able to make any corrections to them. */
     if (iheader->type == WFDB_LOCAL &&
 	iheader->fp != stdin && strcmp(p, record) != 0) {
-	wfdb_error("init: record name in record %s header is incorrect\n",
-		 record);
-	return (-2);
+	/* If there is a mismatch, check to see if the record argument includes
+	   a directory separator (whether valid or not for this OS);  if so,
+	   compare only the final portion of the argument against the name in
+	   the header file. */
+	char *r, *s;
+
+	for (r = record, s = r + strlen(r) - 1; r != s; s--)
+	    if (*s == '/' || *s == '\\' || *s == ':')
+		break;
+
+	if (r > s || strcmp(p, s+1) != 0) {
+	    wfdb_error("init: record name in record %s header is incorrect\n",
+		       record);
+	    return (-2);
+	}
     }
 
     /* Identify which type of header file is being read by trying to get
