@@ -1,5 +1,5 @@
 /* file: xvwave.c	G. Moody	 27 April 1990
-			Last revised:  14 November 2002
+			Last revised:  4 December 2002
 XView support functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -112,7 +112,7 @@ int height;
     /* Recalibrate based on selected scales, clear the display list cache. */
     if (*record) {
 	set_baselines();
-	alloc_sigdata(2);
+	alloc_sigdata(nsig > 2 ? nsig : 2);
 	dismiss_mode();	/* read and set user-selected scales, if any */
 
 	vscale[0] = 0.;	/* force clear_cache() -- see calibrate() */

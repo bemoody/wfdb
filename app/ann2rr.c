@@ -1,5 +1,5 @@
 /* file: ann2rr.c		G. Moody	 16 May 1995
-				Last revised:  1 November 2002
+				Last revised:  5 December 2002
 -------------------------------------------------------------------------------
 ann2rr: Calculate RR intervals from an annotation file
 Copyright (C) 2002 George B. Moody
@@ -128,6 +128,11 @@ char *argv[];
 	  case 'w':	/* output annotation types following intervals */
 	    wflag = 1;
 	    break;
+	  case 'W':  /* output annotation types following intervals in sec */
+	    wflag = 1;
+	    if (vflag == 0) vflag = 1;
+	    if (tformat == 0) tformat = -1;
+	    break;
 	  default:
 	    (void)fprintf(stderr, "%s: unrecognized option %s\n",
 			  pname, argv[i]);
@@ -179,25 +184,39 @@ char *argv[];
 	if (!isann(annot.anntyp)) continue;
 	if ((flag[0] && isqrs(annot.anntyp)) || flag[annot.anntyp]) {
 	    if (cflag == 0 || previous_annot_valid == 1) {
-		rr = annot.time - tp;
-		if (vflag) {	/* print elapsed time */
+		if (vflag) {	/* print elapsed time if requested */
 		    long tt = (vflag > 0) ? tp : annot.time;
-		  switch (tformat) {
-		    default:
-		    case 0: (void)printf("%ld\t", tt); break;
-		    case 1: (void)printf("%.3lf\t", tt/sps); break;
-		    case 2: (void)printf("%.5lf\t", tt/spm); break;
-		    case 3: (void)printf("%.7lf\t", tt/sph); break;
-		  }
+		    switch (tformat) {
+		      default:
+		      case 0: (void)printf("%ld\t", tt); break;
+		      case 1: (void)printf("%.3lf\t", tt/sps); break;
+		      case 2: (void)printf("%.5lf\t", tt/spm); break;
+		      case 3: (void)printf("%.7lf\t", tt/sph); break;
+		      case -1: break;
+		    }
 		}	
 		/* print RR interval */
-		if (tformat) (void)printf("%.3lf", rr/sps);
-		else (void)printf("%ld", rr);
+		rr = annot.time - tp;
+		if (tformat) {
+		    char rrstr[10];
+		    static double frr, t = 0.0;
+
+		    (void)sprintf(rrstr, "%.3lf", rr/sps);
+		    (void)printf("%s", rrstr);
+		    sscanf(rrstr, "%lf", &frr);
+		    t += frr * sps;
+		    tp = (long)(t + 0.5);
+		}
+		else {
+		    (void)printf("%ld", rr);
+		    tp = annot.time;
+		}
 		/* print annotation type if requested */
 		if (wflag) (void)printf("\t%s", annstr(annot.anntyp));
 		printf("\n");
 	    }
-	    tp = annot.time;
+	    else
+		tp = annot.time;
 	    previous_annot_valid = 1;
 	}
 	else if (cflag)
@@ -247,7 +266,8 @@ static char *help_strings[] = {
  " -Vh     same as -V, but print times in hours and RR intervals in seconds",
  " -Vm     same as -V, but print times in minutes and RR intervals in seconds",
  " -Vs     same as -V, but print times and RR intervals in seconds",
- " -w      print annotation types following intervals",
+ " -w      print annotation types following intervals (in sample intervals)",
+ " -W      print annotation types following intervals (in seconds)",
 NULL
 };
 

@@ -1,4 +1,4 @@
-.TH EDF2MIT 1  "2 November 2002" "WFDB 10.3.1" "WFDB Applications Guide"
+.TH EDF2MIT 1  "4 December 2002" "WFDB 10.3.1" "WFDB Applications Guide"
 .SH NAME
 edf2mit, mit2edf \- convert between EDF and MIT formats
 .SH SYNOPSIS
@@ -54,6 +54,25 @@ transducer type or the prefiltering specification; these parameters are
 not preserved by these conversion programs.  Also note that use of the standard
 signal and unit names specified for EDF is permitted but not enforced by
 \fBmit2edf\fR.
+
+.PP
+Many EDF files contain signals at widely varying sampling frequencies.
+\fBedf2mit\fR handles these properly, but the default behavior of most
+WFDB applications is to read such data in low-resolution mode (in which
+all signals are resampled at the lowest sampling frequency used for any
+signal in the record).  This is almost certainly not what you want if, for
+example, the record contains EEG signals sampled at 200 Hz and body temperature
+sampled at 1 Hz;  by default, applications such as \fBrdsamp\fR and \fBwave\fR
+will resample the EEGs (and any other signals in the record) at 1 Hz.  To
+avoid this behavior, you can use the \fB-H\fR (high resolution) option provided
+by \fBrdsamp\fR, \fBwave\fR, and a few other WFDB applications, or you can
+set the environment variable \fBWFDBGVMODE\fR to 1 (or any non-zero value) to
+specify that signals are to be read in high-resolution mode (in which all
+signals are resampled at the highest frequency used for any signal in the
+record).  Setting \fBWFDBGVMODE\fR works with all WFDB applications, not only
+those that support the \fB-H\fR option.  For further information, see the
+section titled "Multi-Frequency Records" in chapter 5 of
+the \fIWFDB Programmer's Guide\fR.
 
 .SH ENVIRONMENT
 .PP

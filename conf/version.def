@@ -5,7 +5,7 @@
 MAJOR = 10
 MINOR = 3
 RELEASE = 1
-VERSION = $(MAJOR).$(MINOR).$(RELEASE)pre2
+VERSION = $(MAJOR).$(MINOR).$(RELEASE)
 
 # RPMRELEASE can be incremented if changes are made between official
 # releases.  It should be reset to 1 whenever the VERSION is changed.

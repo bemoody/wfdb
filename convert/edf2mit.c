@@ -1,5 +1,5 @@
-/* file: edf2mit.c		G. Moody	16 October 1996
-				Last revised:  14 November 2002
+/* file: edf2mit.c		G. Moody       16 October 1996
+				Last revised:  4 December 2002
 
 -------------------------------------------------------------------------------
 Convert EDF (European Data Format) file to MIT format header and signal files
@@ -37,8 +37,9 @@ char **argv;
     char buf[81], record[WFDB_MAXRNL+1], **vi, **vin;
     double *sigpmax, *sigpmin, *sampfreq, spr, sps;
     FILE *ifile = NULL;
-    int big_endian = 0, fpb, h, i, j, k, l, nsig, nosig = 0, *siglist, *spb,
-	tspb = 0, tspf = 0, vflag = 0, day, month, year, hour, minute, second;
+    int big_endian = 0, fpb, h, i, j, k, l, nsig, nosig = 0, *siglist = NULL,
+	*spb, tspb = 0, tspf = 0, vflag = 0,
+	day, month, year, hour, minute, second;
     long adcrange, *sigdmax, *sigdmin;
     WFDB_Sample *vo, *vout;
     WFDB_Siginfo *si, *so;

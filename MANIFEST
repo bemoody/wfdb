@@ -45,6 +45,7 @@ app/sumstats.c
 app/tach.c
 app/view.c
 app/vsetup.c
+app/wabp.c
 app/wfdbcat.c
 app/wfdbcollate.c
 app/wfdb-config.c
@@ -310,6 +311,7 @@ doc/wag-src/sumstats.1
 doc/wag-src/tach.1
 doc/wag-src/tmac.dif
 doc/wag-src/view.1
+doc/wag-src/wabp.1
 doc/wag-src/wag.cover
 doc/wag-src/wag.ht0
 doc/wag-src/wag.ht1

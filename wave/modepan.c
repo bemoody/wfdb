@@ -1,10 +1,10 @@
 /* file: modepan.c	G. Moody        30 April 1990
-			Last revised:	29 April 1999
+			Last revised:  5 December 2002
 Mode panel functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -68,7 +68,8 @@ Event *event;
 int mode_popup_active = -1;
 char *tchoice[] = {"0.25 mm/min", "1 mm/min", "5 mm/min", "25 mm/min",
     "50 mm/min", "125 mm/min", "250 mm/min", "500 mm/min",
-    "12.5 mm/sec", "25 mm/sec", "50 mm/sec", "125 mm/sec", "250 mm/sec" };
+    "12.5 mm/sec", "25 mm/sec", "50 mm/sec", "125 mm/sec", "250 mm/sec",
+    "500 mm/sec", "1000 mm/sec"};
 char *vchoice[] = { "1 mm/mV", "2.5 mm/mV", "5 mm/mV", "10 mm/mV", "20 mm/mV",
    "40 mm/mV", "100 mm/mV" };
 
@@ -102,7 +103,8 @@ void create_mode_popup()
 	PANEL_CHOICE_STRINGS,
 	      tchoice[0], tchoice[1], tchoice[2], tchoice[3], tchoice[4],
 	      tchoice[5], tchoice[6], tchoice[7], tchoice[8], tchoice[9],
-	      tchoice[10],tchoice[11],tchoice[12], NULL,
+	      tchoice[10],tchoice[11],tchoice[12],tchoice[13],tchoice[14],
+	      NULL,
 	PANEL_VALUE, DEF_TSA_INDEX,
 	PANEL_DEFAULT_VALUE, DEF_TSA_INDEX,
 	0);
@@ -259,7 +261,7 @@ void set_modes()
        small displays, or if the frame has been resized to a small size),
        the calculated widths in seconds are usually integers, at worst
        expressible as an integral number of tenths of seconds. */
-    if ((i = xv_get(ts_item, PANEL_VALUE)) >= 0 && i < 13) {
+    if ((i = xv_get(ts_item, PANEL_VALUE)) >= 0 && i < 15) {
 	int u = ((int)(canvas_width/dmmx(1) + 1)/5);	/* number of 5 mm
 							   time-grid units */
 	switch (tsa_index = i) {
@@ -301,7 +303,13 @@ void set_modes()
 	    canvas_width_sec = u / 25; break;
 	  case 12:	/* 250 mm/sec */
 	    mmpersec = 250.;
-	    canvas_width_sec = u / 50; break;
+	    canvas_width_sec = u / 50.0; break;
+	  case 13:	/* 500 mm/sec */
+	    mmpersec = 500.;
+	    canvas_width_sec = u / 100.0; break;
+	  case 14:	/* 1000 mm/sec */
+	    mmpersec = 1000.;
+	    canvas_width_sec = u / 200.0; break;
 	}
     }
 

@@ -1,3 +1,22 @@
+10.3.1:
+	Added a -W option to ann2rr to create 2-column output containing
+	intervals in seconds and annotation mnemonics, and modified the
+	interval calculations to avoid accumulated roundoff error.
+
+	Fixed a bug that caused WAVE to crash when the main window was
+	resized if the open record had 3 or more signals, and added two
+	high-resolution time scales in modepan.c.
+
+	Fixed a bug in edf2mit that caused crashes when using the -s option,
+	and another bug in mit2edf that caused crashes when converting a
+	record with a frame rate of less than 1 Hz.  Thanks to Jesus Olivan
+	for reporting these problems and for providing test cases that were
+	helpful in developing and testing the fixes.
+
+	Wei Zong has contributed an arterial blood pressure pulse detector
+	for continuous ABP signals, which has been added to the package
+	(see wabp).
+
 10.3.0:
 	The WFDB Software Package has been ported to MacOS/X (Darwin),
 	version 10.2 (the port should also work under 10.1 but this

@@ -1,7 +1,7 @@
-/* file: wqrs.c		Wei Zong      23 October 1998
-			Last revised:  % December 2002 (by W.Zong and G. Moody)
+/* file wabp.c          Wei Zong      23 October 1998
+                     Last revised: 5 December 2002 (by W. Zong and G. Moody)
 -----------------------------------------------------------------------------
-wqrs: Single-lead QRS detector based on length transform
+wabp: beat detector for arterial blood presure (ABP) signal
 Copyright (C) 2002 Wei Zong
 
 This program is free software; you can redistribute it and/or modify it under
@@ -22,96 +22,71 @@ You may contact the author by e-mail (wzong@mit.edu) or postal mail
 please visit PhysioNet (http://www.physionet.org/).
 ------------------------------------------------------------------------------
 
-This program analyzes an ECG signal, detecting QRS onsets and J-points, using
-a nonlinearly-scaled ECG curve length feature.  This version has been optimized
-for ECGs sampled at 125 Hz, but it can analyze ECGs sampled at any frequency
-using on-the-fly resampling provided by the WFDB library.
+This program detects heart beats (pulse waveforms) in a continuous arterial
+blood pressure (ABP) signal.  This version of wabp works best with ABP signals
+sampled at 125 Hz, but it can analyze ABPs sampled at any frequency
+using on-the-fly resampling provided by the WFDB library.  'wabp' has been
+optimized for adult human  ABPs. For other ABPs, it may be necessary to
+experiment with the input sampling frequency and the time constants indicated
+below.
 
-`wqrs' can process records containing any number of signals, but it uses only
-one signal for QRS detection (signal 0 by default;  this can be changed using
-the `-s' option, see below).  'wqrs' has been optimized for adult human ECGs.
-For other ECGs, it may be necessary to experiment with the input sampling
-frequency and the time constants indicated below.
+`wabp' can process records containing any number of signals, but it uses only
+one signal for ABP pulse detection (by default, the lowest-numbered signal
+labelled `ABP', `ART', or `BP';  this can be changed using the `-s' option, see
+below).
 
 To compile this program under GNU/Linux, MacOS/X, MS-Windows, or Unix, use gcc:
-	gcc -o wqrs wqrs.c -lwfdb -lm
-You must have installed the WFDB library, available at	
-	http://www.physionet.org/physiotools/wfdb.shtml
+        gcc -o wabp wabp.c -lwfdb
+You must have installed the WFDB library, available at  
+        http://www.physionet.org/physiotools/wfdb.shtml
 gcc is standard with GNU/Linux and is available for other platforms from:
-	http://www.gnu.org/		(sources and Unix binaries)
-	http://fink.sourceforge.net	(Mac OS/X only)
-	http://www.cygwin.com/   	(MS-Windows only)
-	
+        http://www.gnu.org/             (sources and Unix binaries)
+        http://fink.sourceforge.net     (Mac OS/X only)
+        http://www.cygwin.com/          (MS-Windows only)
+        
 For a usage summary, see the help text at the end of this file.  The input
 record may be in any of the formats readable by the WFDB library, and it may
 be anywhere in the WFDB path (in a local directory or on a remote web or ftp
-server).  The output of 'wqrs' is an annotation file named RECORD.wqrs (where
+server).  The output of 'wabp' is an annotation file named RECORD.wabp (where
 RECORD is replaced by the name of the input record).  Within the output
-annotation file, the time of each NORMAL annotation marks a QRS onset;  if
-the '-j' option is used, additional JPT annotations mark the J points (the
-ends of the QRS complexes).  During the learning period (the first LPERIOD
-samples), LEARN annotations are used instead of NORMAL annotations, and there
-are no JPT annotations.
-
-For example, to mark QRS complexes in record 100 beginning 5 minutes from the
-start, ending 10 minutes and 35 seconds from the start, and using signal 1, use
-the command:
-    wqrs -r 100 -f 5:0 -t 10:35 -s 1
-The output may be read using (for example):
-    rdann -a wqrs -r 100
-To evaluate the performance of this program, run it on the entire record, by:
-    wqrs -r 100
-and then compare its output with the reference annotations by:
-    bxb -r 100 -a atr wqrs
+annotation file, the time of each NORMAL annotation marks an ABP pulse wave
+onset.
 */
 
 #include <stdio.h>
-#include <math.h>
 #include <wfdb/wfdb.h>
 #include <wfdb/ecgcodes.h>
-#include <wfdb/ecgmap.h>
 
-#define BUFLN   4096	/* must be a power of 2, see ltsamp() */
+#define BUFLN   4096	/* must be a power of 2, see slpsamp() */
 #define EYE_CLS 0.25    /* eye-closing period is set to 0.25 sec (250 ms) */ 
 #define LPERIOD 1000	/* learning period is the first LPERIOD samples */
-#define MaxQRSw 0.13    /* maximum QRS width (130ms) */                        
-#define NDP	 2.5    /* adjust threshold if no QRS found in NDP seconds */
-#define PWFreqDEF 60    /* power line (mains) frequency, in Hz (default) */
-#define TmDEF	 100	/* minimum threshold value (default) */
+#define SLPW    0.13    /* Slope width (130ms) */                        
+#define NDP	 2.5    /* adjust threshold if no pulse found in NDP seconds */
+#define TmDEF	   5	/* minimum threshold value (default) */
 
 char *pname;		/* the name by which this program was invoked */
-double lfsc;		/* length function scale constant */
 int *ebuf;
 int nsig;		/* number of input signals */
-int LPn, LP2n;          /* filter parameters (dependent on sampling rate) */
-int LTwindow;           /* LT window size */
-int PWFreq = PWFreqDEF;	/* power line (mains) frequency, in Hz */
-int signal = 0;	        /* signal number of signal to be analyzed */
+int SLPwindow;          /* Slope window size */
+int signal = -1;        /* signal number of signal to be analyzed (initial
+			   value forces search for ABP, ART, or BP signal) */
 int Tm = TmDEF;		/* minimum threshold value */
 WFDB_Sample *lbuf = NULL;
 
-/* ltsamp() returns a sample of the length transform of the input at time t.
-   Since this program analyzes only one signal, ltsamp() does not have an
-   input argument for specifying a signal number; rather, it always filters
-   and returns samples from the signal designated by the global variable
-   'signal'.  The caller must never "rewind" by more than BUFLN samples (the
-   length of ltsamp()'s buffers). */
 
-WFDB_Sample ltsamp(WFDB_Time t)
+WFDB_Sample slpsamp(WFDB_Time t)
 {
     int dy;
-    static int Yn, Yn1, Yn2;
     static WFDB_Time tt = (WFDB_Time)-1L;
 
     if (lbuf == NULL) {
-	lbuf = (WFDB_Sample *)malloc((unsigned)BUFLN*sizeof(WFDB_Sample));
+	lbuf = (WFDB_Sample *)malloc((unsigned)BUFLN * sizeof(WFDB_Sample));
 	ebuf = (int *)malloc((unsigned)BUFLN * sizeof(int));
 	if (lbuf && ebuf) {
-	    for (ebuf[0] = sqrt(lfsc), tt = 1L; tt < BUFLN; tt++)
+	    for (ebuf[0] = 0, tt = 1L; tt < BUFLN; tt++)
 		ebuf[tt] = ebuf[0];
 	    if (t > BUFLN) tt = (WFDB_Time)(t - BUFLN);
 	    else tt = (WFDB_Time)-1L;
-	    Yn = Yn1 = Yn2 = 0;
 	}
 	else {
 	    (void)fprintf(stderr, "%s: insufficient memory\n", pname);
@@ -119,21 +94,15 @@ WFDB_Sample ltsamp(WFDB_Time t)
 	}
     }
     if (t < tt - BUFLN) {
-        fprintf(stderr, "%s: ltsamp buffer too short\n", pname);
+        fprintf(stderr, "%s: slpsamp buffer too short\n", pname);
 	exit(2);
     }
     while (t > tt) {
 	static int aet = 0, et;
-
-	Yn2 = Yn1;
-	Yn1 = Yn;
-	Yn = 2*Yn1 - Yn2 + sample(signal, tt) -
-	     2*sample(signal, tt-LPn) + sample(signal, tt-LP2n);
-	dy = (Yn - Yn1) / LP2n;		/* lowpass derivative of input */
-	et = ebuf[(++tt)&(BUFLN-1)] = sqrt(lfsc +dy*dy); /* length transform */
-	lbuf[(tt)&(BUFLN-1)] = aet += et - ebuf[(tt-LTwindow)&(BUFLN-1)];
-	/* lbuf contains the average of the length-transformed samples over
-	   the interval from tt-LTwindow+1 to tt */
+	dy = sample(signal, tt) - sample(signal, tt-1); 
+	if (dy < 0) dy = 0;
+	et = ebuf[(++tt)&(BUFLN-1)] = dy; 
+	lbuf[(tt)&(BUFLN-1)] = aet += et - ebuf[(tt-SLPwindow)&(BUFLN-1)];
     }
     return (lbuf[t&(BUFLN-1)]);
 }
@@ -146,11 +115,9 @@ main(int argc, char **argv)
     int i, max, min, minutes = 0, onset, timer, vflag = 0;
     int dflag = 0;		     /* if non-zero, dump raw and filtered
 					samples only;  do not run detector */
-    int jflag = 0;		     /* if non-zero, annotate J-points */
-    int Rflag = 0;		     /* if non-zero, resample at 120 or 150 Hz
-				      */
+    int Rflag = 0;		     /* if non-zero, resample at 125 Hz  */
     int EyeClosing;                  /* eye-closing period, related to SR */
-    int ExpectPeriod;                /* if no QRS is detected over this period,
+    int ExpectPeriod;                /* if no ABP pulse is detected over this period,
 					the threshold is automatically reduced
 					to a minimum value;  the threshold is
 					restored upon a detection */
@@ -181,20 +148,9 @@ main(int argc, char **argv)
 	    help();
 	    exit(0);
 	    break;
-	  case 'j':	/* annotate J-points (ends of QRS complexes) */
-	    jflag = 1;
-	    break;
 	  case 'm':	/* threshold */
 	    if (++i >= argc || (Tm = atoi(argv[i])) <= 0) {
 		(void)fprintf(stderr, "%s: threshold ( > 0) must follow -m\n",
-			      pname);
-		exit(1);
-	    }
-	    break;
-	  case 'p':	/* specify power line (mains) frequency */
-	    if (++i >= argc || (PWFreq = atoi(argv[i])) <= 0) {
-		(void)fprintf(stderr,
-			    "%s: power line frequency ( > 0) must follow -p\n",
 			      pname);
 		exit(1);
 	    }
@@ -249,17 +205,32 @@ main(int argc, char **argv)
 	(void)fprintf(stderr, "%s: insufficient memory\n", pname);
 	exit(2);
     }
-    a.name = "wqrs"; a.stat = WFDB_WRITE;
+    a.name = "wabp"; a.stat = WFDB_WRITE;
     if ((nsig = wfdbinit(record, &a, 1, s, nsig)) < 1) exit(2);
-    if (signal < 0 || signal >= nsig) signal = 0;
-    sps = sampfreq((char *)NULL);
-    if (Rflag) {
-    	if (PWFreq == 60.0) setifreq(sps = 120.);
-    	else setifreq(sps = 150.);
+    if (signal < 0 || signal >= nsig) {
+	/* Identify the lowest-numbered ABP, ART, or BP signal */
+	for (i = 0; i < nsig; i++)
+	    if (strcmp(s[i].desc, "ABP") == 0 ||
+		strcmp(s[i].desc, "ART") == 0 ||
+		strcmp(s[i].desc, "BP") == 0)
+		break;
+	if (i == nsig) {
+	    fprintf(stderr, "%s: no ABP signal specified; use -s option\n\n",
+		    pname);
+	    help();
+	    exit(3);
+	}
+	signal = i;
     }
+    if (vflag)
+	fprintf(stderr, "%s: analyzing signal %d (%s)\n",
+		pname, signal, s[signal].desc);
+    sps = sampfreq((char *)NULL);
+    if (Rflag)
+    	setifreq(sps = 125.); 
     if (from > 0L) {
 	if ((from = strtim(argv[from])) < 0L)
-	from = -from;
+	    from = -from;
     }
     if (to > 0L) {
 	if ((to = strtim(argv[to])) < 0L)
@@ -269,27 +240,16 @@ main(int argc, char **argv)
     annot.subtyp = annot.num = 0;
     annot.chan = signal;
     annot.aux = NULL;
-    Tm = muvadu((unsigned)signal, Tm);
+    Tm = physadu((unsigned)signal, Tm);
     samplingInterval = 1000.0/sps;
-    lfsc = 5.0e6/sps;	/* length function scale constant */
     spm = 60 * sps;
     next_minute = from + spm;
-    LPn = sps/PWFreq;   /* The LP filter will have a notch at the
-				    power line (mains) frequency */
-    if (LPn > 8)  LPn = 8;	/* avoid filtering too agressively */
-    LP2n = 2 * LPn;
     EyeClosing = sps * EYE_CLS;   /* set eye-closing period */
-    ExpectPeriod = sps * NDP;	   /* maximum expected RR interval */
-    LTwindow = sps * MaxQRSw;     /* length transform window size */
+    ExpectPeriod = sps * NDP;	  /* maximum expected RR interval */
+    SLPwindow = sps * SLPW;       /* slope window size */
 
-    (void)sample(signal, 0L);
-    if (dflag) {
-	for (t = from; (to == 0L || t < to) && sample_valid(); t++)
-	    printf("%6d\t%6d\n", sample(signal, t), ltsamp(t));
-	exit(0);
-    }
-
-    if (vflag) {
+    if (vflag) 
+    {
 	printf("\n------------------------------------------------------\n");
 	printf("Record Name:             %s\n", record);
 	printf("Total Signals:           %d  (", nsig);
@@ -301,18 +261,23 @@ main(int argc, char **argv)
 	printf("Signal channel used for detection:    %d\n", signal);
 	printf("Eye-closing period:      %d samples (%.0f ms)\n",
 	       EyeClosing, EyeClosing*samplingInterval);
-	printf("Minimum threshold:       %d A/D units (%d microvolts)\n",
-	       Tm, adumuv(signal, Tm));
-	printf("Power line frequency:    %d Hz\n", PWFreq);
+	printf("Minimum threshold:       %d\n", Tm);
 	printf("\n------------------------------------------------------\n\n");
 	printf("Processing:\n");
     }
 
-    /* Average the first 8 seconds of the length-transformed samples
+    (void)sample(signal, 0L);
+    if (dflag) {
+	for (t = from; (to == 0L || t < to) && sample_valid(); t++)
+	    printf("%6d\t%6d\n", sample(signal, t), slpsamp(t));
+	exit(0);
+    }
+
+    /* Average the first 8 seconds of the slope  samples
        to determine the initial thresholds Ta and T0 */
     t1 = from + strtim("8");
     for (T0 = 0, t = from; t < t1 && sample_valid(); t++)
-	T0 += ltsamp(t);
+	T0 += slpsamp(t);
     T0 /= t1 - from;
     Ta = 3 * T0;
 
@@ -326,28 +291,23 @@ main(int argc, char **argv)
 		T1 = T0;
 		t = from;	/* start over */
 	    }
-	    else
-		T1 = 2*T0;
+	    else T1 = 2*T0;
 	}
 	
-	/* Compare a length-transformed sample against T1. */
-	if (ltsamp(t) > T1) {	/* found a possible QRS near t */
-	    timer = 0; /* used for counting the time after previous QRS */
-	    max = min = ltsamp(t);
+	if (slpsamp(t) > T1) {   /* found a possible ABP pulse near t */ 
+	    timer = 0; 
+            /* used for counting the time after previous ABP pulse */
+	    max = min = slpsamp(t);
 	    for (tt = t+1; tt < t + EyeClosing/2; tt++)
-		if (ltsamp(tt) > max) max = ltsamp(tt);
+		if (slpsamp(tt) > max) max = slpsamp(tt);
 	    for (tt = t-1; tt > t - EyeClosing/2; tt--)
-		if (ltsamp(tt) < min) min = ltsamp(tt);
-	    if (max > min+10) { /* There is a QRS near tt */
-		/* Find the QRS onset (PQ junction) */
+		if (slpsamp(tt) < min) min = slpsamp(tt);
+	    if (max > min+10) { 
 		onset = max/100 + 2;
 		tpq = t - 5;
 		for (tt = t; tt > t - EyeClosing/2; tt--) {
-		    if (ltsamp(tt)   - ltsamp(tt-1) < onset &&
-			ltsamp(tt-1) - ltsamp(tt-2) < onset &&
-			ltsamp(tt-2) - ltsamp(tt-3) < onset &&
-			ltsamp(tt-3) - ltsamp(tt-4) < onset) {
-			tpq = tt - LP2n;	/* account for phase shift */
+		    if (slpsamp(tt) - slpsamp(tt-1) < onset) {
+		      tpq = tt;  
 			break;
 		    }
 		}
@@ -356,30 +316,12 @@ main(int argc, char **argv)
 		    /* Check that we haven't reached the end of the record. */
 		    (void)sample(signal, tpq);
 		    if (sample_valid() == 0) break;
-		    /* Record an annotation at the QRS onset */
+		    /* Record an annotation at the ABP pulse onset */
 		    annot.time = tpq;
 		    annot.anntyp = NORMAL;
 		    if (putann(0, &annot) < 0) { /* write the annotation */
 			wfdbquit();	/* close files if an error occurred */
 			exit(1);
-		    }
-		    if (jflag) {
-			/* Find the end of the QRS */
-			for (tt = t, tj = t + 5; tt < t + EyeClosing/2; tt++) {
-			    if (ltsamp(tt) > max - (max/10)) {
-				tj = tt;
-				break;
-			    }
-			}
-			(void)sample(signal, tj);
-			if (sample_valid() == 0) break;
-			/* Record an annotation at the J-point */
-			annot.time = tj;
-			annot.anntyp = JPT;
-			if (putann(0, &annot) < 0) {
-			    wfdbquit();
-			    exit(1);
-			}
 		    }
 		}
 
@@ -387,18 +329,17 @@ main(int argc, char **argv)
 		Ta += (max - Ta)/10;
 		T1 = Ta / 3;
 
-
 		/* Lock out further detections during the eye-closing period */
 		t += EyeClosing;
 	    }
 	}
 	else if (!learning) {
-	    /* Once past the learning period, decrease threshold if no QRS
+	    /* Once past the learning period, decrease threshold if no pulse
 	       was detected recently. */
 	    if (++timer > ExpectPeriod && Ta > Tm) {
 		Ta--;
-		T0 = Ta / 3;
-	    }      
+		T1 = Ta / 3;
+	    }
 	}
 
 	/* Keep track of progress by printing a dot for each minute analyzed */
@@ -418,7 +359,7 @@ main(int argc, char **argv)
     wfdbquit();		        /* close WFDB files */
     fprintf(stderr, "\n");
     if (vflag) {
-	printf("\n\nDone! \n\nResulting annotation file:  %s.wqrs\n\n\n",
+	printf("\n\nDone! \n\nResulting annotation file:  %s.wabp\n\n\n",
 	       record);
     }
     exit(0);
@@ -444,6 +385,7 @@ char *s;
     return (p+1);
 }
 
+
 static char *help_strings[] = {
  "usage: %s -r RECORD [OPTIONS ...]\n",
  "where RECORD is the name of the record to be analyzed, and OPTIONS may",
@@ -452,17 +394,11 @@ static char *help_strings[] = {
  "             do not annotate",
  " -f TIME     begin at specified time (default: beginning of the record)",
  " -h          print this usage summary",
- " -j          find and annotate J-points (QRS ends) as well as QRS onsets",
- " -m THRESH   set detector threshold to THRESH (default: 100)", /* TmDEF */
- " -p FREQ     specify power line (mains) frequency (default: 60)",
- 								/* PWFreqDEF */
- " -R          resample input at 120 or 150 Hz, depending on power line",
- "             frequency (default: do not resample)",
+ " -R          resample input at 125 Hz (default: do not resample)",
  " -s SIGNAL   analyze specified signal (default: 0)",
  " -t TIME     stop at specified time (default: end of the record)",
  " -v          verbose mode",
- "If too many beats are missed, decrease THRESH;  if there are too many extra",
- "detections, increase THRESH.",
+ " ",
 NULL
 };
 
@@ -474,3 +410,4 @@ void help()
     for (i = 1; help_strings[i] != NULL; i++)
 	(void)fprintf(stderr, "%s\n", help_strings[i]);
 }
+

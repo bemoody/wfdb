@@ -1,17 +1,17 @@
 # file: Makefile.tpl		G. Moody	23 May 2000
-#				Last revised: 26 November 2002
+#				Last revised: 5 December 2002
 # This section of the Makefile should not need to be changed.
 
 CFILES = ann2rr.c bxb.c calsig.c ecgeval.c epicmp.c fir.c ihr.c mfilt.c \
  mrgann.c mxm.c nst.c plotstm.c pscgen.c pschart.c psfd.c rdann.c rdsamp.c \
  rr2ann.c rxr.c sampfreq.c sample.c sigamp.c sigavg.c skewedit.c snip.c \
- sortann.c sqrs.c sqrs125.c sumann.c sumstats.c tach.c view.c vsetup.c \
+ sortann.c sqrs.c sqrs125.c sumann.c sumstats.c tach.c view.c vsetup.c wabp.c \
  wfdbcat.c wfdbcollate.c wfdb-config.c wfdbdesc.c wfdbwhich.c wqrs.c wrann.c \
  wrsamp.c wvscript.c xform.c
 XFILES = ann2rr bxb calsig ecgeval epicmp fir ihr mfilt \
  mrgann mxm nst plotstm pscgen pschart psfd rdann rdsamp \
  rr2ann rxr sampfreq sigamp sigavg skewedit snip \
- sortann sqrs sqrs125 sumann sumstats tach \
+ sortann sqrs sqrs125 sumann sumstats tach wabp \
  wfdbcat wfdbcollate wfdb-config wfdbdesc wfdbwhich wqrs wrann \
  wrsamp xform
 SCRIPTS = cshsetwfdb setwfdb

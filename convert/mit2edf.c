@@ -1,5 +1,5 @@
 /* file: mit2edf.c		G. Moody	2 November 2002
-				Last revised:  14 November 2002
+				Last revised:   4 December 2002
 -------------------------------------------------------------------------------
 Convert MIT format header and signal files to EDF (European Data Format) file
 Copyright (C) 2002 George B. Moody
@@ -142,7 +142,8 @@ char **argv;
        "blocks". */
     for (i = samples_per_frame = 0; i < nsig; i++)
 	samples_per_frame += si[i].spf;
-    frames_per_second = strtim("1");	/* one second */
+    frames_per_second = strtim("1:0")/60.0;	/* i.e., the number of frames
+						   per minute, divided by 60 */
     frames_per_block = 10 * frames_per_second + 0.5;	/* ten seconds */
     bytes_per_block = 2 * samples_per_frame * frames_per_block;
     				   /* EDF specifies 2 bytes per sample */
@@ -151,6 +152,18 @@ char **argv;
 	frames_per_block /= 10;
 	bytes_per_block = samples_per_frame * 2 * frames_per_block;
     }
+
+    if (frames_per_block < 1) {
+	fprintf(stderr, "%s: can't convert record %s to EDF\n", pname, record);
+	fprintf(stderr,
+ " EDF blocks cannot be larger than %d bytes, but each input frame requires\n",
+		EDFMAXBLOCK);
+	fprintf(stderr,
+ " %d bytes.  Use the -s option to select a subset of the input signals.\n",
+		samples_per_frame * 2);
+	exit(5);
+    }
+
     seconds_per_block = frames_per_block / frames_per_second;
 
     /* Calculate the number of blocks to be written.  strtim("e") is the frame
