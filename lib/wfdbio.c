@@ -1,10 +1,10 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-			Last revised:	  16 July 2003		wfdblib 10.3.9
+                        Last revised:	  5 March 2004       wfdblib 10.3.12
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 2003 George B. Moody
+Copyright (C) 1988-2004 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -373,6 +373,7 @@ char *p;
     char *q;
     int current_type, found_end;
     struct wfdb_path_component *c0 = NULL, *c1 = wfdb_path_list;
+    static first_call = 1;
 
     /* First, free the existing wfdb_path_list, if any. */
     wfdb_free_path_list();
@@ -381,7 +382,10 @@ char *p;
     if (p == NULL) return (0);
 
     /* Register the cleanup function so that it is invoked on exit. */
-    atexit(wfdb_free_path_list);
+    if (first_call) {
+	atexit(wfdb_free_path_list);
+	first_call = 0;
+    }
     q = p;
 
     /* Now construct the wfdb_path_list from the contents of p. */
@@ -1612,9 +1616,12 @@ const char *mode;
         for (p = fname; *p; p++)
 	    if (*p == '/') {	/* only Unix-style directory separators */
 		*p = '\0';
-		stat = mkdir(fname, 0755);
-		/* The '0755' means that (under Unix), the directory will
-		   be world-readable, but writeable only by the owner. */
+		stat = MKDIR(fname, 0755);
+		/* MKDIR is defined as mkdir in wfdblib.h;  depending on
+		   the platform, mkdir may take two arguments (POSIX), or
+		   only the first argument (MS-Windows without Cygwin).
+		   The '0755' means that (under Unix), the directory will
+		   be world-readable, but writable only by the owner. */
 		*p = '/';
 	    }
 	/* At this point, we may have created one or more directories.

@@ -1,4 +1,4 @@
-.TH ANN2RR 1 "8 February 2003" "WFDB 10.3.2" "WFDB Applications Guide"
+.TH ANN2RR 1 "31 December 2003" "WFDB 10.3.12" "WFDB Applications Guide"
 .SH NAME
 ann2rr, rr2ann \- convert annotation files to interval lists and vice versa
 .SH SYNOPSIS
@@ -52,7 +52,7 @@ with ``-'', however, it must immediately follow \fB-p\fR (standard annotation
 mnemonics do not begin with ``-'', but modification labels in an annotation
 file may define such mnemonics).
 .TP
-\fB-p\fR \fItype\fR [ \fItype\fR ... ]
+\fB-P\fR \fItype\fR [ \fItype\fR ... ]
 Print intervals begun by annotations of the specified \fItypes\fR only.
 .TP
 \fB-t\fR \fItime\fR
@@ -77,7 +77,7 @@ above) of the annotations that end each interval), immediately following the
 intervals in each line of output.
 .TP
 \fB-W\fR
-Print initial annotations (the types of the annotations that end each
+Print initial annotations (the types of the annotations that begin each
 interval), immediately before the interval in each line of output.
 .PP
 The \fB-c\fR option, used without the \fB-p\fR option, causes \fBann2rr\fR to

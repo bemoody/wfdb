@@ -39,18 +39,33 @@ main()
 		    continue;
 		}
 		fgets(buf, sizeof(buf), stdin);	lineno++;
-		for (p = buf; p-buf<sizeof(buf)-1 && *p!='(' && *p!='\n'; p++)
+		for (p = buf; p-buf<sizeof(buf)-1 && *p!='(' && *p!='<'
+			 && *p!='\n'; p++)
 		    ;
-		if (*p != '(') {
+		if (*p == '(') {	/* ASCII, look for '\' */
+		    for (q = ++p; q-buf<sizeof(buf)-1 && *q!='\\' && *q!='\n';
+			 q++)
+			;
+		    *q = '\0';
+		    if (strcmp(pagename, p)) {
+			strcpy(pagename, p);
+			printf("%d\n", pageno);
+		    }
+		}
+		else if (*p == '<') {	/* hex, look for '28' (left paren) */
+		    for (q = ++p; q-buf<sizeof(buf)-2 &&
+			     !(*q == '2' && *(q+1) == '8') &&
+			     (*q != '\n' && *(q+1) != '\n'); q += 2)
+			;
+		    *q = '\0';
+		    if (strcmp(pagename, p)) {
+			strcpy(pagename, p);
+			printf("%d\n", pageno);
+		    }
+		}	
+		else {
 		    fprintf(stderr, "%d: Page name missing\n", lineno);
 		    continue;
-		}
-		for (q = ++p; q-buf<sizeof(buf)-1 && *q!='\\' && *q!='\n'; q++)
-		    ;
-		*q = '\0';
-		if (strcmp(pagename, p)) {
-		    strcpy(pagename, p);
-		    printf("%d\n", pageno);
 		}
 	    }
 	}

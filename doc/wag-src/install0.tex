@@ -96,38 +96,45 @@ instructions given by {\tt configure} for setting your {\tt PATH} and
 Depending on the speed of your system and of your C compiler, {\tt make} will
 generally require between 1 and 10 minutes.
 
-\subsection*{Mac OS/X (Darwin)}
+\subsection*{Mac OS X (Darwin)}
 
-The WFDB Software Package has been successfully compiled under Mac
-OS/X 10.2 (Darwin 6.0.1).  It should also work under 10.1, but this
-has not been tested.
+The WFDB Software Package, including WAVE, has been successfully compiled under
+Mac OS X 10.2 (Darwin 6.0.1) and 10.3.  It should also work under 10.1, but
+this has not been tested.
 
 Before compiling the WFDB Software Package, download and install:
 
 \begin{itemize}
 \item
-Mac OS/X Developer Tools (from {\tt
-http://\-devel\-oper.\-apple.\-com/macosx/)}
+Mac OS X Developer Tools (from {\tt
+http://\-devel\-oper.\-apple.\-com/\-tools/\-xcode/)}
 \item
-XDarwin (from Fink, {\tt http://\-fink.\-source\-forge.\-net/};
-sources from {\tt http://\-www.\-xdar\-win.\-org/})
+libwww (from Fink, {\tt http://\-fink.\-source\-forge.\-net/})
+\item
+an X11 package  (from Fink, {\tt http://\-fink.\-source\-forge.\-net/};
+XDarwin, {\tt http://\-www.\-xdar\-win.\-org/}; or Apple,
+{\tt http://\-www.\-apple.\-com/\-macosx/\-features/\-x11/\-download/})
+\item
+XView (from PhysioNet,
+{\tt http://\-www.\-physionet.\-org/\-physiotools/\-xview/})
 \end{itemize}
 
-Now follow the instructions in the previous section for Unix or
-GNU/Linux.  At this time, an incomplete port of XView to Darwin is
-available from the GNU-Darwin project ({\tt
-http://\-gnu-darwin.\-source\-forge.\-net}).  You may wish to see if a
-complete XView port is available; if so, it should be possible to
-compile WAVE under Mac OS/X as part of the installation of the WFDB
-Software Package.
+Now follow the instructions in the previous section for installing from sources
+under Unix or GNU/Linux.
 
 \subsection*{MS-Windows}
+
+The WFDB Software Package, except for WAVE, has been successfully compiled
+under all modern versions of MS-Windows (including MS-Windows 95, 98, ME, NT,
+2000, and XP) using the Cygwin development environment.
 
 If you have not already done so, install the Cygwin development environment
 (freely available from {\tt http://\-www.\-cygwin.\-com/}).  This includes
 {\tt gcc} (the GNU C/C++ compiler) as well as a comprehensive assortment of
 other Unix utilities ported to MS-Windows.  Accept the defaults suggested by
-the installer.
+the installer,  but be sure to select and install the {\tt gcc},
+{\tt binutils}, and {\tt make} packages from the {\tt Devel} category
+(these are not installed by default in a minimal Cygwin installation).
 
 \emph{Important:} Although you may be able to compile the WFDB software
 package using a proprietary compiler, this is \emph{not supported}.  The

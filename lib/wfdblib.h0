@@ -1,10 +1,10 @@
 /* file: wfdblib.h	G. Moody	13 April 1989
-                        Last revised:    7 April 2003       wfdblib 10.3.6
+                        Last revised:	 5 March 2004       wfdblib 10.3.12
 External definitions for WFDB library private functions
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 2002 George B. Moody
+Copyright (C) 1989-2004 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -33,7 +33,24 @@ symbols reserved to the library begin with the characters "wfdb_".
 
 #include "wfdb.h"
 
-/* Define the symbol _WINDLL if this library is to be compiled as a Microsoft
+/* MS-Windows users are strongly advised to compile the WFDB library using the
+   free Cygwin tools (www.cygwin.com).  Use of other compilers may be possible
+   but is not supported.
+
+   Cygwin users:  Note that the symbols _WINDOWS, _WINDLL, WIN32, etc. are
+   not defined and should not be defined when compiling the WFDB software
+   package using gcc.  Cygwin's POSIX emulation layer avoids the need for
+   the various workarounds required when using other compilers under
+   MS-Windows.
+
+   If you are using another MS-Windows compiler, you will need these
+   workarounds, and you should be careful to define _WINDOWS, _WINDLL, and
+   _WIN32 as appropriate.  Older versions of the WFDB library were successfully
+   compiled under MS-DOS and under 16-bit versions of MS-Windows, but the
+   conditionally compiled code written to support these platforms has not been
+   tested recently.
+
+   Define the symbol _WINDLL if this library is to be compiled as a Microsoft
    Windows DLL.  Note that a DLL's private functions (such as those listed
    below) *cannot* be called by Windows user programs, which can call only DLL
    functions that use the Pascal calling interface (see wfdb.h).  To compile
@@ -55,10 +72,6 @@ symbols reserved to the library begin with the characters "wfdb_".
 
 #if defined(_WINDOWS) && !defined (_WIN16) && !defined(_WIN32)
 #define _WIN16
-#endif
-
-#if defined(_WINDLL)
-#define WFDBANNSORT 0
 #endif
 
 /* Define the symbol MSDOS if this library is to be used under MS-DOS or MS
@@ -125,8 +138,14 @@ symbols reserved to the library begin with the characters "wfdb_".
    environment variable WFDBANNSORT specifies if wfdbquit() should attempt to
    sort annotations in any output annotation files before closing them (it
    does this if WFDBANNSORT is non-zero, or if WFDBANNSORT is not set, and
-   DEFWFDBANNSORT is non-zero). */
+   DEFWFDBANNSORT is non-zero).  Sorting is done by invoking 'sortann' (see
+   ../app/sortann.c) as a separate process;  since this cannot be done from
+   an MS-Windows DLL, sorting is disabled by default in this case. */
+#if defined(_WINDLL)
+#define DEFWFDBANNSORT 0
+#else
 #define DEFWFDBANNSORT 1
+#endif
 
 /* When reading multifrequency records, getvec() can operate in two modes:
    WFDB_LOWRES (returning one sample per signal per frame), or WFDB_HIGHRES
@@ -249,7 +268,6 @@ typedef struct WFDB_FILE WFDB_FILE;
 #endif
 
 #ifdef _WINDOWS
-#include <dir.h>	/* needed for mkdir() declaration */
 #ifndef _WIN32	/* these definitions are needed for 16-bit MS Windows only */
 #define strcat _fstrcat
 #define strchr _fstrchr
@@ -258,6 +276,17 @@ typedef struct WFDB_FILE WFDB_FILE;
 #define strlen _fstrlen
 #define strncmp _fstrncmp
 #define strtok _fstrtok
+#endif
+#endif
+
+/* Define MKDIR as either the one-argument mkdir() (for the native MSDOS and
+   MS-Windows API) or the standard two-argument mkdir() (everywhere else). */
+#ifndef MKDIR
+#ifdef MSDOS
+#include <direct.h>
+#define MKDIR(D,P)	mkdir((D))
+#else
+#define MKDIR(D,P)	mkdir((D),(P))
 #endif
 #endif
 

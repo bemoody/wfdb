@@ -44,4 +44,6 @@ record	- - undefined 10 V
 record	- - undefined 100 mmHg
 record	0 - undefined 100 bpm
 record	0 - undefined 100 BPM
+edr	- - undefined 200 units
+ann	- - undefined 100 units
 foobar	0 100 square 100 mmHg

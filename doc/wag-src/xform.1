@@ -1,4 +1,4 @@
-.TH XFORM 1 "30 March 2003" "WFDB 10.3.4" "WFDB Applications Guide"
+.TH XFORM 1 "26 January 2004" "WFDB 10.3.12" "WFDB Applications Guide"
 .SH NAME
 xform \- sampling frequency, amplitude, and format conversion for WFDB records
 .SH SYNOPSIS
@@ -67,6 +67,9 @@ output specifications.
 Write only the signals named in the \fIsignal-list\fR (one or more input signal
 numbers, separated by spaces;  default: write all signals).  This option may be
 used to re-order or duplicate signals.
+.TP
+\fB-S\fR \fIscript\fR
+Take answers to prompts from the specified \fIscript\fR (a text file).
 .TP
 \fB-t\fR \fItime\fR
 Process until the specified \fItime\fR in the input record (default: continue

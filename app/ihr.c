@@ -1,9 +1,9 @@
 /* file ihr.c		G. Moody      12 November 1992
-			Last revised: 17 November 2002
+			Last revised:   5 March 2004
 
 -------------------------------------------------------------------------------
 ihr: Generate instantaneous heart rate data from annotation file
-Copyright (C) 2002 George B. Moody
+Copyright (C) 1992-2004 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -44,7 +44,8 @@ int argc;
 char *argv[];
 {
     char *record = NULL, *prog_name();
-    double ihr, ihrlast, mhr = 70.0, sph, spm, sps, tol = 10.0, atof(), fabs();
+    double dmhr,  ihr, ihrlast, mhr = 70.0, sph, spm, sps, tol = 10.0,
+	atof(), fabs();
     int i, j, lastann = NOTQRS, last2ann = NOTQRS, tformat = 1, vflag = 1,
 	xflag = 0, lastint = 1, thisint = 0;
     long from = 0L, to = 0L, lasttime = -9999L;
@@ -179,7 +180,17 @@ char *argv[];
     while (getann(0, &annot) == 0 && (to == 0L || annot.time <= to)) {
 	if (flag[annot.anntyp]) {
 	    ihr = sps*60./(annot.time - lasttime);
-	    mhr += (ihr - mhr)/10.;
+	    dmhr = (ihr - mhr)/10.;
+	    /* The next two lines of code were added in March 2004.  They limit
+	       the magnitude of dmhr (the increment to be applied to the
+	       predictor mhr) in order to limit the influence on mhr of any
+	       single observation.  This helps to keep mhr reasonably close to
+	       the recent mean heart rate even when the input contains gross
+	       QRS detection errors.  Given error-free input and a reasonable
+	       value for tol, these lines have no significant effect. */
+	    if (dmhr > tol) dmhr = tol;
+	    else if (dmhr < -tol) dmhr = -tol;
+	    mhr += dmhr;
 	    if (flag[lastann] && fabs(ihr-ihrlast)<tol && fabs(ihr-mhr)<tol) {
 		if (flag[last2ann] || !xflag) {
 		    long tt = (vflag > 0) ? lasttime : annot.time;

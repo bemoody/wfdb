@@ -1,5 +1,5 @@
-# file: wfdbcal		G. Moody	June 1991
-#			Last revised:  17 October 2003
+# file: wfdbcal		G. Moody	  June 1991
+#			Last revised:	5 March 2004
 # Default calibration database for WFDB library
 #
 # Format:
@@ -73,3 +73,10 @@ record	- - undefined 10 V
 record	- - undefined 100 mmHg
 record	0 - undefined 100 bpm
 record	0 - undefined 100 BPM
+
+# Definitions for time series encoded in annotation 'num' fields.  Use
+# the annotator name as the signal type, and 'units' as the unit type.
+edr	- - undefined 200 units
+
+# Any annotator not matching one of those above.
+ann	- - undefined 100 units

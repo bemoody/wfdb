@@ -39,7 +39,8 @@ char *argv[];
 {
     char **ap, *cp, **desc, **fp = NULL, fsep = '\0', *ifname = "(stdin)",
 	*l = NULL, ofname[40], *p, *record = NULL, rsep = '\n', *prog_name();
-    double freq = WFDB_DEFFREQ, gain = WFDB_DEFGAIN, scale = 1.0, v;
+    char *gain = "", *scale = "";
+    double freq = WFDB_DEFFREQ, *scalef, v;
 #ifndef atof
     double atof();
 #endif
@@ -76,10 +77,11 @@ char *argv[];
 	    }
 	    break;
 	  case 'G':
-	    if (++i >= argc || (gain = atof(argv[i])) <= 0.) {
-	       (void)fprintf(stderr, "%s: gain must follow -G\n", pname);
+	    if (++i >= argc) {
+	       (void)fprintf(stderr, "%s: gain(s) must follow -G\n", pname);
 		exit(1);
 	    }
+	    gain = argv[i];
 	    break;
 	  case 'h':
 	    help();
@@ -140,11 +142,12 @@ char *argv[];
 	    }
 	    break;
 	  case 'x':
-	    if (++i >= argc || (scale = atof(argv[i])) <= 0.) {
-	       (void)fprintf(stderr, "%s: scaling factor must follow -x\n",
+	    if (++i >= argc) {
+	       (void)fprintf(stderr, "%s: scaling factor(s) must follow -x\n",
 			     pname);
 		exit(1);
 	    }
+	    scale = argv[i];
 	    break;
 	  default:
 	    (void)fprintf(stderr, "%s: unrecognized option %s\n", pname,
@@ -182,7 +185,8 @@ char *argv[];
 
     if ((vout = malloc(nf * sizeof(WFDB_Sample))) == NULL ||
 	(si = malloc(nf * sizeof(WFDB_Siginfo))) == NULL ||
-	(desc = malloc(nf * sizeof(char *))) == NULL) {
+	(desc = malloc(nf * sizeof(char *))) == NULL ||
+	(scalef = malloc(nf * sizeof(double))) == NULL) {
 	(void)fprintf(stderr, "%s: insufficient memory\n", pname);
 	exit(2);
     }
@@ -204,14 +208,28 @@ char *argv[];
 	    (void)sprintf(desc[i], "%s, column %d", ifname, fv[i]);
 	si[i].desc = desc[i];
 	si[i].units = "";
-	si[i].gain = gain;
 	si[i].group = 0;
 	si[i].fmt = 16;
 	si[i].bsize = 0;
 	si[i].adcres = WFDB_DEFRES;
 	si[i].adczero = 0;
 	si[i].baseline = 0;
+	while (*gain == ' ')
+	    gain++;
+	if (sscanf(gain, "%lf", &(si[i].gain)) < 1)
+	    si[i].gain = (i == 0) ? WFDB_DEFGAIN : si[i-1].gain;
+	else
+	    while (*gain != '\0' && *gain != ' ')
+		gain++;
+	while (*scale == ' ')
+	    scale++;
+	if (sscanf(scale, "%lf", &(scalef[i])) < 1)
+	    scalef[i] = (i == 0) ? 1.0 : scalef[i-1];
+	else
+	    while (*scale != '\0' && *scale != ' ')
+		scale++;
     }
+
     if (osigfopen(si, nf) < nf || setsampfreq(freq) < 0)
 	exit(2);
 
@@ -255,7 +273,7 @@ char *argv[];
 			vout[i] = 0;
 		    }
 		    else {
-			v *= scale;
+			v *= scalef[i];
 			if (v >= 0) vout[i] = (int)(v + 0.5);
 			else vout[i] = (int)(v - 0.5);
 		    }
@@ -315,7 +333,7 @@ static char *help_strings[] = {
  " -c          check that each input line contains the same number of fields",
  " -f N        start copying with line N (default: 0)",
  " -F FREQ     specify frequency to be written to header file (default: 250)",
- " -G GAIN     specify gain to be written to header file (default: 200)",
+ " -G GAIN     specify gain(s) to be written to header file (default: 200)",
  " -h          print this usage summary",
  " -i FILE     read input from FILE (default: standard input)",
  " -l LEN      read up to LEN characters in each line (default: 1024)",
@@ -326,7 +344,10 @@ static char *help_strings[] = {
  " -s FSEP     interpret FSEP as the input field separator (default: space",
  "              or tab)",
  " -t N        stop copying at line N (default: end of input file)",
- " -x SCALE    multiply all inputs by SCALE (default: 1)",
+ " -x SCALE    multiply inputs by SCALE factor(s) (default: 1)",
+ "To specify different GAIN or SCALE values for each output signal, provide",
+ "a quoted list of values, e.g., -G \"100 50\" defines the gain for signal 0",
+ "as 100, and the gain for signal 1 (and any additional signals) as 50.",
 NULL
 };
 

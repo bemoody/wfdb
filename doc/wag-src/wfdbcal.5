@@ -1,4 +1,4 @@
-.TH WFDBCAL 5 "1 August 2002" "WFDB software 10.2.7" "WFDB Applications Guide"
+.TH WFDBCAL 5 "5 March 2004" "WFDB software 10.3.12" "WFDB Applications Guide"
 .SH NAME
 wfdbcal \- WFDB calibration file format
 .SH DESCRIPTION
@@ -102,6 +102,24 @@ calibrations for some reason, an entry of the form:
 	ECG lead II	- 2 sine 1 mV
 .br
 should be inserted \fIbefore\fR the entry for `ECG lead I'.
+.PP
+Programs that display time series extracted from annotation files (e.g.,
+\fBwave\fR(1), which can display the sequence of `num' fields in an annotation
+file as a signal) can use calibration records to choose an ordinate scale.
+These records can be included in the calibration file, with annotator names
+used in place of the signal type, and `units' as the units type.  An entry
+with signal type "ann" can be used as a default for calibrating data from
+files whose annotator names do not have entries.  For example,
+the default calibration file contains these entries:
+.br
+        edr     - - undefined 200 units
+.br
+        ann     - - undefined 100 units
+The first specifies that data from 'edr' annotation files are to be
+displayed at a nominal 200 units per centimeter.  The second specifies that
+files from other types of annotation files are to be displayed at 100 units
+per centimeter.
+
 .SH ENVIRONMENT
 Programs compiled with the WFDB library use the environment variable
 \fBWFDBCAL\fR to determine the name of the calibration file.  Calibration files

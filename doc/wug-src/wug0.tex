@@ -57,7 +57,7 @@ Harvard-MIT Division of Health Sciences and Technology}
 \pagestyle{empty}
 \vspace*{\fill}
 \noindent
-Copyright \copyright 1992 -- 2003 George B. Moody
+Copyright \copyright 1992 -- 2004 George B. Moody
 
 \vspace{1 in}
 \noindent
@@ -1012,7 +1012,8 @@ minutes to do so. It is not necessary to wait for the output to
 appear before continuing. The output will appear as in figure~\ref{fig:chart1}.
 
 \begin{figure}
-\fbox{\centerline{\epsfig{file=chart1,angle=-90,width=.9\linewidth}}}
+\fbox{\centerline{\epsfig{file=chart1,width=.9\linewidth}}}
+%\fbox{\centerline{\epsfig{file=chart1,angle=-90,width=.9\linewidth}}}
 % This figure was produced in ``landscape'' mode.  To print it
 % properly in portrait mode, it must be rotated by -90 degrees
 % *before* scaling it.
@@ -3647,8 +3648,8 @@ other UNIX applications that invoke editors.
 \item[{\tt Wave.View.{\it showoption}}]
 These resources specify which of the {\sf Show:} options at the top of the
 {\sf View} window are enabled by default.  {\it showoption} is one of {\tt
-Subtype}, {\tt Chan}, {\tt Num}, {\tt Aux}, {\tt Markers}, {\tt Signal
-Names}, {\tt Baselines}, or {\tt Level}.  The values of these
+Subtype}, {\tt Chan}, {\tt Num}, {\tt Aux}, {\tt Markers}, {\tt SignalNames},
+{\tt Baselines}, or {\tt Level}.  The values of these
 resources are `{\tt True}' or `{\tt False}'.
 
 \index{amplitude scale}
@@ -3658,9 +3659,9 @@ These resources specify the positions of the initial choices in the
 corresponding {\sf View} menus, where the top item on each menu is in
 position 0, the one below it is in position 1, etc.  {\it menuname} is
 one of {\tt TimeScale}, {\tt AmplitudeScale}, {\tt SignalMode}, {\tt
-AnnotationMode}, {\tt TimeMode}, or {\tt GridMode}.  For example, to set the
-initial time scale to 50 mm/sec (the item at position 6 in the 
-\amenubutton{Time Scale:} menu), set {\tt Wave.View.TimeScale} to 6.
+AnnotationMode}, {\tt AnnotationOverlap}, {\tt TimeMode}, or {\tt GridMode}.
+For example, to set the initial time scale to 50 mm/sec (the item at position
+13 in the \amenubutton{Time Scale:} menu), set {\tt Wave.View.TimeScale} to 13.
 
 \item[{\tt Wave.View.CoarseGridMode}]
 This resource specifies the initial grid display mode to be used at highly
@@ -3671,7 +3672,7 @@ recommended alternatives are 5 (1 m x 0.5 mV) or 6 (1 m x 0.1 mV).
 \item[{\tt Wave.View.CoarseTimeScale}]
 This resource specifies the initial time scale to be used for low-rate
 records (those sampled at 10 Hz per signal or less).  The possible values are
-the same as those for {\tt Wave.View.TimeScale}.  The default is 2
+the same as those for {\tt Wave.View.TimeScale}.  The default is 5
 (corresponding to 5 mm per minute).
 \end{description}
 

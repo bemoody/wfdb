@@ -1,4 +1,4 @@
-.TH WRSAMP 1 "1 August 2002" "WFDB 10.2.7" "WFDB Applications Guide"
+.TH WRSAMP 1 "26 January 2004" "WFDB 10.3.12" "WFDB Applications Guide"
 .SH NAME
 wrsamp \- write WFDB signal files
 .SH SYNOPSIS
@@ -46,9 +46,11 @@ file, see \fBxform\fR(1).
 .TP
 \fB-G\fR \fIn\fR
 Specify the gain (in A/D units per millivolt) for the output signals (default:
-200).  This option is useful only in conjunction with \fB-o\fR, since it
-affects the output header file only.  This option has no effect on the output
-signal file.  If you wish to rescale samples in the signal file, use \fB-x\fR.
+200).  To specify different gains for each output signal, provide a quoted
+list of values in place of \fIn\fR (see the examples below).  This option is
+useful only in conjunction with \fB-o\fR, since it affects the output header
+file only.  This option has no effect on the output signal file.  If you wish
+to rescale samples in the signal file, use \fB-x\fR.
 .TP
 \fB-h\fR
 Print a usage summary.
@@ -84,12 +86,13 @@ Stop copying at line \fIn\fR (line \fIn\fR is not processed).  By default,
 .TP
 \fB-x\fR \fIn\fR
 Multiply all input samples by \fIn\fR (default: 1) before writing them to the
-output signal file.
+output signal file.  To specify different scaling factors for each signal,
+provide a quoted list of values in place of \fIn\fR (see the examples below).
 .SH ENVIRONMENT
 .PP
 It may be necessary to set and export the shell variable \fBWFDB\fR (see
 \fBsetwfdb\fR(1)).
-.SS Example
+.SS Examples
 .br
 	\fBrdsamp -r 100s | wrsamp -o 100w -F 360 1 2\fR
 .br
@@ -102,6 +105,23 @@ header file for record `100w' would indicate that the sampling frequency was
 input.  Note that columns 1 and 2 of \fIwrsamp\fR's input correspond to signals
 0 and 1 respectively;  column 0 is the sample number, not useful to
 \fBwrsamp\fR.
+
+.br
+	\fBwrsamp -i in.txt -o out -G "100 100 50" -x "1 .5 -10 2" 4 1 0 3\fR
+.br
+This command creates a record named `out' that contains signals derived from
+four columns of its input (`in.txt').  Notice that the argument of the -G
+(gain) option is the quoted string "100 100 50";  the effect is that the
+gains of the first two output signals are set to 100, and that of the third
+is 50.  Since no explicit gain is specified for the fourth signal, it is
+assigned the same gain as the previous (third) signal (i.e., 50).  Similarly,
+the quoted argument of the -x option specifies scaling factors applied to the
+samples before they are written to the output signal file:  output signal 0
+will be unscaled (scale factor 1), signal 1 will be halved (.5), signal 2
+will be scaled by 10 and inverted (-10), and signal 3 will be doubled (2).
+Finally, note that the four columns selected from the input file have been
+rearranged, so that the leftmost column (0) will become output signal 2, etc.
+
 .SH SEE ALSO
 \fBrdsamp\fR(1), \fBsetwfdb\fR(1), \fBxform\fR(1), \fBsignal\fR(5)
 .SH AUTHOR

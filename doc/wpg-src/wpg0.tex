@@ -21,7 +21,7 @@
 @center Harvard-MIT Division of Health Sciences and Technology
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1989 -- 2003 George B. Moody
+Copyright @copyright{} 1989 -- 2004 George B. Moody
 @sp 2
 The most recent versions of the software described in this guide may be
 downloaded from @uref{http://www.physionet.org/}.  For further
@@ -408,8 +408,8 @@ formats, annotation codes, and other enhancements (@pxref{Extensions}).
 The WFDB library has been written with portability in mind.  It runs on
 a wide variety of machines and operating systems, including Unix (BSD
 4.x, System V, SunOS, Solaris, HP-UX, OSF/1, Version 7, XENIX, VENIX,
-ULTRIX, GNU/Linux, OpenBSD, IRIX, AIX, AUX, Darwin, MacOS/X, SCO,
-Coherent, and more), MS-DOS, MS-Windows, VMS, and classic MacOS.
+ULTRIX, GNU/Linux, FreeBSD, OpenBSD, IRIX, AIX, AUX, Darwin, Mac OS X, SCO,
+Coherent, and more), MS-DOS, MS-Windows, VMS, and classic Mac OS.
 This guide was written for Unix users (with notes for MS-Windows and
 MS-DOS users where differences exist), but others should find only minor
 differences.
@@ -418,16 +418,17 @@ At the end of the guide is a list of sources for databases and other
 materials that may be useful to readers (@pxref{Sources}).
 
 Many friends have contributed to the development of the WFDB library.  Thanks
-to Paul Albrecht, Ted Baker, Phil Devlin, Scott Greenwald, David Israel, Roger
-Mark, Joe Mietus, Warren Muldrow, and especially to Paul Schluter, whose
-elegant 8080 assembly language functions inspired these (long live
-@code{getann}!).  Pat Hamilton and Bob Farrell contributed ports, to classic
-MacOS and the MS 32-bit Windows environments, respectively.  Jose Garcia
-Moros and Salvador Olmos contributed Matlab/Octave reimplementations of a
-useful subset of the WFDB library.  Thanks also to the many readers of earlier
-versions of this guide; if this edition answers your questions, it is because
-someone else has already asked them, and hounded the author until he produced
-comprehensible answers.
+to Paul Albrecht, Ted Baker, Phil Devlin, Scott Greenwald, Isaac Henry, David
+Israel, Roger Mark, Joe Mietus, Warren Muldrow, and especially to Paul
+Schluter, whose elegant 8080 assembly language functions inspired these (long
+live @code{getann}!).  Pat Hamilton and Bob Farrell contributed ports, to
+classic Mac OS and the MS 32-bit Windows environments, respectively.  Jose
+Garcia Moros and Salvador Olmos contributed Matlab/Octave reimplementations of
+a useful subset of the WFDB library.  Jonas Carlson wrote, documented, and
+contributed a set of Matlab wrappers for the WFDB library.  Thanks also to the
+many readers of earlier versions of this guide; if this edition answers your
+questions, it is because someone else has already asked them, and hounded the
+author until he produced comprehensible answers.
 
 Before May, 1999, and the release of version 10.0.0 of the library, the
 WFDB library was known as the DB library, and this guide was the @cite{ECG
@@ -487,6 +488,26 @@ to this guide since the first printing of the tenth edition of this
 guide in June, 1999.  See @file{NEWS}, in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
+
+@unnumberedsubsec Changes in version 10.3.12
+
+Okko Willeboordse pointed out an incompatibility between the native
+MS-Windows API and the ANSI/ISO C library function @code{mkdir}, which is
+used by the WFDB library.  This does not present a problem when
+compiling the WFDB library using the supported Cygwin/gcc compiler
+under MS-Windows, nor does any related problem occur on any other
+platform.  It should now be a little easier to compile the WFDB library
+using unsupported compilers, thanks to a new @code{MKDIR} macro that hides
+the incompatibility (see @file{lib/wfdblib.h0}).
+
+Piotr Wlodarek initiated a discussion about memory leaks in the WFDB
+library, citing as an example the 'trivial example program in C' from
+this Guide, which does not free memory it allocates in @code{isigopen()}
+when reading the signal specifications.  This problem can be avoided by
+invoking @code{wfdbquit()} in the example program, just before exiting.
+Further discussion of this point has been added to this Guide following
+the presentation of the 'trivial example', and in the description of
+@code{wfdbquit}.
 
 @unnumberedsubsec Changes in version 10.3.11
 
@@ -573,7 +594,7 @@ group numbers when reading from two or more records at the same time (as in
 @file{nst}), a bug that caused a segfault in @file{nst}, and a bug that
 referenced uninitialized memory in @code{newheader} if @code{nsig} = 0.
 
-The WFDB Software Package has been ported to MacOS/X (Darwin),
+The WFDB Software Package has been ported to Mac OS X (Darwin),
 version 10.2 (the port should also work under 10.1 but this
 has not been tested and will not be supported).	
 
@@ -909,7 +930,24 @@ The functions used in the example are described in detail in the next
 chapter, and the data types are described in the following chapter
 (@pxref{Data Types}).  For now, note that @code{isigopen} prepares a
 record to be read by @code{getvec}, which reads a sample from each of
-the two signals each time it is called.
+the two signals each time it is called.  
+
+Note that in some cases it may be important to insure that all memory
+allocated by the WFDB library is freed before the program exits;  in
+the example program, this can be done by adding the line
+
+@example
+wfdbquit();
+@end example
+
+@noindent
+just above @code{exit(0);}
+@iftex
+(@pxref{wfdbquit, , @code{wfdbquit}}).
+@end iftex
+@ifinfo
+(@pxref{wfdbquit}).
+@end ifinfo
 
 @node     compiling, other languages, print samples, Usage
 @comment  node-name,  next,  previous,  up
@@ -1086,19 +1124,29 @@ in the WFDB Software Package.
 @cindex Octave bindings
 @cindex Scilab bindings
 @cindex wrappers for Matlab, Octave, or Scilab
-It should be possible to write a similar set of wrapper functions for use with
-Matlab, Octave (a freely available open-source language that is compatible with
-Matlab, available from @uref{http://www.che.wisc.edu/octave/}), or Scilab (an
-open-source scientific software package for numerical computations, with a
-language similar to that of Matlab, available from
-@uref{http://www-rocq.@-inria.@-fr/@-scilab/}).  At this time, such wrappers
-are not available, but a reimplementation of a useful subset of the WFDB
-library in native m-code (contributed by Jose Garcia Moros and Salvador Olmos)
-is available from
-@uref{http://www.@-physio@-net.@-org/@-physio@-tools/@-matlab/}.  Jesus Olivan
-Palacios has written a tutorial (available at
+
+A set of wrappers for Matlab has been written and contributed by Jonas Carlson.
+These wrappers (@code{wfdb_tools}) provide access to almost all of the
+functionality of the WFDB library, including HTTP access to remote data files,
+to users of Matlab R13 (but not earlier versions) under GNU/Linux or
+MS-Windows; other platforms remain to be tested.  The wrappers, together with
+examples and a tutorial/reference guide, are available from
+@uref{http://www.@-physio@-net.@-org/@-physio@-tools/@-matlab/@-wfdb_tools/}.
+
+It should be possible to write a set of wrapper functions similar to
+@code{wfdb_tools} for use with Octave (a freely available open-source
+language that is compatible with Matlab, available from
+@uref{http://www.che.wisc.edu/octave/}) or Scilab (an open-source
+scientific software package for numerical computations, with a language
+similar to that of Matlab, available from
+@uref{http://www-rocq.@-inria.@-fr/@-scilab/}).
+Jesus Olivan Palacios has written a tutorial (available at
 @uref{http://www.@-neurotraces.@-com/@-scilab/@-sciteam/}) on using the WFDB
 Software Package with Scilab.
+
+Also available is a reimplementation of a useful subset of the WFDB
+library in native m-code (contributed by Jose Garcia Moros and Salvador Olmos)
+at @uref{http://www.@-physio@-net.@-org/@-physio@-tools/@-matlab/}.
 
 @node     WFDB path, running example, other languages, Usage
 @comment  node-name,  next,  previous,  up
@@ -1138,7 +1186,7 @@ so that the WFDB path can be examined by the running program.  The WFDB
 software package includes easily customizable shell scripts (batch
 files) that illustrate how to do this for popular shells and command
 interpreters; see @emph{setwfdb}(1), in the @cite{WFDB Applications
-Guide}.  (Under classic MacOS, for which the concept of environment
+Guide}.  (Under classic Mac OS, for which the concept of environment
 variables is foreign, the WFDB path may be set only by using
 @code{DEFWFDB}.)  For further information, @pxref{WFDB path syntax}.
 
@@ -1248,7 +1296,7 @@ the database name is included in the record name (for example,
 
 Under Unix and VMS, the WFDB path can be given as a colon-separated list
 of prefixes, in the format used for the Bourne shell's @code{PATH}
-variable.  Under MS-Windows, MS-DOS, and MacOS, the WFDB path can be
+variable.  Under MS-Windows, MS-DOS, and classic Mac OS, the WFDB path can be
 given in the format used for the MS-DOS @code{PATH} variable, with
 semicolons used to separate prefixes (colons retain their customary
 meanings, as drive letter suffixes under MS-DOS, or as directory
@@ -1302,7 +1350,7 @@ the specified @var{file}.  (This feature was first introduced in WFDB
 library version 8.0.)  Indirect WFDB path files may be nested up to ten
 levels (this arbitrary limit is imposed to avoid infinite recursion if
 the contents of the indirect file are incorrect).  This method of
-indirect assignment is useful under classic MacOS, where recompilation of
+indirect assignment is useful under classic Mac OS, where recompilation of
 the WFDB library would otherwise be necessary in order to change the WFDB
 path.  It may also be useful under MS-DOS to reduce the need for
 environment space, or if the length of the command needed to set the
@@ -3544,7 +3592,8 @@ void wfdbquit(void)
 @c @end group
 
 @noindent
-This function closes all open database files.  It also resets the following:
+This function closes all open WFDB files and frees any memory allocated by
+other WFDB library functions.  It also resets the following:
 
 @itemize @bullet
 @item
@@ -3584,7 +3633,26 @@ annotations are not in order, and providing instructions for putting them in
 order.
 
 Programs that do not write annotations or signals need not use
-@code{wfdbquit}.
+@code{wfdbquit}.  Note, however, that several WFDB library functions allocate
+memory that is maintained for later use by the library.  This is not generally
+a problem, since these functions also free such memory if it is no longer
+needed on a subsequent call;  thus these `memory leaks' do not grow over time.
+Virtually all operating systems reclaim memory allocated by user-level
+applications on exit, so that a small and self-limiting leak is not
+a problem.  Nevertheless, there are embedded systems and other
+environments in which memory is not reclaimed when a user application
+exits, and in these cases it is best to invoke @code{wfdbquit()} on exit from
+any WFDB application, even those that do not write output using the
+library.  In an ANSI/ISO C environment, this can be ensured by
+including the line
+
+@example
+	atexit(wfdbquit);
+@end example
+
+@noindent
+early in the code, before the first exit.
+
 
 @c @group
 @node     iannclose and oannclose, wfdbquiet and wfdbverbose, wfdbquit, miscellaneous functions
@@ -7558,8 +7626,8 @@ pages for the package, and a one-minute sample record (@samp{100s}).
 			Software Package.
 * Unix installation::	Installing the WFDB Software Package on Unix,
 			GNU/Linux, and similar systems.
-* MacOS/X installation::	Installing the WFDB Software Package under
-				MacOS/X (Darwin).
+* Mac OS X installation::	Installing the WFDB Software Package under
+				Mac OS X (Darwin).
 * MS-Windows installation::	Installing the WFDB Software Package on
                                 MS-Windows PCs.
 * Other installation::	Installing the WFDB Software Package on other systems.
@@ -7575,7 +7643,7 @@ binaries for popular operating systems and development snapshots, as well as
 quick-start guides including installation notes for popular operating systems,
 are also usually available there.
 
-@node Unix installation, MacOS/X installation, Distribution, Installation
+@node Unix installation, Mac OS X installation, Distribution, Installation
 @unnumberedsec Unix, GNU/Linux, and similar operating systems
 
 @cindex libwww
@@ -7634,39 +7702,45 @@ instructions given by @code{configure} for setting your @code{PATH} and
 Depending on the speed of your system and of your C compiler, @samp{make} will
 generally require between 1 and 10 minutes.
 
-@node MacOS/X installation, MS-Windows installation, Unix installation, Installation
-@unnumberedsec Mac OS/X (Darwin)
+@node Mac OS X installation, MS-Windows installation, Unix installation, Installation
+@unnumberedsec Mac OS X (Darwin)
 
-The WFDB Software Package has been successfully compiled under Mac OS/X
-10.2 (Darwin 6.0.1).  It should also work under 10.1, but this has not
-been tested.
+The WFDB Software Package, including WAVE, has been successfully compiled under
+Mac OS X 10.2 (Darwin 6.0.1) and 10.3.  It should also work under 10.1, but
+this has not been tested.
 
 Before compiling the WFDB Software Package, download and install:
 
 @itemize @bullet
 @item
-Mac OS/X Developer Tools (from @uref{http://developer.apple.com/macosx/})
+Mac OS X Developer Tools (from @uref{http://developer.apple.com/tools/xcode/})
 @item
-XDarwin (from Fink, @uref{http://fink.sourceforge.net/}; sources from
-@uref{http://www.xdarwin.org/})
+libwww (from Fink, @uref{http://fink.sourceforge.net/})
+@item
+an X11 package (from Fink, @uref{http://fink.sourceforge.net/}; XDarwin,
+@uref{http://www.xdarwin.org/}; or Apple,
+@uref{http://www.apple.com/macosx/features/x11/download/})
+@item
+XView (from PhysioNet, @uref{http://www.physionet.org/physiotools/xview/})
 @end itemize
 
-Now follow the instructions in the previous section for Unix or GNU/Linux.
+Now follow the instructions in the previous section for installing from sources
+under Unix or GNU/Linux.
 
-At this time, an incomplete port of XView to Darwin is available from
-the GNU-Darwin project (@uref{http://gnu-darwin.sourceforge.net/}).  You
-may wish to see if a complete XView port is available;  if so, it should
-be possible to compile WAVE under Mac OS/X as part of the installation
-of the WFDB Software Package.
-
-@node MS-Windows installation, Other installation, MacOS/X installation, Installation
+@node MS-Windows installation, Other installation, Mac OS X installation, Installation
 @unnumberedsec MS-Windows
+
+The WFDB Software Package, except for WAVE, has been successfully compiled
+under all modern versions of MS-Windows (including MS-Windows 95, 98, ME, NT,
+2000, and XP) using the Cygwin development environment.
 
 If you have not already done so, install the Cygwin development environment
 (freely available from @uref{http://www.cygwin.com}).  This
 includes @code{gcc} (the GNU C/C++ compiler) as well as a comprehensive
 assortment of other Unix utilities ported to MS-Windows.  Accept the defaults
-suggested by the installer.
+suggested by the installer, but be sure to select and install the @code{gcc},
+@code{binutils}, and @code{make} packages from the @code{Devel} category
+(these are not installed by default in a minimal Cygwin installation).
 
 @emph{Important:} Although you may be able to compile the WFDB software package
 using a proprietary compiler, this is @emph{not supported}.  The
@@ -7729,18 +7803,17 @@ make install
 @end example
 
 If you have Microsoft or Turbo C or C++, and a Microstar Laboratories DAP 1200-
-or 2400-series analog interface board, you can instruct the @file{install}
-procedure to compile @file{sample} (a program for creating database records
-from analog signals, and for replaying them in analog form).  To do so
-successfully, you must first have installed the Microstar @file{#include} files
-and DAP interface library on your system.  Specifically, files @file{c_lib.c},
-@file{clock.h}, and @file{ioutil.h} must be installed in your @file{include}
-directory, and the version of the file @file{cdapl.lib} that is compatible with
-your compiler must be installed in a directory in which libraries are found by
-your linker.  Read and customize @code{lib/Makefile.dos} and
-@code{app/Makefile.dos} as appropriate for your compiler, and use your
-compiler's @code{make} utility to generate @code{wfdb.lib} and then
-@code{sample.exe}.
+or 2400-series analog interface board, you can compile @file{sample} (a program
+for creating database records from analog signals, and for replaying them in
+analog form).  To do so successfully, you must first have installed the
+Microstar @file{#include} files and DAP interface library on your system.
+Specifically, files @file{c_lib.c}, @file{clock.h}, and @file{ioutil.h} must be
+installed in your @file{include} directory, and the version of the file
+@file{cdapl.lib} that is compatible with your compiler must be installed in a
+directory in which libraries are found by your linker.  Read and customize
+@code{lib/Makefile.dos} and @code{app/Makefile.dos} as appropriate for your
+compiler, and use your compiler's @code{make} utility to generate
+@code{wfdb.lib} and then @code{sample.exe}.
 
 
 @node Other installation, , MS-Windows installation, Installation
@@ -8323,10 +8396,31 @@ Dept. of Bioengineering and Medical Informatics
 via Trieste, 41
 56126 PISA, Italy
 
-email:	@email{taddei@@ifc.pi.cnr.it}
+email: @email{taddei@@ifc.pi.cnr.it}
 telephone: +39 050 501145
 telefax: +39 050 503596
 @end display
+
+Over half of this database has been contributed to PhysioNet (see above), from
+which it may be downloaded freely.
+
+@cindex CD-ROM
+@cindex LTST DB
+@item Long-Term ST Database
+@sp 1
+@display
+Franc Jager
+Laboratory of Biomedical Computer Systems and Imaging
+University of Ljubljana
+Faculty of Computer and Information Science
+Trzaska 25
+1000 Ljubljana, Slovenia
+
+email: @email{lbcsi@@fri.uni-lj.si}
+@end display
+
+Over half of this database has been contributed to PhysioNet (see above), from
+which it may be downloaded freely.
 
 @cindex AHA DB
 @item AHA Database for Evaluation of Ventricular Arrhythmia Detectors
@@ -8357,7 +8451,8 @@ telephone: +1 617 726 8824
 
 This is a large database of multi-channel recordings (3 ECG leads, radial
 arterial, pulmonary arterial, and central venous pressure, respiration,
-and CO2), which has been issued on 10 CD-ROMs.
+and CO2), which has been issued on 10 CD-ROMs.  In 2003, this database was
+contributed to PhysioNet (see above), from which it can be downloaded freely.
 
 @item American National Standard ANSI/AAMI EC38:1998, Ambulatory Electrocardiographs
 @itemx American National Standard ANSI/AAMI EC57:1998 Testing and Reporting Performance
@@ -8387,7 +8482,7 @@ in even-numbered years, they are convened in North America, and in Europe in
 odd-numbered years.  The deadline for submission of abstracts is 1 May each
 year.  Proceedings of the conferences are published by the IEEE, and
 usually appear about 3 months after the date of the conference.  CinC
-will be in Thessaloniki in 2003 and in Chicago in 2004.
+will be in Chicago in 2004 and in Lyon in 2005.
 
 @item Proceedings of Computers in Cardiology (ISSN 0276-6574)
 @sp 1
@@ -8446,7 +8541,7 @@ The Unix @TeX{} distribution is also distributed on CD-ROM and in other tape
 formats by the Free Software Foundation (address above) and others.  It is
 also included with most GNU/Linux distributions (see below).
 
-Several commercial implementations of @TeX{} for MS-DOS, MS-Windows, and MacOS
+Several commercial implementations of @TeX{} for MS-DOS, MS-Windows, and Mac OS
 are widely available;  visit the web site of the @TeX{} Users Group (below) for
 pointers.
 

@@ -1,3 +1,73 @@
+10.3.12:
+	A beta release of the WFDB_tools package is now available for testing.
+	This package allows Matlab R13 users to use the WFDB library to read
+	and write digitized signals and annotations such as those available
+	from PhysioBank. The WFDB_tools functions are wrappers for the WFDB
+	library, so that Matlab users can access the full range of capabilities
+	offered by current and future versions of the WFDB library, including
+	transparent access to data in a large and growing number of formats,
+	whether stored locally or on remote web servers. The package was
+	written and contributed by Jonas Carlson. It has been tested
+	successfully under GNU/Linux and MS-Windows, and it should be portable
+	to MacOS X and other platforms supported by Matlab R13.  Look for the
+	WFDB_tools package on PhysioNet.
+
+	Thanks to instructions provided by David Linker, and a port of the
+	XView library by Logan Donaldson, WAVE can now be used under Mac OS X.
+	No code changes were necessary;  it just works!
+
+	It has long been possible to use WAVE to view sequence of the 'num'
+	fields in an annotation file as a signal.  This is useful, for example,
+	for visualizing a series of measurements applied to each beat in an
+	ECG.  WAVE now supports changing the scale of the displayed signal,
+	using the same controls as for ordinary signals.  Also, it is possible
+	to define default scales for different types of measurements in the
+	WFDB calibration database (data/wfdbcal), using the annotator name as
+	the signal type.
+
+	Some recent GNU/Linux distributions use a default color for window
+	backgrounds that makes WAVE's grid invisible.  WAVE's resource
+	(preference) file (wave/Wave.res) has been updated to work around this
+	problem;  it also includes documentation of all other WAVE-specific
+	settings that can be controlled via this file.  Portions of the WAVE
+	User's Guide related to this subject have also been updated.
+
+	Okko Willeboordse pointed out an incompatibility between the native
+	MS-Windows API and the ANSI/ISO C library function 'mkdir', which is
+	used by the WFDB library.  This does not present a problem when
+	compiling the WFDB library using the supported Cygwin/gcc compiler
+	under MS-Windows, nor does any related problem occur on any other
+	platform.  It should now be a little easier to compile the WFDB library
+	using unsupported compilers, thanks to a new MKDIR macro that hides
+	the incompatibility (see lib/wfdblib.h0).
+
+	Piotr Wlodarek initiated a discussion about memory leaks in the WFDB
+	library, citing as an example the 'trivial example program in C' from
+	the WFDB Programmer's Guide, which does not free memory it allocates
+	in isigopen() when reading the signal specifications.  This problem
+	can be avoided by invoking wfdbquit() in the example program, just
+	before exiting.  Further discussion of this point has been added to
+	the WFDB Programmer's Guide following the presentation of the 'trivial
+	example', and in the description of wfdbquit().
+
+	Thomas Heldt provided a sample input for `ihr', in which a misplaced
+	annotation evoked a lengthy interval during which valid inputs were
+	rejected.  This example stimulated a modification to the predictor
+	used by ihr for outlier detection, in order to avoid such behavior;
+	see comments in app/ihr.c for details.
+
+	Using rdsamp's -v option causes it to print column headings based on
+	the descriptions of the signals in the input record.  The default
+	signal description as supplied by the WFDB library ('record XXX,
+	signal N') is abbreviated to 'sig N', but previous versions did not
+	do this consistently.
+
+	Gains and scale factors can now be chosen independently for each
+	signal when using wrsamp.
+
+	The man page for xform (doc/wag-src/xform.1) now documents the -S
+	option (thanks to Lucy Gibson for pointing out the omission).
+
 10.3.11:
 	Isaac Henry provided a fix for 'configure' to avoid a problem that
 	may occur in a non-standard Cygwin installation. 

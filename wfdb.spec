@@ -16,6 +16,9 @@ Requires: w3c-libwww-devel >= 5.2
 BuildRoot: /var/tmp/%{name}-root
 
 %changelog
+* Mon Mar 8 2004 George B Moody <george@mit.edu>
+- added time2sec
+
 * Wed Mar 19 2003 George B Moody <george@mit.edu>
 - added --mandir to build, fixed linking in post
 
@@ -64,7 +67,7 @@ make clean
 
 %post
 /sbin/ldconfig
-test -e /usr/lib/libwfdb.so.10 -a ! -e /usr/lib/libwfdb.so && ln -s /usr/lib/libwfdb.so.10 /usr/lib/libwfdb.so
+test -e /usr/lib/libwfdb.so.10 -a ! -e /usr/lib/libwfdb.so && ln -sf /usr/lib/libwfdb.so.10 /usr/lib/libwfdb.so
 
 %postun -p /sbin/ldconfig
 
@@ -175,6 +178,7 @@ power spectrum estimation, and many others.
 %{_bindir}/sumann
 %{_bindir}/sumstats
 %{_bindir}/tach
+%{_bindir}/time2sec
 %{_bindir}/url_view
 %{_bindir}/wabp
 %{_bindir}/wav2mit
@@ -236,8 +240,5 @@ Programmer's Guide, the WFDB Applications Guide, and the WAVE User's Guide.
 %files doc
 %defattr(-,root,root)
 %doc doc/wag doc/wpg doc/wug
-
-
-
 
 

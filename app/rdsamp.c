@@ -1,9 +1,9 @@
 /* file: rdsamp.c	G. Moody	 23 June 1983
-			Last revised:  14 November 2002
+			Last revised:    8 March 2004
 
 -------------------------------------------------------------------------------
 rdsamp: Print an arbitrary number of samples from each signal
-Copyright (C) 2002 George B. Moody
+Copyright (C) 1983-2004 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -216,8 +216,8 @@ char *argv[];
 
     /* Print column headers if '-v' option selected. */
     if (vflag) {
-	char *p, *t;
-	int l;
+	char *p, *r, *t;
+	int j, l;
 
 	if (pflag == 0) (void)printf("samp #");
 	else (void)printf("time");
@@ -225,10 +225,21 @@ char *argv[];
 	    fprintf(stderr, "%s: insufficient memory\n", pname);
 	    exit(2);
 	}
+	for (r = record+strlen(record); r > record; r--)
+	    if (*r == '/') {
+		r++;
+		break;
+	    }
 	for (i = 0; i < nsig; i++) {
-	    (void)sprintf(t, "record %s, signal %d", record, sig[i]);
+	    /* Check if a default signal description was provided.  Note that
+	       if the description comes from the header file, the record name
+	       may include path information that might not match that in
+	       'record' (if any);  so we compare only the final part of the
+	       description (p+j below) against the expected description (t). */
+	    (void)sprintf(t, "%s, signal %d", r, sig[i]);
 	    p = si[sig[i]].desc;
-	    if (strcmp(p, t) == 0) {
+	    j = strlen(p) - strlen(t);
+	    if (j > 0 && strcmp(p+j, t) == 0) {
 		(void)sprintf(t, "sig %d", sig[i]);
 		p = t;
 	    }

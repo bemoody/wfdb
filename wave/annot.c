@@ -1,10 +1,10 @@
 /* file: annot.c	G. Moody	  1 May 1990
-			Last revised:  12 October 2001
+			Last revised:    5 March 2004
 Annotation list handling and display functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 2001 George B. Moody
+Copyright (C) 1990-2004 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -385,7 +385,7 @@ int dt;
 	    y = ytop = abase; p = annstr(annp->this.anntyp); break;
 	}
 	if (ann_mode == 2 && y == abase) {
-	    int yy = y + annp->this.num*vscale[0];
+	    int yy = y + annp->this.num*vscalea;
 
 	    if (xs >= 0)
 		XDrawLine(display, xid, draw_ann, xs, ys, x, yy);
