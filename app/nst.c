@@ -1,5 +1,5 @@
 /* file: nst.c		G. Moody	8 December 1983
-			Last revised:	10 October 2001
+			Last revised:  17 December 2001
 
 -------------------------------------------------------------------------------
 nst: Noise stress test
@@ -180,7 +180,7 @@ char *argv[];
 
     /* Set the reference annotator name if it was not specified with -a. */
     if (refaname[0] == '\0')
-	(void)strcpy(refaname, "atruth");
+	(void)strcpy(refaname, "atr");
 
     /* Get input record names if they were not specified with -i. */
     if (irec[0] == '\0' || nrec[0] == '\0') {
@@ -576,7 +576,7 @@ static char *help_strings[] = {
  "usage: %s [OPTIONS ...]\n",
  "where OPTIONS may include any of:",
  " -a ANNOTATOR  copy annotations for the specified ANNOTATOR from SREC to",
- "                OREC (default: atruth);  unless -p is used, normal QRS",
+ "                OREC (default: atr);  unless -p is used, normal QRS",
  "                annotations from this annotator are used in determining",
  "                signal amplitudes (hence noise scale factors)",
  " -F N          write output signals in format N (default: 16)",

@@ -1,5 +1,5 @@
 # file: generic-slib.def	G. Moody	31 May 2000
-#				Last revised:	5 June 2000
+#				Last revised: 17 December 2001
 # This section contains settings suitable for compiling a shared version of the
 # WFDB library under versions of UNIX that are not otherwise recognized by
 # 'configure'.  Not all versions of UNIX support shared libraries, so you may
@@ -44,9 +44,27 @@ LIBDIR = $(WFDBROOT)/lib
 # CC is the name of your C compiler.
 CC = gcc
 
+# CCDEFS is the set of C compiler options needed to set preprocessor variables
+# while compiling the WFDB Software Package.  CCDEFS should always include
+# VDEFS.  Add the following options to CCDEFS as appropriate (separating them
+# by spaces if you use more than one):
+#   -DISPRINTF	  if you do not have `stdlib.h' and your `sprintf' returns an
+#		   int (see wfdblib.h)
+#   -DNETFILES	  if you have libwww and want to be able to access WFDB files
+#		   remotely via http or ftp (as well as local files)
+#   -DNOMALLOC_H  if you have neither `stdlib.h' nor `malloc.h' (see wfdblib.h)
+#   -DNOSTRTOK	  if your standard C library does not include function `strtok'
+#		   (see wfdbio.c)
+#   -DNOTIME	  if you do not have `time.h' (see signal.c)
+#   -DNOVALUES_H  if you do not have `values.h' (see psd/log10.c)
+#   -DOLDC	  if you have neither `stdarg.h' nor `varargs.h' (see wfdbio.c)
+# If your C compiler fails to compile `signal.c', add -DBROKEN_CC to CCDEFS
+# and try again (see signal.c).
+CCDEFS = $(VDEFS)
+
 # CFLAGS is the set of C compiler options used when compiling the shared
-# library.  CFLAGS should always include VDEFS.
-CFLAGS = -fpic -g -O $(VDEFS) `$(LWC) --cflags` -I$(INCDIR)
+# library.  CFLAGS should always include CCDEFS.
+CFLAGS = -fpic -g -O $(CCDEFS) `$(LWC) --cflags` -I$(INCDIR)
 
 # WFDBLIB_BASENAME is the name, without version numbers, of the alternate
 # library.  WFDBLIB_SONAME is the shared object name ("soname") of the

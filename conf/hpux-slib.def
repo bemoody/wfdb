@@ -1,5 +1,5 @@
 # file: hpux-slib.def	G. Moody	31 May 2000
-#			Last revised:	5 June 2000
+#			Last revised: 17 December 2001
 # This section contains settings suitable for generating a shared library under
 # HP-UX.
 
@@ -40,9 +40,14 @@ LIBDIR = $(WFDBROOT)/lib
 # CC is the name of your C compiler.
 CC = gcc
 
+# CCDEFS is the set of C compiler options needed to set preprocessor variables
+# while compiling the WFDB Software Package.  CCDEFS should always include
+# VDEFS.
+CCDEFS = $(VDEFS)
+
 # CFLAGS is the set of C compiler options used when compiling the shared
-# library.  CFLAGS should always include VDEFS.
-CFLAGS = -fpic -g -O $(VDEFS) `$(LWC) --cflags` -I$(INCDIR)
+# library.  CFLAGS should always include CCDEFS.
+CFLAGS = -fpic -g -O $(CCDEFS) `$(LWC) --cflags` -I$(INCDIR)
 
 # WFDBLIB_BASENAME is the name, without version numbers, of the alternate
 # library.  WFDBLIB_SONAME is the shared object name ("soname") of the

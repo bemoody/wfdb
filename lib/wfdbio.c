@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-			Last revised:	 7 November 2001	wfdblib 10.2.1
+			Last revised:	17 December 2001	wfdblib 10.2.4
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -729,12 +729,12 @@ static char irec[WFDB_MAXRNL+1]; /* current record name, set by wfdb_setirec */
 
 /* wfdb_open is used by other WFDB library functions to open a database file
 for reading or writing.  wfdb_open accepts two string arguments and an integer
-argument.  The first string specifies the file type ("header", "atruth", etc.),
+argument.  The first string specifies the file type ("hea", "atr", etc.),
 and the second specifies the record name.  The integer argument (mode) is
 either WFDB_READ or WFDB_WRITE.  Note that a function which calls wfdb_open
 does not need to know the filename itself; thus all system-specific details of
 file naming conventions can be hidden in wfdb_open.  If the first argument is
-"-", or if the first argument is "header" and the second is "-", wfdb_open
+"-", or if the first argument is "hea" and the second is "-", wfdb_open
 returns a file pointer to the standard input or output as appropriate.  If
 either of the string arguments is null or empty, wfdb_open takes the other as
 the file name.  Otherwise, it constructs the file name by concatenating the
@@ -793,7 +793,7 @@ int mode;
 
     /* Check to see if standard input or output is requested. */
     if (strcmp(s, "-") == 0 ||
-	(strcmp(s, "header") == 0 && strcmp(record, "-") == 0))
+	(strcmp(s, "hea") == 0 && strcmp(record, "-") == 0))
 	if (mode == WFDB_READ) {
 	    static WFDB_FILE wfdb_stdin;
 

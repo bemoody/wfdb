@@ -78,8 +78,8 @@ Options:
 			from the `View' panel (see `Resources' for details).
 Examples:
 ---------
- wave -r 200 -a atruth		Open record 200, and show annotations from
-				the reference annotation file (atruth.200)
+ wave -r 200 -a atr		Open record 200, and show annotations from
+				the reference annotation file (200.atr)
 
  wave -r 100 -g -dpi 65x70	Open record 100, and use shades of grey only
 				on a display that has a resolution of 65 dpi

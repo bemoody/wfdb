@@ -1,5 +1,5 @@
 # file: hpux.def		G. Moody	31 May 2000
-#				Last revised: 13 December 2001
+#				Last revised: 17 December 2001
 # 'make' definitions for compiling the WFDB library under HP-UX
 
 # Choose a value for WFDBROOT to determine where the WFDB Software Package will
@@ -67,16 +67,21 @@ PSPDIR = $(WFDBROOT)/lib/ps
 # CC is the name of your C compiler.
 CC = gcc
 
+# CCDEFS is the set of C compiler options needed to set preprocessor variables
+# while compiling the WFDB Software Package.  CCDEFS should always include
+# VDEFS.
+CCDEFS = $(VDEFS)
+
 # CFLAGS is the set of C compiler options.  CFLAGS should always include
-# VDEFS.  Add the following options to CFLAGS as appropriate (separating them
+# CCDEFS.  Add the following options to CFLAGS as appropriate (separating them
 # by spaces if you use more than one):
 #   -g		  to save symbols for debugging
 #   -O		  if you trust your C compiler's optimizer
 # With the exception of `gcc', most C compilers do not allow you to use -g and
 # -O simultaneously.
-CFLAGS = -g $(VDEFS) `$(LWC) --cflags` -I$(INCDIR)
+CFLAGS = -g $(CCDEFS) `$(LWC) --cflags` -I$(INCDIR)
 # `gcc' users may comment out the previous line, and uncomment the next one.
-# CFLAGS = -g -O $(VDEFS) `$(LWC) --cflags` -I$(INCDIR)
+# CFLAGS = -g -O $(CCDEFS) `$(LWC) --cflags` -I$(INCDIR)
 
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.

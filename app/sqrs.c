@@ -1,5 +1,5 @@
 /* file: sqrs.c		G. Moody	27 October 1990
-			Last revised:    8 October 2001
+			Last revised:  17 December 2001
 
 -------------------------------------------------------------------------------
 sqrs: Single-channel QRS detector
@@ -67,7 +67,7 @@ The output may be read using (for example):
 To evaluate the performance of this program, run it on the entire record, by:
     sqrs -r 100
 and then compare its output with the reference annotations by:
-    bxb -r 100 -a atruth qrs
+    bxb -r 100 -a atr qrs
 */
 
 #include <stdio.h>

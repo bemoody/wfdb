@@ -1,5 +1,5 @@
 # file: linux.def		G. Moody	31 May 2000
-#				Last revised: 13 December 2001
+#				Last revised: 17 December 2001
 # 'make' definitions for compiling the WFDB Software Package under Linux
 
 # Choose a value for WFDBROOT to determine where the WFDB Software Package will
@@ -59,9 +59,14 @@ PSPDIR = $(WFDBROOT)/lib/ps
 # CC is the name of your C compiler.
 CC = gcc
 
-# CFLAGS is the set of C compiler options.  CFLAGS should always include
+# CCDEFS is the set of C compiler options needed to set preprocessor variables
+# while compiling the WFDB Software Package.  CCDEFS should always include
 # VDEFS.
-CFLAGS = -g -O $(VDEFS) `$(LWC) --cflags` -I$(INCDIR)
+CCDEFS = $(VDEFS)
+
+# CFLAGS is the set of C compiler options.  CFLAGS should always include
+# CCDEFS.
+CFLAGS = -g -O $(CCDEFS) `$(LWC) --cflags` -I$(INCDIR)
 
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.

@@ -139,7 +139,7 @@ double imargin;			/* inside margin (mm) */
 double omargin;			/* outside margin (mm) */
 
 /* User-settable parameters */
-char aname[41] = "atruth";	/* annotator name */
+char aname[41] = "atr";		/* annotator name */
 char aname2[41] = "";		/* second annotator name */
 int aux_shorten = 0;		/* if non-zero, print first char of aux only */
 double boff = 0.;		/* binding offset (mm) */
@@ -1575,7 +1575,7 @@ char *s;
 static char *help_strings[] = {
  "usage: %s [ OPTIONS ] SCRIPT-FILE\n",
  "Options are:",
- " -a ANN    specify first annotator (default: atruth)",
+ " -a ANN    specify first annotator (default: atr)",
  " -A ANN    specify second annotator (default: none)",
  " -b N      set binding offset in mm (default: 0)",
  " -c STR    set copyright notice",

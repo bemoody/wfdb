@@ -1,9 +1,9 @@
 /* file: ecgeval.c	G. Moody	22 March 1992
-			Last revised:  9 February 2000
+			Last revised: 17 December 2001
 
 -------------------------------------------------------------------------------
 ecgeval: Generate and run a script of commands to compare sets of annotations
-Copyright (C) 2000 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -141,11 +141,7 @@ main()
 		mxmfile[40] = "hr%d.out", epicaffile[40] = "af.out",
 		epicvffile[40] = "vf.out", epicstfile1[40] = "st.out",
 		epicstfile2[40] = "stm.out", plotstmfile[40] = "stm.ps";
-#ifdef MSDOS
     static char *rname = "atr";
-#else
-    static char *rname = "atruth";
-#endif
 
 #ifdef __STDC__
     time_t t, time();

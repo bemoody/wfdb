@@ -215,7 +215,7 @@ New features
 
 - You can now specify the starting time of the first screen shown by WAVE
   using the `-f' command-line option.  For example,
-	wave -r 100 -a atruth -f 25:14
+	wave -r 100 -a atr -f 25:14
   opens record 100 at 25 minutes and 14 seconds from the beginning of the
   record.  You may also set the initial value of the signal list (see below)
   using the `-s' option.  For example,

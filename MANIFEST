@@ -498,7 +498,7 @@ wave/wave.xbm
 wave/xview-patches
 wave/xvwave.c
 wave/xvwave.h
-wfdb-10.2.3-1.spec
+wfdb-10.2.4-1.spec
 wview/
 wview/clean
 wview/ecg.ico

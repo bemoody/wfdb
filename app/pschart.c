@@ -1757,7 +1757,7 @@ char *s;
 static char *help_strings[] = {
  "usage: %s [ OPTIONS ] SCRIPT-FILE\n",
  "Options are:",
- " -a ANN    specify first annotator (default: atruth)",
+ " -a ANN    specify first annotator (default: atr)",
  " -A ANN    specify second annotator (default: none)",
  " -b N      set binding offset in mm (default: 0)",
  " -c STR    set copyright notice",
