@@ -1,5 +1,5 @@
 # file: linux-slib.def		G. Moody	31 May 2000
-#                               Last revised:	5 June 2000
+#                               Last revised: 13 December 2001
 # This section contains settings suitable for generating an ELF-format shared
 # library under Linux.
 
@@ -84,7 +84,7 @@ SETDPERMISSIONS = chmod 755
 
 # SETLPERMISSIONS is the command needed to make the WFDB library usable by
 # programs linked to it.
-SETLPERMISSIONS = chmod 644
+SETLPERMISSIONS = chmod 755
 
 # `make' (with no target specified) will be equivalent to `make all'.
 make-all:	all

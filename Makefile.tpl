@@ -74,7 +74,7 @@ test-install: $(TESTDIRS)
 	$(MAKE) WFDBROOT=$(HOME)/wfdb-test install
 
 # 'make check': test currently installed version of the WFDB software package
-check:
+check:		config.cache
 	cd checkpkg; $(MAKE) all
 
 # Create directories for test installation if necessary.
@@ -117,3 +117,14 @@ tarballs:	clean
 # binaries and other installed files
 bin-tarball:	test-install
 	cd $(HOME)/wfdb-test;  tar cfvz ../$(PACKAGE)-$(ARCH).tar.gz .
+
+# 'make rpms': make source and binary RPMs
+RPMROOT=/usr/src/redhat
+RPMRELEASE=1
+
+rpms:		tarballs
+	cp -p ../$(PACKAGE).tar.gz $(RPMROOT)/SOURCES
+	cp -p $(PACKAGE)-$(RPMRELEASE).spec $(RPMROOT)/SPECS
+	rpm -ba $(PACKAGE)-$(RPMRELEASE).spec
+	mv $(RPMROOT)/RPMS/*/$(PACKAGE)-$(RPMRELEASE).*.rpm ..
+	mv $(RPMROOT)/SRPMS/$(PACKAGE)-$(RPMRELEASE).src.rpm ..

@@ -55,6 +55,7 @@ app/xform.c
 check-manifest
 checkpkg/
 checkpkg/appcheck
+checkpkg/checkfile
 checkpkg/expected/
 checkpkg/expected/100s.a2r
 checkpkg/expected/100s.mix
@@ -202,7 +203,7 @@ data/pipe/8x8.hea
 data/pipe/8x9.hea
 data/README
 data/tape/
-data/tape/102040.hea
+data/tape/10240.hea
 data/tape/1024.hea
 data/tape/4096.hea
 data/tape/512.hea
@@ -257,6 +258,8 @@ doc/icons/up_gr.png
 doc/icons/up.png
 doc/ihr.1
 doc/index.ht0
+doc/info/
+doc/info/README.info
 doc/install.tex
 doc/intro.ht0
 doc/.latex2html-init
@@ -294,8 +297,6 @@ doc/sqrs.1
 doc/sumann.1
 doc/sumstats.1
 doc/tach.1
-doc/texi2html
-doc/texindex.c
 doc/tmac.dif
 doc/view.1
 doc/wave/
@@ -497,6 +498,7 @@ wave/wave.xbm
 wave/xview-patches
 wave/xvwave.c
 wave/xvwave.h
+wfdb-10.2.3-1.spec
 wview/
 wview/clean
 wview/ecg.ico

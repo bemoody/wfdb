@@ -1,5 +1,5 @@
 # file: cygwin.def		G. Moody	6 June 2000
-#				Last revised:	29 November 2001
+#				Last revised: 13 December 2001
 #
 # This file contains default 'make' definitions for compiling the WFDB Software
 # Package under MS Windows using the free Cygwin/gcc ANSI C compiler, available
@@ -51,10 +51,9 @@ DBDIR = $(WFDBROOT)/database
 # INCDIR specifies the name of a directory in which to install the WFDB
 # library's #include <...> files.
 INCDIR = $(WFDBROOT)/include
-# Note: if you have both gcc and a vendor-supplied C compiler, and if INCDIR
-# is /usr/include, CFLAGS should *not* contain -I$(INCDIR) (if it does, gcc may
-# read the wrong version of files such as stdio.h when compiling WFDB
-# applications).
+
+# INFODIR is the GNU info directory (optional, needed to `make info').
+INFODIR = /usr/info
 
 # LIBDIR specifies the name of a directory in which to install the WFDB
 # library.

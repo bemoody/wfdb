@@ -6,7 +6,19 @@
 
 	The full package is now much smaller because the figures for the
 	WAVE User's Guide are now generated as needed from compressed ppm
-	files.
+	files.  Also, 'doc/texindex.c' and 'doc/texi2html' have been removed
+	from the package (these are now more widely available than when they
+	were originally included, and relatively few users need them).
+
+	Added rules for creating 'dbu.hlp' (MS-Windows help file version of
+	the WFDB Programmer's Guide) to doc/Makefile.tpl.  Updated rules for
+        generating the info version of the Programmer's Guide.
+
+	Special pipe and tape header files from 'data' are now installed
+	by default.
+
+	Added rules for creating WFDB source and binary RPMs to the top-level
+	Makefile.tpl.
 
 10.2.2:
 	WAVE can now be used to view and edit annotations for records that

@@ -1,12 +1,44 @@
 file: README		G. Moody	7 September 1989
-			Last revised:	  25 May 1999
+			Last revised:	14 December 2001
 
 This directory contains UNIX man pages in troff source format for the WFDB
-software, and the TeX source for the WFDB Programmer's Guide.  On a UNIX
-system, this material can be printed or installed on-line by following the
-instructions in `Makefile'.  Both TeX and troff are available for MS-DOS as
-well.  See the beginning of `dbu.tex' for information on obtaining printed
-copies of the material in this directory.
+software and other sources for the WFDB Applications Guide, the TeX (texinfo)
+source for the WFDB Programmer's Guide, and the LaTeX source for the WAVE
+User's Guide.  Under Unix, Linux, or under MS-Windows with the Cygwin toolkit,
+this material can be printed or installed on-line by following the instructions
+in `Makefile'.
+
+If you follow the instructions for a standard installation of the WFDB Software
+Package, the man pages from this directory will be installed so they can be
+read using 'man', 'xman', etc.  If you have the necessary formatting software,
+these man pages and a large amount of other documentation can be produced in a
+wide variety of formats from the sources in in this directory (see 'Makefile').
+Here is a brief list of available formats and the commands needed to produce
+them:
+
+WFDB Programmer's Guide
+  printed copy	'make guide' (requires troff, texi2dvi, dvips, and a printer)
+  HTML		'make htmlpg' (requires texi2html)
+  info		'make info' (requires makeinfo or GNU emacs)
+  PDF		'make dbpg.pdf' (requires texi2dvi)
+  PostScript	'make dbpg.ps' (requires texi2dvi and dvips)
+  Windows help	'make dbu.hlp' (requires makertf and hcrtf)
+
+WFDB Applications Guide
+  printed copy	'make appguide' (requires troff, latex, dvips, and a printer)
+  HTML		'make htmlag' (requires perl)
+  PDF		'make dbag.pdf' (requires latex, troff, dvips, and pstopdf)
+  PostScript	'make dbag.ps' (requires latex, troff, and dvips)
+
+WAVE User's Guide
+  printed copy	'make wguide' (requires troff, latex, dvips, and a printer)
+  HTML		'make htmlag' (requires perl)
+  PDF		'make dbag.pdf' (requires pdflatex)
+  PostScript	'make dbag.ps' (requires latex and dvips)
+
+All of these, with the exception of printed copies, can be downloaded from
+PhysioNet (look in http://www.physionet.org/physiotools/manuals.shtml).
+
 
 The following files will be found in this directory:
 
@@ -14,43 +46,51 @@ The following files will be found in this directory:
 		 Applications Guide into HTML using latex2html
 Makefile	UNIX `make' description file for printing the WFDB software
 		 documentation and installing it on-line
+Makefile.top	Used by ../configure to construct Makefile (comments only)
+Makefile.tpl	Used by ../configure to construct Makefile (portable section)
 README		this file
 
-appguide.int	table of contents and introduction for the Applications Guide
-cover.ag	troff source for the cover of the Applications Guide
-cover.pg	troff source for the cover of the Progammer's Guide
-dbag.htm	HTML-format table of contents for the Applications Guide
-dbag.tex	TeX source for the title page of the Applications Guide
-dbu.hlp		the WFDB Programmer's Guide in Microsoft help file format
-		 (this file may not be up-to-date)
-dbu.htm		HTML-format introduction for the Programmer's Guide
-dbu.tex		TeX source for the WFDB Programmer's Guide
-dir.db		Text to be added (by `make') to the top-level `info' menu
+appguide.int	troff contents and introduction for the WFDB Applications Guide
+cover.ag	troff source for the cover of the WFDB Applications Guide
+cover.pg	troff source for the cover of the WFDB Progammer's Guide
+cover.wug	troff source for the cover of the WAVE User's Guide
+ctotexi.c	formats a C program as texinfo (used to format programs from
+		 ../examples for inclusion in the WFDB Programmer's Guide)
+dbag.ht0	HTML-format table of contents for the WFDB Applications Guide
+dbag.tex	LaTeX source for the title page of the WFDB Applications Guide
+dbpg.hlp	Programmer's Guide in MS-Windows help file format (this may not
+		 be up-to-date;  see 'Makefile' for information on updating it)
+dbu.ht0		HTML-format introduction for the WFDB Programmer's Guide
+dbu.tex		TeX (texinfo) source for the WFDB Programmer's Guide
+dir.db		Text to be added (by `make info') to the top-level `info' menu
 dir.top		Template for top-level `info' menu
-eval.tex	TeX source for "Evaluating ECG Analyzers" (an appendix in
-		 the Applications Guide)
+eval.tex	LaTeX source for "Evaluating ECG Analyzers" (an appendix in
+		 the WFDB Applications Guide)
+fancybox.perl	LaTeX 'fancybox' extension for latex2html
 fixag.sed	sed commands for fixing HTML links (used by fixag.sh)
-fixag.sh	Script for postprocessing Applications Guide HTML files
+fixag.sh	Script for postprocessing WFDB Applications Guide HTML files
 fixpg.sed	sed commands for fixing HTML links (used by fixpg.sh)
-fixpg.sh	Script for postprocessing Programmer's Guide HTML files
-foot.htm	final lines for HTML files, appended after address and date
-icons		directory containing navigational icons for HTML files
-index.htm	top-level HTML introduction to WFDB documentation
-install.tex	Tex source for "Installing the WFDB Software Package" (an
-		 appendix in the Applications Guide)
-intro.htm	HTML-format introduction for the Applications Guide
-makeinfo.sh	Script for using GNU emacs to convert dbu.tex to emacs-usable
-		 `info' hypertext files (if you don't have the GNU `makeinfo'
-		 utility)
+fixpg.sh	Script for postprocessing WFDB Programmer's Guide HTML files
+foot.ht0	final lines for HTML files, appended after address and date
+icons/		directory containing navigational icons for HTML files
+index.ht0	top-level HTML introduction to WFDB documentation
+info/		directory for GNU info version of the WFDB Programmer's Guide
+install.tex	LaTex source for "Installing the WFDB Software Package" (an
+		 appendix in the WFDB Applications Guide)
+intro.ht0	HTML-format introduction for the WFDB Applications Guide
+makeinfo.sh	Script for converting dbu.tex to `info' hypertext files using
+		 GNU emacs (if you don't have `makeinfo')
 manhtml.sh	Script for converting man pages to HTML using `rman'
 maninst.sh	Script for installing man pages (to be invoked by `make' using
 		 `Makefile')
-texi2htm	Perl script for converting texinfo to HTML format
+texi2html	Perl script for converting texinfo to HTML format
 texindex.c	C source for TeX index generation program
-texinfo.tex	TeX macros for formatting dbu.tex
 tmac.dif	notes on troff macros for printing the Applications Guide
+wave/		figures and other miscellaneous files for the WAVE User's Guide
+wug.tex		LaTeX source for the WAVE User's Guide
 
 *.1		troff sources for man pages for the programs in app, convert,
 		 psd, wave, and wview
 *.3		troff sources for man pages for the WFDB library functions
 *.5		troff sources for man pages for WFDB file format specifications
+xview.7		XView toolkit man page (for use with WAVE)

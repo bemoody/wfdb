@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:  3 December 2001
+#				Last revised:  14 December 2001
 # Change the settings below as appropriate for your setup.
 
 # Set COLORS to 'color' if you have a color printer and would like to print
@@ -32,16 +32,10 @@ T2DARGS = -t @letterpaper
 # from the sources in this directory.
 HTMLDIR = ../../html
  
-# INFODIR is the GNU info directory (needed to `make info').  One of the
-# following definitions should be correct.
-INFODIR = /usr/info
-# INFODIR = /usr/local/info
-# INFODIR = /usr/local/emacs/info
-
 # LN is a command that makes the file named by its first argument accessible
 # via the name given in its second argument.  If your system supports symbolic
 # links, uncomment the next line.
-LN = ln -s
+LN = ln -sf
 # Otherwise uncomment the next line if your system supports hard links.
 # LN = ln
 # If your system doesn't support links at all, copy files instead.
@@ -213,11 +207,11 @@ dbpg.pdf:	dbu.tex
 	texi2dvi --pdf $(T2DARGS) dbu.tex
 	mv dbu.pdf dbpg.pdf
 
-# `make info': create and install emacs info files
+# `make info': create and install info files for the WFDB Programmer's Guide
 info:	$(INFODIR)
 	$(MAKEINFO) dbu.tex
 	test -s dbpg && \
-         cp dbpg* $(INFODIR); \
+         cp dbpg dbpg-* $(INFODIR); \
          ( test -s $(INFODIR)/dbpg && \
 	  ( $(SETPERMISSIONS) $(INFODIR)/dbpg*; \
 	   ( test -s $(INFODIR)/dir || cp dir.top $(INFODIR)/dir ); \
@@ -225,8 +219,22 @@ info:	$(INFODIR)
 	     cat dir.db >>$(INFODIR)/dir ))); \
 	rm -f dbpg*
 
+# `make info.tar.gz': create a tarball of info files
+info.tar.gz:
+	$(MAKEINFO) dbu.tex
+	mv dbpg dbpg-* info
+	tar cfv - info | gzip >info.tar.gz
+
 $(INFODIR):
 	mkdir -p $(INFODIR); $(SETDPERMISSIONS) $(INFODIR)
+
+# `make dbu.hlp': create a MS-Windows help file from the Programmer's Guide.
+dbu.hlp:	dbu.tex
+	makertf --hpj=dbu.hpj --output=dbu.rtf --force dbu.tex
+	@echo Ignore any errors that appear above!
+	hcrtf -o dbu.hlp -x dbu.hpj
+	test -s DBU.HLP && mv DBU.HLP dbu.hlp
+	rm -f dbu.rtf dbu.hpj dbu.ph
 
 # `make html': create HTML files, check for anything not accessible to MSDOS
 html:	makehtmldirs htmlag htmlpg htmlwg
@@ -268,12 +276,9 @@ htmlag:	makehtmldirs dbag.ps
 
 htmlpg:	makehtmldirs dbpg.ps
 	cp -p dbu.tex dbpg.ps $(HTMLDIR)/dbpg
-	echo '#!$(PERL)' >$(HTMLDIR)/dbpg/texi2html
-	cat texi2html >>$(HTMLDIR)/dbpg/texi2html
-	$(SETXPERMISSIONS) $(HTMLDIR)/dbpg/texi2html
 	cp dbu.ht0 $(HTMLDIR)/dbpg/dbpg.htm
-	cd $(HTMLDIR)/dbpg; ./texi2html -short_ext -menu -split_node dbu.tex
-	rm -f $(HTMLDIR)/dbpg/dbu.tex $(HTMLDIR)/dbpg/texi2html
+	cd $(HTMLDIR)/dbpg; texi2html -short_ext -menu -split_node dbu.tex
+	rm -f $(HTMLDIR)/dbpg/dbu.tex
 	./fixpg.sh $(HTMLDIR)/dbpg
 	date '+%e %B %Y' >>$(HTMLDIR)/dbpg/dbpg.htm
 	cat foot.ht0 >>$(HTMLDIR)/dbpg/dbpg.htm
@@ -296,15 +301,15 @@ htmlwg: makehtmldirs wug.ps
 
 # `make listing': print listings of programs in this directory
 listing:
-	$(PRINT) README Makefile fixag.sed fixag.sh fixpg.sed fixpg.sh \
-	 makeinfo.sh manhtml.sh maninst.sh tmac.dif
+	$(PRINT) README Makefile ctotexi.c fancybox.perl fixag.sed fixag.sh \
+	 fixpg.sed fixpg.sh makeinfo.sh manhtml.sh maninst.sh tmac.dif
 # This directory also contains .latex2html-init, which is a slightly customized
-# version of dot.latex2html-init from the latex2html 96.1 distribution; and
-# texi2html, included here for convenience since not everyone may have it.
-# They are not included in the listings, however, because of their length and
-# specialized interest.
+# version of dot.latex2html-init from the latex2html 96.1 distribution. This is
+# not included in the listings, however, because of its length and specialized
+# interest.
 
 # `make clean': remove intermediate and backup files
 clean:
 	rm -f *.aux *.dvi *.log *.pdf *.toc db*.?? db*.??s dbpg* *~ texindex \
-	 wug.ind wug.ilg wug.idx wug.out wug.ps labels.pl internals.pl
+	 wug.ind wug.ilg wug.idx wug.out wug.ps labels.pl internals.pl \
+	 info.tar.gz info/dbpg*

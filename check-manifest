@@ -5,6 +5,7 @@ sort <../${PACKAGE}-MANIFEST >../sort.$$
 mv ../sort.$$ ../${PACKAGE}-MANIFEST
 if diff MANIFEST ../${PACKAGE}-MANIFEST
 then
+  rm -f ../${PACKAGE}-MANIFEST
   cat <<EOF
 
 The contents of ${PACKAGE} match the MANIFEST -- no errors were detected.

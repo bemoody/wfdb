@@ -84,7 +84,7 @@ install:	$(BINDIR) $(HELPDIR)/wave $(MENUDIR) $(RESDIR) wave wave.hlp
 	 sed "s%HELPDIR%$(HELPDIR)%" >wave.pro
 	$(STRIP) wave; $(SETXPERMISSIONS) wave;	../install.sh $(BINDIR) wave
 	cp $(HELPFILES) wave.hlp wave.info wave.pro demo.txt $(HELPDIR)/wave
-	-ln -s $(HELPDIR)/wave/wave.pro $(HELPDIR)/wave/news.hlp
+	-ln -sf $(HELPDIR)/wave/wave.pro $(HELPDIR)/wave/news.hlp
 	cd $(HELPDIR)/wave; $(SETPERMISSIONS) $(HELPFILES) news.hlp wave.info \
 	 wave.pro demo.txt
 	-cp wavemenu.def $(MENUDIR) && \

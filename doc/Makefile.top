@@ -60,9 +60,9 @@
 # by typing `make html'.  In order to do this successfully, you must have
 # installed `latex2html' (to translate the WAVE User's Guide and the appendices
 # of the WFDB Applications Guide), and `rman' (to translate the man pages in
-# the WFDB Applications Guide).  You also need `texi2html' (included here, to
-# translate the WFDB Programmer's Guide), and Perl (in order to run
-# `latex2html' and `texi2html').  Links to all of these are available from
+# the WFDB Applications Guide).  You also need `texi2html' (to translate the
+# WFDB Programmer's Guide), and Perl (in order to run `latex2html' and
+# `texi2html').  Links to all of these are available from
 # http://www.physionet.org/, along with the latest versions of the files in
 # this directory.
 
@@ -80,6 +80,13 @@
 # the top-level menu.  Note that `make info' adds an entry for the Guide to the
 # top-level `info' file ($INFODIR/dir).  If you install a GNU emacs update,
 # this entry may disappear; to restore it, simply `make info' again.
+
+# The WFDB Programmer's Guide can also be formatted as an MS-Windows help file,
+# using 'makertf' and 'hcrtf'.  This requires 'makertf' (open-source, from
+# http://makertf.sourceforge.net/) and 'hcrtf' (see the 'makertf' page above
+# for further information).  Install both of these programs in your PATH before
+# trying to generate dbu.hlp.
+
 
 # Printed documentation
 # =====================

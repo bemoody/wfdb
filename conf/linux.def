@@ -1,5 +1,5 @@
 # file: linux.def		G. Moody	31 May 2000
-#				Last revised:	5 June 2000
+#				Last revised: 13 December 2001
 # 'make' definitions for compiling the WFDB Software Package under Linux
 
 # Choose a value for WFDBROOT to determine where the WFDB Software Package will
@@ -44,6 +44,9 @@ DBDIR = $(WFDBROOT)/database
 # INCDIR specifies the name of a directory in which to install the WFDB
 # library's #include <...> files.
 INCDIR = $(WFDBROOT)/include
+
+# INFODIR is the GNU info directory (optional, needed to `make info').
+INFODIR = /usr/share/info
 
 # LIBDIR specifies the name of a directory in which to install the WFDB
 # library.

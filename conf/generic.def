@@ -1,5 +1,5 @@
 # file: generic.def		G. Moody	31 May 2000
-#				Last revised:	6 June 2000
+#				Last revised: 13 December 2001
 # This file contains default 'make' definitions for compiling the WFDB Software
 # Package under versions of UNIX that are not otherwise recognized by
 # 'configure'.
@@ -56,6 +56,13 @@ INCDIR = $(WFDBROOT)/include
 # is /usr/include, CFLAGS should *not* contain -I$(INCDIR) (if it does, gcc may
 # read the wrong version of files such as stdio.h when compiling WFDB
 # applications).
+
+# INFODIR is the GNU info directory (optional, needed to `make info').  One of
+# the following definitions should be correct.
+INFODIR = /usr/info
+# INFODIR = /usr/local/info
+# INFODIR = /usr/local/emacs/info
+# INFODIR = /usr/share/info
 
 # LIBDIR specifies the name of a directory in which to install the WFDB
 # library.
