@@ -23,8 +23,9 @@ char *argv[];
     a.name = "qrs"; a.stat = WFDB_WRITE;
 
     if ((nsig = isigopen(argv[1], NULL, 0)) < 1) exit(2);
-    if ((s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo))) == NULL ||
-	(v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample))) == NULL) {
+    s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+    v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
+    if (s == NULL || v == NULL) {
 	fprintf(stderr, "%s: insufficient memory\n", argv[0]);
 	exit(2);
     }

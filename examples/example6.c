@@ -5,8 +5,9 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-    static WFDB_Siginfo *s;
-    static int i, nsig, nsamp=1000, *vin, *vout;
+    WFDB_Siginfo *s;
+    int i, nsig, nsamp=1000;
+    WFDB_Sample *vin, *vout;
 
     if (argc < 2) {
         fprintf(stderr, "usage: %s record\n", argv[0]); exit(1);

@@ -484,7 +484,7 @@ Division'').
 
 This section contains a brief summary of changes to the WFDB library and to
 this guide since the first printing of the ninth edition of this guide in July,
-1995.  See @file{NEWS.TXT}, in the top-level directory of the WFDB Software
+1995.  See @file{NEWS}, in the top-level directory of the WFDB Software
 Package distribution, for details on these changes, and for information on any
 more recent changes that may not be described here.
 
@@ -734,7 +734,8 @@ This may change in a future version of the WFDB library.
 @unnumberedsubsec Changes in version 9.5
 
 The number of signals that may be read simultaneously, @code{WFDB_MAXSIG},
-was increased from 16 to 32.
+was increased from 16 to 32. [This limit has been eliminated entirely as of
+version 10.2.0.]
 
 @unnumberedsubsec Changes in version 9.4.2
 
@@ -1320,10 +1321,7 @@ an array of @code{WFDB_Anninfo} structures
 (@pxref{WFDB_Anninfo structures}),
 @end ifinfo
 one for each annotator to be opened.  @var{nann} is the number of
-@code{WFDB_Anninfo} structures in @var{aiarray}; @var{nann} must be no
-greater than twice @code{WFDB_MAXANN} (a constant defined in
-@file{<wfdb/wfdb.h>}), and no more than @code{WFDB_MAXANN} input and
-@code{WFDB_MAXANN} output annotators may be open at once.  The caller must
+@code{WFDB_Anninfo} structures in @var{aiarray}.  The caller must
 fill in the @code{WFDB_Anninfo} structures to specify the names of the
 annotators, and to indicate which annotators are to be read, and which
 are to be written.  Input and output annotators may be listed in any
@@ -1449,7 +1447,7 @@ main()
 
     nsig = isigopen("100s", NULL, 0);
     if (nsig < 1)
-	exit(1);
+        exit(1);
     siarray = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
     nsig = isigopen("100s", siarray, nsig);
     for (i = 0; i < nsig; i++)
@@ -1611,8 +1609,7 @@ closed by @code{osigfopen}.  @var{siarray} is a pointer to an array of
 (@pxref{WFDB_Siginfo structures}),
 @end ifinfo
 one for each signal to be opened.  @var{nsig} is the number of
-@code{WFDB_Siginfo} structures in @var{siarray}; @var{nsig} must be no
-greater than @code{WFDB_MAXSIG} (a constant defined in @file{<wfdb/wfdb.h>}).
+@code{WFDB_Siginfo} structures in @var{siarray}.
 
 Before invoking @code{osigfopen}, the caller must fill in the fields of
 the @code{WFDB_Siginfo} structures in @var{siarray} (@pxref{Data Types};
@@ -1738,11 +1735,10 @@ This function reads a sample from each input signal.  The caller should
 allocate storage for an array of WFDB_Samples (integers) and pass a
 pointer to this array to @code{getvec}.  (The length of the array must
 be no less than the number of input signals, as obtained from
-@code{isigopen} or @code{wfdbinit}; this number will never exceed
-@code{WFDB_MAXSIG}, defined in @file{<wfdb/wfdb.h>}.)  On return,
-@var{vector[i]} contains the next sample from signal @var{i}.  For
-example, this modified version of the example from chapter 1 reads and
-prints the first ten samples of each available input signal:
+@code{isigopen} or @code{wfdbinit}.)  On return, @var{vector[i]}
+contains the next sample from signal @var{i}.  For example, this
+modified version of the example from chapter 1 reads and prints the
+first ten samples of each available input signal:
 
 @example
 #include <stdio.h>
@@ -1757,7 +1753,7 @@ main()
 
     nsig = isigopen("100s", NULL, 0);
     if (nsig < 1)
-	exit(1);
+        exit(1);
     s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
     if (isigopen("100s", s, nsig) != nsig)
         exit(1);
@@ -1855,8 +1851,7 @@ This function writes a sample to each input signal.  The caller should
 fill an array of WFDB_Samples with the samples and pass a pointer to this
 array to @code{putvec}.  (The length of the array must be no less than
 the number of output signals, as given to @code{osigfopen} or
-@code{osigopen}; this number must never exceed @code{WFDB_MAXSIG}, defined in
-@file{<wfdb/wfdb.h>}.)  On entry, @var{vector[i]} contains the next sample
+@code{osigopen}.)  On entry, @var{vector[i]} contains the next sample
 from signal @var{i}.  For example, this modified version of the previous
 example
 @iftex
@@ -1868,17 +1863,23 @@ example
 copies the first ten samples of each available input signal:
 
 @example
+#include <stdio.h>
 #include <wfdb/wfdb.h>
 
 main()
 @{
-    int i, nsig;
-    WFDB_Sample v[WFDB_MAXSIG];
-    static WFDB_Siginfo s[WFDB_MAXSIG];
+    int i, j, nsig;
+    WFDB_Sample *v;
+    WFDB_Siginfo *s;
 
-    if ((nsig = isigopen("100s", s, WFDB_MAXSIG)) < 1 ||
-        osigopen("8l", s, nsig) < 1)
+    nsig = isigopen("100s", NULL, 0);
+    if (nsig < 1)
         exit(1);
+    s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+    if (isigopen("100s", s, nsig) != nsig || 
+        osigopen("8l", s, nsig) != nsig)
+        exit(1);
+    v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
     for (i = 0; i < 10; i++)
         if (getvec(v) < 0 || putvec(v) < 0)
             break;
@@ -2990,9 +2991,11 @@ record @file{new}:
 @example
 @dots{}
 int nsig, status;
-WFDB_Siginfo s[WFDB_MAXSIG];
+WFDB_Siginfo *s;
 
-nsig = isigopen("old", s, -WFDB_MAXSIG);
+nsig = isigopen("old", NULL, 0);
+s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+nsig = isigopen("old", s, -nsig);
 if (nsig > 0) @{
     s[0].gain = 100.0;
     status = setheader("new", s, (unsigned int)nsig);
@@ -3847,11 +3850,14 @@ be done:
 char *record;
 int nsig;
 WFDB_Signal s;
-static WFDB_Siginfo siarray[WFDB_MAXSIG];
+static WFDB_Siginfo *si;
 
 @dots{}
 
-if ((nsig = isigopen(record, siarray, WFDB_MAXSIG)) < 1)
+if ((nsig = isigopen(record, NULL, 0)) < 1)
+    exit(1);
+si = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+if (si == NULL || isigopen(record, siarray, nsig)!= nsig)
     exit(1);
 for (s = 0; s < nsig; s++) @{
     wfdbsetskew(s, wfdbgetskew(s));
@@ -4119,11 +4125,10 @@ belonging to the same group must be stored in the same format.
 @cindex signals (oversampled)
 @cindex samples per frame
 the number of samples per frame.  This is 1, for all except oversampled
-signals in multi-frequency records, for which @code{spf} may be between
-2 and @code{WFDB_MAXSPF} (defined in @file{<wfdb/wfdb.h>}).  Note that
-non-integer values are not permitted (thus the frame rate must be chosen
-such that all sampling frequencies used in the record are integer
-multiples of the frame rate).
+signals in multi-frequency records, for which @code{spf} may be any
+positive integer.  Note that non-integer values are not permitted (thus
+the frame rate must be chosen such that all sampling frequencies used in
+the record are integer multiples of the frame rate).
 
 @item int bsize
 @cindex block size
@@ -4192,9 +4197,7 @@ and output signal numbers are assigned beginning with 0 in the order in
 which the signals are given in @var{siarray}.  Note that input signal 0
 and output signal 0 are distinct.  Input signal numbers are supplied to
 @code{aduphys}, @code{physadu}, @code{adumuv}, and @code{muvadu} in
-their first arguments.  There may be no more than @code{WFDB_MAXSIG}
-(defined in @file{<wfdb/wfdb.h>}) input signals and @code{WFDB_MAXSIG} output
-signals open at once.  @xref{Example 5}, for an illustration of how to
+their first arguments.  @xref{Example 5}, for an illustration of how to
 read signal specifications from @code{WFDB_Siginfo} structures.
 
 @node WFDB_Calinfo structures, WFDB_Anninfo structures, WFDB_Siginfo structures, Data Types
@@ -4324,9 +4327,7 @@ numbers beginning with 0 in the order in which they are given in the
 array of @code{WFDB_Anninfo} objects.  Output annotator numbers used by
 @code{putann} also start at 0; note that input annotator 0 and output
 annotator 0 are distinct.  Annotator numbers are supplied to
-@code{getann} and @code{putann} in their first arguments.  There may be
-no more than @code{WFDB_MAXANN} (defined in @file{<wfdb/wfdb.h>}) input
-annotators and @code{WFDB_MAXANN} output annotators open at once.
+@code{getann} and @code{putann} in their first arguments.
 @iftex
 @xref{annopen, , @code{annopen}},
 @end iftex
@@ -4642,7 +4643,9 @@ Recall that a WFDB record is not a file; rather, it is an extensible
 Thus, for example, record 100 of the MIT-BIH Arrhythmia Database
 consists of the files named @file{100.hea}, @file{100.dat}, and
 @file{100.atr} in the @file{mitdb} directory of the MIT-BIH Arrhythmia
-Database CD-ROM, together with any additional files in other directories
+Database CD-ROM (or in PhysioBank, within
+@code{http://@-www.@-physio@-net.@-org/@-physio@-bank/@-data@-base/@-mitdb/}),
+together with any additional files in other directories
 that you may have associated with record 100 (such as your own
 annotation file).  All files associated with a given record include the
 record name in their file names, either as the first part of the name
@@ -5033,18 +5036,19 @@ record @file{16}.  Signal files in AHA format also match these
 specifications.  Piped records for reading or writing other numbers of
 signals also exist; they are named @file{8x@var{n}} and
 @file{16x@var{n}}, where @var{n} is the number of signals (@var{n} = 1,
-2, @dots{}, @code{WFDB_MAXSIG}). 
+2, @dots{}, 16;  piped record header files can be created with larger
+numbers of signals (use the existing files as a model).
 
 @cindex local record
 @cindex signal file (local)
 Application programs may also read or write signal files in the current
 directory using @dfn{local record} @file{header} files.  Record
-@file{16l} (``one-six-ell'') specifies up to @code{WFDB_MAXSIG} format 16
+@file{16l} (``one-six-ell'') specifies up to sixteen format 16
 files, and record @file{8l} (``eight-ell'') specifies up to
-@code{WFDB_MAXSIG} format 8 files, named @file{data0}, @file{data1},
+sixteen format 8 files, named @file{data0}, @file{data1},
 @file{data2}, @dots{}, @file{data@var{n}} in the current directory.
 When opened using @code{isigopen} or @code{wfdbinit}, these signal files
-will be readable by @code{getvec} as signals 0, 1, 2, @dots{} @var{n}
+will be readable by @code{getvec} as signals 0, 1, 2, @dots{} 16
 respectively.  These files should be created by the user, with the use
 of @code{putvec}.  It is necessary to create only as many signal files
 as will be used; if, for example, only one signal is needed, only
@@ -5524,81 +5528,92 @@ argument:
  @i{5}  int argc;
  @i{6}  char *argv[];
  @i{7}  @{
- @i{8}      static WFDB_Siginfo s[WFDB_MAXSIG];
+ @i{8}      WFDB_Siginfo *s;
  @i{9}      int i, nsig;
 @i{10}
 @i{11}      if (argc < 2) @{
 @i{12}          fprintf(stderr, "usage: %s record\n", argv[0]);
 @i{13}          exit(1);
 @i{14}      @}
-@i{15}      nsig = isigopen(argv[1], s, WFDB_MAXSIG);
+@i{15}      nsig = isigopen(argv[1], NULL, 0);
 @i{16}      if (nsig < 1) exit(2);
-@i{17}      printf("Record %s\n", argv[1]);
-@i{18}      printf("Starting time: %s\n", timstr(0L));
-@i{19}      printf("Sampling frequency: %g Hz\n", sampfreq(argv[1]));
-@i{20}      printf("%d signals\n", nsig);
-@i{21}      for (i = 0; i < nsig; i++) @{
-@i{22}          printf("Group %d, Signal %d:\n", s[i].group, i);
-@i{23}          printf(" File: %s\n", s[i].fname);
-@i{24}          printf(" Description: %s\n", s[i].desc);
-@i{25}          printf(" Gain: ");
-@i{26}          if (s[i].gain == 0.)
-@i{27}              printf("uncalibrated; assume %g", WFDB_DEFGAIN);
-@i{28}          else printf("%g", s[i].gain);
-@i{29}          printf(" adu/%s\n", s[i].units ? s[i].units : "mV");
-@i{30}          printf(" Initial value: %d\n", s[i].initval);
-@i{31}          printf(" Storage format: %d\n", s[i].fmt);
-@i{32}          printf(" I/O: ");
-@i{33}          if (s[i].bsize == 0) printf("can be unbuffered\n");
-@i{34}          else printf("%d-byte blocks\n", s[i].bsize);
-@i{35}          printf(" ADC resolution: %d bits\n", s[i].adcres);
-@i{36}          printf(" ADC zero: %d\n", s[i].adczero);
-@i{37}          if (s[i].nsamp > 0L) @{
-@i{38}              printf(" Length: %s (%ld sample intervals)\n",
-@i{39}                     timstr(s[i].nsamp), s[i].nsamp);
-@i{40}              printf(" Checksum: %d\n", s[i].cksum);
-@i{41}          @}
-@i{42}          else printf(" Length undefined\n");
-@i{43}      @}
-@i{44}      exit(0);
-@i{45}  @}
+@i{17}      s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+@i{18}      if (s == NULL) @{
+@i{19}          fprintf(stderr, "insufficient memory\n");
+@i{20}	        exit(3);
+@i{21}      @}
+@i{22}      if (isigopen(argv[1], s, nsig) != nsig) exit(2);
+@i{23}      printf("Record %s\n", argv[1]);
+@i{24}      printf("Starting time: %s\n", timstr(0L));
+@i{25}      printf("Sampling frequency: %g Hz\n", sampfreq(argv[1]));
+@i{26}      printf("%d signals\n", nsig);
+@i{27}      for (i = 0; i < nsig; i++) @{
+@i{28}          printf("Group %d, Signal %d:\n", s[i].group, i);
+@i{29}          printf(" File: %s\n", s[i].fname);
+@i{30}          printf(" Description: %s\n", s[i].desc);
+@i{31}          printf(" Gain: ");
+@i{32}          if (s[i].gain == 0.)
+@i{33}              printf("uncalibrated; assume %g", WFDB_DEFGAIN);
+@i{34}          else printf("%g", s[i].gain);
+@i{35}          printf(" adu/%s\n", s[i].units ? s[i].units : "mV");
+@i{36}          printf(" Initial value: %d\n", s[i].initval);
+@i{37}          printf(" Storage format: %d\n", s[i].fmt);
+@i{38}          printf(" I/O: ");
+@i{39}          if (s[i].bsize == 0) printf("can be unbuffered\n");
+@i{40}          else printf("%d-byte blocks\n", s[i].bsize);
+@i{41}          printf(" ADC resolution: %d bits\n", s[i].adcres);
+@i{42}          printf(" ADC zero: %d\n", s[i].adczero);
+@i{43}          if (s[i].nsamp > 0L) @{
+@i{44}              printf(" Length: %s (%ld sample intervals)\n",
+@i{45}                     timstr(s[i].nsamp), s[i].nsamp);
+@i{46}              printf(" Checksum: %d\n", s[i].cksum);
+@i{47}          @}
+@i{48}          else printf(" Length undefined\n");
+@i{49}      @}
+@i{50}      exit(0);
+@i{51}  @}
 @end example
 
 @noindent
 @strong{Notes:}
 
 @table @emph
-@item Line 8:
-There might be as many as @code{WFDB_MAXSIG} signals, so we allocate enough
-@code{WFDB_Siginfo} objects to accommodate them all.
-
 @item Line 15:
 The command-line argument, @code{argv[1]}, is the record name.  The
-number of readable signals is @code{nsig}.  This program will give
-specifications for each of them, but not for any signals that are named
-in the @file{header} file but are not readable.  If @code{nsig} < 1,
-@code{isigopen} will print an error message; in this case the program
-can't do anything useful, so it exits.
+number of signals listed in the header file for the record is returned by
+@code{isigopen} as @code{nsig}.  If @code{nsig} < 1, @code{isigopen} will
+print an error message; in this case the program can't do anything useful,
+so it exits.
 
-@item Line 18:
+@item Line 17:
+We allocate @code{nsig} signal information (@code{WFDB_Siginfo}) objects.
+
+@item Line 22:
+On the second invocation of @code{isigopen}, we pass the pointer to the
+signal information objects and the number of signals we expect to open.
+@code{isigopen} returns the number of signals it is able to open;  if
+any of those named in the header file are unreadable, the return value
+will not match @code{nsig}, and the program exits.
+
+@item Line 24:
 Invoking @code{timstr} with an argument of zero (here written @samp{0L}
 to emphasize to the compiler that the argument is a @code{long} integer)
 will obtain the starting time of the record.  If no starting time is
 defined, @code{timstr} will return ``@code{0:00:00}''.
 
-@item Lines 25--28:
+@item Lines 31--34:
 Notice how a zero value for @code{gain} is interpreted.
 
-@item Line 29:
+@item Line 35:
 If the @code{units} field is NULL, the physical units are assumed to be
 millivolts (``mV'').
 
-@item Lines 32--34:
+@item Lines 38--40:
 If @code{bsize} is zero, I/O can be performed in blocks of any reasonable
 size;  otherwise it must be performed in blocks of exactly the specified
 @code{bsize}.
 
-@item Lines 37--42:
+@item Lines 43--48:
 If the length of the record is defined, it is printed in both hours,
 minutes, and seconds, and in sample intervals.  Since the argument of
 @code{timstr} in line 39 is positive, it is interpreted as a time
@@ -5620,59 +5635,67 @@ approach.
 @example
  @i{1}  #include <stdio.h>
  @i{2}  #include <wfdb/wfdb.h>
- @i{3}
+ @i{3}  
  @i{4}  main(argc, argv)
  @i{5}  int argc;
  @i{6}  char *argv[];
  @i{7}  @{
- @i{8}      static WFDB_Siginfo s[WFDB_MAXSIG];
- @i{9}      int i, nsig, nsamp = 1000;
-@i{10}      WFDB_Sample vin[WFDB_MAXSIG], vout[WFDB_MAXSIG];
-@i{11}
+ @i{8}      WFDB_Siginfo *s;
+ @i{9}      int i, nsig, nsamp=1000;
+@i{10}      WFDB_Sample *vin, *vout;
+@i{11}  
 @i{12}      if (argc < 2) @{
 @i{13}          fprintf(stderr, "usage: %s record\n", argv[0]); exit(1);
 @i{14}      @}
-@i{15}      if ((nsig = isigopen(argv[1], s, WFDB_MAXSIG)) <= 0) exit(2);
-@i{16}      if (osigopen("8l", s, nsig) <= 0) exit(3);
-@i{17}      while (nsamp-- > 0 && getvec(vin) > 0) @{
-@i{18}          for (i = 0; i < nsig; i++)
-@i{19}              vout[i] -= vin[i];
-@i{20}          if (putvec(vout) < 0) break;
-@i{21}          for (i = 0; i < nsig; i++)
-@i{22}              vout[i] = vin[i];
-@i{23}      @}
-@i{24}      (void)newheader("dif");
-@i{25}      wfdbquit();
-@i{26}      exit(0);
-@i{27}  @}
+@i{15}      if ((nsig = isigopen(argv[1], NULL, 0)) <= 0) exit(2);
+@i{16}      s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+@i{17}      vin = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
+@i{18}      vout = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
+@i{19}      if (s == NULL || vin == NULL || vout == NULL) @{
+@i{20}          fprintf(stderr, "insufficient memory\n");
+@i{21}          exit(3);
+@i{22}      @}
+@i{23}      if (isigopen(argv[1], s, nsig) != nsig) exit(2);
+@i{24}      if (osigopen("8l", s, nsig) <= 0) exit(3);
+@i{25}      while (nsamp-- > 0 && getvec(vin) > 0) @{
+@i{26}          for (i = 0; i < nsig; i++)
+@i{27}              vout[i] -= vin[i];
+@i{28}          if (putvec(vout) < 0) break;
+@i{29}          for (i = 0; i < nsig; i++)
+@i{30}              vout[i] = vin[i];
+@i{31}      @}
+@i{32}      (void)newheader("dif");
+@i{33}      wfdbquit();
+@i{34}      exit(0);
+@i{35}  @}
 @end example
 
 @noindent
 @strong{Notes:}
 
 @table @emph
-@item Line 16:
+@item Line 24:
 Here we attempt to open as many output signals as there are input
 signals; if we cannot do so, the program exits after @code{osigopen}
 prints an error message.
 
-@item Line 17:
+@item Line 25:
 The main loop of the program begins here.  If 1000 samples can be read
 from each signal, the loop will end normally; if @code{getvec} fails
 before 1000 samples have been read, the loop ends prematurely.
 
-@item Lines 18--19:
+@item Lines 26--27:
 For each signal, we compute the negated first difference by subtracting
 the new sample from the previous sample.
 
-@item Line 20:
+@item Line 28:
 One sample of each output signal is written here.
 
-@item Lines 21--22:
+@item Lines 29--30:
 The new input samples are copied into the output sample vector in preparation
 for the next iteration.
 
-@item Line 24:
+@item Line 32:
 This step is optional.  It creates a @file{header} file for a new record
 to be called @file{dif}, which we can then open with another program if
 we want to read the signals that this program has written.  Since the
@@ -5682,7 +5705,7 @@ read these files using record @file{8l}; one reason for making a new
 not necessarily indicate the proper sampling frequency for these
 signals.
 
-@item Line 25:
+@item Line 33:
 Since the program writes output signals, it must invoke @code{wfdbquit} to
 close the files properly.
 @end table
@@ -5713,85 +5736,96 @@ The output of the program is readable as record @file{out}, for which a
  @i{1}  #include <stdio.h>
  @i{2}  #include <wfdb/wfdb.h>
  @i{3}  #define BUFLN 512
- @i{4}  int sample_ok = 1;
- @i{5}
- @i{6}  WFDB_Sample sample(s, t)
- @i{7}  WFDB_Signal s;
- @i{8}  WFDB_Time t;
- @i{9}  @{
-@i{10}      static WFDB_Sample sbuf[BUFLN][WFDB_MAXSIG];
-@i{11}      static WFDB_Time tt = -1L;
-@i{12}
+ @i{4}  int nsig, sample_ok = 1;
+ @i{5}  WFDB_Sample *sbuf;
+ @i{6}  
+ @i{7}  sample(s, t)
+ @i{8}  int s;
+ @i{9}  long t;
+@i{10}  @{
+@i{11}      static long tt = -1L;
+@i{12}  
 @i{13}      if (t <= tt - BUFLN)
 @i{14}          fprintf(stderr, "sample: buffer too short\n");
 @i{15}      while (t > tt)
-@i{16}          if (getvec(sbuf[(++tt)&(BUFLN-1)]) < 0) sample_ok = 0;
-@i{17}      return (sbuf[t&(BUFLN-1)][s]);
-@i{18}  @}
-@i{19}
-@i{20}  main(argc, argv)
-@i{21}  int argc;
-@i{22}  char *argv[];
-@i{23}  @{
-@i{24}      double *c, one = 1.0, vv, atof();
-@i{25}      int i, j, nc = argc - 4, nsig, v[WFDB_MAXSIG];
-@i{26}      long nsamp, t;
-@i{27}      static WFDB_Siginfo s[WFDB_MAXSIG];
-@i{28}
-@i{29}      if (argc < 4) @{
-@i{30}          fprintf(stderr,
-@i{31}            "usage: %s record start duration [ coefficients ... ]\n",
-@i{32}                  argv[0]);
-@i{33}          exit(1);
-@i{34}      @}
-@i{35}      if (nc < 1) @{
-@i{36}          nc = 1; c = &one;
-@i{37}      @}
-@i{38}      else if (nc >= BUFLN ||
-@i{39}               (c = (double *)calloc(nc, sizeof(double))) == NULL) @{
-@i{40}          fprintf(stderr, "%s: too many coefficients\n", argv[0]);
-@i{41}          exit(2);
-@i{42}      @}
-@i{43}      for (i = 0; i < nc; i++)
-@i{44}          c[i] = atof(argv[i+4]);
-@i{45}      if ((nsig = isigopen(argv[1], s, WFDB_MAXSIG)) < 1)
-@i{46}          exit(3);
-@i{47}      if (isigsettime(strtim(argv[2])) < 0)
-@i{48}          exit(4);
-@i{49}      if ((nsamp = strtim(argv[3])) < 1) @{
-@i{50}          fprintf(stderr, "%s: inappropriate value for duration\n",
-@i{51}                  argv[0]);
-@i{52}          exit(5);
-@i{53}      @}
-@i{54}      if (osigopen("16l", s, nsig) != nsig)
-@i{55}          exit(6);
-@i{56}
-@i{57}      for (t = 0; t < nsamp && sample_ok; t++) @{
-@i{58}          for (j = 0; j < nsig; j++) @{
-@i{59}              for (i = 0, vv = 0.; i < nc; i++)
-@i{60}                  if (c[i] != 0.) vv += c[i]*sample(j, t+i);
-@i{61}              v[j] = (int)vv;
-@i{62}          @}
-@i{63}          if (putvec(v) < 0) break;
+@i{16}          if (getvec(sbuf + nsig * ((++tt)&(BUFLN-1))) < 0)
+@i{17}              sample_ok = 0;
+@i{18}      return (*(sbuf + nsig * (t&(BUFLN-1)) + s));
+@i{19}  @}
+@i{20}  
+@i{21}  main(argc, argv)
+@i{22}  int argc;
+@i{23}  char *argv[];
+@i{24}  @{
+@i{25}      double *c, one = 1.0, vv, atof();
+@i{26}      int i, j, nc = argc - 4;
+@i{27}      long nsamp, t;
+@i{28}      static WFDB_Sample *v;
+@i{29}      static WFDB_Siginfo *s;
+@i{30}  
+@i{31}      if (argc < 4) @{
+@i{32}          fprintf(stderr,
+@i{33}            "usage: %s record start duration [ coefficients ... ]\n",
+@i{34}                  argv[0]);
+@i{35}          exit(1);
+@i{36}      @}
+@i{37}      if (nc < 1) @{
+@i{38}          nc = 1; c = &one;
+@i{39}      @}
+@i{40}      else if (nc >= BUFLN ||
+@i{41}               (c = (double *)calloc(nc, sizeof(double))) == NULL) @{
+@i{42}          fprintf(stderr, "%s: too many coefficients\n", argv[0]);
+@i{43}          exit(2);
+@i{44}      @}
+@i{45}      for (i = 0; i < nc; i++)
+@i{46}          c[i] = atof(argv[i+4]);
+@i{47}      if ((nsig = isigopen(argv[1], NULL, 0)) < 1)
+@i{48}          exit(3);
+@i{49}      s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+@i{50}      v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
+@i{51}      sbuf = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample)*BUFLN);
+@i{52}      if (s == NULL || v == NULL || sbuf == NULL) @{
+@i{53}          fprintf(stderr, "insufficient memory\n");
+@i{54}          exit(3);
+@i{55}      @}
+@i{56}      if (isigopen(argv[1], s, nsig) != nsig)
+@i{57}          exit(3);
+@i{58}      if (isigsettime(strtim(argv[2])) < 0)
+@i{59}          exit(4);
+@i{60}      if ((nsamp = strtim(argv[3])) < 1) @{
+@i{61}          fprintf(stderr, "%s: inappropriate value for duration\n",
+@i{62}                  argv[0]);
+@i{63}          exit(5);
 @i{64}      @}
-@i{65}
-@i{66}      (void)newheader("out");
-@i{67}      wfdbquit();
-@i{68}      exit(0);
-@i{69}  @}
+@i{65}      if (osigopen("16l", s, nsig) != nsig)
+@i{66}          exit(6);
+@i{67}  
+@i{68}      for (t = 0; t < nsamp && sample_ok; t++) @{
+@i{69}          for (j = 0; j < nsig; j++) @{
+@i{70}              for (i = 0, vv = 0.; i < nc; i++)
+@i{71}                  if (c[i] != 0.) vv += c[i]*sample(j, t+i);
+@i{72}              v[j] = (int)vv;
+@i{73}          @}
+@i{74}          if (putvec(v) < 0) break;
+@i{75}      @}
+@i{76}  
+@i{77}      (void)newheader("out");
+@i{78}      wfdbquit();
+@i{79}      exit(0);
+@i{80}  @}
 @end example
 
 @noindent
 @strong{Notes:}
 
 @table @emph
-@item Line 4:
-@code{BUFLN} must be a power of 2 (why? see lines 16 and 17), and it
+@item Line 3:
+@code{BUFLN} must be a power of 2 (why? see lines 16 and 18), and it
 should be larger than the length of the filter (i.e., the caller should
 not look back further than @code{BUFLN-1} samples into the past,
 relative to the most recent sample that has been read).
 
-@item Lines 6--18:
+@item Lines 7--19:
 This function supplies input samples to the @code{main} routine as
 needed, and frees the @code{main} routine of the need to read them in
 strict time order.  The @code{sample} function returns the sample from
@@ -5804,46 +5838,47 @@ next slot in the circular buffer; note that @code{tt} is an internal
 the most recently read sample.  In this program, the test in line 13 is
 redundant (why?)  and might be removed for efficiency's sake.
 
-@item Lines 35--37:
+@item Lines 37--39:
 If no coefficients are provided on the command line, the program will
 simply copy the selected segment of the input signals.
 
-@item Lines 38--44:
+@item Lines 40--46:
 If there are more coefficients than there are samples in the circular
 buffer, or if memory cannot be allocated for the coefficient vector, the
 program cannot work properly, so it exits with an error message.  In
-lines 43 and 44, the ASCII strings that represent the coefficients are
+lines 45 and 46, the ASCII strings that represent the coefficients are
 converted to @code{double} format and stored in the coefficient
 vector.
 
-@item Lines 45--48:
+@item Lines 47--59:
 The record name is @code{argv[1]}, and the start time is @code{argv[2]};
 if the record can't be opened, or the start time is inappropriate, the
-program exits.
+program exits.  See the previous example for details on how @code{isigopen}
+is used.
 
-@item Lines 49--53:
+@item Lines 60--64:
 The @var{duration} argument should be a time interval in @var{HH:MM:SS}
 format; @code{strtim} converts it to the appropriate number of
 samples.
 
-@item Lines 54--55:
+@item Lines 65--66:
 The output signals will be written to files in the current directory
 according to the specifications for record @file{16l}
 (@pxref{Piped and Local Records}).  If we can't write as many output
 signals as there are input signals, the program exits.
 
-@item Lines 57--64:
+@item Lines 68--75:
 Here's where the work is done.  The outer loop is executed once per
 sample vector, the middle loop once per signal, and the inner loop
-once per coefficient.  In line 60, we retrieve an input sample,
+once per coefficient.  In line 71, we retrieve an input sample,
 multiply it by a filter coefficient, and add it to a running sum.
-The sum is initialized to zero in line 59 before we begin, and is
-converted to an @code{int} in line 61 when we are finished.  Once
-an entire sample vector has been filtered, it is written out in line 63.
+The sum (@code{vv}) is initialized to zero in line 70 before we begin, and is
+converted to an @code{int} in line 72 when we are finished.  Once
+an entire sample vector has been filtered, it is written out in line 74.
 The entire process is repeated up to @code{nsamp} times, or until
 we run out of input samples.
 
-@item Line 66:
+@item Line 77:
 The program creates a @file{header} file for record @file{out}, using
 the signal specifications from record @file{16l} and the sampling
 frequency from the input record.
@@ -5860,103 +5895,120 @@ finally creates a @file{header} file for the new record.  Details of
 data acquisition are hardware-dependent and are not shown here. 
 
 @example
- @i{1}  #include <stdio.h>
- @i{2}  #include <wfdb/wfdb.h>
- @i{3}
- @i{4}  main()
- @i{5}  @{
- @i{6}      char answer[32], record[8], directory[32];
- @i{7}      int i, nsig = 0, v[WFDB_MAXSIG];
- @i{8}      long nsamp, t;
- @i{9}      double freq = 0.;
-@i{10}      static char filename[WFDB_MAXSIG][32],
-@i{11}          description[WFDB_MAXSIG][32], units[WFDB_MAXISIG][22];
-@i{12}      static WFDB_Siginfo s[WFDB_MAXSIG];
-@i{13}
-@i{14}      do @{
-@i{15}          printf("Choose a record name [up to 6 characters]: ");
-@i{16}          fgets(record, 8, stdin); record[strlen(record)-1] = '\0';
-@i{17}      @} while (newheader(record) < 0);
-@i{18}      do @{
-@i{19}          printf("Number of signals to be recorded [1-%d]: ",
-@i{20}                 WFDB_MAXSIG);
-@i{21}          fgets(answer, 32, stdin); sscanf(answer, "%d", &nsig);
-@i{22}      @} while (nsig < 1 || nsig > WFDB_MAXSIG);
-@i{23}      do @{
-@i{24}          printf("Sampling frequency [Hz per signal, > 0]: ");
-@i{25}          fgets(answer, 32, stdin); sscanf(answer, "%lf", &freq);
-@i{26}      @} while (setsampfreq(freq) < 0);
-@i{27}      do @{
-@i{28}          printf("Length of record (H:M:S): ");
-@i{29}          fgets(answer, 32, stdin);
-@i{30}      @} while ((nsamp = strtim(answer)) < 1L);
-@i{31}      printf("Directory for signal files [up to 30 characters]: ");
-@i{32}      fgets(directory, 32, stdin);
-@i{33}      directory[strlen(directory)-1] = '\0';
-@i{34}      printf("Save signals in difference format? [y/n]: ");
-@i{35}      fgets(answer, 32, stdin);
-@i{36}      s[0].fmt = (answer[0] == 'y') ? 8 : 16;
-@i{37}      printf("Save all signals in one file? [y/n]: ");
-@i{38}      fgets(answer, 32, stdin);
-@i{39}      if (answer[0] == 'y') @{
-@i{40}          sprintf(filename[0], "%s/d.%s", directory, record);
-@i{41}          for (i = 0; i < nsig; i++) @{
-@i{42}               s[i].fname = filename[0];
-@i{43}               s[i].group = 0;
-@i{44}          @}
-@i{45}      @}
-@i{46}      else @{
-@i{47}          for (i = 0; i < nsig; i++) @{
-@i{48}               sprintf(filename[i], "%s/d%d.%s", directory,i,record);
-@i{49}               s[i].fname = filename[i];
-@i{50}               s[i].group = i;
-@i{51}          @}
-@i{52}      @}
-@i{53}      for (i = 0; i < nsig; i++) @{
-@i{54}          s[i].fmt = s[0].fmt; s[i].bsize = 0;
-@i{55}          printf("Signal %d description [up to 30 characters]: ", i);
-@i{56}          fgets(description[i], 32, stdin);
-@i{57}          description[i][strlen(description[i])-1] = '\0';
-@i{58}          s[i].desc = description[i];
-@i{59}          printf("Signal %d units [up to 20 characters]: ", i);
-@i{60}          fgets(units[i], 22, stdin);
-@i{61}          units[i][strlen(units[i])-1] = '\0';
-@i{62}          s[i].units = (*units[i]) ? units[i] : "mV";
-@i{63}          do @{
-@i{64}              printf(" Signal %d gain [adu/%s]: ", i, s[i].units);
-@i{65}              fgets(answer, 32, stdin);
-@i{66}              sscanf(answer, "%lf", &s[i].gain);
-@i{67}          @} while (s[i].gain < 0.);
-@i{68}          do @{
-@i{69}              printf(" Signal %d ADC resolution in bits [8-16]: ", i);
-@i{70}              fgets(answer, 32, stdin);
-@i{71}              sscanf(answer, "%d", &s[i].adcres);
-@i{72}          @} while (s[i].adcres < 8 || s[i].adcres > 16);
-@i{73}          printf(" Signal %d ADC zero level [adu]: ", i);
-@i{74}          fgets(answer, 32, stdin);
-@i{75}          sscanf(answer, "%d", &s[i].adczero);
-@i{76}      @}
-@i{77}      if (osigfopen(s, nsig) < nsig) exit(1);
-@i{78}      printf("To begin sampling, press RETURN;  to specify a\n");
-@i{79}      printf(" start time other than the current time, enter\n");
-@i{80}      printf(" it in H:M:S format before pressing RETURN: ");
-@i{81}      fgets(answer, 32, stdin); answer[strlen(answer)-1] = '\0';
-@i{82}      setbasetime(answer);
-@i{83}
-@i{84}      @var{initialize ADC here}
-@i{85}
-@i{86}      for (t = 0; t < nsamp; t++) @{
-@i{87}          for (i = 0; i < nsig; i++)
-@i{88}              v[i] = @var{sample from ADC channel i}
-@i{89}          if (putvec(v) < 0) break;
-@i{90}      @}
-@i{91}
-@i{92}      @var{stop ADC here}
-@i{93}
-@i{94}      (void)newheader(record);
-@i{95}      wfdbquit();
-@i{96}      exit(0);
-@i{97}  @}
+  @i{1}  #include <stdio.h>
+  @i{2}  #include <wfdb/wfdb.h>
+  @i{3}  
+  @i{4}  main()
+  @i{5}  @{
+  @i{6}      char answer[32], record[8], directory[32];
+  @i{7}      int i, nsig = 0;
+  @i{8}      long nsamp, t;
+  @i{9}      double freq = 0.;
+ @i{10}      char **filename, **description, **units;
+ @i{11}      WFDB_Sample *v;
+ @i{12}      WFDB_Siginfo *s;
+ @i{13}  
+ @i{14}      do @{
+ @i{15}          printf("Choose a record name [up to 6 characters]: ");
+ @i{16}          fgets(record, 8, stdin); record[strlen(record)-1] = '\0';
+ @i{17}      @} while (newheader(record) < 0);
+ @i{18}      do @{
+ @i{19}          printf("Number of signals to be recorded [>0]: ");
+ @i{20}          fgets(answer, 32, stdin); sscanf(answer, "%d", &nsig);
+ @i{21}      @} while (nsig < 1);
+ @i{22}      s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+ @i{23}      v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
+ @i{24}      filename = (char **)malloc(nsig * sizeof(char *));
+ @i{25}      description = (char **)malloc(nsig * sizeof(char *));
+ @i{26}      units = (char **)malloc(nsig * sizeof(char *));
+ @i{27}      if (s == NULL || v == NULL || filename == NULL ||
+ @i{28}          description == NULL || units == NULL) @{
+ @i{29}          fprintf(stderr, "insufficient memory\n");
+ @i{30}          exit(1);
+ @i{31}      @}
+ @i{32}      for (i = 0; i < nsig; i++) @{
+ @i{33}          if ((filename[i] = (char *)malloc(32)) == NULL ||
+ @i{34}              (description[i] = (char *)malloc(32)) == NULL ||
+ @i{35}              (units[i] = (char *)malloc(32)) == NULL) @{
+ @i{36}              fprintf(stderr, "insufficient memory\n");
+ @i{37}              exit(1);
+ @i{38}          @}
+ @i{39}      @}
+ @i{40}      do @{
+ @i{41}          printf("Sampling frequency [Hz per signal, > 0]: ");
+ @i{42}          fgets(answer, 32, stdin); sscanf(answer, "%lf", &freq);
+ @i{43}      @} while (setsampfreq(freq) < 0);
+ @i{44}      do @{
+ @i{45}          printf("Length of record (H:M:S): ");
+ @i{46}          fgets(answer, 32, stdin);
+ @i{47}      @} while ((nsamp = strtim(answer)) < 1L);
+ @i{48}      printf("Directory for signal files [up to 30 characters]: ");
+ @i{49}      fgets(directory, 32, stdin);
+ @i{50}      directory[strlen(directory)-1] = '\0';
+ @i{51}      printf("Save signals in difference format? [y/n]: ");
+ @i{52}      fgets(answer, 32, stdin);
+ @i{53}      s[0].fmt = (answer[0] == 'y') ? 8 : 16;
+ @i{54}      printf("Save all signals in one file? [y/n]: ");
+ @i{55}      fgets(answer, 32, stdin);
+ @i{56}      if (answer[0] == 'y') @{
+ @i{57}          sprintf(filename[0], "%s/d.%s", directory, record);
+ @i{58}          for (i = 0; i < nsig; i++) @{
+ @i{59}               s[i].fname = filename[0];
+ @i{60}               s[i].group = 0;
+ @i{61}          @}
+ @i{62}      @}
+ @i{63}      else @{
+ @i{64}          for (i = 0; i < nsig; i++) @{
+ @i{65}               sprintf(filename[i], "%s/d%d.%s", directory,i,record);
+ @i{66}               s[i].fname = filename[i];
+ @i{67}               s[i].group = i;
+ @i{68}          @}
+ @i{69}      @}
+ @i{70}      for (i = 0; i < nsig; i++) @{
+ @i{71}          s[i].fmt = s[0].fmt; s[i].bsize = 0;
+ @i{72}          printf("Signal %d description [up to 30 characters]: ", i);
+ @i{73}          fgets(description[i], 32, stdin);
+ @i{74}          description[i][strlen(description[i])-1] = '\0';
+ @i{75}          s[i].desc = description[i];
+ @i{76}          printf("Signal %d units [up to 20 characters]: ", i);
+ @i{77}          fgets(units[i], 22, stdin);
+ @i{78}          units[i][strlen(units[i])-1] = '\0';
+ @i{79}          s[i].units = (*units[i]) ? units[i] : "mV";
+ @i{80}          do @{
+ @i{81}              printf(" Signal %d gain [adu/%s]: ", i, s[i].units);
+ @i{82}              fgets(answer, 32, stdin);
+ @i{83}              sscanf(answer, "%lf", &s[i].gain);
+ @i{84}          @} while (s[i].gain < 0.);
+ @i{85}          do @{
+ @i{86}              printf(" Signal %d ADC resolution in bits [8-16]: ",i);
+ @i{87}              fgets(answer, 32, stdin);
+ @i{88}              sscanf(answer, "%d", &s[i].adcres);
+ @i{89}          @} while (s[i].adcres < 8 || s[i].adcres > 16);
+ @i{90}          printf(" Signal %d ADC zero level [adu]: ", i);
+ @i{91}          fgets(answer, 32, stdin);
+ @i{92}          sscanf(answer, "%d", &s[i].adczero);
+ @i{93}      @}
+ @i{94}      if (osigfopen(s, nsig) < nsig) exit(1);
+ @i{95}      printf("To begin sampling, press RETURN;  to specify a\n");
+ @i{96}      printf(" start time other than the current time, enter\n");
+ @i{97}      printf(" it in H:M:S format before pressing RETURN: ");
+ @i{98}      fgets(answer, 32, stdin); answer[strlen(answer)-1] = '\0';
+ @i{99}      setbasetime(answer);
+@i{100}  
+@i{101}      adinit();
+@i{102}  
+@i{103}      for (t = 0; t < nsamp; t++) @{
+@i{104}          for (i = 0; i < nsig; i++)
+@i{105}              v[i] = adget(i);
+@i{106}          if (putvec(v) < 0) break;
+@i{107}      @}
+@i{108}  
+@i{109}      adquit();
+@i{110}  
+@i{111}      (void)newheader(record);
+@i{112}      wfdbquit();
+@i{113}      exit(0);
+@i{114}  @}
 @end example
 
 @noindent
@@ -5966,29 +6018,29 @@ data acquisition are hardware-dependent and are not shown here.
 This code uses @code{newheader} to determine if a legal record name was
 entered (since we don't want to digitize the signals and then find out
 that we can't create the @file{header} file).  The @file{header} file
-created in line 17 will be overwritten in line 94.
+created in line 17 will be overwritten in line 111.
 
-@item Lines 39--45:
+@item Lines 57--62:
 This code generates a file name and initializes the @code{fname} and
 @code{group} fields of the array of @code{WFDB_Siginfo} objects so that all
 signals will be saved in one file.
 
-@item Lines 46--52:
+@item Lines 63--69:
 This code generates unique file names and groups for each signal.
 
-@item Lines 53--76:
+@item Lines 70--93:
 Here, information specific to individual signals is gathered.
 
-@item Line 77:
+@item Line 94:
 If the signal files can't be created, this program can do nothing else
 useful, so it quits with an error message from @code{osigfopen}.
 
-@item Lines 78--82:
+@item Lines 95--99:
 Just before sampling begins, we set the base time.  Note that an empty
 string argument for @code{setbasetime} gives us the current time read from
 the system clock.
 
-@item Line 84:
+@item Line 101:
 What goes here will be hardware dependent.  Typically it is necessary to
 set up a timer for the ADC, allocate DMA buffers, specify interrupt vectors,
 and initiate the first conversion(s).  This program might also be used to
@@ -5996,7 +6048,7 @@ create a database record from prerecorded data in a non-supported format;
 in this case, we might simply open the file containing the prerecorded data
 here.
 
-@item Lines 86--90:
+@item Lines 103--107:
 Here is where the samples are acquired (using hardware-dependent code
 not shown here) and recorded (using @code{putvec}).  At high sampling
 frequencies, it is critical to make this code as fast as possible.  It
@@ -6006,18 +6058,18 @@ including @code{putvec} itself, can be written in assembly language;
 since it is only a small fraction of the entire program, doing so is
 within reason.
 
-@item Line 92:
+@item Line 109:
 This final piece of hardware-dependent code typically clears the ADC
 control register, stops the timer, and frees any system resources such as
 DMA channels or interrupts.
 
-@item Line 94:
+@item Line 111:
 All of the information needed to generate the @file{header} file has been
 stored in WFDB library internal data structures by @code{osigfopen} and 
 @code{putvec};  we call @code{newheader} here (before @code{wfdbquit}) to
 create the new @file{header} file.
 
-@item Line 95:
+@item Line 112:
 It is still necessary to use @code{wfdbquit} to close the signal file(s),
 even after calling @code{newheader}.  (In fact, it would be possible,
 though not likely to be useful, to record more samples and to generate
@@ -6040,19 +6092,19 @@ average normal QRS complex).
  @i{1}  #include <stdio.h>
  @i{2}  #include <wfdb/wfdb.h>
  @i{3}  #include <wfdb/ecgmap.h>
- @i{4}
+ @i{4}  
  @i{5}  main(argc, argv)
  @i{6}  int argc;
  @i{7}  char *argv[];
  @i{8}  @{
  @i{9}      int btype, i, j, nbeats = 0, nsig, hwindow, window;
-@i{10}      WFDB_Sample v[WFDB_MAXSIG], vb[WFDB_MAXSIG];
-@i{11}      long stoptime = 0L, *sum[WFDB_MAXSIG];
-@i{12}      WFDB_Anninfo a;
-@i{13}      WFDB_Annotation annot;
-@i{14}      static WFDB_Siginfo s[WFDB_MAXSIG];
+@i{10}      long stoptime = 0L, **sum;
+@i{11}      WFDB_Anninfo a;
+@i{12}      WFDB_Annotation annot;
+@i{13}      WFDB_Sample *v, *vb;
+@i{14}      WFDB_Siginfo *s;
 @i{15}      void *calloc();
-@i{16}
+@i{16}  
 @i{17}      if (argc < 3) @{
 @i{18}          fprintf(stderr,
 @i{19}                  "usage: %s annotator record [beat-type from to]\n",
@@ -6060,108 +6112,117 @@ average normal QRS complex).
 @i{21}          exit(1);
 @i{22}      @}
 @i{23}      a.name = argv[1]; a.stat = WFDB_READ;
-@i{24}      if ((nsig = wfdbinit(argv[2],&a,1,s,WFDB_MAXSIG)) < 1) exit(2);
-@i{25}      hwindow = strtim(".05"); window = 2*hwindow + 1;
-@i{26}      btype = (argc > 3) ? strann(argv[3]) : NORMAL;
-@i{27}      if (argc > 4) iannsettime(strtim(argv[4]));
-@i{28}      if (argc > 5) @{
-@i{29}          if ((stoptime = strtim(argv[5])) < 0L)
-@i{30}              stoptime = -stoptime;
-@i{31}          if (s[0].nsamp > 0L && stoptime > s[0].nsamp)
-@i{32}              stoptime = s[0].nsamp;
-@i{33}      @}
-@i{34}      else stoptime = s[0].nsamp;
-@i{35}      if (stoptime > 0L) stoptime -= hwindow;
-@i{36}      for (i = 0; i < nsig; i++)
-@i{37}          if ((sum[i]=(long *)calloc(window,sizeof(long))) == NULL) @{
-@i{38}              fprintf(stderr, "%s: insufficient memory\n", argv[0]);
-@i{39}              exit(3);
-@i{40}          @}
-@i{41}      while (getann(0, &annot) == 0 && annot.time < hwindow)
-@i{42}          ;
-@i{43}      do @{
-@i{44}          if (annot.anntyp != btype) continue;
-@i{45}          isigsettime(annot.time - hwindow - 1);
-@i{46}          (void)getvec(vb);
-@i{47}          for (j = 0; j < window && getvec(v) > 0; j++)
-@i{48}              for (i = 0; i < nsig; i++)
-@i{49}                  sum[i][j] += v[i] - vb[i];
-@i{50}          nbeats++;
-@i{51}      @} while (getann(0, &annot) == 0 &&
-@i{52}               (stoptime == 0L || annot.time < stoptime));
-@i{53}      if (nbeats < 1) @{
-@i{54}          fprintf(stderr, "%s: no `%s' beats found\n",
-@i{55}                  argv[0], annstr(btype));
-@i{56}          exit(4);
-@i{57}      @}
-@i{58}      printf("Average of %d `%s' beats:\n", nbeats, annstr(btype));
-@i{59}      for (j = 0; j < window; j++)
-@i{60}          for (i = 0; i < nsig; i++)
-@i{61}              printf("%g%c", (double)sum[i][j]/nbeats, 
-@i{62}                     (i == nsig-1) ? '\n' : '\t');
-@i{63}      exit(0);
-@i{64}  @}
+@i{24}      if ((nsig = isigopen(argv[2], NULL, 0)) < 1) exit(2);
+@i{25}      s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+@i{26}      v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
+@i{27}      vb = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
+@i{28}      sum = (long **)malloc(nsig * sizeof(long *));
+@i{29}      if (s == NULL || v == NULL || vb == NULL || sum == NULL) @{
+@i{30}          fprintf(stderr, "%s: insufficient memory\n", argv[0]);
+@i{31}          exit(2);
+@i{32}      @}
+@i{33}      for (i = 0; i < nsig; i++)
+@i{34}          if ((sum[i]=(long *)calloc(window,sizeof(long))) == NULL) @{
+@i{35}              fprintf(stderr, "%s: insufficient memory\n", argv[0]);
+@i{36}              exit(2);
+@i{37}          @}
+@i{38}      if (wfdbinit(argv[2], &a, 1, s, nsig) != nsig) exit(3);
+@i{39}      hwindow = strtim(".05"); window = 2*hwindow + 1;
+@i{40}      btype = (argc > 3) ? strann(argv[3]) : NORMAL;
+@i{41}      if (argc > 4) iannsettime(strtim(argv[4]));
+@i{42}      if (argc > 5) @{
+@i{43}          if ((stoptime = strtim(argv[5])) < 0L)
+@i{44}              stoptime = -stoptime;
+@i{45}          if (s[0].nsamp > 0L && stoptime > s[0].nsamp)
+@i{46}              stoptime = s[0].nsamp;
+@i{47}      @}
+@i{48}      else stoptime = s[0].nsamp;
+@i{49}      if (stoptime > 0L) stoptime -= hwindow;
+@i{50}      while (getann(0, &annot) == 0 && annot.time < hwindow)
+@i{51}          ;
+@i{52}      do @{
+@i{53}          if (annot.anntyp != btype) continue;
+@i{54}          isigsettime(annot.time - hwindow - 1);
+@i{55}          getvec(vb);
+@i{56}          for (j = 0; j < window && getvec(v) > 0; j++)
+@i{57}              for (i = 0; i < nsig; i++)
+@i{58}                  sum[i][j] += v[i] - vb[i];
+@i{59}          nbeats++;
+@i{60}      @} while (getann(0, &annot) == 0 &&
+@i{61}               (stoptime == 0L || annot.time < stoptime));
+@i{62}      if (nbeats < 1) @{
+@i{63}          fprintf(stderr, "%s: no `%s' beats found\n",
+@i{64}                  argv[0], annstr(btype));
+@i{65}          exit(4);
+@i{66}      @}
+@i{67}      printf("Average of %d `%s' beats:\n", nbeats, annstr(btype));
+@i{68}      for (j = 0; j < window; j++)
+@i{69}          for (i = 0; i < nsig; i++)
+@i{70}              printf("%g%c", (double)sum[i][j]/nbeats,
+@i{71}                     (i == nsig-1) ? '\n' : '\t');
+@i{72}      exit(0);
+@i{73}  @}
 @end example
 
 @noindent
 @strong{Notes:}
 
 @table @emph
-@item Line 25:
+@item Lines 33--37:
+Here we allocate memory for the @code{sum} vectors that will be used to
+store the running totals.  See @cite{K&R}, page 167, for a description
+of @code{calloc}.
+
+@item Line 39:
 The ``half-window'' is 50 milliseconds wide, and the ``window'' (the
 duration of a segment to be entered into the average) is one sample more
 than twice that amount (i.e., 50 milliseconds to either side of the
 fiducial point defined by the annotation).
 
-@item Line 26:
+@item Line 40:
 If a third argument is present on the command line, it is taken as an
 annotation code mnemonic for the desired beat type;  otherwise, the
 program will average @code{NORMAL} QRS complexes.
 
-@item Line 27:
+@item Line 41:
 If a fourth argument is present on the command line, it is taken as the
 start time; we arrange for the first annotation to be read by
 @code{getann} to be the first annotation that occurs after the chosen
 start time.
 
-@item Lines 28--35:
+@item Lines 42--49:
 This code similarly determines when the averaging should stop.  Unless
 no stop time was specified on the command line and the signal length is
 not defined in the @file{header} file for the record, @code{stoptime}
-will have a positive value in line 35, which makes a tiny adjustment so
+will have a positive value in line 49, which makes a tiny adjustment so
 that if a beat annotation occurs within 50 milliseconds of the end of the
 averaging period, the beat will not be included in the average.
 
-@item Lines 36--40:
-Here we allocate memory for the @code{sum} vectors that will be used to
-store the running totals.  See @cite{K&R}, page 167, for a description
-of @code{calloc}.
-
-@item Lines 41-42:
+@item Lines 50-51:
 This code addresses the (admittedly unlikely) prospect that the first
 annotation(s) might occur within the first 50 milliseconds of the
 record; any such annotations will be excluded from the average.
 
-@item Lines 43--52:
+@item Lines 52--61:
 Here we read annotations (the first is already in @code{annot} when we
-enter the loop, and subsequent annotations are read in line 51); select
-the desired ones (line 44); skip to the correct spot in the signals (line
-45; the sample selected there is the one just before the beginning of
-the window); read a sample from each signal (line 46) into the @code{vb}
+enter the loop, and subsequent annotations are read in line 60); select
+the desired ones (line 53); skip to the correct spot in the signals (line
+54; the sample selected there is the one just before the beginning of
+the window); read a sample from each signal (line 55) into the @code{vb}
 vector, which will be used as a crude baseline estimate; read
-@code{window} samples from each signal (line 47), subtracting the
+@code{window} samples from each signal (line 56), subtracting the
 baseline from each and adding the result into the running totals; update
-a beat counter (line 50); and check for loop termination conditions
-(line 52).
+a beat counter (line 59); and check for loop termination conditions
+(line 61).
 
-@item Lines 53--62:
+@item Lines 62--71:
 This is the output section.  If no beats of type @code{btype} were
 found, obviously no average can be printed; note that the message goes
 to the standard error output, so the user will notice it even if the
 standard output has been redirected to a file.  In the usual case, the
 averages are printed out as a table, with a column allocated to each
-signal.  Note the cast in line 61 (necessary to preserve precision), and
-the trick used in line 62 to print a tab after each column but the last
+signal.  Note the cast in line 70 (necessary to preserve precision), and
+the trick used in line 71 to print a tab after each column but the last
 in each line.
 @end table
 
@@ -6183,85 +6244,94 @@ is based on a Pascal program written by W.A.H. Engelse and C. Zeelenberg,
  @i{2}  #include <wfdb/wfdb.h>
  @i{3}  #include <wfdb/ecgcodes.h>
  @i{4}  
- @i{5}  #define abs(A)	((A) >= 0 ? (A) : -(A))
+ @i{5}  #define abs(A)  ((A) >= 0 ? (A) : -(A))
  @i{6}  
  @i{7}  main(argc, argv)
  @i{8}  int argc;
  @i{9}  char *argv[];
 @i{10}  @{
-@i{11}      int filter, time=0, slopecrit, sign, maxslope=0, nslope=0,
+@i{11}      int filter, time=0, slopecrit, sign, maxslope=0, nsig, nslope=0,
 @i{12}          qtime, maxtime, t0, t1, t2, t3, t4, t5, t6, t7, t8, t9,
-@i{13}          ms160, ms200, s2, scmax, scmin = 0, v[WFDB_MAXSIG];
+@i{13}          ms160, ms200, s2, scmax, scmin = 0;
 @i{14}      WFDB_Anninfo a;
 @i{15}      WFDB_Annotation annot;
-@i{16}      static WFDB_Siginfo s[WFDB_MAXSIG];
-@i{17}  
-@i{18}      if (argc < 2) @{
-@i{19}          fprintf(stderr, "usage: %s record [threshold]\n", argv[0]);
-@i{20}          exit(1);
-@i{21}      @}
-@i{22}      a.name = argv[0]; a.stat = WFDB_WRITE;
-@i{23}      if (wfdbinit(argv[1], &a, 1, s, WFDB_MAXSIG) < 1) exit(2);
-@i{24}      if (sampfreq(NULL) != 250.)
-@i{25}          fprintf(stderr,"warning: %s is designed for 250 Hz input\n",
-@i{26}                  argv[0]);
-@i{27}      if (argc > 2) scmin = muvadu(0, atoi(argv[2]));
-@i{28}      if (scmin < 1) scmin = muvadu(0, 1000);
-@i{29}      slopecrit = scmax = 10 * scmin;
-@i{30}      ms160 = strtim("0.16"); ms200 = strtim("0.2"); s2 = strtim("2");
-@i{31}      annot.subtyp = annot.chan = annot.num = 0; annot.aux = NULL;
-@i{32}      (void)getvec(v);
-@i{33}      t9 = t8 = t7 = t6 = t5 = t4 = t3 = t2 = t1 = v[0];
-@i{34}  
-@i{35}      do @{
-@i{36}          filter = (t0 = v[0]) + 4*t1 + 6*t2 + 4*t3 + t4
-@i{37}                  - t5         - 4*t6 - 6*t7 - 4*t8 - t9;
-@i{38}          if (time % s2 == 0) @{
-@i{39}              if (nslope == 0) @{
-@i{40}                  slopecrit -= slopecrit >> 4;
-@i{41}                  if (slopecrit < scmin) slopecrit = scmin;
-@i{42}              @}
-@i{43}              else if (nslope >= 5) @{
-@i{44}                  slopecrit += slopecrit >> 4;
-@i{45}                  if (slopecrit > scmax) slopecrit = scmax;
-@i{46}              @}
-@i{47}          @}
-@i{48}          if (nslope == 0 && abs(filter) > slopecrit) @{
-@i{49}              nslope = 1; maxtime = ms160;
-@i{50}              sign = (filter > 0) ? 1 : -1;
-@i{51}              qtime = time;
-@i{52}          @}
-@i{53}          if (nslope != 0) @{
-@i{54}              if (filter * sign < -slopecrit) @{
-@i{55}                  sign = -sign;
-@i{56}                  maxtime = (++nslope > 4) ? ms200 : ms160;
-@i{57}              @}
-@i{58}              else if (filter * sign > slopecrit &&
-@i{59}                       abs(filter) > maxslope)
-@i{60}                  maxslope = abs(filter);
-@i{61}              if (maxtime-- < 0) @{
-@i{62}                  if (2 <= nslope && nslope <= 4) @{
-@i{63}                      slopecrit += ((maxslope>>2) - slopecrit) >> 3;
-@i{64}                      if (slopecrit < scmin) slopecrit = scmin;
-@i{65}                      else if (slopecrit > scmax) slopecrit = scmax;
-@i{66}                      annot.time = strtim("i") - (time - qtime) - 4;
-@i{67}                      annot.anntyp = NORMAL; (void)putann(0, &annot);
-@i{68}                      time = 0;
-@i{69}                  @}
-@i{70}                  else if (nslope >= 5) @{
-@i{71}                      annot.time = strtim("i") - (time - qtime) - 4;
-@i{72}                      annot.anntyp = ARFCT; (void)putann(0, &annot);
-@i{73}                  @}
-@i{74}                  nslope = 0;
-@i{75}              @}
-@i{76}          @}
-@i{77}          t9 = t8; t8 = t7; t7 = t6; t6 = t5; t5 = t4;
-@i{78}          t4 = t3; t3 = t2; t2 = t1; t1 = t0; time++;
-@i{79}      @} while (getvec(v) > 0);
-@i{80}  
-@i{81}      wfdbquit();
-@i{82}      exit(0);
-@i{83}  @}
+@i{16}      WFDB_Sample *v;
+@i{17}      WFDB_Siginfo *s;
+@i{18}  
+@i{19}      if (argc < 2) @{
+@i{20}          fprintf(stderr, "usage: %s record [threshold]\n", argv[0]);
+@i{21}          exit(1);
+@i{22}      @}
+@i{23}      a.name = "qrs"; a.stat = WFDB_WRITE;
+@i{24}  
+@i{25}      if ((nsig = isigopen(argv[1], NULL, 0)) < 1) exit(2);
+@i{26}      s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+@i{27}      v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
+@i{28}      if (s == NULL || v == NULL) @{
+@i{29}          fprintf(stderr, "%s: insufficient memory\n", argv[0]);
+@i{30}          exit(2);
+@i{31}      @}
+@i{32}      if (wfdbinit(argv[1], &a, 1, s, nsig) != nsig) exit(2);
+@i{33}      if (sampfreq(NULL) != 250.)
+@i{34}          fprintf(stderr,"warning: %s is designed for 250 Hz input\n",
+@i{35}                  argv[0]);
+@i{36}      if (argc > 2) scmin = muvadu(0, atoi(argv[2]));
+@i{37}      if (scmin < 1) scmin = muvadu(0, 1000);
+@i{38}      slopecrit = scmax = 10 * scmin;
+@i{39}      ms160 = strtim("0.16"); ms200 = strtim("0.2"); s2 = strtim("2");
+@i{40}      annot.subtyp = annot.chan = annot.num = 0; annot.aux = NULL;
+@i{41}      (void)getvec(v);
+@i{42}      t9 = t8 = t7 = t6 = t5 = t4 = t3 = t2 = t1 = v[0];
+@i{43}  
+@i{44}      do @{
+@i{45}          filter = (t0 = v[0]) + 4*t1 + 6*t2 + 4*t3 + t4
+@i{46}                  - t5         - 4*t6 - 6*t7 - 4*t8 - t9;
+@i{47}          if (time % s2 == 0) @{
+@i{48}              if (nslope == 0) @{
+@i{49}                  slopecrit -= slopecrit >> 4;
+@i{50}                  if (slopecrit < scmin) slopecrit = scmin;
+@i{51}              @}
+@i{52}              else if (nslope >= 5) @{
+@i{53}                  slopecrit += slopecrit >> 4;
+@i{54}                  if (slopecrit > scmax) slopecrit = scmax;
+@i{55}              @}
+@i{56}          @}
+@i{57}          if (nslope == 0 && abs(filter) > slopecrit) @{
+@i{58}              nslope = 1; maxtime = ms160;
+@i{59}              sign = (filter > 0) ? 1 : -1;
+@i{60}              qtime = time;
+@i{61}          @}
+@i{62}          if (nslope != 0) @{
+@i{63}              if (filter * sign < -slopecrit) @{
+@i{64}                  sign = -sign;
+@i{65}                  maxtime = (++nslope > 4) ? ms200 : ms160;
+@i{66}              @}
+@i{67}              else if (filter * sign > slopecrit &&
+@i{68}                       abs(filter) > maxslope)
+@i{69}                  maxslope = abs(filter);
+@i{70}              if (maxtime-- < 0) @{
+@i{71}                  if (2 <= nslope && nslope <= 4) @{
+@i{72}                      slopecrit += ((maxslope>>2) - slopecrit) >> 3;
+@i{73}                      if (slopecrit < scmin) slopecrit = scmin;
+@i{74}                      else if (slopecrit > scmax) slopecrit = scmax;
+@i{75}                      annot.time = strtim("i") - (time - qtime) - 4;
+@i{76}                      annot.anntyp = NORMAL; (void)putann(0, &annot);
+@i{77}                      time = 0;
+@i{78}                  @}
+@i{79}                  else if (nslope >= 5) @{
+@i{80}                      annot.time = strtim("i") - (time - qtime) - 4;
+@i{81}                      annot.anntyp = ARFCT; (void)putann(0, &annot);
+@i{82}                  @}
+@i{83}                  nslope = 0;
+@i{84}              @}
+@i{85}          @}
+@i{86}          t9 = t8; t8 = t7; t7 = t6; t6 = t5; t5 = t4;
+@i{87}          t4 = t3; t3 = t2; t2 = t1; t1 = t0; time++;
+@i{88}      @} while (getvec(v) > 0);
+@i{89}  
+@i{90}      wfdbquit();
+@i{91}      exit(0);
+@i{92}  @}
 @end example
 
 @noindent
@@ -6274,58 +6344,58 @@ A macro that evaluates to the absolute value of its argument.
 @item Lines 11--12:
 The names of these variables match those in the original Pascal program.
 
-@item Lines 24--26:
+@item Lines 33--35:
 Most of this program is independent of sampling frequency, but the filter
-(lines 36--37) and the threshold are as specified by the authors
+(lines 45--46) and the threshold are as specified by the authors
 of the original program for human ECGs sampled at 250 Hz (e.g., the AHA DB).
 The program will work for MIT DB records sampled at 360 Hz, but better
 results can be obtained if the filter is optimized for the correct sampling
 frequency.
 
-@item Lines 27--29:
+@item Lines 36--38:
 The threshold is actually a slope criterion (with units of amplitude/time);
 these lines normalize the threshold with respect to the signal gain.
 The default value is used unless the user supplies an acceptable
 alternative.  The variables @code{scmin} and @code{scmax} are lower and
 upper bounds for the adaptive threshold @code{slopecrit}.
 
-@item Lines 32--33:
+@item Lines 41--42:
 Here we read the first sample and copy it into the variables that will
 be used to store the ten most recent samples.
 
 @cindex digital filter
 @cindex filter (digital)
-@item Lines 36--37:
+@item Lines 45--46:
 This FIR filter differentiates and low-pass filters the input signal.
 
-@item Lines 38--47:
+@item Lines 47--56:
 Here we adjust the threshold if more than two seconds have elapsed since
-a QRS was detected.  In line 40, @code{slopecrit} is set to 15/16 of its
-previous value if no slopes have been found;  in line 45, it is set to
+a QRS was detected.  In line 49, @code{slopecrit} is set to 15/16 of its
+previous value if no slopes have been found;  in line 53, it is set to
 17/16 of its previous value if 5 or more slopes were found (suggesting
 the presence of noise).
 
-@item Lines 48--52:
+@item Lines 57--61:
 If the condition in line 48 is satisfied, we may have found the beginning
 of a QRS complex.  We record that a slope has been found, set the timer
 @code{maxtime} to 160 msec, and save the sign of the slope and the current
 time relative to the previous beat.
 
-@item Lines 53--76:
+@item Lines 62--85:
 This code is executed once we have found a slope.  Each time the filter
 output crosses the threshold, we record another slope and begin looking
-for a threshold crossing of the opposite sign (lines 54--57), which must
+for a threshold crossing of the opposite sign (lines 63--66), which must
 occur within a specified time.  We record the maximum absolute value of
-the filter in @code{maxslope} (lines 58--60) for eventual use in updating
-the threshold (lines 63--65).  Once a sufficient interval has elapsed
-following the last threshold crossing (line 61), if there were between
+the filter in @code{maxslope} (lines 67--69) for eventual use in updating
+the threshold (lines 72--74).  Once a sufficient interval has elapsed
+following the last threshold crossing (line 70), if there were between
 2 and 4 slopes, we have (apparently) found a QRS complex, and the program
-records a @code{NORMAL} annotation (lines 66--67).  If there were 5 or more
-slopes, the program records an artifact annotation (lines 71--72).  If
+records a @code{NORMAL} annotation (lines 75--76).  If there were 5 or more
+slopes, the program records an artifact annotation (lines 80--81).  If
 only 1 slope was found, it is assumed to represent a baseline shift and
 no output is produced.
 
-@item Lines 77--79:
+@item Lines 86--88:
 At the end of the loop, the samples are shifted through the @code{t@var{n}}
 variables and another sample is read.
 @end table
@@ -6346,9 +6416,9 @@ it.  Remember to set and export the environment variable @code{WFDB}
 record @file{100s}, input annotator @file{atruth}, and output annotator
 @file{normal}.  The program should finish in five seconds or less.
 The annotations will have been written into a file called
-@file{100s.normal} (under MS-DOS, @file{100s.nor}) in the current
-directory.  Now type ``@code{rdann -r 100s -a atruth}'' and observe the output
-for a few seconds, then try ``@code{rdann -r 100s -a normal}'' and notice the
+@file{100s.nor} in the current directory.  Now type
+``@code{rdann -r 100s -a atruth}'' and observe the output
+for a few seconds, then try ``@code{rdann -r 100s -a nor}'' and notice the
 difference.
 
 @item
@@ -6469,14 +6539,13 @@ of 100 msec or less?
 
 @item
 This exercise assumes that you have access to the MIT-BIH Arrhythmia
-Database.  Since the 360 Hz sampling frequency used in that database is
-an integer multiple of 60 Hz, it is quite easy to design a 60 Hz notch
-filter that can be applied to the database.  Write a program that
-filters two input signals and writes out the filtered data using
-@code{putvec} (@pxref{Example 7}, for a model program).  Try it out on
-MIT-BIH record @file{122}.  Caution: signal files are quite large.  In
-order to avoid using too much disk space for this exercise, limit the
-program to writing 10 seconds' worth of samples.  Use your programs from
+Database, either on a CD-ROM or via PhysioNet.  Since the 360 Hz sampling
+frequency used in that database is an integer multiple of 60 Hz, it is
+quite easy to design a 60 Hz notch filter that can be applied to the
+database.  Write a program that filters two input signals and writes
+out the filtered data using @code{putvec} (@pxref{Example 7}, for a
+model program).  Try it out on MIT-BIH record @file{122} (or use record
+@file{mitdb/x_mitdb/x_122} from PhysioNet).  Use your programs from
 the previous exercises to display your output.
 
 @item
@@ -6594,10 +6663,7 @@ using either convention.
 @cindex annotator number (defined)
 An integer by which an annotation file, once opened, is known.  Input
 annotators and output annotators each have their own series of annotator
-numbers assigned in serial order beginning with 0.  Since at most
-@code{WFDB_MAXANN} (defined in @file{<wfdb/wfdb.h>}) input or output
-annotation files may be open at once, the largest valid annotator number
-is @code{WFDB_MAXANN - 1}.
+numbers assigned in serial order beginning with 0.
 
 @item Application program
 In this guide, a program that uses the WFDB library to do
@@ -6812,7 +6878,7 @@ have their own @file{header} files (created using @code{setmsheader}),
 and may have their own annotation files as well (annotation files for
 the constituent segments of a multi-segment record are @emph{not}
 concatenated automatically when the record is read).  The WFDB Software
-Package includes @code{wfdbcollate} (under MS-DOS, @code{wfdbcoll}), an
+Package includes @code{wfdbcollate}, an
 application that can create multi-segment records from sets of
 single-segment records.  Version 9.1 and later versions of the WFDB
 library support reading and writing multi-segment records.
@@ -6878,7 +6944,7 @@ Extraneous bytes at the beginning of a signal file that are not to be
 read as samples.  Signal files created using the WFDB library do not
 contain prologs, but signal files created using other means may contain
 prologs.  To read such a signal file using the WFDB library, provided that
-the sample data is in a supported format, it is sufficient to record the
+the sample data are in a supported format, it is sufficient to record the
 length of the prolog (in bytes) in the appropriate locations in a
 @file{header} file that names the signal file.  If you need to create
 such a @file{header} file, refer to the description of the byte offset
@@ -6892,7 +6958,7 @@ An extensible set of files that may include signal files, annotation
 files, and a @file{header} file, all of which are associated with the
 same original signals.  Only the @file{header} file is mandatory.
 Although records are sometimes called tapes for historical reasons,
-records are now more commonly maintained on optical or magnetic disks
+records are now more commonly maintained on CD-ROMs or magnetic disks
 than on tape.
 
 @item Record name
@@ -6970,9 +7036,7 @@ A number by which a signal file, once opened, is known.
 @cindex signal number (defined)
 An integer by which a signal, once opened, is known.  Input and output
 signals each have their own series of signal numbers assigned in serial
-order beginning with 0.  Since at most @code{WFDB_MAXSIG} (defined in
-@file{<wfdb/wfdb.h>}) input or output signals may be open at once, the
-largest valid signal number is @code{WFDB_MAXSIG - 1}.
+order beginning with 0.
 
 @item Skew
 @cindex skew
@@ -7025,8 +7089,8 @@ callable by C and C++ programs, and described in this guide.
 @menu
 * Distribution::	How to obtain the latest version of the WFDB
 			Software Package.
-* UNIX installation::	Installing the WFDB Software Package on UNIX, Linux,
-			and similar systems.
+* UNIX installation::	Installing the WFDB Software Package on UNIX,
+			GNU/Linux, and similar systems.
 * MS-DOS installation::	Installing the WFDB Software Package on MS-DOS PCs.
 * Other installation::	Installing the WFDB Software Package on other systems.
 @end menu
@@ -7066,18 +7130,18 @@ see the files @file{readme.doc} (in the root directory of the CD-ROM) and
 @file{software} directory).
 
 @node UNIX installation, MS-DOS installation, Distribution, Installation
-@unnumberedsec UNIX, Linux, and similar operating systems
+@unnumberedsec UNIX, GNU/Linux, and similar operating systems
 
 Before beginning the installation of the WFDB Software Package, obtain and
 install the @code{libwww} package from @code{http://www.w3.org/Library/} or
 from @code{http://www.physionet.org/physiotools/libwww/}.  This package is
-provided with most current versions of Linux.  (If you have a program called
-@code{libwww-config}, then @code{libwww} is installed already.)  You may
+provided with most current versions of GNU/Linux.  (If you have a program
+called @code{libwww-config}, then @code{libwww} is installed already.)  You may
 omit this step if you do not wish to have NETFILES support.
 
 Also obtain and install the @code{XView} software from
 @code{http://www.physio@-net.org/physio@-tools/xview/}.  Sources are available,
-as are binaries for several versions of Linux.  If you are using SunOS or
+as are binaries for several versions of GNU/Linux.  If you are using SunOS or
 Solaris, XView binaries are available in the Open Look Software Development
 package and may be installed already.  (If you have a program called
 @code{textedit}, then @code{XView} is installed already.) If you are able to
@@ -7088,8 +7152,10 @@ may omit this step if you do not wish to use @emph{WAVE}.
 
 Select an existing directory in a writable file system for the WFDB Software
 Package installation; @file{/usr/local/src} is a good choice in most cases.
-Make sure that at least 6 megabytes are available (most of this space can be
-recovered after the installation is complete).
+Make sure that at least 6 megabytes are available;  most of this space can be
+recovered after the installation is complete. [Obviously, this was written
+in ancient times -- the early 1990s -- when 6 Mb was still enough space for
+most computer users to notice!]
 
 If you have downloaded the software from PhysioNet or another source, you
 will have a @code{gzip}-compressed @code{tar} archive.  Unpack it using
@@ -7100,12 +7166,12 @@ gzip -d wfdb.tar.gz
 tar xfv wfdb.tar
 @end example
 
-(If you have GNU @code{tar}, as on Linux, you can combine these into a
+(If you have GNU @code{tar}, as on GNU/Linux, you can combine these into a
 single command: @samp{tar xfvz wfdb.tar.gz}.)
 
 This will create a directory with a name of the form @code{wfdb-}@var{m.n.r},
 where @var{m.n.r} is the version number of the included WFDB library (e.g.,
-@code{10.1.1}).  Enter this directory.
+@code{10.2.0}).  Enter this directory.
 
 If you are installing the software from a CD-ROM, copy the contents of the
 @file{src/wfdb} directory to your writable file system and then enter that
@@ -7260,11 +7326,17 @@ these programs print a brief synopsis of how they are used.
 @unnumberedsec Annotation File Processing
 
 @example
+ann2rr -a @var{annotator} -r @var{record [ options ... ]}
+rr2ann -a @var{annotator} -r @var{record [ options ... ]}
 rdann -a @var{annotator} -r @var{record [} -f @var{from} -t @var{to} -p @var{type ... ]}
 wrann -a @var{annotator} -r @var{record}
 sumann -a @var{annotator} -r @var{record}
 tach -a @var{annotator} -r @var{record [ options ... ]}
 @end example
+
+Programs @file{ann2rr} and @file{rr2ann} respectively list RR (inter-beat)
+intervals in text format from an annotation file, and create an annotation
+file from a text-format list of RR intervals.
 
 The program @file{rdann} is an annotation printer similar to the one
 shown in chapter 6 (@pxref{Example 3}).  The optional @var{from} and
@@ -7548,13 +7620,6 @@ directory.  Install the modified versions of the @file{.h} files in the
 system's @file{include} directory after installing the modified WFDB
 library.
 
-If you wish to increase the number of simultaneously accessible signals or
-annotators, simply change @code{WFDB_MAXSIG} or @code{WFDB_MAXANN} in
-@file{wfdb.h}, and recompile the WFDB library and your applications.  Your
-operating system's limit on the number of simultaneously open files may require
-you to use multiplexed signal files if you increase @code{WFDB_MAXSIG}
-substantially.
-
 The cleanest mechanism for adding additional fields to @file{header} files is
 to include them in `info' strings
 @iftex
@@ -7688,11 +7753,8 @@ to disable code optimization for some C compilers.
 @appendix Sources
 
 This section is a compendium of sources for databases and related
-materials that may be useful to readers of this guide.  If you have
-installed the WFDB Software Package, you may find an updated version of
-this list in @file{SOURCES.TXT}, in the @file{wfdb} directory that was
-created during the installation.  Please send any corrections to the
-author (@code{george@@mit.edu}).
+materials that may be useful to readers of this guide.  Please send any
+corrections to the author (@code{george@@mit.edu}).
 
 @table @emph
 @cindex MIT DB
@@ -7714,22 +7776,18 @@ PhysioNet offers free access via the web to large collections of
 recorded physiologic signals and related open-source software.
 PhysioNet is a public service of the Research Resource for
 Complex Physiologic Signals, funded by the National Center for
-Research Resources of the National Institutes of Health.
+Research Resources of the National Institutes of Health.  The
+master PhysioNet web server is located at MIT in Cambridge, Massachusetts;
+about ten public mirrors are located elsewhere in the US and around
+the world (see @code{http://@-www.@-physio@-net.@-org/@-mirrors/} for a list).
 
 @sp 1
 @cindex CD-ROM
 @cindex MIT DB
 @cindex waveform editor
-@item WFDB Programmer's Guide
-@itemx WFDB Applications Guide
-@itemx WAVE User's Guide
 @itemx MIT-BIH Arrhythmia Database CD-ROM
-@itemx MIT-BIH Arrhythmia Database Directory
 @itemx MIT-BIH Polysomnographic Database CD-ROM
-@itemx MIT-BIH Polysomnographic Database Directory
-@itemx Samples of Physiologic Databases CD-ROM
 @itemx Software for Physiologic Databases with Samples CD-ROM
-@itemx MIMIC Database CD-ROMs
 @display
 MIT-BIH Database Distribution
 MIT Room E25-505A
@@ -7817,7 +7875,7 @@ in even-numbered years, they are convened in North America, and in Europe in
 odd-numbered years.  The deadline for submission of abstracts is 1 May each
 year.  Proceedings of the conferences are published by the IEEE, and
 usually appear about 3 months after the date of the conference.  CinC will be
-in Cambridge, Massachusetts in 2000, and in Rotterdam in 2001.
+in Memphis, Tennessee in 2002, and in Thessaloniki in 2003.
 
 @sp 1
 @item Proceedings of Computers in Cardiology (ISSN 0276-6574)
@@ -7874,7 +7932,7 @@ is @file{http://ctan.tug.org/ctan/}).
 
 The UNIX @TeX{} distribution is also distributed on CD-ROM and in other tape
 formats by the Free Software Foundation (address above) and others.  It is
-also included with most Linux distributions (see below).
+also included with most GNU/Linux distributions (see below).
 
 Several commercial implementations of @TeX{} for MS-DOS are widely available.
 
@@ -7933,27 +7991,17 @@ ftp.funet.fi
 @end display
 
 There are also many low-cost (typically US$10 to US$30) distributions of
-Linux on CD-ROMs widely available.  Among the more popular are:
+GNU/Linux on CD-ROMs widely available.  Among the more popular are:
 
 @display
 Caldera Systems, Inc.
 240 West Center Street
 Orem, UT 84057 USA
 
-e-mail: @code{info@@calderasystems.com}
-WWW: @code{http://www.calderasystems.com/}
+e-mail: @code{info@@caldera.com}
+WWW: @code{http://www.caldera.com/}
 telephone: +1 801 765 4999
 telefax: +1 801 765 1313
-
-
-Corel Corporation
-1600 Carling Ave.
-Ottawa, Ontario
-K1Z 8R7
-Canada
-
-WWW: @code{http://linux.corel.com/}
-telephone: +1 613 728 0826
 
 
 Debian
@@ -7962,8 +8010,8 @@ WWW: @code{http://www.debian.org/}
 
 
 Red Hat
-P.O. Box 13588
-RTP, NC 27709 USA
+2600 Meridian Parkway
+Durham, NC 27713
 
 e-mail: @code{orders@@redhat.com}
 WWW: @code{http://www.redhat.com/}
@@ -7972,14 +8020,8 @@ telefax: +1 919 547 0024
 
 
 Slackware
-Walnut Creek CD-ROM
-4041 Pike Lane, Suite E
-Concord, CA 94520 USA
 
-e-mail: @code{info@@slackware.com}, @code{info@@cdrom.com}
-WWW: @code{http://www.slackware.com/}, @code{http://www.cdrom.com/}
-telephone: 1 800 786 9907 (USA and Canada) or +1 510 674 0783
-telefax: +1 510 674 0821
+WWW: @code{http://www.slackware.com/}
 
 
 S.u.S.E. GmbH
@@ -7994,6 +8036,18 @@ telefax: +49 911 7417755
 @end display
 
 @sp 1
+@cindex Cygwin
+@item Cygwin
+
+WWW: @code{http://source.redhat.com/cygwin/}
+
+This is a free software development platform for MS-Windows 9x/NT/2000/ME/XP,
+based on GNU @code{gcc} and a large set of UNIX utilities ported by Cygnus
+Software (now part of Red Hat, see above).  Cygwin itself is open-source
+software and is highly recommended in preference to commercial C/C++ compilers
+if you must work in the MS-Windows environment.  The WFDB Software Package
+binaries available via PhysioNet are created using Cygwin.
+
 @item Borland C++
 @itemx Turbo C/C++
 @display
@@ -8164,11 +8218,11 @@ numbered versions of the WFDB library.
 @ifinfo
 WFDB Programmer's Guide
 
-Tenth Edition (revised for WFDB library version 10.0.0)
+Tenth Edition (revised and with additions for WFDB library version 10.2.0)
 
 George B. Moody
 
-Copyright (C) 1989 -- 1999 George B. Moody
+Copyright (C) 1989 -- 2001 George B. Moody
 
 Permission is granted to make and distribute verbatim copies of this
 guide provided that the copyright notice and this permission notice are

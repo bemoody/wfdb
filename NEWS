@@ -1,4 +1,4 @@
-10.2.0pre10:
+10.2.0:
 	The 10.2 series differs from all earlier releases in that the WFDB
 	library no longer imposes any fixed limits on the numbers of annotators
 	or signals that can be open simultaneously.  There is also no
@@ -8,21 +8,15 @@
 	lib/wfdb.h for compatibility with older programs that use them, e.g.,
 	to set array sizes.
 
-	In this beta release, almost all of the WFDB applications, including
-	WAVE, those in the 'app' and 'examples' directories, and
-	convert/edf2mit, have been revised so that they can handle arbitrary
-	numbers of signals and (where applicable) annotation files.  The
-	exceptions are:
+	In this release, almost all of the WFDB applications, including WAVE,
+	those in the 'app' and 'examples' directories, and convert/edf2mit,
+	have been revised so that they can handle arbitrary numbers of signals
+	and (where applicable) annotation files.  The exceptions are:
 
 	  sample
 	    limited by the number of channels provided by the ADC/DAC it uses
 	  view, wview
 	    use 'gtkwave' (http://www.physionet.org/physiotools/beta/gtkwave)
-
-	'man' pages in the 'doc' directory should be up-to-date, but the WFDB
-	Programmer's Guide (doc/dbu.tex) is only partially updated (in
-	particular, note that the example programs in the text are not the
-	updated versions from the 'examples' directory).
 
 	Also please note the new 'checkpkg' directory, which contains a variety
 	of tests to check the basic functionality of the WFDB library and many

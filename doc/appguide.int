@@ -1,5 +1,5 @@
 \" file: appguide.int		G. Moody	July 1989
-\"				Last revised:  12 December 2000
+\"				Last revised:  15 October 2001
 \" Table of contents and introduction to the WFDB Applications Guide.
 \"
 \" To print this document using GNU groff, use:
@@ -74,7 +74,7 @@ wfdbdesc	read signal specifications	83
 wfdbwhich	find a WFDB file and print its pathname	84
 wrann	write a WFDB annotation file	85
 wrsamp	write WFDB signal files	86
-wview	WFDB browser for MS Windows	87
+wview	WFDB browser for MS Windows	88
 xform	sampling frequency, amplitude, and format conversion for WFDB records	92
 
 
@@ -91,7 +91,7 @@ wfdbcal	WFDB calibration file format	107
 
 \fBAppendices\fP
 	\fIInstalling the WFDB Software Package\fP	109
-	\fIEvaluating ECG Analyzers\fP	112
+	\fIEvaluating ECG Analyzers\fP	113
 .TE
 
 .LP

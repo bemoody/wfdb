@@ -22,10 +22,11 @@ char *argv[];
     }
     a.name = argv[1]; a.stat = WFDB_READ;
     if ((nsig = isigopen(argv[2], NULL, 0)) < 1) exit(2);
-    if ((s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo))) == NULL ||
-	(v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample))) == NULL ||
-	(vb = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample))) == NULL ||
-	(sum = (long **)malloc(nsig * sizeof(long *))) == NULL) {
+    s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+    v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
+    vb = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
+    sum = (long **)malloc(nsig * sizeof(long *));
+    if (s == NULL || v == NULL || vb == NULL || sum == NULL) {
 	fprintf(stderr, "%s: insufficient memory\n", argv[0]);
 	exit(2);
     }
