@@ -1,4 +1,4 @@
-.TH PSCHART 1 "20 May 2000" "WFDB software 10.1.3" "WFDB applications"
+.TH PSCHART 1 "17 June 2000" "WFDB software 10.1.5" "WFDB applications"
 .SH NAME
 pschart \- produce annotated `chart recordings' on a PostScript device
 .SH SYNOPSIS
@@ -79,7 +79,14 @@ Generate EPSF format (encapsulated PostScript file format), suitable for
 inclusion in another PostScript file.
 .TP
 \fB-g\fR
-Print a 0.5 mV x 0.2 sec grid under each strip (default: no grid).
+Print a 0.5 mV x 0.2 sec grid with 0.1 mV x 0.04 sec subticks under each strip
+(default: no grid).  This grid is drawn using the \fBgrid\fR procedure in
+the prolog file (see \fBENVIRONMENT\fR below).
+.TP
+\fB-G\fR
+Print a 0.5 mV x 0.2 sec grid without subticks under each strip
+(default: no grid).  This grid is drawn using the \fBGrid\fR procedure in
+the prolog file (see \fBENVIRONMENT\fR below).
 .TP
 \fB-h\fR
 Print a usage summary.
@@ -251,7 +258,8 @@ default PostScript prolog file.
 \fI/usr/local/lib/ps/12lead.pro\fR
 alternative PostScript prolog file, suitable for printing standard 12-lead
 diagnostic ECGs (10 seconds, 4 traces, with the top three traces divided into
-2.5 second segments by marker bars).
+2.5 second segments by marker bars).  This file redefines the grid drawn by
+the \fB-G\fR option (see the \fIGrid\fR procedure for details).
 .SH BUGS
 .PP
 High quality takes time.  A full page, with grids and default scales, typically

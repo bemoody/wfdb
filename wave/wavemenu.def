@@ -1,5 +1,5 @@
 # file: wavemenu.def	G. Moody	17 August 1990
-#			Last revised:	  24 May 2000
+#			Last revised:	 19 June 2000
 # WAVE analysis menu
 # -----------------------------------------------------------------------------
 # WAVE: Waveform analyzer, viewer, and editor
@@ -142,16 +142,16 @@ Set variables		RECORD=$RECORD; ANNOTATOR=$ANNOTATOR; START=$START; \
 
 # The label `<Open URL>' defines the command that is executed when a follow-
 # link command is given in the signal window.  (To give a follow-link command,
-# select a link annotation and press ENTER.)  `urlview' is itself a script that
-# you may customize for your web browser.  The version of `urlview' supplied
-# with WAVE uses Netscape (1.1 or any later version) to direct an already-
-# running Netscape process to open the specified URL; if Netscape is not
-# already running, `urlview' starts it.  If you prefer to use a different web
-# browser, either change the action associated with `<Open URL>' below, or
-# (preferably) replace the last command in `urlview' with one that invokes
+# select a link annotation and press ENTER.)  `url_view' is itself a script
+# that you may customize for your web browser.  The version of `url_view'
+# supplied with WAVE uses Netscape (1.1 or any later version) to direct an
+# already-running Netscape process to open the specified URL; if Netscape is
+# not already running, `url_view' starts it.  If you prefer to use a different
+# web browser, either change the action associated with `<Open URL>' below, or
+# (preferably) replace the last command in `url_view' with one that invokes
 # your browser (unfortunately, the syntax for doing so is not standard;
 # consult your browser's documentation).
-<Open URL>		urlview $URL
+<Open URL>		url_view $URL
 
 # The next two buttons use a file created using WAVE's Log window.  Typically,
 # the file contains the times of interesting events selected by the user,

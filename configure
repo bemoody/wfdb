@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody               24 May 2000
-#                             Last revised:          6 June 2000
+#                             Last revised:        28 February 2001
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -197,7 +197,18 @@ rm conf/site.def conf/site-slib.def
 
 echo
 echo "Looking for the XView libraries ..."
-if ( which textedit 2>&1 | grep "no " >/dev/null )
+if [ -d /usr/openwin -o -d /usr/local/openwin -o -d /opt/openwin ]
+then
+    WAVE=1;
+else
+  if ( which textedit 2>&1 | grep "no " >/dev/null )
+  then
+    WAVE=0;
+  else
+    WAVE=1;
+  fi
+fi
+if [ $WAVE = 0 ]
 then
     echo "WAVE will not be compiled, because the XView libraries do not"
     echo "appear to be installed on this system."

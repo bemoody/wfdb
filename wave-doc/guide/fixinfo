@@ -28,7 +28,7 @@ sub fixinfo {
 	if ($_ =~ /:.*:%*%/) {
 	    @words = split(/%/);
 	    $key = @words[1];
-	    print "@words[0]urlview /usr/local/help/html/wug/$label{$key}\n";
+	    print "@words[0]url_view /usr/local/help/html/wug/$label{$key}\n";
 	}
 	else {
 	   print $_;

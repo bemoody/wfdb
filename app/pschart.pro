@@ -1,9 +1,9 @@
 % file: pschart.pro	G. Moody	  27 May 1988
-%			Last revised:	  20 May 2000
+%			Last revised:	  7 October 2000
 
 % -----------------------------------------------------------------------------
 % prolog for pschart output
-% Copyright (C) 1999 George B. Moody
+% Copyright (C) 2000 George B. Moody
 
 % This program is free software; you can redistribute it and/or modify it under
 % the terms of the GNU General Public License as published by the Free Software
@@ -77,6 +77,17 @@ save 100 dict begin /pschart exch def
  [] 0 setdash
 }bind def
 
+% alternate grid
+/Grid { newpath 0 setlinecap
+ /dy1 exch dpi 25.4 div mul lw sub def /dy2 dy1 lw add 5 mul def
+ /dx1 exch dpi 25.4 div mul lw sub def /dx2 dx1 lw add 5 mul def
+ /y1 exch def /x1 exch def /y0 exch def /x0 exch def
+ dpi 100 idiv setlinewidth x0 y0 moveto x1 y0 lineto x1 y1 lineto x0 y1 lineto
+ closepath stroke lw setlinewidth
+ y0 dy2 add dy2 y1 {newpath dup x0 exch moveto x1 exch lineto stroke}for
+ x0 dx2 add dx2 x1 {newpath dup y0 moveto y1 lineto stroke }for
+}bind def
+
 % pn x y prpn: print page number, pn, centered on (x, y) (in mm).
 /prpn { mm exch mm exch moveto 10 R /pn exch def /str 10 string def
  pn str cvs stringwidth exch -.5 mul exch rmoveto
@@ -128,19 +139,16 @@ save 100 dict begin /pschart exch def
 /yb 0 def
 /yc 0 def
 /yd 0 def
-/ye 0 def
 
 % ya yb yc yd sb: set ordinates for marker bars
-/sb {/yd exch def /yc exch def /yb exch def /ya exch def
- /ye dpi 50.8 div lw sub def}def
+/sb {/yd exch def /yc exch def /yb exch def /ya exch def}def
 
 % ya yb Sb: set ordinates for short marker bars
-/Sb {/yb exch def /ya exch def /yc yb def /yd yb def
- /ye dpi 50.8 div lw sub def}def
+/Sb {/yb exch def /ya exch def /yc yb def /yd yb def}def
 
 % x mb: draw marker bars at x
 /mb { dup ya newpath moveto dup yb lineto dup yc moveto yd lineto
-[lw ye] 0 setdash stroke [] 0 setdash}bind def
+stroke}bind def
 
 % str x a: plot str at (x, ay), with marker bars if defined
 /a {ya yb ne {dup mb}if ay m t}bind def

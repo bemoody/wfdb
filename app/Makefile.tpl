@@ -1,17 +1,17 @@
 # file: Makefile.tpl		G. Moody		23 May 2000
-#
+#				Last revised:		6 December 2000
 # This section of the Makefile should not need to be changed.
 
-CFILES = bxb.c calsig.c ecgeval.c epic.c fir.c ihr.c mfilt.c mrgann.c \
- mxm.c nst.c plotstm.c pschart.c psfd.c rdann.c rdsamp.c rxr.c sampfreq.c \
- sample.c sigamp.c skewedit.c snip.c sortann.c sqrs.c sqrs125.c sumann.c \
- sumstats.c tach.c view.c vsetup.c wfdbcat.c wfdbcollate.c wfdbdesc.c \
- wfdbwhich.c wrann.c wrsamp.c wvscript.c xform.c
-XFILES = bxb calsig ecgeval epic fir ihr mfilt mrgann \
- mxm nst plotstm pschart psfd rdann rdsamp rxr sampfreq \
- sigamp skewedit snip sortann sqrs sqrs125 sumann \
- sumstats tach wfdbcat wfdbcollate wfdbdesc \
- wfdbwhich wrann wrsamp xform
+CFILES = ann2rr.c bxb.c calsig.c ecgeval.c epic.c fir.c ihr.c mfilt.c \
+ mrgann.c mxm.c nst.c plotstm.c pscgen.c pschart.c psfd.c rdann.c rdsamp.c \
+ rr2ann.c rxr.c sampfreq.c sample.c sigamp.c skewedit.c snip.c sortann.c \
+ sqrs.c sqrs125.c sumann.c sumstats.c tach.c view.c vsetup.c wfdbcat.c \
+ wfdbcollate.c wfdbdesc.c wfdbwhich.c wrann.c wrsamp.c wvscript.c xform.c
+XFILES = ann2rr bxb calsig ecgeval epic fir ihr mfilt \
+ mrgann mxm nst plotstm pscgen pschart psfd rdann rdsamp \
+ rr2ann rxr sampfreq sigamp skewedit snip sortann \
+ sqrs sqrs125 sumann sumstats tach wfdbcat \
+ wfdbcollate wfdbdesc wfdbwhich wrann wrsamp xform
 SCRIPTS = cshsetwfdb setwfdb
 PSFILES = pschart.pro psfd.pro 12lead.pro
 OTHERFILES = cshsetwfdb setwfdb setwfdb.bat sample8.hea

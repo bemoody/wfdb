@@ -74,7 +74,7 @@ New features
 - If you have a web browser such as Netscape, you can read the WAVE User's
   Guide on-line.  WAVE's Help Topics window contains a `User's Guide' button
   that opens the guide using Netscape or the browser of your choice.  (If
-  you don't use Netscape, you will need to customize the `urlview' script
+  you don't use Netscape, you will need to customize the `url_view' script
   provided with the WAVE distribution.)  Some topics in WAVE's spot help
   have `More' buttons that link in this way to the User's Guide for an
   in-depth discussion.
@@ -101,7 +101,7 @@ New features
   The aux field of a LINK annotation contains a URL and an optional comment.
   WAVE displays the comment, underlined and distinctively colored, in the
   manner of a Web browser;  if you select a LINK annotation, WAVE uses the
-  `urlview' script included in the WAVE distribution to cause your web browser
+  `url_view' script included in the WAVE distribution to cause your web browser
   to open the specified URL.  Going in the opposite direction, the `wavescript'
   application included in the WAVE distribution can be used as a helper by
   a web browser;  `wavescript' starts WAVE if necessary and causes it to

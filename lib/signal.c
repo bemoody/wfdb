@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  19 January 2000		wfdblib 10.1.1
+			Last revised:  28 February 2001		wfdblib 10.1.6
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -1705,7 +1705,7 @@ unsigned int nsig;
 	return (-1);
 
     /* Try to create the header file. */
-    if ((oheader = wfdb_open("header", record, WFDB_WRITE)) == NULL) {
+    if ((oheader = wfdb_open("hea", record, WFDB_WRITE)) == NULL) {
 	wfdb_error("newheader: can't create header for record %s\n", record);
 	return (-1);
     }

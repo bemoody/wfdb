@@ -1,9 +1,9 @@
 /* file: sumann.c	G. Moody       5 February 1982
-			Last revised:     4 May 1999
+			Last revised:  8 November 2000
 
 -------------------------------------------------------------------------------
 sumann: Tabulates annotations
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2000 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -44,6 +44,7 @@ extern char *malloc();
 
 #include <wfdb/wfdb.h>
 #include <wfdb/ecgcodes.h>
+#include <wfdb/ecgmap.h>
 
 #define MAXR	100
 
@@ -66,7 +67,7 @@ char *argv[];
 {
     static WFDB_Anninfo ai;
     WFDB_Annotation annot;
-    int i, rhythm = 0, noise = 2;
+    int i, rhythm = 0, noise = 2, qflag = 0;
     static long tab[64], rtab[MAXR], ntab[6];
     static long rtime[MAXR], ntime[6], r0, n0, from_time, to_time;
     char *record = NULL, *prog_name();
@@ -105,6 +106,9 @@ char *argv[];
 	  case 'h':	/* print usage summary and quit */
 	    help();
 	    exit(0);
+	    break;
+	  case 'q':       /* list only QRS annotations in event table */
+	    qflag = 1;
 	    break;
 	  case 'r':	/* input record name follows */
 	    if (++i >= argc) {
@@ -235,7 +239,7 @@ char *argv[];
 	ntime[noise] += to_time - n0;
     }
     for (i = 0; i < 64; i++)
-	if (tab[i] != 0L)
+      if (tab[i] != 0L && (qflag == 0 || isqrs(i)))
 	    (void)printf("%s\t%6ld\n", annstr(i), tab[i]);
     (void)printf("\n");
     for (i = 1; i <= MAXR; i++)
@@ -277,6 +281,7 @@ static char *help_strings[] = {
  "where RECORD and ANNOTATOR specify the input, and OPTIONS may include:",
  " -f TIME  start at specified TIME",
  " -h       print this usage summary",
+ " -q       list only QRS annotations in the event table",
  " -t TIME  stop at specified TIME",
 NULL
 };

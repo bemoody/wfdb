@@ -1,5 +1,5 @@
 /* file: analyze.c	G. Moody	10 August 1990
-			Last revised:	6 January 2000
+			Last revised:	 19 June 2000
 Functions for the analysis panel of WAVE
 
 -------------------------------------------------------------------------------
@@ -91,7 +91,7 @@ void open_url()
     if (menu_read == 0)
 	read_menu();
     if (open_url_command == NULL) {
-	sprintf(default_open_url_command, "urlview $URL\n");
+	sprintf(default_open_url_command, "url_view $URL\n");
 	open_url_command = default_open_url_command;
     }
     do_command(open_url_command);

@@ -1,0 +1,24 @@
+.TH SAMPFREQ 1 "12 December 2000" "WFDB software 10.2" "WFDB applications"
+.SH NAME
+sampfreq \- show sampling frequency for a record
+.SH SYNOPSIS
+\fBsampfreq\fR [ \fB-H\fR ] \fIrecord \fR
+.SH DESCRIPTION
+This program shows the sampling frequency for the specified \fIrecord\fR.
+By default, \fBsampfreq\fR shows the base sampling frequency (frame rate)
+for multi-frequency records;  if the \fB-H\fR option is present,
+\fBsampfreq\fR shows the highest sampling frequency used for any signal
+in a multi-frequency record.
+.PP
+The shell variable \fBWFDB\fR should be set and exported (see
+\fIsetwfdb\fR(1)).
+.SH FILES
+.TP 22
+\fIrecord\fR.hea
+header file
+.SH SEE ALSO
+setwfdb(1)
+.SH AUTHOR
+George B. Moody (george@mit.edu)
+.SH SOURCE
+http://www.physionet.org/physiotools/wfdb/app/sampfreq.c

@@ -1,4 +1,4 @@
-.TH RDANN 1 "11 January 2000" "WFDB software 10.0" "WFDB applications"
+.TH RDANN 1 "26 February 2001" "WFDB software 10.1" "WFDB applications"
 .SH NAME
 rdann \- read a WFDB annotation file
 .SH SYNOPSIS
@@ -17,6 +17,12 @@ the annotation type; the annotation \fBsubtyp\fR, \fBchan\fR, and
 .TP
 \fB-c\fI chan\fR
 Print only those annotations with \fBchan\fR fields that match \fIchan\fR.
+.TP
+\fB-e\fR
+Print annotation times as elapsed times from the beginning of the record
+(default: \fIrdann\rR prints absolute times if the absolute time of the
+beginning of the record is defined, and elapsed times otherwise, unless
+the \fB-x\fR option has been given).
 .TP
 \fB-f\fI time\fR
 Begin at the specified \fItime\fR.  By default, \fIrdann\fR starts at the
@@ -64,6 +70,9 @@ are also printed).  If the argument of the \fB-t\fR option begins with `#', it
 is taken as the number of QRS annotations to be processed;  note that not all
 of those processed will necessarily be printed, if the \fB-p\fR option is used
 to select only a subset of annotation types to be printed.  
+.PP
+Note that the \fB-e\fR and \fB-x\fR options are mutually exclusive;  if both
+are given, only the last one is effective.
 .PP
 The shell variable \fBWFDB\fR should be set and exported (see
 \fIsetwfdb\fR(1)).

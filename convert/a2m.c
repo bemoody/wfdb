@@ -1,5 +1,5 @@
 /* file: a2m.c		G. Moody	 9 June 1983
-			Last revised:   17 June 1999
+			Last revised:  13 February 2001
 
 -------------------------------------------------------------------------------
 a2m: Convert an AHA format annotation file to MIT format
@@ -81,7 +81,7 @@ char *argv[];
     long offset = 0L;
     unsigned int nann = 2;
     WFDB_Anninfo afarray[2];
-    WFDB_Annotation annot;
+    static WFDB_Annotation annot;
     void help();
 
     /* Read and interpret command-line arguments. */

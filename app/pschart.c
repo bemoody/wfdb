@@ -1,5 +1,5 @@
 /* file: pschart.c	G. Moody	 15 March 1988
-			Last revised:     20 May 2000
+			Last revised:  10 January 2001
 
 -------------------------------------------------------------------------------
 pschart: Produce annotated `chart recordings' on a PostScript device
@@ -110,6 +110,10 @@ char *s1, *s2;
 #define T_SEP	   1.0		/* distance from bottom of title to top of
 				   grid (mm) */
 #define V_SEP	   5.0		/* vertical space between strips (mm) */
+#define FS_ANN	  12.0		/* font size (in PostScript points) for
+				   annotations */
+#define FS_LABEL  10.0		/* font size for labels */
+#define FS_TITLE  12.0		/* font size for title */
 
 #ifndef PTYPE
 #define PTYPE	 "letter"	/* default page type */
@@ -139,12 +143,14 @@ int aux_shorten = 0;		/* if non-zero, print first char of aux only */
 double boff = 0.;		/* binding offset (mm) */
 char *copyright;		/* copyright notice string */
 char *defpagetitle;		/* default page title */
+char *footer = NULL;		/* footer string */
 char *rdpagetitle;		/* page title based on recording date */
 double dpi = DPI;		/* pixels per inch */
 int Cflag = 0;			/* if non-zero, produce color output */
 int eflag = 0;			/* if non-zero, do even/odd page handling */
 int Eflag = 0;			/* generate EPSF */
 int gflag = 0;			/* if non-zero, plot grid */
+int Gflag = 0;			/* if non-zero, plot alternate grid */
 int lflag = 0;			/* if non-zero, label signals */
 int Lflag = 0;			/* if non-zero, use landscape orientation */
 double lwmm = 0.;		/* line width (mm); 0 is narrowest possible */
@@ -191,19 +197,24 @@ double l_sep = L_SEP;		/* distance from labels to sides of grid */
 double t_sep = T_SEP;		/* distance from bottom of title to top of
 				   grid (mm) */
 double v_sep = V_SEP;		/* vertical space between strips (mm) */
+double fs_ann = FS_ANN;		/* font size (in PostScript points) for
+				   annotations */
+double fs_label = FS_LABEL;	/* font size for labels */
+double fs_title = FS_TITLE;	/* font size for titles */
 
 /* Color definitions. */
 struct pscolor {
     float red, green, blue;
 };
-struct pscolor ac = { 0.5, 0.5, 1.0 };	/* annotations: light blue */
-struct pscolor gc = { 1.0, 0.0, 0.0 };	/* grid: red */
+struct pscolor ac = { 0.0, 0.0, 1.0 };	/* annotations: blue */
+struct pscolor gc = { 1.0, 0.5, 0.5 };	/* grid: light red */
+struct pscolor Gc = { 0.2, 0.2, 0.2 };	/* alternate grid: dark grey */
 struct pscolor lc = { 0.0, 0.0, 0.0 };	/* labels: black */
-struct pscolor sc = { 0.0, 0.0, 0.5 };	/* signals: dark blue */
+struct pscolor sc = { 0.0, 0.0, 0.3 };	/* signals: dark blue */
 
 char *prog_name();
 int printstrip(), setpagedim(), setpagetitle();
-void append_scale(), cont(), ejectpage(), flush_cont(), grid(), help(),
+void append_scale(), cont(), ejectpage(), flush_cont(), grid(), Grid(), help(),
     label(), larger(), move(), newpage(), plabel(), process(), rlabel(),
     rtlabel(), setbar1(), setbar2(), setcourier(), setitalic(), setmargins(),
     setrgbcolor(), setroman(), smaller(), tlabel();
@@ -256,7 +267,11 @@ char *argv[];
     if (p = getenv("L_SEP")) l_sep = atof(p);
     if (p = getenv("T_SEP")) t_sep = atof(p);
     if (p = getenv("V_SEP")) v_sep = atof(p);
+    if ((p = getenv("FS_ANN")) && (fs_ann = atof(p)) <= 0.0) fs_ann = FS_ANN;
+    if ((p = getenv("FS_LABEL"))&&(fs_label=atof(p)) <= 0.0) fs_label=FS_LABEL;
+    if ((p = getenv("FS_TITLE"))&&(fs_title=atof(p)) <= 0.0) fs_title=FS_TITLE;
     if (p = getenv("PTYPE")) ptype = p;
+    if (p = getenv("FOOTER")) footer = p;
 
     /* Check for buggy TranScript software. */
     if (getenv("TRANSCRIPTBUG")) uflag = 1;
@@ -312,6 +327,7 @@ char *argv[];
 	    switch (argv[i][2]) {
 	    case 'a':	colorp = &ac; break;
 	    case 'g':	colorp = &gc; break;
+	    case 'G':	colorp = &Gc; break;
 	    case 'l':	colorp = &lc; break;
 	    case 's':	colorp = &sc; break;
 	    case '\0':  break;
@@ -354,6 +370,9 @@ char *argv[];
 	    break;
 	  case 'g':	/* enable grid printing */
 	    gflag = 1;
+	    break;
+	  case 'G':	/* enable alternate grid printing */
+	    Gflag = 1;
 	    break;
 	  case 'h':    	/* print usage summary and quit */
 	    help();
@@ -404,7 +423,7 @@ char *argv[];
 		if (Mflag < 0 || Mflag > 3) {
 		    (void)fprintf(stderr,
 			  "%s: incorrect format (%d) specified after -M\n",
-				  pname);
+				  pname, Mflag);
 		    exit(1);
 		}
 	    }
@@ -559,7 +578,7 @@ double v_tick;		/* distance (mm) between voltage ticks on grid */
 int aflag = 0;	       	/* if non-zero, plot annotations */
 unsigned int nann = 0;	/* number of annotation files to be plotted (0-2) */
 char *scales;		/* string which describes time and voltage scales */
-char record[20];	/* current record name */
+char record[80];	/* current record name */
 int usflag = 0;		/* if non-zero, uncalibrated signals were plotted */
 
 /* The rhpage() macro is true for all right-hand pages (normally the odd-
@@ -611,13 +630,13 @@ FILE *cfile;
 	}
 	else {
 	    tokptr = strtok(combuf, " \t");
-	    if (tokptr) (void)strncpy(record, tokptr, 19);
+	    if (tokptr) (void)strncpy(record, tokptr, sizeof(record)-1);
 	    tstring = strtok((char *)NULL, " \t\n");
 	    title = strtok((char *)NULL, "\n");
 	    for (i = 0; i < nisig; i++)
 		uncal[siglist[i]] = 0;
 	    if (tokptr == NULL || tstring == NULL ||
-		(nisig = isigopen(record, s, WFDB_MAXSIG)) < 1) continue;
+		(nisig = isigopen(record, s, WFDB_MAXSIG)) < 0) continue;
 	    (void)setpagetitle(0L);
 	    if (nosiglist) {
 		for (i = 0; i < nisig; i++)
@@ -715,10 +734,11 @@ char *record, *title;
 	}
     }
 
-    /* Fill the buffers. */
-    if (isigsettime(t0) < 0) return (0);
     if ((jmax = (int)(t1 - t0)) > nsamp) jmax = nsamp;
-    for (j = 0; j < jmax && getvec(v) == nisig; j++) {
+    if (nsig > 0) {
+      /* Fill the buffers. */
+      if (isigsettime(t0) < 0) return (0);
+      for (j = 0; j < jmax && getvec(v) == nisig; j++) {
 	for (i = 0; i < nsig; i++) {
 	    int sig = siglist[i], vtmp;
 
@@ -727,13 +747,12 @@ char *record, *title;
 	    else if (vtmp < vmin[sig]) vmin[sig] = vtmp;
 	    vsum[sig] += vtmp;
 	}
-    }
-    if (j == 0) return (0);
-    jmax = j;
-    t1 = t0 + jmax;
+      }
+      if (j == 0) return (0);
+      jmax = j;
 
-    /* Calculate the midranges. */
-    for (i = 0; i < nsig; i++) {
+      /* Calculate the midranges. */
+      for (i = 0; i < nsig; i++) {
 	int sig = siglist[i], vb, vm, vs;
 	double w;
 
@@ -743,13 +762,15 @@ char *record, *title;
 	else if (vb < vs) w = (vs - vb)/(vs - vmin[sig]);
 	else w = 0.0;
 	vbase[sig] = vs + ((double)vb-vs)*w;
+      }
     }
-
+    t1 = t0 + jmax;
+    
     /* Determine the width and height of the strip.  Allow the greater of 4 mV
        or 20 mm per trace if possible.  If n strips won't fit on the page
        (even if the allowance per trace is decreased moderately), the allowance
        is adjusted so that n-1 strips fill the page (for n = 2, 3, and 4). */
-    s_width = j*tscale/sps;
+    s_width = jmax*tscale/sps;
     if (vscale >= 5.) s_height = 4. * vscale * nsig;
     else s_height = 20. * nsig;
     if (1.5 * (s_height+v_sep) > p_height - (tmargin+bmargin))
@@ -779,30 +800,23 @@ char *record, *title;
     if (!pflag) s_left = lmargin + (s_defwidth - s_width)/2;
     s_right = s_left + s_width;
 
-    /* Draw the grid and print the title, scales, and time markers. */
+    /* Draw the grid and print the title and time markers. */
     if (gflag) {
 	setrgbcolor(&gc);
-	grid(mm(s_left), mm(s_bot), mm(s_right), mm(s_top), t_tick, v_tick);
+	if (Gflag)
+	   grid(mm(s_left-10.0),mm(s_bot),mm(s_right),mm(s_top),t_tick,v_tick);
+	else
+	   grid(mm(s_left), mm(s_bot), mm(s_right), mm(s_top), t_tick, v_tick);
+    }
+    if (Gflag) {
+	setrgbcolor(&Gc);
+	Grid(mm(s_left), mm(s_bot), mm(s_right), mm(s_top), t_tick, v_tick);
     }
     setrgbcolor(&lc);
-    setroman(8.);
+    setroman(fs_title);
     move(mm(s_left), mm(s_top + t_sep));
     if (rflag) { label("Record "); label(record); label("    "); }
     if (title) label(title);
-    if (smode == 3 || smode == 4) {
-	double a = s_width;
-
-	/* Estimate the space available for printing the scales above the
-	   strip (1 printer's em in 8-point type is about 1 mm). */
-	if (rflag) a -= 9. + (double)strlen(record);
-	if (title) a -= (double)strlen(title);
-	if (a >= (double)strlen(scales) + 10.)
-	    move(mm(s_left + s_width), mm(s_top + t_sep)); rlabel(scales);
-    }
-    else if ((smode == 5 || smode == 6) &&
-	     s_width >= (double)strlen(scales) + 10.) {
-	move(mm(s_right - l_sep), mm(s_bot + t_sep)); rlabel(scales);
-    }
     /* If side-by-side strip printing is enabled, print the time markers within
        the strip at the upper corners;  in this case, if the strip is less than
        30 mm wide, only the starting time marker is printed.  Otherwise, if
@@ -895,7 +909,7 @@ char *record, *title;
     /* Draw the signals. */
     x0 = mm(s_left);
     if (lflag) {
-	setitalic(8.);
+	setitalic(fs_label);
 	/* If side-by-side printing and signal label printing are both enabled,
 	   print the signal labels in the left margin only. */
 	if (pflag && s_left == lmargin)
@@ -960,7 +974,7 @@ char *record, *title;
 		char lbuf[20];
 		int yt, yi = pt(3.);
 
-		setroman(6.);
+		setroman(fs_label*0.75);
 		(void)sprintf(lbuf, "%g", ptick * (n-1));
 		yt = y0 - adu(ytick);
 		move(mm(s_left - 1.5*l_sep), yt - yi); rlabel(lbuf);
@@ -973,7 +987,7 @@ char *record, *title;
 		move(mm(s_left - l_sep), yt); cont(mm(s_left), yt);
 		move(mm(s_right + 1.5*l_sep), yt - yi); label(lbuf);
 		move(mm(s_right + l_sep), yt); cont(mm(s_right), yt);
-		setitalic(8.);
+		setitalic(fs_label);
 	    }
 	}
 	y0 -= adu(vbase[sig]);
@@ -983,7 +997,7 @@ char *record, *title;
 	for (j = 1; j < jmax; j++)
 	    cont(x0 + si(j), y0 + adu(*vp++));
     }
-    if (lflag) setroman(8.);
+    if (lflag) setroman(fs_label);
     else flush_cont();
 
     /* Print the annotations;  ya[0] and ya[1] are the baseline ordinates (in
@@ -1003,10 +1017,10 @@ char *record, *title;
 
        The scheme on the left is used for records with only one signal, and
        that on the right is used in other cases. */
-    if (nsig < 2) ya[0] = mm(s_top - 5.0) - pt(4.);
-    else ya[0] = mm(s_top - t_height) - pt(4.);
-    if (nsig < 3) ya[1] = mm(s_bot + 5.0) - pt(4.);
-    else ya[1] = mm(s_top - 2*t_height) - pt(4.);
+    if (nsig < 2) ya[0] = mm(s_top - 5.0) - pt(fs_ann/2.);
+    else ya[0] = mm(s_top - t_height) - pt(fs_ann/2.);
+    if (nsig < 3) ya[1] = mm(s_bot + 5.0) - pt(fs_ann/2.);
+    else ya[1] = mm(s_top - 2*t_height) - pt(fs_ann/2.);
     if (Mflag) setbar1(mm(s_top), mm(s_bot));
 
     /* Set s_top (and s_left, if side-by-side strip printing is enabled)
@@ -1019,7 +1033,7 @@ char *record, *title;
 	if (s_left + tscale > lmargin + s_defwidth) {
 	    if (lflag) {
 		setrgbcolor(&lc);
-		setitalic(8.);
+		setitalic(fs_label);
 		for (i = 0; i < nsig; i++) {
 		    char *d = s[siglist[i]].desc, *t;
 
@@ -1030,7 +1044,7 @@ char *record, *title;
 		    label(d);
 		    if (uncal[siglist[i]]) label(" *");
 		}
-		setroman(8.);
+		setroman(fs_label);
 	    }
 	    s_left = lmargin;
 	    s_top -= (s_height + v_sep);
@@ -1047,6 +1061,7 @@ char *record, *title;
 
 	if (iannsettime(t0) < 0 && nann == 1) return (1);
 	setrgbcolor(&ac);
+	setroman(fs_ann);
 	for (ia = 0; ia < nann; ia++) {
 	    if (Mflag <= 2)
 		(void)printf("%d Ay\n", y = ya[ia]);
@@ -1065,7 +1080,7 @@ char *record, *title;
 		x = (int)(annot.time - t0);
                 switch (annot.anntyp) {
 		  case NOISE:
-		    move(x0 + si(x), ya[ia] + pt(9.));
+		    move(x0 + si(x), ya[ia] + pt(fs_ann+1.0));
 		    if (annot.subtyp == -1) { label("U"); break; }
 		    /* The existing scheme is good for up to 4 signals;  it can
 		       be easily extended to 8 or 12 signals using the chan and
@@ -1130,6 +1145,24 @@ char *record, *title;
 	    }
 	}
     }
+    if (smode == 3 || smode == 4) {
+	double a = s_width;
+
+	setrgbcolor(&lc);
+	/* Estimate the space available for printing the scales above the
+	   strip (1 printer's em in 8-point type is about 1 mm). */
+	if (rflag) a -= 9. + (double)strlen(record);
+	if (title) a -= (double)strlen(title);
+	if (a >= (double)strlen(scales) + 10.) {
+	    move(mm(s_left + s_width), mm(s_top + t_sep)); rlabel(scales);
+	}
+    }
+    else if ((smode == 5 || smode == 6) &&
+	     s_width >= (double)strlen(scales) + 10.) {
+	setrgbcolor(&lc);
+	move(mm(s_right - l_sep), mm(s_bot + t_sep));
+	rlabel(scales);
+    }
     return (2);
 }
 
@@ -1166,6 +1199,10 @@ int setpagedim()
     else if (strcmp(ptype, "letter") == 0) {   /* SPARCprinter letter size */
 	p_width = 208.62;
 	p_height = 271.61;
+    }
+    else if (strcmp(ptype, "rletter") == 0) {   /* rotated letter (11x8.5) */
+	p_width = 271.61;
+	p_height = 208.62;
     }
     else if (strcmp(ptype, "lwletter") == 0) { /* Apple LaserWriter letter */
 	p_width = 203.20;
@@ -1274,6 +1311,14 @@ double xtick, ytick;
     (void)printf("%d %d %d %d %g %g grid\n", x0, y0, x1, y1, xtick, ytick);
 }
 
+/* As above, but print the alternate grid. */
+void Grid(x0, y0, x1, y1, xtick, ytick)
+int x0, y0, x1, y1;
+double xtick, ytick;
+{
+    (void)printf("%d %d %d %d %g %g Grid\n", x0, y0, x1, y1, xtick, ytick);
+}
+
 /* Start a new page by invoking the PostScript `newpage' procedure.
    This is a little kludgy -- it should be necessary to send the prolog
    only once, but (with some PostScript printers, at least) pages get
@@ -1353,7 +1398,7 @@ void ejectpage()
     flush_cont();
     if (s_top != -9999.) {
 	setrgbcolor(&lc);
-	setroman(10.);
+	setroman(fs_title);
 	if (Rflag) {
 	    if (rhpage()) {
 		move(mm(p_width - rmargin), mm(title_y));
@@ -1368,8 +1413,9 @@ void ejectpage()
 	}
 	if (infofile) {
 	    static char tstr[256];
-	    double yt = mm(title_y) + mm(20.0);
+	    double yt = mm(title_y) + mm(30.0);
 
+	    if (Rflag) yt -= mm(10.0);
 	    setcourier(10.0);
 	    while (fgets(tstr, sizeof(tstr), infofile)) {
 		move(mm(lmargin), (int)(yt -= pt(10)));
@@ -1395,12 +1441,12 @@ void ejectpage()
 	    }
 	}
 	if (lflag && usflag) {
-	    setroman(6.);
+	    setroman(fs_label*0.75);
 	    move(mm(p_width - rmargin), mm(bmargin) - pt(7.5));
 	    rlabel("* uncalibrated signal");
 	}
 	if (smode == 1 || smode == 2) {
-	    setroman(6.);
+	    setroman(fs_label*0.75);
 	    if (scales) {
 		/* 1 em at 6 points is about 1 mm.  Decide whether to
 		   try to fit the scales on the same line as the copyright
@@ -1411,6 +1457,10 @@ void ejectpage()
 		else
 		    move(mm(p_width - rmargin), mm(footer_y) + pt(7.5));
 		rlabel(scales);
+		if (footer) {
+		    move(mm(lmargin), mm(footer_y));
+		    label(footer);
+		}
 		/* reset scales for next page */
 		if (smode == 1) (void)sprintf(scales, "%g mm/sec", tscale);
 		else (void)sprintf(scales, "Grid intervals: %g sec", 5.0/tps);
@@ -1697,6 +1747,7 @@ static char *help_strings[] = {
  " -e        even/odd processing for two-sided printing",
  " -E        generate EPSF",
  " -g        print grids",
+ " -G	     print alternate grids",
  " -h        print this usage summary",
  " -H        use high-resolution mode for multi-frequency records",
  " -i FILE   print (as text) contents of FILE in title area of first page",
@@ -1782,6 +1833,16 @@ static char *dprolog[] = {
 " [] 0 setdash",
 "}bind def",
 
+"/Grid { newpath 0 setlinecap",
+" /dy1 exch dpi 25.4 div mul lw sub def /dy2 dy1 lw add 5 mul def",
+" /dx1 exch dpi 25.4 div mul lw sub def /dx2 dx1 lw add 5 mul def",
+" /y1 exch def /x1 exch def /y0 exch def /x0 exch def",
+" dpi 100 idiv setlinewidth x0 y0 moveto x1 y0 lineto x1 y1 lineto x0 y1 lineto",
+" closepath stroke lw setlinewidth",
+" y0 dy2 add dy2 y1 {newpath dup x0 exch moveto x1 exch lineto stroke}for",
+" x0 dx2 add dx2 x1 {newpath dup y0 moveto y1 lineto stroke }for",
+"}bind def",
+
 "/prpn { mm exch mm exch moveto 10 R /pn exch def /str 10 string def",
 " pn str cvs stringwidth exch -.5 mul exch rmoveto",
 " (- ) stringwidth exch neg exch rmoveto",
@@ -1791,7 +1852,7 @@ static char *dprolog[] = {
 
 "/prco { mm exch mm exch moveto",
 " 6 R (Copyright ) show",
-" /Symbol findfont 6 scalefont setfont (\323) show",
+" /Symbol findfont 6 scalefont setfont (\\323) show",
 " 6 R show } def",
 
 "/newpage {/dpi exch def tm setmatrix newpath [] 0 setdash",
@@ -1817,15 +1878,12 @@ static char *dprolog[] = {
 "/yb 0 def",
 "/yc 0 def",
 "/yd 0 def",
-"/ye 0 def",
-"/sb {/yd exch def /yc exch def /yb exch def /ya exch def",
-" /ye dpi 50.8 div lw sub def}def",
-"/Sb {/yb exch def /ya exch def /yc yb def /yd yb def",
-" /ye dpi 50.8 div lw sub def}def",
+"/sb {/yd exch def /yc exch def /yb exch def /ya exch def}def",
+"/Sb {/yb exch def /ya exch def /yc yb def /yd yb def}def",
 "/mb { dup ya newpath moveto dup yb lineto dup yc moveto yd lineto",
-"[lw ye] 0 setdash stroke [] 0 setdash}bind def",
+"stroke}bind def",
 "/a {ya yb ne {dup mb}if ay m t}bind def",
-"/A {ya yb ne {dup mb}if ay m (\267) t}bind def",
+"/A {ya yb ne {dup mb}if ay m (\\267) t}bind def",
 "/endpschart {cleartomark showpage pschart end restore}def",
 NULL
 };

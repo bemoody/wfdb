@@ -1,5 +1,5 @@
-# file: Makefile.tpl		G. Moody	24 May 2000
-#				Last revised:	5 June 2000
+# file: Makefile.tpl		G. Moody	 24 May 2000
+#				Last revised:  12 December 2000
 # Change the settings below as appropriate for your setup.
 
 # DOSCHK is a command for checking file and directory names within the current
@@ -10,7 +10,7 @@ DOSCHK = find . -print | doschk
 # DOSCHK = 
 
 # D2PARGS is a list of options for dvips.  Uncomment one of these to set the
-# paper size:
+# paper size ("a4" is most common except in the US and Canada):
 # D2PARGS = -t a4
 D2PARGS = -t letter
 
@@ -35,8 +35,10 @@ INFODIR = /usr/info
 # via the name given in its second argument.  If your system supports symbolic
 # links, uncomment the next line.
 LN = ln -s
-# Otherwise uncomment the next line.
+# Otherwise uncomment the next line if your system supports hard links.
 # LN = ln
+# If your system doesn't support links at all, copy files instead.
+# LN = cp
 
 # If you wish to install the info (GNU hypertext documentation) files from this
 # package, specify the command needed to format them from the texinfo source
@@ -109,6 +111,7 @@ install:	$(MAN1) $(MAN3) $(MAN5)
 	$(LN) $(MAN1)/a2m.1 $(MAN1)/ad2m.1
 	$(LN) $(MAN1)/a2m.1 $(MAN1)/m2a.1
 	$(LN) $(MAN1)/a2m.1 $(MAN1)/md2a.1
+	$(LN) $(MAN1)/ann2rr.1 $(MAN1)/rr2ann.1
 	$(LN) $(MAN1)/hrfft.1 $(MAN1)/hrlomb.1
 	$(LN) $(MAN1)/hrfft.1 $(MAN1)/hrmem.1
 	$(LN) $(MAN1)/hrfft.1 $(MAN1)/hrplot.1
@@ -117,8 +120,8 @@ install:	$(MAN1) $(MAN3) $(MAN5)
 	$(LN) $(MAN1)/view.1 $(MAN1)/vsetup.1
 
 uninstall:
-	../uninstall.sh $(MAN1) *.1 ad2m.1 m2a.1 md2a.1 hrlomb.1 hrmem.1 \
-	 hrplot.1 plot3d.1 cshsetwfdb.1 vsetup.1
+	../uninstall.sh $(MAN1) *.1 ad2m.1 ann2rr.1 m2a.1 md2a.1 hrlomb.1 \
+	 hrmem.1 hrplot.1 plot3d.1 cshsetwfdb.1 vsetup.1
 	../uninstall.sh $(MAN3) *.3
 	../uninstall.sh $(MAN5) *.5
 

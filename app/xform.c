@@ -1,5 +1,5 @@
 /* file: xform.c	G. Moody       8 December 1983
-			Last revised:   10 April 2000
+			Last revised:  26 February 2001
 
 -------------------------------------------------------------------------------
 xform: Sampling frequency, amplitude, and format conversion for WFDB records
@@ -543,21 +543,8 @@ char *argv[];
        the changes effective, the output signals must be (re)opened using
        osigfopen. */
     if (nrec && use_irec_desc) {
-	char *p;
-
-	for (i = 0; i < nosig; i++) {
+	for (i = 0; i < nosig; i++)
 	    dfout[i].desc = dfin[siglist[i]].desc;
-	    /* If the filenames were obtained from osigopen, they must be
-	       copied (since osigfopen returns the storage allocated for them
-	       by osigopen to the heap). */
-	    if ((p = (char *)malloc((unsigned)strlen(dfout[i].fname)+1)) ==
-		(char *)NULL) {
-		(void)fprintf(stderr, "%s: out of memory\n", pname);
-		exit(2);
-	    }
-	    (void)strcpy(p, dfout[i].fname);
-	    dfout[i].fname = p;
-	}
 	reopen = 1;
     }
 
@@ -619,8 +606,40 @@ char *argv[];
     }
 
     /* Reopen output signals if necessary. */
-    if (reopen && osigfopen(dfout, (unsigned)nosig) != nosig)
+    if (reopen) {
+      /* Copy all strings that may be deallocated by osigfopen. */
+      for (i = 0; i < nosig; i++) {
+	char *p;
+
+	if ((p = (char *)malloc((unsigned)strlen(dfout[i].fname)+1)) ==
+	    (char *)NULL) {
+	  (void)fprintf(stderr, "%s: out of memory\n", pname);
+	  exit(2);
+	}
+	(void)strcpy(p, dfout[i].fname);
+	dfout[i].fname = p;
+	if (dfout[i].units) {
+	  if ((p = (char *)malloc((unsigned)strlen(dfout[i].units)+1)) ==
+	      (char *)NULL) {
+	    (void)fprintf(stderr, "%s: out of memory\n", pname);
+	    exit(2);
+	  }
+	  (void)strcpy(p, dfout[i].units);
+	  dfout[i].units = p;
+	}
+	if (dfout[i].desc) {
+	  if ((p = (char *)malloc((unsigned)strlen(dfout[i].desc)+1)) ==
+	      (char *)NULL) {
+	    (void)fprintf(stderr, "%s: out of memory\n", pname);
+	    exit(2);
+	  }
+	  (void)strcpy(p, dfout[i].desc);
+	  dfout[i].desc = p;
+	}
+      }
+      if (osigfopen(dfout, (unsigned)nosig) != nosig)
 	exit(2);
+    }
 
     /* Determine the legal range of sample values for each output signal. */
     for (i = 0; i < nosig; i++) {

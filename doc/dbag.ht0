@@ -57,6 +57,8 @@ into another language, under the above conditions for modified versions.
 <UL> 
 <LI> <A HREF="a2m-1.htm">a2m, ad2m, m2a, md2a</A>: utilities for converting
 	between MIT and AHA DB formats
+<LI> <A HREF="ann2rr-1.htm">ann2rr, rr2ann</A>: convert annotation files to
+	interval lists and vice versa
 <LI> <A HREF="bxb-1.htm">bxb</A>: ANSI/AAMI-standard beat-by-beat annotation
 	comparator
 <LI> <A HREF="calsig-1.htm">calsig</A>: calibrate signals of a WFDB record
@@ -95,9 +97,10 @@ into another language, under the above conditions for modified versions.
 <LI> <A HREF="rdsamp-1.htm">rdsamp</A>: read WFDB signal files
 <LI> <A HREF="rxr-1.htm">rxr</A>: ANSI/AAMI-standard run-by-run annotation
 	comparator
+<LI> <A HREF="sampfr-1.htm">sampfreq</A>: show sampling frequency for a record
 <LI> <A HREF="sample-1.htm">sample</A>: digitize and replay analog signals
 	(MS-DOS only)
-<LI> <A HREF="setdb-1.htm">setwfdb, cshsetwfdb</A>: set WFDB environment
+<LI> <A HREF="setwfd-1.htm">setwfdb, cshsetwfdb</A>: set WFDB environment
 	variables
 <LI> <A HREF="sigamp-1.htm">sigamp</A>: measure signal amplitudes of a WFDB
 	record

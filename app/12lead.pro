@@ -1,4 +1,5 @@
 % file: 12lead.pro	G. Moody	  20 May 2000
+%			Last revised:	7 October 2000
 
 % -----------------------------------------------------------------------------
 % prolog for pschart output of 12-lead ECGs (based on pschart.pro)
@@ -64,44 +65,54 @@ save 100 dict begin /pschart exch def
 % x0 y0 x1 y1 xtick ytick grid: print a grid with the lower corner at (x0, y0),
 %  the upper corner at (x1, y1), and ticks at intervals of xtick and ytick (in
 %  mm);  the units of x0, y0, x1, and y1 are printer coordinates.
-% This function is the only one from pschart.pro that is modified.  This
-% version prints a 1 mv (10 yticks) x 200 ms (5 xticks) "calibration pulse" at
+/grid { newpath 0 setlinecap
+ /dy1 exch dpi 25.4 div mul def /dy2 dy1 5 mul def
+ /dx1 exch dpi 25.4 div mul def /dx2 dx1 5 mul def
+ /y1 exch def /x1 exch def /y0 exch def /x0 exch def
+ dpi 100 idiv setlinewidth x0 y0 moveto x1 y0 lineto x1 y1 lineto x0 y1 lineto
+ closepath stroke lw setlinewidth
+ y0 dy2 add dy2 y1 {newpath dup x0 exch moveto x1 exch lineto stroke}for
+ x0 dx2 add dx2 x1 {newpath dup y0 moveto y1 lineto stroke }for
+ [ lw dx1 lw sub lw dx1 2 mul lw sub lw dx1 lw sub lw dx1 lw sub ] dx1 2 mul
+  setdash
+ y0 dy1 add dy1 y1 {newpath dup x0 exch moveto x1 exch lineto stroke}for
+ [] 0 setdash
+}bind def
+
+% alternate grid
+% prints a 1 mv (10 yticks) x 200 ms (5 xticks) "calibration pulse" at
 % the beginning of each trace, and also prints marker bars at the times when
 % the signals change.
-/grid { newpath 0 setlinecap
- /dy1 exch dpi 25.4 div mul lw sub def /dy2 dy1 lw add 5 mul def
- /dx1 exch dpi 25.4 div mul lw sub def /dx2 dx1 lw add 5 mul def
+/Grid { newpath 0 setlinecap
+ /dy1 exch dpi 25.4 div mul def /dy2 dy1 5 mul def
+ /dx1 exch dpi 25.4 div mul def /dx2 dx1 5 mul def
  /y1 exch def /x1 exch def /y0 exch def /x0 exch def
-% dpi 100 idiv setlinewidth x0 y0 moveto x1 y0 lineto x1 y1 lineto x0 y1 lineto
-% closepath stroke lw setlinewidth [lw dx1] 0 setdash
-% y0 dy2 add dy2 y1 {newpath dup x0 exch moveto x1 exch lineto stroke}for
-% [lw dy1] 0 setdash
-% x0 dx2 add dx2 x1 {newpath dup y0 moveto y1 lineto stroke }for
-% [] 0 setdash
-  /dx3 dx1 5 mul def /dx4 dx2 12.5 mul def
-  /dy3 y1 y0 sub 8 div def /dy4 dy1 10 mul def
-  /x2 x0 dx3 sub def /x3 x2 dx1 sub def /x4 x0 dx4 add def
-  /y2 y0 dy3 add def /y3 y2 dy4 add def
-  newpath x3 y2 moveto x2 y2 lineto x2 y3 lineto x0 y3 lineto x0 y2 lineto
-   stroke
-  /y2 y2 dy3 dup add add def /y3 y2 dy4 add def /y4 y2 dy4 sub def
-  newpath x3 y2 moveto x2 y2 lineto x2 y3 lineto x0 y3 lineto x0 y2 lineto
-   x4 y3 moveto x4 y4 lineto /x4 x4 dx4 add def
-   x4 y3 moveto x4 y4 lineto /x4 x4 dx4 add def
-   x4 y3 moveto x4 y4 lineto /x4 x0 dx4 add def
-   stroke
-  /y2 y2 dy3 dup add add def /y3 y2 dy4 add def /y4 y2 dy4 sub def
-  newpath x3 y2 moveto x2 y2 lineto x2 y3 lineto x0 y3 lineto x0 y2 lineto
-   x4 y3 moveto x4 y4 lineto /x4 x4 dx4 add def
-   x4 y3 moveto x4 y4 lineto /x4 x4 dx4 add def
-   x4 y3 moveto x4 y4 lineto /x4 x0 dx4 add def
-   stroke
-  /y2 y2 dy3 dup add add def /y3 y2 dy4 add def /y4 y2 dy4 sub def
-  newpath x3 y2 moveto x2 y2 lineto x2 y3 lineto x0 y3 lineto x0 y2 lineto
-   x4 y3 moveto x4 y4 lineto /x4 x4 dx4 add def
-   x4 y3 moveto x4 y4 lineto /x4 x4 dx4 add def
-   x4 y3 moveto x4 y4 lineto
-   stroke
+ /dx3 dx1 5 mul def /dx4 dx2 12.5 mul def
+ /dy3 y1 y0 sub 8 div def /dy4 dy1 10 mul def
+ /x2 x0 dx3 sub def /x3 x2 dx1 sub def /x4 x0 dx4 add def
+ /y2 y0 dy3 add def /y3 y2 dy4 add def
+ lw 5 mul setlinewidth
+ newpath x3 y2 moveto x2 y2 lineto x2 y3 lineto x0 y3 lineto x0 y2 lineto
+  stroke
+ /y2 y2 dy3 dup add add def /y3 y2 dy4 add def /y4 y2 dy4 sub def
+ newpath x3 y2 moveto x2 y2 lineto x2 y3 lineto x0 y3 lineto x0 y2 lineto
+  x4 y3 moveto x4 y4 lineto /x4 x4 dx4 add def
+  x4 y3 moveto x4 y4 lineto /x4 x4 dx4 add def
+  x4 y3 moveto x4 y4 lineto /x4 x0 dx4 add def
+  stroke
+ /y2 y2 dy3 dup add add def /y3 y2 dy4 add def /y4 y2 dy4 sub def
+ newpath x3 y2 moveto x2 y2 lineto x2 y3 lineto x0 y3 lineto x0 y2 lineto
+  x4 y3 moveto x4 y4 lineto /x4 x4 dx4 add def
+  x4 y3 moveto x4 y4 lineto /x4 x4 dx4 add def
+  x4 y3 moveto x4 y4 lineto /x4 x0 dx4 add def
+  stroke
+ /y2 y2 dy3 dup add add def /y3 y2 dy4 add def /y4 y2 dy4 sub def
+ newpath x3 y2 moveto x2 y2 lineto x2 y3 lineto x0 y3 lineto x0 y2 lineto
+  x4 y3 moveto x4 y4 lineto /x4 x4 dx4 add def
+  x4 y3 moveto x4 y4 lineto /x4 x4 dx4 add def
+  x4 y3 moveto x4 y4 lineto
+  stroke
+ lw 2 mul setlinewidth
 }bind def
 
 % pn x y prpn: print page number, pn, centered on (x, y) (in mm).
@@ -155,19 +166,16 @@ save 100 dict begin /pschart exch def
 /yb 0 def
 /yc 0 def
 /yd 0 def
-/ye 0 def
 
 % ya yb yc yd sb: set ordinates for marker bars
-/sb {/yd exch def /yc exch def /yb exch def /ya exch def
- /ye dpi 50.8 div lw sub def}def
+/sb {/yd exch def /yc exch def /yb exch def /ya exch def}def
 
 % ya yb Sb: set ordinates for short marker bars
-/Sb {/yb exch def /ya exch def /yc yb def /yd yb def
- /ye dpi 50.8 div lw sub def}def
+/Sb {/yb exch def /ya exch def /yc yb def /yd yb def}def
 
 % x mb: draw marker bars at x
 /mb { dup ya newpath moveto dup yb lineto dup yc moveto yd lineto
-[lw ye] 0 setdash stroke [] 0 setdash}bind def
+stroke}bind def
 
 % str x a: plot str at (x, ay), with marker bars if defined
 /a {ya yb ne {dup mb}if ay m t}bind def

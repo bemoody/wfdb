@@ -1,9 +1,8 @@
-/* file rdann.c	    T. Baker and G. Moody	27 July 1981
-		    Last revised:	        26 February 2001
-
+/* file: ann2rr.c		G. Moody	 16 May 1995
+				Last revised:  19 February 2001
 -------------------------------------------------------------------------------
-rdann: Print an annotation file in ASCII form
-Copyright (C) 1999 George B. Moody
+ann2rr: Calculate RR intervals from an annotation file
+Copyright (C) 2000 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -22,9 +21,6 @@ You may contact the author by e-mail (george@mit.edu) or postal mail
 (MIT Room E25-505A, Cambridge, MA 02139 USA).  For updates to this software,
 please visit PhysioNet (http://www.physionet.org/).
 _______________________________________________________________________________
-
-Caution: If the output format of 'rdann' is modified, 'wrann' will require
-modification as well!
 */
 
 #include <stdio.h>
@@ -40,26 +36,6 @@ extern void exit();
 #define annpos
 #include <wfdb/ecgmap.h>
 
-/* Define the default WFDB path for CD-ROM versions of this program (the MS-DOS
-   executables found in the `bin' directories of the various CD-ROMs).  This
-   program has been revised since the appearance of these CD-ROMs; compiling
-   this file will not produce executables identical to those on the CD-ROMs.
-   Note that the drive letter is not included in these WFDB path definitions,
-   since it varies among systems.
- */
-#ifdef MITCDROM
-#define WFDBP ";\\mitdb;\\nstdb;\\stdb;\\vfdb;\\afdb;\\cdb;\\svdb;\\ltdb;\\cudb"
-#endif
-#ifdef STTCDROM
-#define WFDBP ";\\edb;\\valedb"
-#endif
-#ifdef SLPCDROM
-#define WFDBP ";\\slpdb"
-#endif
-#ifdef MGHCDROM
-#define WFDBP ";\\mghdb"
-#endif
-
 char *pname;
 
 main(argc, argv)	
@@ -67,41 +43,18 @@ int argc;
 char *argv[];
 {
     char *record = NULL, *prog_name();
-    signed char cflag = 0, chanmatch, nflag = 0, nummatch, sflag = 0, submatch;
-    double sps, spm, sph;
-    int eflag = 0, i, j, xflag = 0;
-    long beat_number = 0L, from = 0L, to = 0L, atol();
+    double sps, spm, sph, rrsec;
+    int cflag=0, i, j, pflag=0, previous_annot_valid=0, vflag=0, xflag=0;
+    long beat_number = 0L, from = 0L, to = 0L, rr, tp = 0L, atol();
     static char flag[ACMAX+1];
     static WFDB_Anninfo ai;
-    WFDB_Annotation annot;
+    static WFDB_Annotation annot;
     void help();
-
-#ifdef WFDBP
-    char *wfdbp = getwfdb();
-    if (*wfdbp == '\0')
-	setwfdb(WFDBP);
-#endif
 
     pname = prog_name(argv[0]);
 
-    /* Accept old syntax. */
-    if (argc >= 3 && argv[1][0] != '-') {
-	ai.name = argv[1];
-	record = argv[2];
-	i = 3;
-	if (argc > 3) { from = 3; i = 4; }
-	if (argc > 4) { to = 4; i = 5; }
-	if (argc <= 5) flag[0] = 1;
-	else while (i < argc && argv[i][0] != '-') {
-	    if (isann(j = strann(argv[i]))) flag[j] = 1;
-	    i++;
-	}
-    }
-    else
-	i = flag[0] = 1;
-
     /* Interpret command-line options. */
-    for ( ; i < argc; i++) {
+    for (i = flag[0] = 1; i < argc; i++) {
 	if (*argv[i] == '-') switch (*(argv[i]+1)) {
 	  case 'a':	/* annotator follows */
 	    if (++i >= argc) {
@@ -111,20 +64,10 @@ char *argv[];
 	    }
 	    ai.name = argv[i];
 	    break;
-	  case 'c':	/* chan value follows */
-	    if (++i >= argc) {
-		(void)fprintf(stderr, 
-		      "%s: chan value (between -128 and 127) must follow -c\n",
-			      pname);
-		exit(1);
-	    }
-	    chanmatch = atoi(argv[i]);
+	  case 'c':    	/* print intervals between consecutive valid
+			   annotations only */
 	    cflag = 1;
-	    break;
-	  case 'e':	/* show elapsed time */
-	    eflag = 1;
-	    xflag = 0;
-	    break;
+	    break;  
 	  case 'f':	/* starting time follows */
 	    if (++i >= argc) {
 		(void)fprintf(stderr, "%s: starting time must follow -f\n",
@@ -136,16 +79,6 @@ char *argv[];
 	  case 'h':	/* print usage summary and quit */
 	    help();
 	    exit(0);
-	    break;
-	  case 'n':	/* num value follows */
-	    if (++i >= argc) {
-		(void)fprintf(stderr, 
-		      "%s: num value (between -128 and 127) must follow -n\n",
-			      pname);
-		exit(1);
-	    }
-	    nummatch = atoi(argv[i]);
-	    nflag = 1;
 	    break;
 	  case 'p':	/* annotation mnemonic(s) follow */
 	    if (++i >= argc || !isann(j = strann(argv[i]))) {
@@ -174,16 +107,6 @@ char *argv[];
 	    }
 	    record = argv[i];
 	    break;
-	  case 's':	/* subtyp value follows */
-	    if (++i >= argc) {
-		(void)fprintf(stderr, 
-		    "%s: subtyp value (between -128 and 127) must follow -s\n",
-			      pname);
-		exit(1);
-	    }
-	    submatch = atoi(argv[i]);
-	    sflag = 1;
-	    break;
 	  case 't':	/* ending time follows */
 	    if (++i >= argc) {
 		(void)fprintf(stderr, "%s: end time must follow -t\n", pname);
@@ -191,9 +114,16 @@ char *argv[];
 	    }
 	    to = i;
 	    break;
+	  case 'v':	/* verbose mode: include time as well as RR */
+	    vflag = 1;
+	    break;
 	  case 'x':	/* use alternate time format */
-	    xflag = 1;
-	    eflag = 0;
+	    switch (*(argv[i]+2)) {
+	      case 'h': xflag = 3; break;
+	      case 'm': xflag = 2; break;
+	      case 's':
+	      default:  xflag = 1; break;
+	    }
 	    break;
 	  default:
 	    (void)fprintf(stderr, "%s: unrecognized option %s\n",
@@ -240,23 +170,30 @@ char *argv[];
 	}
     }
 
+    tp = from;
     while (getann(0, &annot) == 0 && (to == 0L || annot.time <= to)) {
-	if ((flag[0] || (isann(annot.anntyp) && flag[annot.anntyp])) &&
-	    (cflag == 0 || annot.chan == chanmatch) &&
-	    (nflag == 0 || annot.num == nummatch) &&
-	    (sflag == 0 || annot.subtyp == submatch)) {
-	    if (eflag)
-		(void)printf("%s  %7ld", mstimstr(annot.time), annot.time);
-	    else if (xflag)
-		(void)printf("%.3lf %.5lf %.7lf",
-			     annot.time/sps, annot.time/spm, annot.time/sph);
-	    else
-		(void)printf("%s  %7ld", mstimstr(-annot.time), annot.time);
-	    (void)printf("%6s%5d%5d%5d", annstr(annot.anntyp), annot.subtyp,
-		annot.chan, annot.num);
-	    if (annot.aux != NULL) (void)printf("\t%s", annot.aux + 1);
-	    (void)printf("\n");
+	if (!isann(annot.anntyp)) continue;
+	if ((flag[0] && isqrs(annot.anntyp)) || flag[annot.anntyp]) {
+	    if (cflag == 0 || previous_annot_valid == 1) {
+		rr = annot.time - tp;
+		if (vflag) {	/* print elapsed time */
+		  switch (xflag) {
+		    default:
+		    case 0: (void)printf("%ld\t", annot.time); break;
+		    case 1: (void)printf("%.3lf\t", annot.time/sps); break;
+		    case 2: (void)printf("%.3lf\t", annot.time/spm); break;
+		    case 3: (void)printf("%.3lf\t", annot.time/sph); break;
+		  }
+		}	
+		/* print RR interval */
+		if (xflag) (void)printf("%.3lf\n", rr/sps);
+		else (void)printf("%ld\n", rr);
+	    }
+	    tp = annot.time;
+	    previous_annot_valid = 1;
 	}
+	else if (cflag)
+	    previous_annot_valid = 0;
 	if (beat_number > 0L && isqrs(annot.anntyp) && --beat_number == 0L)
 	    break;
     }
@@ -286,16 +223,17 @@ char *s;
 static char *help_strings[] = {
  "usage: %s -r RECORD -a ANNOTATOR [OPTIONS ...]\n",
  "where RECORD and ANNOTATOR specify the input, and OPTIONS may include:",
- " -c CHAN             print annotations with specified CHAN only",
- " -e                  * show annotation times as elapsed times",
- " -f TIME             start at specified TIME",
- " -h                  print this usage summary",
- " -n NUM              print annotations with specified NUM only",
- " -p TYPE [TYPE ...]  print annotations of specified TYPEs only",
- " -s SUBTYPE          print annotations with specified SUBTYPE only",
- " -t TIME             stop at specified TIME",
- " -x                  * use alternate time format (seconds, minutes, hours)",
- "* Only one of -e and -x can be used.",
+ " -c       print intervals between consecutive valid annotations only",
+ " -f TIME  start at specified TIME",
+ " -h       print this usage summary",
+ " -p TYPE [TYPE ...]  print intervals between annotations of specified TYPEs",
+ "                      only",
+ " -t TIME  stop at specified TIME",
+ " -v       print elapsed times as well as RR intervals",
+ " -x       use alternate format (times and RR intervals in seconds)",
+ " -xh      use alternate format (times in hours, RR intervals in seconds)",
+ " -xm      use alternate format (times in minutes, RR intervals in seconds)",
+ " -xs      same as -x",
 NULL
 };
 

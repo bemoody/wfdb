@@ -2635,14 +2635,14 @@ window.  \WAVE{}'s interface to the web browser is defined by the
 line beginning with the {\tt <Open URL>} tag in \WAVE{}'s menu
 file.  In the standard version of the menu file, this line reads:
 \begin{verbatim}
-  <Open URL>    urlview $URL
+  <Open URL>    url_view $URL
 \end{verbatim}
 % $ (this comment is here only to keep Emacs's LaTeX fontification happy)
 
-The program {\tt urlview} is a shell script (normally installed at the
+The program {\tt url_view} is a shell script (normally installed at the
 same time as \WAVE{}, and in the same directory) that handles starting
 the browser if necessary and instructing it to display the specified
-URL.  The standard version of {\tt urlview} does so using the command:
+URL.  The standard version of {\tt url_view} does so using the command:
 \begin{verbatim}
  ( netscape -remote 'openURL($URL)' || netscape $URL ) &
 \end{verbatim}
@@ -2661,9 +2661,9 @@ netscape -remote} command fails, and (in this case only) \WAVE{}
 starts a new Netscape browser process.
 
 To configure \WAVE{} to use a different web browser, edit the {\tt
-urlview} script appropriately.  (You may also do this by editing the
+url_view} script appropriately.  (You may also do this by editing the
 action associated with {\tt <Open URL>}, but it's better to modify
-{\tt urlview}, since \WAVE{} also uses {\tt urlview} to display some
+{\tt url_view}, since \WAVE{} also uses {\tt url_view} to display some
 of its on-line help.  If you decide to modify the action in the
 \WAVE{} menu file, be careful not to change the {\tt <Open URL>} tag
 at the beginning of the line, since \WAVE{} uses this tag to identify
