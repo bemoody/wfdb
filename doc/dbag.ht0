@@ -59,7 +59,7 @@ into another language, under the above conditions for modified versions.
 	between MIT and AHA DB formats
 <LI> <A HREF="bxb-1.htm">bxb</A>: ANSI/AAMI-standard beat-by-beat annotation
 	comparator
-<LI> <A HREF="calibr-1.htm">calibrate</A>: calibrate signals of a WFDB record
+<LI> <A HREF="calsig-1.htm">calsig</A>: calibrate signals of a WFDB record
 <LI> <A HREF="cohere-1.htm">coherence</A>: estimate coherence and
 	cross-spectrum of two time series
 <LI> <A HREF="ecgeva-1.htm">ecgeval</A>: generate and run ECG analyzer

@@ -1,5 +1,5 @@
 This is the WAVE FAQ (frequently asked questions) list.  It was last revised on
-7 January 2000 (recent changes are marked with `*' below).
+24 May 2000 (recent changes are marked with `*' below).
 
 Hardware questions:
  * Can I use WAVE if I don't have a SparcStation?
@@ -415,10 +415,10 @@ determines display scales for signals based on several parameters:
    not been determined, or is incorrect, the size of the signal as drawn by
    WAVE may be incorrect as well.  If you know the physical values that
    correspond to at least two levels represented in the signal (for example,
-   the top and bottom of a calibration pulse), you can use the `calibrate'
+   the top and bottom of a calibration pulse), you can use the `calsig'
    application to determine the gain and to rewrite the header file.  See the
-   WFDB Applications Guide for details.  `calibrate' can be most
-   conveniently run from WAVE's Analysis panel.
+   WFDB Applications Guide for details.  `calsig' can be most conveniently run
+   from WAVE's Analysis panel.
  - Finally, the display calibration determines the number of pixels per inch
    (25.4 mm).  WAVE usually gets its information about the display calibration
    from the X server, but the X server may not supply the correct information.

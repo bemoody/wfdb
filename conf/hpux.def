@@ -1,0 +1,133 @@
+# file: hpux.def		G. Moody	31 May 2000
+#				Last revised:	5 June 2000
+# 'make' definitions for compiling the WFDB library under HP-UX
+
+# Choose a value for WFDBROOT to determine where the WFDB Software Package will
+# be installed.  One of the following is usually a reasonable choice.
+# Installing in /usr generally requires root permissions, but will be easiest
+# for future software development (no special -I or -L options will be needed
+# to compile software with the WFDB library, since the *.h files and the
+# library will be installed in the standard directories).
+WFDBROOT = /usr
+# Installing in /usr/local usually requires root permissions.  On a multi-user
+# system where it is desirable to keep the OS vendor's software separate from
+# other software, this is a good choice.  Another common choice in such cases
+# is /opt .
+# WFDBROOT = /usr/local
+# To install without root permissions, a good choice is to set WFDBROOT to the
+# name of your home directory, as in the example below (change as needed).
+# WFDBROOT = /home/frodo
+
+# If the W3C's libwww library of HTTP and FTP client code is available, and
+# you wish to compile a WFDB library with NETFILES support, set LWC to
+# 'libwww-config' (a utility supplied with libwww).  Otherwise set LWC to ':'
+# (a program that does nothing, successfully).
+LWC = libwww-config
+
+# LDLIBWWW, which is appended to LDFLAGS below, is the set of options needed
+# to link with libwww.  If libwww is not installed, or if libwfdb is a shared
+# library, LDLIBWWW can be empty (if there is a '#' immediately after the '='
+# below, the remainder of the line is ignored, so LDLIBWWW is empty in this
+# case).  Otherwise, it is generated from the output of LWC.  Note that up to
+# three passes through the option list are necessary to satisfy all
+# dependencies when linking to the static libwww libraries.
+LDLIBWWW = # `$(LWC) --libs` `$(LWC) --libs` `$(LWC) --libs`
+
+# BINDIR specifies the directory in which the applications will be installed;
+# it should be a directory in the PATH of those who will use the applications.
+BINDIR = $(WFDBROOT)/bin
+
+# DBDIR specifies the name of a directory in which to install the contents
+# of the `data' directory.
+DBDIR = $(WFDBROOT)/database
+
+# INCDIR specifies the name of a directory in which to install the WFDB
+# library's #include <...> files.
+INCDIR = $(WFDBROOT)/include
+# Note: if you have both gcc and a vendor-supplied C compiler, and if INCDIR
+# is /usr/include, CFLAGS (below) should *not* contain -I$(INCDIR) (if it does,
+# gcc may read the wrong version of files such as stdio.h when compiling WFDB
+# applications).
+
+# LIBDIR specifies the name of a directory in which to install the WFDB
+# library.
+LIBDIR = $(WFDBROOT)/lib
+
+# PSPDIR specifies the name of a directory in which to install the PostScript
+# prolog (*.pro) files from the 'app' directory.
+PSPDIR = $(WFDBROOT)/lib/ps
+
+# CC is the name of your C compiler.
+CC = gcc
+
+# CFLAGS is the set of C compiler options.  CFLAGS should always include
+# VDEFS.  Add the following options to CFLAGS as appropriate (separating them
+# by spaces if you use more than one):
+#   -g		  to save symbols for debugging
+#   -O		  if you trust your C compiler's optimizer
+# With the exception of `gcc', most C compilers do not allow you to use -g and
+# -O simultaneously.
+CFLAGS = -g $(VDEFS) `$(LWC) --cflags` -I$(INCDIR)
+# `gcc' users may comment out the previous line, and uncomment the next one.
+# CFLAGS = -g -O $(VDEFS) `$(LWC) --cflags` -I$(INCDIR)
+
+# LDFLAGS is appended to the C compiler command line to specify loading the
+# WFDB library.
+LDFLAGS = -L$(LIBDIR) -lwfdb $(LDLIBWWW)
+
+# WFDBLIB is the name of the standard WFDB library.  In order to access it via
+# `-lwfdb', WFDBLIB should be `libwfdb.a'.
+WFDBLIB = libwfdb.a
+
+# AR is the name of the command used to build a standard library from `.o'
+# files, and ARFLAGS is the set of options used when doing so.  AR and ARFLAGS
+# are usually `make' builtins and need not be defined here;  under HP UX, and
+# perhaps other versions of UNIX, however, you will need to define these
+# variables by uncommenting the next two lines.
+AR = ar
+ARFLAGS = rv
+
+# BUILDLIB is the command to be used to create WFDBLIB once all of its
+# components have been compiled separately.  This will not usually need to be
+# changed.
+BUILDLIB = $(AR) $(ARFLAGS) $(WFDBLIB) `lorder $(OFILES) | tsort`
+
+# PRINT is the name of the program used to produce listings (including any
+# options for the desired formatting).
+PRINT = lpr
+
+# SETPERMISSIONS is the command needed to make the installed files accessible
+# to those who will use them.  The value given below makes them readable by
+# everyone, and writeable by the owner only.  (If you perform the installation
+# as `root', `root' is the owner of the installed files.)
+SETPERMISSIONS = chmod 644
+
+# SETDPERMISSIONS is similarly used to make directories created during the
+# installation accessible.
+SETDPERMISSIONS = chmod 755
+
+# SETLPERMISSIONS is the command needed to make the WFDB library usable by
+# programs linked to it.
+SETLPERMISSIONS = chmod 644
+
+# SETXPERMISSIONS is the command needed to make the applications accessible.
+SETXPERMISSIONS = chmod 755
+
+# STRIP is the command used to compact the compiled binaries by removing their
+# symbol tables.
+STRIP = strip
+# To retain the symbol tables for debugging, comment out the previous line, and
+# uncomment the next line.
+# STRIP = :
+
+# `make' (with no target specified) will be equivalent to `make all'.
+make-all:	all
+
+# `make lib-post-install' should be run after installing the WFDB library.
+lib-post-install:
+	ranlib $(LIBDIR)/$(WFDBLIB)
+
+lib-post-uninstall:
+	echo "Nothing to be done for lib-post-uninstall"
+# _____________________________________________________________________________
+

@@ -1,5 +1,5 @@
 # file: wavemenu.def	G. Moody	17 August 1990
-#			Last revised:	6 January 2000
+#			Last revised:	  24 May 2000
 # WAVE analysis menu
 # -----------------------------------------------------------------------------
 # WAVE: Waveform analyzer, viewer, and editor
@@ -79,7 +79,7 @@
 # Button labels		Commands
 # -------------		--------
 Mark QRS complexes	sqrs -r $RECORD -f $START -t $END -s $SIGNAL
-Calibrate		calibrate -r $RECORD -f $START -t $END -s $SIGNALS
+Calibrate		calsig -r $RECORD -f $START -t $END -s $SIGNALS
 Extract segment		snip -i $RECORD -f $START -t $END -n n_$RECORD \
 			 -a $ANNOTATOR
 List annotations	rdann -r $RECORD -a $ANNOTATOR -f $START -t $END

@@ -65,37 +65,37 @@ WAVEVERSION = 6.3
 # of these directories.  Generally, you will need `root' permissions in order
 # to install the software in the standard places.  To do so, uncomment the next
 # line.
-INSTALL = /usr
+WFDBROOT = /usr
 # If you do not have `root' permissions, a reasonable alternative to the
 # standard installation is to put everything into directories called `include'
 # and `local' within the current directory (or any other writeable directory).
 # To use the current directory for this purpose, replace `xxx' below with the
 # full pathname of the current directory, and uncomment the next line.
-# INSTALL = xxx
+# WFDBROOT = xxx
 
 # BINDIR specifies the directory in which WAVE is to be installed;  it should
 # be a directory in the PATH of those who will use WAVE.
-BINDIR = $(INSTALL)/local/bin
+BINDIR = $(WFDBROOT)/local/bin
 
 # INCDIR should be one of the directories searched by your C compiler for
 # #include <...> files.
-INCDIR = $(INSTALL)/include
+INCDIR = $(WFDBROOT)/include
 
 # HELPDIR specifies the directory in which the on-line help files are kept.
 # The installation procedure creates a subdirectory, `wave', in HELPDIR, and
 # installs several files there.
-HELPDIR = $(INSTALL)/local/help
+HELPDIR = $(WFDBROOT)/local/help
 
 # LIBDIR should be one of the directories searched by CC's loader for -l...
 # libraries.
-LIBDIR = $(INSTALL)/local/lib
+LIBDIR = $(WFDBROOT)/local/lib
 
 # MENUDIR specifies the directory in which the default analysis menu file is
 # kept.
-MENUDIR = $(INSTALL)/local/lib
+MENUDIR = $(WFDBROOT)/local/lib
 
 # RESDIR specifies the directory in which X11 client resource files are kept.
-RESDIR = $(INSTALL)/lib/X11/app-defaults
+RESDIR = $(WFDBROOT)/lib/X11/app-defaults
 
 # CC is the name of your C compiler.  WAVE can be compiled with K&R C compilers
 # (`cc' on most if not all UNIX systems) as well as with ANSI C compilers such

@@ -1,106 +1,6 @@
-# file: Makefile	G. Moody	24 June 1989
-#			Last revised:  9 February 2000
-# `make' description file for WFDB software documentation
-#
-# -----------------------------------------------------------------------------
-# WFDB applications: programs for working with annotated signals
-# Copyright (C) 2000 George B. Moody
-#
-# These programs are free software; you can redistribute them and/or modify
-# them under the terms of the GNU General Public License as published by the
-# Free Software Foundation; either version 2 of the License, or (at your
-# option) any later version.
-#
-# These programs are distributed in the hope that they will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-# more details.
-#
-# You should have received a copy of the GNU General Public License along with
-# these programs; if not, write to the Free Software Foundation, Inc.,
-# 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-#
-# You may contact the author by e-mail (george@mit.edu) or postal mail
-# (MIT Room E25-505A, Cambridge, MA 02139 USA).  For updates to this software,
-# please visit PhysioNet (http://www.physionet.org/).
-# _____________________________________________________________________________
-#
-# This file is used with the UNIX `make' command to install on-line
-# documentation for the WFDB Software Package, and also to format and print it.
-# Before using this file for the first time, check that the site-specific
-# variables below are appropriate for your system.
-
-# The primary documentation for the WFDB Software Package consists of 3 guides:
-#  * The WFDB Applications Guide.  This guide documents the application
-#    programs provided in the app, convert, psd, wave (briefly), and wview
-#    subdirectories of wfdb, as well as the file formats supported by the WFDB
-#    Software Package. It also includes a tutorial on evaluation of arrhythmia
-#    and ischemia detectors using this software and standard databases.
-#  * The WFDB Programmer's Guide.  This guide documents the WFDB library.
-#    It contains both tutorial and reference material, with many examples, that
-#    will be useful if you wish to develop your own application programs for
-#    reading, analyzing, or creating digitized, optionally annotated,
-#    recordings of signals.
-#  * The WAVE User's Guide.  This guide (found in wfdb/wave-doc, not in this
-#    directory) includes a comprehensive tutorial, with reference material,
-#    for WAVE, an interactive waveform browser with facilities for annotation
-#    editing and control of external analysis programs. WAVE runs on PCs under
-#    Linux, and on SPARC-based systems under SunOS or Solaris.
-# The files in this directory can be used to prepare printed or on-line
-# versions of the first two of these guides.
-
-# On-line documentation
-# =====================
-
-# To install the man pages (the text of the WFDB Applications Guide) on-line,
-# type `make install' (or just `make').  The individual pages will be
-# accessible to the UNIX `man' command, and to similar commands such as `xman',
-# provided that MANDIR (see below) is in your MANPATH (type `man man' for
-# further information).
-
-# If GNU emacs or GNU info has been installed on your system, a hypertext
-# version of the WFDB Programmer's Guide may be installed by typing `make
-# info'.  Once the info files have been installed, provided that INFODIR is in
-# your INFOPATH (see below), you can browse the guide from within emacs by
-# typing C-h i to enter the info system, and selecting `WFDB library' from
-# the top-level menu.  Note that `make info' adds an entry for the Guide to the
-# top-level `info' file ($INFODIR/dir).  If you install a GNU emacs update,
-# this entry may disappear; to restore it, simply `make info' again.
-
-# To install both the WFDB Applications Guide and the WFDB Programmer's Guide
-# in HTML form, suitable for reading using a World Wide Web browser, type `make
-# html'.  In order to do this successfully, you must have installed
-# `latex2html' (to translate the appendices of the Applications Guide), and
-# `rman' (to translate the man pages in the Applications Guide).  You also need
-# `texi2html' (included here, to translate the WFDB Programmer's Guide),
-# and Perl (in order to run `latex2html' and `texi2html').  Links to all of
-# these are available from http://www.physionet.org, along with the latest
-# versions of the files in this directory.
-
-# Printed documentation
-# =====================
-
-# Individual man pages or info nodes can be printed using the facilities of
-# man and emacs respectively, or (from the HTML versions) using your web
-# browser's print facilities.  Complete printed copies of the WFDB
-# Applications and Programmer's Guides can be obtained in several ways:
-#  - Preformatted versions are provided in ../../html/*.ps.  If you don't have
-#    a PostScript printer, you may still be able to use ghostscript to print
-#    these versions on your printer (most popular laser, inkjet, and dot
-#    matrix printers are supported by ghostscript).
-#  - The sources for these manuals are provided in this directory;  you should
-#    use these if you have made additions to the manuals or wish to customize
-#    them in any other way.  To format the sources, you will need groff or
-#    troff, gtbl or tbl, TeX, LaTeX, texi2dvi, and dvips. To format and print
-#    the Applications Guide, type `make appguide' (but read `tmac.dif' first,
-#    unless you are using groff). To print the Programmer's Guide, type
-#    `make guide'.
-#  - Finally, if you can't or don't wish to print your own copies, nicely
-#    printed and bound copies are available from MIT (see `../../../ORDER.4M').
-# Sources for ghostscript, groff, gtbl, TeX, LaTeX, texi2dvi, and dvips are
-# all freely available (see `../SOURCES').
-
-# Site-specific variables.
+# file: Makefile.tpl		G. Moody	24 May 2000
+#				Last revised:	5 June 2000
+# Change the settings below as appropriate for your setup.
 
 # DOSCHK is a command for checking file and directory names within the current
 # directory for MS-DOS compatibility, used by `make html'.  If you have GNU
@@ -167,23 +67,9 @@ MAN5 = $(MANDIR)/man5
 # PERL is the full pathname of your perl interpreter, needed for `make htmlpg'.
 PERL = /usr/bin/perl
 
-# PRINT is the name of the program used to produce listings (including any
-# options for the desired formatting).
-PRINT = lpr
-
 # PSPRINT is the name of the program that prints PostScript files (needed to
 # `make guide' and to `make appguide').
 PSPRINT = lpr
-
-# SETDPERMISSIONS is the command needed to make directories created during the
-# installation accessible to those who will use them.
-SETDPERMISSIONS = chmod 755
-
-# SETPERMISSIONS is the command needed to make the installed files accessible
-# to those who will use them.  The value given below makes them readable by
-# everyone, and writable by the owner only.  (If you perform the installation
-# as `root', `root' is the owner of the installed files.)
-SETPERMISSIONS = chmod 644
 
 # TROFF is the name of the program that prints UNIX troff files (needed to
 # `make appguide' and for the covers of both guides).  Use `groff' if you have
@@ -215,8 +101,10 @@ TMS = -mgs
 
 .IGNORE:
 
+all:
+
 # `make' or `make install': install the man pages
-install:
+install:	$(MAN1) $(MAN3) $(MAN5)
 	./maninst.sh $(MAN1) $(MAN3) $(MAN5) "$(SETPERMISSIONS)"
 	$(LN) $(MAN1)/a2m.1 $(MAN1)/ad2m.1
 	$(LN) $(MAN1)/a2m.1 $(MAN1)/m2a.1
@@ -227,6 +115,20 @@ install:
 	$(LN) $(MAN1)/plot2d.1 $(MAN1)/plot3d.1
 	$(LN) $(MAN1)/setwfdb.1 $(MAN1)/cshsetwfdb.1
 	$(LN) $(MAN1)/view.1 $(MAN1)/vsetup.1
+
+uninstall:
+	../uninstall $(MAN1) *.1 ad2m.1 m2a.1 md2a.1 hrlomb.1 hrmem.1 \
+	 hrplot.1 plot3d.1 cshsetwfdb.1 vsetup.1
+	../uninstall $(MAN3) *.3
+	../uninstall $(MAN5) *.5
+
+# Create directories for installation if necessary.
+$(MAN1):
+	mkdir -p $(MAN1); $(SETDPERMISSIONS) $(MAN1)
+$(MAN3):
+	mkdir -p $(MAN3); $(SETDPERMISSIONS) $(MAN3)
+$(MAN5):
+	mkdir -p $(MAN5); $(SETDPERMISSIONS) $(MAN5)
 
 # `make appguide': print the man pages (the Applications Guide)
 appguide:
@@ -262,30 +164,38 @@ dbpg.ps:
 	dvips $(D2PARGS) -o dbpg.ps dbu.dvi
 
 # `make info': create and install emacs info files
-info:
+info:	$(INFODIR)
 	$(MAKEINFO) dbu.tex
 	test -s dbpg && \
-	 ( test -d $(INFODIR) || \
-          ( mkdir -p $(INFODIR); $(SETDPERMISSIONS) $(INFODIR) ); \
          cp dbpg* $(INFODIR); \
          ( test -s $(INFODIR)/dbpg && \
 	  ( $(SETPERMISSIONS) $(INFODIR)/dbpg*; \
 	   ( test -s $(INFODIR)/dir || cp dir.top $(INFODIR)/dir ); \
 	   ( grep -s dbpg $(INFODIR)/dir >/dev/null || \
-	     cat dir.db >>$(INFODIR)/dir )))); \
+	     cat dir.db >>$(INFODIR)/dir ))); \
 	rm -f dbpg*
+
+$(INFODIR):
+	mkdir -p $(INFODIR); $(SETDPERMISSIONS) $(INFODIR)
 
 # `make html': create HTML files, check for anything not accessible to MSDOS
 html:	makehtmldirs htmlag htmlpg
 	cd $(HTMLDIR); $(DOSCHK); ln -s index.htm index.html
 
-makehtmldirs:
+makehtmldirs:  $(HTMLDIR)/dbpg $(HTMLDIR)/dbag
 	-mkdir $(HTMLDIR)
 	cp -p index.ht0 $(HTMLDIR)/index.htm
 	date '+%e %B %Y' >>$(HTMLDIR)/index.htm
 	cat foot.ht0 >>$(HTMLDIR)/index.htm
 	-mkdir $(HTMLDIR)/dbpg
 	-mkdir $(HTMLDIR)/dbag
+
+$(HTMLDIR):
+	mkdir -p $(HTMLDIR); $(SETDPERMISSIONS) $(HTMLDIR)
+$(HTMLDIR)/dbag:	$(HTMLDIR)
+	mkdir -p $(HTMLDIR)/dbag; $(SETDPERMISSIONS) $(HTMLDIR)/dbag
+$(HTMLDIR)/dbpg:	$(HTMLDIR)
+	mkdir -p $(HTMLDIR)/dbpg; $(SETDPERMISSIONS) $(HTMLDIR)/dbpg
 
 htmlag:	makehtmldirs dbag.ps
 	cp -p icons/* dbag.ps fixag.sh fixag.sed $(HTMLDIR)/dbag

@@ -25,7 +25,8 @@ _______________________________________________________________________________
 
 */
 
-#include "wfdblib.h"
+#include <stdio.h>
+#include <wfdb/wfdb.h>
 #ifndef __STDC__
 extern double atof();
 extern void exit();
@@ -36,7 +37,28 @@ extern void exit();
 #include <strings.h>
 #endif
 
-static WFDB_FILE *iheader;
+/* netfile and WFDB_FILE definitions copied from ../lib/libwfdb.h */
+struct netfile {
+  char *url;
+  char *data;
+  int mode;
+  long base_addr;
+  long cont_len;
+  long pos;
+  long err;
+  int fd;
+};
+
+struct WFDB_FILE {
+  FILE *fp;
+  struct netfile *netfp;
+  int type;
+};
+
+typedef struct WFDB_FILE WFDB_FILE;
+
+WFDB_FILE *iheader;
+WFDB_FILE *wfdb_open();
 WFDB_Siginfo si[WFDB_MAXSIG];
 WFDB_Time nsamples;
 

@@ -27,7 +27,7 @@
 \title{\WAVE{} User's Guide}
 \author{Fifth Edition\\
 (revised and with corrections for \WAVE{} version 6.3)\\
-14 January 2000\\
+24 May 2000\\
 \\
 \\
 \\
@@ -2993,40 +2993,40 @@ until this has been done.)
 Figure~\ref{fig:calibration} illustrates signal calibration using a
 record from the MIMIC Database.  In this case, the type of signal
 (ABP) is known from an entry in the {\tt WFDBCAL} file (not shown here),
-so that {\tt calibrate} is able to determine the physical units of the
+so that {\tt calsig} is able to determine the physical units of the
 signal (mmHg).  Since a variety of calibration pulses are used for ABP
 signals, the {\tt WFDBCAL} file does not specify the pulse levels, which
-{\tt calibrate} has asked us to enter (in this case, we have entered
-{\tt 60} and {\tt 120}).  Based on this information, {\tt calibrate}
+{\tt calsig} has asked us to enter (in this case, we have entered
+{\tt 60} and {\tt 120}).  Based on this information, {\tt calsig}
 determines the offset and gain needed to convert raw sample values for
-signal 3 into ABP measurements in mmHg.  {\tt calibrate} then makes
+signal 3 into ABP measurements in mmHg.  {\tt calsig} then makes
 the appropriate changes to the header file for the current record.
 When \WAVE{} or another WFDB application next opens this record, the ABP
 signal will be properly calibrated.
 
-\index{calibrate command@{\tt calibrate} command}
-By default, {\tt calibrate} generates an amplitude histogram of the
+\index{calsig command@{\tt calsig} command}
+By default, {\tt calsig} generates an amplitude histogram of the
 samples between the `{\tt <}' and `{\tt >}' markers.  It then
 identifies the low and high amplitude portions of the calibration
 pulse by searching for the two largest distinct modes in this
-amplitude histogram.  For this reason, {\tt calibrate} works best if
+amplitude histogram.  For this reason, {\tt calsig} works best if
 the segment bounded by the `{\tt <}' and `{\tt >}' markers includes at
 least a few samples of both the high and low amplitude phases.  Avoid
 placing either marker immediately next to the transition point between
-the phases if possible.  If {\tt calibrate} fails to find two distinct
+the phases if possible.  If {\tt calsig} fails to find two distinct
 peaks in the amplitude histogram, it will produce an error message;
 if this happens, adjust the positions of the markers and try again.
 
 In some cases (for example, if the calibration pulse is a sawtooth, as
 in the RESP signal at the bottom of figure~\ref{fig:calibration}),
 this strategy may fail, no matter where the markers are placed.  In
-such cases, try again with {\tt calibrate}'s {\tt -q} or {\tt -Q}
+such cases, try again with {\tt calsig}'s {\tt -q} or {\tt -Q}
 options to use one of its alternate algorithms.  (These are less
 robust since they depend on differential rather than integrative
 measurements, but they can be used in a pinch.)
 
 For further information on signal calibration, see 
-\htmladdnormallink{{\tt calibrate(1)}}{../dbag/calibr-1.htm},
+\htmladdnormallink{{\tt calsig(1)}}{../dbag/calibr-1.htm},
 in the
 \htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm}.
 
@@ -4879,7 +4879,7 @@ available from PhysioNet.
 the same sources as \WAVE{} itself
 (\htmladdnormallink{{\tt http://www.physionet.org/}}
 {http://www.physionet.org/}).  The WFDB Software Package includes
-{\tt calibrate}, {\tt mrgann}, {\tt plot2d}, {\tt pschart}, {\tt
+{\tt calsig}, {\tt mrgann}, {\tt plot2d}, {\tt pschart}, {\tt
 psfd}, {\tt rdann}, {\tt rdsamp}, {\tt sample}, {\tt snip}, {\tt
 sqrs}, {\tt tach}, {\tt wfdbcollate}, {\tt wfdbdesc}, {\tt wfdbwhich},
 {\tt wrann}, {\tt wrsamp}, and {\tt xform} (among many other applications).
@@ -5633,10 +5633,10 @@ Second, the header file for the record specifies the gain for each signal
 not been determined, or is incorrect, the size of the signal as drawn by
 \WAVE{} may be incorrect as well.  If you know the physical values that
 correspond to at least two levels represented in the signal (for example,
-the top and bottom of a calibration pulse), you can use the `{\tt calibrate}'
+the top and bottom of a calibration pulse), you can use the `{\tt calsig}'
 application to determine the gain and to rewrite the header file.  See the
 \htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm}
-for details.  `{\tt calibrate}' can be most conveniently run from
+for details.  `{\tt calsig}' can be most conveniently run from
 \WAVE{}'s {\sf Analysis} window.
 
 \item

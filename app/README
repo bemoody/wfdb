@@ -1,9 +1,9 @@
 file: README		G. Moody	 1 June 1989
-			Last revised:   30 April 1999
+			Last revised:    24 May 2000
 
 -------------------------------------------------------------------------------
 WFDB applications: programs for working with annotated signals
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2000 George B. Moody
 
 These programs are free software; you can redistribute them and/or modify
 them under the terms of the GNU General Public License as published by the
@@ -56,7 +56,7 @@ Makefile.dos	MS-DOS `make' description file for compiling these applications
 		 using Microsoft `make' or `nmake', Borland `make', etc.
 README		this file
 bxb.c		AAMI-standard beat-by-beat annotation comparator
-calibrate.c	Calibrates signals of a database record
+calsig.c	Calibrates signals of a database record
 cshsetwfdb	Template for C-shell WFDB path initialization script
 ecgeval.c	Generates and runs ECG analyzer evaluation script
 epic.c		AAMI-standard episode-by-episode annotation comparator

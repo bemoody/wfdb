@@ -1,5 +1,5 @@
 '\" t
-.TH WAVE 1 "11 January 2000" "WAVE 6.3" "WFDB applications"
+.TH WAVE 1 "24 May 2000" "WAVE 6.3" "WFDB applications"
 .SH NAME
 wave \- waveform analyzer, viewer, and editor for the X Window System
 .SH SYNOPSIS
@@ -548,7 +548,7 @@ The default menu file includes the following lines (among others):
 center;
 l l.
  \fIMark QRS complexes\fR	sqrs -r $RECORD -f $START -t $END -s $SIGNAL
- \fICalibrate\fR	calibrate -r $RECORD -f $START -t $END -s $SIGNALS
+ \fICalibrate\fR	calsig -r $RECORD -f $START -t $END -s $SIGNALS
  \fIExtract segment\fR	snip -i $RECORD -f $START -t $END -n n_$RECORD \\ 
 	 -a $ANNOTATOR
  \fIList annotations\fR	rdann -r $RECORD -a $ANNOTATOR -f $START -t $END

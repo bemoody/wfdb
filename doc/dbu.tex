@@ -9,7 +9,7 @@
 @sp 5
 @center @titlefont{WFDB Programmer's Guide}
 @sp 4
-@center Tenth Edition (revised and with additions for WFDB library version 10.1.1)
+@center Tenth Edition (revised and with additions for WFDB library version 10.1.4)
 @center @today
 @sp 5
 @center George B. Moody
@@ -7327,7 +7327,7 @@ fir @var{[ options ... ]} -c @var{coefficient ...}
 sigamp -r @var{record [ options ...]}
 sqrs -r @var{record [ options ... ]}
 sample @var{[ options ... ]}
-calibrate -r @var{record [ options ... ]}
+calsig -r @var{record [ options ... ]}
 @end example
 
 @file{rdsamp} prints samples from the specified record;  @samp{-f} and
@@ -7358,7 +7358,7 @@ similar to the one discussed in chapter 6 (@pxref{Example 7}).
 
 @file{sigamp} measures signal amplitudes (either baseline-corrected RMS
 amplitudes or peak-to-peak amplitudes);  it may be useful for calibrating
-signals (together with @file{calibrate}) or for determining signal gains
+signals (together with @file{calsig}) or for determining signal gains
 for @file{nst}.
 
 @cindex QRS detector
@@ -7377,9 +7377,9 @@ wish to use other hardware for these purposes, refer to chapter 6
 models.
 
 If you create your own database records using @file{sample} or other
-means, program @file{calibrate} may be useful for determining signal
+means, program @file{calsig} may be useful for determining signal
 gains and offsets if your signals include standard calibration pulses or
-identifiable signal levels. @file{calibrate} incorporates two
+identifiable signal levels. @file{calsig} incorporates two
 independent algorithms for measuring calibration pulses; it rewrites
 @file{header} files based on its measurements.
 

@@ -1,5 +1,5 @@
 /* file: pschart.c	G. Moody	 15 March 1988
-			Last revised:   16 February 2000
+			Last revised:     20 May 2000
 
 -------------------------------------------------------------------------------
 pschart: Produce annotated `chart recordings' on a PostScript device
@@ -130,6 +130,7 @@ double title_y;			/* distance from page bottom to title (mm) */
 double footer_y;		/* distance from page bottom to footer (mm) */
 double imargin;			/* inside margin (mm) */
 double omargin;			/* outside margin (mm) */
+FILE *infofile;			/* file to print instead of title */
 
 /* User-settable parameters */
 char aname[41] = "atruth";	/* annotator name */
@@ -204,8 +205,8 @@ char *prog_name();
 int printstrip(), setpagedim(), setpagetitle();
 void append_scale(), cont(), ejectpage(), flush_cont(), grid(), help(),
     label(), larger(), move(), newpage(), plabel(), process(), rlabel(),
-    rtlabel(), setbar1(), setbar2(), setitalic(), setmargins(), setrgbcolor(),
-    setroman(), smaller(), tlabel();
+    rtlabel(), setbar1(), setbar2(), setcourier(), setitalic(), setmargins(),
+    setrgbcolor(), setroman(), smaller(), tlabel();
 
 main(argc, argv)
 int argc;
@@ -361,6 +362,14 @@ char *argv[];
 	  case 'H':	/* use getvec's high resolution mode */
 	    setgvmode(WFDB_HIGHRES);
 	    break;
+	  case 'i':	/* print contents of file in title area */
+	    if (++i >= argc || ((infofile = fopen(argv[i], "rt")) == NULL)) {
+		(void)fprintf(stderr,
+		      "%s: the name of a readable file must follow -i\n",
+			      pname);
+		exit(1);
+	    }
+	    break;
 	  case 'l':	/* enable signal labelling */
 	    lflag = 1;
 	    break;
@@ -368,6 +377,11 @@ char *argv[];
 	    Lflag = 1;
 	    (void)setpagedim();
 	    if (!mflag) setmargins();
+	    else {
+		s_defwidth = 25.0 * (int)((p_width - (imargin+omargin))/25.0);
+		title_y = p_height - 0.6*tmargin;
+		footer_y = 0.5*bmargin;
+	    }
 	    break;
 	  case 'm':	/* specify margins */
 	    if (++i >= argc - 3 || *argv[i] == '-' ||
@@ -1284,7 +1298,7 @@ void newpage()
 	    (void)printf("%%%%Title: Chart Recording\n");
 	    (void)printf("%%%%Pages: (atend)\n");
 	    (void)printf(
-		       "%%%%DocumentFonts: Times-Roman Times-Italic Symbol\n");
+	       "%%%%DocumentFonts: Times-Roman Times-Italic Courier Symbol\n");
 	    if (Lflag == 0)
 		(void)printf("%%%%BoundingBox: %d %d %d %d\n",
 		   (int)(lmargin*72.0/25.4 - 36.0),
@@ -1352,7 +1366,19 @@ void ejectpage()
 		tlabel(record);
 	    }
 	}
-	if (*pagetitle) {
+	if (infofile) {
+	    static char tstr[256];
+	    double yt = mm(title_y) + mm(20.0);
+
+	    setcourier(10.0);
+	    while (fgets(tstr, sizeof(tstr), infofile)) {
+		move(mm(lmargin), (int)(yt -= pt(10)));
+		label(tstr);
+	    }
+	    (void)fclose(infofile);
+	    infofile = NULL;
+	}
+	else if (*pagetitle) {
 	    if (rhpage()) {
 		move(mm(lmargin), mm(title_y));
 		if (pagetitle == defpagetitle && rdpagetitle != NULL)
@@ -1544,6 +1570,14 @@ double size;
     (void)printf("%g %c\n", fsize, style); 
 }
 
+void setcourier(size)
+double size;
+{
+    flush_cont();
+    fsize = size; style = 'C';
+    (void)printf("%g %c\n", fsize, style);
+}
+
 void smaller()	/* change to a font 20% smaller in the current style */
 {
     flush_cont();
@@ -1665,6 +1699,7 @@ static char *help_strings[] = {
  " -g        print grids",
  " -h        print this usage summary",
  " -H        use high-resolution mode for multi-frequency records",
+ " -i FILE   print (as text) contents of FILE in title area of first page",
  " -l        print signal labels",
  " -L        use landscape orientation",
  " -m IN OUT TOP BOTTOM   set margins in mm",
@@ -1733,6 +1768,7 @@ static char *dprolog[] = {
 "/mm {72 mul 25.4 div}def",
 "/I {/Times-Italic findfont exch scalefont setfont}def",
 "/R {/Times-Roman findfont exch scalefont setfont}def",
+"/C {/Courier findfont exch scalefont setfont}def",
 
 "/grid { newpath 0 setlinecap",
 " /dy1 exch dpi 25.4 div mul lw sub def /dy2 dy1 lw add 5 mul def",
@@ -1812,4 +1848,3 @@ void sendprolog()
 	if (*buf != '%' && *buf != '\n') (void)fputs(buf, stdout);
     (void)fclose(fp);
 }
-

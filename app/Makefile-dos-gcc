@@ -1,10 +1,10 @@
 # file: Makefile-dos-gcc	G. Moody	 23 April 1997
-#				Last revised:	 29 April 1999
+#				Last revised:	  24 May 2000
 # GCC-DOS 'make' description file for WFDB applications
 #
 # -----------------------------------------------------------------------------
 # WFDB applications: programs for working with annotated signals
-# Copyright (C) 1999 George B. Moody
+# Copyright (C) 2000 George B. Moody
 #
 # These programs are free software; you can redistribute them and/or modify
 # them under the terms of the GNU General Public License as published by the
@@ -91,12 +91,12 @@ STRIP = :
 # It should not be necessary to modify anything below this line.
 # -----------------------------------------------------------------------------
 
-CFILES = bxb.c calibrate.c ecgeval.c epic.c fir.c ihr.c mfilt.c mrgann.c \
+CFILES = bxb.c calsig.c ecgeval.c epic.c fir.c ihr.c mfilt.c mrgann.c \
  mxm.c nst.c plotstm.c pschart.c psfd.c rdann.c rdsamp.c rxr.c sample.c \
  sigamp.c skewedit.c snip.c sortann.c sqrs.c sqrs125.c sumann.c sumstats.c \
  tach.c view.c vsetup.c wfdbcollate.c wfdbdesc.c wfdbwhich.c wrann.c wrsamp.c \
  xform.c
-XFILES = bxb.exe calibr8.exe ecgeval.exe epic.exe fir.exe ihr.exe mfilt.exe \
+XFILES = bxb.exe calsig.exe ecgeval.exe epic.exe fir.exe ihr.exe mfilt.exe \
  mrgann.exe mxm.exe nst.exe plotstm.exe pschart.exe psfd.exe rdann.exe \
  rdsamp.exe rxr.exe sigamp.exe skewedit.exe snip.exe sortann.exe sqrs.exe \
  sqrs125.exe sumann.exe sumstats.exe tach.exe wfdbcol8.exe wfdbdesc.exe \
@@ -126,8 +126,8 @@ clean:
 
 bxb.exe:	bxb.c
 	$(CC) $(CFLAGS) bxb.c -o $@ $(LDFLAGS) -lm
-calibr8.exe:	calibrate.c
-	$(CC) $(CFLAGS) calibrate.c -o $@ $(LDFLAGS)
+calsig.exe:	calsig.c
+	$(CC) $(CFLAGS) calsig.c -o $@ $(LDFLAGS)
 wfdbcol8.exe:	wfdbcollate.c
 	$(CC) $(CFLAGS) wfdbcollate.c -o $@ $(LDFLAGS)
 wfdbwhic.exe:	wfdbwhich.c

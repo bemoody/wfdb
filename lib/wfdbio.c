@@ -62,8 +62,8 @@ The next two groups of functions, which together enable input from remote
 (http and ftp) files, were first implemented in version 10.0.1 by Michael
 Dakin.  Thanks, Mike!
 
-These functions, defined here if NETFILES is defined, are intended only for
-the use of the functions in the next group below (except for wfdb_wwwquit,
+These functions, defined here if WFDB_NETFILES is non-zero, are intended only
+for the use of the functions in the next group below (except for wfdb_wwwquit,
 their definitions are not visible outside of this file):
  wfdb_wwwquit *		(shut down libwww cleanly)
  www_init		(initialize libwww)
@@ -99,9 +99,9 @@ In the current version of the WFDB library, output to remote files is not
 implemented;  for this reason, several of the functions listed above are
 stubs (placeholders) only, as noted.
 
-These functions, also defined here, are compiled only if NETFILES is defined;
-they permit access to remote files via http or ftp (using libwww) as well as
-to local files (using the standard C I/O functions).  The functions in this
+These functions, also defined here, are compiled only if WFDB_NETFILES is non-
+zero; they permit access to remote files via http or ftp (using libwww) as well
+as to local files (using the standard C I/O functions).  The functions in this
 group are intended primarily for use by other WFDB library functions, but may
 also be called directly by WFDB applications that need to read remote files.
 Unlike other private functions in the WFDB library, the interfaces to these
@@ -121,11 +121,11 @@ similarly-named ANSI/ISO C standard I/O functions:
  wfdb_putc		(emulates putc, for local files only)
  wfdb_fopen		(emulates fopen, but returns a WFDB_FILE pointer)
 
-(If NETFILES is not defined, wfdblib.h defines all but the last of these
+(If WFDB_NETFILES is zero, wfdblib.h defines all but the last of these
 functions as macros that invoke the standard I/O functions that they would
 otherwise emulate.  The implementation of wfdb_fopen is below;  it includes
-a small amount of code compiled only if NETFILES is defined.  All of these
-functions are new in version 10.0.1.)
+a small amount of code compiled only if WFDB_NETFILES is non-zero.  All of
+these functions are new in version 10.0.1.)
 
 Finally, this file includes several miscellaneous functions needed only in
 certain environments:
@@ -626,7 +626,7 @@ int wfdb_fprintf(WFDB_FILE *wp, const char *format, ...)
     va_list args;
 
     va_start(args, format);
-#ifdef NETFILES
+#if WFDB_NETFILES
     if (wp->type == WFDB_NET)
 	ret = nf_vfprintf(wp->fp, format, args);
     else
@@ -931,8 +931,8 @@ or FTP server.  (Writing files to a remote WWW or FTP server may be
 supported in the future.)
 
 If you do not wish to allow access to remote files, or if libwww is not
-available, simply do not define the symbol NETFILES when compiling the
-WFDB library.  If the symbol NETFILES is not defined, wfdblib.h defines
+available, simply define the symbol WFDB_NETFILES as 0 when compiling the
+WFDB library.  If the symbol WFDB_NETFILES is zero, wfdblib.h defines
 wfdb_fread as fread, wfdb_fwrite as fwrite, etc.;  thus in this case, the
 I/O is performed using the standard C I/O functions, and the function
 definitions in the next section are not compiled.  This behavior exactly
@@ -940,14 +940,14 @@ mimics that of versions of the WFDB library earlier than version 10.0.1
 (which did not support remote file access), with no additional run-time
 overhead.
 
-If NETFILES is defined, however, these functions are compiled.  The WFDB_FILE
-pointers that are among the arguments to these functions point to objects that
-may contain either (local) FILE handles or (remote) NETFILE handles, depending
-on the value of the 'type' member of the WFDB_FILE object.  All access to local
-files is handled by passing the 'fp' member of the WFDB_FILE object to the
-appropriate standard C I/O function.  Access to remote files via http or ftp
-is handled by passing the 'netfp' member of the WFDB_FILE object to the
-appropriate libwww function(s).
+If WFDB_NETFILES is non-zero, however, these functions are compiled.  The
+WFDB_FILE pointers that are among the arguments to these functions point to
+objects that may contain either (local) FILE handles or (remote) NETFILE
+handles, depending on the value of the 'type' member of the WFDB_FILE object.
+All access to local files is handled by passing the 'fp' member of the
+WFDB_FILE object to the appropriate standard C I/O function.  Access to remote
+files via http or ftp is handled by passing the 'netfp' member of the WFDB_FILE
+object to the appropriate libwww function(s).
 
 In order to read remote files, the WFDB environment variable should include
 one or more components that specify http:// or ftp:// URL prefixes.  These
@@ -963,7 +963,7 @@ before looking on remote http or ftp servers, but the WFDB library allows you
 to set the search order in any way you wish, as in this example.
 */
 
-#ifdef NETFILES
+#if WFDB_NETFILES
 
 static int nf_open_files = 0;		/* number of open netfiles */
 static long page_size = NF_PAGE_SIZE;	/* bytes per range request (0: disable
@@ -1503,7 +1503,7 @@ WFDB_FILE *wp;
     return (putc(c, wp->fp));
 }
 
-#endif	/* NETFILES */
+#endif	/* WFDB_NETFILES */
 
 WFDB_FILE *wfdb_fopen(fname, mode)
 const char *fname, *mode;
@@ -1517,7 +1517,7 @@ const char *fname, *mode;
     }
     while (*p)
 	if (*p++ == ':' && *p++ == '/' && *p++ == '/') {
-#ifdef NETFILES
+#if WFDB_NETFILES
 	    if (wp->netfp = nf_fopen(fname, mode)) {
 		wp->type = WFDB_NET;
 		return (wp);

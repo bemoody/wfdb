@@ -1,9 +1,9 @@
 /* file: lomb.c		G. Moody	12 February 1992
-			Last revised:	   5 May 1999
+			Last revised:	  23 May 2000
 
 -------------------------------------------------------------------------------
 lomb: Lomb periodogram of real data
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2000 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -44,7 +44,11 @@ frequency with total power equal to the variance);  thanks to Joe Mietus.
 #include <stdio.h>
 #include <math.h>
 
+#ifndef hpux
 #define NMAX	65536	/* maximum number of inputs */
+#else
+#define NMAX	64000
+#endif
 
 static long lmaxarg1, lmaxarg2;
 #define LMAX(a,b) (lmaxarg1 = (a),lmaxarg2 = (b), (lmaxarg1 > lmaxarg2 ? \

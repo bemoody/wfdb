@@ -1,5 +1,5 @@
 /* file: wfdblib.h	G. Moody	13 April 1989
-                        Last revised: 30 January 2000         wfdblib 10.1.1
+                        Last revised: 	 23 May 2000         wfdblib 10.1.4
 External definitions for WFDB library private functions
 
 _______________________________________________________________________________
@@ -30,6 +30,8 @@ to share information about library private functions, which are not intended
 to be invoked directly by user programs.  By convention, all externally defined
 symbols reserved to the library begin with the characters "wfdb_".
 */
+
+#include "wfdb.h"
 
 /* Define the symbol _WINDLL if this library is to be compiled as a Microsoft
 Windows DLL.  Note that a DLL's private functions (such as those listed below)
@@ -73,7 +75,7 @@ software (recommended) or uncomment the next line. */
 /* DEFWFDBP is the default value of the WFDB path if the WFDB environment
 variable is not set.  In most cases, it is sufficient to use the string "."
 for this purpose (thus restricting the search for DB files to the current
-directory).  If NETFILES support is enabled, the setting below adds the
+directory).  If WFDB_NETFILES support is enabled, the setting below adds the
 web-accessible PhysioBank databases to the default path;  you may wish to
 change this to use a nearby PhysioNet mirror (for a list of mirrors, see
 http://www.physionet.org/mirrors/).   DEFWFDBP must not be NULL, however.
@@ -91,7 +93,7 @@ reconfiguration possible.  See getwfdb() in wfdbio.c for further information.
 # define __STDC__
 # endif
 #else
-# ifdef NETFILES
+# if WFDB_NETFILES
 #  define DEFWFDBP	". http://www.physionet.org/physiobank/database"
 # else
 #  define DEFWFDBP	"."
@@ -167,9 +169,9 @@ typedef struct netfile netfile;
 typedef struct WFDB_FILE WFDB_FILE;
 
 /* To enable http and ftp access as well as standard (local file) I/O via the
-   WFDB library, define NETFILES and link with libwww (see 'Makefile').
+   WFDB library, define WFDB_NETFILES=1 and link with libwww (see 'Makefile').
    Otherwise, the WFDB library uses only the ANSI/ISO standard I/O library. */
-#ifdef NETFILES
+#if WFDB_NETFILES
 #include <WWWLib.h>
 #include <WWWInit.h>
 #include <errno.h>
@@ -216,7 +218,7 @@ extern int wfdb_getc(WFDB_FILE *fp);
 extern int wfdb_putc(int c, WFDB_FILE *fp);
 extern void wfdb_wwwquit(void);
 
-#else		/* NETFILES not defined -- use standard I/O functions only */
+#else	    /* WFDB_NETFILES = 0 -- use standard I/O functions only */
 
 #define wfdb_fclose(wp)			fclose(wp->fp)
 #define wfdb_feof(wp)			feof(wp->fp)
@@ -231,8 +233,6 @@ extern void wfdb_wwwquit(void);
 #define wfdb_putc(c, wp)		putc(c, wp->fp)
 
 #endif
-
-#include "wfdb.h"
 
 /* The following block is needed only to declare the values returned by
 malloc() (either char * or void *) and sprintf() (either int or char *).

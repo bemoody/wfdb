@@ -1,7 +1,6 @@
 s/wfdbwhich-1.htm/wfdbwh-1.htm/g
 s/sumstats-1.htm/sumsta-1.htm/g
 s/ecgeval-1.htm/ecgeva-1.htm/g
-s/calibrate-1.htm/calibr-1.htm/g
 s/pschart-1.htm/pschar-1.htm/g
 s/coherence-1.htm/cohere-1.htm/g
 s/wfdbcollate-1.htm/wfdbco-1.htm/g

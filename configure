@@ -1,17 +1,200 @@
 #! /bin/sh
+# file: configure             G. Moody               24 May 2000
+#                             Last revised:          5 June 2000
+# Configuration script for the WFDB Software Package
+
+# This script was not generated using 'autoconf'.  If you can implement
+# autoconf input files for a 'configure' that does what this one does,
+# please send them to me (george@mit.edu) for inclusion in a future
+# version of this package.
+
+echo "Checking the operating system type ..."
+OS=`uname`
+echo "Configuring the WFDB software package for $OS."
+
+cp conf/version.def conf/site.def
+cp /dev/null conf/site-slib.def
+case `uname` in
+  Linux*) OS=Linux
+    cat conf/linux.def >>conf/site.def
+    cat conf/version.def conf/linux-slib.def >conf/site-slib.def ;;
+  SunOS*) OS=Solaris
+    cat conf/solaris.def >>conf/site.def
+    cat conf/version.def conf/solaris-slib.def >conf/site-slib.def
+    echo "It is normal, and harmless, for Solaris to be recognized as"
+    echo "SunOS." ;;
+  HP-UX*) OS=HPUX
+    cat conf/hpux.def >>conf/site.def
+    cat conf/version.def conf/hpux-slib.def >conf/site-slib.def ;;
+  *)      OS=generic
+    cat conf/generic.def >>conf/site.def
+    cat conf/version.def conf/generic-slib.def >conf/site-slib.def
+    echo "Using the generic configuration, which may need to be customized"
+    echo "for your operating system.  'configure' will offer suggestions for"
+    echo "customization after it completes the generic configuration." ;;
+esac
+
+if [ -s conf/site-slib.def ]
+then
+    echo
+    echo "The WFDB library may be compiled as a static library or as a"
+    echo "dynamically loaded (shared) library (the default).  Type S for a"
+    echo -n "static library, or D for a dynamically loaded library: "
+    read LIBTYPE
+    case x$LIBTYPE in
+       xS*|xs*) cp /dev/null conf/site-slib.def
+                LIBTYPE=static
+	        echo "Configuring for a static library."
+		echo
+		echo "You may link the WFDB applications to dynamically loaded"
+		echo "system libraries (such as the standard C library) to"
+		echo "save disk space and for faster loading even while using"
+		echo "the static WFDB library, or you may link them to static"
+		echo "libraries only, which will make them easier to copy to"
+		echo "other systems.  Note that choosing to link to static"
+		echo "libraries only may cause compilation to fail if your"
+		echo "system does not have a complete set of static libraries."
+		echo "Type S to link to static libraries only, or D to link to"
+		echo -n "dynamically loaded libraries where available: "
+		read SYSLIBS
+		case x$SYSLIBS in
+		   xS*|xs*) sed "s/LDFLAGS = -L/LDFLAGS = -static -L/" \
+			     <conf/site.def >conf/site.tmp
+			    mv conf/site.tmp conf/site.def ;;
+		         *) ;;
+		esac ;;
+       *)       LIBTYPE=dynamic
+	        echo "Configuring for a dynamically loaded library." ;;
+    esac
+else
+    LIBTYPE=static
+fi
+
+echo
+echo "Looking for the C compiler ..."
+if ( which gcc 2>&1 | grep "no " >/dev/null )
+then
+    if (which cc 2>&1 | grep "no " >/dev/null )
+    then
+        echo "The WFDB software cannot be compiled, because there does not"
+        echo "appear to be a C compiler installed on this system.  Please"
+        echo "install one, be sure that it is in your PATH, and that it is"
+	echo "accessible as either 'cc' or 'gcc', then run ./configure again."
+	exit
+    else
+        sed "s/CC = gcc/CC = cc/" <conf/site.def >conf/site.tmp
+	mv conf/site.tmp conf/site.def
+        sed "s/CC = gcc/CC = cc/" <conf/site-slib.def >conf/site.tmp
+	mv conf/site.tmp conf/site-slib.def
+        echo "The WFDB software will be compiled with 'cc'."
+    fi
+else
+    echo "The WFDB software will be compiled with 'gcc'."
+fi
+
+echo
+echo "Where do you wish to install the WFDB Software Package?"
+echo "It will be installed in subdirectories of WFDBROOT (by default,"
+echo "WFDBROOT is /usr, so that files are installed in /usr/bin,"
+echo "/usr/include, /usr/lib, etc.).  Other reasonable choices for"
+echo "WFDBROOT are /usr/local, /opt, or your home directory ($HOME)."
+echo "The value of WFDBROOT must be a full pathname (beginning with '/',"
+echo "but without a '/' at the end).  If the subdirectories (bin, include,"
+echo "lib, ...) of WFDBROOT don't exist, they will be created as necessary."
+echo
+DIR=
+while [ x$DIR = x ]
+do
+  echo -n "Choose a location, or press <Enter> to install in /usr: "
+  read DIR
+  case x$DIR in
+   x/usr) ;;
+   x) DIR=/usr ;;
+   */) DIR=
+       echo "Please type the path again, omitting the '/' at the end." ;;
+   x/*) sed "s+^WFDBROOT = /usr+WFDBROOT = $DIR+" <conf/site.def >conf/site.tmp
+      mv conf/site.tmp conf/site.def
+      sed "s+^WFDBROOT = /usr+WFDBROOT = $DIR+" <conf/site-slib.def \
+       >conf/site.tmp
+      mv conf/site.tmp conf/site-slib.def
+      if [ $LIBTYPE = dynamic ]
+      then
+          echo
+          echo "IMPORTANT:  You have chosen to build a dynamic (shared)"
+          echo "library in a directory that is not normally searched for such"
+          echo "libraries.  In order to use the applications that will be"
+	  echo "compiled with this library, it may be necessary to add this"
+	  echo "directory to your LD_LIBRARY_PATH.  If your shell is csh or a"
+	  echo "variant, do this by typing:"
+          case "x$LD_LIBRARY_PATH" in
+            x) echo "  setenv LD_LIBRARY_PATH $DIR/lib"
+	       echo "Otherwise, do this by typing:"
+               echo "  LD_LIBRARY_PATH=$DIR/lib"
+               echo "  export LD_LIBRARY_PATH" ;;
+            *) echo "  setenv LD_LIBRARY_PATH \${LD_LIBRARY_PATH}:$DIR/lib"
+               echo "Otherwise, do this by typing:"
+               echo "  LD_LIBRARY_PATH=\${LD_LIBRARY_PATH}:$DIR/lib"
+               echo "  export LD_LIBRARY_PATH" ;;
+          esac
+          echo -n "Press <Enter> to continue: "
+          read A
+      fi ;;
+   *) DIR=
+      echo "Please enter an absolute pathname, beginning with '/'." ;;
+  esac
+done
+  
+echo
+echo "Looking for libwww ..."
 if ( which libwww-config 2>&1 | grep "no " >/dev/null )
 then
     echo "The WFDB software will be compiled without NETFILES access, because"
     echo "libwww does not appear to be installed on this system."
     echo "To add NETFILES access, install libwww and run ./configure again."
-    cp -p lib/makelib lib/Makefile
     echo "NETFILES=0" >config.cache
+    sed "s/LWC = libwww-config/LWC = :/" <conf/site.def >conf/site.tmp
+    mv conf/site.tmp conf/site.def
+    sed "s/LWC = libwww-config/LWC = :/" <conf/site-slib.def >conf/site.tmp
+    mv conf/site.tmp conf/site-slib.def
+    sed "s/WFDB_NETFILES 1/WFDB_NETFILES 0/" <lib/wfdb.h >lib/wfdb.tmp
+    mv lib/wfdb.tmp lib/wfdb.h
 else
     echo "The WFDB software will be compiled with NETFILES access."
-    cp -p lib/netmake lib/Makefile
     echo "NETFILES=1" >config.cache
+    sed "s/LWC = :/LWC = libwww-config/" <conf/site.def >conf/site.tmp
+    mv conf/site.tmp conf/site.def
+    if [ $LIBTYPE = "static" ]
+    then
+        sed "s/LDLIBWWW = #/LDLIBWWW =/" <conf/site.def >conf/site.tmp
+	mv conf/site.tmp conf/site.def
+    fi
+    sed "s/LWC = :/LWC = libwww-config/" <conf/site-slib.def >conf/site.tmp
+    mv conf/site.tmp conf/site-slib.def
+    sed "s/WFDB_NETFILES 0/WFDB_NETFILES 1/" <lib/wfdb.h >lib/wfdb.temp
+    mv lib/wfdb.temp lib/wfdb.h
 fi
 
+echo
+echo "Creating Makefile in lib ..."
+if [ -s conf/site-slib.def ]
+then
+    cat lib/Makefile.top conf/site-slib.def lib/Makefile.tpl >lib/Makefile
+else
+    cat lib/Makefile.top conf/site.def lib/Makefile.tpl >lib/Makefile
+fi
+for D in app convert data doc examples fortran psd wave wave-doc waverc .
+do
+   if [ -s $D/Makefile.top ]
+   then
+       echo "Creating Makefile in $D ..."
+       cat $D/Makefile.top conf/site.def $D/Makefile.tpl >$D/Makefile
+   fi
+done
+
+rm conf/site.def conf/site-slib.def
+
+echo
+echo "Looking for the XView libraries ..."
 if ( which textedit 2>&1 | grep "no " >/dev/null )
 then
     echo "WAVE will not be compiled, because the XView libraries do not"
@@ -22,8 +205,49 @@ then
     echo "WAVE=0" >>config.cache
 else
     echo "WAVE will be compiled."
-    cp -p wave/makewave wave/Makefile
     echo "WAVE=1" >>config.cache
 fi
 
+echo
+echo "Looking for perl ..."
+if ( which perl 2>&1 | grep "no " >/dev/null )
+then
+    echo "The texi2html utility, which can be used to prepare some on-line"
+    echo "documentation in HTML form, requires perl, which does not appear"
+    echo "to be installed on this system.  This documentation is available"
+    echo "from http://www.physionet.org/ and its mirrors.  If you wish to"
+    echo "be able to prepare a local copy of this material, install perl"
+    echo "into a directory in your PATH and run ./configure again."
+else
+    PERL=`which perl`
+    case $PERL in
+      /usr/bin/perl) ;;
+      *) sed s+/usr/bin/perl+$PERL+ <doc/texi2html >texi2html
+         mv texi2html doc
+         sed s+/usr/bin/perl+$PERL+ <doc/Makefile >doc/Makefile.tmp
+         mv doc/Makefile.tmp doc/Makefile ;;
+    esac
+    echo "Found $PERL."
+fi
 
+# Clean up old *.o files in lib, to avoid possibly using binaries intended
+# for a shared library in a static library or vice versa.
+rm -f lib/*.o
+
+if [ $OS = generic ]
+then
+    echo "No specific configuration information is available for your"
+    echo "operating system.  Please try compiling using the generic Makefiles"
+    echo "that have been generated by this configuration utility.  If there"
+    echo "are problems, it may be possible to solve them by customizing"
+    echo "conf/generic.def (and conf/generic-slib.def if you are attempting"
+    echo "to compile a shared WFDB library).  Run ./configure again after"
+    echo "making any necessary changes to these files.  Please send reports"
+    echo "of success or failure, together with the output of the command"
+    echo "'uname -a', and copies of any files you have changed, to:"
+    echo "        george@mit.edu"
+fi
+
+echo
+echo "WFDB software configuration is complete."
+echo "Now run 'make', followed by 'make install'."

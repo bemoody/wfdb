@@ -1,5 +1,5 @@
 \" file: appguide.int		G. Moody	July 1989
-\"				Last revised: 11 March 2000
+\"				Last revised:  24 May 2000
 \" Table of contents and introduction to the WFDB Applications Guide.
 \"
 \" To print this document using GNU groff, use:
@@ -32,7 +32,7 @@ l l r.
 \fBSection 1: Applications\fP
 a2m, ad2m, m2a, md2a	utilities for converting between MIT and AHA DB formats	1
 bxb	ANSI/AAMI-standard beat-by-beat annotation comparator	4
-calibrate	calibrate signals of a DB record	6
+calsig	calibrate signals of a DB record	6
 coherence	estimate coherence and cross-spectrum of two time series	8
 ecgeval	generate and run ECG analyzer evaluation script	9
 epic	ANSI/AAMI-standard episode-by-episode annotation comparator	10

@@ -1,8 +1,8 @@
-/* file: calibrate.c	G. Moody	 4 March 1991
-			Last revised:  7 September 1999
+/* file: calsig.c	G. Moody	 4 March 1991
+			Last revised:    24 May 2000
 
 -------------------------------------------------------------------------------
-calibrate: measure gains and baselines in a DB record and rewrite header
+calsig: measure gains and baselines in a DB record and rewrite header
 Copyright (C) 1999 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
@@ -23,14 +23,14 @@ You may contact the author by e-mail (george@mit.edu) or postal mail
 please visit PhysioNet (http://www.physionet.org/).
 _______________________________________________________________________________
 
-`calibrate' rewrites the header file for a WFDB record, setting the gain and
+`calsig' rewrites the header file for a WFDB record, setting the gain and
 baseline fields based on measurements it makes.  Normally, the program is
 used by specifying a time interval for the measurements;  best results will
 be achieved if the specified interval is restricted to one or more square-wave
 calibration pulses in each signal to be calibrated, although sine-wave pulses
 may be usable if the sampling frequency and/or ADC resolution is high enough.
 The baseline field is set only for signals that have been identified as
-DC-coupled.  `calibrate' also sets the units field for any signal it
+DC-coupled.  `calsig' also sets the units field for any signal it
 calibrates (if the units field is not already set in the header file).
 
 By default, the program constructs a smoothed amplitude histogram for each
@@ -41,13 +41,13 @@ low-pass filter which replaces the contents of each bin by a weighted sum of
 several bins centered on the bin of interest.  The two principal modes in the
 smoothed histogram must be separated by at least one bin with a count which is
 less than one-eighth the count of the larger mode.  If this criterion is not
-satisfied for a given signal, `calibrate' warns the user and does not adjust
+satisfied for a given signal, `calsig' warns the user and does not adjust
 the gain or baseline for the affected signal.
 
-`calibrate' has two less rigorous techniques it can use if the algorithm above
-fails.  Using the `-q' option, `calibrate' takes the endpoints of the specified
+`calsig' has two less rigorous techniques it can use if the algorithm above
+fails.  Using the `-q' option, `calsig' takes the endpoints of the specified
 interval as representative of the high and low values of the calibration
-pulse.  Using the `-Q' option, `calibrate' searches the interval for the
+pulse.  Using the `-Q' option, `calsig' searches the interval for the
 maximum and minimum amplitudes and takes these as the high and low values of
 the calibration pulse.  These algorithms, particularly the `-Q' algorithm, are
 highly sensitive to noise and are thus not recommended except in cases in which

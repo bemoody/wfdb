@@ -1,4 +1,4 @@
-.TH PSCHART 1 "12 February 2000" "WFDB software 10.1" "WFDB applications"
+.TH PSCHART 1 "20 May 2000" "WFDB software 10.1.3" "WFDB applications"
 .SH NAME
 pschart \- produce annotated `chart recordings' on a PostScript device
 .SH SYNOPSIS
@@ -90,6 +90,11 @@ These modes are identical for ordinary records.  For multifrequency records,
 the standard decimation of oversampled signals to the frame rate is suppressed
 in high-resolution mode (rather, all other signals are resampled at the highest
 sampling frequency).
+.TP
+\fB-i \fIfile\fR
+Print the (text) contents of \fIfile\fR instead of the title in the title area
+of the first page of output.  The text is printed in a monospaced font;  use
+spaces rather than tabs in the text to align columns.
 .TP
 \fB-l\fR
 Label the signals in the margins next to each strip (default: no signal
@@ -242,6 +247,11 @@ variables \fBWFDB\fR and \fBWFDBCAL\fR should be set and exported (see
 .TP
 \fI/usr/local/lib/ps/pschart.pro\fR
 default PostScript prolog file.
+.br
+\fI/usr/local/lib/ps/12lead.pro\fR
+alternative PostScript prolog file, suitable for printing standard 12-lead
+diagnostic ECGs (10 seconds, 4 traces, with the top three traces divided into
+2.5 second segments by marker bars).
 .SH BUGS
 .PP
 High quality takes time.  A full page, with grids and default scales, typically

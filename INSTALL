@@ -1,5 +1,5 @@
 file: INSTALL			G. Moody	30 January 2000
-
+				Last revised:	  5 June 2000
 WFDB Software Package installation notes
 _______________________________________________________________________________
 
@@ -30,11 +30,16 @@ Under UNIX or Linux:
 
 3. In this directory, type:
 	./configure
+	make
 	make install
    You will need root permissions to run 'make install', unless you change
-   WFDBROOT in 'Makefile' so that the files are installed in a directory
-   that you own.
+   WFDBROOT so that the files are installed in a directory that you own (you
+   will be given a chance to do this when running 'configure').
 
+4. If for any reason you wish to uninstall the WFDB Software Package, type:
+	make uninstall
+   from this directory.  You will need root permissions to uninstall unless
+   you changed WFDBROOT before installing the package.
 _______________________________________________________________________________
 
 Under MS-DOS or MS-Windows:
