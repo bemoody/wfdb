@@ -1,8 +1,8 @@
 /* file: snip.c		G. Moody	30 July 1989
-			Last revised:    4 May 1999
+			Last revised:	10 September 2001
 -------------------------------------------------------------------------------
 snip: Copy an excerpt of a database record
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -141,8 +141,6 @@ char *argv[];
 	from = -from;
 	if (isigsettime(from) < 0)
 	    exit(2);
-	for (i = 0; i < nann; i++)
-	    (void)getann((unsigned)i, &annot[i]);
     }
     if (to > 0L) {
 	if ((to = strtim(argv[to])) < 0L)
@@ -160,12 +158,14 @@ char *argv[];
 
     /* Copy selected segment of annotations. */
     for (i = 0; i < nann; i++) {
-	do {
-	    annot[i].time -= from;
-	    if (annot[i].time >= 0L && putann((unsigned)i, &annot[i]) < 0)
-		break;
-	} while (getann((unsigned)i, &annot[i]) == 0 &&
-		 (to == 0L || annot[i].time < to));
+	if (getann((unsigned)i, &annot[i]) == 0) {
+	    do {
+		annot[i].time -= from;
+		if (annot[i].time >= 0L && putann((unsigned)i, &annot[i]) < 0)
+		    break;
+	    } while (getann((unsigned)i, &annot[i]) == 0 &&
+		     (to == 0L || annot[i].time < to));
+	}
     }
 
     /* Clean up. */

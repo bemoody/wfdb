@@ -1,4 +1,4 @@
-[OK]:  Library version matches <wfdb.h>
+[OK]:  Library version matches <wfdb/wfdb.h>
 [OK]:  WFDB supports NETFILES
 [OK]:  WFDB_MAXANN = 2
 [OK]:  WFDB_MAXSIG = 32
@@ -51,8 +51,8 @@
 [OK]:  osigfopen returned 2
 [OK]:  getframe read 21600 samples
 [OK]:  putvec wrote 21600 samples
-[OK]:  newheader created header for output record 100x
-[OK]:  3 info strings copied to record 100x header
+[OK]:  newheader created header for output record 100z
+[OK]:  3 info strings copied to record 100z header
 [OK]:  Repeating tests using NETFILES (reverting to default WFDB path)
 [OK]:  sampfreq(NULL) returned 0
 [OK]:  setsampfreq changed sampling frequency successfully
@@ -93,7 +93,7 @@
 [OK]:  osigfopen returned 2
 [OK]:  getframe read 21600 samples
 [OK]:  putvec wrote 21600 samples
-[OK]:  newheader created header for output record udb/100x
-[OK]:  3 info strings copied to record udb/100x header
+[OK]:  newheader created header for output record udb/100z
+[OK]:  3 info strings copied to record udb/100z header
 [OK]:  no WFDB library errors
 no errors: test succeeded

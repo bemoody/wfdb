@@ -1,5 +1,6 @@
 #!/bin/sh
 # file: libcheck		G. Moody	8 September 2001
+#                               Last revised:  12 September 2001
 #
 # This script checks the functionality of the WFDB library by comparing the
 # outputs of 'lcheck' with expected outputs.  See 'lcheck.c' for details of
@@ -20,35 +21,31 @@ fi
 test -s Makefile || ( cd ..; ./configure )
 test -s lcheck || make lcheck
 ./lcheck -v >lcheck.log
-test -s 100s.chk-expected || cp ../data/100s.atr 100s.chk-expected
-test -s 100x.dat-expected || cp ../data/100s.dat 100x.dat-expected
-test -s 100x.hea-expected ||
-  sed s/100s/100x/ <../data/100s.hea >100x.hea-expected
-CF="lcheck.log 100s.chk 100x.dat 100x.hea"
+cp ../data/100s.atr expected/100s.chk
+cp ../data/100s.dat expected/100z.dat
+CF="lcheck.log 100s.chk 100z.dat 100z.hea"
 if grep -q "WFDB supports NETFILES" lcheck.log
 then
-  CF="$CF udb/100s.chk udb/100x.dat udb/100x.hea"
-  echo -n " Downloading test data, please be patient ..."
-  # Make sure that wfdbcat doesn't copy the files created by lcheck!
-  cd udb
-  test -s 100s.chk-expected || wfdbcat udb/100s.atr >100s.chk-expected
-  test -s 100x.dat-expected || wfdbcat udb/100s.dat >100x.dat-expected
-  test -s 100x.hea-expected ||
-    ( wfdbcat udb/100s.hea | sed s%100s%udb/100x% >100x.hea-expected )
-  cd ..
-  echo " download complete."
-  cp lcheck.log-NETFILES lcheck.log-expected
+  CF="$CF udb/100s.chk udb/100z.dat udb/100z.hea"
+  cp ../data/100s.atr expected/udb/100s.chk
+  cp ../data/100s.dat expected/udb/100z.dat
+  cp expected/lcheck.log-NETFILES expected/lcheck.log
 else
-  cp lcheck.log-no-NETFILES lcheck.log-expected
+  cp expected/lcheck.log-no-NETFILES expected/lcheck.log
 fi
 
 for i in $CF
 do
-	diff -q $i $i-expected &&
-	 ( echo " Files $i and $i-expected match: test succeeded"
-	   rm -f $i $i-expected )
+    case $i in
+      *.hea) diff -q $i expected/$i &&
+	       ( echo " Files $i and expected/$i match: test succeeded"
+		 rm -f $i ) ;;
+      *) diff -q $i expected/$i &&
+	       ( echo " Files $i and expected/$i match: test succeeded"
+		 rm -f $i expected/$i ) ;;
+    esac
 done
 
 # rmdir will fail if 'udb' is not empty.  This is a *feature*, not a bug --
 # don't fix it!
-rmdir udb
+test -d udb && rmdir udb

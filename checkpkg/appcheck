@@ -96,9 +96,54 @@ diff -q $F expected &&
 
 rm 100s.qrs
 
+echo Testing ecgeval ...
+F=ecgeval.out
+ecgeval <input/ecgeval >$F 2>&1
+grep -v file: eval-qrs-mit >>$F
+grep -v file: qrs-mit-evaluation >>$F
+diff -q $F expected &&
+ ( echo " Files $F and expected/$F match: test succeeded"
+   rm -f $F eval-qrs-mit qrs-mit-evaluation bxb.out sd.out )
+
+echo Testing fir ...
+fir -i 100s -n fir -f 10 -t 15 -c -1 1
+for F in fir.dat fir.hea
+do
+  diff -q $F expected &&
+   ( echo " Files $F and expected/$F match: test succeeded"
+     rm -f $F )
+done
+
 echo Testing ihr ...
 F=ihr.out
 ihr -r 100s -a atr >$F
+diff -q $F expected &&
+ ( echo " Files $F and expected/$F match: test succeeded"
+   rm -f $F )
+
+echo Testing mfilt ...
+mfilt -l 5 -i 100s -n mfilt -f 10 -t 15 2>/dev/null
+for F in mfilt.dat mfilt.hea
+do
+  diff -q $F expected &&
+   ( echo " Files $F and expected/$F match: test succeeded"
+     rm -f $F )
+done
+
+echo Testing pschart ...
+F=pschart.ps
+pschart -a atr -c "" -g -l -T Test - >$F <<EOF
+100s 10-15
+EOF
+diff -q $F expected &&
+ ( echo " Files $F and expected/$F match: test succeeded"
+   rm -f $F )
+
+echo Testing psfd ...
+F=psfd.ps
+psfd -a atr -c "" -g -l -T Test - >$F <<EOF
+100s 0-e
+EOF
 diff -q $F expected &&
  ( echo " Files $F and expected/$F match: test succeeded"
    rm -f $F )
@@ -117,9 +162,36 @@ diff -q $F expected &&
  ( echo " Files $F and expected/$F match: test succeeded"
    rm -f $F )
 
+echo Testing snip ...
+snip -i 100s -n snip -a atr -f 10 -t 15
+for F in snip.atr snip.dat snip.hea
+do
+  diff -q $F expected &&
+   ( echo " Files $F and expected/$F match: test succeeded"
+     rm -f $F )
+done
+
+echo Testing sortann ...
+rdann -r 100s -a atr -f 30 >foo
+rdann -r 100s -a atr -t 30 >>foo
+( WFDBNOSORT=1; export WFDBNOSORT; wrann -r 100s -a mix <foo 2>/dev/null )
+rm -f foo
+sortann -r 100s -a mix
+F=100s.mix
+diff -q $F expected &&
+ ( echo " Files $F and expected/$F match: test succeeded"
+   rm -f $F )
+
 echo Testing sumann ...
 F=sumann.out
 sumann -r 100s -a atr >$F
+diff -q $F expected &&
+ ( echo " Files $F and expected/$F match: test succeeded"
+   rm -f $F )
+
+echo Testing sumstats ...
+F=sumstats.out
+sumstats input/sumstats >$F
 diff -q $F expected &&
  ( echo " Files $F and expected/$F match: test succeeded"
    rm -f $F )
@@ -131,6 +203,15 @@ diff -q $F expected &&
  ( echo " Files $F and expected/$F match: test succeeded"
    rm -f $F )
 
+echo Testing wfdbcollate ...
+wfdbcollate -s 100s -o wfd -l 30 2>/dev/null
+for F in wfd*hea wfd*dat
+do
+  diff -q $F expected &&
+   ( echo " Files $F and expected/$F match: test succeeded"
+     rm -f $F )
+done
+
 echo Testing wfdbdesc ...
 F=wfdbdesc.out
 wfdbdesc 100s >$F
@@ -139,36 +220,38 @@ diff -q $F expected &&
    rm -f $F )
 
 echo Testing xform ...
-xform -i mimicdb/237/237 -s 1 2 0 3 -f 9:19:45 -t "[22:01:23 20/07/1995]" \
- -a all -M -n xform -S response >xform.out 2>&1
-for F in xform.out xform.hea xform.dat xform.all
+xform -i 100s -a atr -n 100x -o input/100x >xform-1.out 2>&1
+for F in xform-1.out 100x.atr 100x.dat 100x.hea
 do
   diff -q $F expected &&
    ( echo " Files $F and expected/$F match: test succeeded"
      rm -f $F )
 done
 
+grep -q "WFDB_NETFILES 1" /usr/include/wfdb/wfdb.h &&
+( echo "Testing xform (with NETFILES) ..."
+  xform -i mimicdb/237/237 -s 1 2 0 3 -f 9:19:45 -t "[22:01:23 20/07/1995]" \
+   -a all -M -n xform -S input/xform >xform-2.out 2>&1
+  for F in xform-2.out xform.hea xform.dat xform.all
+  do
+    diff -q $F expected &&
+      ( echo " Files $F and expected/$F match: test succeeded"
+        rm -f $F )
+  done 
+)
+
 cat <<EOF
 
 These programs are not (yet) tested by this script:
 
 calsig
-ecgeval
 epic
-fir
-mfilt
 mrgann
 mxm
 nst
 plotstm
 pscgen
-pschart
-psfd
 skewedit
-snip
-sortann
 sqrs125
-sumstats
-wfdbcollate
 
 EOF

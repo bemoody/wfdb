@@ -1,5 +1,5 @@
 /* file: wfdbcheck.c	G. Moody       	7 September 2001
-			Last revised:	9 September 2001
+			Last revised:  11 September 2001
 -------------------------------------------------------------------------------
 wfdbcheck: test WFDB library
 Copyright (C) 2001 George B. Moody
@@ -23,53 +23,6 @@ please visit PhysioNet (http://www.physionet.org/).
 _______________________________________________________________________________
 
 */
-
-#if 0
-/* This program does not (yet) test the following WFDB library functions. */
-extern FINT osigopen(char *record, WFDB_Siginfo *siarray, unsigned int nsig);
-extern FINT wfdbinit(char *record, WFDB_Anninfo *aiarray, unsigned int nann,
-                  WFDB_Siginfo *siarray, unsigned int nsig);
-extern FINT getspf(void);
-extern FVOID setgvmode(int mode);
-extern FINT ungetann(WFDB_Annotator a, WFDB_Annotation *annot);
-extern FINT isgsettime(WFDB_Group g, WFDB_Time t);
-extern FSTRING ecgstr(int annotation_code);
-extern FINT strecg(char *annotation_mnemonic_string);
-extern FINT setecgstr(int annotation_code, char *annotation_mnemonic_string);
-extern FINT strann(char *annotation_mnemonic_string);
-extern FINT setannstr(int annotation_code, char *annotation_mnemonic_string);
-extern FSTRING anndesc(int annotation_code);
-extern FINT setanndesc(int annotation_code, char *annotation_description);
-extern FVOID iannclose(WFDB_Annotator a);
-extern FVOID oannclose(WFDB_Annotator a);
-extern FSTRING datstr(WFDB_Date d);
-extern FDATE strdat(char *date_string);
-extern FINT adumuv(WFDB_Signal s, WFDB_Sample a);
-extern FSAMPLE muvadu(WFDB_Signal s, int microvolts);
-extern FSAMPLE physadu(WFDB_Signal s, double v);
-extern FINT calopen(char *calibration_filename);
-extern FINT getcal(char *description, char *units, WFDB_Calinfo *cal);
-extern FINT putcal(WFDB_Calinfo *cal);
-extern FINT newcal(char *calibration_filename);
-extern FVOID flushcal(void);
-extern FINT setheader(char *record, WFDB_Siginfo *siarray, unsigned int nsig);
-extern FINT setmsheader(char *record, char **segnames, unsigned int nsegments);
-extern FINT wfdbgetskew(WFDB_Signal s);
-extern FVOID wfdbsetskew(WFDB_Signal s, int skew);
-extern FLONGINT wfdbgetstart(WFDB_Signal s);
-extern FVOID wfdbsetstart(WFDB_Signal s, long bytes);
-extern FFREQUENCY getcfreq(void);
-extern FVOID setcfreq(WFDB_Frequency counter_frequency);
-extern FDOUBLE getbasecount(void);
-extern FVOID setbasecount(double count);
-extern FINT setbasetime(char *time_string);
-extern FVOID wfdbquiet(void);
-extern FVOID wfdbverbose(void);
-extern FINT setibsize(int input_buffer_size);
-extern FINT setobsize(int output_buffer_size);
-extern FSTRING wfdbfile(char *file_type, char *record);
-extern FVOID wfdbflush(void);
-#endif
 
 #include <stdio.h>
 #ifdef __STDC__
@@ -99,16 +52,17 @@ WFDB_Anninfo aiarray[2];
 WFDB_Annotation annot;
 WFDB_Siginfo *si;
 WFDB_Sample *vector;
-void help();
+void help(), list_untested();
 
 main(argc, argv)
 int argc;
 char *argv[];
 {
 
-  pname = prog_name();
+  pname = prog_name(argv[0]);
   if (argc > 1) {
     if (strcmp(argv[1], "-v") == 0) vflag = 1;
+    else if (strcmp(argv[1], "-V") == 0) vflag = 2;
     else { help(); exit(1); }
   }
 
@@ -123,16 +77,16 @@ char *argv[];
   /* Print the library version number and date. */
   fprintf(stderr, "Testing %s", libversion = wfdberror());
 
-  /* Check that the installed <wfdb.h> matches the library. */
+  /* Check that the installed <wfdb/wfdb.h> matches the library. */
   sprintf(headerversion, "WFDB library version %d.%d.%d",
 	  WFDB_MAJOR, WFDB_MINOR, WFDB_RELEASE);
   if (strncmp(libversion, headerversion, strlen(headerversion))) {
-    printf("Error: Library version does not match <wfdb.h>\n"
-                    "       (<wfdb.h> is from %s)\n", headerversion);
+    printf("Error: Library version does not match <wfdb/wfdb.h>\n"
+                    "       (<wfdb/wfdb.h> is from %s)\n", headerversion);
     errors++;
   }
   else if (vflag)
-    printf("[OK]:  Library version matches <wfdb.h>\n");
+    printf("[OK]:  Library version matches <wfdb/wfdb.h>\n");
 
   /* If in verbose mode, print library defaults. */
   if (vflag) {
@@ -184,7 +138,7 @@ char *argv[];
     printf("[OK]:  WFDB path modified successfully\n");
 
   /* Test I/O using the local record first. */
-  check("100s", "100x");
+  check("100s", "100z");
 
   /* Test I/O again using the remote record. */
   if (WFDB_NETFILES) {
@@ -200,7 +154,7 @@ char *argv[];
       printf(" (reverting to default WFDB path)\n");
       setwfdb(defpath);
     }
-    check("udb/100s", "udb/100x");
+    check("udb/100s", "udb/100z");
   }
 
   /* If there were any errors detected by the WFDB library but not by this
@@ -226,6 +180,8 @@ char *argv[];
     printf("%d error%s: test failed\n", errors, errors > 1 ? "s" :"");
   else if (vflag)
     printf("no errors: test succeeded\n");
+  if (vflag == 2)
+    list_untested();
   exit(errors);
 }
 
@@ -563,6 +519,7 @@ char *s;
 static char *help_strings[] = {
  "usage: %s [OPTIONS ...]\n",
  " -v          verbose mode",
+ " -V          verbose mode, also list untested functions",
  NULL
 };
 
@@ -573,4 +530,52 @@ void help()
     (void)fprintf(stderr, help_strings[0], pname);
     for (i = 1; help_strings[i] != NULL; i++)
 	(void)fprintf(stderr, "%s\n", help_strings[i]);
+}
+
+void list_untested()
+{
+    printf(
+   "This program does not (yet) test the following WFDB library functions:\n");
+    printf("osigopen\n");
+    printf("wfdbinit\n");
+    printf("getspf\n");
+    printf("setgvmode\n");
+    printf("ungetann\n");
+    printf("isgsettime\n");
+    printf("ecgstr\n");
+    printf("strecg\n");
+    printf("setecgstr\n");
+    printf("strann\n");
+    printf("setannstr\n");
+    printf("anndesc\n");
+    printf("setanndesc\n");
+    printf("iannclose\n");
+    printf("oannclose\n");
+    printf("datstr\n");
+    printf("strdat\n");
+    printf("adumuv\n");
+    printf("muvadu\n");
+    printf("physadu\n");
+    printf("calopen\n");
+    printf("getcal\n");
+    printf("putcal\n");
+    printf("newcal\n");
+    printf("flushcal\n");
+    printf("setheader\n");
+    printf("setmsheader\n");
+    printf("wfdbgetskew\n");
+    printf("wfdbsetskew\n");
+    printf("wfdbgetstart\n");
+    printf("wfdbsetstart\n");
+    printf("getcfreq\n");
+    printf("setcfreq\n");
+    printf("getbasecount\n");
+    printf("setbasecount\n");
+    printf("setbasetime\n");
+    printf("wfdbquiet\n");
+    printf("wfdbverbose\n");
+    printf("setibsize\n");
+    printf("setobsize\n");
+    printf("wfdbfile\n");
+    printf("wfdbflush\n");
 }

@@ -1,10 +1,10 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  9 September 2001		wfdblib 10.2.0
+			Last revised:  11 September 2001	wfdblib 10.2.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 2000 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -423,6 +423,9 @@ WFDB_Siginfo *to, *from;
 {
     if (to == NULL || from == NULL) return (0);
     *to = *from;
+    /* The next line works around an optimizer bug in gcc (version 2.96, maybe
+       others). */
+    to->fname = to->desc = to->units = NULL;
     if (from->fname) {
         to->fname = (char *)malloc((size_t)strlen(from->fname)+1);
 	if (to->fname == NULL) return (-1);
@@ -1410,7 +1413,7 @@ char *record;
 WFDB_Siginfo *siarray;
 int nsig;
 {
-    int navail, ngroups;
+    int navail, ngroups, nn;
     struct hsdata *hs;
     struct isdata *is;
     struct igdata *ig;
@@ -1458,9 +1461,16 @@ int nsig;
     if (nsig > navail) nsig = navail;
 
     /* Allocate input signals and signal group workspace. */
-    nsig = allocisig(nisig + nsig);
-    ngroups = allocigroup(nigroups + hsd[nsig-1]->info.group + 1);
-    /* FIXME: check for errors from allocisig and allocigroup! */
+    nn = nisig + nsig;
+    if (allocisig(nn) != nn)
+	return (-1);	/* failed, nisig is unchanged, allocisig emits error */
+    else
+	nsig = nn;
+    nn = nigroups + hsd[nsig-1]->info.group + 1;
+    if (allocigroup(nn) != nn)
+	return (-1);	/* failed, allocigroup emits error */
+    else
+	ngroups = nn;
 
     /* Set default buffer size (if not set already by setibsize). */
     if (ibsize <= 0) ibsize = BUFSIZ;
@@ -1611,27 +1621,27 @@ unsigned int nsig;
     ga = nogroups;
 
     /* Open the signal files.  One signal is handled per iteration. */
-    for (s = 0, os = osd[nosig]; s < nsig; s++, nosig++, os++) {
+    for (s = 0, os = osd[nosig]; s < nsig; s++, nosig++, siarray++) {
 	op = os;
 	os = osd[nosig];
 
 	/* Copy signal information from readheader's workspace. */
-	if (copysi(&os->info, &hsd[s]->info) < 0) {
+	if (copysi(&os->info, &hsd[s]->info) < 0 ||
+	    copysi(siarray, &hsd[s]->info) < 0) {
 	    wfdb_error("osigopen: insufficient memory\n");
 	    return (-3);
 	}
-	if (os->info.spf < 1) os->info.spf = 1;
-	os->info.cksum = 0;
-	os->info.nsamp = (WFDB_Time)0L;
-	os->info.group += ga;
+	if (os->info.spf < 1) os->info.spf = siarray->spf = 1;
+	os->info.cksum = siarray->cksum = 0;
+	os->info.nsamp = siarray->nsamp = (WFDB_Time)0L;
+	os->info.group += ga; siarray->group += ga;
 
-	/* Check if this signal is in the same group as the previous one. */
 	if (s == 0 || os->info.group != op->info.group) {
+	    /* This is the first signal in a new group; allocate buffer. */
 	    size_t obuflen;
 
 	    og->bsize = os->info.bsize;
 	    obuflen = og->bsize ? og->bsize : obsize;
-	    /* This is the first signal in a new group; allocate buffer. */
 	    if ((og->buf = (char *)malloc(obuflen)) == NULL) {
 	        wfdb_error("osigopen: can't allocate buffer for %s\n",
 			   os->info.fname);
@@ -1646,7 +1656,9 @@ unsigned int nsig;
 		og->fp = wfdb_open(os->info.fname,(char *)NULL, WFDB_WRITE);
 		if (og->fp == NULL) {
 		    wfdb_error("osigopen: can't open %s\n", os->info.fname);
-		    /* FIXME: close any open files, free allocated buffers */
+		    free(og->buf);
+		    og->buf = NULL;
+		    osigclose();
 		    return (-3);
 		}
 	    }
@@ -1678,6 +1690,9 @@ unsigned int nsig;
 
     /* Close any open output signals. */
     osigclose();
+
+    /* Do nothing further if there are no signals to open. */
+    if (siarray == NULL || nsig == 0) return (0);
 
     if (obsize <= 0) obsize = BUFSIZ;
 
@@ -1770,7 +1785,9 @@ unsigned int nsig;
 	        og->fp = wfdb_open(os->info.fname,(char *)NULL, WFDB_WRITE);
 		if (og->fp == NULL) {
 		    wfdb_error("osigfopen: can't open %s\n", os->info.fname);
-		    /* FIXME: close any open files, free allocated buffers */
+		    free(og->buf);
+		    og->buf = NULL;
+		    osigclose();
 		    return (-3);
 		}
 	    }

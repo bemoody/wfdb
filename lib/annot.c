@@ -1,10 +1,10 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:   7 September 2001	wfdblib 10.2.0
+			Last revised:  11 September 2001	wfdblib 10.2.0
 WFDB library functions for annotations
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free

@@ -1,9 +1,9 @@
 /* file: wfdbcollate.c        G. Moody        28 April 1994
-			      Last revised:  14 October 1999
+			      Last revised:  10 September 2001
 
 -------------------------------------------------------------------------------
 wfdbcollate: Collate WFDB records into a multi-segment record
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -182,7 +182,8 @@ char *argv[];
     isigsettime(t = tf = 0L);
 
     strcpy(irecbase, timstr(0L));
-    irecbase[strlen(irecbase)-1] = '\0';
+    if (*irecbase == '[')
+	irecbase[strlen(irecbase)-1] = '\0';
 
     while (getframe(v) > 0) {
 	if (t >= tf) {
@@ -193,7 +194,8 @@ char *argv[];
 		osigfopen(NULL, 0);	/* close output signal file */
 	    }
 	    strcpy(segbase, timstr(-t));
-	    segbase[strlen(segbase)-1] = '\0';
+	    if (*segbase == '[')
+		segbase[strlen(segbase)-1] = '\0';
 	    sprintf(segname, "%s%05d", orecname, ++segnumber);
 	    sprintf(sigfname, "%s.dat", segname);
 	    if (osigfopen(si, nsig) < nsig) {
