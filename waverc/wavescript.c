@@ -1,10 +1,10 @@
 /* file: wavescript.c		G. Moody	10 October 1996
-				Last revised:	17 October 1999
+				Last revised:	  30 May 2001
 Remote control for WAVE via script
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -41,6 +41,7 @@ The (text) message written by this program may contain any or all of:
   -a ANNOTATOR	[to (re)open the specified ANNOTATOR for the current record]
   -f TIME	[to go to the specified TIME in the current record]
   -p PATH	[to add PATH to the list of locations for input files ]
+  -s SIGNAL	[to specify signals to be displayed]
 These messages are copied from the file named in the first command-line
 argument, with one exception.
 
@@ -72,29 +73,20 @@ empty when wavescript first looks in it, wavescript waits for a short interval
 to give WAVE a chance to empty it.  If the mailbox is still not empty on a
 second look, wavescript advises the user to delete it and try again.
 
-In unusual cases, wavescript may be unable to read the mailbox.  This can
-happen if the highest-numbered WAVE process belongs to another user, for
-example.  In such cases, wavescript advises the user to delete the mailbox
-and try again.  (Of course, you won't be able to do that if the mailbox really
-does belong to another user;  in this case, you can try using wavescript's
--pid option to tell it to look in the mailbox belonging to your own WAVE
-process.)
+In unusual cases, wavescript may be unable to read the mailbox.  In such cases,
+wavescript advises the user to delete the mailbox and try again.
 
 If a record name is specified, and no WAVE processes can be found, wavescript
 starts a new WAVE process.  The option -pid 0 prevents wavescript from
 looking for an existing WAVE process, so this method can be used to start
 WAVE unconditionally (though it's unclear why this would be useful).
-
-This program would be more reliable if it checked to see if the target process
-has the same user ID as that of the wavescript process.  On a typical
-workstation, with only one user running WAVE at a time, however, the current
-implementation is adequate.
 */
 
 #include <stdio.h>
 #include <signal.h>
 #include <sys/types.h>
 #include <dirent.h>
+#include <wfdb/wfdb.h>
 
 char *pname;
 
@@ -106,6 +98,7 @@ void help()
     fprintf(stderr, " -f TIME\n");
     fprintf(stderr, " -r RECORD\n");
     fprintf(stderr, " -p PATH\n");
+    fprintf(stderr, " -s SIGNAL ...\n");
     fprintf(stderr,
 	    "Any lines in the SCRIPT not beginning with '-' are ignored.\n");
 }
@@ -136,12 +129,13 @@ char **environ;
 #endif
 #define STRING(A)	#A
 #define WAVE(A)		STRING(A) ## "/wave"
+#define MAXARGS		(WFDB_MAXSIG+12)
 
-int start_new_wave(record, annotator, ptime, path)
-char *record, *annotator, *ptime, *path;
+int start_new_wave(record, annotator, ptime, siglist, path)
+char *record, *annotator, *ptime, **siglist, *path;
 {
     if (*record) {
-	static char *arg[16];
+	static char *arg[MAXARGS+1];
 	int nargs;
 
 	arg[0] = "wave";
@@ -160,15 +154,18 @@ char *record, *annotator, *ptime, *path;
 	    arg[nargs++] = "-p";
 	    arg[nargs++] = path;
 	}
+	if (*siglist) {
+	    arg[nargs++] = "-s";
+	    while (nargs < MAXARGS && *siglist)
+		arg[nargs++] = *siglist++;
+	}
 	arg[nargs] = NULL;
 	/* Send the standard error output to /dev/null.  This avoids having
 	   such error output appear as dialog boxes when wavescript is run from
-	   Netscape.  WAVE's and the DB library's error messages are unaffected
-	   by this choice (since they are handled within WAVE), but the XView
-	   library sometimes generates error messages (particularly under
-	   Linux, where the message "ttysw_sigwinch, can't get tty process
-	   group: Not a typewriter" appears whenever the Analysis Commands
-	   window opens or closes).  These may be safely ignored. */
+	   Netscape.  WAVE's and the WFDB library's error messages are
+           unaffected by this choice (since they are handled within WAVE), but
+           the XView library sometimes generates warning messages that may be
+	   safely ignored. */
 	freopen("/dev/null", "w", stderr);
 	return (execve(WAVE(BINDIR), arg, environ));
     }
@@ -186,8 +183,9 @@ char **argv, **env;
 {
     char fname[30], *p, *q;
     FILE *ofile = NULL, *script;
-    int i, pid;
+    int i = 0, pid;
     static char buf[80], record[80], annotator[80], ptime[80], path[80];
+    static char *siglist[WFDB_MAXSIG], sigstrings[80];
 
     pname = argv[0];
     environ = env;
@@ -221,6 +219,18 @@ char **argv, **env;
 	    strcpy(record, q);
 	    record[strlen(record)-1] = '\0';
 	    break;
+	  case 's':	/* signal numbers follow */
+	    strcpy(sigstrings, q);	  /* copy the list of signal numbers */
+	    sigstrings[strlen(sigstrings)-1] = ' ';	   /* append a space */
+	    q = sigstrings;
+	    while (*q && i < WFDB_MAXSIG) {    /* split the list into tokens */
+		siglist[i++] = q++;	    /* save pointer to current token */
+		while (*q != ' ' && *q != '\t')	/* find the end of the token */
+		    q++;
+		*q++ = '\0';	   /* split the list at the end of the token */
+		while (*q == ' ' || *q == '\t')
+		    q++;		  /* look for the next token, if any */
+	    }
 	}
     }
     fclose(script);
@@ -246,8 +256,7 @@ char **argv, **env;
 	    sprintf(fname, "/tmp/.wave.%d.%d", (int)getuid(), pid);
 	    ofile = fopen(fname, "r");	/* attempt to read from file */
 	    if (ofile == NULL && pid == find_wave_pid()) {
-		/* The mailbox is unreadable -- it may be owned by another
-		   user. */
+		/* The mailbox is unreadable */
 		fprintf(stderr, "Please remove %s and try again.\n", fname);
 		exit(3);
 	    }
@@ -279,12 +288,18 @@ char **argv, **env;
 	if (*record) fprintf(ofile, "-r %s\n", record);
 	if (*annotator) fprintf(ofile, "-a %s\n", annotator);
 	if (*ptime) fprintf(ofile, "-f %s\n", ptime);
+	if (siglist[0]) {
+	    fprintf(ofile, "-s %s", siglist[0]);
+	    for (i = 1; i < WFDB_MAXSIG && siglist[i]; i++)
+		fprintf(ofile, " %s", siglist[i]);
+	    fprintf(ofile, "\n");
+	}
 	fclose(ofile);
-    
+
 	kill(pid, SIGUSR1);	/* signal to WAVE that the message is ready */
 	exit(0);
     }
 
     else 
-	exit(start_new_wave(record, annotator, ptime, path));
+	exit(start_new_wave(record, annotator, ptime, siglist, path));
 }

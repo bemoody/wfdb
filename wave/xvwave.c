@@ -1,5 +1,5 @@
 /* file: xvwave.c	G. Moody	27 April 1990
-			Last revised:    29 May 2001
+			Last revised:    30 May 2001
 XView support functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -240,7 +240,7 @@ void save_defaults()
 	defaults_set_integer("Wave.View.CoarseTimeScale", tsa_index);
     defaults_set_integer("Wave.View.AmplitudeScale", vsa_index);
     defaults_set_integer("Wave.View.AnnotationMode", ann_mode);
-    //    defaults_set_integer("Wave.View.AnnotationOverlap", overlap);
+    defaults_set_integer("Wave.View.AnnotationOverlap", overlap);
     defaults_set_integer("Wave.View.SignalMode", sig_mode);
     defaults_set_integer("Wave.View.TimeMode", time_mode);
     if (tsa_index > MAX_COARSE_TSA_INDEX)
@@ -260,22 +260,12 @@ Destroy_status status;
 {
     if (status == DESTROY_CHECKING) {
 	int result;
-	// #ifdef NOTICE
-#if 0
-	Xv_notice notice = xv_create((Frame)client, NOTICE,
-				     XV_SHOW, TRUE,
-				     NOTICE_STATUS, &result,
-#else
+
 	result = notice_prompt((Frame)client, (Event *)NULL,
-#endif
 		NOTICE_MESSAGE_STRINGS, "Are you sure you want to Quit?", NULL,
 				   NOTICE_BUTTON_YES, "Confirm",
 				   NOTICE_BUTTON_NO, "Cancel",
 				   NULL);
-#if 0
-				     //#ifdef NOTICE
-	xv_destroy_safe(notice);
-#endif
 	if (result != NOTICE_YES)
 	    notify_veto_destroy(client);
     } else if (status == DESTROY_CLEANUP) {
@@ -347,7 +337,11 @@ Notify_signal_mode when;
 	set_start_time(new_time);
     if (*new_siglist) {
 	set_siglist_from_string(new_siglist);
-	sig_mode = 1;	/* display listed signals only */
+	if (sig_mode == 0) {
+	    sig_mode = 1;	/* display listed signals only */
+	    mode_undo();	/* change setting in View panel to match */
+	    set_baselines();	/* recalculate display positions of signals */
+	}
     }
     fclose(sfile);
     if (wave_ppid) {	/* synch parent WAVE, if any, with this one */
@@ -641,10 +635,10 @@ int mode;
 	ann_mode     = defaults_get_integer("wave.view.annotationmode",
 					    "Wave.View.AnnotationMode",
 					    0);
-    //    if (overlap < 0)
-    //	overlap      = defaults_get_integer("wave.view.annotationoverlap",
-    //					    "Wave.View.AnnotationOverlap",
-    //				    0);
+    if (overlap < 0)
+    	overlap      = defaults_get_integer("wave.view.annotationoverlap",
+					    "Wave.View.AnnotationOverlap",
+					    0);
     if (sig_mode < 0)
 	sig_mode     = defaults_get_integer("wave.view.signalmode",
 					    "Wave.View.SignalMode",

@@ -24,14 +24,16 @@ please visit PhysioNet (http://www.physionet.org/).
 _______________________________________________________________________________
 
 This program implements the VF, AF, and ST episode-by-episode comparison
-algorithms described in ANSI/AAMI EC38-1994, the American National Standard for
-ambulatory ECGs (available from AAMI, Suite 400, 3330 Washington Blvd.,
-Arlington, VA 22201 USA)..  The relevant provisions of the standard are
-described in file `eval.doc'.  Information about using this program is
-contained in file `epic.1'.
+algorithms described in ANSI/AAMI EC38:1998, the American National Standard for
+Ambulatory electrocardiographs and ANSI/AAMI EC57:1998, the American National
+Standard for Testing and reporting performance results of cardiac rhythm and
+ST segment measurement algorithms (both available from AAMI, Suite 400, 3330
+Washington Blvd., Arlington, VA 22201 USA).  The relevant provisions of these
+standards are described in file `eval.doc'.  Information about using this
+program is contained in file `epic.1'.
 
 The -f and -t options modify the comparison algorithm used by epic in ways
-not permitted by EC38-1994.  These options are provided for the use of
+not permitted by these standards.  These options are provided for the use of
 developers, who may find them useful for obtaining a more detailed
 understanding of algorithm errors.
 */

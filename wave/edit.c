@@ -1,10 +1,10 @@
 /* file: edit.c		G. Moody	1 May 1990
-			Last revised:   4 May 1999
+			Last revised:  30 May 2001
 Annotation-editing functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -29,7 +29,7 @@ _______________________________________________________________________________
 #include "wave.h"
 #include "xvwave.h"
 #include <unistd.h>	/* getcwd */
-#include <wfdb//ecgmap.h>
+#include <wfdb/ecgmap.h>
 #include <xview/notice.h>
 #include <xview/win_input.h>
 

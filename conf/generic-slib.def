@@ -71,7 +71,7 @@ WFDBLIB = $(WFDBLIB_SONAME).$(MINOR)
 # make up the library will be appended to BUILDLIB.  This command varies
 # considerably depending on the operating system;  the setting here works
 # if gcc and the GNU binutils are installed.
-SBUILDLIB = gcc -shared -Wl,-soname,$(SWFDBLIB_SONAME) \
+BUILDLIB = gcc -shared -Wl,-soname,$(SWFDBLIB_SONAME) \
  `$(LWC) --libs` -o $(SWFDBLIB)
 
 # PRINT is the name of the program used to produce listings (including any

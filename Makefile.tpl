@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody		24 May 2000
-#				Last revised:		29 May 2001
+#				Last revised:		30 May 2001
 # This section of the Makefile should not need to be changed.
 
 # ARCH specifies the type of CPU and the operating system (e.g., 'i686-Linux').
@@ -95,18 +95,18 @@ $(HOME)/wfdb-test/lib:		$(HOME)/wfdb-test
 
 # 'make tarballs': clean up the source directories, then make a pair of gzipped
 # tar source archives of the WFDB software package (with and without the
-# documentation), and generate PGP signature blocks for the archives
+# documentation), and check that the MANIFEST (list of files in the package)
+# is correct.
 tarballs:	clean
 	cd ..; tar --create --file $(PACKAGE).tar.gz --verbose --gzip \
-                '--exclude=$(PACKAGE)/*CVS' $(PACKAGE)
+          '--exclude=$(PACKAGE)/*CVS' $(PACKAGE) | tee $(PACKAGE)-MANIFEST
 	cd ..; tar --create --file $(PACKAGE)-no-docs.tar.gz \
-		--verbose --gzip \
-                '--exclude=$(PACKAGE)/*doc' \
-		'--exclude=$(PACKAGE)/*CVS' $(PACKAGE)
-	cd ..; pgps -b $(PACKAGE).tar.gz $(PACKAGE).tar.gz
+	  --verbose --gzip \
+          '--exclude=$(PACKAGE)/*doc' \
+	  '--exclude=$(PACKAGE)/*CVS' $(PACKAGE)
+	./check-manifest $(PACKAGE)
 
 # 'make bin-tarball': make a gzipped tar archive of the WFDB software package
 # binaries and other installed files
 bin-tarball:	test-install
 	cd $(HOME)/wfdb-test;  tar cfvz ../$(PACKAGE)-$(ARCH).tar.gz .
-	cd ..; pgps -b $(PACKAGE)-$(ARCH).tar.gz
