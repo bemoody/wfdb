@@ -1,5 +1,5 @@
 /* file: bxb.c		G. Moody	14 December 1987
-			Last revised:	14 December 2002
+			Last revised:	24 November 2002
 
 -------------------------------------------------------------------------------
 bxb: ANSI/AAMI-standard beat-by-beat annotation file comparator
@@ -132,6 +132,47 @@ char *argv[];
 	 huge_time).
        - If the option `-t 0' was specified (end_time = 0), the loop ends when
          EOF is first reached in either annotation file (T or t = huge_time).
+
+    24 November 2002:  The comparison algorithm has been very slightly modified
+    by the addition of an alternative criterion for accepting a match in cases
+    1 and 3 below.  The original match criterion for case 1 was:
+            if (T-t <= match_dt && T-t < abs(T-tprime)) ...
+    and for case 3, the original match criterion was:
+            if (t-T <= match_dt && t-T < abs(t-Tprime)) ...
+    The alternative criteria were added to account for rare cases in which
+    (for case 1) both t and tprime are in the match window, or (for case 3)
+    both T and Tprime are in the match window.
+
+    Consider case 3.  The original algorithm paired the current test and
+    reference annotations only if their times matched more closely than
+    those of the current test and next reference annotations.  The modified
+    algorithm also checks how well the next test annotation matches the next
+    reference annotation;  if this is a better match than that between the
+    current test and next reference annotations, then the current annotations
+    are paired.  An example may make this clear;  assume match_dt = 37 and
+    the following annotation times:
+         ref1 = 96	test1 = 128
+	 ref2 = 160	test2 = 185
+    Since test1-ref1 (32) is not less than ref2-test1 (also 32), the original
+    algorithm would not match ref1 and test1, and would count ref1 as missed.
+    Since ref2-test1 (32) is not less than test2-ref2 (15), the original
+    algorithm would also fail to match test1 and ref2, and would count test1
+    as an extra detection.  The modified algorithm finds that test2-ref2 (15)
+    is less than ref2-test1 (32), and therefore excludes ref2 as a possible
+    match for test1;  having done so, it then matches ref1 and test1.  Similar
+    reasoning applies in case 1, in which the roles of ref and test are
+    reversed.
+
+    Note that the only situation in which these modifications will have an
+    effect is when consecutive reference annotations and consecutive test
+    annotations occur at intervals less than or equal to twice the match
+    window.  Generally, the match window is chosen so that this is unlikely;
+    using the standard window, this can only happen if both the true heart
+    rate and the detected heart rate exceed 200 bpm.
+
+    Thanks to James Pardey for reporting the problem with the original
+    algorithm and for providing a test case that was helpful for developing
+    and testing these modifications.
     */
     while ((end_time > 0L && (T <= end_time || t <= end_time)) ||
 	   (end_time == -1L && T != huge_time) ||
@@ -139,7 +180,8 @@ char *argv[];
 	if (t < T) {	/* test annotation is earliest */
 	    /* (1) If t is within the match window, and is a better match than
 	       the next test annotation, pair it. */
-	    if (T-t <= match_dt && T-t < abs(T-tprime)) {
+	    if (T-t <= match_dt && 
+		(T-t < abs(T-tprime) || abs(Tprime-tprime) < abs(T-tprime))) {
 		pair(A, a);
 		getref();
 		gettest();
@@ -154,7 +196,8 @@ char *argv[];
 	else {		/* reference annotation is earliest */
 	    /* (3) If T is within the match window, and is a better match than
 	       the next reference annotation, pair it. */
-	    if (t-T <= match_dt && t-T < abs(t-Tprime)) {
+	    if (t-T <= match_dt &&
+		(t-T < abs(t-Tprime) || abs(tprime-Tprime) < abs(t-Tprime))) {
 		pair(A, a);
 		gettest();
 		getref();

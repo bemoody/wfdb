@@ -27,6 +27,15 @@
 	New -w option for 'ann2rr' and 'rr2ann' for attaching annotation
 	types to intervals.
 
+	Fixed a subtle bug in 'bxb' that caused it to count matching
+	annotations as mismatches in very rare circumstances when the heart
+	rate exceeds 200 bpm.  The effect of this bug was only to cause
+	a tiny fraction of correct detections to be counted as errors, and not
+	to cause detector errors to be counted as correct.  Thanks to James
+	Pardey for reporting the problem and for providing a test case that
+	was useful for developing and testing the fix.  See the comments in
+	'app/bxb.c' for details.
+
 	The application formerly known as 'epic' has be renamed 'epicmp'
 	(episode comparator), to avoid conflicts with a new but widely
 	distributed IRC chat client named 'epic'.

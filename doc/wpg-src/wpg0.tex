@@ -2399,6 +2399,7 @@ input.
 * isigsettime::			Setting time of next samples read.
 * isgsettime::			As above, but for one signal group only.
 * iannsettime::			Setting time of next annotations read.
+* sample::			A random access interface to input signals.
 @end menu
 
 @c @group
@@ -2463,7 +2464,7 @@ group specified by @var{sgroup}.  This function may be of use if more than
 one record is open simultaneously (@pxref{Multiple Record Access}).
 
 @c @group
-@node     iannsettime, , isgsettime, non-sequential
+@node     iannsettime, sample, isgsettime, non-sequential
 @unnumberedsubsec iannsettime
 @findex iannsettime
 @cindex annotations (non-sequential access)
@@ -2506,6 +2507,49 @@ occasionally cause incorrect results.  To avoid this problem when using
 that version of the library, make at least one call to @code{getann}
 before using @code{iannsettime}.  The bug was corrected in version 4.0
 of the library.
+
+@c @group
+@node     sample, , iannsettime, non-sequential
+@unnumberedsubsec sample and sample_valid
+@findex sample [10.3.0]
+@findex sample_valid [10.3.0]
+
+@example
+WFDB_Sample sample(WFDB_Signal @var{s}, WFDB_Time @var{t})
+int sample_valid(void)
+@end example
+@noindent
+@strong{Return:}
+@table @asis
+@item @i{n}
+(from @code{sample}): The value (in raw adus) of sample number @var{t}
+in open signal @var{s},if successful, or the value of the previous
+successfully read sample.
+@item @t{0}
+(from @code{sample_valid}): The most recent value returned by
+@code{sample} was invalid
+@item @t{1}
+(from @code{sample_valid}): The most recent value returned by
+@code{sample} was valid
+@end table
+@c @end group
+
+@noindent
+The @code{sample} function allows the caller to read samples in any
+order.  The first argument is a signal number (a non-negative integer),
+and the second is a time, expressed as a non-negative sample number.
+If @code{sample} is invoked with valid input arguments, the companion
+function @code{sample_valid} returns 1.
+
+There are three ways in which @code{sample} can be invoked with invalid
+input arguments.  In each case, @code{sample_valid()} returns 0, but
+@code{sample} attempts to return a reasonable value.  If @var{t} is
+invalid, @code{sample} returns the value of signal 0 at the specified
+time.  If @var{t} is negative, the returned value is that of sample
+number zero of the specified signal.  If @var{t} specifies a sample
+number beyond the end of the record, the returned value is that of the
+last valid sample of the specified signal.  For an example of the use
+of @code{sample} and @code{sample_valid}, @pxref{Example 7}.
 
 @page
 @node     conversion, calibration, non-sequential, Functions
@@ -6046,84 +6090,66 @@ header file is created in the current directory.
 @example
  @i{1}  #include <stdio.h>
  @i{2}  #include <wfdb/wfdb.h>
- @i{3}  #define BUFLN 512
- @i{4}  int nsig, sample_ok = 1;
- @i{5}  WFDB_Sample *sbuf;
- @i{6}  
- @i{7}  sample(s, t)
- @i{8}  int s;
- @i{9}  long t;
-@i{10}  @{
-@i{11}      static long tt = -1L;
-@i{12}  
-@i{13}      if (t <= tt - BUFLN)
-@i{14}          fprintf(stderr, "sample: buffer too short\n");
-@i{15}      while (t > tt)
-@i{16}          if (getvec(sbuf + nsig * ((++tt)&(BUFLN-1))) < 0)
-@i{17}              sample_ok = 0;
-@i{18}      return (*(sbuf + nsig * (t&(BUFLN-1)) + s));
-@i{19}  @}
-@i{20}  
-@i{21}  main(argc, argv)
-@i{22}  int argc;
-@i{23}  char *argv[];
-@i{24}  @{
-@i{25}      double *c, one = 1.0, vv, atof();
-@i{26}      int i, j, nc = argc - 4;
-@i{27}      long nsamp, t;
-@i{28}      static WFDB_Sample *v;
-@i{29}      static WFDB_Siginfo *s;
-@i{30}  
-@i{31}      if (argc < 4) @{
-@i{32}          fprintf(stderr,
-@i{33}            "usage: %s record start duration [ coefficients ... ]\n",
-@i{34}                  argv[0]);
-@i{35}          exit(1);
+ @i{3}  
+ @i{4}  main(argc, argv)
+ @i{5}  int argc;
+ @i{6}  char *argv[];
+ @i{7}  @{
+ @i{8}      double *c, one = 1.0, vv, atof();
+ @i{9}      int i, j, nc = argc - 4, nsig;
+@i{10}      long nsamp, t;
+@i{11}      static WFDB_Sample *v;
+@i{12}      static WFDB_Siginfo *s;
+@i{13}  
+@i{14}      if (argc < 4) @{
+@i{15}          fprintf(stderr,
+@i{16}            "usage: %s record start duration [ coefficients ... ]\n",
+@i{17}                  argv[0]);
+@i{18}          exit(1);
+@i{19}      @}
+@i{20}      if (nc < 1) @{
+@i{21}          nc = 1; c = &one;
+@i{22}      @}
+@i{23}      else if ((c = (double *)calloc(nc, sizeof(double))) == NULL) @{
+@i{24}          fprintf(stderr, "%s: too many coefficients\n", argv[0]);
+@i{25}          exit(2);
+@i{26}      @}
+@i{27}      for (i = 0; i < nc; i++)
+@i{28}          c[i] = atof(argv[i+4]);
+@i{29}      if ((nsig = isigopen(argv[1], NULL, 0)) < 1)
+@i{30}          exit(3);
+@i{31}      s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+@i{32}      v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
+@i{33}      if (s == NULL || v == NULL) @{
+@i{34}          fprintf(stderr, "insufficient memory\n");
+@i{35}          exit(3);
 @i{36}      @}
-@i{37}      if (nc < 1) @{
-@i{38}          nc = 1; c = &one;
-@i{39}      @}
-@i{40}      else if (nc >= BUFLN ||
-@i{41}               (c = (double *)calloc(nc, sizeof(double))) == NULL) @{
-@i{42}          fprintf(stderr, "%s: too many coefficients\n", argv[0]);
-@i{43}          exit(2);
-@i{44}      @}
-@i{45}      for (i = 0; i < nc; i++)
-@i{46}          c[i] = atof(argv[i+4]);
-@i{47}      if ((nsig = isigopen(argv[1], NULL, 0)) < 1)
-@i{48}          exit(3);
-@i{49}      s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
-@i{50}      v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
-@i{51}      sbuf = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample)*BUFLN);
-@i{52}      if (s == NULL || v == NULL || sbuf == NULL) @{
-@i{53}          fprintf(stderr, "insufficient memory\n");
-@i{54}          exit(3);
-@i{55}      @}
-@i{56}      if (isigopen(argv[1], s, nsig) != nsig)
-@i{57}          exit(3);
-@i{58}      if (isigsettime(strtim(argv[2])) < 0)
-@i{59}          exit(4);
-@i{60}      if ((nsamp = strtim(argv[3])) < 1) @{
-@i{61}          fprintf(stderr, "%s: inappropriate value for duration\n",
-@i{62}                  argv[0]);
-@i{63}          exit(5);
-@i{64}      @}
-@i{65}      if (osigopen("16l", s, nsig) != nsig)
-@i{66}          exit(6);
-@i{67}  
-@i{68}      for (t = 0; t < nsamp && sample_ok; t++) @{
-@i{69}          for (j = 0; j < nsig; j++) @{
-@i{70}              for (i = 0, vv = 0.; i < nc; i++)
-@i{71}                  if (c[i] != 0.) vv += c[i]*sample(j, t+i);
-@i{72}              v[j] = (int)vv;
-@i{73}          @}
-@i{74}          if (putvec(v) < 0) break;
-@i{75}      @}
-@i{76}  
-@i{77}      (void)newheader("out");
-@i{78}      wfdbquit();
-@i{79}      exit(0);
-@i{80}  @}
+@i{37}      if (isigopen(argv[1], s, nsig) != nsig)
+@i{38}          exit(3);
+@i{39}      if (isigsettime(strtim(argv[2])) < 0)
+@i{40}          exit(4);
+@i{41}      if ((nsamp = strtim(argv[3])) < 1) @{
+@i{42}          fprintf(stderr, "%s: inappropriate value for duration\n",
+@i{43}                  argv[0]);
+@i{44}          exit(5);
+@i{45}      @}
+@i{46}      if (osigopen("16l", s, nsig) != nsig)
+@i{47}          exit(6);
+@i{48}  
+@i{49}      (void)sample(0, 0L);
+@i{50}      for (t = 0; t < nsamp && sample_valid(); t++) @{
+@i{51}          for (j = 0; j < nsig; j++) @{
+@i{52}              for (i = 0, vv = 0.; i < nc; i++)
+@i{53}                  if (c[i] != 0.) vv += c[i]*sample(j, t+i);
+@i{54}              v[j] = (int)vv;
+@i{55}          @}
+@i{56}          if (putvec(v) < 0) break;
+@i{57}      @}
+@i{58}  
+@i{59}      (void)newheader("out");
+@i{60}      wfdbquit();
+@i{61}      exit(0);
+@i{62}  @}
 @end example
 
 @noindent
@@ -6134,71 +6160,57 @@ for a copy of this program.)
 @strong{Notes:}
 
 @table @emph
-@item Line 3:
-@code{BUFLN} must be a power of 2 (why? see lines 16 and 18), and it
-should be larger than the length of the filter (i.e., the caller should
-not look back further than @code{BUFLN-1} samples into the past,
-relative to the most recent sample that has been read).
-
-@item Lines 7--19:
-This function supplies input samples to the @code{main} routine as
-needed, and frees the @code{main} routine of the need to read them in
-strict time order.  The @code{sample} function returns the sample from
-signal @code{s} with adjusted sample number @code{t} (i.e., relative to
-the beginning of the segment to be processed), either by retrieving it
-from a circular buffer of samples recently read, or by reading it using
-@code{getvec}.  The ugly-looking @code{getvec} argument is simply the
-next slot in the circular buffer; note that @code{tt} is an internal
-``clock'' for @code{sample}, which records the adjusted sample number of
-the most recently read sample.  In this program, the test in line 13 is
-redundant (why?)  and might be removed for efficiency's sake.
-
-@item Lines 37--39:
+@item Lines 20--22:
 If no coefficients are provided on the command line, the program will
 simply copy the selected segment of the input signals.
 
-@item Lines 40--46:
+@item Lines 23--28:
 If there are more coefficients than there are samples in the circular
 buffer, or if memory cannot be allocated for the coefficient vector, the
 program cannot work properly, so it exits with an error message.  In
-lines 45 and 46, the ASCII strings that represent the coefficients are
+lines 27 and 28, the ASCII strings that represent the coefficients are
 converted to @code{double} format and stored in the coefficient
 vector.
 
-@item Lines 47--59:
+@item Lines 29--40:
 The record name is @code{argv[1]}, and the start time is @code{argv[2]};
 if the record can't be opened, or the start time is inappropriate, the
 program exits.  See the previous example for details on how @code{isigopen}
 is used.
 
-@item Lines 60--64:
+@item Lines 41--45:
 The @var{duration} argument should be a time interval in @var{HH:MM:SS}
 format; @code{strtim} converts it to the appropriate number of
 samples.
 
-@item Lines 65--66:
+@item Lines 46--47:
 The output signals will be written to files in the current directory
 according to the specifications for record @file{16l}
 (@pxref{Piped and Local Records}).  If we can't write as many output
 signals as there are input signals, the program exits.
 
-@item Lines 68--75:
+@item Line 49:
+Here, @code{signal} is invoked only for its side effect;  assuming that
+any samples can be read from the specified record, @code{sample(0, 0L)}
+returns a valid sample, so that the value returned by
+@code{sample_valid()} is true (1);
+
+@item Lines 50--57:
 Here's where the work is done.  The outer loop is executed once per
 sample vector, the middle loop once per signal, and the inner loop
-once per coefficient.  In line 71, we retrieve an input sample,
+once per coefficient.  In line 53, we retrieve an input sample,
 multiply it by a filter coefficient, and add it to a running sum.
-The sum (@code{vv}) is initialized to zero in line 70 before we begin, and is
-converted to an @code{int} in line 72 when we are finished.  Once
-an entire sample vector has been filtered, it is written out in line 74.
+The sum (@code{vv}) is initialized to zero in line 52 before we begin, and is
+converted to an @code{int} in line 54 when we are finished.  Once
+an entire sample vector has been filtered, it is written out in line 56.
 The entire process is repeated up to @code{nsamp} times, or until
 we run out of input samples.
 
-@item Line 77:
+@item Line 59:
 The program creates a header file for record @file{out}, using
 the signal specifications from record @file{16l} and the sampling
 frequency from the input record.
 @end table
-
 @node     Example 8, Example 9, Example 7, Examples
 @unnumberedsec Example 8:  Creating a New Database Record
 @cindex creating a record
