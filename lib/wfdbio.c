@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-			Last revised:	  1 April 2003		wfdblib 10.3.6
+			Last revised:	  16 July 2003		wfdblib 10.3.9
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -48,6 +48,7 @@ library functions defined elsewhere:
  wfdb_p32		(writes a 32-bit integer)
  wfdb_free_path_list *** (frees all data structures assigned to the path list)
  wfdb_parse_path ***	(splits WFDB path into components)
+ wfdb_export_config **** (puts the WFDB path, etc. into the environment)
  wfdb_getiwfdb *	(sets WFDB from the contents of a file)
  wfdb_addtopath *	(adds path component of string argument to WFDB path)
  wfdb_error		(produces an error message)
@@ -56,7 +57,8 @@ library functions defined elsewhere:
  wfdb_checkname		(checks record and annotator names for validity)
  wfdb_setirec **	(saves current record name)
 
-(* New in version 6.2; ** new in version 9.7; *** new in version 10.0.1)
+(* New in version 6.2; ** new in version 9.7; *** new in version 10.0.1;
+**** new in version 10.3.9)
 
 The next two groups of functions, which together enable input from remote
 (http and ftp) files, were first implemented in version 10.0.1 by Michael
@@ -147,79 +149,42 @@ module.
 
 /* WFDB library functions */
 
-/* getwfdb is used to obtain a list of places in which to search for database
-files to be opened for reading.  Under UNIX or MS-DOS, this list is obtained
-from the shell (environment) variable WFDB, which may be set by the user
-(typically as part of the login script).  A default value may be set at compile
-time (DEFWFDB in wfdblib.h);  this is necessary when compiling for the
-Macintosh OS.  If the value of WFDB is of the form `@FILE', wfdb_getiwfdb()
-reads the WFDB path from the specified FILE. */
+/* getwfdb is used to obtain the WFDB path, a list of places in which to search
+for database files to be opened for reading.  In most environments, this list
+is obtained from the shell (environment) variable WFDB, which may be set by the
+user (typically as part of the login script).  A default value may be set at
+compile time (DEFWFDB in wfdblib.h); this is necessary for environments that do
+not support the concept of environment variables, such as MacOS9 and earlier.
+If WFDB or DEFWFDB is of the form '@FILE', getwfdb reads the WFDB path from the
+specified (local) FILE (using wfdb_getiwfdb); such files may be nested up to
+10 levels. */
 
 static char *wfdbpath;
-static int getiwfdb_count = 0;
 
 FSTRING getwfdb()
 {
-    void wfdb_getiwfdb();
-
     if (wfdbpath == NULL) {
-	wfdbpath = getenv("WFDB");
-	if (wfdbpath == NULL) {
-#ifdef HAS_PUTENV
-	    static char *p;
-	    if (p == NULL) p = (char *)malloc(strlen(DEFWFDB)+6);
-	    if (p) {
-		sprintf(p, "WFDB=%s", DEFWFDB);
-		putenv(p);
-	    }
-#endif
-	    wfdbpath = DEFWFDB;
-	}
-    }
-    getiwfdb_count = 0;
-    while (*wfdbpath == '@')
-	wfdb_getiwfdb();
-    wfdb_parse_path(wfdbpath);
-#ifdef HAS_PUTENV
-    if (getenv("WFDBCAL") == NULL) {
-	static char *p;
-	if (p == NULL) p = malloc(strlen(DEFWFDBCAL)+9);
-	if (p) {
-	    sprintf(p, "WFDBCAL=%s", DEFWFDBCAL);
-	    putenv(p);
-	}
-    }
-    if (getenv("WFDBANNSORT") == NULL) {
-	static char *p;
-	if (p == NULL) p = malloc(32);
-	if (p) {
-	    sprintf(p, "WFDBANNSORT=%d", DEFWFDBANNSORT);
-	    putenv(p);
-	}
-    }
-    if (getenv("WFDBGVMODE") == NULL) {
-	static char *p;
-	if (p == NULL) p = malloc(32);
-	if (p) {
-	    sprintf(p, "WFDBGVMODE=%d", DEFWFDBGVMODE == 0 ? 0 : 1);
-	    putenv(p);
-	}
-    }
+	char *p = getenv("WFDB"), *wfdb_getiwfdb();
 
-
-#endif
+	if (p == NULL) p = DEFWFDB;
+	if (*p == '@') p = wfdb_getiwfdb();
+	setwfdb(p);
+    }
     return (wfdbpath);
 }
 
-/* setwfdb can be called within an application to override the setting of WFDB.
-For portability, as well as efficiency, it is better to use setwfdb() than
-to manipulate WFDB directly (via putenv(), for example.) */
+/* setwfdb can be called within an application to change the WFDB path. */
 
-FVOID setwfdb(pt)
-char *pt;
+FVOID setwfdb(p)
+char *p;
 {
-   wfdbpath = pt;
-   wfdb_parse_path(wfdbpath);
+    void wfdb_export_config();
+
+    if (p == NULL && (p = getenv("WFDB")) == NULL) p = DEFWFDB;
+    wfdb_parse_path(p);
+    if (wfdbpath = (char *)malloc(strlen(p)+1))
+	strcpy(wfdbpath, p);
+    wfdb_export_config();
 }
 
 /* wfdbquiet can be used to suppress error messages from the WFDB library. */
@@ -240,6 +205,8 @@ FVOID wfdbverbose()
 
 #define MFNLEN	256	/* max length of WFDB filename, including '\0' */
 static char wfdb_filename[MFNLEN];
+
+/* wfdbfile returns the pathname or URL of a WFDB file. */
 
 FSTRING wfdbfile(s, record)
 char *s, *record;
@@ -331,29 +298,29 @@ void wfdb_free_path_list()
 /* Operating system and compiler dependent code
 
 All of the operating system and compiler dependencies in the WFDB library are
-contained within the following section of this file.
+contained within the following section of this file.  (In the following
+comments, 'MS-DOS' includes all versions of MS-Windows.)
 
 1. Directory separators vary:
      UNIX and variants use `/'.
      MS-DOS and OS/2 use `\'.
-     Macintosh OS uses `:'.
+     MacOS uses `:'.
 
 2. Path component separators also vary:
      UNIX and variants use `:' (as in the PATH environment variable)
      MS-DOS and OS/2 use `;' (also as in the PATH environment variable;
        `:' within a path component follows a drive letter)
-     Macintosh OS uses `;' (`:' is a directory separator, as noted above)
+     MacOS uses `;' (`:' is a directory separator, as noted above)
    See the notes above wfdb_open for details about path separators and how
    WFDB file names are constructed.
 
 3. By default, MS-DOS files are opened in "text" mode.  Since WFDB files are
    binary, they must be opened in binary mode.  To accomplish this, ANSI C
-   libraries, and those supplied with non-ANSI C compilers under MS-DOS,
-   define argument strings "rb" and "wb" to be supplied to fopen();
-   unfortunately, most other non-ANSI C versions of fopen do not recognize
-   these as legal.  The "rb" and "wb" forms are used here for ANSI and MS-DOS
-   C compilers only, and the older "r" and "w" forms are used in all other
-   cases.
+   libraries, and those supplied with non-ANSI C compilers under MS-DOS, define
+   argument strings "rb" and "wb" to be supplied to fopen(); unfortunately,
+   most other non-ANSI C versions of fopen do not recognize these as legal.
+   The "rb" and "wb" forms are used here for ANSI and MS-DOS C compilers only,
+   and the older "r" and "w" forms are used in all other cases.
 
 4. Before the ANSI/ISO C standard was adopted, there were at least two
    (commonly used but incompatible) ways of declaring functions with variable
@@ -464,9 +431,10 @@ char *p;
     return (0);
 }	
 
+
 /* wfdb_getiwfdb reads a new value for WFDB from the file named by the second
-through last characters of the current value.  It maintains a use counter to
-detect looping behavior;  getwfdb() resets the counter to zero.
+through last characters of its input argument.  If that value begins with '@',
+this procedure is repeated, with nesting up to ten levels.
 
 Note that the input file must be local (it is accessed using the standard C I/O
 functions rather than their wfdb_* counterparts).  This limitation is
@@ -477,33 +445,68 @@ contents of the WFDB path) seems an unnecessary security risk. */
 #define SEEK_END 2
 #endif
 
-void wfdb_getiwfdb()
+char *wfdb_getiwfdb(p)
+char *p;
 {
     FILE *wfdbpfile;
+    int i = 0;
+    long len;
 
-    if (getiwfdb_count++ > 10) {
-	wfdb_error("getwfdb: files nested too deeply\n");
-	wfdbpath = "";
-    }
-    else if ((wfdbpfile = fopen(wfdbpath+1, RB)) == NULL)
-	wfdbpath = "";
-    else {
-	long len;
-
-	if (fseek(wfdbpfile, 0L, SEEK_END) == 0)
-	    len = ftell(wfdbpfile);
-	else len = 255;
-	rewind(wfdbpfile);
-	if ((wfdbpath = (char *)malloc((unsigned)len+1)) == NULL)
-	    wfdbpath = "";
+    for (i = 0; i < 10 && *p == '@'; i++) {
+	if ((wfdbpfile = fopen(p+1, RB)) == NULL) p = "";
 	else {
-	    len = fread(wfdbpath, 1, (int)len, wfdbpfile);
-	    while (wfdbpath[len-1] == '\n' || wfdbpath[len-1] == '\r')
-		wfdbpath[--len] = '\0';
+	    if (fseek(wfdbpfile, 0L, SEEK_END) == 0)
+		len = ftell(wfdbpfile);
+	    else len = 255;
+	    if ((p = (char *)malloc((unsigned)len+1)) == NULL) p = "";
+	    else {
+		rewind(wfdbpfile);
+		len = fread(p, 1, (int)len, wfdbpfile);
+		while (p[len-1] == '\n' || p[len-1] == '\r')
+		    p[--len] = '\0';
+	    }
+	    (void)fclose(wfdbpfile);
 	}
-	(void)fclose(wfdbpfile);
+    }	
+    if (*p == '@') {
+	wfdb_error("getwfdb: files nested too deeply\n");
+	p = "";
+    }
+    return (p);
+}
+
+/* wfdb_export_config is invoked from setwfdb to place the configuration
+   variables into the environment if possible. */
+
+#ifndef HAS_PUTENV
+#define wfdb_export_config()
+#else
+void wfdb_export_config()
+{
+    char *p;
+
+    if (p = (char *)malloc(strlen(wfdbpath)+6)) {
+	sprintf(p, "WFDB=%s", wfdbpath);
+	putenv(p);
+    }
+    if (getenv("WFDBCAL") == NULL) {
+	if (p = malloc(strlen(DEFWFDBCAL)+9)) {
+	    sprintf(p, "WFDBCAL=%s", DEFWFDBCAL);
+	    putenv(p);
+	}
+    }
+    if (getenv("WFDBANNSORT") == NULL) {
+	static char p[14];
+	sprintf(p, "WFDBANNSORT=%d", DEFWFDBANNSORT == 0 ? 0 : 1);
+	putenv(p);
+    }
+    if (getenv("WFDBGVMODE") == NULL) {
+	static char p[13];
+	sprintf(p, "WFDBGVMODE=%d", DEFWFDBGVMODE == 0 ? 0 : 1);
+	putenv(p);
     }
 }
+#endif
 
 /* wfdb_addtopath appends the path component of its string argument (i.e.
 everything except the file name itself) to the end of the WFDB path, provided
@@ -523,7 +526,6 @@ char *s;
 {
     char *d, *p, *t;
     int i, j, l;
-    static char *nwfdbp;
     struct wfdb_path_component *c0;
 
     if (s == NULL || *s == '\0') return;
@@ -558,14 +560,11 @@ char *s;
 	return;			/* WFDB path is unchanged */
     }
     (void)strcpy(t, wfdbpath);
-    t[l] = PSEP;		/* append a path separator */
-    for (j = 0; j < i; j++)
-	t[l+j+1] = s[j];	/* append the new path component */
+    t[l++] = PSEP;		/* append a path separator */
+    (void)strncpy(t+l, s, i); 	/* append the new path component */
     t[l+i+1] = '\0';
-    if (wfdbpath == nwfdbp)	/* WFDB path was previously modified by this
-				   function */
-	(void)free(nwfdbp);
-    setwfdb(nwfdbp = t);
+    setwfdb(t);
+    free(t);
 }
 
 /* The wfdb_error function handles error messages, normally by printing them

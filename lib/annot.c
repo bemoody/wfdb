@@ -1,10 +1,10 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:    20 July 2002		wfdblib 10.2.7
+			Last revised:    16 July 2003		wfdblib 10.3.9
 WFDB library functions for annotations
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 2002 George B. Moody
+Copyright (C) 2003 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -694,7 +694,10 @@ int code;
 char *string;
 {
     if (NOTQRS <= code && code <= ACMAX) {
-	cstring[code] = string;
+	if (strcmp(cstring[code], string)) {
+	    char *p = malloc(strlen(string)+1);
+	    if (p) strcpy(cstring[code] = p, string);
+	}
 	return (0);
     }
     wfdb_error("setecgstr: illegal annotation code %d\n", code);
@@ -743,12 +746,20 @@ int code;
 char *string;
 {
     if (0 < code && code <= ACMAX) {
-	astring[code] = string;
-	modified[code] = 1;
+	if (strcmp(astring[code], string)) {
+	    char *p = malloc(strlen(string)+1);
+	    if (p) {
+		strcpy(astring[code] = p, string);
+		modified[code] = 1;
+	    }
+	}
 	return (0);
     }
     else if (-ACMAX < code && code <= 0) {
-	astring[-code] = string;
+	if (strcmp(astring[-code], string)) {
+	    char *p = malloc(strlen(string)+1);
+	    if (p) strcpy(astring[-code] = p, string);
+	}
 	return (0);
     }
     else {
@@ -824,12 +835,20 @@ int code;
 char *string;
 {
     if (0 < code && code <= ACMAX) {
-	tstring[code] = string;
-	modified[code] = 1;
+	if (strcmp(tstring[code], string)) {
+	    char *p = malloc(strlen(string)+1);
+	    if (p) {
+		strcpy(tstring[code] = p, string);
+		modified[code] = 1;
+	    }
+	}
 	return (0);
     }
     else if (-ACMAX < code && code <= 0) {
-	tstring[-code] = string;
+	if (strcmp(tstring[-code], string)) {
+	    char *p = malloc(strlen(string)+1);
+	    if (p) strcpy(tstring[-code] = p, string);
+	}
 	return (0);
     }
     else {

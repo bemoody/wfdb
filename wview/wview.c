@@ -1,5 +1,5 @@
 /* file: wview.c        G. Moody        20 January 1993
-                        Last revised:     11 June 2000
+                        Last revised:     11 June 2000 (but see *** below)
    
 -------------------------------------------------------------------------------
 wview: view WFDB-format signals and annotations under MS Windows
@@ -568,8 +568,13 @@ LONG lParam;
       case WM_INITDIALOG:
 	SetDlgItemText(hDlg, IDD_RECORD, record);
 	SetDlgItemText(hDlg, IDD_ANNOTATOR, annotator);
-	if ((t = getwfdb()) != wfdbpath)
+	if ((t = getwfdb()) != wfdbpath) {
 	    strncpy(wfdbpath, t, sizeof(wfdbpath)-1);
+	    setwfdb(wfdbpath);	/* *** 16 July 2003 (GBM).  This call is
+				   necessary for WFDB 10.3.9 and later, in
+				   which setwfdb keeps its own copy of the
+				   WFDB path. */
+	}
 	SetDlgItemText(hDlg, IDD_WFDBPATH, wfdbpath);
 	SetDlgItemText(hDlg, IDD_WFDBCAL, cfname);
 	return (TRUE);

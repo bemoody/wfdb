@@ -1,4 +1,4 @@
-This is wpg, produced by makeinfo version 4.0 from wpg.tex.
+This is wpg, produced by makeinfo version 4.0b from wpg.tex.
 
 INFO-DIR-SECTION Libraries
 START-INFO-DIR-ENTRY
@@ -10,8 +10,8 @@ File: wpg,  Node: Top,  Next: Overview,  Prev: (dir),  Up: (dir)
 
    This guide documents the Waveform Database interface library (the
 WFDB library).  This file contains the text of the Tenth Edition of the
-`WFDB Programmer's Guide' (7 April 2003), with revisions for release
-10.3.6 of the WFDB library.
+`WFDB Programmer's Guide' (16 July 2003), with revisions for release
+10.3.9 of the WFDB library.
 
 * Menu:
 
@@ -388,6 +388,32 @@ and to this guide since the first printing of the tenth edition of this
 guide in June, 1999.  See `NEWS', in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
+
+Changes in version 10.3.9
+-------------------------
+
+   The WFDB library functions `setwfdb', `setannstr', `setanndesc', and
+`setecgstr' now copy their input string arguments, so that it is no
+longer necessary for WFDB applications to keep these strings valid.  If
+you have created applications that rely on being able to modify these
+strings, it will be necessary to invoke the corresponding functions
+again before such changes will take effect within the WFDB library.
+
+   Previous versions of the WFDB library function `putinfo' did not
+flush their output until either a new header file was created (via
+`setheader' or `newheader') or the process exited.  This has now been
+corrected, and putinfo output is now flushed before `putinfo' returns.
+Thanks to Jonas Carlson for reporting this problem.
+
+Changes in version 10.3.8
+-------------------------
+
+   The WFDB library function `setbasetime()' now properly accepts
+arguments specifying midnight (e.g., `0:0:0'), which previous versions
+rejected, and the function `setheader()' records such times correctly
+in the `.hea' files it creates.
+
+   (WFDB library version 10.3.7 was identical to 10.3.6.)
 
 Changes in version 10.3.6
 -------------------------
@@ -1016,27 +1042,4 @@ as:
 
    The left column contains samples from signal 0, and the right column
 contains those from signal 1.
-
-
-File: wpg,  Node: name restrictions,  Next: WFDB path syntax,  Prev: running example,  Up: Usage
-
-A Note on Identifiers
-=====================
-
-   External identifiers that begin with the underscore (`_') character
-are reserved under the rules of ANSI C to the compiler and libraries.
-In order to make the WFDB library as portable as possible, its own
-external identifiers do not begin with underscores (since otherwise
-they might conflict with external identifiers used by a standard
-library).
-
-   External identifiers beginning with `wfdb_' are reserved for the use
-of the WFDB library.  These names are used for functions and global
-variables that are intended for the private use of the WFDB library;
-your programs should not need to use them.  You should avoid defining
-functions or global variables with such names in your programs.
-
-   External identifiers beginning with `WFDB_' are used for constants
-and data types defined within `<wfdb/wfdb.h>'.  Use these identifiers
-as needed in your programs, but avoid redefining them.
 

@@ -1,9 +1,32 @@
-This is wpg, produced by makeinfo version 4.0 from wpg.tex.
+This is wpg, produced by makeinfo version 4.0b from wpg.tex.
 
 INFO-DIR-SECTION Libraries
 START-INFO-DIR-ENTRY
 * WFDB library: (wpg).		The Waveform Database library.
 END-INFO-DIR-ENTRY
+
+
+File: wpg,  Node: name restrictions,  Next: WFDB path syntax,  Prev: running example,  Up: Usage
+
+A Note on Identifiers
+=====================
+
+   External identifiers that begin with the underscore (`_') character
+are reserved under the rules of ANSI C to the compiler and libraries.
+In order to make the WFDB library as portable as possible, its own
+external identifiers do not begin with underscores (since otherwise
+they might conflict with external identifiers used by a standard
+library).
+
+   External identifiers beginning with `wfdb_' are reserved for the use
+of the WFDB library.  These names are used for functions and global
+variables that are intended for the private use of the WFDB library;
+your programs should not need to use them.  You should avoid defining
+functions or global variables with such names in your programs.
+
+   External identifiers beginning with `WFDB_' are used for constants
+and data types defined within `<wfdb/wfdb.h>'.  Use these identifiers
+as needed in your programs, but avoid redefining them.
 
 
 File: wpg,  Node: WFDB path syntax,  Next: exercises 1,  Prev: name restrictions,  Up: Usage

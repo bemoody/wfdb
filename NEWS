@@ -1,3 +1,18 @@
+10.3.9:
+	The WFDB library functions setwfdb, setannstr, setanndesc, and
+	setecgstr now copy their input string arguments, so that it is
+	no longer necessary for WFDB applications to keep these strings
+	valid.  If you have created applications that rely on being able
+	to modify these strings, it will be necessary to invoke the
+	corresponding functions again before such changes will take effect
+	within the WFDB library.
+
+	Previous versions of the WFDB library function putinfo did not
+	flush their output until either a new header file was created (via
+	setheader or newheader) or the process exited.  This has now been
+	corrected, and putinfo output is now flushed before putinfo returns.
+	Thanks to Jonas Carlson for reporting this problem.
+
 10.3.8:
 	The WFDB library function setbasetime (in lib/signal.c) now properly
 	accepts arguments specifying midnight (e.g., "0:0:0"), which previous

@@ -1,4 +1,4 @@
-This is wpg, produced by makeinfo version 4.0 from wpg.tex.
+This is wpg, produced by makeinfo version 4.0b from wpg.tex.
 
 INFO-DIR-SECTION Libraries
 START-INFO-DIR-ENTRY
@@ -104,8 +104,7 @@ used by `anndesc'; and `setecgstr' modifies the table shared by
 defined annotation codes as well as to define strings for undefined
 annotation codes.  For example, `setannstr(NORMAL, "\\267")' redefines
 the string for normal beats as a PostScript bullet, `*' (`NORMAL' is
-defined in `<wfdb/ecgcodes.h>').  These functions do not copy their
-string arguments, which must therefore be kept valid by the caller.
+defined in `<wfdb/ecgcodes.h>').
 
    An important difference between `setannstr' (or `setanndesc') and
 `setecgstr' is that `annopen' and `wfdbinit' insert modification labels
@@ -929,16 +928,8 @@ Evaluation of indirect WFDB paths is deferred until `getwfdb' is
 invoked, either explicitly or by the WFDB library while attempting to
 open an input file (e.g., using `annopen' or `isigopen').  (The
 features described in this paragraph were first introduced in WFDB
-library version 8.0.)
-
-   The `setwfdb' function does not copy the string itself, which must
-therefore be kept valid by the caller, nor does it modify the
-environment variable `WFDB', which will be inherited by any processes
-spawned from the caller.  For portability, as well as efficiency, it is
-better to use `setwfdb' than to manipulate `WFDB' directly (via
-`putenv', for example); furthermore, doing the latter is ineffective
-(within the current process) once the first WFDB file has been opened.
-*Note getwfdb::, for an example of the use of `setwfdb'.
+library version 8.0.)  *Note getwfdb::, for an example of the use of
+`setwfdb'.
 
 
 File: wpg,  Node: getwfdb,  Next: wfdbfile,  Prev: setwfdb,  Up: miscellaneous functions

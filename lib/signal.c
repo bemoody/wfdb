@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:    9 July 2003		wfdblib 10.3.8
+			Last revised:   16 July 2003		wfdblib 10.3.9
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -2500,6 +2500,7 @@ char *s;
 	return (-1);
     }
     (void)wfdb_fprintf(oheader, "#%s\r\n", s);
+    (void)wfdb_fflush(oheader);
     return (0);
 }
 

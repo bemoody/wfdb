@@ -488,6 +488,23 @@ guide in June, 1999.  See @file{NEWS}, in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
+@unnumberedsubsec Changes in version 10.3.9
+
+The WFDB library functions @code{setwfdb}, @code{setannstr},
+@code{setanndesc}, and @code{setecgstr} now copy their input string
+arguments, so that it is no longer necessary for WFDB applications to
+keep these strings valid.  If you have created applications that rely on
+being able to modify these strings, it will be necessary to invoke the
+corresponding functions again before such changes will take effect
+within the WFDB library.
+
+Previous versions of the WFDB library function @code{putinfo} did not
+flush their output until either a new header file was created (via
+@code{setheader} or @code{newheader}) or the process exited.  This has
+now been corrected, and putinfo output is now flushed before
+@code{putinfo} returns.  Thanks to Jonas Carlson for reporting this
+problem.
+
 @unnumberedsubsec Changes in version 10.3.8
 
 The WFDB library function @code{setbasetime()} now properly
@@ -2765,8 +2782,7 @@ to redefine strings for defined annotation codes as well as to define
 strings for undefined annotation codes.  For example,
 @code{setannstr(NORMAL, "\\267")} redefines the string for normal beats
 as a PostScript bullet, @samp{@bullet{}} (@code{NORMAL} is defined in
-@file{<wfdb/ecgcodes.h>}).  These functions do not copy their string
-arguments, which must therefore be kept valid by the caller.
+@file{<wfdb/ecgcodes.h>}).
 
 @cindex modification label
 An important difference between @code{setannstr} (or @code{setanndesc})
@@ -3928,15 +3944,6 @@ invoked, either explicitly or by the WFDB library while attempting to open
 an input file (e.g., using @code{annopen} or @code{isigopen}).  (The
 features described in this paragraph were first introduced in WFDB library
 version 8.0.)
-
-The @code{setwfdb} function does not copy the string itself, which must
-therefore be kept valid by the caller, nor does it modify the environment
-variable @code{WFDB}, which will be inherited by any processes spawned
-from the caller.  For portability, as well as efficiency, it is better
-to use @code{setwfdb} than to manipulate @code{WFDB} directly (via
-@code{putenv}, for example); furthermore, doing the latter is
-ineffective (within the current process) once the first WFDB file has been
-opened.
 @iftex
 @xref{getwfdb, , @code{getwfdb}},
 @end iftex
