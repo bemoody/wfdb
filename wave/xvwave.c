@@ -1,10 +1,10 @@
 /* file: xvwave.c	G. Moody	 27 April 1990
-			Last revised:   14 October 2001
+			Last revised:   11 October 2002
 XView support functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -113,8 +113,8 @@ int height;
     /* Recalibrate based on selected scales, clear the display list cache. */
     if (*record) {
 	set_baselines();
-	dismiss_mode();	/* read and set user-selected scales, if any */
 	alloc_sigdata(2);
+	dismiss_mode();	/* read and set user-selected scales, if any */
 
 	vscale[0] = 0.;	/* force clear_cache() -- see calibrate() */
 	calibrate();

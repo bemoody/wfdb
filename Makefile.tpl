@@ -110,6 +110,7 @@ $(HOME)/wfdb-test/lib:		$(HOME)/wfdb-test
 # documentation), and check that the MANIFEST (list of files in the package)
 # is correct.
 tarballs:	clean
+	cd lib; $(SETPERMISSIONS) *.h
 	cd ..; tar --create --file $(PACKAGE).tar.gz --verbose --gzip \
           '--exclude=$(PACKAGE)/*CVS' $(PACKAGE) | sed s+${PACKAGE}/++ | \
 	  tee $(PACKAGE)-MANIFEST

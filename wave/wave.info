@@ -1,5 +1,5 @@
 # file: wave.info	G. Moody	21 August 1990
-#			Last revised:    8 August 2002		WAVE 6.5
+#			Last revised:  16 September 2002	WAVE 6.5
 # XView spot help file for `wave'
 #
 # -----------------------------------------------------------------------------
@@ -71,7 +71,7 @@ directory and you open the same annotator more
 than once.
 #
 
-:file.load.calibration_file:url_view /usr/local/help/html/wag/wfdbcal-5.htm
+:file.load.calibration_file:url_view /usr/local/help/html/wag/wfdbca-5.htm
 Specifies the name of the WFDB calibration file
 (a text file containing information on the
 relative scales of many types of signals).

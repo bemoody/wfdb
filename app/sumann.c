@@ -1,9 +1,9 @@
 /* file: sumann.c	G. Moody       5 February 1982
-			Last revised:  8 November 2000
+			Last revised:  3 October 2002
 
 -------------------------------------------------------------------------------
 sumann: Tabulates annotations
-Copyright (C) 2000 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -68,8 +68,8 @@ char *argv[];
     static WFDB_Anninfo ai;
     WFDB_Annotation annot;
     int i, rhythm = 0, noise = 2, qflag = 0;
-    static long tab[64], rtab[MAXR], ntab[6];
-    static long rtime[MAXR], ntime[6], r0, n0, from_time, to_time;
+    static long tab[64], rtab[MAXR+1], ntab[6];
+    static long rtime[MAXR+1], ntime[6], r0, n0, from_time, to_time;
     char *record = NULL, *prog_name();
     void help();
 

@@ -1,3 +1,7 @@
+10.2.8:
+	Fixed a bug in WAVE that occasionally caused a crash when starting
+	up;  also repaired a broken link in WAVE's on-line help.
+
 10.2.7:
 	Added a workaround to wfdb_fclose() (in lib/wfdbio.c) so that
 	closing stdin after using freopen doesn't trigger a core dump.

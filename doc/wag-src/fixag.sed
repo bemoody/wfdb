@@ -42,7 +42,7 @@ s+<I>strtim+<I><A HREF="../wpg/strtim.htm">strtim</A>+
 s+BGCOLOR="[^"]*"+BGCOLOR="#FFFFFF"+
 s+(http://www.physionet.org/physiobank/database)+<A HREF="http://www.physionet.org/physiobank/database">(http://www.physionet.org/physiobank/database)</A>+
 s+(http://www.aami.org/)+<A HREF="http://www.aami.org/" target="other">(http://www.aami.org/)</A>+
-s+http://www.gnuplot.info/+<A HREF="http://www.gnuplot.info/" target="other">http://www.gnuplot.info/</A>+
+s+"http://www.gnuplot.info/"+"http://www.gnuplot.info/" target="other"+
 s+http://www.mstarlabs.com/+<A HREF="http://www.mstarlabs.com/" target="other">http://www.mstarlabs.com/</A>+
 s+(http://www.hsr.nl/bobkemp/edf/edf.htm)+<A HREF="http://www.hsr.nl/bobkemp/edf/edf.htm" target="other">(http://www.hsr.nl/bobkemp/edf/edf.htm)</A>+
 s+<I>Evaluating ECG Analyzers</I>+<a href="eval.htm"><I>Evaluating ECG Analyzers</I></a>+

@@ -1,5 +1,5 @@
 /* file: xform.c	G. Moody       8 December 1983
-			Last revised:    20 May 2002
+			Last revised: 13 September 2002
 
 -------------------------------------------------------------------------------
 xform: Sampling frequency, amplitude, and format conversion for WFDB records
@@ -201,6 +201,14 @@ char *argv[];
     /* Check that an input record was specified. */
     if (irec == NULL) {
 	help();
+	exit(1);
+    }
+
+    /* Check that nrec and orec differ if both were specified. */
+    if (nrec && orec && (strcmp(nrec, orec) == 0)) {
+	(void)fprintf(stderr,
+	      "%s: arguments of -n (or -N) and -o cannot be identical\n",
+		      pname);
 	exit(1);
     }
 
