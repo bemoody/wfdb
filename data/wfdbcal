@@ -1,5 +1,5 @@
 # file: wfdbcal		G. Moody	June 1991
-#			Last revised:	7 May 1999
+#			Last revised:  9 April 2003
 # Default calibration database for WFDB library
 #
 # Format:
@@ -17,8 +17,11 @@
 
 ECG	- 1 sine 1 mV
 EEG	- - undefined 0.1 mV
+EEG	- - undefined 100 uV
 EOG	- - undefined 0.1 mV
+EOG	- - undefined 100 uV
 EMG	- - undefined 0.1 mV
+EMG	- - undefined 100 uV
 BP	0 100 square 100 mmHg
 ABP	0 - square 100 mmHg
 Resp	- - undefined 1 l
@@ -53,4 +56,5 @@ P	- - undefined 100 mmHg
 
 # Definitions for nameless signals with defined units
 record	- - undefined 1 mV
+record  - - undefined 1000 uV
 record	- - undefined 100 mmHg

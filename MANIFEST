@@ -284,6 +284,7 @@ doc/wag-src/intro.ht0
 doc/wag-src/.latex2html-init
 doc/wag-src/log10.1
 doc/wag-src/lomb.1
+doc/wag-src/lwcat.1
 doc/wag-src/Makefile
 doc/wag-src/Makefile.top
 doc/wag-src/Makefile.tpl
@@ -475,6 +476,8 @@ fortran/
 fortran/example.f
 fortran/fsamples.f
 fortran/Makefile
+fortran/Makefile.top
+fortran/Makefile.tpl
 fortran/README
 fortran/wfdbf.c
 INSTALL

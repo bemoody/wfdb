@@ -1,4 +1,4 @@
-This is wpg, produced by makeinfo version 4.0b from wpg.tex.
+This is wpg, produced by makeinfo version 4.0 from wpg.tex.
 
 INFO-DIR-SECTION Libraries
 START-INFO-DIR-ENTRY
@@ -1151,6 +1151,10 @@ signal.  If T specifies a sample number beyond the end of the record,
 the returned value is that of the last valid sample of the specified
 signal.  For an example of the use of `sample' and `sample_valid',
 *note Example 7::.
+
+   Be sure to call `wfdbquit' before exiting from any program that uses
+`sample', to be certain that dynamically allocated memory used by
+`sample' is freed.
 
 
 File: wpg,  Node: conversion,  Next: calibration,  Prev: non-sequential,  Up: Functions

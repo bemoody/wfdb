@@ -1,3 +1,8 @@
+10.3.7:
+	Fixed a bug in xform, introduced in 10.3.4, that prevented xform from
+	reading the output sampling frequency from the standard input.  Thanks
+	to Thomas Heldt for the bug report.
+
 10.3.6:
 	The fix applied in isigclose() in 10.3.5 was incomplete but is now
 	(really!) fixed.  Applications that use sample() should call wfdbquit()
@@ -12,6 +17,7 @@
 	several different http servers, the strategy for handling such problems
 	within the WFDB NETFILES code has been improved substantially, but
 	there may be further room for improvement.
+
 10.3.5:
 	Fixed a bug in WFDB library function isigclose() (in lib/signal.c)
 	that had caused sample()'s buffer to be freed inappropriately when

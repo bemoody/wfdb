@@ -205,7 +205,7 @@ lines.  At most \fBMAXLABELFILES\fR (defined in \fBplt.h\fR, currently 6)
 As for \fB-hl\fR, but print the label in a vertical orientation (rotated
 90 degrees counterclockwise).
 .TP
-\fB-le \fR\fIlinenumber plotnumber\fR [ \fItext\fR ]
+\fB-le\fR\fI linenumber plotnumber\fR [ \fItext\fR ]
 Define the specified \fIlinenumber\fR in the legend (see also \fB-lp\fR).
 Line numbers in the legend begin with 0 (the top line);  plot numbers also
 begin with 0 (these refer to the data plots, and are used here to determine
@@ -219,7 +219,7 @@ segments), an overlaid legend entry can be created using additional \fB-le\fR
 options with the same \fIlinenumber\fR and different \fIplotnumbers\fR,
 omitting the \fItext\fR for all but the first.
 .TP
-\fB-lp \fR\fIxw0 yw0\fR [ \fIboxscale\fR [ \fIseglength\fR [ \fIopaque\fR ] ] ]
+\fB-lp\fR\fI xw0 yw0\fR [ \fIboxscale\fR [ \fIseglength\fR [ \fIopaque\fR ] ] ]
 Define the window coordinates \fI(xw0, yw0)\fR of the upper left corner of
 the plot legend text, and other attributes for the plot legend (key).
 \fBplt\fR determines the size of the box it draws around the legend, but
@@ -240,7 +240,7 @@ use the \fIsubticks\fR argument to change \fBplt\fR's default behavior.
 \fB-ly \fR [ \fIbase\fR [ \fIsubticks\fR ] ]
 Draw a logarithmic y-axis.
 .TP
-\fB-tf \fR\fIfile\fR [ \fItbc\fR ]
+\fB-tf\fR\fI file\fR [ \fItbc\fR ]
 Load the text string array from the specified \fIfile\fR.  Each line of the
 \fIfile\fR defines an element of the string array;  using plot styles
 \fBc\fR or \fBt\fR, these strings can be plotted in the same manner as
@@ -259,11 +259,11 @@ Load the font string array from the quoted argument.  Using appropriate
 plot style (\fB-p\fR) options, the strings can be used to change the font,
 line style (solid, dotted, dashed, etc.), or drawing color.
 .TP
-\fB-x \fR\fIstring\fR
+\fB-x\fR\fI string\fR
 Set the x-axis title to \fIstring\fR (which must be quoted if this option
 is used on the command line or if \fIstring\fR begins with `(' or `[').
 .TP
-\fB-xa \fR\fIxmin xmax tick fmt tskip ycross\fR
+\fB-xa\fR\fI xmin xmax tick fmt tskip ycross\fR
 Specify the x-axis range (as \fIxmin\fR to \fIxmax\fR); the interval between
 x-axis tick marks; the format, \fIfmt\fR, in which to print the numbers (e.g.,
 ``\fB%.3f\fR'', ``\fB%.2e\fR'';  any format that \fBprintf(3)\fR can use for
@@ -273,75 +273,75 @@ x-axis should cross, in y-units.  Any of these parameters may be supplied as
 ``-'', which causes \fBplt\fR to choose a reasonable value based on the input
 data.
 .TP
-\fB-xe \fR\fIxmin-error xmax-error\fR
+\fB-xe\fR\fI xmin-error xmax-error\fR
 Use this option to specify the amount by which the x-axis range is allowed
 to exceed the range of x-values in the input data, when \fBplt\fR determines
 the x-axis range automatically.
 .TP
-\fB-xm \fR\fItick-base\fR
+\fB-xm\fR\fI tick-base\fR
 Make x-axis ticks be multiples of the specified \fItick-base\fR.
 .TP
-\fB-xo \fR\fIx-axis-offset\fR
+\fB-xo\fR\fI x-axis-offset\fR
 Move the x-axis down by \fIx-axis-offset\fR (expressed as a fraction of the
 y-axis length).
 .TP
 \fB-xr\fR
 Draw the x-axis at the top of the plot
 .TP
-\fB-xt \fR\fIx label\fR [ \fItick-size\fR ]
+\fB-xt\fR\fI x label\fR [ \fItick-size\fR ]
 Add an extra labelled tick at the specified \fIx\fR position, and label it
 with the specified \fIlabel\fR (which may be any string).  The optional
 \fItick-size\fR argument specifies the length of the added tick, as a fraction
 of the default length for labelled ticks (e.g., a value of 1.5 makes the
 added tick 50\% longer than the standard size).
 .TP
-\fB-xts \fR\fIx\fR [ \fItick-size\fR ]
+\fB-xts\fR\fI x\fR [ \fItick-size\fR ]
 Force a labelled tick to appear on the x-axis at the specified \fIx\fR
 (the positions of the other labelled x-ticks are adjusted accordingly).
 \fItick-size\fR is defined as for \fB-xt\fR.
 .TP
-\fB-y \fR\fIstring\fR
+\fB-y\fR\fI string\fR
 Set the y-axis title to \fIstring\fR (see \fB-x\fR).
 .TP
-\fB-ya \fR\fIymin ymax tick fmt tskip xcross\fR
+\fB-ya\fR\fI ymin ymax tick fmt tskip xcross\fR
 Set up the y-axis (see \fB-xa\fR).
 .TP
-\fB-ye \fR\fIymin-error ymax-error\fR
+\fB-ye\fR\fI ymin-error ymax-error\fR
 Set the allowable error in the y-axis range (see \fB-xe\fR).
 .TP
-\fB-ym \fR\fItick-base\fR
+\fB-ym\fR\fI tick-base\fR
 Make y-axis ticks be multiples of the specified \fItick-base\fR.
 .TP
-\fB-yo \fR\fIy-axis-offset\fR
+\fB-yo\fR\fI y-axis-offset\fR
 Move the y-axis to the left by \fIy-axis-offset\fR (expressed as a fraction of
 the x-axis length).
 .TP
 \fB-yr\fR
 Draw the y-axis at the right edge of the plot.
 .TP
-\fB-yt \fR\fIy label\fR [ \fItick-size\fR ]
+\fB-yt\fR\fI y label\fR [ \fItick-size\fR ]
 Add an extra labelled tick at the specified \fIy\fR position (see \fB-xt\fR).
 .TP
-\fB-yts \fR\fIy\fR [ \fItick-size\fR ]
+\fB-yts\fR\fI y\fR [ \fItick-size\fR ]
 Force a labelled tick to appear on the y-axis at the specified \fIy\fR
 (see \fB-xts\fR).
 .TP
-\fB-dev \fR\fIpterm option\fR
+\fB-dev\fR\fI pterm option\fR
 Process \fIoption\fR only if the value of \fBPTERM\fR is \fIpterm\fR.
 The \fB-dev\fR option may be useful in scripts that produce screen or
 printed plots in different formats.
 .TP
-\fB-sf \fR\fIname specification\fR
+\fB-sf\fR\fI name specification\fR
 Create a new font group with the specified \fIname\fR and set its
 specifications (font, point size, color/grey level, line width, and line
 style).  See the chapter titled \fIColors, Line Styles, and Fonts\fR in
 the \fIplt Tutorial and Cookbook\fR for details.
 .TP
-\fB-ch \fR\fIheight-factor width-factor\fR
+\fB-ch\fR\fI height-factor width-factor\fR
 Modify the height and width of all characters printed in the plot by
 the specified factors.
 .TP
-\fB-size \fR\fIfscl width height left-margin bottom-margin\fR
+\fB-size\fR\fI fscl width height left-margin bottom-margin\fR
 Specify the size and position of the plot on the page.  The \fIwidth\fR,
 \fIheight\fR, \fIleft-margin\fR, and \fIbottom-margin\fR are specified
 in \fIinches\fR (1 inch = 25.4 mm).  \fIfscl\fR is a factor applied to the
@@ -350,15 +350,16 @@ applied to the rest of the plot.  This option is effective for printed plots
 only.
 .SS Screen and printed plots
 .PP
-By default, \fBplt\fR makes an X11 screen plot.  To make a printed plot,
-use the option \fB-T lw\fR, and pipe the output of \fBplt\fR to
-\fBlwcat\fR.  Under Unix, GNU/Linux, or MacOS/X, \fBlwcat\fR uses the standard
-\fBlpr\fR print spooler to send \fBplt\fR's output in PostScript
-format to the default printer.  When running with a Cygwin/bash window under
-MS-Windows, or when using \fBlwcat\fR's \fB-gv\fR option under Unix or Linux,
-the PostScript output is displayed on-screen using GhostScript (\fBGSView\fR
-under MS-Windows, or \fBgv\fR otherwise; these programs can save the output
-in a file or send it to a printer).
+By default, \fBplt\fR makes an X11 screen plot.  To make a printed
+plot, use the option \fB-T lw\fR, and pipe the output of \fBplt\fR to
+\fBlwcat\fR(1).  Under Unix, GNU/Linux, or MacOS/X, \fBlwcat\fR uses
+the standard \fBlpr\fR print spooler to send \fBplt\fR's output in
+PostScript format to the default printer.  When running with a
+Cygwin/bash window under MS-Windows, or when using \fBlwcat\fR's
+\fB-gv\fR option under Unix or Linux, the PostScript output is
+displayed on-screen using GhostScript (\fBGSView\fR under MS-Windows,
+or \fBgv\fR otherwise; these programs can save the output in a file or
+send it to a printer).
 .SH EXAMPLES
 .PP
 Create a text file with the following contents:
@@ -381,13 +382,9 @@ The same file can be used to generate a number of different plots, by
 choosing different columns.  To plot the third column vs. the first, try:
 .br
 	\fBplt powers 2 0 -t "Marshmallows" -x "Mass (kg)" -y "Height (m)"\fR
-.SH FILES
-.TP
-\fB/usr/lib/ps/plt.pro\fR
-PostScript prolog for plots printed using \fBlwcat\fR
 .SH SEE ALSO
 .PP
-\fBimageplt\fR(1), \fBpltf\fR(1)
+\fBimageplt\fR(1), \fBlwcat\fR(1), \fBpltf\fR(1)
 .PP
 The \fIplt Tutorial and Cookbook\fR (a book-length introduction to \fBplt\fR,
 included in the \fBplt\fR source package) contains many more examples.

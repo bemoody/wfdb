@@ -1,7 +1,10 @@
 ECG	- 1 sine 1 mV
 EEG	- - undefined 0.1 mV
+EEG	- - undefined 100 uV
 EOG	- - undefined 0.1 mV
+EOG	- - undefined 100 uV
 EMG	- - undefined 0.1 mV
+EMG	- - undefined 100 uV
 BP	0 100 square 100 mmHg
 ABP	0 - square 100 mmHg
 Resp	- - undefined 1 l

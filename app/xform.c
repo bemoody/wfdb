@@ -353,7 +353,7 @@ char *argv[];
 		  "Output sampling frequency (Hz per signal, > 0) [%g]: ",
 			  ofreq);
 	    (void)fgets(answer, sizeof(answer), ttyin);
-	    (void)sscanf(answer, "%g", &ofreq);
+	    (void)sscanf(answer, "%lf", &ofreq);
 	} while (ofreq < 0);
 	if (ofreq == 0) ofreq = WFDB_DEFFREQ;
 	if (nosig > 0) {

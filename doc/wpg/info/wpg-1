@@ -1,4 +1,4 @@
-This is wpg, produced by makeinfo version 4.0b from wpg.tex.
+This is wpg, produced by makeinfo version 4.0 from wpg.tex.
 
 INFO-DIR-SECTION Libraries
 START-INFO-DIR-ENTRY
@@ -10,8 +10,8 @@ File: wpg,  Node: Top,  Next: Overview,  Prev: (dir),  Up: (dir)
 
    This guide documents the Waveform Database interface library (the
 WFDB library).  This file contains the text of the Tenth Edition of the
-`WFDB Programmer's Guide' (26 November 2002), with revisions for
-release 10.3.0 of the WFDB library.
+`WFDB Programmer's Guide' (7 April 2003), with revisions for release
+10.3.6 of the WFDB library.
 
 * Menu:
 
@@ -389,10 +389,48 @@ guide in June, 1999.  See `NEWS', in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
+Changes in version 10.3.6
+-------------------------
+
+   The fix applied in `isigclose()' in 10.3.5 was incomplete but is now
+(really!) fixed.  Applications that use `sample()' should call
+`wfdbquit()' to be certain that `sample''s buffer is freed before
+exiting.
+
+   Some long-standing problems in the code (in `lib/wfdbio.c') that
+handles http range requests for NETFILES-enabled versions of the
+library have been partially addressed.  The underlying issue is that
+http servers do not always return the range of bytes requested;  when
+this happens, it is not difficult to determine that there is a problem,
+but it is tricky to figure out what to do about it.  Based on
+experiments with several different http servers, the strategy for
+handling such problems within the WFDB NETFILES code has been improved
+substantially, but there may be further room for improvement.
+
+Changes in version 10.3.5
+-------------------------
+
+   Fixed a bug in WFDB library function `isigclose()' (in
+`lib/signal.c') that had caused `sample()''s buffer to be freed
+inappropriately when switching segments in a multi-segment record.
+Thanks to Dave Schaffer for the bug report and for a test case that
+illustrated the bug.
+
+   (WFDB library versions 10.3.3 and 10.3.4 were identical to 10.3.2.)
+
+Changes in version 10.3.2
+-------------------------
+
+   Fixed a WFDB library bug that caused annotation sorting to fail if a
+new header file had been written.  Thanks to Winton Baker for reporting
+this problem and for providing an example that illustrated the bug.
+
+   (WFDB library version 10.3.1 was identical to 10.3.0.)
+
 Changes in version 10.3.0
 -------------------------
 
-   Fixed bugs in `lib/sample.c' that caused improper accounting of
+   Fixed bugs in `lib/signal.c' that caused improper accounting of
 signal group numbers when reading from two or more records at the same
 time (as in `nst'), a bug that caused a segfault in `nst', and a bug
 that referenced uninitialized memory in `newheader' if `nsig' = 0.

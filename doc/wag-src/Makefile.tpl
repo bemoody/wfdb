@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:	 4 March 2003
+#				Last revised:	 9 April 2003
 # Change the settings below as appropriate for your setup.
 
 # D2PARGS is a list of options for dvips.  Uncomment one of these to set the
@@ -136,7 +136,9 @@ wag.man:
 	test -d $(MAN3) || ( mkdir -p $(MAN3); $(SETDPERMISSIONS) $(MAN3) )
 	test -d $(MAN5) || ( mkdir -p $(MAN5); $(SETDPERMISSIONS) $(MAN5) )
 	test -d $(MAN7) || ( mkdir -p $(MAN7); $(SETDPERMISSIONS) $(MAN7) )
+	mv view.1 dview.1	# avoid conflict with vi's "view"
 	./maninst.sh $(MAN1) $(MAN3) $(MAN5) $(MAN7) "$(SETPERMISSIONS)"
+	mv dview.1 view.1
 	cd $(MAN1); $(LN) a2m.1 ad2m.1
 	cd $(MAN1); $(LN) a2m.1 ahaconvert.1
 	cd $(MAN1); $(LN) a2m.1 m2a.1
@@ -149,7 +151,7 @@ wag.man:
 	cd $(MAN1); $(LN) plot2d.1 plot3d.1
 	cd $(MAN1); $(LN) pnnlist.1 pNNx.1
 	cd $(MAN1); $(LN) setwfdb.1 cshsetwfdb.1
-	cd $(MAN1); $(LN) view.1 vsetup.1
+	cd $(MAN1); $(LN) dview.1 vsetup.1
 	cd $(MAN1); $(LN) wav2mit.1 mit2wav.1
 	cd $(MAN1); $(LN) wave.1 gtkwave.1
 
