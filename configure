@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody         24 May 2000
-#                             Last revised:  21 November 2002
+#                             Last revised:  25 November 2002
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -144,9 +144,12 @@ then
 		     <conf/site.def >conf/site.tmp
 		 mv conf/site.tmp conf/site.def
 		 echo "Applications will be linked with static libraries only."
+		 SYSLIBS=static
 		 ;;
-	      *) ;;
+	      *) SYSLIBS=dynamic ;;
     esac
+else
+    SYSLIBS=dynamic
 fi
 
 echo

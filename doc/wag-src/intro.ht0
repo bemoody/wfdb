@@ -110,9 +110,11 @@ for `<TT>e0104.atr</TT>' is `<TT>atr</TT>'.  The special annotator name
 `<TT>atr</TT>' is used to name the set of <I>reference annotations</I>
 supplied by the database developers.  Other annotation sets have annotator
 names that may contain letters, digits, and underscores, as for record names.
-.IP
-Each PhysioBank database directory includes a text file named \fBANNOTATORS\fR,
-which lists the annotator names for all annotation files in that directory.
+
+<P>
+Each PhysioBank database directory includes a text file named
+<B>ANNOTATORS</B>, which lists the annotator names for all annotation files in
+that directory.
 
 <a name="time">
 <DT><I>time</I></a>

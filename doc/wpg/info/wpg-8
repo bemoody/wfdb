@@ -607,6 +607,8 @@ numbered versions of the WFDB library.
 * putinfo (4.0):                         putinfo.
 * putvec:                                putvec.
 * sampfreq:                              sampfreq.
+* sample (10.3.0):                       sample.
+* sample_valid (10.3.0):                 sample.
 * setanndesc (5.3):                      annstr and strann.
 * setannpos (6.0):                       Mapping macros.
 * setannstr (5.3):                       annstr and strann.
@@ -651,7 +653,7 @@ File: wpg,  Node: Copying,  Prev: Function and Macro Index,  Up: Top
    WFDB Programmer's Guide
 
    Tenth Edition (revised and with additions for WFDB library version
-10.3.0pre1) 7 November 2002
+10.3.0) 26 November 2002
 
    George B. Moody
 

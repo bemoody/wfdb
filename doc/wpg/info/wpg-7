@@ -6,6 +6,104 @@ START-INFO-DIR-ENTRY
 END-INFO-DIR-ENTRY
 
 
+File: wpg,  Node: Signal processing,  Next: Graphics,  Prev: Evaluation,  Up: WFDB Applications
+
+Signal Processing Applications
+==============================
+
+     rdsamp -r RECORD [ OPTIONS ... ]
+     wrsamp -r RECORD [ OPTIONS ... ]
+     snip -i INPUT-RECORD -n NEW-RECORD [ OPTIONS ... ]
+     xform -i INPUT-RECORD [ OPTIONS ... ]
+     fir [ OPTIONS ... ] -c COEFFICIENT ...
+     sigamp -r RECORD [ OPTIONS ...]
+     sqrs -r RECORD [ OPTIONS ... ]
+     sample [ OPTIONS ... ]
+     calsig -r RECORD [ OPTIONS ... ]
+
+   `rdsamp' prints samples from the specified record;  `-f' and `-t'
+options may be used to specify a range of sample numbers, and a subset
+of signal numbers may be selected using the `-s' option.  The output of
+`rdsamp', or any similar text, can be converted into a WFDB record
+using `wrsamp'.
+
+   To copy an excerpt of a longer record, use `snip', which creates new
+header and signal files for NEW-RECORD in the current directory.  The
+beginning and end of the excerpt are specified using `-f' and `-t'
+options as for `rdsamp'.  Annotator names may follow a `-a' option; in
+this case excerpts from the specified annotation files are copied as
+well (the annotations are appropriately time-shifted).
+
+   `xform' is a more general version of `snip'; its main uses are for
+reformatting, rescaling, and sampling rate conversion.  You may create a
+`hea' file specifying the desired format, sampling frequency, ADC zero
+levels, signal gains, etc., and supply it to `xform' using the `-o'
+option; if you do not do so, `xform' obtains the required information
+interactively.  `xform' accepts all of the options used by `snip', as
+well as several others.
+
+   Program `fir' is a general-purpose FIR filter for WFDB records,
+similar to the one discussed in chapter 6 (*note Example 7::).
+
+   `sigamp' measures signal amplitudes (either baseline-corrected RMS
+amplitudes or peak-to-peak amplitudes);  it may be useful for
+calibrating signals (together with `calsig') or for determining signal
+gains for `nst'.
+
+   `sqrs' is a slightly modified version of the QRS detector discussed
+in chapter 6 (*note Example 10::).  Options allow specification of the
+signal and interval to be analyzed and the detection threshold.
+
+   Program `sample' is an MS-DOS application that uses a Microstar
+Laboratories DAP 1200- or 2400-series ISA (AT bus) analog interface
+board (*note Sources::) to generate database records from analog
+signals, or to generate analog signals from database records.  If you
+wish to use other hardware for these purposes, refer to chapter 6
+(*note Example 8::) and to the source for `sample' as models.
+
+   If you create your own database records using `sample' or other
+means, program `calsig' may be useful for determining signal gains and
+offsets if your signals include standard calibration pulses or
+identifiable signal levels. `calsig' incorporates two independent
+algorithms for measuring calibration pulses; it rewrites header files
+based on its measurements.
+
+
+File: wpg,  Node: Graphics,  Prev: Signal processing,  Up: WFDB Applications
+
+Graphical Applications
+======================
+
+     wave -r RECORD [ -a ANNOTATOR ]
+     view RECORD ANNOTATOR
+     wview RECORD ANNOTATOR
+     pschart [ [ OPTIONS ... ] SCRIPT ... ]
+     psfd [ [ OPTIONS ... ] SCRIPT ... ]
+
+   `wave' is an X Window System client application for viewing and
+editing WFDB records.  (`wave' is not included in the WFDB software
+package, but is available separately; *note Sources::.)  `wave' can be
+run on Unix systems, and can be accessed remotely using networked PCs or
+other systems for which X11 servers are available.  Run `wave' without
+any arguments to obtain instructions for printing its on-line manual.
+
+   `view', included on the MIT-BIH Arrhythmia Database and European ST-T
+Database CD-ROMs, among others, is an MS-DOS application for viewing
+WFDB records on CGA, EGA, VGA, SVGA, XGA, or Hercules graphics-capable
+PCs.  See `bin.doc' in the `bin' directory of the CD-ROM for more
+information.
+
+   `wview', included on recent (1995 and later) CD-ROMs and also
+available separately (*note Sources::, is an MS-Windows application for
+viewing WFDB records.  It has most of the display capabilities of
+`wave', but lacks support for annotation editing.
+
+   `pschart' and `psfd' produce annotated "chart recordings" and
+"full-disclosure" plots that can be printed on PostScript devices.
+These programs were used to prepare the `MIT-BIH Arrhythmia Database
+Directory' and the `European ST-T Database Directory'.
+
+
 File: wpg,  Node: Extensions,  Next: Sources,  Prev: WFDB Applications,  Up: Top
 
 Extensions

@@ -6,6 +6,176 @@ START-INFO-DIR-ENTRY
 END-INFO-DIR-ENTRY
 
 
+File: wpg,  Node: Exercises,  Next: Glossary,  Prev: Examples,  Up: Top
+
+Exercises
+*********
+
+   These exercises are based on the material in the previous chapters.
+Answers to some of them are at the back of the book, but try to work
+through them first.
+
+  1. Type in the first program from the previous chapter, compile it,
+     and run it.  If you know that you will need to read WFDB files
+     from non-standard locations, remember to set and export the
+     environment variable `WFDB' (*note WFDB path::).  It is a good
+     idea to include this step in your `.profile', `.cshrc', or
+     `autoexec.bat'.  As input, try record `100s', input annotator
+     `atr', and output annotator `normal'.  The program should finish
+     in five seconds or less.  The annotations will have been written
+     into a file called `100s.nor' in the current directory.  Now type
+     "`rdann -r 100s -a atr'" and observe the output for a few seconds,
+     then try "`rdann -r 100s -a nor'" and notice the difference.
+
+  2. Modify the program from the previous exercise so that the non-QRS
+     annotations are put into a second output annotation file.
+     Remember that you will need three annotation files in all (one
+     input and two output).
+
+  3. The next five short exercises are to be worked out on paper,
+     although you may wish to check your work on the computer.  All of
+     them assume that we are given a signal sampled at 100 Hz with the
+     following specifications:
+          fname = "signal.dat"
+          desc = "BP"
+          units = "mmHg"
+          gain = 10
+          initval = 80
+          group = 0
+          fmt = 212
+          spf = 1
+          bsize = 0
+          adcres = 12
+          adczero = 0
+          baseline = -300
+          nsamp = 1000000
+          cksum = 3109
+     For starters, convert a sample value of 280 into physical units.
+
+  4. Convert 120 mmHg into adus.
+
+  5. What are the maximum and minimum possible sample values in adu?  in
+     mmHg?
+
+  6. How large is `signal.dat', in bytes?  How much space could we save
+     if we converted it to format 8 (eight-bit first-differences)?
+     What is the maximum slew rate (in mmHg/second) that we can
+     represent in that format?
+
+  7. Oops!  We have just discovered that the maximum slew rate in our
+     signal is 1500 mmHg/sec.  Is there any way to store it at full
+     precision in one of the supported formats, that saves space
+     compared to its present format?
+
+  8. Figure out how to plot or display the first 1000 points from
+     signal 0 of a record in amplitude vs. time format.  You may wish
+     to begin with the example program from the first chapter.  Arrange
+     for the record name to be read from the command line (see `K&R',
+     pp. 114-115, if you don't know how to do this).
+
+  9. Try plotting VCGs by modifying the program from the previous
+     exercise to plot pairs of samples from each of two signals rather
+     than sample number/value pairs.
+
+ 10. Modify the program from the previous exercise, or Example 2 from
+     the previous chapter, so that you can specify a segment of the
+     record to be processed with start and end times.  For example, the
+     command
+          YOUR-PROGRAM RECORD 10:0 10:10
+     should skip the first ten minutes, then process the next ten
+     seconds of signals from RECORD.
+
+ 11. Wesley Q. Phortran, IV, wrote this program to print beat times (in
+     minutes and seconds) and R-R intervals for the reference
+     annotation file of record `100'.  Why doesn't it work?
+           1  #include <wfdb/wfdb.h>
+           2
+           3  main()
+           4  {
+           5      WFDB_Annotation *annot;
+           6      WFDB_Anninfo ai;
+           7      int t;
+           8
+           9      ai.name = "atr";
+          10      ai.stat = WFDB_READ;
+          11      if (annopen(100, ai, 1)) {
+          12          while (getann(1, annot)) {
+          13              printf("%s\t(%d)\t%s\n", timstr(annot.time),
+          14                     annot.time, mstimstr(annot.time - t));
+          15              t = annot.time;
+          16          }
+          17      }
+          18  }
+     Extra credit: Without actually trying it out, what _does_ it
+     produce on the standard output?
+
+ 12. Using `isigsettime' on a format 8 signal introduces a random offset
+     into the signal, since the contents of a format 8 signal file are
+     first differences rather than amplitudes.  For an AC-coupled
+     signal such as an ECG, this is usually inconsequential, but a
+     DC-coupled signal such as a blood pressure signal is usually
+     useful only if absolute levels are known.  If we store such a
+     signal in format 8, we must read it sequentially from the
+     beginning in order to get correct sample values.  If we intend to
+     do a lot of non-sequential processing of such a signal, it may be
+     worthwhile to build a table containing the correct sample values
+     at periodic intervals; then we can use `isigsettime' to skip to a
+     sample in the table, and read forward sequentially from that
+     point.  Write a program to build such a table, and wrappers for
+     `isigsettime' and `getvec' to give random access to format 8
+     signal files without introducing offset errors.  On your system,
+     how many sample intervals should be allowed between table entries
+     in order to obtain an `isigsettime' equivalent that executes in an
+     average of 100 msec or less?
+
+ 13. This exercise assumes that you have access to the MIT-BIH
+     Arrhythmia Database, either on a CD-ROM or via PhysioNet.  Since
+     the 360 Hz sampling frequency used in that database is an integer
+     multiple of 60 Hz, it is quite easy to design a 60 Hz notch filter
+     that can be applied to the database.  Write a program that filters
+     two input signals and writes out the filtered data using `putvec'
+     (*note Example 7::, for a model program).  Try it out on MIT-BIH
+     record `122' (or use record `mitdb/x_mitdb/x_122' from PhysioNet).
+     Use your programs from the previous exercises to display your
+     output.
+
+ 14. If you used Example 7 as a model in the previous exercise, you may
+     have noticed that it is quite slow.  Make it faster by arranging
+     for `sample' to return a pointer to a vector of samples from all
+     signals (thereby reducing the number of function calls).  Speed it
+     up further by defining a macro that calls the function only if the
+     proper sample vector is not already in the circular buffer;
+     otherwise the macro should evaluate to a pointer to the correct
+     sample vector.
+
+ 15. Prof. Nottin Ventedhier says, "Real programmers don't use
+     inefficient library I/O routines -- they write their own, in
+     assembly language."  Implement a version of the QRS detector in
+     Example 10 _without_ using the WFDB library.  (To keep it simple,
+     assume that only one input format -- of your choice -- needs to be
+     supported.)  How much faster than the original is your version?
+
+ 16. (Non-trivial) Write a QRS detector that is independent of sampling
+     frequency.  Some useful constants (for adult human ECGs): average
+     normal QRS duration = 80 milliseconds, average QRS amplitude = 1
+     millivolt, average R-R interval = 1 second; assume that upper and
+     lower limits for these quantities are within a factor of 3 of the
+     average values.  Run your detector on MIT-BIH Arrhythmia Database
+     record `200'.  (This record is available on PhysioNet.  If you
+     have a NETFILES-enabled WFDB library, use the default WFDB path,
+     and open record `mitdb/200'; otherwise, download the record from
+     `http://www.physionet.org/physiobank/database/mitdb/'.)  Read the
+     documentation on the annotation comparator, `bxb', and figure out
+     how to use it to compare the annotation file produced by your
+     program against the reference annotator `atr'.  How does your
+     detector compare to Example 10?
+
+ 17. If the previous exercise was too easy, modify your detector so
+     that the annotations it generates match those in the `atr' file.
+     Copying the `atr' file is not permitted.  You may find this rather
+     difficult.  Good luck!
+
+
 File: wpg,  Node: Glossary,  Next: Installation,  Prev: Exercises,  Up: Top
 
 Glossary
@@ -481,6 +651,8 @@ Applications::), TeX source for this manual, `troff' source for Unix
 			Software Package.
 * Unix installation::	Installing the WFDB Software Package on Unix,
 			GNU/Linux, and similar systems.
+* MacOS/X installation::	Installing the WFDB Software Package under
+				MacOS/X (Darwin).
 * MS-Windows installation::	Installing the WFDB Software Package on
                                 MS-Windows PCs.
 * Other installation::	Installing the WFDB Software Package on other systems.
@@ -499,7 +671,7 @@ well as quick-start guides including installation notes for popular
 operating systems, are also usually available there.
 
 
-File: wpg,  Node: Unix installation,  Next: MS-Windows installation,  Prev: Distribution,  Up: Installation
+File: wpg,  Node: Unix installation,  Next: MacOS/X installation,  Prev: Distribution,  Up: Installation
 
 Unix, GNU/Linux, and similar operating systems
 ==============================================
@@ -554,7 +726,34 @@ instructions given by `configure' for setting your `PATH' and
 will generally require between 1 and 10 minutes.
 
 
-File: wpg,  Node: MS-Windows installation,  Next: Other installation,  Prev: Unix installation,  Up: Installation
+File: wpg,  Node: MacOS/X installation,  Next: MS-Windows installation,  Prev: Unix installation,  Up: Installation
+
+Mac OS/X (Darwin)
+=================
+
+   The WFDB Software Package has been successfully compiled under Mac
+OS/X 10.2 (Darwin 6.0.1).  It should also work under 10.1, but this has
+not been tested.
+
+   Before compiling the WFDB Software Package, download and install:
+
+   * Mac OS/X Developer Tools (from
+     `http://developer.apple.com/macosx/')
+
+   * XDarwin (from Fink, `http://fink.sourceforge.net/'; sources from
+     `http://www.xdarwin.org/')
+
+   Now follow the instructions in the previous section for Unix or
+GNU/Linux.
+
+   At this time, an incomplete port of XView to Darwin is available from
+the GNU-Darwin project (`http://gnu-darwin.sourceforge.net/').  You may
+wish to see if a complete XView port is available;  if so, it should be
+possible to compile WAVE under Mac OS/X as part of the installation of
+the WFDB Software Package.
+
+
+File: wpg,  Node: MS-Windows installation,  Next: Other installation,  Prev: MacOS/X installation,  Up: Installation
 
 MS-Windows
 ==========
@@ -864,102 +1063,4 @@ used to generate the graded series of noisy ECG records in the `nstdb'
 directory of the MIT-BIH Arrhythmia Database CD-ROM.  These records are
 among those specified as standard test material by EC38 (section
 4.2.14.2) and EC57 (section 3.2).
-
-
-File: wpg,  Node: Signal processing,  Next: Graphics,  Prev: Evaluation,  Up: WFDB Applications
-
-Signal Processing Applications
-==============================
-
-     rdsamp -r RECORD [ OPTIONS ... ]
-     wrsamp -r RECORD [ OPTIONS ... ]
-     snip -i INPUT-RECORD -n NEW-RECORD [ OPTIONS ... ]
-     xform -i INPUT-RECORD [ OPTIONS ... ]
-     fir [ OPTIONS ... ] -c COEFFICIENT ...
-     sigamp -r RECORD [ OPTIONS ...]
-     sqrs -r RECORD [ OPTIONS ... ]
-     sample [ OPTIONS ... ]
-     calsig -r RECORD [ OPTIONS ... ]
-
-   `rdsamp' prints samples from the specified record;  `-f' and `-t'
-options may be used to specify a range of sample numbers, and a subset
-of signal numbers may be selected using the `-s' option.  The output of
-`rdsamp', or any similar text, can be converted into a WFDB record
-using `wrsamp'.
-
-   To copy an excerpt of a longer record, use `snip', which creates new
-header and signal files for NEW-RECORD in the current directory.  The
-beginning and end of the excerpt are specified using `-f' and `-t'
-options as for `rdsamp'.  Annotator names may follow a `-a' option; in
-this case excerpts from the specified annotation files are copied as
-well (the annotations are appropriately time-shifted).
-
-   `xform' is a more general version of `snip'; its main uses are for
-reformatting, rescaling, and sampling rate conversion.  You may create a
-`hea' file specifying the desired format, sampling frequency, ADC zero
-levels, signal gains, etc., and supply it to `xform' using the `-o'
-option; if you do not do so, `xform' obtains the required information
-interactively.  `xform' accepts all of the options used by `snip', as
-well as several others.
-
-   Program `fir' is a general-purpose FIR filter for WFDB records,
-similar to the one discussed in chapter 6 (*note Example 7::).
-
-   `sigamp' measures signal amplitudes (either baseline-corrected RMS
-amplitudes or peak-to-peak amplitudes);  it may be useful for
-calibrating signals (together with `calsig') or for determining signal
-gains for `nst'.
-
-   `sqrs' is a slightly modified version of the QRS detector discussed
-in chapter 6 (*note Example 10::).  Options allow specification of the
-signal and interval to be analyzed and the detection threshold.
-
-   Program `sample' is an MS-DOS application that uses a Microstar
-Laboratories DAP 1200- or 2400-series ISA (AT bus) analog interface
-board (*note Sources::) to generate database records from analog
-signals, or to generate analog signals from database records.  If you
-wish to use other hardware for these purposes, refer to chapter 6
-(*note Example 8::) and to the source for `sample' as models.
-
-   If you create your own database records using `sample' or other
-means, program `calsig' may be useful for determining signal gains and
-offsets if your signals include standard calibration pulses or
-identifiable signal levels. `calsig' incorporates two independent
-algorithms for measuring calibration pulses; it rewrites header files
-based on its measurements.
-
-
-File: wpg,  Node: Graphics,  Prev: Signal processing,  Up: WFDB Applications
-
-Graphical Applications
-======================
-
-     wave -r RECORD [ -a ANNOTATOR ]
-     view RECORD ANNOTATOR
-     wview RECORD ANNOTATOR
-     pschart [ [ OPTIONS ... ] SCRIPT ... ]
-     psfd [ [ OPTIONS ... ] SCRIPT ... ]
-
-   `wave' is an X Window System client application for viewing and
-editing WFDB records.  (`wave' is not included in the WFDB software
-package, but is available separately; *note Sources::.)  `wave' can be
-run on Unix systems, and can be accessed remotely using networked PCs or
-other systems for which X11 servers are available.  Run `wave' without
-any arguments to obtain instructions for printing its on-line manual.
-
-   `view', included on the MIT-BIH Arrhythmia Database and European ST-T
-Database CD-ROMs, among others, is an MS-DOS application for viewing
-WFDB records on CGA, EGA, VGA, SVGA, XGA, or Hercules graphics-capable
-PCs.  See `bin.doc' in the `bin' directory of the CD-ROM for more
-information.
-
-   `wview', included on recent (1995 and later) CD-ROMs and also
-available separately (*note Sources::, is an MS-Windows application for
-viewing WFDB records.  It has most of the display capabilities of
-`wave', but lacks support for annotation editing.
-
-   `pschart' and `psfd' produce annotated "chart recordings" and
-"full-disclosure" plots that can be printed on PostScript devices.
-These programs were used to prepare the `MIT-BIH Arrhythmia Database
-Directory' and the `European ST-T Database Directory'.
 

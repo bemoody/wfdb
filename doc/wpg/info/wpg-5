@@ -6,6 +6,238 @@ START-INFO-DIR-ENTRY
 END-INFO-DIR-ENTRY
 
 
+File: wpg,  Node: Example 1,  Next: Example 2,  Prev: Examples,  Up: Examples
+
+Example 1:  An Annotation Filter
+================================
+
+   The following program copies an annotation file, changing all QRS
+annotations to `NORMAL' and deleting all non-QRS annotations.
+
+      1  #include <stdio.h>
+      2  #include <wfdb/wfdb.h>
+      3  #include <wfdb/ecgmap.h>
+      4
+      5  main()
+      6  {
+      7      WFDB_Anninfo an[2];
+      8      char record[8], iann[10], oann[10];
+      9      WFDB_Annotation annot;
+     10
+     11      printf("Type record name: ");
+     12      fgets(record, 8, stdin); record[strlen(record)-1] = '\0';
+     13      printf("Type input annotator name: ");
+     14      fgets(iann, 10, stdin); iann[strlen(iann)-1] = '\0';
+     15      printf("Type output annotator name: ");
+     16      fgets(oann, 10, stdin); oann[strlen(oann)-1] = '\0';
+     17      an[0].name = iann; an[0].stat = WFDB_READ;
+     18      an[1].name = oann; an[1].stat = WFDB_WRITE;
+     19      if (annopen(record, an, 2) < 0) exit(1);
+     20      while (getann(0, &annot) == 0)
+     21          if (isqrs(annot.anntyp)) {
+     22              annot.anntyp = NORMAL;
+     23              if (putann(0, &annot) < 0) break;
+     24          }
+     25      wfdbquit();
+     26  }
+
+(See `http://www.physionet.org/physiotools/wfdb/examples/example1.c'
+for a copy of this program.)
+
+*Notes:*
+
+_Line 2:_
+     All programs that use the WFDB library must include
+     `<wfdb/wfdb.h>'.
+
+_Line 3:_
+     The `#include' statement makes available not only the mapping
+     macros, one of which will be used in line 21, but also the
+     annotation code symbols in `<wfdb/ecgcodes.h>', one of which will
+     be needed in line 22.
+
+_Line 7:_
+     Since there will be two annotators (one each for input and output),
+     the array of `WFDB_Anninfo' objects has two members.
+
+_Line 9:_
+     This structure will be filled in by `getann', modified, and passed
+     to `putann' for output.
+
+_Lines 11-16:_
+     The record name and the annotator names are filled into the
+     character arrays.  The code in lines 12, 14, and 16 illustrates a
+     C idiom for reading a string of limited length; the second
+     statement in each of these lines replaces the trailing newline
+     character (which `fgets' copies into the string) with a null.
+     String arguments to WFDB library functions should not include
+     newline characters.
+
+_Lines 17-18:_
+     Pointers to the character arrays (strings) containing the annotator
+     names are filled into the `name' fields of the array of
+     `WFDB_Anninfo' objects. Note that the `name' fields are only
+     pointers and do not contain storage for the strings themselves.
+     If this is not clear to you, review the discussion of pointers and
+     arrays in `K&R', pp.  97-100.  The input annotator is to be read,
+     the output annotator is to be written.  `WFDB_READ' and
+     `WFDB_WRITE' are defined in `<wfdb/wfdb.h>'.
+
+_Line 19:_
+     Note that the first and second arguments of `annopen' are the
+     names of the respective arrays; thus `annopen' receives pointers
+     rather than values in its argument list.
+
+_Line 20:_
+     An annotation is read from annotator 0 into `annot'.  The `&' is
+     necessary since `getann' requires a pointer to the structure in
+     order to be able to modify its contents.  When `getann' returns a
+     negative value, no more annotations remain to be read and the loop
+     ends.
+
+_Line 21:_
+     The macro `isqrs' is defined in `<wfdb/ecgmap.h>'; `isqrs(X)' is
+     true if X is an annotation code that denotes a QRS complex, false
+     if X is not a QRS annotation code.
+
+_Line 22:_
+     `NORMAL' is defined in `<wfdb/ecgcodes.h>'.
+
+_Line 23:_
+     The call to `putann' now writes the modified annotation in the
+     output annotator 0 file.  As for `getann', a pointer to `annot'
+     must be passed using the `&' operator.
+
+_Line 25:_
+     All files are closed prior to exiting.  This is mandatory since the
+     program creates an output file with `putann'.
+
+
+File: wpg,  Node: Example 2,  Next: Example 3,  Prev: Example 1,  Up: Examples
+
+Example 2: An Annotation Translator
+===================================
+
+   This program translates the `atr' annotations for the record named
+in its argument into an AHA-format annotation file with the annotator
+name `aha'.
+
+      1  #include <stdio.h>
+      2  #include <wfdb/wfdb.h>
+      3
+      4  main(argc, argv)
+      5  int argc;
+      6  char *argv[];
+      7  {
+      8      WFDB_Anninfo an[2];
+      9      WFDB_Annotation annot;
+     10
+     11      if (argc < 2) {
+     12          fprintf(stderr, "usage: %s record\n", argv[0]);
+     13          exit(1);
+     14      }
+     15      an[0].name = "atr"; an[0].stat = WFDB_READ;
+     16      an[1].name = "aha"; an[1].stat = WFDB_AHA_WRITE;
+     17      if (annopen(argv[1], an, 2) < 0) exit(2);
+     18      while (getann(0, &annot) == 0 && putann(0, &annot) == 0)
+     19          ;
+     20      wfdbquit();
+     21      exit(0);
+     22  }
+
+(See `http://www.physionet.org/physiotools/wfdb/examples/example2.c'
+for a copy of this program.)
+
+*Notes:*
+
+_Lines 4-6:_
+     If this doesn't look familiar, see `K&R', pp. 114-115.
+
+_Lines 11-14:_
+     This is the standard idiom for producing those cryptic error
+     messages for which Unix programs are notorious; `argv[0]' is the
+     name by which the program was invoked.
+
+_Lines 15-16:_
+     These lines set up the annotator information.  Input annotator 0
+     is the `atr' annotation file, and output annotator 0 will be
+     written in AHA format.
+
+_Line 17:_
+     If we can't read the input or write the output, quit with an error
+     message from `annopen'.
+
+_Line 18:_
+     Here's where the work is done.  The format translation is handled
+     entirely by `getann' and `putann'.  The loop ends normally when
+     `getann' reaches the end of the input file, or prematurely if
+     there is a read or write error.
+
+_Line 21:_
+     Since we have carefully defined non-zero exit codes for the various
+     errors that this program might encounter, we also define this
+     successful exit here.  If this program is run as part of a Unix
+     shell script, the exit codes are accessible to the shell, which
+     can determine what to do next as a result.  If this line were
+     omitted (as in example 1), the exit code would be undefined.
+
+
+File: wpg,  Node: Example 3,  Next: Example 4,  Prev: Example 2,  Up: Examples
+
+Example 3: An Annotation Printer
+================================
+
+   This program prints annotations in readable form.  Its first
+argument is an annotator name, and its second argument is a record name.
+
+      1  #include <stdio.h>
+      2  #include <wfdb/wfdb.h>
+      3
+      4  main(argc, argv)
+      5  int argc;
+      6  char *argv[];
+      7  {
+      8      WFDB_Anninfo a;
+      9      WFDB_Annotation annot;
+     10
+     11      if (argc < 3) {
+     12          fprintf(stderr, "usage: %s annotator record\n", argv[0]);
+     13          exit(1);
+     14      }
+     15      a.name = argv[1]; a.stat = WFDB_READ;
+     16      (void)sampfreq(argv[2]);
+     17      if (annopen(argv[2], &a, 1) < 0) exit(2);
+     18      while (getann(0, &annot) == 0)
+     19          printf("%s (%ld) %s %d %d %d %s\n",
+     20                 timstr(-(annot.time)),
+     21                 annot.time,
+     22                 annstr(annot.anntyp),
+     23                 annot.subtyp, annot.chan, annot.num,
+     24                 (annot.aux != NULL && *annot.aux > 0) ?
+     25                  annot.aux+1 : "");
+     26      exit(0);
+     27  }
+
+(See `http://www.physionet.org/physiotools/wfdb/examples/example3.c'
+for a copy of this program.)
+
+*Notes:*
+_Line 16:_
+     The invocation of `sampfreq' here sets the internal variables
+     needed by `timstr' below.
+
+_Line 20:_
+     This line gives the annotation time as a time of day.  If the base
+     time is omitted in the header file, or if we used
+     `timstr(annot.time)' instead, we would obtain the elapsed time from
+     the beginning of the record.
+
+_Lines 24-25:_
+     This expression evaluates to an empty string unless the `aux'
+     string is non-empty.  It makes the assumption that `aux' is a
+     printable ASCII string; the printable part follows the length byte.
+
+
 File: wpg,  Node: Example 4,  Next: Example 5,  Prev: Example 3,  Up: Examples
 
 Example 4: Generating an R-R Interval Histogram
@@ -285,14 +517,13 @@ File: wpg,  Node: Example 7,  Next: Example 8,  Prev: Example 6,  Up: Examples
 Example 7:  A General-Purpose FIR Filter
 ========================================
 
-   This program illustrates a useful technique for obtaining something
-close to random access to signals, a technique that is particularly
-useful for implementing digital filters.  The first argument is the
-record name, the second and third arguments are the start time and the
-duration of the segment to be filtered, and the rest of the arguments
-are finite-impulse-response (FIR) filter coefficients.  For example, if
-this program were compiled into an executable program called `filter',
-it might be used by
+   This program illustrates the use of `sample' to obtain random access
+to signals, a technique that is particularly useful for implementing
+digital filters.  The first argument is the record name, the second and
+third arguments are the start time and the duration of the segment to
+be filtered, and the rest of the arguments are finite-impulse-response
+(FIR) filter coefficients.  For example, if this program were compiled
+into an executable program called `filter', it might be used by
      filter 100 5:0 20 .2 .2 .2 .2 .2
 
 which would apply a five-point moving average (rectangular window)
@@ -302,149 +533,118 @@ which a header file is created in the current directory.
 
       1  #include <stdio.h>
       2  #include <wfdb/wfdb.h>
-      3  #define BUFLN 512
-      4  int nsig, sample_ok = 1;
-      5  WFDB_Sample *sbuf;
-      6
-      7  sample(s, t)
-      8  int s;
-      9  long t;
-     10  {
-     11      static long tt = -1L;
-     12
-     13      if (t <= tt - BUFLN)
-     14          fprintf(stderr, "sample: buffer too short\n");
-     15      while (t > tt)
-     16          if (getvec(sbuf + nsig * ((++tt)&(BUFLN-1))) < 0)
-     17              sample_ok = 0;
-     18      return (*(sbuf + nsig * (t&(BUFLN-1)) + s));
-     19  }
-     20
-     21  main(argc, argv)
-     22  int argc;
-     23  char *argv[];
-     24  {
-     25      double *c, one = 1.0, vv, atof();
-     26      int i, j, nc = argc - 4;
-     27      long nsamp, t;
-     28      static WFDB_Sample *v;
-     29      static WFDB_Siginfo *s;
-     30
-     31      if (argc < 4) {
-     32          fprintf(stderr,
-     33            "usage: %s record start duration [ coefficients ... ]\n",
-     34                  argv[0]);
-     35          exit(1);
+      3
+      4  main(argc, argv)
+      5  int argc;
+      6  char *argv[];
+      7  {
+      8      double *c, one = 1.0, vv, atof();
+      9      int i, j, nc = argc - 4, nsig;
+     10      long nsamp, t;
+     11      static WFDB_Sample *v;
+     12      static WFDB_Siginfo *s;
+     13
+     14      if (argc < 4) {
+     15          fprintf(stderr,
+     16            "usage: %s record start duration [ coefficients ... ]\n",
+     17                  argv[0]);
+     18          exit(1);
+     19      }
+     20      if (nc < 1) {
+     21          nc = 1; c = &one;
+     22      }
+     23      else if ((c = (double *)calloc(nc, sizeof(double))) == NULL) {
+     24          fprintf(stderr, "%s: too many coefficients\n", argv[0]);
+     25          exit(2);
+     26      }
+     27      for (i = 0; i < nc; i++)
+     28          c[i] = atof(argv[i+4]);
+     29      if ((nsig = isigopen(argv[1], NULL, 0)) < 1)
+     30          exit(3);
+     31      s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+     32      v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
+     33      if (s == NULL || v == NULL) {
+     34          fprintf(stderr, "insufficient memory\n");
+     35          exit(3);
      36      }
-     37      if (nc < 1) {
-     38          nc = 1; c = &one;
-     39      }
-     40      else if (nc >= BUFLN ||
-     41               (c = (double *)calloc(nc, sizeof(double))) == NULL) {
-     42          fprintf(stderr, "%s: too many coefficients\n", argv[0]);
-     43          exit(2);
-     44      }
-     45      for (i = 0; i < nc; i++)
-     46          c[i] = atof(argv[i+4]);
-     47      if ((nsig = isigopen(argv[1], NULL, 0)) < 1)
-     48          exit(3);
-     49      s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
-     50      v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
-     51      sbuf = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample)*BUFLN);
-     52      if (s == NULL || v == NULL || sbuf == NULL) {
-     53          fprintf(stderr, "insufficient memory\n");
-     54          exit(3);
-     55      }
-     56      if (isigopen(argv[1], s, nsig) != nsig)
-     57          exit(3);
-     58      if (isigsettime(strtim(argv[2])) < 0)
-     59          exit(4);
-     60      if ((nsamp = strtim(argv[3])) < 1) {
-     61          fprintf(stderr, "%s: inappropriate value for duration\n",
-     62                  argv[0]);
-     63          exit(5);
-     64      }
-     65      if (osigopen("16l", s, nsig) != nsig)
-     66          exit(6);
-     67
-     68      for (t = 0; t < nsamp && sample_ok; t++) {
-     69          for (j = 0; j < nsig; j++) {
-     70              for (i = 0, vv = 0.; i < nc; i++)
-     71                  if (c[i] != 0.) vv += c[i]*sample(j, t+i);
-     72              v[j] = (int)vv;
-     73          }
-     74          if (putvec(v) < 0) break;
-     75      }
-     76
-     77      (void)newheader("out");
-     78      wfdbquit();
-     79      exit(0);
-     80  }
+     37      if (isigopen(argv[1], s, nsig) != nsig)
+     38          exit(3);
+     39      if (isigsettime(strtim(argv[2])) < 0)
+     40          exit(4);
+     41      if ((nsamp = strtim(argv[3])) < 1) {
+     42          fprintf(stderr, "%s: inappropriate value for duration\n",
+     43                  argv[0]);
+     44          exit(5);
+     45      }
+     46      if (osigopen("16l", s, nsig) != nsig)
+     47          exit(6);
+     48
+     49      (void)sample(0, 0L);
+     50      for (t = 0; t < nsamp && sample_valid(); t++) {
+     51          for (j = 0; j < nsig; j++) {
+     52              for (i = 0, vv = 0.; i < nc; i++)
+     53                  if (c[i] != 0.) vv += c[i]*sample(j, t+i);
+     54              v[j] = (int)vv;
+     55          }
+     56          if (putvec(v) < 0) break;
+     57      }
+     58
+     59      (void)newheader("out");
+     60      wfdbquit();
+     61      exit(0);
+     62  }
 
 (See `http://www.physionet.org/physiotools/wfdb/examples/example7.c'
 for a copy of this program.)
 
 *Notes:*
 
-_Line 3:_
-     `BUFLN' must be a power of 2 (why? see lines 16 and 18), and it
-     should be larger than the length of the filter (i.e., the caller
-     should not look back further than `BUFLN-1' samples into the past,
-     relative to the most recent sample that has been read).
-
-_Lines 7-19:_
-     This function supplies input samples to the `main' routine as
-     needed, and frees the `main' routine of the need to read them in
-     strict time order.  The `sample' function returns the sample from
-     signal `s' with adjusted sample number `t' (i.e., relative to the
-     beginning of the segment to be processed), either by retrieving it
-     from a circular buffer of samples recently read, or by reading it
-     using `getvec'.  The ugly-looking `getvec' argument is simply the
-     next slot in the circular buffer; note that `tt' is an internal
-     "clock" for `sample', which records the adjusted sample number of
-     the most recently read sample.  In this program, the test in line
-     13 is redundant (why?)  and might be removed for efficiency's sake.
-
-_Lines 37-39:_
+_Lines 20-22:_
      If no coefficients are provided on the command line, the program
      will simply copy the selected segment of the input signals.
 
-_Lines 40-46:_
+_Lines 23-28:_
      If there are more coefficients than there are samples in the
      circular buffer, or if memory cannot be allocated for the
      coefficient vector, the program cannot work properly, so it exits
-     with an error message.  In lines 45 and 46, the ASCII strings that
+     with an error message.  In lines 27 and 28, the ASCII strings that
      represent the coefficients are converted to `double' format and
      stored in the coefficient vector.
 
-_Lines 47-59:_
+_Lines 29-40:_
      The record name is `argv[1]', and the start time is `argv[2]'; if
      the record can't be opened, or the start time is inappropriate, the
      program exits.  See the previous example for details on how
      `isigopen' is used.
 
-_Lines 60-64:_
+_Lines 41-45:_
      The DURATION argument should be a time interval in HH:MM:SS
      format; `strtim' converts it to the appropriate number of samples.
 
-_Lines 65-66:_
+_Lines 46-47:_
      The output signals will be written to files in the current
      directory according to the specifications for record `16l' (*note
      Piped and Local Records::).  If we can't write as many output
      signals as there are input signals, the program exits.
 
-_Lines 68-75:_
+_Line 49:_
+     Here, `signal' is invoked only for its side effect;  assuming that
+     any samples can be read from the specified record, `sample(0, 0L)'
+     returns a valid sample, so that the value returned by
+     `sample_valid()' is true (1).
+
+_Lines 50-57:_
      Here's where the work is done.  The outer loop is executed once per
      sample vector, the middle loop once per signal, and the inner loop
-     once per coefficient.  In line 71, we retrieve an input sample,
+     once per coefficient.  In line 53, we retrieve an input sample,
      multiply it by a filter coefficient, and add it to a running sum.
-     The sum (`vv') is initialized to zero in line 70 before we begin,
-     and is converted to an `int' in line 72 when we are finished.  Once
+     The sum (`vv') is initialized to zero in line 52 before we begin,
+     and is converted to an `int' in line 54 when we are finished.  Once
      an entire sample vector has been filtered, it is written out in
-     line 74.  The entire process is repeated up to `nsamp' times, or
+     line 56.  The entire process is repeated up to `nsamp' times, or
      until we run out of input samples.
 
-_Line 77:_
+_Line 59:_
      The program creates a header file for record `out', using the
      signal specifications from record `16l' and the sampling frequency
      from the input record.
@@ -965,174 +1165,4 @@ _Lines 62-85:_
 _Lines 86-88:_
      At the end of the loop, the samples are shifted through the `tN'
      variables and another sample is read.
-
-
-File: wpg,  Node: Exercises,  Next: Glossary,  Prev: Examples,  Up: Top
-
-Exercises
-*********
-
-   These exercises are based on the material in the previous chapters.
-Answers to some of them are at the back of the book, but try to work
-through them first.
-
-  1. Type in the first program from the previous chapter, compile it,
-     and run it.  If you know that you will need to read WFDB files
-     from non-standard locations, remember to set and export the
-     environment variable `WFDB' (*note WFDB path::).  It is a good
-     idea to include this step in your `.profile', `.cshrc', or
-     `autoexec.bat'.  As input, try record `100s', input annotator
-     `atr', and output annotator `normal'.  The program should finish
-     in five seconds or less.  The annotations will have been written
-     into a file called `100s.nor' in the current directory.  Now type
-     "`rdann -r 100s -a atr'" and observe the output for a few seconds,
-     then try "`rdann -r 100s -a nor'" and notice the difference.
-
-  2. Modify the program from the previous exercise so that the non-QRS
-     annotations are put into a second output annotation file.
-     Remember that you will need three annotation files in all (one
-     input and two output).
-
-  3. The next five short exercises are to be worked out on paper,
-     although you may wish to check your work on the computer.  All of
-     them assume that we are given a signal sampled at 100 Hz with the
-     following specifications:
-          fname = "signal.dat"
-          desc = "BP"
-          units = "mmHg"
-          gain = 10
-          initval = 80
-          group = 0
-          fmt = 212
-          spf = 1
-          bsize = 0
-          adcres = 12
-          adczero = 0
-          baseline = -300
-          nsamp = 1000000
-          cksum = 3109
-     For starters, convert a sample value of 280 into physical units.
-
-  4. Convert 120 mmHg into adus.
-
-  5. What are the maximum and minimum possible sample values in adu?  in
-     mmHg?
-
-  6. How large is `signal.dat', in bytes?  How much space could we save
-     if we converted it to format 8 (eight-bit first-differences)?
-     What is the maximum slew rate (in mmHg/second) that we can
-     represent in that format?
-
-  7. Oops!  We have just discovered that the maximum slew rate in our
-     signal is 1500 mmHg/sec.  Is there any way to store it at full
-     precision in one of the supported formats, that saves space
-     compared to its present format?
-
-  8. Figure out how to plot or display the first 1000 points from
-     signal 0 of a record in amplitude vs. time format.  You may wish
-     to begin with the example program from the first chapter.  Arrange
-     for the record name to be read from the command line (see `K&R',
-     pp. 114-115, if you don't know how to do this).
-
-  9. Try plotting VCGs by modifying the program from the previous
-     exercise to plot pairs of samples from each of two signals rather
-     than sample number/value pairs.
-
- 10. Modify the program from the previous exercise, or Example 2 from
-     the previous chapter, so that you can specify a segment of the
-     record to be processed with start and end times.  For example, the
-     command
-          YOUR-PROGRAM RECORD 10:0 10:10
-     should skip the first ten minutes, then process the next ten
-     seconds of signals from RECORD.
-
- 11. Wesley Q. Phortran, IV, wrote this program to print beat times (in
-     minutes and seconds) and R-R intervals for the reference
-     annotation file of record `100'.  Why doesn't it work?
-           1  #include <wfdb/wfdb.h>
-           2
-           3  main()
-           4  {
-           5      WFDB_Annotation *annot;
-           6      WFDB_Anninfo ai;
-           7      int t;
-           8
-           9      ai.name = "atr";
-          10      ai.stat = WFDB_READ;
-          11      if (annopen(100, ai, 1)) {
-          12          while (getann(1, annot)) {
-          13              printf("%s\t(%d)\t%s\n", timstr(annot.time),
-          14                     annot.time, mstimstr(annot.time - t));
-          15              t = annot.time;
-          16          }
-          17      }
-          18  }
-     Extra credit: Without actually trying it out, what _does_ it
-     produce on the standard output?
-
- 12. Using `isigsettime' on a format 8 signal introduces a random offset
-     into the signal, since the contents of a format 8 signal file are
-     first differences rather than amplitudes.  For an AC-coupled
-     signal such as an ECG, this is usually inconsequential, but a
-     DC-coupled signal such as a blood pressure signal is usually
-     useful only if absolute levels are known.  If we store such a
-     signal in format 8, we must read it sequentially from the
-     beginning in order to get correct sample values.  If we intend to
-     do a lot of non-sequential processing of such a signal, it may be
-     worthwhile to build a table containing the correct sample values
-     at periodic intervals; then we can use `isigsettime' to skip to a
-     sample in the table, and read forward sequentially from that
-     point.  Write a program to build such a table, and wrappers for
-     `isigsettime' and `getvec' to give random access to format 8
-     signal files without introducing offset errors.  On your system,
-     how many sample intervals should be allowed between table entries
-     in order to obtain an `isigsettime' equivalent that executes in an
-     average of 100 msec or less?
-
- 13. This exercise assumes that you have access to the MIT-BIH
-     Arrhythmia Database, either on a CD-ROM or via PhysioNet.  Since
-     the 360 Hz sampling frequency used in that database is an integer
-     multiple of 60 Hz, it is quite easy to design a 60 Hz notch filter
-     that can be applied to the database.  Write a program that filters
-     two input signals and writes out the filtered data using `putvec'
-     (*note Example 7::, for a model program).  Try it out on MIT-BIH
-     record `122' (or use record `mitdb/x_mitdb/x_122' from PhysioNet).
-     Use your programs from the previous exercises to display your
-     output.
-
- 14. If you used Example 7 as a model in the previous exercise, you may
-     have noticed that it is quite slow.  Make it faster by arranging
-     for `sample' to return a pointer to a vector of samples from all
-     signals (thereby reducing the number of function calls).  Speed it
-     up further by defining a macro that calls the function only if the
-     proper sample vector is not already in the circular buffer;
-     otherwise the macro should evaluate to a pointer to the correct
-     sample vector.
-
- 15. Prof. Nottin Ventedhier says, "Real programmers don't use
-     inefficient library I/O routines -- they write their own, in
-     assembly language."  Implement a version of the QRS detector in
-     Example 10 _without_ using the WFDB library.  (To keep it simple,
-     assume that only one input format -- of your choice -- needs to be
-     supported.)  How much faster than the original is your version?
-
- 16. (Non-trivial) Write a QRS detector that is independent of sampling
-     frequency.  Some useful constants (for adult human ECGs): average
-     normal QRS duration = 80 milliseconds, average QRS amplitude = 1
-     millivolt, average R-R interval = 1 second; assume that upper and
-     lower limits for these quantities are within a factor of 3 of the
-     average values.  Run your detector on MIT-BIH Arrhythmia Database
-     record `200'.  (This record is available on PhysioNet.  If you
-     have a NETFILES-enabled WFDB library, use the default WFDB path,
-     and open record `mitdb/200'; otherwise, download the record from
-     `http://www.physionet.org/physiobank/database/mitdb/'.)  Read the
-     documentation on the annotation comparator, `bxb', and figure out
-     how to use it to compare the annotation file produced by your
-     program against the reference annotator `atr'.  How does your
-     detector compare to Example 10?
-
- 17. If the previous exercise was too easy, modify your detector so
-     that the annotations it generates match those in the `atr' file.
-     Copying the `atr' file is not permitted.  You may find this rather
-     difficult.  Good luck!
 

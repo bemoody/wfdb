@@ -54,7 +54,7 @@ make clean
 /usr/bin/cshsetwfdb
 /usr/bin/ecgeval
 /usr/bin/edf2mit
-/usr/bin/epic
+/usr/bin/epicmp
 /usr/bin/fft
 /usr/bin/fir
 /usr/bin/hrfft
@@ -69,6 +69,7 @@ make clean
 /usr/bin/md2a
 /usr/bin/memse
 /usr/bin/mfilt
+/usr/bin/mit2edf
 /usr/bin/mrgann
 /usr/bin/mxm
 /usr/bin/nst
@@ -87,6 +88,7 @@ make clean
 /usr/bin/sampfreq
 /usr/bin/setwfdb
 /usr/bin/sigamp
+/usr/bin/sigavg
 /usr/bin/skewedit
 /usr/bin/snip
 /usr/bin/sortann
@@ -104,6 +106,7 @@ make clean
 /usr/bin/wfdb-config
 /usr/bin/wfdbdesc
 /usr/bin/wfdbwhich
+/usr/bin/wqrs
 /usr/bin/wrann
 /usr/bin/wrsamp
 /usr/bin/xform

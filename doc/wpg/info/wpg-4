@@ -6,6 +6,183 @@ START-INFO-DIR-ENTRY
 END-INFO-DIR-ENTRY
 
 
+File: wpg,  Node: WFDB_Siginfo structures,  Next: WFDB_Calinfo structures,  Prev: Data Types,  Up: Data Types
+
+Signal Information Structures
+=============================
+
+   The SIARRAY argument for `isigopen', `osigopen', `wfdbinit', and
+`osigfopen' is a pointer to an array of objects of type `WFDB_Siginfo'.
+The first three of these functions fill in the `WFDB_Siginfo' objects
+to which SIARRAY points, but the caller must supply initialized
+`WFDB_Siginfo' objects to `osigfopen'.  Each object specifies the
+attributes of a signal:
+
+`char *fname'
+     a pointer to a null-terminated string that names the file in which
+     samples of the associated signal are stored.  Input signal files
+     are found by prefixing `fname' with each of the components of the
+     database path in turn (*note WFDB path::).  `fname' may include
+     relative or absolute path specifications if necessary; the use of
+     an absolute pathname, combined with an initial null component in
+     `WFDB', reduces the time needed to find the signal file to a
+     minimum.  If `fname' is `-', it refers to the standard input or
+     output.
+
+`char *desc'
+     a pointer to a null-terminated string without embedded newlines
+     (e.g., `ECG lead V1' or `trans-thoracic impedance').  The length of
+     the `desc' string is restricted to a maximum of `WFDB_MAXDSL'
+     (defined in `<wfdb/wfdb.h>') characters, not including the null.
+
+`char *units'
+     a pointer to a null-terminated string without embedded whitespace.
+     The string specifies the physical units of the signal; if NULL,
+     the units are assumed to be millivolts.  The length of the `units'
+     string is restricted to a maximum of `WFDB_MAXUSL' (defined in
+     `<wfdb/wfdb.h>') characters (not including the null).
+
+`WFDB_Gain gain'
+     the number of analog-to-digital converter units (adus) per
+     physical unit (see previous item) relative to the original analog
+     signal; for an ECG, this is roughly equal to the amplitude of a
+     normal QRS complex.  If `gain' is zero, no amplitude calibration
+     is available; in this case, a `gain' of `WFDB_DEFGAIN' (defined in
+     `<wfdb/wfdb.h>') may be assumed.
+
+`WFDB_Sample initval'
+     the initial value of the associated signal (i.e., the value of
+     sample number 0).
+
+`WFDB_Group group'
+     the signal group number.  All signals in a given group are stored
+     in the same file.  If there are two or more signals in a group,
+     the file is called a "multiplexed signal file".  Group numbers
+     begin at 0; arrays of `WFDB_Siginfo' structures are always kept
+     ordered with respect to the group number, so that signals
+     belonging to the same group are described by consecutive entries
+     in SIARRAY.
+
+`int fmt'
+     the signal storage format.  The most commonly-used formats are
+     format 8 (8-bit first differences), format 16 (16-bit amplitudes),
+     and format 212 (pairs of 12-bit amplitudes bit-packed into byte
+     triplets).  See `<wfdb/wfdb.h>' for a complete list of supported
+     formats.  All signals belonging to the same group must be stored
+     in the same format.
+
+`int spf'
+     the number of samples per frame.  This is 1, for all except
+     oversampled signals in multi-frequency records, for which `spf'
+     may be any positive integer.  Note that non-integer values are not
+     permitted (thus the frame rate must be chosen such that all
+     sampling frequencies used in the record are integer multiples of
+     the frame rate).
+
+`int bsize'
+     the block size, in bytes.  For signal files that reside on Unix
+     character device special files (or their equivalents), the `bsize'
+     field indicates how many bytes must be read or written at a time
+     (*note Special Files::).  For ordinary disk files, `bsize' is zero.
+     All signals belonging to a given group have the same `bsize'.
+
+`int adcres'
+     the ADC resolution in bits.  Typical ADCs have resolutions between
+     8 and 16 bits inclusive.
+
+`int adczero'
+     the ADC output given an input that falls exactly at the center of
+     the ADC range (normally 0 VDC).  Bipolar ADCs produce two's
+     complement output; for these, `adczero' is usually zero.  For the
+     MIT DB, however, an offset binary ADC was used, and `adczero' was
+     1024.
+
+`int baseline'
+     the value of ADC output that would map to 0 physical units input.
+     The value of `adczero' is not synonymous with that of `baseline'
+     (the isoelectric or physical zero level of the signal);  the
+     `baseline' is a characteristic of the _signal_, while `adczero' is
+     a characteristic of the _digitizer_.  The value of `baseline' need
+     not necessarily lie within the output range of the ADC;  for
+     example, if the `units' are `degrees_Kelvin', and the ADC range is
+     200-300 degrees Kelvin, `baseline' corresponds to absolute zero,
+     and lies well outside the range of values actually produced by the
+     ADC.
+
+`long nsamp'
+     the number of samples in the signal.  (Exception: in
+     multi-frequency records, `nsamp' is the number of samples divided
+     by `spf', see above, i.e., the number of frames.)  All signals in
+     a given record must have the same `nsamp'.  If `nsamp' is zero,
+     the number of samples is unspecified, and the `cksum' (see the
+     next item) is not used; this is useful for specifying signals that
+     are obtained from pipes, for which the length may not be known.
+
+`int cksum'
+     a 16-bit checksum of all samples.  This field is not usually
+     accessed by application programs; `newheader' records checksums
+     calculated by `putvec' when it creates a new `hea' file, and
+     `getvec' compares checksums that it calculates against `cksum' at
+     the end of the record, provided that the entire record was read
+     through without skipping samples.
+
+   The number of `WFDB_Siginfo' structures in SIARRAY is given by the
+NSIG argument of the functions that open signal files.  Input and
+output signal numbers are assigned beginning with 0 in the order in
+which the signals are given in SIARRAY.  Note that input signal 0 and
+output signal 0 are distinct.  Input signal numbers are supplied to
+`aduphys', `physadu', `adumuv', and `muvadu' in their first arguments.
+*Note Example 5::, for an illustration of how to read signal
+specifications from `WFDB_Siginfo' structures.
+
+
+File: wpg,  Node: WFDB_Calinfo structures,  Next: WFDB_Anninfo structures,  Prev: WFDB_Siginfo structures,  Up: Data Types
+
+Calibration Information Structures
+==================================
+
+   The CAL argument for `getcal' and `putcal' is a pointer to an object
+of type `WFDB_Calinfo'.  A `WFDB_Calinfo' object contains information
+about signals of a specified type:
+
+`char *sigtype'
+     a pointer to a null-terminated string without embedded tabs or
+     newlines.  This field describes the type(s) of signals to which
+     the calibration specifications apply.  Usually, `sigtype' is an
+     exact match to (or a prefix of) the `desc' field of the
+     `WFDB_Siginfo' object that describes a matching signal.
+
+`char *units'
+     a pointer to a null-terminated string without embedded whitespace.
+     This field specifies the physical units of signals to which the
+     calibration specifications apply.  Usually, the `units' field of a
+     `WFDB_Calinfo' structure must exactly match the `units' field of
+     the `WFDB_Siginfo' structure that describes a matching signal.
+
+`double scale'
+     the customary plotting scale, in physical units per centimeter.
+     WFDB applications that produce graphical output may use `scale' as
+     a default.  Except in unusual circumstances, signals of different
+     types should be plotted at equal multiples of their respective
+     `scale's.
+
+`double low'
+`double high'
+     values (in physical units) corresponding to the low and high
+     levels of a calibration pulse.  If the signal is AC-coupled (see
+     below), `low' is zero, and `high' is the pulse amplitude.
+
+`int caltype'
+     a small integer that specifies the shape of the calibration pulse
+     (see `<wfdb/wfdb.h>' for definitions).  `caltype' is even if
+     signals of the corresponding `sigtype' are AC-coupled, and odd if
+     they are DC-coupled.
+
+   The calibration list is a memory-resident linked list of
+`WFDB_Calinfo' structures.  It is accessible only via `calopen',
+`getcal', `putcal', `newcal', and `flushcal'.
+
+
 File: wpg,  Node: WFDB_Anninfo structures,  Next: WFDB_Annotation structures,  Prev: WFDB_Calinfo structures,  Up: Data Types
 
 Annotator Information Structures
@@ -821,236 +998,4 @@ these examples are included in the WFDB Software Package, within the
 * Example 8::			Creating a new WFDB record.
 * Example 9::			A signal averager.
 * Example 10::			A QRS detector.
-
-
-File: wpg,  Node: Example 1,  Next: Example 2,  Prev: Examples,  Up: Examples
-
-Example 1:  An Annotation Filter
-================================
-
-   The following program copies an annotation file, changing all QRS
-annotations to `NORMAL' and deleting all non-QRS annotations.
-
-      1  #include <stdio.h>
-      2  #include <wfdb/wfdb.h>
-      3  #include <wfdb/ecgmap.h>
-      4
-      5  main()
-      6  {
-      7      WFDB_Anninfo an[2];
-      8      char record[8], iann[10], oann[10];
-      9      WFDB_Annotation annot;
-     10
-     11      printf("Type record name: ");
-     12      fgets(record, 8, stdin); record[strlen(record)-1] = '\0';
-     13      printf("Type input annotator name: ");
-     14      fgets(iann, 10, stdin); iann[strlen(iann)-1] = '\0';
-     15      printf("Type output annotator name: ");
-     16      fgets(oann, 10, stdin); oann[strlen(oann)-1] = '\0';
-     17      an[0].name = iann; an[0].stat = WFDB_READ;
-     18      an[1].name = oann; an[1].stat = WFDB_WRITE;
-     19      if (annopen(record, an, 2) < 0) exit(1);
-     20      while (getann(0, &annot) == 0)
-     21          if (isqrs(annot.anntyp)) {
-     22              annot.anntyp = NORMAL;
-     23              if (putann(0, &annot) < 0) break;
-     24          }
-     25      wfdbquit();
-     26  }
-
-(See `http://www.physionet.org/physiotools/wfdb/examples/example1.c'
-for a copy of this program.)
-
-*Notes:*
-
-_Line 2:_
-     All programs that use the WFDB library must include
-     `<wfdb/wfdb.h>'.
-
-_Line 3:_
-     The `#include' statement makes available not only the mapping
-     macros, one of which will be used in line 21, but also the
-     annotation code symbols in `<wfdb/ecgcodes.h>', one of which will
-     be needed in line 22.
-
-_Line 7:_
-     Since there will be two annotators (one each for input and output),
-     the array of `WFDB_Anninfo' objects has two members.
-
-_Line 9:_
-     This structure will be filled in by `getann', modified, and passed
-     to `putann' for output.
-
-_Lines 11-16:_
-     The record name and the annotator names are filled into the
-     character arrays.  The code in lines 12, 14, and 16 illustrates a
-     C idiom for reading a string of limited length; the second
-     statement in each of these lines replaces the trailing newline
-     character (which `fgets' copies into the string) with a null.
-     String arguments to WFDB library functions should not include
-     newline characters.
-
-_Lines 17-18:_
-     Pointers to the character arrays (strings) containing the annotator
-     names are filled into the `name' fields of the array of
-     `WFDB_Anninfo' objects. Note that the `name' fields are only
-     pointers and do not contain storage for the strings themselves.
-     If this is not clear to you, review the discussion of pointers and
-     arrays in `K&R', pp.  97-100.  The input annotator is to be read,
-     the output annotator is to be written.  `WFDB_READ' and
-     `WFDB_WRITE' are defined in `<wfdb/wfdb.h>'.
-
-_Line 19:_
-     Note that the first and second arguments of `annopen' are the
-     names of the respective arrays; thus `annopen' receives pointers
-     rather than values in its argument list.
-
-_Line 20:_
-     An annotation is read from annotator 0 into `annot'.  The `&' is
-     necessary since `getann' requires a pointer to the structure in
-     order to be able to modify its contents.  When `getann' returns a
-     negative value, no more annotations remain to be read and the loop
-     ends.
-
-_Line 21:_
-     The macro `isqrs' is defined in `<wfdb/ecgmap.h>'; `isqrs(X)' is
-     true if X is an annotation code that denotes a QRS complex, false
-     if X is not a QRS annotation code.
-
-_Line 22:_
-     `NORMAL' is defined in `<wfdb/ecgcodes.h>'.
-
-_Line 23:_
-     The call to `putann' now writes the modified annotation in the
-     output annotator 0 file.  As for `getann', a pointer to `annot'
-     must be passed using the `&' operator.
-
-_Line 25:_
-     All files are closed prior to exiting.  This is mandatory since the
-     program creates an output file with `putann'.
-
-
-File: wpg,  Node: Example 2,  Next: Example 3,  Prev: Example 1,  Up: Examples
-
-Example 2: An Annotation Translator
-===================================
-
-   This program translates the `atr' annotations for the record named
-in its argument into an AHA-format annotation file with the annotator
-name `aha'.
-
-      1  #include <stdio.h>
-      2  #include <wfdb/wfdb.h>
-      3
-      4  main(argc, argv)
-      5  int argc;
-      6  char *argv[];
-      7  {
-      8      WFDB_Anninfo an[2];
-      9      WFDB_Annotation annot;
-     10
-     11      if (argc < 2) {
-     12          fprintf(stderr, "usage: %s record\n", argv[0]);
-     13          exit(1);
-     14      }
-     15      an[0].name = "atr"; an[0].stat = WFDB_READ;
-     16      an[1].name = "aha"; an[1].stat = WFDB_AHA_WRITE;
-     17      if (annopen(argv[1], an, 2) < 0) exit(2);
-     18      while (getann(0, &annot) == 0 && putann(0, &annot) == 0)
-     19          ;
-     20      wfdbquit();
-     21      exit(0);
-     22  }
-
-(See `http://www.physionet.org/physiotools/wfdb/examples/example2.c'
-for a copy of this program.)
-
-*Notes:*
-
-_Lines 4-6:_
-     If this doesn't look familiar, see `K&R', pp. 114-115.
-
-_Lines 11-14:_
-     This is the standard idiom for producing those cryptic error
-     messages for which Unix programs are notorious; `argv[0]' is the
-     name by which the program was invoked.
-
-_Lines 15-16:_
-     These lines set up the annotator information.  Input annotator 0
-     is the `atr' annotation file, and output annotator 0 will be
-     written in AHA format.
-
-_Line 17:_
-     If we can't read the input or write the output, quit with an error
-     message from `annopen'.
-
-_Line 18:_
-     Here's where the work is done.  The format translation is handled
-     entirely by `getann' and `putann'.  The loop ends normally when
-     `getann' reaches the end of the input file, or prematurely if
-     there is a read or write error.
-
-_Line 21:_
-     Since we have carefully defined non-zero exit codes for the various
-     errors that this program might encounter, we also define this
-     successful exit here.  If this program is run as part of a Unix
-     shell script, the exit codes are accessible to the shell, which
-     can determine what to do next as a result.  If this line were
-     omitted (as in example 1), the exit code would be undefined.
-
-
-File: wpg,  Node: Example 3,  Next: Example 4,  Prev: Example 2,  Up: Examples
-
-Example 3: An Annotation Printer
-================================
-
-   This program prints annotations in readable form.  Its first
-argument is an annotator name, and its second argument is a record name.
-
-      1  #include <stdio.h>
-      2  #include <wfdb/wfdb.h>
-      3
-      4  main(argc, argv)
-      5  int argc;
-      6  char *argv[];
-      7  {
-      8      WFDB_Anninfo a;
-      9      WFDB_Annotation annot;
-     10
-     11      if (argc < 3) {
-     12          fprintf(stderr, "usage: %s annotator record\n", argv[0]);
-     13          exit(1);
-     14      }
-     15      a.name = argv[1]; a.stat = WFDB_READ;
-     16      (void)sampfreq(argv[2]);
-     17      if (annopen(argv[2], &a, 1) < 0) exit(2);
-     18      while (getann(0, &annot) == 0)
-     19          printf("%s (%ld) %s %d %d %d %s\n",
-     20                 timstr(-(annot.time)),
-     21                 annot.time,
-     22                 annstr(annot.anntyp),
-     23                 annot.subtyp, annot.chan, annot.num,
-     24                 (annot.aux != NULL && *annot.aux > 0) ?
-     25                  annot.aux+1 : "");
-     26      exit(0);
-     27  }
-
-(See `http://www.physionet.org/physiotools/wfdb/examples/example3.c'
-for a copy of this program.)
-
-*Notes:*
-_Line 16:_
-     The invocation of `sampfreq' here sets the internal variables
-     needed by `timstr' below.
-
-_Line 20:_
-     This line gives the annotation time as a time of day.  If the base
-     time is omitted in the header file, or if we used
-     `timstr(annot.time)' instead, we would obtain the elapsed time from
-     the beginning of the record.
-
-_Lines 24-25:_
-     This expression evaluates to an empty string unless the `aux'
-     string is non-empty.  It makes the assumption that `aux' is a
-     printable ASCII string; the printable part follows the length byte.
 

@@ -1,11 +1,11 @@
-.TH SIGAMP 1 "31 July 2002" "WFDB 10.2.7" "WFDB Applications Guide"
+.TH SIGAMP 1 "25 November 2002" "WFDB 10.3.0" "WFDB Applications Guide"
 .SH NAME
 sigamp \- measure signal amplitudes of a WFDB record
 .SH SYNOPSIS
 \fBsigamp -r\fR \fIrecord\fR [ \fIoptions\fR ... ]
 .SH DESCRIPTION
 .PP
-\fRsigamp\fR measures either baseline-corrected RMS amplitudes or (for
+\fBsigamp\fR measures either baseline-corrected RMS amplitudes or (for
 suitably annotated ECG signals) normal QRS peak-to-peak amplitudes
 for all signals of the specified \fIrecord\fR.  It makes up to 300
 measurements (but see \fB-n\fR below) for each signal and calculates
@@ -51,7 +51,7 @@ Set RMS amplitude measurement window.  Default: \fIdtw\fR = 1 (second).
 It may be necessary to set and export the shell variable \fBWFDB\fR (see
 \fBsetwfdb\fR(1)).
 .SH SEE ALSO
-\fBcalsig\fR(1), \fBsetwfdb\fR(1)
+\fBcalsig\fR(1), \fBsetwfdb\fR(1), \fBsigavg\fR(1)
 .SH AUTHOR
 George B. Moody (george@mit.edu)
 .SH SOURCE

@@ -372,7 +372,6 @@ SIARRAY[I].  For example, we can read the `gain' attributes of each
 signal in record `100s' like this:
 
      #include <stdio.h>
-     #include <malloc.h>
      #include <wfdb/wfdb.h>
      
      main()
@@ -1030,6 +1029,7 @@ piped input.
 * isigsettime::			Setting time of next samples read.
 * isgsettime::			As above, but for one signal group only.
 * iannsettime::			Setting time of next annotations read.
+* sample::			A random access interface to input signals.
 
 
 File: wpg,  Node: isigsettime,  Next: isgsettime,  Prev: non-sequential,  Up: non-sequential
@@ -1078,7 +1078,7 @@ group specified by SGROUP.  This function may be of use if more than
 one record is open simultaneously (*note Multiple Record Access::).
 
 
-File: wpg,  Node: iannsettime,  Prev: isgsettime,  Up: non-sequential
+File: wpg,  Node: iannsettime,  Next: sample,  Prev: isgsettime,  Up: non-sequential
 
 iannsettime
 -----------
@@ -1113,6 +1113,46 @@ using `iannsettime'.  The bug was corrected in version 4.0 of the
 library.
 
 
+File: wpg,  Node: sample,  Prev: iannsettime,  Up: non-sequential
+
+sample and sample_valid
+-----------------------
+
+     WFDB_Sample sample(WFDB_Signal S, WFDB_Time T)
+     int sample_valid(void)
+
+*Return:*
+n
+     (from `sample'): The value (in raw adus) of sample number T in
+     open signal S,if successful, or the value of the previous
+     successfully read sample.
+
+0
+     (from `sample_valid'): The most recent value returned by `sample'
+     was invalid
+
+1
+     (from `sample_valid'): The most recent value returned by `sample'
+     was valid
+
+The `sample' function allows the caller to read samples of the
+currently open input signals in any order.  The first argument is a
+signal number (a non-negative integer between 0 and NSIG-1, where NSIG
+is the number of open input signals), and the second is a time,
+expressed as a non-negative sample number. If `sample' is invoked with
+valid input arguments, the companion function `sample_valid' returns 1.
+
+   There are three ways in which `sample' can be invoked with invalid
+input arguments.  In each case, `sample_valid' returns 0, but `sample'
+attempts to return a reasonable value.  If S is invalid, `sample'
+returns the value of signal 0 at the specified time.  If T is negative,
+the returned value is that of sample number zero of the specified
+signal.  If T specifies a sample number beyond the end of the record,
+the returned value is that of the last valid sample of the specified
+signal.  For an example of the use of `sample' and `sample_valid',
+*note Example 7::.
+
+
 File: wpg,  Node: conversion,  Next: calibration,  Prev: non-sequential,  Up: Functions
 
 Conversion Functions
@@ -1129,128 +1169,4 @@ strings, and between ADC units and physical units.
 * timstr and strtim::		time in sample intervals <-> HH:MM:SS string
 * datstr and strdat::		Julian date <-> DD/MM/YYYY string
 * aduphys and physadu::		ADC units <-> physical units
-
-
-File: wpg,  Node: annstr and strann,  Next: timstr and strtim,  Prev: conversion,  Up: conversion
-
-annstr, anndesc, and ecgstr
----------------------------
-
-     char *annstr(int CODE)
-     char *anndesc(int CODE)
-     char *ecgstr(int CODE)
-
-*Return:*
-(char *)
-     pointer to a printable string that describes the code, or `NULL'
-
-These functions translate the annotation code specified by their
-argument into a string (*note Annotation Codes::).  Illegal or
-undefined codes are translated by `annstr' and `ecgstr' into decimal
-numerals surrounded by brackets (e.g., `[55]'); `anndesc' returns `NULL'
-in such cases.  The strings returned by `annstr' are mnemonics (usually
-only one character), which may be modified either by `setannstr' or by
-the presence of "modification labels" in an input annotation file
-(*note annstr and strann::).  The strings returned by `anndesc' are
-brief descriptive strings, usually those given in the table of
-annotation codes (*note Annotation Codes::).  The strings returned by
-`ecgstr' are usually the same as those returned by `annstr', but they
-can be modified only by `setecgstr', and not by the presence of
-modification labels as for `annstr'.  The intent is that `ecgstr'
-should be used rather than `annstr' only when it is necessary that a
-fixed set of mnemonics be used, independent of any modification labels.
-
-   Here is a little program that prints a table of the codes, mnemonic
-strings, and descriptions:
-
-     #include <stdio.h>
-     #include <wfdb/wfdb.h>
-     #include <wfdb/ecgcodes.h>
-     
-     main()
-     {
-         int i;
-     
-         printf("Code\tMnemonic\tDescription\n");
-         for (i = 1; i <= ACMAX; i++) {
-             printf("%3d\t%s", i, annstr(i));
-             if (anndesc(i) != NULL)
-                 printf("\t\t%s", anndesc(i));
-             printf("\n");
-         }
-     }
-
-(See `http://www.physionet.org/physiotools/wfdb/examples/exannstr.c'
-for a copy of this program.)
-
-   `ACMAX' is defined in `<wfdb/ecgcodes.h>'.  The range from 1 through
-`ACMAX' includes all legal annotation codes; if you run this program,
-you will find some undefined but legal annotation codes in this range.
-*Note Example 3::, for another illustration of the use of `annstr'.
-(`annstr' and `anndesc' were first introduced in WFDB library version
-5.3.)
-
-strann and strecg
------------------
-
-     int strann(char *STRING)
-     int strecg(char *STRING)
-
-*Return:*
-(int)
-     annotation code
-
-These functions translate the null-terminated ASCII character strings to
-which their arguments point into annotation codes.  Illegal strings are
-translated into `NOTQRS'.  Input strings for `strann' and `strecg'
-should match those returned by `annstr' and `ecgstr' respectively.
-*Note Example 9::, for an illustration of the use of `strann'.
-(`strann' was first introduced in WFDB library version 5.3.)
-
-setannstr, setanndesc, and setecgstr
-------------------------------------
-
-     int setannstr(int CODE, char *STRING)
-     int setanndesc(int CODE, char *STRING)
-     int setecgstr(int CODE, char *STRING)
-
-*Return:*
- 0
-     Success
-
--1
-     Failure: illegal `code'
-
-These functions modify translation tables used by functions that
-convert between annotation codes and strings.  `setannstr' modifies the
-table shared by `annstr' and `strann'; `setanndesc' modifies the table
-used by `anndesc'; and `setecgstr' modifies the table shared by
-`ecgstr' and `strecg'.  They may be used to redefine strings for
-defined annotation codes as well as to define strings for undefined
-annotation codes.  For example, `setannstr(NORMAL, "\\267")' redefines
-the string for normal beats as a PostScript bullet, `*' (`NORMAL' is
-defined in `<wfdb/ecgcodes.h>').  These functions do not copy their
-string arguments, which must therefore be kept valid by the caller.
-
-   An important difference between `setannstr' (or `setanndesc') and
-`setecgstr' is that `annopen' and `wfdbinit' insert modification labels
-in any output annotation files that are created _after_ invoking
-`setannstr' or `setanndesc'; `setecgstr' does not have this side
-effect.  By using `setannstr' before `annopen', a WFDB application may
-create annotation files with self-contained code tables, which can be
-read properly by other WFDB applications without the need to inform them
-explicitly about non-standard codes.  For this scheme to work as
-intended, all custom code mnemonics and descriptions must be defined
-before the output annotation files are opened.
-
-   By passing a negative value as CODE to `setannstr' or `setanndesc',
-the translation for -CODE can be modified without triggering the
-generation of a modification label.  This feature can be useful for
-programs that use alternate sets of mnemonics or descriptions for
-speakers of different languages.
-
-   Note that it is possible, though not desirable, to define identical
-strings for two or more codes; the behavior of `strann' and `strecg' in
-such cases is implementation-dependent.  (`setannstr' and `setanndesc'
-were first introduced in WFDB library version 5.3.)
 

@@ -34,6 +34,7 @@ app/sample.c
 app/setwfdb
 app/setwfdb.bat
 app/sigamp.c
+app/sigavg.c
 app/skewedit.c
 app/snip.c
 app/sortann.c
@@ -297,6 +298,7 @@ doc/wag-src/sampfreq.1
 doc/wag-src/sample.1
 doc/wag-src/setwfdb.1
 doc/wag-src/sigamp.1
+doc/wag-src/sigavg.1
 doc/wag-src/signal.5
 doc/wag-src/skewedit.1
 doc/wag-src/snip.1

@@ -2511,8 +2511,8 @@ of the library.
 @c @group
 @node     sample, , iannsettime, non-sequential
 @unnumberedsubsec sample and sample_valid
-@findex sample [10.3.0]
-@findex sample_valid [10.3.0]
+@findex sample (10.3.0)
+@findex sample_valid (10.3.0)
 
 @example
 WFDB_Sample sample(WFDB_Signal @var{s}, WFDB_Time @var{t})
@@ -2535,15 +2535,17 @@ successfully read sample.
 @c @end group
 
 @noindent
-The @code{sample} function allows the caller to read samples in any
-order.  The first argument is a signal number (a non-negative integer),
-and the second is a time, expressed as a non-negative sample number.
-If @code{sample} is invoked with valid input arguments, the companion
-function @code{sample_valid} returns 1.
+The @code{sample} function allows the caller to read samples of the
+currently open input signals in any order.  The first argument is a
+signal number (a non-negative integer between 0 and @var{nsig}-1,
+where @var{nsig} is the number of open input signals), and the second
+is a time, expressed as a non-negative sample number. If @code{sample}
+is invoked with valid input arguments, the companion function
+@code{sample_valid} returns 1.
 
 There are three ways in which @code{sample} can be invoked with invalid
-input arguments.  In each case, @code{sample_valid()} returns 0, but
-@code{sample} attempts to return a reasonable value.  If @var{t} is
+input arguments.  In each case, @code{sample_valid} returns 0, but
+@code{sample} attempts to return a reasonable value.  If @var{s} is
 invalid, @code{sample} returns the value of signal 0 at the specified
 time.  If @var{t} is negative, the returned value is that of sample
 number zero of the specified signal.  If @var{t} specifies a sample
@@ -6070,8 +6072,8 @@ close the files properly.
 
 @cindex digital filter
 @cindex filter (digital)
-This program illustrates a useful technique for obtaining something
-close to random access to signals, a technique that is particularly
+This program illustrates the use of @code{sample} to obtain random
+access to signals, a technique that is particularly
 useful for implementing digital filters.  The first argument is the
 record name, the second and third arguments are the start time and the
 duration of the segment to be filtered, and the rest of the arguments
@@ -6193,7 +6195,7 @@ signals as there are input signals, the program exits.
 Here, @code{signal} is invoked only for its side effect;  assuming that
 any samples can be read from the specified record, @code{sample(0, 0L)}
 returns a valid sample, so that the value returned by
-@code{sample_valid()} is true (1);
+@code{sample_valid()} is true (1).
 
 @item Lines 50--57:
 Here's where the work is done.  The outer loop is executed once per
@@ -7484,6 +7486,8 @@ pages for the package, and a one-minute sample record (@samp{100s}).
 			Software Package.
 * Unix installation::	Installing the WFDB Software Package on Unix,
 			GNU/Linux, and similar systems.
+* MacOS/X installation::	Installing the WFDB Software Package under
+				MacOS/X (Darwin).
 * MS-Windows installation::	Installing the WFDB Software Package on
                                 MS-Windows PCs.
 * Other installation::	Installing the WFDB Software Package on other systems.
@@ -7499,7 +7503,7 @@ binaries for popular operating systems and development snapshots, as well as
 quick-start guides including installation notes for popular operating systems,
 are also usually available there.
 
-@node Unix installation, MS-Windows installation, Distribution, Installation
+@node Unix installation, MacOS/X installation, Distribution, Installation
 @unnumberedsec Unix, GNU/Linux, and similar operating systems
 
 @cindex libwww
@@ -7558,7 +7562,32 @@ instructions given by @code{configure} for setting your @code{PATH} and
 Depending on the speed of your system and of your C compiler, @samp{make} will
 generally require between 1 and 10 minutes.
 
-@node MS-Windows installation, Other installation, Unix installation, Installation
+@node MacOS/X installation, MS-Windows installation, Unix installation, Installation
+@unnumberedsec Mac OS/X (Darwin)
+
+The WFDB Software Package has been successfully compiled under Mac OS/X
+10.2 (Darwin 6.0.1).  It should also work under 10.1, but this has not
+been tested.
+
+Before compiling the WFDB Software Package, download and install:
+
+@itemize @bullet
+@item
+Mac OS/X Developer Tools (from @uref{http://developer.apple.com/macosx/})
+@item
+XDarwin (from Fink, @uref{http://fink.sourceforge.net/}; sources from
+@uref{http://www.xdarwin.org/})
+@end itemize
+
+Now follow the instructions in the previous section for Unix or GNU/Linux.
+
+At this time, an incomplete port of XView to Darwin is available from
+the GNU-Darwin project (@uref{http://gnu-darwin.sourceforge.net/}).  You
+may wish to see if a complete XView port is available;  if so, it should
+be possible to compile WAVE under Mac OS/X as part of the installation
+of the WFDB Software Package.
+
+@node MS-Windows installation, Other installation, MacOS/X installation, Installation
 @unnumberedsec MS-Windows
 
 If you have not already done so, install the Cygwin development environment

@@ -1,5 +1,5 @@
 /* file: lcheck.c	G. Moody       7 September 2001
-			Last revised:  14 November 2002
+			Last revised:  26 November 2002
 -------------------------------------------------------------------------------
 wfdbcheck: test WFDB library
 Copyright (C) 2002 George B. Moody
@@ -28,7 +28,7 @@ _______________________________________________________________________________
 #include <wfdb/wfdb.h>
 
 char *info, *pname, *prog_name();
-int n, nsig, i, j, framelen, errors = 0, stat, vflag = 0;
+int n, nsig, i, j, framelen, errors = 0, istat, vflag = 0;
 char headerversion[40];
 char *libversion;
 char *p, *q, *defpath, *dbpath;
@@ -252,8 +252,8 @@ int check(char *record, char *orec)
     printf("[OK]:  sampfreq(NULL) returned %g\n", f);
 
   /* *** setsampfreq *** */
-  if (stat = setsampfreq(100.0)) {
-    printf("Error: setsampfreq returned %d (should have been 0)\n", stat);
+  if (istat = setsampfreq(100.0)) {
+    printf("Error: setsampfreq returned %d (should have been 0)\n", istat);
     errors++;
   }
   if (sampfreq(NULL) != 100.0) {
@@ -273,19 +273,19 @@ int check(char *record, char *orec)
     printf("[OK]:  sampfreq(%s) returned %g\n", record, f);
 
   /* *** annopen *** */
-  stat = annopen(record, aiarray, 1);
-  if (stat) {
+  istat = annopen(record, aiarray, 1);
+  if (istat) {
     fprintf(stderr,
-	  "Error: annopen of 1 file returned %d (should have been 0)\n", stat);
+	  "Error: annopen of 1 file returned %d (should have been 0)\n", istat);
     errors++;
   }
   else if (vflag)
     printf("[OK]:  annopen of 1 file succeeded\n");
 
-  stat = annopen(record, aiarray, 2);
-  if (stat) {
+  istat = annopen(record, aiarray, 2);
+  if (istat) {
     fprintf(stderr,
-	 "Error: annopen of 2 files returned %d (should have been 0)\n", stat);
+	 "Error: annopen of 2 files returned %d (should have been 0)\n", istat);
     errors++;
   }
   else if (vflag)
@@ -399,10 +399,10 @@ int check(char *record, char *orec)
     printf("[OK]:  datstr returned '%s'\n", p);
 
   /* *** iannsettime *** */
-  stat = iannsettime(t);
-  if (stat) {
+  istat = iannsettime(t);
+  if (istat) {
     printf("Error: iannsettime returned %d (should have been 0)\n",
-	    stat);
+	    istat);
     errors++;
   }
   else if (vflag)
@@ -411,10 +411,10 @@ int check(char *record, char *orec)
 
   /* *** getann, stimstr *** */
   for (i = 0; i < 5; i++) {
-    stat = getann(0, &annot);
-    if (stat != 0 && stat != -1) {
+    istat = getann(0, &annot);
+    if (istat != 0 && istat != -1) {
       printf("Error: getann returned %d (should have been 0 or -1)\n",
-	     stat);
+	     istat);
       errors++;
     }
     else if (vflag)
@@ -424,10 +424,10 @@ int check(char *record, char *orec)
   }
 
   /* *** iannsettime, again *** */
-  stat = iannsettime(0L);
-  if (stat) {
+  istat = iannsettime(0L);
+  if (istat) {
     printf("Error: iannsettime returned %d (should have been 0)\n",
-	    stat);
+	    istat);
     errors++;
   }
   else if (vflag)
@@ -435,20 +435,20 @@ int check(char *record, char *orec)
 	    timstr(0L));
 
   /* *** getann, putann *** */
-  i = j = stat = 0;
-  while (stat == 0) {
-    stat = getann(0, &annot);
-    if (stat != 0 && stat != -1) {
+  i = j = istat = 0;
+  while (istat == 0) {
+    istat = getann(0, &annot);
+    if (istat != 0 && istat != -1) {
       printf("Error: getann returned %d (should have been 0 or -1)\n",
-	     stat);
+	     istat);
       errors++;
     }
-    else if (stat == 0) {
+    else if (istat == 0) {
       i++;
-      stat = putann(0, &annot);
-      if (stat != 0) {
+      istat = putann(0, &annot);
+      if (istat != 0) {
 	printf("Error: putann returned %d (should have been 0)\n",
-	       stat);
+	       istat);
 	errors++;
       }
       else j++;
@@ -556,10 +556,10 @@ int check(char *record, char *orec)
     printf("[OK]:  timstr returned '%s'\n", p);
   
   /* *** isigsettime *** */
-  stat = isigsettime(t);
-  if (stat) {
+  istat = isigsettime(t);
+  if (istat) {
     printf("Error: isigsettime returned %d (should have been 0)\n",
-	    stat);
+	    istat);
     errors++;
   }
   else if (vflag)
@@ -585,10 +585,10 @@ int check(char *record, char *orec)
 
   /* *** isigsettime *** */
   t = tt-1; /* try a backward skip, to one sample before the previous set */
-  stat = isigsettime(t);
-  if (stat) {
+  istat = isigsettime(t);
+  if (istat) {
     printf("Error: isigsettime returned %d (should have been 0)\n",
-	    stat);
+	    istat);
     errors++;
   }
   else if (vflag)
@@ -611,10 +611,10 @@ int check(char *record, char *orec)
   }
 
   /* Now return to the beginning of the record and copy it. */
-  stat = isigsettime(t = 0L);
-  if (stat) {
+  istat = isigsettime(t = 0L);
+  if (istat) {
     printf("Error: isigsettime returned %d (should have been 0)\n",
-	    stat);
+	    istat);
     errors++;
   }
   else if (vflag)
@@ -626,21 +626,21 @@ int check(char *record, char *orec)
     si[i].fname = realloc(si[i].fname, strlen(orec) + 5);
     sprintf(si[i].fname, "%s.dat", orec);
   }
-  stat = osigfopen(si, nsig);
-  if (stat != nsig) {
+  istat = osigfopen(si, nsig);
+  if (istat != nsig) {
       printf("Error: osigfopen returned %d (should have been %d)\n",
-	     stat, nsig);
+	     istat, nsig);
       errors++;
   }
   else if (vflag)
-      printf("[OK]:  osigfopen returned %d\n", stat);
+      printf("[OK]:  osigfopen returned %d\n", istat);
 
   /* *** getframe (again), putvec *** */
   while ((n = getframe(vector)) == nsig) {
     t++;
-    if ((stat = putvec(vector)) != nsig) {
+    if ((istat = putvec(vector)) != nsig) {
       printf("Error: putvec returned %d (should have been %d)\n",
-	     stat, nsig);
+	     istat, nsig);
       errors++;
       break;
     }
@@ -652,18 +652,18 @@ int check(char *record, char *orec)
   }
   else if (vflag)	/* getframe reached EOF, checksums OK */
     printf("[OK]:  getframe read %ld samples\n", t);
-  if (stat != nsig) {	/* some error occurred while writing samples */
+  if (istat != nsig) {	/* some error occurred while writing samples */
     printf("Error: putvec returned %d (should have been %d) at %s\n",
-	   stat, nsig, mstimstr(t));
+	   istat, nsig, mstimstr(t));
     errors++;
   }
   else if (vflag)	/* putvec wrote all samples without apparent error */
     printf("[OK]:  putvec wrote %ld samples\n", t);
 
   /* *** newheader *** */
-  stat = newheader(orec);
-  if (stat) {	/* some error occurred while writing the header */
-    printf("Error: newheader returned %d (should have been 0)\n", stat);
+  istat = newheader(orec);
+  if (istat) {	/* some error occurred while writing the header */
+    printf("Error: newheader returned %d (should have been 0)\n", istat);
     errors++;
   }
   else if (vflag)	/* putvec wrote all samples without apparent error */
@@ -673,9 +673,9 @@ int check(char *record, char *orec)
   n = 0;
   if (info = getinfo(record)) {
     do {
-      stat = putinfo(info);
-      if (stat) {
-	printf("Error: putinfo returned %d (should have been 0)\n", stat);
+      istat = putinfo(info);
+      if (istat) {
+	printf("Error: putinfo returned %d (should have been 0)\n", istat);
 	errors++;
       }
       else

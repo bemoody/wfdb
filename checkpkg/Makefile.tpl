@@ -4,7 +4,7 @@ all:
 	@./libcheck $(DBDIR)
 	@../conf/prompt "Press <Enter> to continue ... "
 	@read a
-	@./appcheck
+	@./appcheck $(INCDIR)
 
 lcheck:	lcheck.c
 	@echo Compiling WFDB library test application ...

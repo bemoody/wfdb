@@ -1,5 +1,5 @@
-/* file: wqrs.c		Wei Zong and George Moody   23 October 1998
-				Last revised:      22 November 2002
+/* file: wqrs.c		Wei Zong      23 October 1998
+			Last revised: 22 November 2002 (by W.Zong and G. Moody)
 -----------------------------------------------------------------------------
 wqrs: Single-lead QRS detector based on length transform
 Copyright (C) 2002 Wei Zong

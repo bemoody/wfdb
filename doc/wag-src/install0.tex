@@ -35,7 +35,7 @@ for the applications described in this manual; \LaTeX{}, {\tt texinfo}, and
 {\tt troff} sources for this and other manuals; and a one-minute sample record
 ({\tt 100s}).
 
-\section*{Obtaining the WFDB Software Package}
+\section*{How to obtain the WFDB Software Package}
 The latest version of the WFDB Software Package can always be downloaded in
 source form from PhysioNet and its mirrors (see {\tt
 http://www.physio\-net.org/physio\-tools/wfdb.shtml}); binaries for popular
@@ -77,7 +77,7 @@ single command: {\tt tar xfvz wfdb.tar.gz}.)
 
 This will create a directory with a name of the form {\tt wfdb-}{\em m.n.r},
 where {\em m.n.r} is the version number of the included WFDB library (e.g.,
-{\tt 10.2.1}).  Enter this directory.
+{\tt 10.3.0}).  Enter this directory.
 
 You should now be ready to configure, compile, and install the software, using
 the commands:
@@ -95,6 +95,31 @@ instructions given by {\tt configure} for setting your {\tt PATH} and
 
 Depending on the speed of your system and of your C compiler, {\tt make} will
 generally require between 1 and 10 minutes.
+
+\subsection*{Mac OS/X (Darwin)}
+
+The WFDB Software Package has been successfully compiled under Mac
+OS/X 10.2 (Darwin 6.0.1).  It should also work under 10.1, but this
+has not been tested.
+
+Before compiling the WFDB Software Package, download and install:
+
+\begin{itemize}
+\item
+Mac OS/X Developer Tools (from {\tt
+http://\-devel\-oper.\-apple.\-com/macosx/)}
+\item
+XDarwin (from Fink, {\tt http://\-fink.\-source\-forge.\-net/};
+sources from {\tt http://\-www.\-xdar\-win.\-org/})
+\end{itemize}
+
+Now follow the instructions in the previous section for Unix or
+GNU/Linux.  At this time, an incomplete port of XView to Darwin is
+available from the GNU-Darwin project ({\tt
+http://\-gnu-darwin.\-source\-forge.\-net}).  You may wish to see if a
+complete XView port is available; if so, it should be possible to
+compile WAVE under Mac OS/X as part of the installation of the WFDB
+Software Package.
 
 \subsection*{MS-Windows}
 
@@ -116,17 +141,11 @@ install the {\tt libwww} package from {\tt http://www.w3.org/Library/} or
 from {\tt http://\-www.physio\-net.org/physio\-tools/libwww/}.  You may
 omit this step if you do not wish to have NETFILES support.
 
-Download
-{\tt http://www.physio\-net.org/physio\-tools/binaries/win\-dows/bin/which.exe}
-and put it into a directory in your PATH.  (This utility is needed by
-{\tt configure} in a later step.  The sources for {\tt which.exe} are available
-within {\tt http://www.physio\-net.org/physio\-tools/util\-ities/}.)
-
 Open a Cygwin terminal window (the Cygwin installer will have added this to
 your MS-Windows start menu).  Perform the remaining steps by typing the
 commands given below into the terminal window.
 
-Check that {\tt which} and {\tt gcc} are accessible by typing the command:
+Check that {\tt gcc} is accessible by typing the command:
 
 \begin{verbatim}
 which gcc
@@ -157,7 +176,7 @@ tar xfv wfdb.tar
 
 This will create a directory with a name of the form {\tt wfdb-}{\em m.n.r},
 where {\em m.n.r} is the version number of the included WFDB library (e.g.,
-{\tt 10.2.0}).  Enter this directory.
+{\tt 10.3.0}).  Enter this directory.
 
 You should now be ready to configure, compile, and install the software, using
 the commands:

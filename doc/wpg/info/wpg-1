@@ -10,8 +10,8 @@ File: wpg,  Node: Top,  Next: Overview,  Prev: (dir),  Up: (dir)
 
    This guide documents the Waveform Database interface library (the
 WFDB library).  This file contains the text of the Tenth Edition of the
-`WFDB Programmer's Guide' (7 November 2002), with revisions for release
-10.3.0pre1 of the WFDB library.
+`WFDB Programmer's Guide' (26 November 2002), with revisions for
+release 10.3.0 of the WFDB library.
 
 * Menu:
 
@@ -389,6 +389,46 @@ guide in June, 1999.  See `NEWS', in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
+Changes in version 10.3.0
+-------------------------
+
+   Fixed bugs in `lib/sample.c' that caused improper accounting of
+signal group numbers when reading from two or more records at the same
+time (as in `nst'), a bug that caused a segfault in `nst', and a bug
+that referenced uninitialized memory in `newheader' if `nsig' = 0.
+
+   The WFDB Software Package has been ported to MacOS/X (Darwin),
+version 10.2 (the port should also work under 10.1 but this has not
+been tested and will not be supported).
+
+   It is now possible to generate a shared WFDB library (DLL) under
+MS-Windows using Cygwin/gcc.
+
+   Added functions `sample' and `sample_valid' to the WFDB library (in
+`lib/signal.c').  `sample(s, t)' returns the sample at time (sample
+number) `t' from signal `s', handling all necessary buffering
+internally and allowing the caller to treat the signal file as a
+virtual array of randomly accessible samples.  `sample_valid' can be
+invoked to check if the most recent value returned by `sample' was
+valid (e.g., to see if the end of the input was reached).  For an
+example of the use of these functions, see `app/wqrs.c'.
+
+Changes in version 10.2.9
+-------------------------
+
+   Fixed a bug in example 9 in this guide (introduced in version
+10.2.0).
+
+   Updated `lib/wfdbdll.def' and the `Makefile.dos' files in several
+directories.  These have not been tested in recent years and may need
+further revisions; feedback is welcome.
+
+   Corrected persistent problems with generating PDF versions of the
+manuals for the desired page size, and added hyperlinks to the PDF
+version of this guide.
+
+   (WFDB library version 10.2.8 was identical to 10.2.7.)
+
 Changes in version 10.2.7
 -------------------------
 
@@ -430,7 +470,7 @@ Previous versions rounded negative values toward zero;  to obtain
 consistent conversions, however, it is necessary to round all values
 down (e.g., from -1.5 to -2 rather than up to -1).
 
-   Fixed a memory leak in wfdb_fclose() (in lib/wfdbio.h).  Thanks to
+   Fixed a memory leak in `wfdb_fclose' (in `lib/wfdbio.h').  Thanks to
 Ion Gaztan~aga.
 
 Changes in version 10.2.5
