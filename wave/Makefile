@@ -1,10 +1,10 @@
 # file: Makefile	G. Moody	 1 May 1990
-#			Last revised: 22 November 1999		WAVE 6.3
+#			Last revised: 29 January 2000		WAVE 6.3
 # `make' description file for WAVE
 #
 # -----------------------------------------------------------------------------
 # WAVE: Waveform analyzer, viewer, and editor
-# Copyright (C) 1999 George B. Moody
+# Copyright (C) 2000 George B. Moody
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -230,7 +230,7 @@ wave:		$(OFILES)
 	$(CC) -o wave $(OFILES) $(LDFLAGS)
 
 wave-static:	$(OFILES)
-	$(CC) -o wave $(OFILES) -static $(LDFLAGS)
+	$(CC) -o wave-static $(OFILES) -static $(LDFLAGS)
 
 soelim:		soelim.c
 	$(CC) -o soelim -O soelim.c

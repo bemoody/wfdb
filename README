@@ -1,6 +1,7 @@
 file: README			G. Moody	5 May 1999
 				Last revised: 22 October 1999
 
+For installation instructions, see `INSTALL' in this directory.
 _______________________________________________________________________________
 WFDB Software Package:  software for working with annotated signals
 Copyright (C) 1999 George B. Moody
@@ -60,36 +61,3 @@ community, the intent is that if you improve them, your improvements should
 benefit the community that has given them to you.  You do not have to give away
 your improvements; but you may not distribute them at all unless you are
 willing to play by the rules spelled out by the GPL.
-
-_______________________________________________________________________________
-
-Notes on compiling this software:
-
-You may need to set OS-specific variables in */Makefile before compiling.
- Use 'make' in this directory to compile and install everything.
-
-WAVE uses Netscape (or another browser, if you've made the appropriate
-changes in waverc/Makefile) for some of its on-line help.  Copy the
-contents of http://www.physionet.org/physiotools/wug/ into
-/usr/local/help/html/wug if you wish to read the help from local files;
-otherwise, edit wave/wave.info and change all occurrences of
-'/usr/local/help/html/' into 'http://www.physionet.org/physiotools/wug/'.
-(The utility 'wget' -- which you can find with a web search -- can be helpful
-if you wish to copy an entire directory of a web site, as suggested here.)
-
-The WFDB library can (optionally) use the freely available libwww libraries
-developed by the World Wide Web consortium to allow any application to read
-input from HTTP and FTP servers as well as from local disk files, without the
-use of a browser and in most cases without the need to download an entire
-file in order to examine a portion of it.  For further information, see
-README.NETFILES in this directory.  The libwww libraries are usable under
-UNIX (including Linux), MS-DOS/Windows, and (with some work) MacOS;  see
-http://www.w3.org/Library/ for details.  Sources and Linux x86 binaries
-can be downloaded from http://www.physionet.org/physiotools/libwww/ (and
-elsewhere).
-
-WAVE requires the (Sun-developed, but freely available) XView libraries and
-header files.  These are available from Sun for SunOS and Solaris; from various
-commercial sources for AIX, HP-UX, and other Unices; and as a part of some
-Linux distributions.  Sources and Linux x86 binaries can be downloaded from
-http://www.physionet.org/physiotools/xview (and elsewhere).

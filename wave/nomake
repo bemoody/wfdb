@@ -1,0 +1,13 @@
+# file: nomake		G. Moody	30 January 2000
+#
+# If renamed as 'makefile', this file prevents WAVE from being compiled
+# on systems that don't have XView installed.
+
+install:
+	@echo "Skipping installation of WAVE (XView required)."
+
+wave:
+	@echo "Skipping compilation of WAVE (XView required)."
+
+clean:
+	make -f Makefile clean

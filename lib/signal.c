@@ -1,10 +1,10 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  14 October 1999		wfdblib 10.1.0
+			Last revised:  19 January 2000		wfdblib 10.1.1
 WFDB library functions for signals
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2000 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -429,10 +429,6 @@ WFDB_Siginfo *siarray;
 		    return (-2);
 		}
 		(void)strcpy(siarray[s].fname, p);
-		/* If the file name includes a directory name which is not
-		   already in the WFDB path, add that directory to the end of
-		   the WFDB path. */
-		wfdb_addtopath(p);
 	    }
 	    /* If the file names of the current and previous signals match,
 	       they are assigned the same group number and share a copy of the

@@ -1,0 +1,87 @@
+file: INSTALL			G. Moody	30 January 2000
+
+WFDB Software Package installation notes
+_______________________________________________________________________________
+
+Under UNIX or Linux:
+
+1. Install the World Wide Web Consortium's libwww library (you will need both
+   the library itself and the developer's package;  download them from
+   http://www.physionet.org/physiotools/libwww/, or from the W3C's web site
+   at http://www.w3.org/Library).  You may skip this step if you don't want
+   support for reading input files from remote web and FTP servers.  See
+   README.NETFILES for further information about this option.
+
+2. Install the XView library (see http://www.physionet.org/physiotools/xview/)
+   if you want to use WAVE, and be sure that the directory that contains the
+   XView application 'textedit' (usually /usr/openwin/bin) is in your PATH.
+   For information about WAVE, see the WAVE User's Guide,
+   http://www.physionet.org/physiotools/wug/.
+
+   WAVE uses Netscape (or another web browser, if you've made the appropriate
+   changes in waverc/Makefile) for some of its on-line help.  Copy the
+   contents of http://www.physionet.org/physiotools/wug/ into
+   /usr/local/help/html/wug if you wish to read the help from local files;
+   otherwise, edit wave/wave.info and change all occurrences of
+   '/usr/local/help/html/' into 'http://www.physionet.org/physiotools/wug/'.
+   (The utility 'wget' -- which you can find with a web search -- can be
+   helpful if you wish to copy an entire directory of a web site, as suggested
+   here.)
+
+3. In this directory, type:
+	./configure
+	make install
+   You will need root permissions to run 'make install', unless you change
+   WFDBROOT in 'Makefile' so that the files are installed in a directory
+   that you own.
+
+_______________________________________________________________________________
+
+Under MS-DOS or MS-Windows:
+
+If possible, use djgpp (DJ Delorie's MS-DOS port of gcc, free from
+http://www.delorie.com/djgpp/) or cygwin (Cygnus Software's MS-Windows port of
+gcc, free from http://sourceware.cygnus.com/cygwin/).  Both of these include
+many of the GNU utilities, including GNU make.  In this directory, type:
+	make -f Makefile-dos-gcc
+
+If you are using an older version of MS-DOS that cannot handle long filenames,
+you will need to rename the 'Makefile-dos-gcc' files here and in each of the
+subdirectories, and then you will need to edit the one in this directory to
+change each reference to 'Makefile-dos-gcc' appropriately.
+
+If you use cygwin, please try to download and install the libwww package, from
+http://www.physionet.org/physiotools/libwww/, or from the W3C's web site at
+http://www.w3.org/Library), and modify lib/Makefile-dos-gcc so that libwww will
+be linked together with the WFDB library.  Instructions for compiling libwww
+with cygwin are provided in the sources and at http://www.w3.org/INSTALL.html.
+This should work but has not yet been tested; please let me know what changes
+are needed.  (Details will be posted on PhysioNet once they are available.)
+
+The 'Makefile.dos' files in each of the subdirectories of this one (except for
+wave, wave-doc, and waverc, which are for UNIX only) can be used with the
+'make' utilities provided with most commercial C compilers, although you may
+need to customize them for your compiler; your feedback is appreciated.  A
+version of libwww for MSVC++ 5.0 is available from PhysioNet and from the W3C
+web site.  If you don't have a 'make' utility, try djgpp or cygwin.
+
+_______________________________________________________________________________
+
+Under MacOS or other operating systems
+
+Sorry, but you are on your own here.  Previous versions of the WFDB library
+and some of the applications have been compiled successfully by Macintosh
+users (and on VMS, among other environments).  The sources are written in
+highly portable C and should not be difficult to port to any environment where
+an ANSI/ISO or K&R C compiler and the standard C library are available.
+
+If you find that changes are necessary in order to compile this software
+successfully, please send details to the author (george@mit.edu) so that
+others can benefit from your experience.  Contributions of working binaries
+are welcome, but please write first before sending them to me. Thanks!
+
+_______________________________________________________________________________
+
+Once you have successfully compiled and installed the WFDB Software Package,
+you will find a great deal of information about using it on PhysioNet;  begin
+looking in http://www.physionet.org/physiotools/wfdb-books.shtml.

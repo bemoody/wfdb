@@ -1,10 +1,10 @@
 /* file: wave.h		G. Moody	26 April 1990
-			Last revised:    4 May 1999
+			Last revised:  21 January 2000
 Constants, macros, global variables, and function prototypes for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2000 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -59,12 +59,12 @@ _______________________________________________________________________________
 #define END_ANALYSIS	(ACMAX+3)
 #define REF_MARK	(ACMAX+4)
 
-/* These can be increased harmlessly.  Since annotator names and log file
+/* These can be increased harmlessly.  Since record names and log file
    names can include path information, it is probably best not to decrease
    ANLMAX or LNLMAX. */
-#define ANLMAX	79	/* length of longest permissible annotator name */
+#define ANLMAX	39	/* length of longest permissible annotator name */
 #define LNLMAX	79	/* length of longest permissible log file name */
-#define RNLMAX	19	/* length of longest permissible record name */
+#define RNLMAX	79	/* length of longest permissible record name */
 #define DSLMAX	80	/* length of longest permissible description in log */
 
 /* Default array indices for scale settings (see modepan.c and xvwave.c). */

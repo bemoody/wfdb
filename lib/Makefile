@@ -1,6 +1,6 @@
 # file: Makefile	G. Moody	 6 July 1983
-#			Last revised:  6 January 2000		Version 10.1.0
-# UNIX 'make' description file for compiling the WFDB library with NETFILES
+#			Last revised:  19 January 2000		Version 10.1.1
+# UNIX 'make' description file for compiling the WFDB library
 #
 # _____________________________________________________________________________
 # wfdb: a library for reading and writing annotated waveforms(time series data)
@@ -32,13 +32,13 @@
 # install the alternate WFDB library (not available on all systems), type
 # `make slib'.
 
-# Note:  This version contains experimental NETFILES support, which requires
-# that you have previously installed libwww (see http://www.w3.org/Library/);
-# if not, you must change the definitions of SCFLAGS and SBUILDLIB below.
-# As is, this Makefile is preconfigured for Linux and requires minor changes
-# for other supported operating systems.  It builds a static version of the
-# library without NETFILES support, and a shared (dynamically loadable) version
-# of the library with NETFILES support.
+# If used as is, this Makefile compiles the WFDB library without NETFILES
+# support.  The simplest way to compile with NETFILES support (which requires
+# that you have previously installed libwww, see http://www.w3.org/Library/),
+# is to copy 'netmake' to 'makefile' before running 'make' in this directory.
+# (If you do this, the definitions in the renamed file take precedence over
+# those below.)  As is, this Makefile is preconfigured for Linux and requires
+# minor changes for other supported operating systems.
 
 # NETFILES support is known to work well under Linux (with both 2.0 and 2.2
 # series kernels and glibc 2.0 and 2.1) provided that the library is compiled
@@ -65,7 +65,7 @@
 # Makefile (in the parent of this directory) for details.
 MAJOR = 10
 MINOR = 1
-RELEASE = 0
+RELEASE = 1
 VERSION = $(MAJOR).$(MINOR).$(RELEASE)
 
 # Historical note:  Versions earlier than 10.0.0, released between 1981 and
@@ -208,9 +208,9 @@ SINCDIR = $(INCDIR)
 # For Solaris or SVR4 `cc', uncomment the next line.
 # SCFLAGS = -K PIC -O $(CCDEFS)
 # For `gcc', uncomment the next line.
-# SCFLAGS = -fpic -g -O $(CCDEFS)
+SCFLAGS = -fpic -g -O $(CCDEFS)
 # For `gcc' with NETFILES, uncomment the next line.
-SCFLAGS = -fpic -g -O $(CCDEFS) -DNETFILES `libwww-config --cflags`
+# SCFLAGS = -fpic -g -O $(CCDEFS) -DNETFILES `libwww-config --cflags`
 # See comments on CFLAGS (above).  If you don't have `gdb', you won't be able
 # to debug the shared library, so you might want to remove the `-g' option in
 # that case.
@@ -252,12 +252,12 @@ SLIBOBJS = wfdbinit.o annot.o signal.o calib.o wfdbio.o
 # For (at least some versions of) HP/UX, uncomment the next line instead.
 # SBUILDLIB = ld -b -o $(SWFDBLIB) $(SLIBOBJS)
 # For Linux without NETFILES (see above), uncomment the next line instead.
-# SBUILDLIB = gcc -shared -Wl,-soname,$(SWFDBLIB_SONAME) -o $(SWFDBLIB) \
-#  $(SLIBOBJS)
+SBUILDLIB = gcc -shared -Wl,-soname,$(SWFDBLIB_SONAME) -o $(SWFDBLIB) \
+  $(SLIBOBJS)
 # For Linux with NETFILES (see above), add -DNETFILES to CCDEFS and uncomment
 # the next line instead.
-SBUILDLIB = gcc -shared -Wl,-soname,$(SWFDBLIB_SONAME) \
-  `libwww-config --libs` -o $(SWFDBLIB) $(SLIBOBJS)
+# SBUILDLIB = gcc -shared -Wl,-soname,$(SWFDBLIB_SONAME) \
+#  `libwww-config --libs` -o $(SWFDBLIB) $(SLIBOBJS)
 
 # SRANLIB is the name of the program used to index the alternate library.
 # Shared libraries are not generally indexed.

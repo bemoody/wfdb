@@ -1,10 +1,10 @@
 # file: Makefile-dos-gcc	G. Moody	23 April 1997
-#				Last revised:	29 April 1998	Version 10.0.0
+#				Last revised: 21 January 2000	Version 10.1.1
 # GCC-DOS 'make' description file for compiling the WFDB library
 
 # _____________________________________________________________________________
 # wfdb: a library for reading and writing annotated waveforms(time series data)
-# Copyright (C) 1999 George B. Moody
+# Copyright (C) 2000 George B. Moody
 #
 # This library is free software; you can redistribute it and/or modify it under
 # the terms of the GNU Library General Public License as published by the Free
@@ -39,8 +39,8 @@
 # the top-level Makefile for the WFDB Software Package).  See the top-level
 # Makefile (in the parent of this directory) for details.
 MAJOR = 10
-MINOR = 0
-RELEASE = 0
+MINOR = 1
+RELEASE = 1
 VERSION = $(MAJOR).$(MINOR).$(RELEASE)
 
 # Site-specific variables

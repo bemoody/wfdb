@@ -1,10 +1,10 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-			Last revised:	14 November 1999	wfdblib 10.1.0
+			Last revised:	19 January 2000		wfdblib 10.1.1
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2000 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -165,12 +165,32 @@ FSTRING getwfdb()
 
     if (wfdbpath == NULL) {
 	wfdbpath = getenv("WFDB");
-	if (wfdbpath == NULL) wfdbpath = DEFWFDBP;
+	if (wfdbpath == NULL) {
+#ifdef HAS_PUTENV
+	    static char *p;
+	    if (p == NULL) p = (char *)malloc(strlen(DEFWFDBP)+6);
+	    if (p) {
+		sprintf(p, "WFDB=%s", DEFWFDBP);
+		putenv(p);
+	    }
+#endif
+	    wfdbpath = DEFWFDBP;
+	}
     }
     getiwfdb_count = 0;
     while (*wfdbpath == '@')
 	wfdb_getiwfdb();
     wfdb_parse_path(wfdbpath);
+#ifdef HAS_PUTENV
+    if (getenv("WFDBCAL") == NULL) {
+	static char *p;
+	if (p == NULL) p = malloc(strlen(DEFWFDBC)+9);
+	if (p) {
+	    sprintf(p, "WFDBCAL=%s", DEFWFDBC);
+	    putenv(p);
+	}
+    }
+#endif
     return (wfdbpath);
 }
 
@@ -786,9 +806,7 @@ int mode;
     }
 
     /* If the file is to be opened for input, prepare to search the database
-       directories.  The string obtained from getwfdb() is constructed in the
-       same manner as PATH, with colons separating its components.  An
-       empty component is interpreted as the current directory. */
+       directories. */
 
     if (wfdb_path_list == NULL) (void)getwfdb();
 
@@ -844,14 +862,20 @@ int mode;
 	if (p + strlen(record) + (s ? strlen(s) : 0) > wfdb_filename + MFNLEN-5)
 	    continue;	/* name too long -- skip */
 	spr1(p, record, s);
-	if ((ifile = wfdb_fopen(wfdb_filename, RB)) != NULL) return (ifile);
-	/* If this file can be opened for input, return its file pointer;
-	   otherwise, try opening it using an alternate form of the name,
+	if ((ifile = wfdb_fopen(wfdb_filename, RB)) != NULL) {
+	    /* Found it! Add its path info to the WFDB path. */
+	    wfdb_addtopath(wfdb_filename);
+	    return (ifile);
+	}
+	/* Not found -- try again, using an alternate form of the name,
 	   provided that that form is distinct. */
 	strcpy(long_filename, wfdb_filename);
 	spr2(p, record, s);
 	if (strcmp(wfdb_filename, long_filename) && 
-	    (ifile = wfdb_fopen(wfdb_filename, RB)) != NULL) return (ifile);
+	    (ifile = wfdb_fopen(wfdb_filename, RB)) != NULL) {
+	    wfdb_addtopath(wfdb_filename);
+	    return (ifile);
+	}
     }
     /* If the file was not found in any of the directories listed in wfdb,
        return a null file pointer to indicate failure. */

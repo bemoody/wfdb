@@ -1,0 +1,29 @@
+#! /bin/sh
+if ( which libwww-config 2>&1 | grep "no " >/dev/null )
+then
+    echo "The WFDB software will be compiled without NETFILES access, because"
+    echo "libwww does not appear to be installed on this system."
+    echo "To add NETFILES access, install libwww and run ./configure again."
+    rm -f lib/makefile
+    echo "NETFILES=0" >config.cache
+else
+    echo "The WFDB software will be compiled with NETFILES access."
+    cp lib/netmake lib/makefile
+    echo "NETFILES=1" >config.cache
+fi
+
+if ( which textedit 2>&1 | grep "no " >/dev/null )
+then
+    echo "WAVE will not be compiled, because the XView libraries do not"
+    echo "appear to be installed on this system."
+    echo "To compile WAVE, install XView, add the directory containing the"
+    echo "XView textedit application to your PATH, and run ./configure again."
+    cp wave/nomake wave/makefile
+    echo "WAVE=0" >>config.cache
+else
+    echo "WAVE will be compiled."
+    rm -f wave/makefile
+    echo "WAVE=1" >>config.cache
+fi
+
+

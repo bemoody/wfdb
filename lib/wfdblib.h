@@ -1,10 +1,10 @@
 /* file: wfdblib.h	G. Moody	13 April 1989
-                        Last revised: 15 September 1999         wfdblib 10.1.0
+                        Last revised: 30 January 2000         wfdblib 10.1.1
 External definitions for WFDB library private functions
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2000 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -39,15 +39,24 @@ for use in a Microsoft Windows application, but *not* as a DLL, define the
 symbol _WINDOWS instead of _WINDLL. */
 /* #define _WINDLL */
 
-#if defined(_WINDLL)
-#if !defined(_WINDOWS)
+#if defined(_WINDLL) && !defined(_WINDOWS)
 #define _WINDOWS
 #endif
-#define WFDBNOSORT
+
+#if defined(_WIN16) && !defined(_WINDOWS)
+#define _WINDOWS
 #endif
 
-#if defined(_WINDOWS) && !defined(MSDOS)
-#define MSDOS
+#if defined(_WIN32) && !defined(_WINDOWS)
+#define _WINDOWS
+#endif
+
+#if defined(_WINDOWS) && !defined (_WIN16) && !defined(_WIN32)
+#define _WIN16
+#endif
+
+#if defined(_WINDLL)
+#define WFDBNOSORT
 #endif
 
 /* Define the symbol MSDOS if this library is to be used under MS-DOS or MS
@@ -62,14 +71,18 @@ software (recommended) or uncomment the next line. */
 /* #define FIXISOCD */
 
 /* DEFWFDBP is the default value of the WFDB path if the WFDB environment
-variable is not set.  In most cases, it is sufficient to use an empty string
+variable is not set.  In most cases, it is sufficient to use the string "."
 for this purpose (thus restricting the search for DB files to the current
-directory).  DEFWFDBP must not be NULL, however.  The default given below for
-the Macintosh specifies that the WFDB path is to be read from the file
-udb/dbpath.mac on the third edition of the MIT-BIH Arrhythmia Database CD-ROM
-(which has a volume name of `MITADB3'); you may prefer to use a file on a
-writable disk for this purpose to make reconfiguration possible.  See getwfdb()
-in wfdbio.c for further information. */
+directory).  If NETFILES support is enabled, the setting below adds the
+web-accessible PhysioBank databases to the default path;  you may wish to
+change this to use a nearby PhysioNet mirror (for a list of mirrors, see
+http://www.physionet.org/mirrors/).   DEFWFDBP must not be NULL, however.
+The default given below for the Macintosh specifies that the WFDB path is to
+be read from the file udb/dbpath.mac on the third edition of the MIT-BIH
+Arrhythmia Database CD-ROM (which has a volume name of `MITADB3'); you may
+prefer to use a file on a writable disk for this purpose to make
+reconfiguration possible.  See getwfdb() in wfdbio.c for further information.
+*/
 #ifdef MAC
 # ifdef FIXISOCD
 #  define DEFWFDBP	"@MITADB3:UDB:DBPATH.MAC;1"
@@ -78,7 +91,11 @@ in wfdbio.c for further information. */
 # define __STDC__
 # endif
 #else
-# define DEFWFDBP	""
+# ifdef NETFILES
+#  define DEFWFDBP	". http://www.physionet.org/physiobank/database"
+# else
+#  define DEFWFDBP	"."
+# endif
 #endif
 
 /* DEFWFDBC is the name of the default WFDB calibration file, used if the
@@ -88,7 +105,19 @@ WFDB path.  The value given below is the name of the standard calibration file
 supplied on the various CD-ROM databases.  DEFWFDBC may be NULL if you prefer
 not to have a default calibration file.  See calopen() in calib.c for further
 information. */
-#define DEFWFDBC "dbcal"
+#define DEFWFDBC "wfdbcal"
+
+/* putenv() is available in POSIX, SVID, and BSD Unices and in MS-DOS and
+32-bit MS Windows, but not under 16-bit MS Windows or under MacOS.  If it is
+available, getwfdb() (in wfdbio.c) detects when the environment variables WFDB
+or WFDBCAL are not set, and sets them according to DEFWFDBP or DEFWFDBC as
+needed using putenv().  This feature is useful mainly for programs such as
+WAVE, where WFDB or WFDBCAL are set interactively and it is useful to show
+their default values to the user;  setwfdb() and getwfdb() do not depend on it.
+*/
+#if !defined(_WIN16) && !defined(MAC)
+#define HAS_PUTENV
+#endif
 
 #ifndef FILE
 #include <stdio.h>

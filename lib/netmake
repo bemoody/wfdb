@@ -1,0 +1,107 @@
+# file: netmake			G. Moody		30 January 2000
+#
+# Redefine make variables to compile a NETFILES-enabled WFDB library
+#
+# _____________________________________________________________________________
+# wfdb: a library for reading and writing annotated waveforms(time series data)
+# Copyright (C) 2000 George B. Moody
+#
+# This library is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Library General Public License as published by the Free
+# Software Foundation; either version 2 of the License, or (at your option) any
+# later version.
+#
+# This library is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Library General Public License for
+# more details.
+#
+# You should have received a copy of the GNU Library General Public License
+# along with this library; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+# You may contact the author by e-mail (george@mit.edu) or postal mail
+# (MIT Room E25-505A, Cambridge, MA 02139 USA).  For updates to this software,
+# please visit PhysioNet (http://www.physionet.org/).
+# _____________________________________________________________________________
+#
+# This is a 'make' description file intended to be used if you wish to compile
+# the WFDB library with support for reading remote files via HTTP and FTP
+# (a capability called NETFILES support in the documentation of the WFDB library).
+# In order to do this successfully, you must have previously installed the World
+# Wide Web Consortium's libwww library, which may be downloaded freely from
+# http://www.w3.org/Library/,
+#
+# The standard 'make' description file provided in this directory, 'Makefile',
+# does not include NETFILES support.  Rather than duplicate all of the common
+# definitions in 'Makefile', this file simply redefines those that must differ
+# when compiling with NETFILES support, and then invokes another instance of
+# 'make' on the standard 'Makefile', but with the new definitions overriding
+# the old ones.  If this file is renamed 'makefile', 'make' will read it
+# first (before 'Makefile') and all of this will happen automagically.  The
+# script 'configure' (in the directory above this one) renames this file
+# if libwww has been installed, so that a simple 'make' in that directory is
+# all that is required.
+#
+# NETFILES support is known to work well under Linux (with both 2.0 and 2.2
+# series kernels and glibc 2.0 and 2.1) provided that the library is compiled
+# as a shared (dynamically loadable) library.  The library does not compile
+# properly as a static library under Linux if NETFILES is enabled (apparently
+# because of redefinitions in the libwww include files).
+#
+# For further information about NETFILES, see README.NETFILES in the top-level
+# directory of the WFDB software package.
+
+# These should exactly match the values in Makefile.  They are needed here because
+# other variables are constructed using these.
+MAJOR = 10
+MINOR = 1
+RELEASE = 1
+CCDEFS = -DWFDB_MAJOR=$(MAJOR) -DWFDB_MINOR=$(MINOR) -DWFDB_RELEASE=$(RELEASE)
+SWFDBLIB_BASENAME = libwfdb.so
+SWFDBLIB_SONAME = $(SWFDBLIB_BASENAME).$(MAJOR)
+SWFDBLIB = $(SWFDBLIB_SONAME).$(MINOR)
+SLIBOBJS = wfdbinit.o annot.o signal.o calib.o wfdbio.o
+
+# SCFLAGS is the set of C compiler options used when compiling the shared library.
+SCFLAGS = -fpic -g -O $(CCDEFS) -DNETFILES `libwww-config --cflags`
+
+# SBUILDLIB is the command that creates the alternate library once its
+# components have been compiled separately.  This version has been tested on Linux
+# and should work on other versions of UNIX where gcc is available.
+SBUILDLIB = gcc -shared -Wl,-soname,$(SWFDBLIB_SONAME) \
+  `libwww-config --libs` -o $(SWFDBLIB) $(SLIBOBJS)
+
+# This command causes the 'make' processes spawned from this one to use the
+# standard Makefile after incorporating the definitions above.
+MAKE = make -f Makefile
+
+# 'make' targets:  Each target in 'Makefile' should have an identically named
+# target here.
+
+install:
+	$(MAKE) "SBUILDLIB=$(SBUILDLIB)" "SCFLAGS=$(SCFLAGS)" install
+
+compat:
+	$(MAKE) compat
+
+slib-test:
+	$(MAKE) "SBUILDLIB=$(SBUILDLIB)" "SCFLAGS=$(SCFLAGS)" slib-test
+
+slib:
+	$(MAKE) "SBUILDLIB=$(SBUILDLIB)" "SCFLAGS=$(SCFLAGS)" slib
+
+lib:
+	$(MAKE) "SBUILDLIB=$(SBUILDLIB)" "SCFLAGS=$(SCFLAGS)" lib
+
+tidy:
+	$(MAKE) tidy
+
+clean:
+	$(MAKE) clean
+
+TAGS:
+	$(MAKE) TAGS
+
+listing:
+	$(MAKE) listing

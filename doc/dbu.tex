@@ -9,7 +9,7 @@
 @sp 5
 @center @titlefont{WFDB Programmer's Guide}
 @sp 4
-@center Tenth Edition (revised and with additions for WFDB library version 10.1.0)
+@center Tenth Edition (revised and with additions for WFDB library version 10.1.1)
 @center @today
 @sp 5
 @center George B. Moody
@@ -32,7 +32,7 @@ USA
 @end display
 
 An HTML version of this guide is available;  point your web browser to
-@code{http://www.physionet.org/physiotools/dbpg/} to view it.
+@code{http://@-www.@-physio@-net.@-org/@-physio@-tools/@-dbpg/} to view it.
 Additional printed copies of this guide are available for US$10 each
 (including shipping by surface mail) by writing to the address above.
 Please make checks payable to ``Beth Israel Hospital Biomedical
@@ -65,7 +65,7 @@ translated versions of this guide for reference purposes.
 This guide documents the Waveform Database interface library (the WFDB
 library).  This file contains the text of the Tenth Edition of
 the @cite{WFDB Programmer's Guide} (January, 2000), with
-additional material for release 10.1.0 of the WFDB library.
+additional material for release 10.1.1 of the WFDB library.
 @end ifinfo
 
 @menu
@@ -334,46 +334,43 @@ eliminate the need for @emph{ad hoc} user-written database I/O.
 @node     Guide, , Applications, Overview
 @unnumberedsec About this Guide
 
-You should have a good grasp of the C language in order to make the best
-use of this guide.  If ANSI C prototypes, used here to document the WFDB
-library functions, are unfamiliar to you, see pp. 217--218 in the second
-edition of @cite{The C Programming Language} by Kernighan and Ritchie,
-Prentice Hall, 1988.  (This is the famous @cite{K&R}; all @cite{K&R}
-references in this guide include page numbers for the second edition.
-Newcomers to C should have a copy for ready reference while reading this
-guide.)  It may also be helpful to have a copy of a database
-directory, such as the @cite{MIT-BIH Arrhythmia Database Directory}.
-If the entire WFDB Software Package is available, the @cite{WFDB
-Applications Guide} will be useful as a reference for existing WFDB
-library-based applications;  if you have only a CD-ROM with MS-DOS
-binaries, refer to @file{bin.doc} (in the @file{bin} directory of your
-CD-ROM) for information on the available applications.
+You should have a good grasp of the C language in order to make the best use of
+this guide.  If ANSI C prototypes, used here to document the WFDB library
+functions, are unfamiliar to you, see pp. 217--218 in the second edition of
+@cite{The C Programming Language} by Kernighan and Ritchie, Prentice Hall,
+1988.  (This is the famous @cite{K&R}; all @cite{K&R} references in this guide
+include page numbers for the second edition.  Newcomers to C should have a copy
+for ready reference while reading this guide.)  It may also be helpful to have
+a copy of a database directory, such as the @cite{MIT-BIH Arrhythmia Database
+Directory}.  The @cite{WFDB Applications Guide} will be useful as a reference
+for existing WFDB library-based applications (available from PhysioNet,
+@code{http://@-www.@-physio@-net.@-org/}).
 
 You should have access to a computer that has the WFDB library and at
-least one or two database records on-line.  (If you are installing the
-WFDB library on a new computer for the first time, please read the
-installation notes supplied with the WFDB library first, or
+least one or two database records on-line, or access to the World Wide Web,
+where database records can be obtained from PhysioNet and other sources.  (If
+you are installing the WFDB library on a new computer for the first time,
+please read the installation notes supplied with the WFDB library first, or
 @pxref{Installation, , Installing the WFDB Software Package}, then return
 here.)  You should know how to create a C source file using your
 favorite editor, and you should know how to compile it and how to run
 the resulting executable program.
 
-Resist all temptation to plunge into the esoteric details of file
-formats.  (Those who find such details irresistible will find them in
-Section 5 of the @cite{WFDB Applications Guide}; note, however,
-that support for new file formats is added to the WFDB library from time
-to time, so that the information you find there may be incomplete.)  The
-WFDB library provides an efficient means of reading and writing files in
-many formats; it is not a trivial task to duplicate it, and time spent
-doing so is time that could be spent doing something useful, enjoyable,
-or possibly both.  If you really think you need to understand the file
-formats in order to translate them into whatever the ECGWhizz Model 666
-needs, consider instead writing a format translator using the WFDB library
-to read the files; then you will at least have a program that requires
-only recompilation with a new version of the WFDB library when file
+Resist all temptation to plunge into the esoteric details of file formats.
+(Those who find such details irresistible will find them in Section 5 of the
+@cite{WFDB Applications Guide}; note, however, that support for new file
+formats is added to the WFDB library from time to time, so that the information
+you find there may be incomplete.)  The WFDB library provides an efficient
+means of reading and writing files in many formats; it is not a trivial task to
+duplicate it, and time spent doing so is time that could be spent doing
+something useful, enjoyable, or possibly both.  If you really think you need to
+understand the file formats in order to translate them into whatever the
+ECGWhizz Model 666 needs, consider instead writing a format translator using
+the WFDB library to read the files; then you will at least have a program that
+requires only recompilation with a new version of the WFDB library when file
 formats change.  @emph{In extremis}, use @file{rdann} and @file{rdsamp} ---
-MS-DOS executables of which are included on all CD-ROM databases of ECGs ---
-to translate files into text format.
+MS-DOS executables of which are available from PhysioNet and included on all
+CD-ROM databases of ECGs --- to translate files into text format.
 
 Chapter 1 of this guide begins with a simple example program that reads
 a few samples from a database record.  This example should help you
@@ -408,18 +405,7 @@ System V, SunOS, Solaris, HP-UX, OSF/1, Version 7, XENIX, VENIX, ULTRIX,
 Linux, AIX, AUX, SCO, Coherent, and more), MS-DOS, MS-Windows, VMS, and
 the Macintosh OS.  This guide was written for UNIX users (with notes for
 MS-DOS users where differences exist), but others should find only minor
-differences.  One obvious difference between MS-DOS and other versions
-of the WFDB library is the file-naming convention: since record names can
-be longer than the three characters permitted in MS-DOS file name
-``extensions'', MS-DOS names for WFDB files @emph{begin} with the record
-name and @emph{end} with a file type specifier (@file{hea} instead of
-@file{header}, @file{atr} instead of @file{atruth}, etc.), rather than
-the other way around.  This difference is not particularly significant,
-however, since WFDB file names @emph{per se} are never needed as WFDB
-library function arguments.  So that database files on CD-ROMs may be
-read on all supported systems, the MS-DOS convention for naming WFDB files
-is recognized in addition to the ``native'' convention under UNIX, VMS,
-and on the Macintosh.
+differences.
 
 Another appendix discusses porting the WFDB library to new machines or
 operating systems, and includes notes on adding support for new file
@@ -427,16 +413,17 @@ formats, annotation codes, and other enhancements (@pxref{Extensions}).
 At the end of the guide is a list of sources for databases and other
 materials that may be useful to readers (@pxref{Sources}).
 
-Many friends have contributed to the development of the WFDB library.
-Thanks to Paul Albrecht, Ted Baker, Phil Devlin, Scott Greenwald, David
-Israel, Roger Mark, Joe Mietus, Warren Muldrow, and especially to Paul
-Schluter, whose elegant 8080 assembly language functions inspired these
-(long live @code{getann}!).  Pat Hamilton and Bob Farrell contributed
-ports, to the Macintosh and the MS 32-bit Windows environments,
-respectively.  Thanks also to the many readers of earlier versions of
-this guide; if this edition answers your questions, it is because
-someone else has already asked them, and hounded the author until he
-produced comprehensible answers.
+Many friends have contributed to the development of the WFDB library.  Thanks
+to Paul Albrecht, Ted Baker, Phil Devlin, Scott Greenwald, David Israel, Roger
+Mark, Joe Mietus, Warren Muldrow, and especially to Paul Schluter, whose
+elegant 8080 assembly language functions inspired these (long live
+@code{getann}!).  Pat Hamilton and Bob Farrell contributed ports, to the
+Macintosh and the MS 32-bit Windows environments, respectively.  Jose Garcia
+Moros and Salvador Olmos contributed Matlab/Octave reimplementations of a
+useful subset of the WFDB library.  Thanks also to the many readers of earlier
+versions of this guide; if this edition answers your questions, it is because
+someone else has already asked them, and hounded the author until he produced
+comprehensible answers.
 
 Before May, 1999, and the release of version 10.0.0 of the library, the
 WFDB library was known as the DB library, and this guide was the @cite{ECG
@@ -460,7 +447,7 @@ MIT Room E25-505
 Cambridge, MA 02139
 USA
 
-(e-mail: george@@mit.edu)
+(e-mail: @code{george@@mit.edu})
 @end display
 
 @iftex
@@ -478,7 +465,7 @@ information about obtaining GNU @code{emacs}).
 
 An HTML version of this guide, suitable for viewing using any web browser,
 is included with the WFDB Software Package.  The latest version may always be
-viewed at @code{http://www.physionet.org/physiotools/dbpg/} using your web
+viewed at @code{http://@-www.@-physio@-net.@-org/@-physio@-tools/@-dbpg/} using your web
 browser.
 
 @ifinfo
@@ -495,12 +482,25 @@ Division'').
 @comment  node-name,  next,  previous,  up
 @unnumberedsec Recent changes
 
-This node contains a brief summary of changes to the WFDB library and to this
-guide since the first printing of the ninth edition of this guide in July,
-1995.  See @file{NEWS.TXT} and @file{NEWNEWS.TXT}, in the top-level
-directory of the WFDB Software Package distribution, for details on these
-changes, and for information on any more recent changes that may not be
-described here.
+This section contains a brief summary of changes to the WFDB library and to
+this guide since the first printing of the ninth edition of this guide in July,
+1995.  See @file{NEWS.TXT} and @file{NEWNEWS.TXT}, in the top-level directory
+of the WFDB Software Package distribution, for details on these changes, and
+for information on any more recent changes that may not be described here.
+
+@unnumberedsubsec Changes in version 10.1.1
+
+Record names may contain (absolute or relative) path information as a prefix,
+and if (as a result) an input file is found in a location that does not appear
+explicitly in the WFDB path, that location is appended to the end of the WFDB
+path.  For example, if the WFDB path is
+@file{. http://@-www.@-physio@-net.@-org/@-physio@-bank/@-data@-base}, and the
+record name @file{mitdb/100} is supplied to @code{wfdbinit}, the WFDB library
+will find the header file at
+@code{http://@-www.@-physio@-net.@-org/@-physio@-bank/@-data@-base/@-mitdb/@-100.hea},
+and will then add @code{http://@-www.@-physio@-net.@-org/@-physio@-bank/data@-base/@-mitdb/} to
+the end of the WFDB path so that the signal file (specified as @file{100.dat}
+in the header file) can be found.
 
 @unnumberedsubsec Changes in version 10.1.0
 
@@ -540,7 +540,7 @@ prefixes more easily (human) readable, use whitespace for path component
 separators.
 
 Previous versions of the WFDB library that were compiled for environments other
-than MS-DOS used file names in the format @var{TYPE.RECORD}.  This file
+than MS-DOS used file names in the format @var{type.record}.  This file
 name format is no longer supported.
 
 @unnumberedsubsec Changes in version 10.0.0
@@ -721,10 +721,8 @@ are a few differences noted below.
 
 Suppose we wish to print the first ten samples of record @file{100s}.
 (Record @file{100s} is the first minute of MIT-BIH Arrhythmia Database
-record @file{100}, supplied as a sample with all source distributions of the
-WFDB Software Package.  If you have only the MS-DOS binary version of the
-WFDB library on a CD-ROM, substitute the name of one of the records on
-your CD-ROM for @file{100s} in the program below.)  We might begin by
+record @file{100}, supplied as a sample in the @code{data} directory of all
+source distributions of the WFDB Software Package.)  We might begin by
 creating a source file called @file{psamples.c} that contains:
 
 @example
@@ -841,6 +839,17 @@ functions themselves.  The Fortran wrapper functions are not discussed
 in this guide; for further information, refer to @file{fortran/readme.doc}
 in the WFDB Software Package (included in version 9.4 and later versions).
 
+@cindex Matlab bindings
+@cindex Octave bindings
+@cindex wrappers for Matlab or Octave
+It should be possible to write a similar set of wrapper functions for use with
+Matlab or Octave (a freely available open-source language that is compatible
+with Matlab, available from @code{http://www.che.wisc.edu/octave/}).  At this
+time, such wrappers are not available, but a reimplementation of a useful
+subset of the WFDB library in native m-code (contributed by Jose Garcia Moros
+and Salvador Olmos) is available from
+@code{http://www.physionet.org/physiotools/matlab/}.
+
 @node     WFDB path, running example, other languages, Usage
 @comment  node-name,  next,  previous,  up
 @section The Database Path
@@ -872,9 +881,11 @@ rearranged.
 
 Alternatively, components of the WFDB path may be separated by
 whitespace (under any operating system), and the WFDB path may contain
-@code{http://} and @code{ftp://} URL prefixes.  If @code{NETFILES}
+@code{http://} and @code{ftp://} URL prefixes (other schema, such as
+@code{file://} and @code{https://}, may also be supported if they are
+supported by your version of @code{libwww}).  If @code{NETFILES}
 support is not compiled into the WFDB library, any WFDB path components
-beginning with @code{http://} or @code{ftp://} are ignored.  (These
+containing @file{://} are ignored.  (These
 features were first introduced in WFDB library version 10.1.0.)
 
 When WFDB applications @emph{write} database files, these files are

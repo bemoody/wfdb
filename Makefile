@@ -1,5 +1,5 @@
 # file: Makefile	G. Moody	5 September 1990
-#			Last revised:    11 January 2000	Version 10.1.1
+#			Last revised:    30 January 2000	Version 10.1.1
 # UNIX 'make' description file for the WFDB software package
 #
 # -----------------------------------------------------------------------------
@@ -73,7 +73,7 @@ WFDBDIRS = \
    RESDIR=$(WFDBROOT)/lib/X11/app-defaults
 
 # 'make' or 'make install': compile and install the WFDB software package
-install:	install-slib
+install:	config.cache install-slib
 	cd wave;     $(MAKE) $(WFDBDIRS)
 	cd waverc;   $(MAKE) $(WFDBDIRS)
 	cd app;      $(MAKE) $(WFDBDIRS)
@@ -110,7 +110,11 @@ clean:
 	cd wave-doc; $(MAKE) clean
 	cd waverc;   $(MAKE) clean
 	cd wview;    $(MAKE) -f clean
-	rm -f *~
+	rm -f *~ lib/makefile wave/makefile config.cache
+
+# 'make config.cache': check configuration
+config.cache:
+	sh ./configure
 
 # 'make test-lib': compile the dynamically-linked WFDB library without
 # installing it
