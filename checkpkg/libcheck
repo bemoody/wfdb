@@ -1,0 +1,54 @@
+#!/bin/sh
+# file: libcheck		G. Moody	8 September 2001
+#
+# This script checks the functionality of the WFDB library by comparing the
+# outputs of 'lcheck' with expected outputs.  See 'lcheck.c' for details of
+# the tests performed, or examine the output of 'lcheck -v'.  Note that
+# 'lcheck' must be run within this directory to ensure that its local input
+# files (in ../data) are available.
+#
+# Suggestions for additional checks are welcome;  please send them to the
+# author (george@mit.edu).
+
+if [ \! -s ../data/100s.hea ]
+then
+  echo "Run this program from the 'checkpkg' directory of the WFDB sources."
+  echo "The 'data' directory, including record 100s, must also be present."
+  exit
+fi
+
+test -s Makefile || ( cd ..; ./configure )
+test -s lcheck || make lcheck
+./lcheck -v >lcheck.log
+test -s 100s.chk-expected || cp ../data/100s.atr 100s.chk-expected
+test -s 100x.dat-expected || cp ../data/100s.dat 100x.dat-expected
+test -s 100x.hea-expected ||
+  sed s/100s/100x/ <../data/100s.hea >100x.hea-expected
+CF="lcheck.log 100s.chk 100x.dat 100x.hea"
+if grep -q "WFDB supports NETFILES" lcheck.log
+then
+  CF="$CF udb/100s.chk udb/100x.dat udb/100x.hea"
+  echo -n " Downloading test data, please be patient ..."
+  # Make sure that wfdbcat doesn't copy the files created by lcheck!
+  cd udb
+  test -s 100s.chk-expected || wfdbcat udb/100s.atr >100s.chk-expected
+  test -s 100x.dat-expected || wfdbcat udb/100s.dat >100x.dat-expected
+  test -s 100x.hea-expected ||
+    ( wfdbcat udb/100s.hea | sed s%100s%udb/100x% >100x.hea-expected )
+  cd ..
+  echo " download complete."
+  cp lcheck.log-NETFILES lcheck.log-expected
+else
+  cp lcheck.log-no-NETFILES lcheck.log-expected
+fi
+
+for i in $CF
+do
+	diff -q $i $i-expected &&
+	 ( echo " Files $i and $i-expected match: test succeeded"
+	   rm -f $i $i-expected )
+done
+
+# rmdir will fail if 'udb' is not empty.  This is a *feature*, not a bug --
+# don't fix it!
+rmdir udb

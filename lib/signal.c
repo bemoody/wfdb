@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  7 September 2001		wfdblib 10.2.0
+			Last revised:  9 September 2001		wfdblib 10.2.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -1496,11 +1496,6 @@ int nsig;
 	/* Check that the signal file is readable. */
 	if (hs->info.fmt == 0)
 	    ig->fp = NULL;	/* Don't open a file for a null signal. */
-	else if (strcmp(hs->info.fname, "-") == 0) {
-	    /* The file name '-' specifies the standard input. */
-	    ig->fp->type = WFDB_LOCAL;
-	    ig->fp->fp = stdin;
-	}
 	else { 
 	    ig->fp = wfdb_open(hs->info.fname, (char *)NULL, WFDB_READ);
 	    /* Skip this group if the signal file can't be opened. */
@@ -1646,11 +1641,6 @@ unsigned int nsig;
 	    og->be = og->buf + obuflen;
 	    if (os->info.fmt == 0)
 	        og->fp = NULL;	/* don't open a file for a null signal */
-	    /* The filename '-' specifies the standard output. */
-	    else if (strcmp(os->info.fname, "-") == 0) {
-	        og->fp->type = WFDB_LOCAL;
-		og->fp->fp = stdout;
-	    }
 	    /* An error in opening an output file is fatal. */
 	    else {
 		og->fp = wfdb_open(os->info.fname,(char *)NULL, WFDB_WRITE);
@@ -1775,11 +1765,6 @@ unsigned int nsig;
 	    og->be = og->buf + obuflen;
 	    if (os->info.fmt == 0)
 	        og->fp = NULL;   /* don't open a file for a null signal */
-	    /* The filename '-' specifies the standard output. */
-	    else if (strcmp(os->info.fname, "-") == 0) {
-	        og->fp->type = WFDB_LOCAL;
-	        og->fp->fp = stdout;
-	    }
 	    /* An error in opening an output file is fatal. */
 	    else {
 	        og->fp = wfdb_open(os->info.fname,(char *)NULL, WFDB_WRITE);
@@ -2340,6 +2325,11 @@ char *record;
     if (record != NULL) {
 	/* Save the current record name. */
 	wfdb_setirec(record);
+	/* Don't require the sampling frequency of this record to match that
+	   of the previously opened record, if any.  (readheader will
+	   complain if the previously defined sampling frequency was > 0.) */
+	setsampfreq(0.);
+	/* readheader sets sfreq if successful. */
 	if ((n = readheader(record)) < 0)
 	    /* error message will come from readheader */
 	    return ((WFDB_Frequency)n);

@@ -1,0 +1,99 @@
+[OK]:  Library version matches <wfdb.h>
+[OK]:  WFDB supports NETFILES
+[OK]:  WFDB_MAXANN = 2
+[OK]:  WFDB_MAXSIG = 32
+[OK]:  WFDB_MAXSPF = 4
+[OK]:  WFDB_MAXRNL = 11
+[OK]:  WFDB_MAXUSL = 20
+[OK]:  WFDB_MAXDSL = 60
+[OK]:  Signal formats = {0, 8, 16, 61, 80, 160, 212, 310, 311}
+[OK]:  WFDB_DEFFREQ = 250
+[OK]:  WFDB_DEFGAIN = 200
+[OK]:  WFDB_DEFRES = 12
+[OK]:  Default WFDB path = . http://www.physionet.org/physiobank/database
+[OK]:  WFDB path modified successfully
+[OK]:  sampfreq(NULL) returned 0
+[OK]:  setsampfreq changed sampling frequency successfully
+[OK]:  sampfreq(100s) returned 360
+[OK]:  annopen of 1 file succeeded
+[OK]:  annopen of 2 files succeeded
+[OK]:  strtim returned 1800
+[OK]:  iannsettime skipping forward to     0:05
+[OK]:  getann read: {N 0 0 0} at     0:05.025 (1809)
+[OK]:  getann read: {A 0 0 0} at     0:05.677 (2044)
+[OK]:  getann read: {N 0 0 0} at     0:06.672 (2402)
+[OK]:  getann read: {N 0 0 0} at     0:07.516 (2706)
+[OK]:  getann read: {N 0 0 0} at     0:08.327 (2998)
+[OK]:  iannsettime skipping backward to     0:00
+[OK]:  75 annotations read, 75 written
+[OK]:  isigopen((null), NULL, 0) succeeded
+[OK]:  (at     0:00.000) getframe returned {  995,  1011}
+[OK]:  (at     0:00.002) getframe returned {  995,  1011}
+[OK]:  (at     0:00.005) getframe returned {  995,  1011}
+[OK]:  (at     0:00.008) getframe returned {  995,  1011}
+[OK]:  (at     0:00.011) getframe returned {  995,  1011}
+[OK]:  sampfreq returned 360
+[OK]:  strtim returned 7200
+[OK]:  isigsettime skipping forward to     0:20
+[OK]:  (at     0:20.000) getvec returned {  943,   946} [-0.405, -0.390]
+[OK]:  (at     0:20.002) getvec returned {  942,   945} [-0.410, -0.395]
+[OK]:  (at     0:20.005) getvec returned {  942,   946} [-0.410, -0.390]
+[OK]:  (at     0:20.008) getvec returned {  942,   945} [-0.410, -0.395]
+[OK]:  (at     0:20.011) getvec returned {  942,   949} [-0.410, -0.375]
+[OK]:  isigsettime skipping backward to     0:19.997
+[OK]:  (at     0:19.997) getframe returned {  940,   944}
+[OK]:  (at     0:20.000) getframe returned {  943,   946}
+[OK]:  (at     0:20.002) getframe returned {  942,   945}
+[OK]:  (at     0:20.005) getframe returned {  942,   946}
+[OK]:  (at     0:20.008) getframe returned {  942,   945}
+[OK]:  (at     0:20.011) getframe returned {  942,   949}
+[OK]:  isigsettime skipping backward to     0:00.000
+[OK]:  osigfopen returned 2
+[OK]:  getframe read 21600 samples
+[OK]:  putvec wrote 21600 samples
+[OK]:  newheader created header for output record 100x
+[OK]:  3 info strings copied to record 100x header
+[OK]:  Repeating tests using NETFILES (reverting to default WFDB path)
+[OK]:  sampfreq(NULL) returned 0
+[OK]:  setsampfreq changed sampling frequency successfully
+[OK]:  sampfreq(udb/100s) returned 360
+[OK]:  annopen of 1 file succeeded
+[OK]:  annopen of 2 files succeeded
+[OK]:  strtim returned 1800
+[OK]:  iannsettime skipping forward to     0:05
+[OK]:  getann read: {N 0 0 0} at     0:05.025 (1809)
+[OK]:  getann read: {A 0 0 0} at     0:05.677 (2044)
+[OK]:  getann read: {N 0 0 0} at     0:06.672 (2402)
+[OK]:  getann read: {N 0 0 0} at     0:07.516 (2706)
+[OK]:  getann read: {N 0 0 0} at     0:08.327 (2998)
+[OK]:  iannsettime skipping backward to     0:00
+[OK]:  75 annotations read, 75 written
+[OK]:  isigopen((null), NULL, 0) succeeded
+[OK]:  (at     0:00.000) getframe returned {  995,  1011}
+[OK]:  (at     0:00.002) getframe returned {  995,  1011}
+[OK]:  (at     0:00.005) getframe returned {  995,  1011}
+[OK]:  (at     0:00.008) getframe returned {  995,  1011}
+[OK]:  (at     0:00.011) getframe returned {  995,  1011}
+[OK]:  sampfreq returned 360
+[OK]:  strtim returned 7200
+[OK]:  isigsettime skipping forward to     0:20
+[OK]:  (at     0:20.000) getvec returned {  943,   946} [-0.405, -0.390]
+[OK]:  (at     0:20.002) getvec returned {  942,   945} [-0.410, -0.395]
+[OK]:  (at     0:20.005) getvec returned {  942,   946} [-0.410, -0.390]
+[OK]:  (at     0:20.008) getvec returned {  942,   945} [-0.410, -0.395]
+[OK]:  (at     0:20.011) getvec returned {  942,   949} [-0.410, -0.375]
+[OK]:  isigsettime skipping backward to     0:19.997
+[OK]:  (at     0:19.997) getframe returned {  940,   944}
+[OK]:  (at     0:20.000) getframe returned {  943,   946}
+[OK]:  (at     0:20.002) getframe returned {  942,   945}
+[OK]:  (at     0:20.005) getframe returned {  942,   946}
+[OK]:  (at     0:20.008) getframe returned {  942,   945}
+[OK]:  (at     0:20.011) getframe returned {  942,   949}
+[OK]:  isigsettime skipping backward to     0:00.000
+[OK]:  osigfopen returned 2
+[OK]:  getframe read 21600 samples
+[OK]:  putvec wrote 21600 samples
+[OK]:  newheader created header for output record udb/100x
+[OK]:  3 info strings copied to record udb/100x header
+[OK]:  no WFDB library errors
+no errors: test succeeded

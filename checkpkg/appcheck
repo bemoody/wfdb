@@ -7,18 +7,168 @@
 # Suggestions for additional checks are welcome;  please send them to the
 # author (george@mit.edu).
 
-i=libcheck.log
-diff -q $i $i-expected &&
-     ( echo " Files $i and $i-expected match: test succeeded"
-       rm -f $i )
-rm -rf mitdb 100s.chk
+WFDB=". ../data http://www.physionet.org/physiobank/database"
+export WFDB
+
+echo Testing wfdbwhich ...
+F=wfdbwhich.out
+wfdbwhich 100s.atr >$F 2>&1
+diff -q $F expected &&
+ ( echo " Files $F and expected/$F match: test succeeded"
+   rm -f $F )
+
+echo Testing wfdbcat ...
+F=wfdbcat.out
+wfdbcat 100s.atr >$F 2>&1
+diff -q $F expected &&
+ ( echo " Files $F and expected/$F match: test succeeded"
+   rm -f $F )
+
+echo Testing rdann ...
+F=rdann.out
+rdann -r 100s -a atr >$F
+diff -q $F expected &&
+ ( echo " Files $F and expected/$F match: test succeeded"
+ )
+
+echo Testing wrann ...
+F=100s.wra
+wrann -r 100s -a wra <rdann.out
+diff -q $F expected &&
+ ( echo " Files $F and expected/$F match: test succeeded"
+   rm -f $F )
+rm rdann.out
+
+echo Testing rdsamp ...
+F=rdsamp.out
+rdsamp -r 100s -f 10 -t 11 -p -v >$F
+diff -q $F expected &&
+ ( echo " Files $F and expected/$F match: test succeeded"
+ )
+
+echo Testing wrsamp ...
+F=100w.dat
+wrsamp -o 100w -f 2 -F 360 -x 200 1 2 <rdsamp.out
+diff -q $F expected &&
+ ( echo " Files $F and expected/$F match: test succeeded"
+   rm -f $F )
+F=100w.hea
+diff -q $F expected &&
+ ( echo " Files $F and expected/$F match: test succeeded"
+   rm -f $F )
+rm rdsamp.out
+
+echo Testing ann2rr ...
+F=ann2rr.out
+ann2rr -r 100s -a atr >$F
+diff -q $F expected &&
+ ( echo " Files $F and expected/$F match: test succeeded"
+ )
+
+echo Testing rr2ann ...
+F=100s.a2r
+rr2ann -r 100s -a a2r <ann2rr.out
+diff -q $F expected &&
+ ( echo " Files $F and expected/$F match: test succeeded"
+   rm -f $F )
+rm ann2rr.out
+
+echo Testing sqrs ...
+F=100s.qrs
+sqrs -r 100s 2>/dev/null
+diff -q $F expected &&
+ ( echo " Files $F and expected/$F match: test succeeded"
+ )
+
+echo Testing bxb ...
+F=bxb.out
+bxb -r 100s -a atr qrs -f 0 >$F 2>&1
+diff -q $F expected &&
+ ( echo " Files $F and expected/$F match: test succeeded"
+   rm -f $F )
+
+echo Testing rxr ...
+F=rxr.out
+rxr -r 100s -a atr qrs -f 0 >$F 2>&1
+diff -q $F expected &&
+ ( echo " Files $F and expected/$F match: test succeeded"
+   rm -f $F )
+
+rm 100s.qrs
+
+echo Testing ihr ...
+F=ihr.out
+ihr -r 100s -a atr >$F
+diff -q $F expected &&
+ ( echo " Files $F and expected/$F match: test succeeded"
+   rm -f $F )
+
+echo Testing sampfreq ...
+F=sampfreq.out
+sampfreq 100s >$F
+diff -q $F expected &&
+ ( echo " Files $F and expected/$F match: test succeeded"
+   rm -f $F )
+
+echo Testing sigamp ...
+F=sigamp.out
+sigamp -r 100s -a atr >$F
+diff -q $F expected &&
+ ( echo " Files $F and expected/$F match: test succeeded"
+   rm -f $F )
+
+echo Testing sumann ...
+F=sumann.out
+sumann -r 100s -a atr >$F
+diff -q $F expected &&
+ ( echo " Files $F and expected/$F match: test succeeded"
+   rm -f $F )
+
+echo Testing tach ...
+F=tach.out
+tach -r 100s -a atr >$F
+diff -q $F expected &&
+ ( echo " Files $F and expected/$F match: test succeeded"
+   rm -f $F )
+
+echo Testing wfdbdesc ...
+F=wfdbdesc.out
+wfdbdesc 100s >$F
+diff -q $F expected &&
+ ( echo " Files $F and expected/$F match: test succeeded"
+   rm -f $F )
 
 echo Testing xform ...
 xform -i mimicdb/237/237 -s 1 2 0 3 -f 9:19:45 -t "[22:01:23 20/07/1995]" \
- -a all -M -n test -S response >test.log 2>&1
-for i in test.log test.hea test.dat test.all
+ -a all -M -n xform -S response >xform.out 2>&1
+for F in xform.out xform.hea xform.dat xform.all
 do
-	diff -q $i $i-expected &&
-	 ( echo " Files $i and $i-expected match: test succeeded"
-	   rm -f $i )
+  diff -q $F expected &&
+   ( echo " Files $F and expected/$F match: test succeeded"
+     rm -f $F )
 done
+
+cat <<EOF
+
+These programs are not (yet) tested by this script:
+
+calsig
+ecgeval
+epic
+fir
+mfilt
+mrgann
+mxm
+nst
+plotstm
+pscgen
+pschart
+psfd
+skewedit
+snip
+sortann
+sqrs125
+sumstats
+wfdbcollate
+
+EOF
