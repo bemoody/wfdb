@@ -119,6 +119,7 @@ make-all:	all
 lib-post-install:
 	-(cd $(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_SONAME))
 	-(cd $(LIBDIR); ln -sf $(WFDBLIB_SONAME) $(WFDBLIB_BASENAME))
+	-([ -x /usr/sbin/selinuxenabled ] && /usr/sbin/selinuxenabled && /sbin/restorecon $(LIBDIR)/$(WFDBLIB))
 	@$(LDCONFIG) || echo Warning: "$(LDCONFIG)" was unsuccessful
 
 lib-post-uninstall:
