@@ -660,9 +660,10 @@ are a few differences noted below.
 * print samples::		A trivial example program.
 * compiling::			Compiling a C program with the WFDB library.
 * other languages::             Using the WFDB library with C++ or Fortran.
-* WFDB path::			The database path (environment variable WFDB).
+* WFDB path::			WFDB library environment variables.
 * running example::		Running the example program.
 * name restrictions::		Names to avoid when writing your programs.
+* WFDB path syntax::		Customizing the WFDB path.
 * exercises 1::			A few questions.
 @end menu
 
@@ -747,8 +748,9 @@ development system (@code{http://@-source@-.redhat@-.com/@-cygwin/}),
 and also in the freely available MinGW package
 (@code{http://@-www@-.mingw@-.org/}).  An MS-DOS version of @file{gcc}
 is available in the free djgpp package
-(@code{http://@-www@-.delorie@-.com/@-djgpp/}). These are used in exactly
-the same way as described above for Unix C compilers..
+(@code{http://@-www@-.delorie@-.com/@-djgpp/}). These are used within a
+Cygwin terminal emulator window or an MS-DOS box in exactly the same way
+as described above for Unix C compilers.
 
 Each proprietary C or C++ compiler has its own idiosyncratic syntax, so no
 general rule can be given for these.  With Microsoft C/C++, use:
@@ -801,6 +803,7 @@ arguments are passed by reference rather than by value).  For example,
 here is the Fortran equivalent of the example program in the previous
 section:
 
+@page
 @example
         integer i, v(2), g
 
@@ -817,7 +820,7 @@ section:
 To compile this program using @code{g77} (the GNU Fortran compiler), save it as
 @file{fsamples.f}, copy @file{wfdbf.c} from the @file{fortran} directory of the
 WFDB Software Package sources or from
-@code{http://\-www.\-physio\-net.\-org/\-physio\-tools/\-wfdb/\-fortran/\-wfdbf.c},
+@code{http://@-www.@-physio@-net.@-org/@-physio@-tools/@-wfdb/@-fortran/@-wfdbf.c},
 then type:
 
 @example
@@ -843,7 +846,7 @@ library in native m-code (contributed by Jose Garcia Moros and Salvador Olmos)
 is available from
 @code{http://www.@-physio@-net.@-org/@-physio@-tools/@-matlab/}.  Jesus Olivan
 Palacios has written a tutorial (available at
-@code{http://www.@-neurotraces.@-com/@-scilab/@-sciteam/} on using the WFDB
+@code{http://www.@-neurotraces.@-com/@-scilab/@-sciteam/}) on using the WFDB
 Software Package with Scilab.
 
 @node     WFDB path, running example, other languages, Usage
@@ -871,140 +874,34 @@ WFDB applications.
 
 When WFDB applications @emph{read} database files, they must be able to
 find them in various locations that may vary from system to system.  The
-WFDB library refers to a character string (the value of the @code{WFDB}
-environment variable) that consists of an ordered list of locations to
-be searched @emph{for input files}.  This string is called the
-@dfn{database path}, or the @dfn{WFDB path}.
+WFDB library refers to a character string that consists of an ordered
+list of locations to be searched @emph{for input files}.  This string is
+called the @dfn{database path}, or the @dfn{WFDB path}.
 
-Under Unix and VMS, the WFDB path can be given as a colon-separated list
-of prefixes, in the format used for the Bourne shell's @code{PATH}
-variable.  Under MS-Windows, MS-DOS, and MacOS, the WFDB path can be
-given in the format used for the MS-DOS @code{PATH} variable, with
-semicolons used to separate prefixes (colons retain their customary
-meanings, as drive letter suffixes under MS-DOS, or as directory
-separators on the Macintosh).  Alternatively, components of the WFDB
-path may be separated by whitespace (under any operating system); this
-also implies that embedded spaces are not permitted within path
-components.  @strong{For this reason, avoid using directories with names
-such as @file{My Documents}, or their subdirectories, to store WFDB files).}
-
-When a WFDB file must be opened for input, the WFDB library attempts to
-locate it by attaching each of the components of the WFDB path (one at a
-time) as a prefix to the file name.  If two or more matching files exist
-in different locations in the WFDB path, the WFDB library opens only the
-file that resides in the first of these locations named in the WFDB
-path.  Any other matching files are effectively invisible to WFDB
-applications unless the WFDB path is rearranged.
-
-@cindex NETFILES
-The WFDB path may contain @code{http://} and @code{ftp://} URL prefixes
-(other schema, such as @code{file://} and @code{https://}, may also be
-supported if they are supported by your version of @code{libwww}).  If
-NETFILES support is not compiled into the WFDB library, any WFDB
-path components containing @file{://} are ignored.  (These features were
-first introduced in WFDB library version 10.1.0.)
-
-When WFDB applications @emph{write} database files, these files are
-generally written to the current directory.  (As an example, an
-application that analyzes one or more signals in a record may record its
-findings in an annotation file in the current directory.)  If the record
-name (as provided by the application to the WFDB library) contains path
-information, however, output files are written to the corresponding
-subdirectory of the current directory.  (For example, if a WFDB
-application writes an annotation file for record @code{edb/e0103}, the
-file will be written in the @code{edb} subdirectory of the current
-directory.  The @code{edb} subdirectory will be created by the WFDB
-library if does not exist already.)
-
-Note particularly that the current directory is @emph{not} necessarily
-part of the WFDB path.  In order to be sure that your WFDB applications can
-read any WFDB files that you have previously written in the current
-directory, be sure that your WFDB path includes an empty (null) component,
-which corresponds to the current directory.  In most cases, this null
-component should be the first in the WFDB path.  Thus, if you write into
-the current directory a modified version of an existing WFDB file, any
-later actions that would read this file will read your modified version
-rather than the original.
-
-@cindex database path (default)
-
-A default WFDB path may be specified at the time the WFDB library is
-compiled, by defining a value for the symbol @code{DEFWFDB} in
-@file{wfdblib.h}.  On most systems, the environment variable @code{WFDB}, if
-set, specifies the value of the WFDB path, and overrides the default value
-if any.  On the Macintosh, for which the concept of environment
-variables is foreign, the WFDB path may be set only by using
-@code{DEFWFDB}.
-
-@cindex indirect WFDB path
-@cindex file containing WFDB path
-@cindex database path file (indirect)
-
-If the WFDB library finds that the value assigned to the WFDB path is of the
-form @samp{@@@var{file}}, it replaces that value with the contents of
-the specified @var{file}.  (This feature was first introduced in WFDB
-library version 8.0.)  Indirect WFDB path files may be nested up to ten
-levels (this arbitrary limit is imposed to avoid infinite recursion if
-the contents of the indirect file are incorrect).  This method of
-indirect assignment is useful on the Macintosh, where recompilation of
-the WFDB library would otherwise be necessary in order to change the WFDB
-path.  It may also be useful under MS-DOS to reduce the need for
-environment space, or if the length of the command needed to set the
-@code{WFDB} environment variable would otherwise approach or exceed the
-128-byte limit for MS-DOS commands.
-
-If a WFDB header file (@pxref{Database Files}) specifies that a signal
-file is to be found in a directory that is not already in the WFDB path,
-that directory is appended to the end of the WFDB path; in this case, if
-the WFDB path is not set, it is created with an initial null component
-followed by the directory that contains the signal file.  (This feature
-was first introduced in WFDB library version 6.2.)
-
-The string @samp{%r} is replaced by the current record name wherever it appears
-in the WFDB path;  @samp{%@var{N}r} is replaced by the first @var{N}
-digits of the record name, if @var{N} is a non-zero digit.  For example,
-if (under Unix) the WFDB path is @samp{:/cdrom/mimicdb/%3r:/cdrom/mitdb},
-a request to read a file associated with record 055n will cause the WFDB
-library to look first in the current directory (since the WFDB path begins
-with an empty component), then in @samp{/cdrom/mimicdb/055}, and then in
-@samp{/cdrom/mitdb}.  If @samp{%} is followed by any character other than
-@samp{r} or a non-zero digit followed by @samp{r}, that character is used
-as is in the WFDB path;  thus a literal @samp{%} can be included in the WFDB
-path by `escaping' it as @samp{%%}.  (Substitutions of @samp{%}-strings
-in the WFDB path were first introduced in WFDB library version 9.7.)
-
-Current versions of the WFDB library are compiled with a three-component
-default WFDB path; the first component is empty (i.e., it refers to the current
-directory), the second component names the @dfn{system-wide database directory}
-(which contains the sample WFDB files supplied with the WFDB software package),
-and the third component is @code{http://www.physionet.org/physiobank/database}
-(referring to the PhysioBank data archives).  Note that this default may be
-changed at the time the WFDB library is compiled.  Normally, however, this
-means that any record available from PhysioBank is readable by any WFDB
-application provided that PhysioBank is accessible from the user's computer and
-that the database name is included in the record name (for example,
-@file{slpdb/slp60} or @file{nsrdb/16265}).
-
-If you need to use a non-default WFDB path, you must set the @code{WFDB}
+On most systems, the environment variable @code{WFDB}, if set, specifies
+the value of the WFDB path, and overrides the default value.  If you
+need to use a non-default WFDB path, you must set the @code{WFDB}
 environment variable appropriately before running any WFDB applications,
 so that the WFDB path can be examined by the running program.  The WFDB
 software package includes easily customizable shell scripts (batch
 files) that illustrate how to do this for popular shells and command
 interpreters; see @emph{setwfdb}(1), in the @cite{WFDB Applications
-Guide}.
+Guide}.  (On the Macintosh, for which the concept of environment
+variables is foreign, the WFDB path may be set only by using
+@code{DEFWFDB}.)  For further information, @pxref{WFDB path syntax}.
 
 @cindex calibration file
 @cindex @code{WFDBCAL} (environment variable)
-These shell scripts also set the @code{WFDBCAL} environment variable,
-which is important if you make use of records that contain signals other
-than ECGs.  @code{WFDBCAL} names a @dfn{calibration file} located in one
-of the directories named by @code{WFDB}.  (The symbol @code{DEFWFDBCAL}
-is usually defined in @file{wfdblib.h} to specify the name of a default
-calibration file, to be used by the WFDB library if @code{WFDBCAL} has
-not been set.)  Each signal type may be represented by an entry in the
-calibration file.  Entries specify the characteristics of any
-calibration pulses that may be present, and customary scales for
-plotting the signals.
+The shell scripts that set @code{WFDB} also set the @code{WFDBCAL}
+environment variable, which is important if you make use of records that
+contain signals other than ECGs.  @code{WFDBCAL} names a
+@dfn{calibration file} located in one of the directories named by
+@code{WFDB}.  (The symbol @code{DEFWFDBCAL} is usually defined in
+@file{wfdblib.h} to specify the name of a default calibration file, to
+be used by the WFDB library if @code{WFDBCAL} has not been set.)  Each
+signal type may be represented by an entry in the calibration file.
+Entries specify the characteristics of any calibration pulses that may
+be present, and customary scales for plotting the signals.
 
 @cindex annotation (canonical order)
 @cindex canonical order of annotations
@@ -1043,7 +940,7 @@ and its output will appear as:
 The left column contains samples from signal 0, and the right column
 contains those from signal 1.
 
-@node     name restrictions, exercises 1, running example, Usage
+@node     name restrictions, WFDB path syntax, running example, Usage
 @section A Note on Identifiers
 @cindex function name restrictions
 @cindex external identifiers (restrictions)
@@ -1066,7 +963,115 @@ External identifiers beginning with @samp{WFDB_} are used for constants
 and data types defined within @file{<wfdb/wfdb.h>}.  Use these identifiers
 as needed in your programs, but avoid redefining them.
 
-@node     exercises 1, , name restrictions, Usage
+@node     WFDB path syntax, exercises 1, name restrictions, Usage
+@section More About the WFDB Path
+
+When a WFDB file must be opened for input, the WFDB library attempts to
+locate it by attaching each of the components of the WFDB path (one at a
+time) as a prefix to the file name.  If two or more matching files exist
+in different locations in the WFDB path, the WFDB library opens only the
+file that resides in the first of these locations.  Any other matching
+files are effectively invisible to WFDB applications unless the WFDB
+path is rearranged.
+
+@cindex database path (default)
+
+The default WFDB path is specified at the time the WFDB library is
+compiled, by defining a value for the symbol @code{DEFWFDB} in
+@file{wfdblib.h}.  Current versions of the WFDB library are compiled
+with a three-component default WFDB path; the first component is empty
+(i.e., it refers to the current directory), the second component names
+the @dfn{system-wide database directory} (which contains the sample WFDB
+files supplied with the WFDB software package), and the third component
+is @code{http://www.physionet.org/physiobank/database} (referring to the
+PhysioBank data archives).  Note that this default may be changed at the
+time the WFDB library is compiled.  Normally, however, this means that
+any record available from PhysioBank is readable by any WFDB application
+provided that PhysioBank is accessible from the user's computer and that
+the database name is included in the record name (for example,
+@file{slpdb/slp60} or @file{nsrdb/16265}).
+
+Under Unix and VMS, the WFDB path can be given as a colon-separated list
+of prefixes, in the format used for the Bourne shell's @code{PATH}
+variable.  Under MS-Windows, MS-DOS, and MacOS, the WFDB path can be
+given in the format used for the MS-DOS @code{PATH} variable, with
+semicolons used to separate prefixes (colons retain their customary
+meanings, as drive letter suffixes under MS-DOS, or as directory
+separators on the Macintosh).  Alternatively, components of the WFDB
+path may be separated by whitespace (under any operating system); this
+also implies that embedded spaces are not permitted within path
+components.  @strong{For this reason, avoid using directories with names
+such as @file{My Documents}, or their subdirectories, to store WFDB files.}
+
+When WFDB applications @emph{write} database files, these files are
+generally written to the current directory.  (As an example, an
+application that analyzes one or more signals in a record may record its
+findings in an annotation file in the current directory.)  If the record
+name (as provided by the application to the WFDB library) contains path
+information, however, output files are written to the corresponding
+subdirectory of the current directory.  (For example, if a WFDB
+application writes an annotation file for record @code{edb/e0103}, the
+file will be written in the @code{edb} subdirectory of the current
+directory.  The @code{edb} subdirectory will be created by the WFDB
+library if does not exist already.  This feature was introduced in WFDB
+library version 10.2.0.)
+
+Note particularly that the current directory is @emph{not} necessarily
+part of the WFDB path.  If you modify your WFDB path, you must
+explicitly include an empty (null) component, which corresponds to the
+current directory, in order to be sure that your WFDB applications can
+read any WFDB files that you have previously written.  In most cases,
+this null component should be the first in the WFDB path.  Thus, if you
+write into the current directory a modified version of an existing WFDB
+file, any later actions that would read this file will read your
+modified version rather than the original.
+
+@cindex NETFILES
+The WFDB path may contain @code{http://} and @code{ftp://} URL prefixes
+(other schema, such as @code{file://} and @code{https://}, may also be
+supported if they are supported by your version of @code{libwww}).  If
+NETFILES support is not compiled into the WFDB library, any WFDB
+path components containing @file{://} are ignored.  (These features were
+first introduced in WFDB library version 10.1.0.)
+
+@cindex indirect WFDB path
+@cindex file containing WFDB path
+@cindex database path file (indirect)
+
+If the WFDB library finds that the value assigned to the WFDB path is of the
+form @samp{@@@var{file}}, it replaces that value with the contents of
+the specified @var{file}.  (This feature was first introduced in WFDB
+library version 8.0.)  Indirect WFDB path files may be nested up to ten
+levels (this arbitrary limit is imposed to avoid infinite recursion if
+the contents of the indirect file are incorrect).  This method of
+indirect assignment is useful on the Macintosh, where recompilation of
+the WFDB library would otherwise be necessary in order to change the WFDB
+path.  It may also be useful under MS-DOS to reduce the need for
+environment space, or if the length of the command needed to set the
+@code{WFDB} environment variable would otherwise approach or exceed the
+128-byte limit for MS-DOS commands.
+
+If a WFDB header file (@pxref{Database Files}) specifies that a signal
+file is to be found in a directory that is not already in the WFDB path,
+that directory is appended to the end of the WFDB path; in this case, if
+the WFDB path is not set, it is created with an initial null component
+followed by the directory that contains the signal file.  (This feature
+was first introduced in WFDB library version 6.2.)
+
+The string @samp{%r} is replaced by the current record name wherever it appears
+in the WFDB path;  @samp{%@var{N}r} is replaced by the first @var{N}
+digits of the record name, if @var{N} is a non-zero digit.  For example,
+if (under Unix) the WFDB path is @samp{:/cdrom/mimicdb/%3r:/cdrom/mitdb},
+a request to read a file associated with record 055n will cause the WFDB
+library to look first in the current directory (since the WFDB path begins
+with an empty component), then in @samp{/cdrom/mimicdb/055}, and then in
+@samp{/cdrom/mitdb}.  If @samp{%} is followed by any character other than
+@samp{r} or a non-zero digit followed by @samp{r}, that character is used
+as is in the WFDB path;  thus a literal @samp{%} can be included in the WFDB
+path by `escaping' it as @samp{%%}.  (Substitutions of @samp{%}-strings
+in the WFDB path were first introduced in WFDB library version 9.7.)
+
+@node     exercises 1, , WFDB path syntax, Usage
 @section Exercises
 
 These exercises should require only a few minutes.  If you work through
@@ -1083,7 +1088,7 @@ download and install the most recent version from PhysioNet first
 
 @item
 Find out where database records are kept on your system.  What records
-are available?
+are available locally?
 
 @item
 Modify the example program so that you can specify the record to be
@@ -7074,6 +7079,9 @@ annotation ``points''.
 @item WFDB library
 A set of functions (subroutines), able to read and write database files,
 callable by C and C++ programs, and described in this guide.
+
+@item WFDB path
+The database path (q.v.).
 @end table
 
 @node     Installation, WFDB Applications, Glossary, Top
@@ -7178,14 +7186,14 @@ compiler. Your feedback is appreciated.
 
 Before beginning the installation of the WFDB Software Package, obtain and
 install the @code{libwww} package from @code{http://www.w3.org/Library/} or
-from @code{http://\-www.physio\-net.org/physio\-tools/libwww/}.  You may
+from @code{http://@-www.physio@-net.org/physio@-tools/libwww/}.  You may
 omit this step if you do not wish to have NETFILES support.
 
 Download
-@code{http://www.physio\-net.org/physio\-tools/binaries/win\-dows/bin/which.exe}
+@code{http://www.physio@-net.org/physio@-tools/binaries/win@-dows/bin/which.exe}
 and put it into a directory in your PATH.  (This utility is needed by
 @code{configure} in a later step.  The sources for @code{which.exe} are
-available within @code{http://www.physio\-net.org/physio\-tools/util\-ities/}.)
+available within @code{http://www.physio@-net.org/physio@-tools/util@-ities/}.)
 
 Open a Cygwin terminal window (the Cygwin installer will have added this to
 your MS-Windows start menu).  Perform the remaining steps by typing the

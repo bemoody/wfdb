@@ -95,8 +95,4 @@
 #    the Applications Guide, type `make appguide' (but read `tmac.dif' first,
 #    unless you are using groff). To print the Programmer's Guide, type
 #    `make guide'.
-#  - Finally, if you can't or don't wish to print your own copies, nicely
-#    printed and bound copies are available from MIT (see `../../../ORDER.4M').
-# Sources for ghostscript, groff, gtbl, TeX, LaTeX, texi2dvi, and dvips are
-# all freely available (see `../SOURCES').
 # _____________________________________________________________________________

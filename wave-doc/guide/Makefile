@@ -1,27 +1,62 @@
 # file: Makefile	G. Moody	 9 August 1992
-#			Last revised:	4 February 2000
+#			Last revised:  16 November 2001
 # `make' description file for printing the WAVE User's Guide
 
-# Copyright(C) Massachusetts Institute of Technology 2000. All rights reserved.
+# -----------------------------------------------------------------------------
+# WAVE: Waveform analyzer, viewer, and editor
+# Copyright (C) 2001 George B. Moody
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc.,  59 Temple
+# Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+# You may contact the author by e-mail (george@mit.edu) or postal mail
+# (MIT Room E25-505A, Cambridge, MA 02139 USA).  For updates to this software,
+# please visit PhysioNet (http://www.physionet.org/).
+# _____________________________________________________________________________
+#
+# This file is used with the UNIX `make' command to install on-line
+# documentation for WAVE, and also to format and print it.  Before using this
+# file for the first time, check that the site-specific variables below are
+# appropriate for your system.
 
-# Type `make guide' to print the compressed PostScript source.  You will need
-# gzip, a PostScript printer (or GhostScript and a supported printer), and
-# about 130 sheets of paper.  Make sure that PRINT is set correctly for your
-# system below.
-
-# If you have LaTeX2e, makeindex, and dvips, you can regenerate the PostScript
-# from the text source and the figure files.  To do this, type `make wug.psz'.
-# If you have an older version of LaTeX (2.09 or earlier), you will need to
-# update it to LaTeX2e in order to do this successfully.
-
-# If you have LaTeX2html and additional freely available software described
-# in the LaTeX2html documentation, you can regenerate the HTML version of the
-# WAVE User's Guide by typing `make html' (see below).
-
-# All of the software mentioned above is freely available;  see ../SOURCES.
+# WAVE documentation exists in several forms:
+#  * The WAVE User's Guide:  This guide (for which sources can be found in
+#    this directory) includes a comprehensive tutorial with reference material.
+#    Up-to-date HTML and PostScript versions of this guide can be found on
+#    PhysioNet.  If you have LaTeX2e, makeindex, and dvips, you can regenerate
+#    the PostScript version of the guide from the sources.using this file, by
+#    typing 'make guide'.  If you also have LaTeX2html and additional freely
+#    available software described in the LaTeX2html documentation, you can
+#    regenerate the HTML version of the WAVE User's Guide by typing `make html'
+#    (see below).
+#  * wave.1:  This man page lists WAVE options, X11 resources, and provides a
+#    concise reference.  It is included in the WFDB Applications Guide, and
+#    its source can be found in ../../doc.  
+#  * wave.info:  This file contains XView spot help for WAVE (if your window
+#    manager cooperates, you can point to any WAVE control and use the HELP
+#    key to get a brief explanation of what it does).  Where additional
+#    information is available in the WAVE User's Guide, this file contains
+#    links to the relevant nodes.  The source for wave.info is wave.inf, which
+#    is located in ../../wave.  In order to regenerate wave.info from wave.inf,
+#    use 'make html' to generate the HTML version of the WAVE User's Guide;
+#    this will automatically update the links in wave.info and will install
+#    the updated version in ../../wave.  In order to use wave.info, you must
+#    install it into HELPDIR/wave (defined in ../../wave/Makefile), which is
+#    done when you compile and install WAVE itself.
 
 # TROFF is the name of the program that prints UNIX troff files (needed to
-# format the covers of the guide).  Use `groff' if you have GNU groff (the
+# format the cover of the guide).  Use `groff' if you have GNU groff (the
 # preferred formatter).
 TROFF = groff
 # Use `ptroff' if you have Adobe TranScript software.
@@ -70,7 +105,7 @@ wugcover.psz:
 	$(TROFF) cover.wug | gzip >wugcover.psz
 
 # `make html':  process the LaTeX source using latex2html.  This has been
-# tested with latex2html version 96.1.  The file `.latex2html.init' in this
+# tested with latex2html version 1.47.  The file `.latex2html.init' in this
 # directory defines special settings needed to create the HTML files as
 # distributed with WAVE.  If you are not using Netscape as your browser, you
 # may want to select a different HTML version or other optimizations.  The
@@ -113,7 +148,6 @@ html:	wug.ps 	# (we also need wug.aux, made with wug.dvi by 'make wug.ps')
 	mv $(HTMLDIR)/wug/*.pl .
 	cd $(HTMLDIR)/wug; ln -s wug.htm index.html; find `pwd` -print | doschk
 	./fixinfo >../../wave/wave.info
-	cp -p ../../wave/wave.info /usr/local/help/wave/wave.info
 
 clean:
 	rm -f wug.aux wug.dvi wug.idx wug.ilg wug.ind wug.lof wug.log wug.toc

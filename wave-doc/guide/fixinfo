@@ -8,22 +8,25 @@ sub init_labels {
     <LABELS>;
     <LABELS>;
     <LABELS>;
+    <LABELS>;
     while (<LABELS>) {
 	@words = split(/\//);
 	$key = @words[1];
 	$_ = <LABELS>;
-	@words = split(/'/);
+	@words = split(/\|/);
 	$node = @words[1];
 	chop($node);
 	if ($key =~ /..*/) {
 		$label{$key} = $node;
 	}
+	<LABELS>;
+	<LABELS>;
     }
     close(LABELS);
 }
 
 sub fixinfo {
-    open(INFO, "wave.inf");
+    open(INFO, "../../wave/wave.inf");
     while (<INFO>) {
 	if ($_ =~ /:.*:%*%/) {
 	    @words = split(/%/);

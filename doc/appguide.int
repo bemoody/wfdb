@@ -1,5 +1,5 @@
 \" file: appguide.int		G. Moody	July 1989
-\"				Last revised:  26 October 2001
+\"				Last revised:  15 November 2001
 \" Table of contents and introduction to the WFDB Applications Guide.
 \"
 \" To print this document using GNU groff, use:
@@ -35,59 +35,60 @@ ann2rr, rr2aaann	convert annotation files to interval lists and vice versa	4
 bxb	ANSI/AAMI-standard beat-by-beat annotation comparator	6
 calsig	calibrate signals of a DB record	8
 coherence	estimate coherence and cross-spectrum of two time series	10
-ecgeval	generate and run ECG analyzer evaluation script	11
-epic	ANSI/AAMI-standard episode-by-episode annotation comparator	12
-fft	fast Fourier transform	14
-fir	general-purpose FIR filter for WFDB records	16
-hrfft, hrlomb, hrmem, hrplot	calculate and plot heart rate power spectra	18
-ihr	calculate instantaneous heart rate	20
-log10	calculate common logarithms of two-column data	21
-lomb	estimate power spectrum using the Lomb periodogram method	22
-memse	estimate power spectrum using maximum entropy (all poles) method	23
-mfilt	general-purpose median filter for WFDB records	25
-mrgann	merge annotation files	26
-mxm	ANSI/AAMI-standard measurement-by-measurement comparator	28
-nst	noise stress test for ECG analysis programs	30
-plot2d, plot3d	make 2-D or 3-D plots from text files of data, using \fIgnuplot\fR	33
-plotstm	produce scatter plot of ST measurement errors on a PostScript device	35
-plt	make 2-D plots	36
-pschart	produce annotated `chart recordings' on a PostScript device	41
-psfd	produce annotated `full-disclosure' plots on a PostScript device	45
-rdann	read a WFDB annotation file	49
-rdsamp	read WFDB signal files	51
-rxr	ANSI/AAMI-standard run-by-run annotation comparator	52
-sampfreq	show sampling frequency for a record	54
-sample	digitize and replay analog signals (MS-DOS only)	55
-setwfdb, cshsetwfdb	set WFDB environment variables	59
-sigamp	measure signal amplitudes of a WFDB record	61
-skewedit	edit skew fields of header file(s)	62
-snip	copy an excerpt of a WFDB record	63
-sortann	rearrange annotations in canonical order	64
-sqrs, sqrs125	single-channel QRS detector	66
-sumann	summarize the contents of a WFDB annotation file	68
-sumstats	derive aggregate statistics from bxb, rxr, etc., line-format output	69
-tach	heart rate tachometer	70
-view, vsetup	WFDB browser for MS-DOS	72
-wave	waveform analyzer, viewer, and editor for the X Window System	75
-wfdbcat	copy WFDB records to standard output	85
-wfdbcollate	collate WFDB records into a multi-segment record	86
-wfdbdesc	read signal specifications	88
-wfdbwhich	find a WFDB file and print its pathname	89
-wrann	write a WFDB annotation file	90
-wrsamp	write WFDB signal files	91
-wview	WFDB browser for MS Windows	93
-xform	sampling frequency, amplitude, and format conversion for WFDB records	97
+dfa	detrended fluctuation analysis	11
+ecgeval	generate and run ECG analyzer evaluation script	12
+epic	ANSI/AAMI-standard episode-by-episode annotation comparator	13
+fft	fast Fourier transform	15
+fir	general-purpose FIR filter for WFDB records	17
+hrfft, hrlomb, hrmem, hrplot	calculate and plot heart rate power spectra	19
+ihr	calculate instantaneous heart rate	21
+log10	calculate common logarithms of two-column data	22
+lomb	estimate power spectrum using the Lomb periodogram method	23
+memse	estimate power spectrum using maximum entropy (all poles) method	24
+mfilt	general-purpose median filter for WFDB records	26
+mrgann	merge annotation files	27
+mxm	ANSI/AAMI-standard measurement-by-measurement comparator	29
+nst	noise stress test for ECG analysis programs	31
+plot2d, plot3d	make 2-D or 3-D plots from text files of data, using \fIgnuplot\fR	34
+plotstm	produce scatter plot of ST measurement errors on a PostScript device	36
+plt	make 2-D plots	37
+pschart	produce annotated `chart recordings' on a PostScript device	42
+psfd	produce annotated `full-disclosure' plots on a PostScript device	46
+rdann	read a WFDB annotation file	50
+rdsamp	read WFDB signal files	52
+rxr	ANSI/AAMI-standard run-by-run annotation comparator	53
+sampfreq	show sampling frequency for a record	55
+sample	digitize and replay analog signals (MS-DOS only)	56
+setwfdb, cshsetwfdb	set WFDB environment variables	60
+sigamp	measure signal amplitudes of a WFDB record	62
+skewedit	edit skew fields of header file(s)	63
+snip	copy an excerpt of a WFDB record	64
+sortann	rearrange annotations in canonical order	65
+sqrs, sqrs125	single-channel QRS detector	67
+sumann	summarize the contents of a WFDB annotation file	69
+sumstats	derive aggregate statistics from bxb, rxr, etc., line-format output	70
+tach	heart rate tachometer	71
+view, vsetup	WFDB browser for MS-DOS	73
+wave	waveform analyzer, viewer, and editor for the X Window System	76
+wfdbcat	copy WFDB records to standard output	86
+wfdbcollate	collate WFDB records into a multi-segment record	87
+wfdbdesc	read signal specifications	89
+wfdbwhich	find a WFDB file and print its pathname	90
+wrann	write a WFDB annotation file	91
+wrsamp	write WFDB signal files	92
+wview	WFDB browser for MS Windows	94
+xform	sampling frequency, amplitude, and format conversion for WFDB records	98
 
 
 \fBSection 3: WFDB library\fP
-wfdb	Waveform Database library	99
+wfdb	Waveform Database library	100
 
 
 \fBSection 5: WFDB file formats\fP
-annot	WFDB annotation file formats	102
-header	WFDB header file format	103
-signal	WFDB signal file formats	110
-wfdbcal	WFDB calibration file format	112
+annot	WFDB annotation file formats	103
+header	WFDB header file format	104
+signal	WFDB signal file formats	111
+wfdbcal	WFDB calibration file format	113
 
 
 \fBAppendices\fP

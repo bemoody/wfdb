@@ -106,7 +106,8 @@ $(HOME)/wfdb-test/lib:		$(HOME)/wfdb-test
 # is correct.
 tarballs:	clean
 	cd ..; tar --create --file $(PACKAGE).tar.gz --verbose --gzip \
-          '--exclude=$(PACKAGE)/*CVS' $(PACKAGE) | tee $(PACKAGE)-MANIFEST
+          '--exclude=$(PACKAGE)/*CVS' $(PACKAGE) | sed s+${PACKAGE}/++ | \
+	  tee $(PACKAGE)-MANIFEST
 	cd ..; tar --create --file $(PACKAGE)-no-docs.tar.gz \
 	  --verbose --gzip \
           '--exclude=$(PACKAGE)/*doc' \

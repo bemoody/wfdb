@@ -1,20 +1,20 @@
 This is the WAVE FAQ (frequently asked questions) list.  It was last revised on
-24 May 2000 (recent changes are marked with `*' below).
+16 November 2001 (recent changes are marked with `*' below).
 
 Hardware questions:
- * Can I use WAVE if I don't have a SparcStation?
+ . Can I use WAVE if I don't run Linux or another Unix?
  . How can I use WAVE from an X terminal, PC, Mac, etc.?
  . Can I run WAVE remotely using a modem?
  . How can I insert annotations using a two-button mouse?
  . How do I get spot help if I don't have a `Help' key?
 Problems starting WAVE:
- * Why won't WAVE run?
- * Why does WAVE take so long to display the first screen?
+ . Why won't WAVE run?
+ . Why does WAVE take so long to display the first screen?
  . Where do I find the missing fonts?
 Display-related questions:
  . I can't see the signals!
  . I can't see text in the signal window!
- * WAVE doesn't draw/erase properly in the scope window!
+ . WAVE doesn't draw/erase properly in the scope window!
  . How can I get correct display scales?
  . Why are signals too big or too small?
  . How can I change WAVE's default scales or display colors?
@@ -22,20 +22,20 @@ Display-related questions:
  . Everything in the Analysis Commands window appears twice!
 File-related questions:
  . I can't find the file named `RECORD'!
- * Why does WAVE tell me `Record ... is unavailable'?
- * How can I view a record stored on a web site or an FTP server?
+ . Why does WAVE tell me `Record ... is unavailable'?
+ . How can I view a record stored on a web site or an FTP server?
 Questions about editing:
- * Where are my annotations?
+ . Where are my annotations?
  . Why does WAVE tell me `You may not edit annotations ...'?
- * How do I edit a record on a CD-ROM, a web site, or an FTP server?
- * How can I undo an edit?
+ . How do I edit a record on a CD-ROM, a web site, or an FTP server?
+ . How can I undo an edit?
  . Can I define my own annotations?
  . How can I recover work after a crash?
  . Can I edit annotations with a text editor?
  . What are `link' annotations?
  . Can WAVE edit signal files?
 What else can WAVE do?
- * How can I make a screen dump?
+ . How can I make a screen dump?
  . Can WAVE read digitized signals in (fill in the blank) format?
  . What is ``high-resolution'' mode?
  . Can WAVE open more than one record at once?
@@ -45,8 +45,8 @@ What else can WAVE do?
  . Can WAVE be used for real-time display of data being acquired?
  . Can WAVE scroll through a record without user intervention?
  . How can I use WAVE's menu variables in a script or other program?
- * Is there a Motif version of WAVE?
- * How can I find out about ...?
+ . Is there a Motif version of WAVE?
+ . How can I find out about ...?
 
 If your question is not on this list, and you think it should be, please
 send it to me (george@hstbme.mit.edu)!
@@ -55,16 +55,24 @@ send it to me (george@hstbme.mit.edu)!
 Hardware questions
 ==================
 
-Can I use WAVE if I don't have a SparcStation?
-----------------------------------------------
+Can I use WAVE if I don't run Linux or another Unix?
+----------------------------------------------------
 
-If you have a 386, 486, or Pentium-based PC with a VGA card, mouse, at least
-8 Mb of RAM and 100 Mb of available disk space, you can run WAVE under Linux,
-a freely available UNIX clone for the PC.  Users have reported that WAVE can
-be compiled and run successfully on DEC Alpha-based workstations under Linux,
-and (in principle) it should be possible to run WAVE on any other type of
-CPU supported by Linux (the list currently includes MIPS, PowerPC, Sparc, ARM,
-as well as x86 and Alpha CPUs).
+Why would you not want to run Linux or Unix?  Any version of Linux or Unix is a
+much better choice for research than any version of MS-Windows. See
+http://www.dyncorp-is.com/darpa/meetings/win98aug/wars.html for an independent
+perspective on this issue.  Linux can coexist on the same PC with MS-Windows if
+necessary.
+
+The major obstacle to porting WAVE to other platforms is that the XView
+toolkit is needed for the user interface components of WAVE.  XView is free
+software and can be ported to other platforms, but this task is not trivial.
+
+Another possibility is to reimplement WAVE's user interface with a different
+toolkit.  The GTKWave project is doing just that, using the Gimp toolkit
+(GTK+), which runs not only under Linux and Unix, but also under MS-Windows.
+Beta-quality versions of GTKWave for Linux and for MS-Windows are currently
+available from PhysioNet (search for GTKWave for further information).
 
 If you have any networked computer that can run X11R4 or a later version
 (this includes all current UNIX workstations, PCs, Macintoshes, and a variety
@@ -1003,7 +1011,7 @@ See WAVE's default menu file for examples of passing WAVE's menu variables
 as command-line arguments to other programs.
 
 Click on `Export variables' in WAVE's analyze menu if you need to use these
-variables within a shell script.  (If you are not using csh or tcsh, edit
+variables within a shell script.  (If you are not using bash, ksh, or sh, edit
 the WAVE menu file first to select the alternate definition of this action.)
 Once the variables have been exported, they may be used in the same way as
 any other environment variables within your shell scripts.  For example, the
@@ -1035,6 +1043,12 @@ Systems, http://www.darwinsys.com/).  Unfortunately, the Motif API, and those
 of its lookalikes, are vastly different from the XView API with which WAVE is
 written, and a port to a Motif-like user interface would be decidedly
 non-trivial.
+
+The GTKWave project is reimplementing the user interface of WAVE using the Gimp
+toolkit (GTK+).  A beta-quality release of {\sf GTKWave} is now available from
+PhysioNet.  This offers a stable, object-oriented, and non-proprietary
+Motif-like interface under any version of Linux or Unix, and also under
+MS-Windows.
 
 
 How can I find out about ...?

@@ -31,11 +31,11 @@ The remainder of this guide assumes that you know:
  - how to start an X application; and
  - how to use the mouse.
 
-If you are planning to run WAVE remotely (i.e., if the display and keyboard
-in front of you do not belong to the system on which WAVE runs, but instead
-belong to another system on the same network), you may need to perform a
-few preparatory steps.  See `How can I use WAVE from an X terminal/PC/Mac/etc?' (below)
-for details.
+If you are planning to run WAVE remotely (i.e., if the display and
+keyboard in front of you do not belong to the system on which WAVE runs,
+but instead belong to another system on the same network), you may need
+to perform a few preparatory steps.  See `How can I use WAVE from an X
+terminal/PC/Mac/etc?'  (below) for details.
 
 Before running WAVE for the first time with a given X server, you may wish to
 calibrate your display so that WAVE can draw signals at the proper scales.

@@ -26,8 +26,8 @@
 
 \title{\WAVE{} User's Guide}
 \author{Fifth Edition\\
-(revised and with corrections for \WAVE{} version 6.3)\\
-24 May 2000\\
+(revised and with corrections for \WAVE{} version 6.5)\\
+16 November 2001\\
 \\
 \\
 \\
@@ -50,7 +50,7 @@ Harvard-MIT Division of Health Sciences and Technology}
 \pagestyle{empty}
 \vspace*{\fill}
 \noindent
-Copyright \copyright 1992 -- 2000 George B. Moody
+Copyright \copyright 1992 -- 2001 George B. Moody
 
 \vspace{1 in}
 \noindent
@@ -81,12 +81,8 @@ The latest version can be downloaded from
 \noindent
 An HTML version of this guide is available; point your web browser to
 {\tt http://www.\-physio\-net.\-org/\-physio\-tools/\-wug/} to view
-it. Additional printed
+it.
 \end{latexonly}
-copies of this guide are available for US\$10 each
-(including shipping by surface mail) by writing to the address above.
-Please make checks payable to ``Beth Israel Hospital Biomedical
-Engineering Division.''
 
 \vspace{0.2 in}
 \noindent
@@ -220,9 +216,9 @@ If you are still using \WAVE{} 5.0, pay attention to the marginal notes here
 and there indicating features of \WAVE{} 6.0 that are not available
 in earlier versions.
 \end{latexonly}
-\WAVE{} 6.0 is available for
+\WAVE{} 6.5 is freely available from
 \hyperref{downloading from the Internet}
-{downloading from the Internet (see section~}
+{Physionet (see section~}
 {, page~\pageref{sec:getting-wave})}
 {sec:getting-wave}.
 
@@ -2639,10 +2635,10 @@ file.  In the standard version of the menu file, this line reads:
 \end{verbatim}
 % $ (this comment is here only to keep Emacs's LaTeX fontification happy)
 
-The program {\tt url_view} is a shell script (normally installed at the
+The program {\tt url\_view} is a shell script (normally installed at the
 same time as \WAVE{}, and in the same directory) that handles starting
 the browser if necessary and instructing it to display the specified
-URL.  The standard version of {\tt url_view} does so using the command:
+URL.  The standard version of {\tt url\_view} does so using the command:
 \begin{verbatim}
  ( netscape -remote 'openURL($URL)' || netscape $URL ) &
 \end{verbatim}
@@ -2661,9 +2657,9 @@ netscape -remote} command fails, and (in this case only) \WAVE{}
 starts a new Netscape browser process.
 
 To configure \WAVE{} to use a different web browser, edit the {\tt
-url_view} script appropriately.  (You may also do this by editing the
+url\_view} script appropriately.  (You may also do this by editing the
 action associated with {\tt <Open URL>}, but it's better to modify
-{\tt url_view}, since \WAVE{} also uses {\tt url_view} to display some
+{\tt url\_view}, since \WAVE{} also uses {\tt url\_view} to display some
 of its on-line help.  If you decide to modify the action in the
 \WAVE{} menu file, be careful not to change the {\tt <Open URL>} tag
 at the beginning of the line, since \WAVE{} uses this tag to identify
@@ -4606,8 +4602,9 @@ need in order to run \WAVE{}, or that you may find useful in order to use
 At a minimum, you will require:
 \begin{description}
 \item [\WAVE{} software]
-This is available in binary form from MIT for SPARC-based systems
-running Solaris 2.x or SunOS 4.1.x, and for PCs running Linux.  (See
+This is freely available from PhysioNet in source form, and in binary form
+for PCs running Linux.  (Older binaries for SPARC-based systems
+running Solaris 2.x or SunOS 4.1.x are also available on PhysioNet. See
 \hyperref{how to obtain the current version of \WAVE{}}
 {section~}
 {, page~\pageref{sec:getting-wave} for details}
@@ -4630,25 +4627,35 @@ Ethernet adapter or a modem.  (Check the Linux Hardware-HOWTO to be
 sure that your chosen hardware is supported.  Most graphics cards,
 including the popular accelerated cards, are fully supported by the standard
 XFree86
+Most PCs manufactured since 1995 will easily meet these requirements;
+new PCs will exceed most of them by large factors.
 \index{X Window System!XFree86 server}
 X server, but a few high-end models are supported only in SVGA
 compatibility mode.  Commercially available X servers for Linux
-support the accelerated modes of many high-end models.)  In early
-1997, it was possible to assemble a suitable Linux PC for about
-US\$1000 (not including the monitor).  It is not unreasonable to budget
+support the accelerated modes of many high-end models.)  In late
+2001, it was possible to assemble a suitable Linux PC for about
+US\$500 (not including the monitor).  It is not unreasonable to budget
 an equal amount for a good monitor, since \WAVE{}'s usability depends
-to a significant extent on being able to see its output clearly.  If
-your budget permits you to spend more, buy
-extra RAM rather than a faster CPU.  Although Linux does not require
-large amounts of RAM, it can use additional RAM very effectively, and
-you are likely to find that purchasing (say) 16 or 32 Mb of additional
-RAM results in a bigger performance improvement than spending the same
-amount on a faster CPU.  Fully configured and supported Linux PCs are
-available from many vendors if you prefer not to assemble your own;
-see the Linux Commercial-HOWTO for further information.
+to a significant extent on being able to see its output clearly.
+If your budget permits, a flat-panel (LCD) monitor is an excellent choice,
+particularly if you plan to do much annotation editing, because these monitors
+typically present very stable images that do not tire the eye.
 
-SPARC-based systems available from Sun and other vendors are slightly more
-expensive than comparable Linux PCs.
+For those on a tight budget, suitable used PCs are often available for next to
+nothing.  If you use an older PC and can afford to upgrade components, get a
+new three-button mouse or trackball first, a new monitor if the old one is
+inadequate, more memory if you have less than 64 Mb, a new IDE disk drive
+(around US\$100) if yours is more than 3 years old, and only then consider
+other performance upgrades such as a faster CPU.  Although Linux does not
+require large amounts of RAM, it can use additional RAM very effectively, and
+you are likely to find that purchasing (say) 16 or 32 Mb of additional RAM
+results in a bigger performance improvement than spending the same amount on a
+faster CPU.  Fully configured and supported Linux PCs are available from many
+vendors if you prefer not to assemble your own; see the Linux Commercial-HOWTO
+for further information.
+
+SPARC-based systems tend to be considerably expensive than comparable
+or faster Linux PCs.  Used SPARCstations may be worth considering.
 
 \item [A source of digitized signals]
 \index{SPARCstation}\index{PC}\index{WFDB Software Package}\index{MS-DOS}
@@ -5130,17 +5137,24 @@ send it to me
 
 \section{Hardware questions}
 
-\subsection{Can I use \WAVE{} if I don't have a SPARCstation?}
+\subsection{Can I use \WAVE{} if I don't run Linux or another Unix?}
 
-If you have a 386, 486, or Pentium-based PC with a VGA card, mouse, at
-least 8 Mb of RAM and 100 Mb of available disk space, you can run
-\WAVE{} under Linux,
-\index{Linux}
-a freely available UNIX clone for the PC.  Users have reported that \WAVE{} can
-be compiled and run successfully on DEC Alpha-based workstations under Linux,
-and (in principle) it should be possible to run \WAVE{} on any other type of
-CPU supported by Linux (the list currently includes MIPS, PowerPC, Sparc, ARM,
-as well as x86 and Alpha CPUs).
+Why would you not want to run Linux or Unix?  Any version of Linux or Unix is a
+much better choice for research than any version of MS-Windows. See
+\htmladdnormallink{{\tt http://\-www.dyncorp-is.com/\-darpa/\-meetings/\-win98aug/\-wars.html}}{http://www.dyncorp-is.com/darpa/meetings/win98aug/wars.html}
+for an independent perspective on this issue.  Linux can coexist on the same PC
+with MS-Windows if necessary.
+
+The major obstacle to porting \WAVE{} to other platforms is that the XView
+toolkit is needed for the user interface components of \WAVE{}.  XView is free
+software and can be ported to other platforms, but this task is not trivial.
+
+Another possibility is to reimplement \WAVE{}'s user interface with a different
+toolkit.  The {\sf GTKWave} project is doing just that, using the Gimp toolkit
+(GTK+), which runs not only under Linux and Unix, but also under MS-Windows.
+Beta-quality versions of {\sf GTKWave} for Linux and for MS-Windows are
+currently available from PhysioNet (search for {\sf GTKWave} for further
+information).
 
 If you have any networked computer that can run X11R4 or a later version
 (this includes all current UNIX workstations, PCs, Macintoshes, and a variety
@@ -5148,7 +5162,7 @@ of other systems), and access via network to another computer that can host
 \WAVE{} (see above), you can run \WAVE{} remotely (see the next question).
 
 \index{PostScript}
-Other WFDB applications ({\sf WVIEW} for Microsoft Windows, {\sf VIEW} for
+Other WFDB applications ({\sf WVIEW} for MS-Windows, {\sf VIEW} for
 MS-DOS, {\sf MacView} for the Macintosh, and {\tt pschart} and {\tt psfd} for
 PostScript devices) offer many of the display features of \WAVE{} in other
 environments;  none of these currently support annotation editing or control
@@ -6364,19 +6378,17 @@ See \WAVE{}'s default menu file for examples of passing \WAVE{}'s menu
 variables as command-line arguments to other programs.
 
 \index{menu variables}
-Click on \button{Export variables} in \WAVE{}'s
-{\sf Analyze} window if you need to use these variables within a shell
-script.  (If you are not using {\tt csh} or {\tt tcsh}, edit the \WAVE{}
-menu file first to select the alternate definition of this action.)
-Once the variables have been exported, they may be used in the same
-way as any other environment variables within your shell scripts.  For
-example, the time of the left edge of the signal window is {\tt
-\$LEFT}.  Within a C program, read the values of these variables using
-{\tt getenv}; for example, {\tt getenv("LEFT")} returns the (string)
-value of the time of the left edge of the signal window.  Note that
-the exported values are only a snapshot of the variables at the time
-you click on \button{Export variables}; the values do not track later
-actions performed within \WAVE{}.
+Click on \button{Export variables} in \WAVE{}'s {\sf Analyze} window if you
+need to use these variables within a shell script.  (If you are not using {\tt
+bash}, {\tt ksh}, or {\tt sh}, edit the \WAVE{} menu file first to select the
+alternate definition of this action.)  Once the variables have been exported,
+they may be used in the same way as any other environment variables within your
+shell scripts.  For example, the time of the left edge of the signal window is
+{\tt \$LEFT}.  Within a C program, read the values of these variables using
+{\tt getenv}; for example, {\tt getenv("LEFT")} returns the (string) value of
+the time of the left edge of the signal window.  Note that the exported values
+are only a snapshot of the variables at the time you click on \button{Export
+variables}; the values do not track later actions performed within \WAVE{}.
 
 \subsection{Is there a Motif version of \WAVE{}?}
 
@@ -6400,6 +6412,12 @@ Motif API, and those of its lookalikes, are vastly different from the XView API
 with which \WAVE{} is written, and a port to Motif would be decidedly
 non-trivial.
 
+The {\sf GTKWave} project is reimplementing the user interface of WAVE using
+the Gimp toolkit (GTK+).  A beta-quality release of {\sf GTKWave} is now
+available from PhysioNet.  This offers a stable, object-oriented, and
+non-proprietary Motif-like interface under any version of Linux or Unix, and
+also under MS-Windows.
+
 \subsection{How can I find out about ...?}
 
 There are several sources of information about \WAVE{}:
@@ -6415,8 +6433,7 @@ the
 \htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm}.
 If you need to develop your own applications for use with \WAVE{}, read the
 \htmladdnormallink{{\it WFDB Programmer's Guide}}{../dbpg/dbpg.htm}.
-Printed copies of these guides may be purchased from MIT, or you may read them
-on-line or print your own copies (visit
+You may read these guides on-line on-line or print your own copies (visit
 \htmladdnormallink{PhysioNet}{http://www.physionet.org/}).
 
 \index{on-line help}\index{help}\index{Netscape}

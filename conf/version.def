@@ -1,10 +1,10 @@
 # file: version.def		G. Moody	24 May 2000
-#				Last revised:	14 August 2001
+#				Last revised:	7 November 2001
 # Each release of the WFDB Software Package is identified by a three-part
 # version number, defined here:
 MAJOR = 10
 MINOR = 2
-RELEASE = 0
+RELEASE = 1
 VERSION = $(MAJOR).$(MINOR).$(RELEASE)
 
 # VDEFS is the set of C compiler options needed to set version number variables
