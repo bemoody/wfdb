@@ -1,9 +1,9 @@
 /* file: coherence.c		G. Moody	22 December 1993
-				Last revised:      5 May 1999
+				Last revised:   17 November 2002
 
 -------------------------------------------------------------------------------
 coherence: Coherence and cross-spectral power estimation
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -72,8 +72,16 @@ where FILENAME is the name of the input file, and OPTIONS may include:
 */
 
 #include <stdio.h>
-#include <malloc.h>
 #include <math.h>
+#if defined(__STDC__) || defined(_WINDOWS)
+# include <stdlib.h>
+#else
+# ifndef NOMALLOC_H
+# include <malloc.h>
+# else
+extern char *calloc();
+# endif
+#endif
 
 /* Function types. */
 int load();

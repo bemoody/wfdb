@@ -1,4 +1,4 @@
-.TH PLT 1 "31 July 2002" "plt 1.99" "WFDB Applications Guide"
+.TH PLT 1 "17 November 2002" "plt 2.2" "WFDB Applications Guide"
 .SH NAME
 plt \- make 2-D plots
 .SH SYNOPSIS
@@ -27,8 +27,8 @@ etc.).
 .PP
 Usually, data must be in text form in order for \fBplt\fR to read them.
 Each non-empty, non-comment line (row) in the input should contain a
-value for each column that will be plotted; if there are additional
-values or other extra text at the end of a row, it will be ignored.
+value for each column that will be plotted; any additional
+values or other extra text at the end of a row will be ignored.
 Columns can be separated by any number of spaces or tabs.  Commas and
 single or double quotation marks can also be used as column separators
 with current versions of \fBplt\fR, though not with older versions.
@@ -352,12 +352,12 @@ only.
 .PP
 By default, \fBplt\fR makes an X11 screen plot.  To make a printed plot,
 use the option \fB-T lw\fR, and pipe the output of \fBplt\fR to
-\fBlwcat\fR.  Under Unix or Linux, \fBlwcat\fR uses the standard
+\fBlwcat\fR.  Under Unix, GNU/Linux, or MacOS/X, \fBlwcat\fR uses the standard
 \fBlpr\fR print spooler to send \fBplt\fR's output in PostScript
-format to the default printer.  Under MS-Windows, or using
-\fBlwcat\fR's \fB-gv\fR option under Unix or Linux, the PostScript
-output is displayed on-screen using GhostScript (\fBGSView\fR under
-MS-Windows, or \fBgv\fR otherwise; these programs can save the output
+format to the default printer.  When running with a Cygwin/bash window under
+MS-Windows, or when using \fBlwcat\fR's \fB-gv\fR option under Unix or Linux,
+the PostScript output is displayed on-screen using GhostScript (\fBGSView\fR
+under MS-Windows, or \fBgv\fR otherwise; these programs can save the output
 in a file or send it to a printer).
 .SH EXAMPLES
 .PP

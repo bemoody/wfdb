@@ -1,8 +1,8 @@
 /* file: stdev.c        G. Moody        19 August 1996
-			Last revised:	25 November 2001
+			Last revised:	17 November 2002
 -------------------------------------------------------------------------------
 stdev: sample application for use with WAVE
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -87,9 +87,9 @@ main(int argc, char **argv)
                 argv[0], s);
         exit(2);
     }
-    if ((si = (WFDB_Siginfo *)malloc(i, sizeof(WFDB_Siginfo))) == NULL ||
-	(v0 = (WFDB_Sample *)malloc(i, sizeof(WFDB_Sample))) == NULL ||
-	(v1 = (WFDB_Sample *)malloc(i, sizeof(WFDB_Sample))) == NULL) {
+    if ((si = (WFDB_Siginfo *)malloc(i * sizeof(WFDB_Siginfo))) == NULL ||
+	(v0 = (WFDB_Sample *)malloc(i * sizeof(WFDB_Sample))) == NULL ||
+	(v1 = (WFDB_Sample *)malloc(i * sizeof(WFDB_Sample))) == NULL) {
 	fprintf(stderr, "%s: insufficient memory\n", argv[0]);
 	exit(3);
     }

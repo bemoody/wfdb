@@ -1,5 +1,5 @@
 /* file ihr.c		G. Moody      12 November 1992
-			Last revised:   20 May 2002
+			Last revised: 17 November 2002
 
 -------------------------------------------------------------------------------
 ihr: Generate instantaneous heart rate data from annotation file
@@ -242,8 +242,8 @@ static char *help_strings[] = {
  "  * Elapsed time (in seconds) from the beginning of the record to the",
  "    beginning of the interval (may be modified by -v or -V options below)",
  "  * Instantaneous heart rate (in beats per minute)",
- "  * Interval type (1 if the interval was bounded by normal beats, otherwise
-      0 (this column does not appear in the output if the -x option is used)",
+ "  * Interval type (1 if the interval was bounded by normal beats, otherwise",
+ "     0 (this column does not appear in the output if the -x option is used)",
  "Use one of the following options to modify the format of the first column:",
  " -v       print times of beginnings of intervals as sample numbers",
  " -vh      same as -v, but print times in hours",
