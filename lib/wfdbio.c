@@ -1,10 +1,10 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-			Last revised:	19 January 2000		wfdblib 10.1.1
+			Last revised:	19 Julyy 2001		wfdblib 10.1.6
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 2000 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -513,15 +513,17 @@ char *s;
     if (s == NULL || *s == '\0') return;
 
     /* Start at the end of the string and search backwards for a directory
-       separator. */
-    for (p = s + strlen(s) - 1; p >= s && *p != DSEP; p--)
+       separator (accept any of the possible separators). */
+    for (p = s + strlen(s) - 1; p >= s &&
+	      *p != '/' && *p != '\\' && *p != ':'; p--)
 	;
 
     /* A path component specifying the root directory must be treated as a
        special case;  normally the trailing directory separator is not
        included in the path component, but in this case there is nothing
        else to include. */
-    if (p == s && *p == DSEP) p++;
+
+    if (p == s && (*p == '/' || *p == '\\' || *p == ';')) p++;
 
     if (p < s) return;		/* argument did not contain a path component */
 
@@ -1005,6 +1007,9 @@ static void www_init()
 	HTCacheInit(cachedir, cachesize);
 	HTCacheMode_setMaxCacheEntrySize(entrysize);
 #endif
+	/*	HTHost_setMaxPipelinedRequests(1);	*/
+	HTEventInit();	/* added 19 July 2001 -- necessary for use with
+			   WINSOCK, seems to be harmless otherwise */
 	atexit(wfdb_wwwquit);
 	www_done_init = TRUE;
     }
