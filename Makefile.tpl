@@ -41,6 +41,7 @@ uninstall:	config.cache
 # 'make clean': remove binaries, other cruft from source directories
 clean:
 	cd app;      $(MAKE) clean
+	cd checkpkg; $(MAKE) clean
 	cd convert;  $(MAKE) clean
 	cd data;     $(MAKE) clean
 	cd doc;      $(MAKE) clean

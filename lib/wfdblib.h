@@ -1,10 +1,10 @@
 /* file: wfdblib.h	G. Moody	13 April 1989
-                        Last revised: 	 23 May 2000         wfdblib 10.1.4
+                        Last revised:  7 September 2001       wfdblib 10.2.0
 External definitions for WFDB library private functions
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 2000 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -297,7 +297,7 @@ extern void wfdb_p32(long x, WFDB_FILE *fp);
 extern int wfdb_parse_path(char *wfdb_path);
 extern void wfdb_addtopath(char *pathname);
 extern void wfdb_error(char *format_string, ...);
-extern WFDB_FILE* wfdb_fopen(const char *fname, const char *mode);
+extern WFDB_FILE* wfdb_fopen(char *fname, const char *mode);
 extern int wfdb_fprintf(WFDB_FILE *fp, const char *format, ...);
 extern void wfdb_setirec(char *record_name);
 

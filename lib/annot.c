@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:   20 August 2001		wfdblib 10.2.0
+			Last revised:   7 September 2001	wfdblib 10.2.0
 WFDB library functions for annotations
 
 _______________________________________________________________________________
@@ -820,6 +820,7 @@ WFDB_Annotator n;
 	}
 	iad[n] = NULL;
 	niaf--;
+	maxiann--;
     }
 }
 
@@ -874,6 +875,7 @@ WFDB_Annotator n;
 	}
 	oad[n] = NULL;
 	noaf--;
+	maxoann--;
     }
 }
 

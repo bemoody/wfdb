@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   27 August 2001		wfdblib 10.2.0
+			Last revised:  7 September 2001		wfdblib 10.2.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -138,12 +138,12 @@ example()
     WFDB_Sample *vector;
 
     /* Get the number of signals without opening any signal files. */
-    n = isiginfo("record", NULL, 0);
+    n = isigopen("record", NULL, 0);
     if (n < 1) { /* no signals -- quit or try another record, etc. */ }
 	
-    /* Allocate WFDB_Siginfo structures before calling isiginfo again. */
+    /* Allocate WFDB_Siginfo structures before calling isigopen again. */
     si = calloc(n, sizeof(WFDB_Siginfo));
-    nsig = isiginfo("record", si, n);
+    nsig = isigopen("record", si, n);
     /* Note that nsig equals n only if all signals were readable. */
 
     /* Get the number of samples per frame. */

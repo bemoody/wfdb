@@ -187,7 +187,7 @@ then
 else
     cat lib/Makefile.top conf/site.def lib/Makefile.tpl >lib/Makefile
 fi
-for D in app convert data doc examples fortran psd wave wave-doc waverc .
+for D in app checkpkg convert data doc examples fortran psd wave wave-doc waverc .
 do
    if [ -s $D/Makefile.top ]
    then

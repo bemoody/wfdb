@@ -1,0 +1,64 @@
+
+[OK]:  Library version matches <wfdb.h>
+[OK]:  WFDB supports NETFILES
+[OK]:  WFDB_MAXANN = 2
+[OK]:  WFDB_MAXSIG = 32
+[OK]:  WFDB_MAXSPF = 4
+[OK]:  WFDB_MAXRNL = 11
+[OK]:  WFDB_MAXUSL = 20
+[OK]:  WFDB_MAXDSL = 60
+[OK]:  Signal formats = {0, 8, 16, 61, 80, 160, 212, 310, 311}
+[OK]:  WFDB_DEFFREQ = 250
+[OK]:  WFDB_DEFGAIN = 200
+[OK]:  WFDB_DEFRES = 12
+[OK]:  Default WFDB path = . http://www.physionet.org/physiobank/database
+[OK]:  WFDB path modified successfully
+[OK]:  annopen of 1 file succeeded
+[OK]:  annopen of 2 files succeeded
+[OK]:  isigopen((null), NULL, 0) succeeded
+[OK]:  (at     0:00.000) getframe returned {  995,  1011}
+[OK]:  (at     0:00.002) getframe returned {  995,  1011}
+[OK]:  (at     0:00.005) getframe returned {  995,  1011}
+[OK]:  (at     0:00.008) getframe returned {  995,  1011}
+[OK]:  (at     0:00.011) getframe returned {  995,  1011}
+[OK]:  sampfreq returned 360
+[OK]:  strtim returned 7200
+[OK]:  isigsettime skipping forward to     0:20
+[OK]:  (at     0:20.000) getvec returned {  943,   946} [-0.405, -0.390]
+[OK]:  (at     0:20.002) getvec returned {  942,   945} [-0.410, -0.395]
+[OK]:  (at     0:20.005) getvec returned {  942,   946} [-0.410, -0.390]
+[OK]:  (at     0:20.008) getvec returned {  942,   945} [-0.410, -0.395]
+[OK]:  (at     0:20.011) getvec returned {  942,   949} [-0.410, -0.375]
+[OK]:  isigsettime skipping backward to     0:19.997
+[OK]:  (at     0:19.997) getframe returned {  940,   944}
+[OK]:  (at     0:20.000) getframe returned {  943,   946}
+[OK]:  (at     0:20.002) getframe returned {  942,   945}
+[OK]:  (at     0:20.005) getframe returned {  942,   946}
+[OK]:  (at     0:20.008) getframe returned {  942,   945}
+[OK]:  (at     0:20.011) getframe returned {  942,   949}
+[OK]:  Repeating tests using NETFILES (reverting to default WFDB path)
+[OK]:  annopen of 1 file succeeded
+[OK]:  annopen of 2 files succeeded
+[OK]:  isigopen((null), NULL, 0) succeeded
+[OK]:  (at     0:00.000) getframe returned {  995,  1011}
+[OK]:  (at     0:00.002) getframe returned {  995,  1011}
+[OK]:  (at     0:00.005) getframe returned {  995,  1011}
+[OK]:  (at     0:00.008) getframe returned {  995,  1011}
+[OK]:  (at     0:00.011) getframe returned {  995,  1011}
+[OK]:  sampfreq returned 360
+[OK]:  strtim returned 7200
+[OK]:  isigsettime skipping forward to     0:20
+[OK]:  (at     0:20.000) getvec returned {  943,   946} [-0.405, -0.390]
+[OK]:  (at     0:20.002) getvec returned {  942,   945} [-0.410, -0.395]
+[OK]:  (at     0:20.005) getvec returned {  942,   946} [-0.410, -0.390]
+[OK]:  (at     0:20.008) getvec returned {  942,   945} [-0.410, -0.395]
+[OK]:  (at     0:20.011) getvec returned {  942,   949} [-0.410, -0.375]
+[OK]:  isigsettime skipping backward to     0:19.997
+[OK]:  (at     0:19.997) getframe returned {  940,   944}
+[OK]:  (at     0:20.000) getframe returned {  943,   946}
+[OK]:  (at     0:20.002) getframe returned {  942,   945}
+[OK]:  (at     0:20.005) getframe returned {  942,   946}
+[OK]:  (at     0:20.008) getframe returned {  942,   945}
+[OK]:  (at     0:20.011) getframe returned {  942,   949}
+[OK]:  no WFDB library errors
+no errors: test succeeded

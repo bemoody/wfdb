@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-			Last revised:	  19 July 2001		wfdblib 10.1.6
+			Last revised:	7 September 2001	wfdblib 10.2.0
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -1511,9 +1511,10 @@ WFDB_FILE *wp;
 #endif	/* WFDB_NETFILES */
 
 WFDB_FILE *wfdb_fopen(fname, mode)
-const char *fname, *mode;
+char *fname;
+const char *mode;
 {
-    const char *p = fname;
+    char *p = fname;
     WFDB_FILE *wp = (WFDB_FILE *)malloc(sizeof(WFDB_FILE));
 
     if (wp == NULL) {
@@ -1534,6 +1535,29 @@ const char *fname, *mode;
     if (wp->fp = fopen(fname, mode)) {
 	wp->type = WFDB_LOCAL;
 	return (wp);
+    }
+    if (strcmp(mode, WB) == 0) {
+        int stat = 1;
+
+	/* An attempt to create an output file failed.  Check to see if all
+	   of the directories in the path exist, create them if necessary
+	   and possible, then try again. */
+        for (p = fname; *p; p++)
+	    if (*p == '/') {	/* only Unix-style directory separators */
+		*p = '\0';
+		stat = mkdir(fname, 0755);
+		/* The '0755' means that (under Unix), the directory will
+		   be world-readable, but writeable only by the owner. */
+		*p = '/';
+	    }
+	/* At this point, we may have created one or more directories.
+	   Only the last attempt to do so matters here:  if and only if
+	   it was successful (i.e., if stat is now 0), we should try again
+	   to create the output file. */
+	if (stat == 0 && (wp->fp = fopen(fname, mode))) {
+		wp->type = WFDB_LOCAL;
+		return (wp);
+	}
     }
     free(wp);
     return (NULL);
