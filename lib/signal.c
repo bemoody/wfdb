@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   17 June 2002	wfdblib 10.2.6
+			Last revised:  8 November 2002		wfdblib 10.3.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -1530,7 +1530,7 @@ int nsig;
 	return (-1);	/* failed, nisig is unchanged, allocisig emits error */
     else
 	nsig = nn;
-    nn = nigroups + hsd[nsig-1]->info.group + 1;
+    nn = nigroups + hsd[nsig-nisig-1]->info.group + 1;
     if (allocigroup(nn) != nn)
 	return (-1);	/* failed, allocigroup emits error */
     else
@@ -1589,7 +1589,7 @@ int nsig;
 		wfdb_error("isigopen: insufficient memory\n");
 		return (-3);
 	    }
-	    is->info.group = g;
+	    is->info.group = nigroups + g;
 	    is->skew = hs->skew;
 	    hs = hsd[++si];
 	    is = isd[nisig + ++s];

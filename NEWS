@@ -1,3 +1,18 @@
+10.3.0:
+	Fixed bugs in lib/sample.c that caused improper accounting of
+	signal group numbers when reading from two or more records at
+	the same time (as in 'nst'), and a bug that caused a segfault
+	in 'nst'.
+
+	Use -p -p to obtain higher precision in 'rdsamp' output.
+
+	New -w option for 'ann2rr' and 'rr2ann' for attaching annotation
+	types to intervals.
+
+	New 'mit2edf' application converts records to European Data Format.
+
+	Numerous updates in the WFDB Applications Guide.
+
 10.2.9:
 	Fixed a bug in example 9 in the WFDB Programmer's Guide (introduced
 	in version 10.2.0).

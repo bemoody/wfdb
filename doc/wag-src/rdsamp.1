@@ -1,4 +1,4 @@
-.TH RDSAMP 1 "31 July 2002" "WFDB 10.2.7" "WFDB Applications Guide"
+.TH RDSAMP 1 "7 November 2002" "WFDB 10.3.0" "WFDB Applications Guide"
 .SH NAME
 rdsamp \- read WFDB signal files
 .SH SYNOPSIS
@@ -34,6 +34,8 @@ time format;  default: no limit).  If both \fB-l\fR and \fB-t\fR are used,
 \fB-p\fR
 Print times in seconds and milliseconds, and values in physical units.  By
 default, \fBrdsamp\fR prints times in sample intervals and values in A/D units.
+Use \fB-p -p\fR to obtain higher precision in the sample values
+(8 decimal places rather than 3).
 .TP
 \fB-s\fR \fIsignal-list\fR
 Print only the signals named in the \fIsignal-list\fR (one or more input signal

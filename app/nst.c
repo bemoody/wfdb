@@ -1,9 +1,9 @@
 /* file: nst.c		G. Moody	8 December 1983
-			Last revised:  17 December 2001
+			Last revised:   8 November 2002
 
 -------------------------------------------------------------------------------
 nst: Noise stress test
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -163,7 +163,7 @@ char *argv[];
        the protocol file it generates). */
     wfdbp = getwfdb();
     if (*wfdbp != PSEP &&
-	!(*wfdbp = '.' && ((*wfdbp+1) == PSEP || *(wfdbp+1) == ' '))) {
+	!(*wfdbp == '.' && ((*wfdbp+1) == PSEP || *(wfdbp+1) == ' '))) {
 	char *nwfdbp;
 
 	if ((nwfdbp = (char *)malloc(strlen(wfdbp+2))) == NULL) {

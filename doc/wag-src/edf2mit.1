@@ -1,15 +1,19 @@
-.TH EDF2MIT 1  "31 July 2002" "WFDB 10.2.7" "WFDB Applications Guide"
+.TH EDF2MIT 1  "2 November 2002" "WFDB 10.3.0" "WFDB Applications Guide"
 .SH NAME
-edf2mit \- converting from EDF to MIT format
+edf2mit, mit2edf \- convert between EDF and MIT formats
 .SH SYNOPSIS
 \fBedf2mit -i\fR \fIedffile\fR [ \fIoptions\fR ... ]
+.br
+\fBmit2edf -r\fR \fIrecord\fR [ \fIoptions\fR ... ]
 .SH DESCRIPTION
 .PP
-This program reads the specified \fIedffile\fR, an EDF (European Data Format)
-file, and creates MIT-format signal and header files containing the same data.
-European Data Format was originally designed for storage of polysomnograms.
+These programs convert EDF (European Data Format) files into
+MIT-format files (as used in PhysioBank) and vice versa.  European
+Data Format was originally designed for storage of polysomnograms.
 .PP
-Options include:
+\fBedf2mit\fR reads the specified \fIedffile\fR and creates MIT-format
+signal and header files containing the same data. Options for
+\fBedf2mit\fR include:
 .TP
 \fB-b\fR
 Input is in big-endian byte order (default: little-endian).
@@ -29,14 +33,37 @@ re-order or duplicate signals.
 .TP
 \fB-v\fR
 Verbose mode (print debugging output).
+.PP
+\fBmit2edf\fR reads the specified MIT-format \fIrecord\fR (header and signal
+files) and creates an EDF file containing the same data.   Output from
+\fBmit2edf\fR is always in the standard little-endian format.  Options for
+\fBmit2edf\fR include:
+.TP
+\fB-h\fR
+Print a brief usage summary.
+.TP
+\fB-o\fR \fIfile\fR
+Write output to the specified \fIfile\fR (default: \fIrecord\fR\fB.edf\fR).
+.TP
+\fB-v\fR
+Verbose mode (print debugging output).
+
+.PP
+Note that EDF format does not include a way to specify the baseline value
+of a signal, and that MIT format does not include a standard way to specify the
+transducer type or the prefiltering specification; these parameters are
+not preserved by these conversion programs.  Also note that use of the standard
+signal and unit names specified for EDF is permitted but not enforced by
+\fBmit2edf\fR.
+
 .SH ENVIRONMENT
 .PP
 It may be necessary to set and export the shell variable \fBWFDB\fR (see
 \fBsetwfdb\fR(1)).
 .SH AVAILABILITY
-This program is provided in the \fIconvert\fR directory of the WFDB Software
-Package.  Run \fBmake\fR in that directory to compile and install it if it
-has not been installed already.
+These programs are provided in the \fIconvert\fR directory of the WFDB Software
+Package.  Run \fBmake\fR in that directory to compile and install them if they
+have not been installed already.
 .SH SEE ALSO
 \fBa2m\fR(1), \fBsnip\fR(1), \fBxform\fR(1), \fBwfdb\fR(3), \fBheader\fR(5)
 .HP
@@ -44,7 +71,7 @@ Bob Kemp, Alpo Värri, Agostinho C. Rosa, Kim D. Nielsen and John Gade.
 A simple format for exchange of digitized polygraphic recordings.
 \fIElectroencephalography and Clinical Neurophysiology\fB 82\fR:391-393 (1992).
 .HP
-Bob Kemp's EDF web site (http://www.hsr.nl/bobkemp/edf/edf.htm).
+Bob Kemp's EDF web site (http://www.hsr.nl/edf/).
 The definitive reference on the format;  it includes the full specification of
 EDF from the 1992 paper, sample EDF files, software for reading and viewing
 them, FAQs, and much more.
@@ -52,3 +79,5 @@ them, FAQs, and much more.
 George B. Moody (george@mit.edu)
 .SH SOURCES
 http://www.physionet.org/physiotools/wfdb/convert/edf2mit.c
+.br
+http://www.physionet.org/physiotools/wfdb/convert/mit2edf.c

@@ -102,7 +102,7 @@ then
     echo
     echo "The WFDB library may be compiled as a static library or as a"
     echo "dynamically loaded (shared) library (the default).  Type S for a"
-    conf/prompt "static library, or D for a dynamically loaded library: "
+    conf/prompt "static library, or D for a dynamically loaded library: " " "
     read LIBTYPE
   fi
 else
@@ -129,7 +129,7 @@ then
 	echo "libraries only may cause compilation to fail if your"
 	echo "system does not have a complete set of static libraries."
 	echo "Type S to link to static libraries only, or D to link to"
-	conf/prompt "dynamically loaded libraries where available: "
+	conf/prompt "dynamically loaded libraries where available: " ""
 	read SYSLIBS
     fi
     case x$SYSLIBS in
@@ -143,7 +143,7 @@ then
 fi
 
 echo
-conf/prompt "Looking for the C compiler ..."
+conf/prompt "Looking for the C compiler ..." ""
 if ( which gcc 2>&1 | grep "no \|not " >/dev/null )
 then
     if (which cc 2>&1 | grep "no \|not " >/dev/null )
@@ -182,7 +182,7 @@ then
     DIR=
     while [ x$DIR = x ]
     do
-        conf/prompt "Choose a location, or press <Enter> to install in /usr: "
+        conf/prompt "Choose a location, or press <Enter> to install in /usr: " ""
         read DIR
         case x$DIR in
             x/usr) ;;

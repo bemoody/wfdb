@@ -1,5 +1,5 @@
 # file: makefile.dos	G. Moody	 2 November 1989
-#			Last revised:	 26 October 2002
+#			Last revised:	 7 November 2002
 # MSDOS `make' description file template for WFDB format converters
 #
 # WARNING: NO SUPPORT FOR PROPRIETARY COMPILERS.  Previous versions of the WFDB
@@ -47,7 +47,8 @@ CFLAGS = $(COFLAGS)
 # anything below this line.
 # -----------------------------------------------------------------------------
 
-XFILES = a2m.exe ad2m.exe m2a.exe md2a.exe makeid.exe readid.exe revise.exe
+XFILES = a2m.exe ad2m.exe m2a.exe md2a.exe makeid.exe readid.exe \
+ edf2mit.exe mit2edf.exe revise.exe
 
 # General rule for compiling C sources into executable files
 .c.exe:

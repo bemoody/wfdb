@@ -1,4 +1,4 @@
-.TH ANN2RR 1 "28 July 2002" "WFDB 10.2.7" "WFDB Applications Guide"
+.TH ANN2RR 1 "1 November 2002" "WFDB 10.3.0" "WFDB Applications Guide"
 .SH NAME
 ann2rr, rr2ann \- convert annotation files to interval lists and vice versa
 .SH SYNOPSIS
@@ -51,6 +51,10 @@ annotations that end the intervals.  Only one of these options can be used at
 a time;  if none is chosen, only the RR intervals are printed, in units of
 sample intervals.  When using \fB-vs\fR, \fB-vm\fR, \fB-vh\fR, \fB-Vs\fR,
 \fB-Vm\fR, or \fB-Vh\fR, intervals are printed in units of seconds.
+.TP
+\fB-w\fR
+Print the type (\fBN\fR, \fBV\fR, etc., as for \fB-p\fR above) of the
+annotation that ends each interval, at the end of each line of output.
 .PP
 The \fB-c\fR option, used without the \fB-p\fR option, causes \fBann2rr\fR to
 filter out intervals between beats that have intervening non-beat annotations,
@@ -66,15 +70,15 @@ be discarded from the output.
 .PP
 Use \fBrr2ann\fR to create an annotation file from the standard input,
 which should usually be a list of intervals in the format produced by
-\fBann2rr\fR.  (For exceptions, see \fB-T\fR and \fB-x\fR below.)
-Only the first token on each line is taken as an interval; anything
-else on the same line is ignored, as are empty lines, spaces and tabs
+\fBann2rr\fR.  (For exceptions, see \fB-T\fR, \fB-w\fR, and \fB-x\fR below.)
+The first token on each line is taken as an interval, and (if the \fB-w\fR
+option is present) the second token is taken as an annotation mnemonic;
+anything else on the same line is ignored, as are empty lines, spaces and tabs
 at the beginning of a line, non-numeric tokens and anything following
 them on the same line, negative intervals, and zero intervals.  The
-output consists of a binary annotation file
-(\fIrecord\fR.\fIannotator\fR), and (if it does not exist already) a
-text header file (\fIrecord\fR.hea).  Options for \fBrr2ann\fR
-include:
+output consists of a binary annotation file (\fIrecord\fR.\fIannotator\fR),
+and (if it does not exist already) a text header file (\fIrecord\fR.hea).
+Options for \fBrr2ann\fR include:
 .TP
 \fB-F\fR \fIfrequency\fR
 Assume the specified sampling \fIfrequency\fR.  This option has no effect unless
@@ -87,13 +91,18 @@ Print a usage summary.
 \fB-T\fR
 Interpret the input as times of occurrence, rather than as intervals.
 .TP
+\fB-w\fR
+Set each annotation type from the mnemonic (\fBN\fR, \fBV\fR, etc.) in the
+second column of the input (in the format produced by \fBann2rr\fR using
+its \fB-w\fR option).
+.TP
 \fB-x\fR \fIn\fR
 Multiply input by \fIn\fR to obtain intervals (or, if \fB-T\fR is also used,
 times of occurrence) in units of sample intervals).  Default: \fIn\fR = 1.
 .PP
-Note that \fBwrann\fR(1) also provides a way to generate an annotation file from
-text.  Unlike that of \fBrr2ann\fR, \fBwrann\fR's input format permits specifying
-annotation types and other fields in addition to the times of occurrence.
+Note that \fBwrann\fR(1) also provides a way to generate an annotation file
+from text.  Unlike that of \fBrr2ann\fR, \fBwrann\fR's input format permits
+specifying annotation subtypes and other fields.
 .SH ENVIRONMENT
 .PP
 It may be necessary to set and export the shell variable \fBWFDB\fR (see

@@ -1,9 +1,9 @@
 /* file: rdsamp.c	G. Moody	23 June 1983
-			Last revised:   5 October 2001
+			Last revised:  7 November 2002
 
 -------------------------------------------------------------------------------
 rdsamp: Print an arbitrary number of samples from each signal
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -136,7 +136,7 @@ char *argv[];
 	    record = argv[i];
 	    break;
 	  case 'p':	/* output in physical units specified */
-	    pflag = 1;
+	    ++pflag;
 	    break;
 	  case 's':	/* signal list follows */
 	    isiglist = i+1; /* index of first argument containing a signal # */
@@ -245,14 +245,14 @@ char *argv[];
 	    l = strlen(p);
 	    if (l > 7) p += l - 7;
 	    /* Print the last 7 characters of each signal description. */
-	    (void)printf("\t%s", p);
+	    (void)printf("\t%s%s", pflag > 1 ? "      " : "", p);
 	}
 	(void)printf("\n");
     }
 
     /* Print data in physical units if '-p' option selected. */
     if (pflag) {
-	char *p;
+	char *p, *fmt = pflag > 1 ?  "\t%15.8lf" : "\t%7.3f";
 	double freq = sampfreq(NULL);
 
 	/* Print units as a second line of column headers if '-v' selected. */
@@ -263,7 +263,7 @@ char *argv[];
 		if (p == NULL) p = "mV";
 		if ((int)strlen(p) > 5) p[5] = '\0';
 		/* Print the first 5 characters of each signal units string. */
-		(void)printf("\t(%s)", p);
+		(void)printf("\t%s(%s)", pflag > 1 ? "      " : "", p);
 	    }
 	    (void)printf("\n");
 	}
@@ -271,7 +271,7 @@ char *argv[];
 	while ((to == 0L || from < to) && getvec(v) >= 0) {
 	    (void)printf("%7.3lf", (double)(from++)/freq);
 	    for (i = 0; i < nsig; i++)
-		(void)printf("\t%7.3lf",
+		(void)printf(fmt,
 		    (double)(v[sig[i]] - si[sig[i]].baseline)/si[sig[i]].gain);
 	    (void)printf("\n");
 	}
@@ -317,6 +317,7 @@ static char *help_strings[] = {
  " -H          read multifrequency signals in high resolution mode",
  " -l INTERVAL truncate output after the specified time interval (hh:mm:ss)",
  " -p          print times and samples in physical units (default: raw units)",
+ "              (use -p -p for greater precision)",
  " -s SIGNAL [SIGNAL ...]  print only the specified signal(s)",
  " -t TIME     stop at specified time",
  " -v          print column headings",

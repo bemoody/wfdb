@@ -1,5 +1,5 @@
-# file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:   8 August 2002
+# file: Makefile.tpl		G. Moody	  24 May 2000
+#				Last revised:	7 November 2002
 # Change the settings below as appropriate for your setup.
 
 # D2PARGS is a list of options for dvips.  Uncomment one of these to set the
@@ -61,12 +61,6 @@ TROFF = groff
 # of each page.
 TMAN = -rC1 -rD1 -man
 
-# TMS is the TROFF option needed to load the 'ms' macro package.  Use the
-# following definition to get the standard 'ms' macros.
-# TMS = -ms
-# Use the following definition to get the GNU groff version of the 'ms' macros.
-TMS = -mgs
-
 # WAGPSREQ is the target that must be made in order to make the PostScript
 # version of the manual (wag.ps), and MAKEWAGPS is the command that must be
 # run in order to do this.  The process is a bit convoluted, because the
@@ -123,16 +117,20 @@ wag-book:	wag0.ps
 wag.html:
 	cp -p ../misc/icons/* fixag.sh fixag.sed ../wag
 	./manhtml.sh ../wag *.1 *.3 *.5 *.7
+	cp -p install0.tex install.tex
+	cp -p eval0.tex eval.tex
 	latex2html -dir ../wag -local_icons -prefix in \
 	 -up_url="wag.htm" -up_title="WFDB Applications Guide" install
 	latex2html -dir ../wag -local_icons -prefix ev \
 	 -up_url="wag.htm" -up_title="WFDB Applications Guide" eval
+	rm -f install.tex eval.tex
 	cd ../wag; rm -f index.html WARNINGS *.aux *.log *.tex
 	sed "s/LONGDATE/$(LONGDATE)/" <intro.ht0 >../wag/intro.htm
 	sed "s/LONGDATE/$(LONGDATE)/" <faq.ht0 >../wag/faq.htm
 	cd ../wag; ./fixag.sh "$(LONGDATE)" *.html; rm -f fixag.sh images.*
 	cd ../wag; rm -f .I* .ORIG_MAP *.html *.pl fixag.sed
-	sed "s/LONGDATE/$(LONGDATE)/" <wag.ht0 | \
+	./maketoc-html.sh | \
+	  sed "s/LONGDATE/$(LONGDATE)/" | \
 	  sed "s/VERSION/$(VERSION)/" >../wag/wag.htm
 	cd ../wag; ln -s wag.htm index.html
 
@@ -164,27 +162,37 @@ wag.pdf:	wag0.ps
 wag.ps:		$(WAGPSREQ)
 	$(MAKEWAGPS)
 
-wag0.ps:	wag.tex appguide.int install.tex eval.tex
+wag0.ps:	wag.tex
+	$(MAKE) wag2.ps
+	$(MAKE) wag1.toc
 	sed 's/VERSION/$(VERSION)/' <wag.tex | \
-	 sed 's/LONGDATE/$(LONGDATE)/' >wag1.tex
-	latex wag1
-	dvips -o wag1.ps wag1
-	sed "s/LONGDATE/$(LONGDATE)/" <appguide.int | \
-	  sed "s/VERSION/$(VERSION)/" | \
-	  tbl | \
-	  $(TROFF) $(TMS) -o3- >wag2.ps
-	tbl *.1 *.3 *.5 | $(TROFF) $(TMAN) >wag3.ps
+	  sed 's/LONGDATE/$(LONGDATE)/' >wag1.tex
+	latex wag1					# front matter
+	dvips $(D2PARGS) -o wag1.ps wag1
+	cat wag[1234].ps | grep -v '^%%' >wag0.ps	# concatenate sections
+
+wag1.toc:	wag2.ps
+	$(MAKE) getpagenos maketoclines
+	./maketoc-tex.sh >wag1.toc			# TOC and appendices
+
+wag2.ps:
+	tbl *.1 *.3 *.5 | $(TROFF) $(TMAN) >wag2.ps	# man pages
+
+install.tex:	wag1.toc
+wag3.ps:	install.tex
 	sed "s/LONGDATE/$(LONGDATE)/" <install.tex | \
+	  sed "s/VERSION/$(VERSION)/" >wag3.tex
+	latex wag3
+	dvips $(D2PARGS) -o wag3.ps wag3.dvi
+
+eval.tex:	wag1.toc
+wag4.ps:	eval.tex
+	sed "s/LONGDATE/$(LONGDATE)/" <eval.tex | \
 	  sed "s/VERSION/$(VERSION)/" >wag4.tex
 	latex wag4
 	dvips $(D2PARGS) -o wag4.ps wag4.dvi
-	sed "s/LONGDATE/$(LONGDATE)/" <eval.tex | \
-	  sed "s/VERSION/$(VERSION)/" >wag5.tex
-	latex wag5
-	dvips $(D2PARGS) -o wag5.ps wag5.dvi
-	cat wag[123].ps blankpage wag4.ps blankpage wag5.ps | grep -v '^%%' >wag0.ps
 
 # 'make clean': remove intermediate and backup files
 clean:
 	rm -f *.aux *.dvi *.log *.ps *.toc intro.htm faq.htm wag.pdf wagcover \
-	      wag[145].tex *~
+	      eval.tex install.tex wag[1234].tex *~

@@ -10,8 +10,8 @@ File: wpg,  Node: Top,  Next: Overview,  Prev: (dir),  Up: (dir)
 
    This guide documents the Waveform Database interface library (the
 WFDB library).  This file contains the text of the Tenth Edition of the
-`WFDB Programmer's Guide' (26 October 2002), with revisions for release
-10.2.9 of the WFDB library.
+`WFDB Programmer's Guide' (7 November 2002), with revisions for release
+10.3.0pre1 of the WFDB library.
 
 * Menu:
 

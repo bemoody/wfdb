@@ -1,9 +1,9 @@
 /* file: edf2mit.c		G. Moody	16 October 1996
-				Last revised:	12 October 2001
+				Last revised:	2 November 2002
 
 -------------------------------------------------------------------------------
 Convert EDF (European Data Format) file to MIT format header and signal files
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -288,7 +288,7 @@ char **argv;
 	    continue;
 	}
 	si[i].adczero = (sigdmax[i]+1 + sigdmin[i])/2;
-	adcrange = sigdmax[i]+1 - sigdmin[i];
+	adcrange = sigdmax[i] - sigdmin[i];
 	si[i].gain = adcrange/(sigpmax[i] - sigpmin[i]);
 	for (j = 0; adcrange > 1; j++)
 	    adcrange /= 2;

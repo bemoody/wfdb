@@ -59,7 +59,7 @@ char *argv[];
     double rr, t = 0.0, xfactor = 1.0;
     static char line[MAXLINELEN];
     char annstr[10], *p, *record = NULL, *prog_name();
-    int i, Tflag = 0;
+    int i, Tflag = 0, wflag = 0;
     void help();
     extern double atof();
 
@@ -108,6 +108,9 @@ char *argv[];
 		exit(1);
 	    }
 	    break;
+	  case 'w':	/* copy annotation types from second column of input */
+	    wflag = 1;
+	    break;
 	  default:
 	    (void)fprintf(stderr, "%s: unrecognized option %s\n",
 			  pname, argv[i]);
@@ -150,7 +153,15 @@ char *argv[];
     /* Read input, write an annotation for each line beginning with a positive
        number. */
     while (fgets(line, sizeof(line), stdin) != NULL) {
-	if (sscanf(line, "%lf", &rr) == 0) continue;
+	if (!wflag) { /* -w option not used, write all annotations as NORMAL */
+	    if (sscanf(line, "%lf", &rr) == 0) continue;
+	}
+        else {	      /* -w option used, copy annotation type from input */
+	    static char astring[MAXLINELEN];
+
+	    if (sscanf(line, "%lf%s", &rr, astring) < 2) continue;
+	    if ((annot.anntyp = strann(astring)) == NOTQRS) continue;
+	}
 	if (rr <= 0.0) continue;
 	else if (Tflag) t = rr * xfactor;
 	else t += rr * xfactor;
@@ -192,15 +203,17 @@ static char *help_strings[] = {
  " -T          TEXT-FILE contains times of occurrence, not RR intervals",
  " -x N        multiply input by N to obtain RR in sample intervals",
  "               (default: N = 1)",
+ " -w          copy annotation types from second column of input",
  "TEXT-FILE should contain a column of RR intervals (or times of occurrence,",
  "if the -T option is specified), in units of sample intervals (unless the",
- "-x option is used to specify a conversion factor).  Only the first token on",
- "each line is taken as an RR interval;  anything else on the same line is",
- "ignored, as are empty lines, spaces and tabs at the beginning of a line,",
- "non-numeric tokens and anything following them on the same line, negative",
- "intervals, and zero intervals.  The output consists of a binary annotation",
- "file (RECORD.ANNOTATOR), and (if it does not exist already) a text header",
- "file (RECORD.hea).",
+ "-x option is used to specify a conversion factor).   The first token on",
+ "each line is taken as an RR interval, and (if the -w option is specified)",
+ "the second token is taken as an annotation mnemonic (N, V, etc.);  anything",
+ "else on the same line is ignored, as are empty lines, spaces and tabs at",
+ "the beginning of a line non-numeric tokens and anything following them on",
+ "the same line, negative intervals, and zero intervals.  The output consists",
+ "of a binary annotation file (RECORD.ANNOTATOR), and (if it does not exist",
+ "already) a text header file (RECORD.hea).",
 NULL
 };
 

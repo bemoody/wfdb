@@ -1,9 +1,9 @@
 file: README		G. Moody	28 July 1989
-			Last revised:  26 October 2002
+			Last revised:  7 November 2002
 
 This directory contains sources for WFDB applications which convert database
-files in various unsupported formats to and from MIT format, including to and
-from AHA DB formats.
+files in various unsupported formats to and from MIT format (also known as
+WFDB or PhysioBank format), including to and from EDF and AHA DB formats.
 
 Note that many commonly used formats are supported by the WFDB library.  The
 program `xform' (in the `app' directory) is a flexible application for
@@ -19,6 +19,11 @@ the `app' directory, perform similar conversions for annotation files.
 If you need to convert digital data to analog form, or vice versa, see program
 `sample' (for MS-DOS only) in the `app' directory.
 
+European Data Format (EDF) has been used for storage of multiparameter,
+multifrequency data (such as polysomnograms) since 1990.  Program `edf2mit'
+reads an EDF file and generates MIT-format header and signal files from it.
+Program 'mit2edf' performs the inverse conversion.
+
 AHA DB tape distribution format was used for both the AHA DB and the MIT-BIH
 DB between 1980 and 1990.  AHA DB tape distribution format requires more space
 than the other formats supported by the WFDB library and applications, however,
@@ -32,10 +37,6 @@ used to create a set of AHA DB records in WFDB format from an AHA DB CD-ROM
 arguments for instructions.  Under MS-DOS or MS-Windows, you will need to
 have a shell utility, such as 'bash' (included with the free Cygwin software
 package from http://www.cygwin.com/) in order to run 'ahaconvert'.
-
-European Data Format (EDF) has been used for storage of multiparameter,
-multifrequency data (such as polysomnograms) since 1990.  Program `edf2mit'
-reads an EDF file and generates MIT-format header and signal files from it.
 
 This directory also contains the program `revise', which converts obsolete MIT
 header files into new-format MIT header files.  (Unless you have very old
@@ -80,5 +81,6 @@ readid.c	Extracts record name and file lengths from AHA-format ID block
 makeid.c	Makes an AHA-format ID block for a database record
 
 edf2mit.c	Converts an EDF file to MIT format
+mit2edf.c	Converts an MIT format record into an EDF file
 
 revise.c	Converts an obsolete MIT header to a new-format MIT header

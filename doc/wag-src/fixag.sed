@@ -44,7 +44,7 @@ s+(http://www.physionet.org/physiobank/database)+<A HREF="http://www.physionet.o
 s+(http://www.aami.org/)+<A HREF="http://www.aami.org/" target="other">(http://www.aami.org/)</A>+
 s+"http://www.gnuplot.info/"+"http://www.gnuplot.info/" target="other"+
 s+http://www.mstarlabs.com/+<A HREF="http://www.mstarlabs.com/" target="other">http://www.mstarlabs.com/</A>+
-s+(http://www.hsr.nl/bobkemp/edf/edf.htm)+<A HREF="http://www.hsr.nl/bobkemp/edf/edf.htm" target="other">(http://www.hsr.nl/bobkemp/edf/edf.htm)</A>+
+s+(http://www.hsr.nl/edf/)+<A HREF="http://www.hsr.nl/edf/" target="other">(http://www.hsr.nl/edf/)</A>+
 s+<I>Evaluating ECG Analyzers</I>+<a href="eval.htm"><I>Evaluating ECG Analyzers</I></a>+
 s+<I>WFDB Programmer's Guide</I>+<a href="../wpg/wpg.htm"><I>WFDB Programmer's Guide</I></a>+
 s+<I>WFDB Applications Guide</I>+<a href="wag.htm"><I>WFDB Applications Guide</I></a>+

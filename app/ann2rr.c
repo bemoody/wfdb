@@ -1,5 +1,5 @@
-/* file: ann2rr.c		G. Moody	16 May 1995
-				Last revised:	20 May 2002
+/* file: ann2rr.c		G. Moody	 16 May 1995
+				Last revised:  1 November 2002
 -------------------------------------------------------------------------------
 ann2rr: Calculate RR intervals from an annotation file
 Copyright (C) 2002 George B. Moody
@@ -44,7 +44,8 @@ char *argv[];
 {
     char *record = NULL, *prog_name();
     double sps, spm, sph, rrsec;
-    int cflag=0, i, j, pflag=0, previous_annot_valid=0, tformat=0, vflag=0;
+    int cflag=0, i, j, pflag=0, previous_annot_valid=0, tformat=0, vflag=0,
+	wflag=0;
     long beat_number = 0L, from = 0L, to = 0L, rr, tp = 0L, atol();
     static char flag[ACMAX+1];
     static WFDB_Anninfo ai;
@@ -124,6 +125,9 @@ char *argv[];
 	      default:  tformat = 0; break;	/* use sample intervals */
 	    }
 	    break;
+	  case 'w':	/* output annotation types following intervals */
+	    wflag = 1;
+	    break;
 	  default:
 	    (void)fprintf(stderr, "%s: unrecognized option %s\n",
 			  pname, argv[i]);
@@ -187,8 +191,11 @@ char *argv[];
 		  }
 		}	
 		/* print RR interval */
-		if (tformat) (void)printf("%.3lf\n", rr/sps);
-		else (void)printf("%ld\n", rr);
+		if (tformat) (void)printf("%.3lf", rr/sps);
+		else (void)printf("%ld", rr);
+		/* print annotation type if requested */
+		if (wflag) (void)printf("\t%s", annstr(annot.anntyp));
+		printf("\n");
 	    }
 	    tp = annot.time;
 	    previous_annot_valid = 1;
@@ -240,6 +247,7 @@ static char *help_strings[] = {
  " -Vh     same as -V, but print times in hours and RR intervals in seconds",
  " -Vm     same as -V, but print times in minutes and RR intervals in seconds",
  " -Vs     same as -V, but print times and RR intervals in seconds",
+ " -w      print annotation types following intervals",
 NULL
 };
 
