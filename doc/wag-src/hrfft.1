@@ -1,4 +1,4 @@
-.TH HRFFT 1 "28 July 2002" "WFDB 10.2.7" "WFDB Applications Guide"
+.TH HRFFT 1 "16 June 2003" "WFDB 10.3.8" "WFDB Applications Guide"
 .SH NAME
 hrfft, hrlomb, hrmem \- calculate and plot heart rate power spectra
 .br
@@ -36,6 +36,10 @@ the environment variable \fBANNOTATOR\fR, if set).
 Begin at the specified \fItime\fR within the annotation file (default: the
 value of the environment variable \fBSTART\fR, if set, or the beginning of the
 file otherwise).
+.TP
+\fB-l\fR \fIaxes\fR
+Log-transform the specified \fIaxes\fR (default: use linear axes).  The
+\fIaxes\fR can be specified as \fBx\fR, \fBy\fR, or \fBxy\fR.
 .TP
 \fB-p\fR \fIplot-utility\fR
 Use the specified \fIplot-utility\fR to generate the output (default: the

@@ -1,9 +1,9 @@
 /* file: lomb.c		G. Moody	12 February 1992
-			Last revised:	  23 May 2000
+			Last revised:	  16 June 2003
 
 -------------------------------------------------------------------------------
 lomb: Lomb periodogram of real data
-Copyright (C) 2000 George B. Moody
+Copyright (C) 2003 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -44,12 +44,6 @@ frequency with total power equal to the variance);  thanks to Joe Mietus.
 #include <stdio.h>
 #include <math.h>
 
-#ifndef hpux
-#define NMAX	65536	/* maximum number of inputs */
-#else
-#define NMAX	64000
-#endif
-
 static long lmaxarg1, lmaxarg2;
 #define LMAX(a,b) (lmaxarg1 = (a),lmaxarg2 = (b), (lmaxarg1 > lmaxarg2 ? \
 						   lmaxarg1 : lmaxarg2))
@@ -73,7 +67,7 @@ float ofac, hifac, wk1[], wk2[];
 unsigned long nwk, *nout, *jmax;
 float *prob;
 {
-    void avevar(), realft(), spread();
+    void avevar(), realft(), spread(), error();
     unsigned long j, k, ndim, nfreq, nfreqt;
     float ave, ck, ckk, cterm, cwt, den, df, effm, expy, fac, fndim, hc2wt,
           hs2wt, hypo, pmax, sterm, swt, var, xdif, xmax, xmin;
@@ -83,10 +77,8 @@ float *prob;
     nfreq = 64;
     while (nfreq < nfreqt) nfreq <<= 1;
     ndim = nfreq << 1;
-    if (ndim > nwk) {
-	fprintf(stderr, "%s: workspaces too small\n", pname);
-	exit(1);
-    }
+    if (ndim > nwk)
+	error("workspaces too small\n");
     avevar(y, n, &ave, &var);
     xmax = xmin = x[1];
     for (j = 2; j <= n; j++) {
@@ -138,11 +130,10 @@ int m;
     int ihi, ilo, ix, j, nden;
     static int nfac[11] = { 0, 1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880 };
     float fac;
+    void error();
 
-    if (m > 10) {
-	fprintf(stderr, "%s: factorial table too small\n", pname);
-	exit(1);
-    }
+    if (m > 10)
+	error("factorial table too small");
     ix = (int)x;
     if (x == (float)ix) yy[ix] += y;
     else {
@@ -275,16 +266,22 @@ int isign;
     }
 }
 
+FILE *ifile;
+float *x, *y, *wk1, *wk2;
+long nmax = 512L;	/* Initial buffer size (must be a power of 2).
+			   Note that input() will increase this value as
+			   necessary by repeated doubling, depending on
+			   the length of the input series. */
+
 main(argc, argv)
 int argc;
 char *argv[];
 {
     char *prog_name();
-    FILE *ifile = NULL;
-    int i, sflag=0, aflag=1;
-    static float x[NMAX], y[NMAX], wk1[64*NMAX], wk2[64*NMAX], prob;
-    unsigned long n, nout, jmax, maxout;
-    void help();
+    float prob;
+    int aflag = 1, i, sflag = 0, zflag = 0;
+    unsigned long n, nout, jmax, maxout, input();
+    void help(), zeromean();
 
     pname = prog_name(argv[0]);
     for (i = 1; i < argc; i++) {
@@ -298,6 +295,9 @@ char *argv[];
 	    break;
 	  case 'P':	    /* output powers instead of amplitudes */
 	    aflag = 0;
+	    break;
+	  case 'z':	    /* zero-mean the input */
+	    zflag = 1;
 	    break;
 	  case '\0':	    /* read data from standard input */
 	    ifile = stdin;
@@ -320,18 +320,26 @@ char *argv[];
     }
 
     /* Read input. */
-    for (n = 0; (n < NMAX) && (fscanf(ifile, "%f%f", &x[n], &y[n]) == 2); n++)
-	;
+    n = input();
+
+    /* Zero-mean the input if requested. */
+    if (zflag) zeromean(n);
 
     /* Compute the Lomb periodogram. */
-    fasper(x-1, y-1, n, 4.0, 2.0, wk1-1, wk2-1, 64*NMAX, &nout, &jmax, &prob);
+    fasper(x-1, y-1, n, 4.0, 2.0, wk1-1, wk2-1, 64*nmax, &nout, &jmax, &prob);
 
-    /* Write the results.  The normalization is by half the number of output
-       samples;  the sum of the outputs is (approximately) the mean square of
-       the inputs. */
+    /* Write the results.  Output only up to Nyquist frequency, so that the
+       results are directly comparable to those obtained using conventional
+       methods.  The normalization is by half the number of output samples; the
+       sum of the outputs is (approximately) the mean square of the inputs.
 
-    maxout = nout/2;    /* output only up to nyquist freq */
+       Note that the Nyquist frequency is not well-defined for an irregularly
+       sampled series.  Here we use half of the mean sampling frequency, but
+       the Lomb periodogram can return (less reliable) estimates of frequency
+       content for frequencies up to half of the maximum sampling frequency in
+       the input.  */
 
+    maxout = nout/2;
     if (sflag) {        /* smoothed */
 
         pwr /= 4;
@@ -359,6 +367,11 @@ char *argv[];
 
     }
 
+    free(x);
+    free(y);
+    free(wk1);
+    free(wk2);
+
     exit(0);
 }
 
@@ -382,15 +395,29 @@ char *s;
     return (p+1);
 }
 
+void error(s)
+char *s;
+{
+    fprintf(stderr, "%s: %s\n", pname, s);
+    exit(1);
+}
+
 static char *help_strings[] = {
 "usage: %s [ OPTIONS ...] INPUT-FILE\n",
-" outputs amplitude spectrum up to the nyquist frequency with total power",
-" equal to the variance.",
-" INPUT-FILE is the name of a text file containing a time series",
-" (use `-' to read the standard input), and OPTIONS may be any of:",
+" where INPUT-FILE is the name of a text file (use '-' to read the standard",
+" input) containing a sampled time series, presented as two columns of",
+" numbers (the sample times and the sample values).  The intervals between",
+" consecutive samples need not be uniform.  The standard output is the Lomb",
+" periodogram (a frequency spectrum derived from the time series, in two"
+" columns (frequency and amplitude), normalized such that the total power",
+" between zero and the Nyquist frequency (based on the mean sampling"
+" frequency) is equal to the variance of the input.  If the units of sample",
+" times are seconds, the units of the frequencies are Hz.",
+" OPTIONS may be any of:",
 " -h       Print on-line help.",
+" -P       Generate a power spectrum (print squared amplitudes).",
 " -s       Produce smoothed output.",
-" -P       Output powers instead of amplitudes.",
+" -z       Zero-mean the input data.",
 NULL
 };
 
@@ -401,4 +428,88 @@ void help()
     (void)fprintf(stderr, help_strings[0], pname);
     for (i = 1; help_strings[i] != NULL; i++)
 	(void)fprintf(stderr, "%s\n", help_strings[i]);
+}
+
+/* Read input data, allocating and filling x[] and y[].  The return value is
+   the number of points read.
+
+   This function allows the input buffers to grow as large as necessary, up to
+   the available memory (assuming that a long int is large enough to address
+   any memory location). */
+
+unsigned long input()
+{
+    unsigned long npts = 0L;
+
+    if ((x = (float *)malloc(nmax * sizeof(float))) == NULL ||
+	(y = (float *)malloc(nmax * sizeof(float))) == NULL ||
+	(wk1 = (float *)malloc(64 * nmax * sizeof(float))) == NULL ||
+	(wk2 = (float *)malloc(64 * nmax * sizeof(float))) == NULL) {
+	if (x) (void)free(x);
+	fclose(ifile);
+	error("insufficient memory");
+    }
+
+    while (fscanf(ifile, "%f%f", &x[npts], &y[npts]) == 2) {
+        if (++npts >= nmax) {	/* double the size of the input buffers */
+	    float *xt, *yt, *w1t, *w2t;
+	    unsigned long nmaxt = nmax << 1;
+
+	    if (64 * nmaxt * sizeof(float) < nmax) {
+		fprintf(stderr,
+		      "%s: insufficient memory, truncating input at row %d\n",
+		      pname, npts);
+	        break;
+	    }
+	    if ((xt = (float *)realloc(x, nmaxt * sizeof(float))) == NULL) {
+		fprintf(stderr,
+		      "%s: insufficient memory, truncating input at row %d\n",
+		      pname, npts);
+	        break;
+	    }
+	    x = xt;
+	    if ((yt = (float *)realloc(y, nmaxt * sizeof(float))) == NULL) {
+		fprintf(stderr,
+		      "%s: insufficient memory, truncating input at row %d\n",
+		      pname, npts);
+	        break;
+	    }
+	    y = yt;
+	    if ((w1t = (float *)realloc(wk1,64*nmaxt*sizeof(float))) == NULL){
+		fprintf(stderr,
+		      "%s: insufficient memory, truncating input at row %d\n",
+		      pname, npts);
+	        break;
+	    }
+	    wk1 = w1t;
+	    if ((w2t = (float *)realloc(wk2,64*nmaxt*sizeof(float))) == NULL){
+		fprintf(stderr,
+		      "%s: insufficient memory, truncating input at row %d\n",
+		      pname, npts);
+	        break;
+	    }
+	    wk2 = w2t;
+	    nmax = nmaxt;
+	}
+    }
+
+    fclose(ifile);
+    if (npts < 1) error("no data read");
+    return (npts);
+}
+
+/* This function calculates the mean of all sample values and subtracts it
+   from each sample value, so that the mean of the adjusted samples is zero. */
+
+void zeromean(n)
+unsigned long n;
+{
+    unsigned long i;
+    double ysum = 0.0;
+
+    for (i = 0; i < n; i++)
+	ysum += y[i];
+    ysum /= n;
+    for (i = 0; i < n; i++)
+	y[i] -= ysum;
 }

@@ -44,6 +44,7 @@ app/sqrs.c
 app/sumann.c
 app/sumstats.c
 app/tach.c
+app/time2sec.c
 app/view.c
 app/vsetup.c
 app/wabp.c
@@ -323,6 +324,7 @@ doc/wag-src/sqrs.1
 doc/wag-src/sumann.1
 doc/wag-src/sumstats.1
 doc/wag-src/tach.1
+doc/wag-src/time2sec.1
 doc/wag-src/tmac.dif
 doc/wag-src/view.1
 doc/wag-src/wabp.1

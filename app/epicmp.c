@@ -1,9 +1,9 @@
-/* file: epicmp.c	G. Moody	 3 March 1992
-			Last revised:  14 November 2002
+/* file: epicmp.c	G. Moody       3 March 1992
+			Last revised:  10 July 2003
 
 -------------------------------------------------------------------------------
 epicmp: ANSI/AAMI-standard episode-by-episode annotation file comparator
-Copyright (C) 2002 George B. Moody
+Copyright (C) 2003 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -61,6 +61,7 @@ understanding of algorithm errors.
 			   comparison */
 
 int aflag, sflag, s0flag, s1flag, vflag;
+char *lzmstimstr(), *zmstimstr();
 
 main(argc, argv)
 int argc;
@@ -110,11 +111,11 @@ char *argv[];
 char *pname;		/* name by which this program was invoked */
 char *record;
 char *afname, *sfname, *s0fname, *s1fname, *vfname;
-int match, mismatch, nexcl, overlap_ex0, overlap_ex1;
+int Iflag, match, mismatch, nexcl, overlap_ex0, overlap_ex1;
 long start_time, end_time, min_length, total_duration, total_overlap;
 long ep_start[2], ep_ex0[2], ep_ex1[2], ep_end[2];
 long ex_start[MAXEXCL], ex_end[MAXEXCL];
-long ref_duration, test_duration, STP, FN, PTP, FP;
+long ref_duration, ref_overlap, test_duration, test_overlap, STP, FN, PTP, FP;
 WFDB_Anninfo an[2];
 
 /* Perform an episode-by-episode comparison. */
@@ -137,16 +138,14 @@ unsigned int stat, type;
     if (stat == 0) {
 	a = 0;
 	b = 1;
-	ref_duration = 0L;
-	STP = FN = 0L;
+	ref_duration = ref_overlap = STP = FN = 0L;
     }
     /* Otherwise, check positive predictivity;  in this case, annotator 1
        defines the location of episodes. */
     else {
 	a = 1;
 	b = 0;
-	test_duration = 0L;
-	PTP = FP = 0L;
+	test_duration = test_overlap = PTP = FP = 0L;
     }
 
     /* Initialize state variables. */
@@ -155,7 +154,7 @@ unsigned int stat, type;
     ep_start[0] = ep_start[1] = ep_end[0] = ep_end[1] = 0L;
     ep_ex0[0] = ep_ex0[1] = ep_ex1[0] = ep_ex1[1] = 0L;
 
-    /* Find the first annotator a episode which ends during the test period. */
+    /* Find the first annotator a episode that ends during the test period. */
     do {
 	find_episode(a, type);
     } while (0L < ep_end[a] && ep_end[a] < start_time);
@@ -272,11 +271,13 @@ unsigned int stat, type;
 	STP = match;
 	FN = mismatch;
 	ref_duration = total_duration;
+	ref_overlap = total_overlap;
     }
     else {
 	PTP = match;
 	FP = mismatch;
 	test_duration = total_duration;
+	test_overlap = total_overlap;
     }
 }
 
@@ -403,7 +404,7 @@ unsigned int annotator, type;
 }
 
 /* This function finds and marks (in the ex_start and ex_end arrays) any
-   intervals which are to be excluded from the comparison.  The only case
+   intervals that are to be excluded from the comparison.  The only case
    in which such intervals are currently defined is that of atrial fibrillation
    positive predictivity comparisons, from which intervals of reference-marked
    atrial flutter are excluded. */
@@ -415,7 +416,7 @@ unsigned int stat, type;
     if (stat == 1 && type == AFE) {
 	if (iannsettime(0L) < 0) exit(2);
 
-	/* Find the first exclusion which ends after the beginning of the test
+	/* Find the first exclusion that ends after the beginning of the test
 	   period. */
 	do {
 	    find_episode(0, AFLE);
@@ -471,14 +472,20 @@ unsigned int annotator, type;
 
     /* There is at least some overlap -- determine its extent. */
     do {
-	/* Ignore any portion of the current episode which precedes the
+	/* Ignore any episodes shorter than the minimum length if using -I */
+	if (Iflag && ep_end[annotator] - ep_start[annotator] < min_length) {
+	    find_episode(annotator, type);
+	    continue;
+	}
+
+	/* Ignore any portion of the current episode that precedes the
 	   beginning of the window. */
 	if (ep_start[annotator] < ep_start[1-annotator])
 	    o_start = ep_start[1-annotator];
 	else
 	    o_start = ep_start[annotator];
 
-	/* Ignore any portion of the current episode which follows the end of
+	/* Ignore any portion of the current episode that follows the end of
 	   the window. */
 	if (ep_end[annotator] > ep_end[1-annotator])
 	    o_end = ep_end[1-annotator];
@@ -490,7 +497,7 @@ unsigned int annotator, type;
 
 	/* If the definition of exclusions is ever changed, it may be necessary
 	   to check explicitly here to see if the interval from o_start to
-	   o_end includes any periods which are to be excluded from the
+	   o_end includes any periods that are to be excluded from the
 	   comparison; in such a case, the duration of such periods must be
 	   subtracted from the overlap tally.  Given the current definition of
 	   exclusions, this case should never happen. */
@@ -564,7 +571,7 @@ char *sd0fname, *sd1fname, *sdfname;
 
 /* This function compares ST measurements.  Since reference measurements are
    only available at the extremum of each episode, stdc finds the test
-   measurement which is nearest in time to each reference measurement.
+   measurement that is nearest in time to each reference measurement.
    Each pair of measurements is recorded in the output file. */
 
 void stdc(mode)
@@ -664,27 +671,31 @@ void tstat(s, a, b)
 char *s;
 long a, b;
 {
-    char *lmstimstr();
-
     if (!lflag) {
 	(void)fprintf(ofile, "%s:", s);
 	if (b <= 0) (void)fprintf(ofile, "   - ");
 	else (void)fprintf(ofile, " %3d%%", (int)((100.*a)/b + 0.5));
-	(void)fprintf(ofile, " (%s", lmstimstr(a));
-	(void)fprintf(ofile, "/%s)\n", lmstimstr(b));
+	(void)fprintf(ofile, " (%s", lzmstimstr(a));
+	(void)fprintf(ofile, "/%s)\n", lzmstimstr(b));
     }
     else if (b <= 0) (void)fprintf(ofile, "   -");
     else (void)fprintf(ofile, " %3d", (int)((100.*a)/b + 0.5));
 }
 
-char *lmstimstr(t)
+char *lzmstimstr(t)
 long t;
 {
-    char *p = mstimstr(t);
+    char *p = zmstimstr(t);
 
     while (*p == ' ')
 	p++;
     return (p);
+}
+
+char *zmstimstr(t)
+long t;
+{
+    return (t ? mstimstr(t) : "       0.000");
 }
 
 void print_results(type)
@@ -782,16 +793,16 @@ int type;
     }
     pstat("           Episode sensitivity", STP, STP + FN);
     pstat(" Episode positive predictivity", PTP, PTP + FP);
-    tstat("          Duration sensitivity", total_overlap, ref_duration);
-    tstat("Duration positive predictivity", total_overlap, test_duration);
+    tstat("          Duration sensitivity", ref_overlap, ref_duration);
+    tstat("Duration positive predictivity", test_overlap, test_duration);
     if (!lflag)
 	(void)fprintf(ofile, "Duration of reference episodes:");
-    (void)fprintf(ofile, "  %s", mstimstr(ref_duration));
+    (void)fprintf(ofile, "  %s", zmstimstr(ref_duration));
     if (!lflag)
 	(void)fprintf(ofile, "\n     Duration of test episodes:");
     else
 	(void)fprintf(ofile, " ");
-    (void)fprintf(ofile, "  %s\n", mstimstr(test_duration));
+    (void)fprintf(ofile, "  %s\n", zmstimstr(test_duration));
 
     if (ofile != stdout)
 	(void)fclose(ofile);
@@ -840,10 +851,13 @@ char *argv[];
 	    help();
 	    exit(1);
 	    break;
+	  case 'I':	/* ignore short intervals when calculating overlap */
+	      Iflag = 1;	/* fall through to -i */
 	  case 'i':	/* minimum episode length follows */
 	    if (++i >= argc) {
 		(void)fprintf(stderr,
-			"%s: minimum episode length must follow -i\n", pname);
+			"%s: minimum episode length must follow %s\n", pname,
+			      argv[i-1]);
 		exit(1);
 	    }
 	    min_length = i;
@@ -969,7 +983,8 @@ static char *help_strings[] = {
  " -f TIME        begin comparison at specified TIME (default: 5 minutes",
  "                 after beginning of record)",
  " -h             print this usage summary",
- " -i TIME        ignore episodes shorter than TIME (default: 0 seconds)",
+ " -i TIME        exclude episodes shorter than TIME from episode statistics",
+ " -I TIME	  exclude episodes shorter than TIME from all statistics",
  " -l             write reports in line format (default: matrix format)",
  " -L             same as -l",
  " -S FILE FILE2  append ST reports for both signals to FILE, and ST",

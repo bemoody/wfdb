@@ -25,9 +25,9 @@
 # please visit PhysioNet (http://www.physionet.org/).
 # _____________________________________________________________________________
 #
-# This shell script is a quick-and-dirty partial replacement for Paul
-# Albrecht's elegant but unsupported `plt'.  It accepts a few of the most
-# commonly-used `plt' options and produces similar plots.
+# This shell script is a quick-and-dirty partial replacement for 'plt', which
+# is available from http://www.physionet.org/physiotools/plt.  'plot2d' accepts
+# a few of the most commonly-used `plt' options and produces similar plots.
 #
 # See `plot2d.1' (type `man plot2d') for usage and examples.
 

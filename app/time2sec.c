@@ -1,8 +1,8 @@
-/* file: readid.c	G. Moody	8 August 1983
-			Last revised:	  5 June 2003
+/* file: time2sec.c	G. Moody	9 July 2003
 
 -------------------------------------------------------------------------------
-readid: Read AHA-format ID block, write record name, file lengths on stdout
+time2sec: Convert a string in WFDB standard time format to time in seconds
+
 Copyright (C) 2003 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
@@ -22,46 +22,35 @@ You may contact the author by e-mail (george@mit.edu) or postal mail
 (MIT Room E25-505A, Cambridge, MA 02139 USA).  For updates to this software,
 please visit PhysioNet (http://www.physionet.org/).
 _______________________________________________________________________________
-
 */
 
 #include <stdio.h>
-#ifndef __STDC__
-extern void exit();
-#endif
-
-g16(fp)
-FILE *fp;
-{
-    int h, l;
-
-    l = fgetc(fp);
-    h = fgetc(fp);
-    return (((h << 8) & 0xff00) | (l & 0xff));
-}
+#include <wfdb/wfdb.h>
 
 main(argc, argv)
 int argc;
-char *argv[];
+char **argv;
 {
-    int dasize, ansize;
-    long dcount, acount;
-    static char buf[512], name[9];
+    double t;
 
-    if (argc < 3) {
-	(void)fprintf(stderr, "usage: %s data-block-size annot-block-size\n",
-		      argv[0]);
-	exit(1);
+    if (argc == 4 && strcmp(argv[1], "-r") == 0) {
+	(void)isigopen(argv[2], NULL, 0);
+	t = strtim(argv[3]);
+	if (t < 0) t = -t;
+	printf("%g\n", t/sampfreq(NULL));
+	exit(0);
     }
-    dasize = atoi(argv[1]);
-    ansize = atoi(argv[2]);
-    if (dasize < 1) dasize = 1;
-    if (ansize < 1) ansize = 1;
-    (void)fread(buf, 1, 24, stdin);
-    (void)sscanf(buf, "%s", name);
-    dcount = (g16(stdin) * 512L + dasize - 1) / dasize;
-    (void)fread(buf, 1, 14, stdin);
-    acount = (g16(stdin) * 512L + ansize - 1) / ansize;
-    (void)printf("%s %ld %ld\n", name, dcount, acount);
-    exit(0);	/*NOTREACHED*/
+    else if (argc == 2 && argv[1][0] != '-') {
+	setsampfreq(1000.0);
+	printf("%g\n", strtim(argv[1])/1000.0);
+	exit(0);
+    }
+
+    fprintf(stderr, "usage: %s [-r RECORD] TIME\n", argv[0]);
+    fprintf(stderr, " where TIME (in hh:mm:ss format) is a time interval\n");
+    fprintf(stderr, " to be converted into seconds.  Enclose TIME in\n");
+    fprintf(stderr, " square brackets (e.g., [9:0:0]) to convert a time\n");
+    fprintf(stderr, " of day to the elapsed time in seconds from the\n");
+    fprintf(stderr, " beginning of the (optionally) specified RECORD.\n");
+    exit(1);
 }

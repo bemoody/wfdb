@@ -488,6 +488,15 @@ guide in June, 1999.  See @file{NEWS}, in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
+@unnumberedsubsec Changes in version 10.3.8
+
+The WFDB library function @code{setbasetime()} now properly
+accepts arguments specifying midnight (e.g., @samp{0:0:0}), which previous
+versions rejected, and the function @code{setheader()}
+records such times correctly in the @file{.hea} files it creates.
+
+(WFDB library version 10.3.7 was identical to 10.3.6.)
+
 @unnumberedsubsec Changes in version 10.3.6
 
 The fix applied in @code{isigclose()} in 10.3.5 was incomplete but is now

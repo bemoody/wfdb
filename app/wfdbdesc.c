@@ -1,9 +1,9 @@
 /* file: wfdbdesc.c		G. Moody	  June 1989
-				Last revised:  14 November 2002
+				Last revised:	9 July 2003
 
 -------------------------------------------------------------------------------
 wfdbdesc: Describe signal specifications
-Copyright (C) 2002 George B. Moody
+Copyright (C) 2003 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -47,10 +47,10 @@ char *argv[];
         exit(1);
     }
     /* Discover the number of signals defined in the header. */
-    if ((nsig = isigopen(argv[1], NULL, 0)) < 1) exit(2);
+    if ((nsig = isigopen(argv[1], NULL, 0)) < 0) exit(2);
 
     /* Allocate storage for nsig signal information structures. */
-    if ((s = malloc(nsig * sizeof(WFDB_Siginfo))) == NULL) {
+    if (nsig > 0 && (s = malloc(nsig * sizeof(WFDB_Siginfo))) == NULL) {
 	fprintf(stderr, "%s: insufficient memory\n", pname);
 	exit(2);
     }
@@ -58,14 +58,14 @@ char *argv[];
     /* If the `-readable' option is given, report only on signals which can
        be opened.  Otherwise, report on all signals named in the header file,
        without attempting to open them. */
-    if (argc > 2 && strncmp(argv[2], "-readable", strlen(argv[2])) == 0)
+    if (nsig > 0 && argc > 2 &&
+	strncmp(argv[2], "-readable", strlen(argv[2])) == 0)
 	nsig = isigopen(argv[1], s, nsig);
-    else
+    else if (nsig > 0)
 	nsig = isigopen(argv[1], s, -nsig);
-    if (nsig < 1) exit(2);
     (void)printf("Record %s", argv[1]);
     t = strtim("e");
-    if (s[0].nsamp != t) {
+    if (nsig > 0 && s[0].nsamp != t) {
 	msrec = 1;
 	(void)printf(" (a multi-segment record)\n");
 	(void)printf("----------------------------------------------\n");
@@ -82,9 +82,9 @@ char *argv[];
     p = mstimstr(0L);
     (void)printf("\nStarting time: %s\n", *p == '[' ? p : "not specified");
     (void)printf("Length: ");
-    if (t > 0L)
+    if (nsig < 1 || t > 0L)
 	(void)printf("%s (%ld sample intervals)\n",
-		     mstimstr(t), t);
+		     t > 0L ? mstimstr(t) : "0", t);
     else if (s[0].fmt && (ifile = fopen(s[0].fname, "rb")) &&
 	     (fseek(ifile, 0L, 2) == 0)) {
 	int framesize = 0;
@@ -116,6 +116,7 @@ char *argv[];
     else (void)printf("not specified\n");
     (void)printf("Sampling frequency: %g Hz\n", sampfreq(NULL));
     (void)printf("%d signal%s\n", nsig, nsig == 1 ? "" : "s");
+    if (nsig < 1) exit(2);
     if (msrec) {
 	(void)printf("----------------------------------------------\n");
 	(void)printf("The following data apply to the first segment:\n");

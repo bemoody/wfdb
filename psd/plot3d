@@ -26,8 +26,8 @@
 # _____________________________________________________________________________
 #
 # This shell script is a simple extension of `plot2d', which is itself a
-# quick-and-dirty partial replacement for Paul Albrecht's elegant but
-# unsupported `plt'.  `plt', however, does not directly support 3D plotting.
+# quick-and-dirty partial replacement for `plt'.  `plt', however, does not
+# directly support 3D plotting, so 'plot3d' may be useful even for 'plt' users.
 #
 # See `plot2d.1' (type `man plot2d') for usage and examples.
 

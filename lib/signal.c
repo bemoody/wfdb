@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:    7 April 2003		wfdblib 10.3.6
+			Last revised:    9 July 2003		wfdblib 10.3.8
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -2251,7 +2251,9 @@ unsigned int nsig;
     }
     (void)wfdb_fprintf(oheader, " %ld", nsig > 0 ? siarray[0].nsamp : 0L);
     if (btime != 0L || bdate != (WFDB_Date)0) {
-        if (btime % 1000 == 0)
+	if (btime == 0L)
+	    (void)wfdb_fprintf(oheader, " 0:00");
+        else if (btime % 1000 == 0)
 	    (void)wfdb_fprintf(oheader, " %s",
 			   timstr((WFDB_Time)(btime*sfreq/1000.0)));
 	else
@@ -2566,12 +2568,13 @@ char *string;
     while (*string == ' ') string++;
     if (p = strchr(string, ' '))
         *p++ = '\0';	/* split time and date components */
-    if ((btime = strtim(string)) == 0L) {
+    btime = strtim(string);
+    bdate = p ? strdat(p) : (WFDB_Date)0;
+    if (btime == 0L && bdate == (WFDB_Date)0 && *string != '[') {
 	if (p) *(--p) = ' ';
 	wfdb_error("setbasetime: incorrect time format, '%s'\n", string);
 	return (-1);
     }
-    if (p) bdate = strdat(p);
     btime *= 1000.0/sfreq;
     return (0);
 }

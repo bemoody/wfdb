@@ -1,10 +1,10 @@
 /* file: modepan.c	G. Moody        30 April 1990
-			Last revised:  5 December 2002
+			Last revised:	12 July 2003
 Mode panel functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 2002 George B. Moody
+Copyright (C) 2003 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -66,7 +66,8 @@ Event *event;
 }
 
 int mode_popup_active = -1;
-char *tchoice[] = {"0.25 mm/min", "1 mm/min", "5 mm/min", "25 mm/min",
+char *tchoice[] = {"0.25 mm/hour", "1 mm/hour", "5 mm/hour",
+    "0.25 mm/min", "1 mm/min", "5 mm/min", "25 mm/min",
     "50 mm/min", "125 mm/min", "250 mm/min", "500 mm/min",
     "12.5 mm/sec", "25 mm/sec", "50 mm/sec", "125 mm/sec", "250 mm/sec",
     "500 mm/sec", "1000 mm/sec"};
@@ -265,49 +266,58 @@ void set_modes()
 	int u = ((int)(canvas_width/dmmx(1) + 1)/5);	/* number of 5 mm
 							   time-grid units */
 	switch (tsa_index = i) {
-	  case 0:	/* 0.25 mm/min */
+	  case 0:	/* 0.25 mm/hour */
+	    mmpersec = (0.25/3600.);
+	    canvas_width_sec = 72000 * u; break;
+	  case 1:	/* 1 mm/hour */
+	    mmpersec = (1./3600.);
+	    canvas_width_sec = 18000 * u; break;
+	  case 2:	/* 5 mm/hour */
+	    mmpersec = (5./3600.);
+	    canvas_width_sec = 3600 * u; break;
+	  case 3:	/* 0.25 mm/min */
 	    mmpersec = (0.25/60.);
 	    canvas_width_sec = 1200 * u; break;
-	  case 1:	/* 1 mm/min */
+	  case 4:	/* 1 mm/min */
 	    mmpersec = (1./60.);
 	    canvas_width_sec = 300 * u; break;
-	  case 2:	/* 5 mm/min */
+	  case 5:	/* 5 mm/min */
 	    mmpersec = (5./60.);
 	    canvas_width_sec = 60 * u; break;
-	  case 3:	/* 25 mm/min */
+	  case 6:	/* 25 mm/min */
 	    mmpersec = (25./60.);
 	    canvas_width_sec = 12 * u; break;
-	  case 4:	/* 50 mm/min */
+	  case 7:	/* 50 mm/min */
 	    mmpersec = (50./60.);
 	    canvas_width_sec = 6 * u; break;
-	  case 5:	/* 125 mm/min */
+	  case 8:	/* 125 mm/min */
 	    mmpersec = (125./60.);
 	    canvas_width_sec = (12 * u) / 5; break;
-	  case 6:	/* 250 mm/min */
+	  case 9:	/* 250 mm/min */
 	    mmpersec = (250./60.);
 	    canvas_width_sec = (6 * u) / 5; break;
-	  case 7:	/* 500 mm/min */
+	  case 10:	/* 500 mm/min */
 	    mmpersec = (500./60.);
 	    canvas_width_sec = (3 * u) / 5; break;
-	  case 8:	/* 12.5 mm/sec */
+	  case 11:	/* 12.5 mm/sec */
 	    mmpersec = 12.5;
 	    canvas_width_sec = (2 * u) / 5; break;
-	  case 9:	/* 25 mm/sec */
+	  case 12:	/* 25 mm/sec */
 	    mmpersec = 25.;
 	    canvas_width_sec = u / 5; break;
-	  case 10:	/* 50 mm/sec */
+	  case 13:	/* 50 mm/sec */
 	    mmpersec = 50.;
 	    canvas_width_sec = u / 10; break;
-	  case 11:	/* 125 mm/sec */
+	  case 14:	/* 125 mm/sec */
 	    mmpersec = 125.;
 	    canvas_width_sec = u / 25; break;
-	  case 12:	/* 250 mm/sec */
+	  case 15:	/* 250 mm/sec */
 	    mmpersec = 250.;
 	    canvas_width_sec = u / 50.0; break;
-	  case 13:	/* 500 mm/sec */
+	  case 16:	/* 500 mm/sec */
 	    mmpersec = 500.;
 	    canvas_width_sec = u / 100.0; break;
-	  case 14:	/* 1000 mm/sec */
+	  case 17:	/* 1000 mm/sec */
 	    mmpersec = 1000.;
 	    canvas_width_sec = u / 200.0; break;
 	}

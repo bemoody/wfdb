@@ -24,19 +24,19 @@ please visit PhysioNet (http://www.physionet.org/).
 _______________________________________________________________________________
 
 This directory contains sources for applications for power spectral density
-(PSD) estimation, and sample UNIX shell scripts for using these applications to
+(PSD) estimation, and sample Unix shell scripts for using these applications to
 obtain heart rate power spectra based upon beat annotation files.  The scripts
-require `ihr' and `tach' from the `app' directory (at the same level as this
-one), and also require either `plt' (not generally available) or `gnuplot'
-(a freely available plotting utility) for output.  The programs to be compiled
-within this directory are independent of the DB Software Package, and require
-only the standard C math library.  This directory also contains documentation
-for these programs and scripts in the form of UNIX man pages.
+require 'ihr' and 'tach' from the '../app' directory, and also require either
+'plt' or 'gnuplot' for output.  (See http://www.physionet.org/physiotools/plt/
+or http://www.gnuplot.info/.)  The programs to be compiled within this
+directory are independent of the remainder of the WFDB Software Package, and
+require only the standard C math library.  The directory '../doc/wag-src'
+contains documentation for these programs and scripts in the form of Unix man
+pages.
 
-These programs were written for and tested under SunOS, Solaris, and Linux,
-although they should be portable to other operating systems, including MS-DOS.
-The shell scripts are UNIX-specific, but should be easy to adapt to MS-DOS.
-Note that versions of `gnuplot' are available for both MS-DOS and MS-Windows.
+These programs were written for SunOS, Solaris, and GNU/Linux;  they are also
+portable to and have been tested with other versions of Unix, as well as
+MacOS X and MS-Windows (with the free Cygwin toolkit, http://www.cygwin.com/).
 
 Follow the instructions in `Makefile' to install these applications and their
 man pages on your system.

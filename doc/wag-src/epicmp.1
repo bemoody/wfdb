@@ -1,4 +1,4 @@
-.TH EPICMP 1  "22 November 2002" "WFDB 10.3.0" "WFDB Applications Guide"
+.TH EPICMP 1  "10 July 2003" "WFDB 10.3.8" "WFDB Applications Guide"
 .SH NAME
 epicmp \- ANSI/AAMI-standard episode-by-episode annotation comparator
 .SH SYNOPSIS
@@ -29,7 +29,13 @@ beginning of the record).
 Print a usage summary.
 .TP
 \fB-i\fR \fItime\fR
-Ignore episodes shorter than \fItime\fR (default: 0 seconds).
+Exclude episodes shorter than \fItime\fR (default: 0 seconds) from
+episode statistics.
+.TP
+\fB-I\fR \fItime\fR
+Exclude episodes shorter than \fItime\fR (default: 0 seconds) from
+episode and duration statistics.
+(At most one of \fB-i\fR and \fB-I\fR may be used.)
 .TP
 \fB-l\fR
 Write reports in line format (default: matrix format).
@@ -139,10 +145,10 @@ It may be necessary to set and export the shell variable \fBWFDB\fR (see
 .SH DIAGNOSTICS
 .TP
 \fInon-standard comparison selected\fR
-The \fB-f\fR, \fB-i\fR, and \fB-t\fR options modify the comparison algorithms
-used by \fBepicmp\fR in ways not permitted by EC38.  These options are provided
-for the use of developers, who may find them useful for obtaining a more
-detailed understanding of algorithm errors.
+The \fB-f\fR, \fB-i\fR, \fB-I\fR, and \fB-t\fR options modify the comparison
+algorithms used by \fBepicmp\fR in ways not permitted by EC38.  These options
+are provided for the use of developers, who may find them useful for obtaining
+a more detailed understanding of algorithm errors.
 .SH BUGS
 .PP
 Since \fBepicmp\fR performs multiple passes over its input files, it cannot be
@@ -150,7 +156,7 @@ used at the end of a pipe.
 .PP
 Between 1992 and 2002, this program was known as \fBepic\fR; the name
 was changed to avoid conflict with a new but widely distributed IRC
-chat client also named \fBepic\fR.  By analogy to \fBbxb\fR and
+chat client also named \fBepic\fR.  By analogy to \fBbxb\fR, \fBmxm\fR, and
 \fBrxr\fR, this program should have been called \fBexe\fR, which would
 have created interesting possibilities for confusion.
 .SH SEE ALSO

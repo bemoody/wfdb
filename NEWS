@@ -1,3 +1,46 @@
+10.3.8:
+	The WFDB library function setbasetime (in lib/signal.c) now properly
+	accepts arguments specifying midnight (e.g., "0:0:0"), which previous
+	versions rejected, and the function setheader (also in lib/signal.c)
+	records such times correctly in the .hea files it creates.
+
+	epicmp's new -I option allows exclusion of short episodes from all
+	statistics (the -i option, which remains available, excludes such
+	episodes from episode counts but includes them in duration tallies.)
+	Also, previous versions of epicmp (formerly epic) output a "time of
+	day"  string where "0.000" should have appeared if the input record had
+	a defined base time.  This behavior has been corrected (thanks to
+	Paul Albrecht for the bug report, and for suggesting and providing
+	an implementation of the -I option).
+
+	The bounding box for pschart output has been enlarged so that most
+	signal labels will not be clipped.
+
+	A new application, time2sec, converts a string in WFDB standard
+	time format into a time interval in seconds.
+
+	wfdbdesc now produces output even for records with no signals.
+
+	Three highly condensed time scales have been added to those previously
+	available in WAVE.
+
+	Modified psd/hrlomb and psd/hrmem so that the plots they produce are
+	power, not amplitude, spectra, as psd/hrfft produces.  All three of
+	these scripts can now produce log-log and semi-log plots (make them
+	by using the new "-l xy" or "-l y" options).
+
+	psd/lomb can now accept input series of arbitrary length, and its -P
+	option (for selecting a power spectrum rather than the default
+	amplitude spectrum) is now properly documented in its man page.
+
+	The -l option of psd/memse is now obsolete; memse can now accept input
+	series of arbitrary length.
+
+	Fixed bugs in convert/readid and convert/makeid.  These programs read
+	and write AHA DB-format tape ID files.  The bugs were introduced in
+	version 10.0.1 (!);  the programs should work properly again, if anyone
+	still needs to use them.
+
 10.3.7:
 	Fixed a bug in xform, introduced in 10.3.4, that prevented xform from
 	reading the output sampling frequency from the standard input.  Thanks

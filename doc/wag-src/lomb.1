@@ -1,4 +1,4 @@
-.TH LOMB 1 "30 July 2002" "WFDB 10.2.7" "WFDB Applications Guide"
+.TH LOMB 1 "16 June 2003" "WFDB 10.3.8" "WFDB Applications Guide"
 .SH NAME
 lomb \- estimate power spectrum using the Lomb periodogram method
 .SH SYNOPSIS
@@ -26,8 +26,15 @@ input file are seconds, the units of the frequencies in the output are Hz.
 \fB-h\fR
 Print a usage summary.
 .TP
+\fB-P\fR
+Generate a power spectrum (print squared magnitudes).
+.TP
 \fB-s\fR
 Smooth the output.
+.TP
+\fB-z\fR
+Add a constant to each input sample, chosen such that the mean value of the
+entire series is zero.
 .PP
 Among many other applications, this program can be used to estimate
 heart rate power spectra, in combination with \fBihr\fR(1).  The Lomb

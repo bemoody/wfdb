@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: hrfft		G. Moody	14 June 1995
-#			Last revised: 19 February 2003
+#			Last revised:   16 June 2003
 #
 # -----------------------------------------------------------------------------
 # Derive a heart rate power spectrum (using tach and fft) and plot it
@@ -25,11 +25,24 @@
 # please visit PhysioNet (http://www.physionet.org/).
 # _____________________________________________________________________________
 
+X=2
+XL="Frequency (Hz)"
+XOPT="0 1"
+Y=3
+YL="Power"
+YOPT=""
+
 while [ $# -gt 1 ]
 do
   case $1 in
     -a) ANNOTATOR=$2 ;;
     -f) START=$2 ;;
+    -l) case $2 in
+         x|X) X=0; XL="log Frequency (Hz)"; XOPT="-4 1 -lx" ;;
+         y|Y) Y=1; YL="log Power"; YOPT="-ly" ;;
+	 *)   X=0; XL="log Frequency (Hz)" ; XOPT="-4 1 -lx";
+              Y=1; YL="log Power"; YOPT="-ly";;
+	esac ;;
     -p) PLOT=$2 ;;
     -r) RECORD=$2 ;;
     -t) END=$2 ;;
@@ -94,7 +107,6 @@ else
 fi
 
 tach -r $RECORD -a $ANNOTATOR -f $START -t $END -F 4 | \
- fft -f 4 -P -w Welch -Z - | \
- $PLOT 0 1 -x "Frequency (Hz)" -y "Power" \
- -t "Record $RECORD ($START - $END): Heart rate spectrum (FFT)" \
-  -X 0 1 $PLOTOUT
+ fft -f 4 -P -w Welch -Z - | log10 | \
+ $PLOT $X $Y -x "$XL" -X $XOPT -y "$YL" $YOPT \
+ -t "Record $RECORD ($START - $END): Heart rate spectrum (FFT)" $PLOTOUT

@@ -68,9 +68,9 @@ _______________________________________________________________________________
 #define DSLMAX	80	/* length of longest permissible description in log */
 
 /* Default array indices for scale settings (see modepan.c and xvwave.c). */
-#define DEF_TSA_INDEX 9
-#define DEF_COARSE_TSA_INDEX 3
-#define MAX_COARSE_TSA_INDEX 5
+#define DEF_TSA_INDEX 12
+#define DEF_COARSE_TSA_INDEX 6
+#define MAX_COARSE_TSA_INDEX 8
 #define DEF_VSA_INDEX 3
 
 /* Macros */

@@ -1,9 +1,9 @@
-/* file: pschart.c	G. Moody	 15 March 1988
-			Last revised:  14 November 2002
+/* file: pschart.c	G. Moody       15 March 1988
+			Last revised:	8 July 2003
 
 -------------------------------------------------------------------------------
 pschart: Produce annotated `chart recordings' on a PostScript device
-Copyright (C) 2002 George B. Moody
+Copyright (C) 2003 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -1350,16 +1350,16 @@ void newpage()
 	       "%%%%DocumentFonts: Times-Roman Times-Italic Courier Symbol\n");
 	    if (Lflag == 0)
 		(void)printf("%%%%BoundingBox: %d %d %d %d\n",
-		   (int)(lmargin*72.0/25.4 - 36.0),
+		   (int)(lmargin*72.0/25.4 - 72.0),
 		   (int)(footer_y*72.0/25.4 - 8.0),
-		   (int)((p_width - rmargin)*72.0/25.4 + 8.0),
+		   (int)((p_width - rmargin)*72.0/25.4 + 44.0),
 		   (int)(title_y*72.0/25.4 + 8.0));
 	    else
 		(void)printf("%%%%BoundingBox: %d %d %d %d\n",
 		   (int)(footer_y*72.0/25.4 - 8.0),
-		   (int)(lmargin*72.0/25.4 - 36.0),
+		   (int)(lmargin*72.0/25.4 - 72.0),
 		   (int)(title_y*72.0/25.4 + 8.0),
-		   (int)((p_width - rmargin)*72.0/25.4 + 8.0));
+		   (int)((p_width - rmargin)*72.0/25.4 + 44.0));
 	    (void)printf("%%%%EndComments\n");
 	    (void)printf("%%%%EndProlog\n");
 	}

@@ -1,9 +1,9 @@
 /* file: memse.c	G. Moody	6 February 1992
-			Last revised:  17 September 1999
+			Last revised:    16 June 2003
 
 -------------------------------------------------------------------------------
 memse: Estimate power spectrum using maximum entropy (all poles) method
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2003 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -39,7 +39,6 @@ extern double atof();
 #include <stdlib.h>
 #endif
 
-#define LEN	16384	/* default maximum points in input series */
 #define PI	 M_PI	/* pi to machine precision, defined in math.h */
 
 #ifdef i386
@@ -140,11 +139,17 @@ int j, n;
 }
 
 char *pname;
+
 FILE *ifile;
-float *wk1, *wk2, *wkm;
+float *data, *wk1, *wk2;
+long nmax = 512L;	/* Initial buffer size (must be a power of 2).
+			   Note that input() will increase this value as
+			   necessary by repeated doubling, depending on
+			   the length of the input series. */
+float *wkm;
 int fflag;
-unsigned int len = LEN;
-unsigned int npoints;
+unsigned int len;
+unsigned int nout;
 unsigned int poles;
 int wflag;
 int zflag;
@@ -157,19 +162,17 @@ char *argv[];
     int i, pflag = 0;
     char *prog_name();
     double df;
-    float pm, *cof, *data, evlmem();
+    float pm, *cof, evlmem();
     FILE *fp;
-    void detrend(), help(), memcof();
+    long input();
+    void detrend(), error(), help(), memcof();
 
     pname = prog_name(argv[0]);
     for (i = 1; i < argc; i++) {
 	if (*argv[i] == '-') switch (*(argv[i]+1)) {
 	  case 'f':	/* print frequencies */
-	    if (++i >= argc) {
-		fprintf(stderr, "%s: sampling frequency must follow -f\n",
-			pname);
-		exit(1);
-	    }
+	    if (++i >= argc)
+		error("sampling frequency must follow -f");
 	    freq = atof(argv[i]);
 	    fflag = 1;
 	    break;
@@ -177,37 +180,28 @@ char *argv[];
 	    help();
 	    exit(0);
 	    break;
-	  case 'l':	/* handle up to n-point input series */
-	    if (++i >= argc) {
-		fprintf(stderr, "%s: input length must follow -l\n", pname);
-		exit(1);
-	    }
-	    len = atoi(argv[i]);
+	  case 'l':	/* handle up to n-point input series (obsolete) */
+	    fprintf(stderr,
+	    "%s: -l option is obsolete (%s can handle inputs of any length)\n",
+		    pname, pname);
+	    ++i;
 	    break;
 	  case 'n':	/* print n equally-spaced output values */
-	    if (++i >= argc) {
-		fprintf(stderr, "%s: output length must follow -n\n", pname);
-		exit(1);
-	    }
-	    npoints = atoi(argv[i]);
+	    if (++i >= argc)
+		error("output length must follow -n");
+	    nout = atoi(argv[i]);
 	    break;
 	  case 'o':	/* specify the model order (number of poles) */
-	    if (++i >= argc) {
-		fprintf(stderr, "%s: order (number of poles) must follow -o\n",
-			pname);
-		exit(1);
-	    }
+	    if (++i >= argc)
+		error("order (number of poles) must follow -o");
 	    poles = atoi(argv[i]);
 	    break;
 	  case 'P':     /* print power spectrum (squared magnitudes) */
 	    pflag = 1;
 	    break;
 	  case 'w':	/* apply windowing function to input */
-	    if (++i >= argc) {
-		fprintf(stderr, "%s: window type must follow -w\n",
-			pname);
-		exit(1);
-	    }
+	    if (++i >= argc)
+		error("window type must follow -w");
 	    if (strcasecmp(argv[i], "Bartlett") == 0)
 		window = win_bartlett;
 	    else if (strcasecmp(argv[i], "Blackman") == 0)
@@ -246,7 +240,7 @@ char *argv[];
 	    fprintf(stderr, "%s: unrecognized option %s ignored\n",
 		    pname, argv[i]);
 	    break;
-	}
+	    }
 	else if (i == argc-1) {	/* last argument: input file name */
 	    if ((ifile = fopen(argv[i], "rt")) == NULL) {
 		fprintf(stderr, "%s: can't open %s\n", pname, argv[i]);
@@ -259,25 +253,8 @@ char *argv[];
 	exit(1);
     }
 
-    /* Allocate arrays for input series and workspace. */
-    if ((data = (float *)malloc((unsigned)len*sizeof(float))) == NULL ||
-	(wk1 = (float *)malloc((unsigned)len*sizeof(float))) == NULL ||
-	(wk2 = (float *)malloc((unsigned)len*sizeof(float))) == NULL) {
-	fprintf(stderr, "%s: insufficient memory\n", pname);
-	exit(1);
-    }
-
     /* Read the input series. */
-    for (i = 0; i < len; i++)
-	if (fscanf(ifile, "%f", &data[i]) < 1) break;
-    if (i == 0) {
-	fprintf(stderr, "%s: input series is empty\n", pname);
-	exit(2);
-    }
-    if (i < len) len = i;
-    else if (fscanf(ifile, "%f", &df) == 1)
-	fprintf(stderr, "%s: input series truncated after %d points\n",
-		pname, len);
+    len = input();
 
     /* Check the model order. */
     if (poles > len) poles = len;
@@ -322,26 +299,26 @@ char *argv[];
     /* If the number of output points was not specified, choose the largest
        power of 2 less than len, plus 1 (so that the number of output points
        matches that produced by an FFT). */
-    if (npoints == 0) {
-	if (len < LEN)
-	    for (npoints = LEN; npoints > len; npoints >>= 1)
-		;
-	else {
-	    for (npoints = LEN; npoints < len; npoints <<= 1)
-		;
-	    npoints >>= 1;
-	}
-	npoints++;
+    if (nout == 0) {
+	while (nmax >= len)
+	    nmax /= 2;;
+	nout = nmax + 1;
     }
 
     /* Print outputs. */
-    for (i = 0, df = 0.5/(npoints-1); i < npoints; i++) {
+    for (i = 0, df = 0.5/(nout-1); i < nout; i++) {
 	if (fflag) printf("%g\t", i*df*freq);
 	if (pflag)
-	    printf("%g\n", evlmem(i*df, cof, poles, pm)/(npoints-1));
+	    printf("%g\n", evlmem(i*df, cof, poles, pm)/(nout-1));
 	else
-	    printf("%g\n", sqrt(evlmem(i*df, cof, poles, pm)/(npoints-1)));
+	    printf("%g\n", sqrt(evlmem(i*df, cof, poles, pm)/(nout-1)));
     }
+
+    free(cof);
+    free(data);
+    free(wk1);
+    free(wk2);
+    free(wkm);
 
     exit(0);
 }
@@ -455,6 +432,13 @@ char *s;
     return (p+1);
 }
 
+void error(s)
+char *s;
+{
+    fprintf(stderr, "%s: %s\n", pname, s);
+    exit(1);
+}
+
 static char *help_strings[] = {
 "usage: %s [ OPTIONS ...] INPUT-FILE\n",
 " where INPUT-FILE is the name of a text file containing a time series",
@@ -463,11 +447,10 @@ static char *help_strings[] = {
 "          FREQ argument specifies the input sampling frequency;  the center",
 "          frequencies are given in the same units.",
 " -h       Print on-line help.",
-" -l LEN   Handle input files with up to N points; default: LEN = 16384.",
-" -n N     Print N equally-spaced output values; default: N = LEN/2.",
-" -o P     Specify the model order (number of poles); default: P = sqrt(LEN).",
-"          spectrum for each chunk.  For best results, n should be a power of",
-"          two.",
+" -n N     Print N equally-spaced output values; default: N = half the number",
+"          of input samples.",
+" -o P     Specify the model order (number of poles); default: P = the square",
+"          root of the number of input samples.",
 " -P       Generate a power spectrum (print squared magnitudes).",
 " -w WINDOW",
 "          Apply the specified WINDOW to the input data.  WINDOW may be one",
@@ -485,4 +468,65 @@ void help()
     (void)fprintf(stderr, help_strings[0], pname);
     for (i = 1; help_strings[i] != NULL; i++)
 	(void)fprintf(stderr, "%s\n", help_strings[i]);
+}
+
+/* Read input data, allocating and filling x[] and y[].  The return value is
+   the number of points read.
+
+   This function allows the input buffers to grow as large as necessary, up to
+   the available memory (assuming that a long int is large enough to address
+   any memory location). */
+
+long input()
+{
+    unsigned long npts = 0L;
+
+    if ((data = (float *)malloc(nmax * sizeof(float))) == NULL ||
+	(wk1 = (float *)malloc(64 * nmax * sizeof(float))) == NULL ||
+	(wk2 = (float *)malloc(64 * nmax * sizeof(float))) == NULL) {
+	if (data) (void)free(data);
+	if (wk1) (void)free(wk1);
+	fclose(ifile);
+	error("insufficient memory");
+    }
+
+    while (fscanf(ifile, "%f", &data[npts]) == 1) {
+        if (++npts >= nmax) {	/* double the size of the input buffers */
+	    unsigned long nmaxt = nmax << 1;
+	    float *datat, *w1t, *w2t;
+
+	    if (nmaxt * sizeof(float) < nmax) {
+		fprintf(stderr,
+		      "%s: insufficient memory, truncating input at row %d\n",
+		      pname, npts);
+	        break;
+	    }
+	    if ((datat = (float *)realloc(data,nmaxt*sizeof(float))) == NULL) {
+		fprintf(stderr,
+		      "%s: insufficient memory, truncating input at row %d\n",
+		      pname, npts);
+	        break;
+	    }
+	    data = datat;
+	    if ((w1t = (float *)realloc(wk1,64*nmaxt*sizeof(float))) == NULL){
+		fprintf(stderr,
+		      "%s: insufficient memory, truncating input at row %d\n",
+		      pname, npts);
+	        break;
+	    }
+	    wk1 = w1t;
+	    if ((w2t = (float *)realloc(wk2,64*nmaxt*sizeof(float))) == NULL){
+		fprintf(stderr,
+		      "%s: insufficient memory, truncating input at row %d\n",
+		      pname, npts);
+	        break;
+	    }
+	    wk2 = w2t;
+	    nmax = nmaxt;
+	}
+    }
+
+    fclose(ifile);
+    if (npts < 1) error("no data read");
+    return (npts);
 }

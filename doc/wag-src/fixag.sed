@@ -9,6 +9,7 @@ s+plotstm-1.htm+plotst-1.htm+g
 s+sampfreq-1.htm+sampfr-1.htm+g
 s+setwfdb-1.htm+setwfd-1.htm+g
 s+sumstats-1.htm+sumsta-1.htm+g
+s+time2sec-1.htm+time2s-1.htm+g
 s+wfdb-config-1.htm+wfdb-c-1.htm+g
 s+wfdbcal-5.htm+wfdbca-5.htm+g
 s+wfdbcollate-1.htm+wfdbco-1.htm+g

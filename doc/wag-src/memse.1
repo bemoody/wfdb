@@ -1,4 +1,4 @@
-.TH MEMSE 1 "30 July 2002" "WFDB 10.2.7" "WFDB Applications Guide"
+.TH MEMSE 1 "16 June 2003" "WFDB 10.3.8" "WFDB Applications Guide"
 .SH NAME
 memse \- estimate power spectrum using maximum entropy (all poles) method
 .SH SYNOPSIS
@@ -51,11 +51,6 @@ frequencies are given in the same units.
 \fB-h\fR
 Print a usage summary.
 .TP
-\fB-l\fR \fIn\fR
-Handle input series up to \fIn\fR points in length.  Default: \fIn\fR = 16384,
-although you should be cautious about using \fImemse\fR with such long input
-series.
-.TP
 \fB-n\fR \fIn\fR
 Produce exactly \fIn\fR power estimates, evenly spaced in frequency from 0
 up to half the input sampling frequency inclusive.  The default depends on
@@ -69,7 +64,7 @@ locations of sharp features in the spectrum;  since this is not possible using
 Use an \fIn\fRth order model (i.e., up to \fIn\fR poles).  Default:  the
 square root of the number of input samples.
 .TP
-\fB-P\fR \fIn\fR
+\fB-P\fR
 Generate a power spectrum (print squared magnitudes).
 .TP
 \fB-w\fR \fIwindow-type\fR
