@@ -1,6 +1,12 @@
 file: INSTALL			G. Moody	30 January 2000
-				Last revised:	  5 June 2000
+				Last revised:	6 September 2001
 WFDB Software Package installation notes
+
+These notes are included here for those who may not have ready access to the
+World Wide Web.  For those who do, please visit PhysioNet, where quick-start
+guides including installation notes for popular operating systems are available
+(see http://www.physionet.org/physiotools/wfdb.shtml).
+
 _______________________________________________________________________________
 
 Under UNIX or Linux:
@@ -24,13 +30,12 @@ Under UNIX or Linux:
    /usr/local/help/html/wug if you wish to read the help from local files;
    otherwise, edit wave/wave.info and change all occurrences of
    '/usr/local/help/html/' into 'http://www.physionet.org/physiotools/wug/'.
-   (The utility 'wget' -- which you can find with a web search -- can be
-   helpful if you wish to copy an entire directory of a web site, as suggested
+   (The utility 'wget' -- which you can find on PhysioNet -- can be helpful
+   if you wish to copy an entire directory of a web site, as suggested
    here.)
 
 3. In this directory, type:
 	./configure
-	make
 	make install
    You will need root permissions to run 'make install', unless you change
    WFDBROOT so that the files are installed in a directory that you own (you
@@ -40,35 +45,52 @@ Under UNIX or Linux:
 	make uninstall
    from this directory.  You will need root permissions to uninstall unless
    you changed WFDBROOT before installing the package.
+
 _______________________________________________________________________________
 
-Under MS-DOS or MS-Windows:
+Under MS-Windows:
 
-If possible, use djgpp (DJ Delorie's MS-DOS port of gcc, free from
-http://www.delorie.com/djgpp/) or cygwin (Cygnus Software's MS-Windows port of
-gcc, free from http://sourceware.cygnus.com/cygwin/).  Both of these include
-many of the GNU utilities, including GNU make.  In this directory, type:
-	make -f Makefile-dos-gcc
+1. If you have not already done so, install the Cygwin development environment
+   (freely available from http://sources.redhat.com/cygwin/).  This includes
+   gcc (the GNU C/C++ compiler) as well as a comprehensive assortment of other
+   Unix utilities ported to MS-Windows.  Accept the defaults suggested by the
+   installer.
 
-If you are using an older version of MS-DOS that cannot handle long filenames,
-you will need to rename the 'Makefile-dos-gcc' files here and in each of the
-subdirectories, and then you will need to edit the one in this directory to
-change each reference to 'Makefile-dos-gcc' appropriately.
+   IMPORTANT:  Although you may be able to compile the WFDB software package
+   using a proprietary compiler, this is NOT SUPPORTED.  The 'Makefile.dos'
+   files in several of the subdirectories of this one can be used with the
+   'make' utilities provided with most commercial C compilers, although you
+   will need to customize them for your compiler. Your feedback is appreciated.
 
-If you use cygwin, please try to download and install the libwww package, from
-http://www.physionet.org/physiotools/libwww/, or from the W3C's web site at
-http://www.w3.org/Library), and modify lib/Makefile-dos-gcc so that libwww will
-be linked together with the WFDB library.  Instructions for compiling libwww
-with cygwin are provided in the sources and at http://www.w3.org/INSTALL.html.
-This should work but has not yet been tested; please let me know what changes
-are needed.  (Details will be posted on PhysioNet once they are available.)
+2. Download http://www.physionet.org/physiotools/binaries/windows/bin/which.exe
+   and put it into a directory in your PATH.  (This utility is needed by
+   'configure' in a later step.  The sources for which.exe are available within
+   http://www.physionet.org/physiotools/utilities/.)
 
-The 'Makefile.dos' files in each of the subdirectories of this one (except for
-wave, wave-doc, and waverc, which are for UNIX only) can be used with the
-'make' utilities provided with most commercial C compilers, although you may
-need to customize them for your compiler; your feedback is appreciated.  A
-version of libwww for MSVC++ 5.0 is available from PhysioNet and from the W3C
-web site.  If you don't have a 'make' utility, try djgpp or cygwin.
+3. Open a Cygwin terminal window (the Cygwin installer will have added this to
+   your MS-Windows start menu).  Check that 'which' and 'gcc' are accessible by
+   typing the command:
+	which gcc
+   The output of this command should be:
+	/usr/bin/gcc
+   If you don't see this output, repeat steps 1 and 2 above as necessary to
+   correct the problem before continuing.
+
+4. Install the World Wide Web Consortium's libwww library (you will need both
+   the library itself and the developer's package;  download them from
+   http://www.physionet.org/physiotools/libwww/, or from the W3C's web site
+   at http://www.w3.org/Library).  You may skip this step if you don't want
+   support for reading input files from remote web and FTP servers.  See
+   README.NETFILES for further information about this option.
+
+5. In this directory (the top-level directory of the WFDB software package,
+   containing the file you are now reading), type:
+	./configure
+	make install
+
+6. If for any reason you wish to uninstall the WFDB Software Package, type:
+	make uninstall
+   from this directory.
 
 _______________________________________________________________________________
 
@@ -79,6 +101,10 @@ and some of the applications have been compiled successfully by Macintosh
 users (and on VMS, among other environments).  The sources are written in
 highly portable C and should not be difficult to port to any environment where
 an ANSI/ISO or K&R C compiler and the standard C library are available.
+
+Several users have reported that the WFDB library and the applications in the
+'app' directory can be compiled successfully using cc (gcc) under MacOS/X
+(Darwin).
 
 If you find that changes are necessary in order to compile this software
 successfully, please send details to the author (george@mit.edu) so that

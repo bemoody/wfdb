@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:   19 August 2001		wfdblib 10.2.0
+			Last revised:   20 August 2001		wfdblib 10.2.0
 WFDB library functions for annotations
 
 _______________________________________________________________________________
@@ -29,6 +29,8 @@ This file contains definitions of the following functions, which are not
 visible outside of this file:
  get_ann_table  (reads tables used by annstr, strann, and anndesc)
  put_ann_table  (writes tables used by annstr, strann, and anndesc)
+ allociann	(sets max number of simultaneously open input annotators)
+ allocoann	(sets max number of simultaneously open output annotators)
 
 This file also contains definitions of the following WFDB library functions:
  annopen        (opens annotation files)
@@ -46,8 +48,6 @@ This file also contains definitions of the following WFDB library functions:
  setanndesc [5.3](modifies code-to-text translation table)
  iannclose [9.1](closes an input annotation file)
  oannclose [9.1](closes an output annotation file)
- setmaxiann [10.2] (sets max number of simultaneously open input annotators)
- setmaxoann [10.2] (sets max number of simultaneously open output annotators)
 
 (Numbers in brackets in the list above indicate the first version of the WFDB
 library that included the corresponding function.  Functions not so marked
@@ -199,6 +199,60 @@ WFDB_Annotator i;
     return (0);
 }
 
+/* Allocate workspace for up to n input annotators. */
+static int allociann(n)
+unsigned n;
+{
+    if (maxiann < n) {     /* allocate input annotator data structures */
+        unsigned m = maxiann;
+        struct iadata **iadnew = realloc(iad, n*sizeof(struct iadata *));
+
+	if (iadnew == NULL) {
+	    wfdb_error("annopen: too many (%d) input annotators\n", n);
+	    return (-1);
+	}
+	iad = iadnew;
+	while (m < n) {
+	    if ((iad[m] = calloc(1, sizeof(struct iadata))) == NULL) {
+		wfdb_error("annopen: too many (%d) input annotators\n", n);
+		while (--m > maxiann)
+		    free(iad[m]);
+		return (-1);
+	    }
+	    m++;
+	}
+        maxiann = n;
+    }
+    return (maxiann);
+}
+
+/* Allocate workspace for up to n output annotators. */
+static int allocoann(n)
+unsigned n;
+{
+    if (maxoann < n) {     /* allocate output annotator data structures */
+        unsigned m = maxoann;
+        struct oadata **oadnew = realloc(oad, n*sizeof(struct oadata *));
+
+	if (oadnew == NULL) {
+	    wfdb_error("annopen: too many (%d) output annotators\n", n);
+	    return (-1);
+	}
+	oad = oadnew;
+	while (m < n) {
+	    if ((oad[m] = calloc(1, sizeof(struct oadata))) == NULL) {
+		wfdb_error("annopen: too many (%d) output annotators\n", n);
+		while (--m > maxoann)
+		    free(oad[m]);
+		return (-1);
+	    }
+	    m++;
+	}
+        maxoann = n;
+    }
+    return (maxoann);
+}
+    
 /* WFDB library functions (for general use). */
 
 FINT annopen(record, aiarray, nann)
@@ -235,7 +289,8 @@ unsigned int nann;
 		     aiarray[i].stat, aiarray[i].name, record);
 	    return (-5);
 	}
-    if (setmaxiann(niafneeded) < 0 || setmaxoann(noafneeded) < 0)
+    /* Allocate workspace. */
+    if (allociann(niafneeded) < 0 || allocoann(noafneeded) < 0)
 	return (-3);
 
     for (i = 0; i < nann; i++) { /* open the annotation files */
@@ -822,64 +877,6 @@ WFDB_Annotator n;
     }
 }
 
-FINT setmaxiann(n)
-unsigned n;
-{
-    if (n < WFDB_MAXANN)
-	n = WFDB_MAXANN;
-    if (maxiann < n) {     /* allocate input annotator data structures */
-        unsigned m = maxiann;
-        struct iadata **iadnew = realloc(iad, n*sizeof(struct iadata *));
-
-	if (iadnew == NULL) {
-	    wfdb_error("annopen: too many (%d) input annotators\n", n);
-	    return (-1);
-	}
-	while (m < n) {
-	    if ((iadnew[m] = calloc(1, sizeof(struct iadata))) == NULL) {
-		wfdb_error("annopen: too many (%d) input annotators\n", n);
-		while (--m > maxiann)
-		    free(iadnew[m]);
-		free(iadnew);
-		return (-1);
-	    }
-	    m++;
-	}
-	iad = iadnew;
-        maxiann = n;
-    }
-    return (maxiann);
-}
-
-FINT setmaxoann(n)
-unsigned n;
-{
-    if (n < WFDB_MAXANN)
-	n = WFDB_MAXANN;
-    if (maxoann < n) {     /* allocate output annotator data structures */
-        unsigned m = maxoann;
-        struct oadata **oadnew = realloc(oad, n*sizeof(struct oadata *));
-
-	if (oadnew == NULL) {
-	    wfdb_error("annopen: too many (%d) output annotators\n", n);
-	    return (-1);
-	}
-	while (m < n) {
-	    if ((oadnew[m] = calloc(1, sizeof(struct oadata))) == NULL) {
-		wfdb_error("annopen: too many (%d) output annotators\n", n);
-		while (--m > maxoann)
-		    free(oadnew[m]);
-		free(oadnew);
-		return (-1);
-	    }
-	    m++;
-	}
-	oad = oadnew;
-        maxoann = n;
-    }
-    return (maxoann);
-}
-    
 /* Private functions (for the use of other WFDB library functions only). */
 
 void wfdb_oaflush()
