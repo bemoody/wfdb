@@ -1,5 +1,5 @@
-/* file: xvwave.c	G. Moody	27 April 1990
-			Last revised:    28 July 2001
+/* file: xvwave.c	G. Moody	 27 April 1990
+			Last revised:  17 September 2001
 XView support functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -968,8 +968,11 @@ int mode;
     /* Signals are drawn using draw_sig, and erased using clear_sig. */
     gcvalues.foreground = pixel_table[signal_color];
     gcvalues.plane_mask = use_overlays ? gcvalues.foreground : ~0;
+    gcvalues.line_width = defaults_get_integer("wave.signalwindow.line_width",
+					       "Wave.SignalWindow.Line_width",
+					       1);
     draw_sig = XCreateGC(display, xid,
-			 GCBackground | GCFont| GCForeground | GCPlaneMask,
+	      GCBackground | GCFont | GCForeground | GCPlaneMask | GCLineWidth,
 			 &gcvalues);
     if (use_overlays) {
 	gcvalues.foreground = gcvalues.background;
