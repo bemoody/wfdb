@@ -1,10 +1,15 @@
+10.3.11:
+	Isaac Henry provided a fix for 'configure' to avoid a problem that
+	may occur in a non-standard Cygwin installation. 
+
 10.3.10:
 	In version 10.3.9, the functions setannstr, setanndesc, and setecgstr
 	(in lib/annot.c) did not contain necessary checks to avoid invoking
 	strcmp with a NULL argument.  These checks have been added in version
-	10.3.10.  In the internal function wfdb_addtopath (in lib/wfdbio.c),
-	an extra character was appended when adding a component to the WFDB
-	path (in version 10.3.9 only);  this has also been corrected.
+	10.3.10.  Thanks to Thomas Heldt for reporting this problem.  In the
+	internal function wfdb_addtopath (in lib/wfdbio.c), an extra character
+	was appended when adding a component to the WFDB path (in version
+	10.3.9 only);  this has also been corrected.
 
 	WAVE now incorporates a simplified method for synchronizing multiple
 	windows.  The WAVE version number has been changed from 6.6 to 6.7.
