@@ -1,9 +1,9 @@
 /* file: pschart.c	G. Moody	 15 March 1988
-			Last revised:  17 December 2001
+			Last revised:  14 November 2002
 
 -------------------------------------------------------------------------------
 pschart: Produce annotated `chart recordings' on a PostScript device
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -24,7 +24,7 @@ please visit PhysioNet (http://www.physionet.org/).
 _______________________________________________________________________________
 
 Note:  This program necessarily deals with several different coordinate
-systems, principally the natural DB coordinates (time in sample intervals
+systems, principally the natural WFDB coordinates (time in sample intervals
 or seconds, amplitude in adus or millivolts), the printer coordinates
 (pixels), and the page coordinates (mostly metric, with occasional English
 dimensions and printer's points added for entertainment).  If you change
@@ -38,26 +38,7 @@ will be correct even if `dpi' is incorrect, however.
 
 #include <stdio.h>
 #include <ctype.h>
-#ifdef __STDC__
-# include <stdlib.h>
-#else
-extern double atof();
-extern void exit();
-typedef long time_t;
-# ifndef NOMALLOC_H
-# include <malloc.h>
-# else
-extern char *calloc(), *malloc(), *realloc();
-# endif
-#endif
-#ifndef BSD
-#include <string.h>
-#else
-#include <strings.h>
-#define strchr index
-#endif
 #include <time.h>
-
 #include <wfdb/wfdb.h>
 #include <wfdb/ecgcodes.h>
 

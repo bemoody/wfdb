@@ -1,5 +1,5 @@
 /* file: mxm.c		G. Moody	20 March 1992
-			Last revised:	 20 May 2002
+			Last revised:  14 November 2002
 
 -------------------------------------------------------------------------------
 mxm: ANSI/AAMI-standard measurement-by-measurement annotation file comparator
@@ -42,18 +42,6 @@ Thanks to Denny Dow for pointing out the problem!
 
 #include <stdio.h>
 #include <math.h>	/* for declaration of sqrt() */
-#ifndef BSD
-#include <string.h>
-#else
-#include <strings.h>
-#endif
-#ifndef __STDC__
-extern double atof();
-extern void exit();
-#else
-#include <stdlib.h>
-#endif
-
 #include <wfdb/wfdb.h>
 #include <wfdb/ecgcodes.h>
 

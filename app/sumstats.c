@@ -1,8 +1,8 @@
 /* file: sumstats.c	G. Moody	17 August 1989
-   			Last revised:	7 November 2001
+   			Last revised:  14 November 2002
 -------------------------------------------------------------------------------
 sumstats: Derive aggregate statistics from bxb, rxr, or epic line-format output
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -32,13 +32,6 @@ graphs" (ANSI/AAMI EC38:1998).  These standards are available from AAMI,
 */
 
 #include <stdio.h>
-#ifdef __STDC__
-#include <stdlib.h>
-#else
-extern double atof();
-extern void exit();
-#endif
-
 #include <wfdb/wfdb.h>
 
 static int nrec, NQS, NQP, NVS, NVP, NVF, NSVS, NSVP;

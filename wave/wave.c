@@ -1,10 +1,10 @@
 /* file: wave.c		G. Moody	 27 April 1990
-			Last revised:	14 October 2001
+			Last revised:  14 November 2002
 main() function for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -28,8 +28,6 @@ _______________________________________________________________________________
 
 #include "wave.h"
 #include "xvwave.h"
-#include <malloc.h>		/* for realloc declaration */
-#include <string.h>		/* for strchr declaration */
 #include <unistd.h>		/* for getpid declaration */
 
 /* Spot help files for WAVE are located in HELPDIR/wave.  Their names are

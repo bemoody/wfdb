@@ -1,5 +1,5 @@
-/* file: rdsamp.c	G. Moody	23 June 1983
-			Last revised:  7 November 2002
+/* file: rdsamp.c	G. Moody	 23 June 1983
+			Last revised:  14 November 2002
 
 -------------------------------------------------------------------------------
 rdsamp: Print an arbitrary number of samples from each signal
@@ -26,16 +26,6 @@ _______________________________________________________________________________
 */
 
 #include <stdio.h>
-#ifdef __STDC__
-# include <stdlib.h>
-#else
-extern void exit();
-# ifndef NOMALLOC_H
-# include <malloc.h>
-# else
-extern char *malloc();
-# endif
-#endif
 #include <wfdb/wfdb.h>
 
 /* Define the default WFDB path for CD-ROM versions of this program (the MS-DOS

@@ -1,5 +1,5 @@
 /* file: nst.c		G. Moody	8 December 1983
-			Last revised:   8 November 2002
+			Last revised:  14 November 2002
 
 -------------------------------------------------------------------------------
 nst: Noise stress test
@@ -27,31 +27,12 @@ _______________________________________________________________________________
 
 #include <stdio.h>
 #include <math.h>	/* declarations of pow(), sqrt() */
-#ifndef BSD
-#include <string.h>
-#else
-#include <strings.h>
-#endif
+#include <wfdb/wfdb.h>
+#include <wfdb/ecgcodes.h>
+
 #ifdef NOMKSTEMP
 #define mkstemp mktemp
 #endif
-#ifdef __STDC__
-# include <stdlib.h>
-# if _MSC_VER >= 700
-#  define mkstemp _mktemp
-#  define unlink _unlink
-# endif
-#else
-extern double atof();
-extern void exit();
-# ifdef NOMALLOC_H
-extern char *calloc(), *malloc(), *realloc();
-# else
-# include <malloc.h>
-# endif
-#endif
-#include <wfdb/wfdb.h>
-#include <wfdb/ecgcodes.h>
 
 /* Define the WFDB path component separator (OS-dependent). */
 #ifdef MSDOS		/* for MS-DOS, OS/2, etc. */

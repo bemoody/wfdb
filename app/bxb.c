@@ -1,5 +1,5 @@
 /* file: bxb.c		G. Moody	14 December 1987
-			Last revised:	  20 May 2002
+			Last revised:	14 December 2002
 
 -------------------------------------------------------------------------------
 bxb: ANSI/AAMI-standard beat-by-beat annotation file comparator
@@ -38,15 +38,6 @@ understanding of algorithm errors.
 
 #include <stdio.h>
 #include <math.h>	/* for declaration of sqrt() */
-#ifndef BSD
-#include <string.h>
-#else
-#include <strings.h>
-#endif
-#ifndef __STDC__
-extern void exit();
-#endif
-
 #include <wfdb/wfdb.h>
 #define map1
 #define map2

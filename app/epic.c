@@ -1,9 +1,9 @@
 /* file: epic.c		G. Moody	 3 March 1992
-			Last revised:	 7 November 2001
+			Last revised:  14 November 2002
 
 -------------------------------------------------------------------------------
 epic: ANSI/AAMI-standard episode-by-episode annotation file comparator
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -41,15 +41,6 @@ understanding of algorithm errors.
 */
 
 #include <stdio.h>
-#ifndef BSD
-#include <string.h>
-#else
-#include <strings.h>
-#endif
-#ifndef __STDC__
-extern void exit();
-#endif
-
 #include <wfdb/wfdb.h>
 #define map1
 #define map2

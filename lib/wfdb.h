@@ -1,5 +1,5 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised: 7 November 2002	wfdblib 10.3.0
+			Last revised: 14 November 2002	wfdblib 10.3.0
 WFDB library type, constant, structure, and function interface definitions
 
 _______________________________________________________________________________
@@ -333,6 +333,43 @@ extern FDOUBLE aduphys(), getbasecount();
 #ifdef wfdb_KRC
 #undef wfdb_KRC
 #undef signed
+#endif
+
+/* Include some useful function declarations.  This section includes standard
+   header files if available and provides alternative declarations for those
+   platforms that need them.
+
+  The ANSI/ISO C standard requires conforming compilers to predefine __STDC__.
+  Non-conforming compilers for MS-Windows may or may not predefine _WINDOWS;
+  if you use such a compiler, you may need to define _WINDOWS manually. */
+
+#if defined(__STDC__) || defined(_WINDOWS)
+# include <stdlib.h>
+#else
+extern double atof();
+extern long atol();
+extern char *getenv();
+extern void exit();
+typedef long time_t;
+# ifndef NOMALLOC_H
+# include <malloc.h>
+# else
+extern char *malloc(), *calloc(), *realloc();
+# endif
+# ifdef ISPRINTF
+extern int sprintf();
+# else
+#  ifndef MSDOS
+extern char *sprintf();
+#  endif
+# endif
+#endif
+
+#ifndef BSD
+# include <string.h>
+#else		/* for Berkeley UNIX only */
+# include <strings.h>
+# define strchr index
 #endif
 
 #endif

@@ -1,8 +1,8 @@
 /* file: snip.c		G. Moody	30 July 1989
-			Last revised:	4 October 2001
+			Last revised:  14 November 2002
 -------------------------------------------------------------------------------
 snip: Copy an excerpt of a database record
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -25,14 +25,6 @@ _______________________________________________________________________________
 */
 
 #include <stdio.h>
-#ifndef __STDC__
-extern void exit();
-#endif
-#ifndef NOMALLOC_H
-#include <malloc.h>
-#else
-extern char *malloc();
-#endif
 #include <wfdb/wfdb.h>
 
 char *pname;

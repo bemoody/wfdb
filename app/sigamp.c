@@ -1,9 +1,9 @@
 /* file: sigamp.c	G. Moody	30 November 1991
-			Last revised:	 9 October 2001
+			Last revised:	14 November 2002
 
 -------------------------------------------------------------------------------
 sigamp: Measure signal amplitudes
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -25,18 +25,8 @@ _______________________________________________________________________________
 
 */
 
-
 #include <stdio.h>
 #include <math.h>
-#ifndef __STDC__
-extern void exit();
-#endif
-#ifndef NOMALLOC_H
-#include <malloc.h>
-#else
-extern char *malloc();
-#endif
-
 #include <wfdb/wfdb.h>
 #define isqrs
 #define map2

@@ -1,5 +1,5 @@
-/* file: sumann.c	G. Moody       5 February 1982
-			Last revised:  3 October 2002
+/* file: sumann.c	G. Moody        5 February 1982
+			Last revised:  14 November 2002
 
 -------------------------------------------------------------------------------
 sumann: Tabulates annotations
@@ -26,22 +26,6 @@ _______________________________________________________________________________
 */
 
 #include <stdio.h>
-#ifndef BSD
-# include <string.h>
-#else
-# include <strings.h>
-#endif
-#ifdef __STDC__
-# include <stdlib.h>
-#else
-extern void exit();
-# ifndef NOMALLOC_H
-#  include <malloc.h>
-# else
-extern char *malloc();
-# endif
-#endif
-
 #include <wfdb/wfdb.h>
 #include <wfdb/ecgcodes.h>
 #include <wfdb/ecgmap.h>

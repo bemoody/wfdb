@@ -1,5 +1,5 @@
-/* file: lcheck.c	G. Moody       	7 September 2001
-			Last revised:     17 June 2002
+/* file: lcheck.c	G. Moody       7 September 2001
+			Last revised:  14 November 2002
 -------------------------------------------------------------------------------
 wfdbcheck: test WFDB library
 Copyright (C) 2002 George B. Moody
@@ -25,22 +25,6 @@ _______________________________________________________________________________
 */
 
 #include <stdio.h>
-#ifdef __STDC__
-# include <stdlib.h>
-#else
-extern void exit();
-# ifndef NOMALLOC_H
-# include <malloc.h>
-# else
-extern char *malloc();
-# endif
-#endif
-#ifndef BSD
-# include <string.h>
-#else
-# include <strings.h>
-#endif
-
 #include <wfdb/wfdb.h>
 
 char *info, *pname, *prog_name();

@@ -1,9 +1,9 @@
 /* file: calsig.c	G. Moody	 4 March 1991
-			Last revised:   9 October 2001
+			Last revised:  14 November 2002
 
 -------------------------------------------------------------------------------
-calsig: measure gains and baselines in a DB record and rewrite header
-Copyright (C) 2001 George B. Moody
+calsig: measure gains and baselines in a WFDB record and rewrite header
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -56,21 +56,6 @@ those in which noise is likely to be a problem for the alternate algorithms.
 */
 
 #include <stdio.h>
-#ifdef __STDC__
-# include <stdlib.h>
-#else
-extern void exit();
-# ifndef NOMALLOC_H
-# include <malloc.h>
-# else
-extern char *malloc();
-# endif
-#endif
-#ifndef BSD
-#include <string.h>
-#else
-#include <strings.h>
-#endif
 #include <wfdb/wfdb.h>
 
 #define UNITSLEN	20

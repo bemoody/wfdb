@@ -1,9 +1,9 @@
 /* file: ecgeval.c	G. Moody	22 March 1992
-			Last revised: 17 December 2001
+			Last revised:  14 November 2002
 
 -------------------------------------------------------------------------------
 ecgeval: Generate and run a script of commands to compare sets of annotations
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -26,20 +26,6 @@ _______________________________________________________________________________
 */
 
 #include <stdio.h>
-#ifndef __STDC__
-extern void exit();
-# ifndef NOMALLOC_H
-# include <malloc.h>
-# else
-extern char *malloc();
-# endif
-#endif
-#ifndef BSD
-#include <string.h>
-#else
-#include <strings.h>
-#define strchr index
-#endif
 #include <time.h>
 #include <wfdb/wfdb.h>
 

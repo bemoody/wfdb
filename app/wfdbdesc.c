@@ -1,9 +1,9 @@
-/* file: wfdbdesc.c		G. Moody	 June 1989
-				Last revised:   5 October 2001
+/* file: wfdbdesc.c		G. Moody	  June 1989
+				Last revised:  14 November 2002
 
 -------------------------------------------------------------------------------
 wfdbdesc: Describe signal specifications
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -29,16 +29,6 @@ Guide.
 */
 
 #include <stdio.h>
-#ifdef __STDC__
-# include <stdlib.h>
-#else
-extern void exit();
-# ifndef NOMALLOC_H
-# include <malloc.h>
-# else
-extern char *malloc();
-# endif
-#endif
 #include <wfdb/wfdb.h>
 
 main(argc, argv)

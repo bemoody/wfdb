@@ -1,5 +1,5 @@
-/* file: xform.c	G. Moody       8 December 1983
-			Last revised: 13 September 2002
+/* file: xform.c	G. Moody        8 December 1983
+			Last revised:  14 November 2002
 
 -------------------------------------------------------------------------------
 xform: Sampling frequency, amplitude, and format conversion for WFDB records
@@ -26,22 +26,6 @@ _______________________________________________________________________________
 */
 
 #include <stdio.h>
-#ifdef __STDC__
-# include <stdlib.h>
-#else
-extern void exit();
-# ifndef NOMALLOC_H
-# include <malloc.h>
-# else
-extern char *malloc();
-# endif
-#endif
-#ifndef BSD
-# include <string.h>
-#else
-# include <strings.h>
-#endif
-
 #include <wfdb/wfdb.h>
 
 char *pname, *prog_name();

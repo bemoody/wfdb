@@ -1,9 +1,9 @@
 /* file: wfdbcollate.c        G. Moody        28 April 1994
-			      Last revised:   9 October 2001
+			      Last revised:  14 November 2002
 
 -------------------------------------------------------------------------------
 wfdbcollate: Collate WFDB records into a multi-segment record
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -80,14 +80,6 @@ changes simply by recompiling them and linking them with the current WFDB
 library.  */
 
 #include <stdio.h>
-#ifndef __STDC__
-extern void exit();
-#endif
-#ifndef NOMALLOC_H
-#include <malloc.h>
-#else
-extern char *malloc();
-#endif
 #include <wfdb/wfdb.h>
 
 #define DEFSEGLEN	"10:0"	/* segments are 10 minutes long by default */

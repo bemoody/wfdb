@@ -1,8 +1,8 @@
 /* file: wrsamp.c	G. Moody	10 August 1993
-			Last revised:   5 October 2001
+			Last revised:  14 November 2002
 -------------------------------------------------------------------------------
 wrsamp: Select fields or columns from a file and generate a WFDB record
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -27,17 +27,8 @@ Portions of this program were derived from the `field' utility described in
 */
 
 #include <stdio.h>
-#ifdef __STDC__
-# include <stdlib.h>
-#else
-extern void exit();
-# ifndef NOMALLOC_H
-# include <malloc.h>
-# else
-extern char *calloc();
-# endif
-#endif
 #include <wfdb/wfdb.h>
+
 #define isfsep(c)	((fsep && ((c)==fsep)) || ((c)==' ' || (c)=='\t'))
 
 char *pname;

@@ -1,5 +1,5 @@
 /* file: sqrs.c		G. Moody	27 October 1990
-			Last revised: 	  28 May 2002
+			Last revised:  14 November 2002
 
 -------------------------------------------------------------------------------
 sqrs: Single-channel QRS detector
@@ -70,14 +70,6 @@ and then compare its output with the reference annotations by:
 */
 
 #include <stdio.h>
-#ifndef __STDC__
-extern void exit();
-#endif
-#ifndef NOMALLOC_H
-#include <malloc.h>
-#else
-extern char *malloc();
-#endif
 #include <wfdb/wfdb.h>
 #include <wfdb/ecgcodes.h>
 

@@ -1,4 +1,3 @@
-#include <malloc.h>
 #include <wfdb/wfdb.h>
 
 main()

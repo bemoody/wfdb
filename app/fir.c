@@ -1,5 +1,5 @@
 /* file: fir.c		G. Moody	5 January 1987
-			Last revised:     20 May 2002
+			Last revised:  14 November 2002
 
 -------------------------------------------------------------------------------
 fir: General-purpose FIR filter for database records
@@ -27,15 +27,6 @@ _______________________________________________________________________________
 
 #include <stdio.h>
 #include <math.h>
-#ifndef __STDC__
-extern void exit();
-#endif
-#ifndef NOMALLOC_H
-#include <malloc.h>
-#else
-extern char *malloc(), *calloc(), *realloc();
-#endif
-
 #include <wfdb/wfdb.h>
 
 char *pname;	/* name by which this program was invoked */

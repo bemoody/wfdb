@@ -1,9 +1,9 @@
 /* file: tach.c		G. Moody	 18 April 1985
-			Last revised:      4 May 1999
+			Last revised:  14 November 2002
 
 -------------------------------------------------------------------------------
 tach: Generate heart rate vs. time signal with evenly spaced samples
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -49,13 +49,6 @@ the previous value with the previous value).
 
 #include <stdio.h>
 #include <math.h>
-#ifndef __STDC__
-extern double atof();
-extern void exit();
-#else
-#include <stdlib.h>
-#endif
-
 #include <wfdb/wfdb.h>
 #define map1
 #define map2

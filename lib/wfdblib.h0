@@ -1,5 +1,5 @@
 /* file: wfdblib.h	G. Moody	13 April 1989
-                        Last revised:   17 June 2002       wfdblib 10.2.6
+                        Last revised:  14 November 2002       wfdblib 10.3.0
 External definitions for WFDB library private functions
 
 _______________________________________________________________________________
@@ -246,43 +246,6 @@ typedef struct WFDB_FILE WFDB_FILE;
 #define wfdb_getc(wp)			getc(wp->fp)
 #define wfdb_putc(c, wp)		putc(c, wp->fp)
 
-#endif
-
-/* The following block is needed only to declare the values returned by
-   getenv() (char * unless otherwise defined in stdlib.h), malloc() (either
-   char * or void *) and sprintf() (either int or char *).  The object code
-   should be correct even if these declarations are not. */
-#if defined(__STDC__) || defined(_WINDOWS)
-# include <stdlib.h>
-#else
-extern char *getenv();
-# ifndef NOMALLOC_H
-# include <malloc.h>
-# else
-extern char *malloc();
-# endif
-# ifdef ISPRINTF
-extern int sprintf();
-# else
-#  ifndef MSDOS
-extern char *sprintf();
-#  endif
-# endif
-#endif
-
-/* Declare the values returned by atof() and atol() (not needed for ANSI C or
-   Microsoft Windows C compilers, which have these declarations in stdlib.h,
-   included above). */
-#if !defined(__STDC__) && !defined(_WINDOWS)
-extern double atof();
-extern long atol();
-#endif
-
-#ifndef BSD
-# include <string.h>
-#else		/* for Berkeley UNIX only */
-# include <strings.h>
-# define strchr index
 #endif
 
 #ifdef _WINDOWS

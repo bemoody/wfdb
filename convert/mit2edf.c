@@ -1,5 +1,5 @@
 /* file: mit2edf.c		G. Moody	2 November 2002
-				Last revised:	5 November 2002
+				Last revised:  14 November 2002
 -------------------------------------------------------------------------------
 Convert MIT format header and signal files to EDF (European Data Format) file
 Copyright (C) 2002 George B. Moody
@@ -25,11 +25,6 @@ _______________________________________________________________________________
 */
 
 #include <stdio.h>
-#ifndef NOMALLOC_H
-# include <malloc.h>
-#else
-extern char *calloc(), *malloc(), *realloc();
-#endif
 #include <wfdb/wfdb.h>
 
 #define EDFMAXBLOCK	61440	/* maximum data block length, in bytes */

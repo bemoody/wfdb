@@ -1,5 +1,5 @@
 /* file: edf2mit.c		G. Moody	16 October 1996
-				Last revised:	2 November 2002
+				Last revised:  14 November 2002
 
 -------------------------------------------------------------------------------
 Convert EDF (European Data Format) file to MIT format header and signal files
@@ -26,11 +26,6 @@ _______________________________________________________________________________
 */
 
 #include <stdio.h>
-#ifndef NOMALLOC_H
-# include <malloc.h>
-#else
-extern char *calloc(), *malloc(), *realloc();
-#endif
 #include <wfdb/wfdb.h>
 
 char *pname;

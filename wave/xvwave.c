@@ -1,5 +1,5 @@
 /* file: xvwave.c	G. Moody	 27 April 1990
-			Last revised:   11 October 2002
+			Last revised:  14 November 2002
 XView support functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -32,16 +32,15 @@ _______________________________________________________________________________
 #include "bitmaps.h"
 #include <pwd.h>		/* for struct passwd definition */
 #include <signal.h>		/* for SIGUSR1 definition */
-#include <string.h>		/* for strchr definition */
 #include <unistd.h>		/* for getpid definition */
 #include <xview/canvas.h>
 #include <xview/cms.h>		/* for Xv_singlecolor definition */
 #include <xview/cursor.h>
 #include <xview/defaults.h>
 #include <xview/win_input.h>
-#include <xview/xview.h>	/* new */
+#include <xview/xview.h>
 #include <xview/frame.h>
-#include <xview/panel.h>	/* new */
+#include <xview/panel.h>
 #include <xview/notice.h>
 #include <xview/window.h>
 

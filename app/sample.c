@@ -1,5 +1,5 @@
 /* file: sample.c	G. Moody	10 January 1991
-			Last revised:	 30 April 1999
+			Last revised:  14 November 2002
 
 -------------------------------------------------------------------------------
 sample: digitize or play back signals on a PC using a Microstar DAP board
@@ -88,16 +88,6 @@ the one in stdio.h that is censored in ANSI C mode. */
 #define fileno(file) ((file)->fd)
 #endif
 #endif
-#endif
-
-#ifdef __STDC__
-# include <stdlib.h>
-#else
-# ifndef NOMALLOC_H
-# include <malloc.h>
-# else
-extern char *malloc();
-# endif
 #endif
 
 #include <wfdb/wfdb.h>
