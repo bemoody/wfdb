@@ -1,10 +1,10 @@
 /* file: wave.c		G. Moody	 27 April 1990
-			Last revised:	  5 March 2000
+			Last revised:	  29 May 2001
 main() function for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 2000 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -227,6 +227,8 @@ char *argv[];
 				  pname);
 		    exit(1);
 		}
+		sig_mode = 1;	/* display listed signals only (may be
+				   overridden using -VS 0) */
 		break;
 	      case 'S':   /* use shared color map only */
 		mode |= MODE_SHARED;

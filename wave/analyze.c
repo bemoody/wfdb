@@ -1,10 +1,10 @@
 /* file: analyze.c	G. Moody	10 August 1990
-			Last revised:	 19 June 2000
+			Last revised:	  29 May 2001
 Functions for the analysis panel of WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 2000 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -44,8 +44,8 @@ _______________________________________________________________________________
 					   file including continuation lines */
 
 void do_analysis(), edit_menu_file(), set_signal(), set_start(), set_stop(),
-    set_back(), set_ahead(), set_siglist(), show_command_window(),
-    add_signal_choice(), delete_signal_choice();
+    set_back(), set_ahead(), set_siglist(), set_siglist_from_string(),
+    show_command_window(), add_signal_choice(), delete_signal_choice();
 char *wavemenu;
 Frame analyze_frame, tty_frame;
 Panel analyze_panel;
@@ -542,8 +542,12 @@ int i;
 
 void set_siglist()
 {
-    char *s = (char *)xv_get(siglist_item, PANEL_VALUE);
+    set_siglist_from_string((char *)xv_get(siglist_item, PANEL_VALUE));
+}
 
+void set_siglist_from_string(s)
+char *s;
+{
     siglistlen = 0;
     while (*s == ' ' || *s == '\t')
 	s++;

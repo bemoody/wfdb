@@ -1,9 +1,9 @@
 /* file: md2a.c		G. Moody	19 July 1983
-			Last revised:    7 May 1999
+			Last revised:   26 April 2001
 
 -------------------------------------------------------------------------------
 md2a: Convert MIT format signal file(s) to AHA DB distribution tape format
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -107,7 +107,7 @@ char *argv[];
     }
 
     /* Give up unless at least one input signal is readable. */
-    if ((nsig = isigopen(argv[1], s, WFDB_MAXSIG)) < 1)
+    if ((nsig = isigopen(record, s, WFDB_MAXSIG)) < 1)
 	exit(2);  
 
     /* Check that the new record name is legal before proceeding.  Note that
@@ -131,7 +131,7 @@ char *argv[];
 	;
 
     /* Write the new header file if requested. */
-    if (nrec) (void)newheader(argv[3]);
+    if (nrec) (void)newheader(nrec);
 
     /* Write the end-of-data marker. */
     for (i = 0; i < nsig; i++)

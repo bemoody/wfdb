@@ -1,10 +1,10 @@
 /* file: wave-remote.c		G. Moody	10 October 1996
-				Last revised:	29 April 1999
+				Last revised:	29 May 2001
 Remote control for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -45,6 +45,8 @@ The (text) message written by this program may contain any or all of:
   -r RECORD	[to (re)open RECORD]
   -a ANNOTATOR	[to (re)open the specified ANNOTATOR for the current record]
   -f TIME	[to go to the specified TIME in the current record]
+  -s SIGNAL ... [to specify signals to be displayed]
+
 These messages are copies of the corresponding command-line arguments given
 to wave-remote.
 
@@ -75,6 +77,7 @@ implementation is adequate.
 #include <sys/types.h>
 #include <dirent.h>
 #include <unistd.h>
+#include <wfdb/wfdb.h>
 
 char *pname;
 
@@ -86,7 +89,8 @@ void help()
     fprintf(stderr, " -f TIME\n");
     fprintf(stderr, " -pid PROCESSID\n");
     fprintf(stderr, " -r RECORD\n");
-    fprintf(stderr, "At least one of -a, -f, and -r must be specified.\n");
+    fprintf(stderr, " -s SIGNAL ...\n");
+    fprintf(stderr, "At least one of -a, -f, -r, and -s must be specified.\n");
 }
 
 int find_wave_pid()
@@ -115,7 +119,7 @@ char **argv;
 {
     char fname[30];
     FILE *ofile;
-    int i, pid;
+    int i, j = 0, pid, siglist[WFDB_MAXSIG];
     static char *ppid, *record, *annotator, *ptime;
 
     pname = argv[0];
@@ -153,9 +157,20 @@ char **argv;
 	    }
 	    record = argv[i];
 	    break;
+	case 's':	/* signal numbers follow */
+	    if (++i >= argc) {
+		fprintf(stderr, "%s: -s must be followed by a signal number\n",
+			argv[0]);
+		exit(1);
+	    }
+	    while (i < argc && j < WFDB_MAXSIG && argv[i][0] != '-')
+		siglist[j++] = atoi(argv[i++]);
+	    i--;
+	    break;
 	}
     }
-    if (annotator == NULL && ptime == NULL && record == NULL) {
+    siglist[j] = -1;
+    if (annotator == NULL && ptime == NULL && record == NULL && j == 0) {
 	help();
 	exit(1);
     }
@@ -172,6 +187,11 @@ char **argv;
 	    if (annotator) sprintf(command+strlen(command),
 				   " -a %s", annotator);
 	    if (ptime) sprintf(command+strlen(command), " -f %s", ptime);
+	    if (siglist[0] >= 0) {
+		sprintf(command+strlen(command), " -s %d", siglist[0]);
+		for (j = 1; siglist[j] >= 0; j++)
+		    sprintf(command+strlen(command), " %d", siglist[j]);
+	    }
 	    system(command);
 	    exit(0);
 	}
@@ -199,6 +219,12 @@ char **argv;
     if (record) fprintf(ofile, "-r %s\n", record);
     if (annotator) fprintf(ofile, "-a %s\n", annotator);
     if (ptime) fprintf(ofile, "-f %s\n", ptime);
+    if (siglist[0] >= 0) {
+	fprintf(ofile, "-s %d", siglist[0]);
+	for (j = 1; siglist[j] >= 0; j++)
+	    fprintf(ofile, " %d", siglist[j]);
+	fprintf(ofile, "\n");
+    }
     fclose(ofile);
     
     kill(pid, SIGUSR1);	/* signal to WAVE that the message is ready */

@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody               24 May 2000
-#                             Last revised:        28 February 2001
+#                             Last revised:          29 May 2001
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -13,6 +13,9 @@ OS=`uname`
 echo "Configuring the WFDB software package for $OS."
 
 cp conf/version.def conf/site.def
+echo -n "PACKAGE=" >>conf/site.def
+basename `pwd` >>conf/site.def
+
 cp /dev/null conf/site-slib.def
 case `uname` in
   Linux*) OS=Linux
@@ -74,9 +77,9 @@ fi
 
 echo
 echo "Looking for the C compiler ..."
-if ( which gcc 2>&1 | grep "no " >/dev/null )
+if ( which gcc 2>&1 | grep "no \|not " >/dev/null )
 then
-    if (which cc 2>&1 | grep "no " >/dev/null )
+    if (which cc 2>&1 | grep "no \|not " >/dev/null )
     then
         echo "The WFDB software cannot be compiled, because there does not"
         echo "appear to be a C compiler installed on this system.  Please"
@@ -148,7 +151,7 @@ done
   
 echo
 echo "Looking for libwww ..."
-if ( which libwww-config 2>&1 | grep "no " >/dev/null )
+if ( which libwww-config 2>&1 | grep "no \|not " >/dev/null )
 then
     echo "The WFDB software will be compiled without NETFILES access, because"
     echo "libwww does not appear to be installed on this system."
@@ -201,7 +204,7 @@ if [ -d /usr/openwin -o -d /usr/local/openwin -o -d /opt/openwin ]
 then
     WAVE=1;
 else
-  if ( which textedit 2>&1 | grep "no " >/dev/null )
+  if ( which textedit 2>&1 | grep "no \|not " >/dev/null )
   then
     WAVE=0;
   else
@@ -223,7 +226,7 @@ fi
 
 echo
 echo "Looking for perl ..."
-if ( which perl 2>&1 | grep "no " >/dev/null )
+if ( which perl 2>&1 | grep "no \|not " >/dev/null )
 then
     echo "The texi2html utility, which can be used to prepare some on-line"
     echo "documentation in HTML form, requires perl, which does not appear"

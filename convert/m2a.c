@@ -1,9 +1,9 @@
 /* file: m2a.c		G. Moody	 9 June 1983
-			Last revised:     7 May 1999
+			Last revised:   26 April 2001
 
 -------------------------------------------------------------------------------
 m2a: Convert MIT format annotation files to AHA DB distribution tape format
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -106,7 +106,7 @@ char *argv[];
 
     afarray[0].name = ianame; afarray[0].stat = WFDB_READ;
     afarray[1].name = oaname; afarray[1].stat = WFDB_AHA_WRITE;
-    if (annopen(argv[1], afarray, 2) < 0)	/* open files */
+    if (annopen(record, afarray, 2) < 0)	/* open files */
 	exit(2);
     if (shift == NULL)
 	while (getann(0, &annot) >= 0)	/* copy annotations to end of data */

@@ -1,10 +1,10 @@
 /* file: xvwave.c	G. Moody	27 April 1990
-			Last revised:    5 March 2000
+			Last revised:    29 May 2001
 XView support functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 2000 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -293,11 +293,12 @@ Notify_client client;
 int sig;
 Notify_signal_mode when;
 {
-    char buf[80], new_annotator[30], new_time[30], new_record[70];
+    char buf[80], new_annotator[30], new_time[30], new_record[70],
+	new_siglist[70];
     FILE *sfile;
 
     sfile = fopen(sentinel, "r");
-    new_annotator[0] = new_time[0] = new_record[0] = '\0';
+    new_annotator[0] = new_time[0] = new_record[0] = new_siglist[0] = '\0';
     while (fgets(buf, sizeof(buf), sfile)) {	/* read a command */
 	if (buf[0] != '-') continue;	/* illegal command -- ignore */
 	else switch (buf[1]) {
@@ -316,6 +317,10 @@ Notify_signal_mode when;
 	      strncpy(new_record, buf+3, sizeof(new_record)-1);
 	      new_record[strlen(new_record)-1] = '\0';
 	      break;
+	  case 's':	/* choose signals for display */
+	      new_siglist[sizeof(new_siglist-1)] = '\0';
+	      strncpy(new_siglist, buf+3, sizeof(new_siglist)-1);
+	      new_siglist[strlen(new_siglist)-1] = '\0';
 	}
     }
     if (*new_record && strcmp(record, new_record)) {
@@ -340,6 +345,10 @@ Notify_signal_mode when;
 	set_annot_item(new_annotator);
     if (*new_time)
 	set_start_time(new_time);
+    if (*new_siglist) {
+	set_siglist_from_string(new_siglist);
+	sig_mode = 1;	/* display listed signals only */
+    }
     fclose(sfile);
     if (wave_ppid) {	/* synch parent WAVE, if any, with this one */
 	if (*new_time == '\0')

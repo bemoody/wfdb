@@ -1,10 +1,10 @@
 /* file: wave.h		G. Moody	26 April 1990
-			Last revised:  21 January 2000
+			Last revised:    29 May 2001
 Constants, macros, global variables, and function prototypes for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 2000 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -321,6 +321,7 @@ extern void reset_siglist(void);		/* in analyze.c */
 extern void open_url(void);			/* in analyze.c */
 extern void do_command(char *command);		/* in analyze.c */
 extern void set_signal_choice(int sig);		/* in analyze.c */
+extern void set_siglist_from_string(char *s);	/* in analyze.c */
 extern void add_signal_choice(void);		/* in analyze.c */
 extern void delete_signal_choice(void);		/* in analyze.c */
 extern void print_proc(void);			/* in analyze.c */
@@ -356,8 +357,8 @@ extern void set_baselines(), calibrate(), set_record_item(), set_annot_item(),
     change_annotations(), check_post_update(), set_frame_title(),
     analyze_proc(), reset_start(), reset_stop(), reset_maxsig(),
     reset_siglist(), open_url(), do_command(), set_signal_choice(),
-    add_signal_choice(), delete_signal_choice(), print_proc(),
-    save_scope_params(), show_scope_window(), strip_x_args(), hide_grid(),
-    unhide_grid(), display_and_process_events(), quit_proc(),
+    set_siglist_from_string(), add_signal_choice(), delete_signal_choice(),
+    print_proc(), save_scope_params(), show_scope_window(), strip_x_args(),
+    hide_grid(), unhide_grid(), display_and_process_events(), quit_proc(),
     sync_other_wave_processes(), reset_ref(), recreate_level_popup();
 #endif
