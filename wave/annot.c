@@ -1,10 +1,10 @@
 /* file: annot.c	G. Moody	  1 May 1990
-			Last revised:  7 September 1999
+			Last revised:  12 October 2001
 Annotation list handling and display functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -118,9 +118,9 @@ annot_init()
     }
 
     /* Check that the annotator name, if any, is legal. */
-    if (nann > 0 && badname(af[0].name)) {
+    if (nann > 0 && badname(af.name)) {
 	char ts[ANLMAX+3];
-	int dummy = (int)sprintf(ts, "`%s'", af[0].name);
+	int dummy = (int)sprintf(ts, "`%s'", af.name);
 
 #ifdef NOTICE
 	Xv_notice notice = xv_create((Frame)frame, NOTICE,
@@ -138,8 +138,8 @@ annot_init()
 #ifdef NOTICE
 	xv_destroy_safe(notice);
 #endif
-	af[0].name = NULL;
-	annotator[0][0] = '\0';
+	af.name = NULL;
+	annotator[0] = '\0';
 	set_annot_item("");
 	set_frame_title();
 	return (annotations = 0);
@@ -152,7 +152,7 @@ annot_init()
     tupdate = time((time_t *)NULL);
 
     /* Return 0 if no annotations are requested or available. */
-    if (nann < 1 || annopen(record, af, nann) < 0) {
+    if (nann < 1 || annopen(record, &af, 1) < 0) {
 	ap_start = annp = scope_annp = NULL;
 	if (frame) xv_set(frame, FRAME_BUSY, FALSE, NULL);
 	return (annotations = 0);
@@ -901,9 +901,9 @@ int post_changes()
 
     /* If there was no annotator name specified, use the name by which this
        program was invoked for this purpose. */
-    if (af[0].name == NULL) {
-	af[0].name = pname;
-	strcpy(annotator[0], pname);
+    if (af.name == NULL) {
+	af.name = pname;
+	strcpy(annotator, pname);
 	set_annot_item(pname);
     }
 
@@ -912,7 +912,7 @@ int post_changes()
 	FILE *tfile;
 
 	/* Generate a name for the updated annotation file. */
-	sprintf(afname, "%s.%s", record, af[0].name);
+	sprintf(afname, "%s.%s", record, af.name);
 
 	/* If the file already exists in the current directory, rename it. */
 	if (tfile = fopen(afname, "r")) {
@@ -954,8 +954,8 @@ int post_changes()
 	savebackup = 0;
     }
 
-    af[0].stat = (af[0].stat == WFDB_AHA_READ) ? WFDB_AHA_WRITE : WFDB_WRITE;
-    if (annopen(record, af, 1)) {
+    af.stat = (af.stat == WFDB_AHA_READ) ? WFDB_AHA_WRITE : WFDB_WRITE;
+    if (annopen(record, &af, 1)) {
 	/* An error from annopen is most likely to result from not being able
 	   to create the output file.  Warn the user and try again later. */
 #ifdef NOTICE
@@ -985,7 +985,7 @@ int post_changes()
 	    exit(1);
 	}
     }
-    af[0].stat = (af[0].stat == WFDB_AHA_WRITE) ? WFDB_AHA_READ : WFDB_READ;
+    af.stat = (af.stat == WFDB_AHA_WRITE) ? WFDB_AHA_READ : WFDB_READ;
     a = ap_start;
 
     /* Write the annotation list to the output file.  This might take a while
@@ -1047,13 +1047,13 @@ void set_frame_title()
 	    ANLMAX for annotator name, 2 for "  " or ") ",
 	    DSLMAX for description from log file, 1 for null */
 
-    if (annotator[0][0]) {
+    if (annotator[0]) {
 	if (changes)
 	    sprintf(frame_title, "WAVE %s  Record %s(%s) ", WAVEVERSION,
-		    record, annotator[0]);
+		    record, annotator);
 	else
 	    sprintf(frame_title, "WAVE %s  Record %s %s  ", WAVEVERSION,
-		    record, annotator[0]);
+		    record, annotator);
     }
     else
 	sprintf(frame_title, "Record %s ", record);

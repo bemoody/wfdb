@@ -765,12 +765,6 @@ Block-interleaved files may be described simply as files with very large
 frames. If you have a block-interleaved file, therefore, you may be able to
 view it with WAVE via this expedient: 
 
-  *  First, check that the block size in samples is no greater than
-     WFDB_MAXSPF, a symbol defined in the WFDB library header file wfdb.h
-     (which you will probably find in /usr/include/wfdb). If necessary,
-     increase the value of WFDB_MAXSPF, recompile and reinstall the shared
-     WFDB library (libwfdb.so.*), and check to be sure that WAVE loads this
-     version of the WFDB library (use the command ldd `which wave`).
   *  Write a header file describing the layout of the block-interleaved signal
      file (see header(5), in the WFDB Applications Guide, for details). The
      sampling frequency in the first line of the header should be given as the
@@ -932,10 +926,8 @@ next question).
 Can WAVE open more than 32 signals at once?
 -------------------------------------------
 
-Not without recompiling.  The limit is WFDB_MAXSIG (defined as 32 in
-<ecg/wfdb.h>); it is necessary to recompile WAVE itself, as well as the WFDB
-library, in order to increase this limit.  In a future version, the current
-limit of 32 signals will be substantially increased or removed.
+Yes.  There is no fixed limit on the number of signals that current versions
+of WAVE can open.  Earlier versions were limited to 32 or fewer signals.
 
 
 Can WAVE open more than one annotation file at once? 

@@ -1,10 +1,10 @@
 /* file: sig.c		G. Moody	27 April 1990
-			Last revised:	14 March 2000
+			Last revised:  13 October 2001
 Signal display functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 2000 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -199,12 +199,9 @@ static struct display_list *get_display_list()
     static int max_nlists = MAX_DISPLAY_LISTS;
     struct display_list *lp = NULL, *lpl;
 
-    if (nsig > WFDB_MAXSIG) return (NULL);
-
-    if (nlists < max_nlists) {
-	lp = (struct display_list *)calloc(1, sizeof(struct display_list));
-	if (lp) nlists++;
-    }
+    if (nlists < max_nlists &&
+	(lp = (struct display_list *)calloc(1, sizeof(struct display_list))))
+	    nlists++;
     if (lp == NULL)
 	switch (nlists) {
 	    case 0: return (NULL);
@@ -217,6 +214,15 @@ static struct display_list *get_display_list()
 		lpl->next = NULL;
 		break;
 	}
+    if (lp->nsig < nsig) {
+	lp->sb = realloc(lp->sb, nsig * sizeof(int));
+	lp->vlist = realloc(lp->vlist, nsig * sizeof(XPoint *));
+	for (i = lp->nsig; i < nsig; i++) {
+	    lp->sb[i] = 0;
+	    lp->vlist[i] = NULL;
+	}
+	lp->nsig = nsig;
+    }
 
     if (canvas_width > vlist_size) vlist_size = canvas_width;
 
@@ -267,7 +273,6 @@ static struct display_list *get_display_list()
 	}
     }
     lp->next = first_list;
-    lp->nsig = nsig;
     lp->npoints = nsamp;
     lp->xmax = maxx;
     return (first_list = lp);
@@ -283,7 +288,6 @@ struct display_list *find_display_list(fdl_time)
 long fdl_time;
 {
     int c, i, j, x, x0, y, ymax, ymin;
-    int v[WFDB_MAXSIG], v0[WFDB_MAXSIG], vmax[WFDB_MAXSIG], vmin[WFDB_MAXSIG];
     struct display_list *lp;
     XPoint *tp;
 
@@ -414,7 +418,7 @@ void clear_cache()
 
     if (canvas_width > vlist_size) {
 	for (lp = first_list; lp; lp = lp->next) {
-	    for (i = 0; i < WFDB_MAXSIG && lp->vlist[i] != NULL; i++) {
+	    for (i = 0; i < lp->nsig && lp->vlist[i] != NULL; i++) {
 		free(lp->vlist[i]);
 		lp->vlist[i] = NULL;
 	    }

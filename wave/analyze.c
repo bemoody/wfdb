@@ -1,5 +1,5 @@
 /* file: analyze.c	G. Moody	10 August 1990
-			Last revised:	  29 May 2001
+			Last revised:	12 October 2001
 Functions for the analysis panel of WAVE
 
 -------------------------------------------------------------------------------
@@ -340,6 +340,7 @@ void create_analyze_popup()
 			     PANEL_LABEL_STRING, "Signal list: ",
 			     XV_HELP_DATA, "wave:file.analyze.signal_list",
 			     PANEL_VALUE_DISPLAY_LENGTH, 15,
+			     PANEL_VALUE_STORED_LENGTH, 1024,
 			     PANEL_NOTIFY_PROC, set_siglist, 0);
     reset_siglist();
 	      
@@ -548,22 +549,28 @@ void set_siglist()
 void set_siglist_from_string(s)
 char *s;
 {
-    siglistlen = 0;
-    while (*s == ' ' || *s == '\t')
-	s++;
-    while (siglistlen < WFDB_MAXSIG && *s != '\0' &&
-	   sscanf(s, "%d", &siglist[siglistlen]) == 1) {
-	if (0 <= siglist[siglistlen] && siglist[siglistlen] < nsig)
-	    siglistlen++;
-	while (*s != ' ' && *s != '\t') {
-	    if (*s == '\0') {
-		reset_siglist();
-		return;
-	    }
-	    else s++;
-	}
-	while (*s == ' ' || *s == '\t')
-	    s++;
+    char *p;
+
+    /* Count the number of signals named in the string (s). */
+    for (p = s, siglistlen = 0; *p; ) {
+	while (*p && (*p == ' ' || *p == '\t'))
+	    p++;
+	if (*p) siglistlen++;
+	while (*p && (*p != ' ' && *p != '\t'))
+	    p++;
+    }
+    /* Allocate storage for siglist. */
+    if (siglistlen > maxsiglistlen) {
+	siglist = realloc(siglist, siglistlen * sizeof(int));
+	maxsiglistlen = siglistlen;
+    }
+    /* Now store the signal numbers in siglist. */
+    for (p = s, siglistlen = 0; *p && siglistlen < maxsiglistlen; ) {
+	while (*p && (*p == ' ' || *p == '\t'))
+	    p++;
+	if (*p) siglist[siglistlen++] = atoi(p);
+	while (*p && (*p != ' ' && *p != '\t'))
+	    p++;
     }
     reset_siglist();
 }
@@ -795,9 +802,15 @@ void reset_stop()
 void reset_siglist()
 {
     if (analyze_popup_active >= 0) {
-	char *p, sigliststring[WFDB_MAXSIG*4], s[4];
+        char *p;
 	int i;
+	static char *sigliststring;
+	static int maxrssiglistlen;
 
+	if (siglistlen > maxrssiglistlen) {
+	    sigliststring = realloc(sigliststring, 8 * siglistlen);
+	    maxrssiglistlen = siglistlen;
+	}
 	p = sigliststring;
 	*p = '\0';
 	for (i = 0; i < siglistlen; i++) {
@@ -824,10 +837,14 @@ void reset_maxsig()
 void add_to_siglist(i)
 int i;
 {
-    if (siglistlen < WFDB_MAXSIG && 0 <= i && i < nsig) {
-	siglist[siglistlen++] = i;
-	reset_siglist();
+    if (0 <= i && i < nsig) {
+	if (++siglistlen >= maxsiglistlen) {
+	    siglist = realloc(siglist, siglistlen * sizeof(int));
+	    maxsiglistlen = siglistlen;
+	}
+	siglist[siglistlen-1] = i;
     }
+    reset_siglist();
 }
 
 void delete_from_siglist(i)
@@ -875,8 +892,8 @@ char *p1;
 		p1 = p2 += 6;
 	    }
 	    else if (strncmp(p1, "ANNOTATOR", 9) == 0) {
-		if (annotator[0][0])
-		    ttysw_input(tty, annotator[0], strlen(annotator[0]));
+		if (annotator[0])
+		    ttysw_input(tty, annotator, strlen(annotator));
 		else
 		    ttysw_input(tty, "\"\"", 2);
 		p1 = p2 += 9;
@@ -1026,10 +1043,10 @@ Event *event;
 	do_command(mep->nme->command);
 }
 
-static char *tempfilename;
+static char fname[20];
 
 /* This function gets called once per second while the timer is running.
-   Once the temporary file named by tempfilename contains readable data, it
+   Once the temporary file named by fname contains readable data, it
    waits one more second, turns off the timer, and then deletes the file. */
 
 Notify_value check_if_done()
@@ -1041,14 +1058,14 @@ Notify_value check_if_done()
     if (file_ready) {
 	notify_set_itimer_func(analyze_frame, NOTIFY_FUNC_NULL, ITIMER_REAL,
 			       NULL, NULL);
-	unlink(tempfilename);
+	unlink(fname);
 	file_ready = 0;
 	reinitialize();
 	set_start(start_item, (Event *)NULL);
 	set_stop(end_item, (Event *)NULL);
 	return (NOTIFY_DONE);
     }
-    if ((tfile = fopen(tempfilename, "r")) == NULL)
+    if ((tfile = fopen(fname, "r")) == NULL)
 	return (NOTIFY_DONE);
     fclose(tfile);
     file_ready++;
@@ -1057,13 +1074,13 @@ Notify_value check_if_done()
 
 void reload()
 {
-    static char command[80], fname[20];
+  static char command[80];
     static struct itimerval timer;
-    char *mktemp();
 
     if (fname[0] == '\0') {
 	sprintf(fname, "/tmp/wave.XXXXXX");
-	sprintf(command, "touch %s\n", tempfilename = mktemp(fname));
+	mkstemp(fname);
+	sprintf(command, "touch %s\n", fname);
     }
     do_command(command);
     timer.it_value.tv_sec = timer.it_interval.tv_sec = 1;

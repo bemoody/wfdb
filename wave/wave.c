@@ -1,5 +1,5 @@
 /* file: wave.c		G. Moody	 27 April 1990
-			Last revised:	  29 May 2001
+			Last revised:	12 October 2001
 main() function for WAVE
 
 -------------------------------------------------------------------------------
@@ -27,8 +27,9 @@ _______________________________________________________________________________
 */
 
 #include "wave.h"
-#include <string.h>		/* for strchr definition */
-#include <unistd.h>		/* for getpid definition */
+#include <malloc.h>		/* for realloc declaration */
+#include <string.h>		/* for strchr declaration */
+#include <unistd.h>		/* for getpid declaration */
 
 /* Spot help files for WAVE are located in HELPDIR/wave.  Their names are
    of the form `HELPDIR/wave/*.info'. */
@@ -41,7 +42,7 @@ int argc;
 char *argv[];
 {
     char *wfdbp, *hp, *p, *start_string = NULL, *tp, *getenv();
-    int do_demo = 0, i, mode = 0;
+    int do_demo = 0, i, j, mode = 0;
     static char *helppath;
     static int wave_procno;
     void set_frame_footer();
@@ -135,7 +136,7 @@ char *argv[];
 			    pname);
 		    exit(1);
 		}
-		strcpy(annotator[0], argv[i]);
+		strcpy(annotator, argv[i]);
 		break;
 	      case 'd':	/* display resolution */
 		if (strcmp(argv[i], "-dpi")) break;
@@ -210,23 +211,29 @@ char *argv[];
 		strcpy(record, argv[i]);
 		break;
 	      case 's':	/* signal list follows */
-		while (++i < argc && *argv[i] != '-') {
-		    int sig;
-
-		    sig = atoi(argv[i]);
-		    if (0 <= sig && sig < WFDB_MAXSIG &&
-			siglistlen < WFDB_MAXSIG){
-			siglist[siglistlen] = sig;
-			siglistlen++;
-		    }
-		}
-		--i;
-		if (siglistlen < 1) {
+	        /* count the number of signals */
+		for (j = 0; ++i < argc && *argv[i] != '-'; j++)
+		    ;
+		if (j == 0) {
 		    (void)fprintf(stderr,
 			     "%s: one or more signal numbers must follow -s\n",
 				  pname);
 		    exit(1);
 		}
+		/* allocate storage for the signal list */
+		if (siglistlen + j > maxsiglistlen) {
+		    if ((siglist = realloc(siglist,
+				      (siglistlen+j) * sizeof(int))) == NULL) {
+			(void)fprintf(stderr, "%s: insufficient memory\n",
+				      pname);
+			exit(2);
+		    }
+		    maxsiglistlen = siglistlen + j;
+		}
+		/* fill the signal list */
+		for (i -= j; i < argc && *argv[i] != '-'; )
+		    siglist[siglistlen++] = atoi(argv[i++]);
+		i--;
 		sig_mode = 1;	/* display listed signals only (may be
 				   overridden using -VS 0) */
 		break;
@@ -345,8 +352,8 @@ char *argv[];
 
     /* Open the selected record (and annotation file, if specified). */
     if (record_init(record)) {
-	if (annotator[0][0]) {
-	    af[0].name = annotator[0]; af[0].stat = WFDB_READ;
+	if (annotator[0]) {
+	    af.name = annotator; af.stat = WFDB_READ;
 	    nann = 1;
 	    annot_init();
 	}

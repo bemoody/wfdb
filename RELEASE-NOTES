@@ -1,20 +1,18 @@
-10.2.0pre8:
+10.2.0pre9:
 	The 10.2 series differs from all earlier releases in that the WFDB
-	library no longer imposes any fixed limits on the numbers of signals
-	or annotators that can be open simultaneously.  See lib/wfdb.h for
-	details.
+	library no longer imposes any fixed limits on the numbers of annotators
+	or signals that can be open simultaneously.  There is also no
+	fixed limit on the number of samples per signal per frame.  The
+	constants WFDB_MAXANN, WFDB_MAXSIG, and WFDB_MAXSPF, which determined
+	these limits in previous versions of the library, are still defined in
+	lib/wfdb.h for compatibility with older programs that use them, e.g.,
+	to set array sizes.
 
-	In this beta release, most of the programs in the 'app' directory have
+	In this beta release, most of the WFDB applications, including
+	WAVE, all of those in the 'app' directory, and convert/edf2mit,
 	been revised so that they can handle arbitrary numbers of signals and
-	annotation files.  In a future release in this series, the following
-	programs will also be revised along the same lines:
-
-		edf2mit
-		pschart
-		psfd
-		wave
-
-	as well as programs in the 'examples' directory.
+	annotation files.  In a future release in this series, the programs
+	in the 'examples' directory will also be revised along the same lines.
 
 	'man' pages in the 'doc' directory should be up-to-date, but the WFDB
 	Programmer's Guide (doc/dbu.tex) is only partially updated.

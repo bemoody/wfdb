@@ -1,5 +1,5 @@
-/* file: edit.c		G. Moody	1 May 1990
-			Last revised:  30 May 2001
+/* file: edit.c		G. Moody	 1 May 1990
+			Last revised:  12 October 2001
 Annotation-editing functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -33,14 +33,11 @@ _______________________________________________________________________________
 #include <xview/notice.h>
 #include <xview/win_input.h>
 
-WFDB_Sample vref[WFDB_MAXSIG];
 WFDB_Time level_time;
 Frame level_frame;
 Panel level_panel;
-Panel_item level_mode_item, level_time_item, level_name[WFDB_MAXSIG],
-    level_value[WFDB_MAXSIG], level_units[WFDB_MAXSIG];
-static char level_time_string[36], level_name_string[WFDB_MAXSIG][12],
-    level_value_string[WFDB_MAXSIG][12], level_units_string[WFDB_MAXSIG][12];
+Panel_item level_mode_item, level_time_item;
+static char level_time_string[36];
 int bar_on, bar_x, bar_y;
 int level_mode, level_popup_active = -1;
 
@@ -75,7 +72,6 @@ void show_level_popup(stat)
 int stat;
 {
     int i, invalid_data;
-    static WFDB_Sample v[WFDB_MAXSIG];
     void create_level_popup();
 
     switch (level_mode) {
@@ -98,7 +94,7 @@ int stat;
 		  level_time - ref_mark_time);
 	  break;
     }
-    invalid_data = (isigsettime(level_time) < 0 || getvec(v) < 0);
+    invalid_data = (isigsettime(level_time) < 0 || getvec(level_v) < 0);
     for (i = 0; i < nsig; i++) {
 	sprintf(level_name_string[i], "%8s: ", signame[i]);
 	if (invalid_data) {
@@ -108,22 +104,22 @@ int stat;
 	else switch (level_mode) {
 	  default:
 	  case 0:	/* physical units (absolute) */
-	      sprintf(level_value_string[i], "%8.3lf", aduphys(i, v[i]));
+	      sprintf(level_value_string[i], "%8.3lf", aduphys(i, level_v[i]));
 	      sprintf(level_units_string[i], "%s%s", sigunits[i],
 		      calibrated[i] ? "" : " *"); 
 	      break;
 	  case 1:	/* physical units (relative) */
 	      sprintf(level_value_string[i], "%8.3lf",
-		      aduphys(i, v[i]) - aduphys(i, vref[i]));
+		      aduphys(i, level_v[i]) - aduphys(i, vref[i]));
 	      sprintf(level_units_string[i], "%s%s", sigunits[i],
 		      calibrated[i] ? "" : " *"); 
 	      break;
 	  case 2:	/* raw units (absolute) */
-	      sprintf(level_value_string[i], "%6d", v[i]);
+	      sprintf(level_value_string[i], "%6d", level_v[i]);
 	      sprintf(level_units_string[i], "adu");
 	      break;
 	  case 3:	/* raw units (relative) */
-	      sprintf(level_value_string[i], "%6d", v[i] - vref[i]);
+	      sprintf(level_value_string[i], "%6d", level_v[i] - vref[i]);
 	      sprintf(level_units_string[i], "adu");
 	      break;
 	}
@@ -190,6 +186,7 @@ void create_level_popup()
 				PANEL_LABEL_BOLD, TRUE,
 				XV_HELP_DATA, "wave:level.time",
 				0);
+    /* *** FIXME: need to create more of these items when nsig changes *** */
     for (i = 0; i < nsig; i++) {
 	level_name[i] = xv_create(level_panel, PANEL_MESSAGE,
 				  XV_X, xv_col(level_panel, 0),
@@ -232,7 +229,7 @@ int x, y, do_bar;
 {
     int  ya = y - mmy(8) - 1, yb = y + mmy(5) + 1;
     static int level_on;
-    static XSegment bar[2], level[WFDB_MAXSIG];
+    static XSegment bar[2];
 
     /* Erase any other bar and levels. */
     if (bar_on) {

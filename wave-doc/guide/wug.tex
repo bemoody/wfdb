@@ -6062,15 +6062,6 @@ may be able to view it with \WAVE{} via this expedient:
 
 \begin{itemize}
 \item
-First, check that the block size in samples is no greater than {\tt
-WFDB\_MAXSPF}, a symbol defined in the WFDB library header file {\tt wfdb.h}
-(which you will probably find in {\tt /usr/include/wfdb}).  If
-necessary, increase the value of {\tt WFDB\_MAXSPF}, recompile and
-reinstall the shared WFDB library ({\tt libwfdb.so.*}), and check to be
-sure that \WAVE{} loads this version of the WFDB library (use the
-command {\tt ldd `which wave`}).
-
-\item
 Write a header file describing the layout of the block-interleaved
 signal file (see
 \htmladdnormallink{{\tt header(5)}}{../dbag/header-5.htm},
@@ -6286,11 +6277,8 @@ number of open signals must be 32 or less (see the next question).
 
 \subsection{Can \WAVE{} open more than 32 signals in a window at once?}
 
-\index{WFDB\_MAXSIG@{\tt WFDB\_MAXSIG}}
-Not without recompiling.  The limit is {\tt WFDB\_MAXSIG} (defined as 32 in
-{\tt <wfdb/wfdb.h>});  it is necessary to recompile \WAVE{} itself, as well as
-the WFDB library, in order to increase this limit.  In a future version,
-the current limit of 32 signals will be substantially increased or removed.
+Yes.  There is no fixed limit on the number of signals that current versions
+of \WAVE{} can open.  Earlier versions were limited to 32 or fewer signals.
 
 \subsection{Can \WAVE{} open more than one annotation file in a window at once?}
 

@@ -1411,49 +1411,72 @@ structures
 @ifinfo
 (@pxref{WFDB_Siginfo structures}),
 @end ifinfo
-one for each signal to be opened.  The number of
-@code{WFDB_Siginfo} structures in @var{siarray}, @var{nsig}, need never be
-greater than @code{WFDB_MAXSIG} (a constant defined in @file{<wfdb/wfdb.h>});
-@code{isigopen} normally returns the number of input signals it actually
-opened, which may be less than @var{nsig} but is never greater than
-@var{nsig}.  The caller must allocate storage for the @code{WFDB_Siginfo}
-structures; @code{isigopen} will fill them in with information about the
-signals.  @dfn{Signal numbers} are assigned in the order in which
-signals are specified in the @file{header} file for the record; on
-return from @code{isigopen}, information for signal @var{i} will be
-found in @var{siarray[i]}.  For example, we can read the @code{gain}
-attributes of each signal in record @file{100s} like this:
+one for each signal to be opened.
+
+As a special case, if @var{nsig} is 0, @var{siarray} can be @code{NULL}.
+In this case, @code{isigopen} closes any open input signals, then
+returns the number of signals in @var{record} without opening them.  Use
+this feature to determine the amount of storage needed for
+signal-related variables, as in the example below, or to force open
+input signal files to be closed without closing open annotation or
+output signal files.  This action also sets internal WFDB library
+variables that record the base time and date, the length of the record,
+and the sampling and counter frequencies, so that time conversion
+functions such as @code{strtim} that depend on these quantities will
+work properly.
+
+If @code{nsig} is greater than 0, @code{isigopen} normally returns the
+number of input signals it actually opened, which may be less than
+@var{nsig} but is never greater than @var{nsig}.  The caller must
+allocate storage for the @code{WFDB_Siginfo} structures; @code{isigopen}
+will fill them in with information about the signals.  @dfn{Signal
+numbers} are assigned in the order in which signals are specified in the
+@file{header} file for the record; on return from @code{isigopen},
+information for signal @var{i} will be found in @var{siarray[i]}.  For
+example, we can read the @code{gain} attributes of each signal in record
+@file{100s} like this:
 
 @c @group
 @example
-@dots{}
-static WFDB_Siginfo s[WFDB_MAXSIG];
-int i, nsig;
+#include <stdio.h>
+#include <malloc.h>
+#include <wfdb/wfdb.h>
 
-nsig = isigopen("100s", s, WFDB_MAXSIG);
-for (i = 0; i < nsig; i++)
-    printf("signal %d gain = %g\n", i, s[i].gain);
-@dots{}
+main()
+@{
+    int i, nsig;
+    WFDB_Siginfo *siarray;
+
+    nsig = isigopen("100s", NULL, 0);
+    if (nsig < 1)
+	exit(1);
+    siarray = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+    nsig = isigopen("100s", siarray, nsig);
+    for (i = 0; i < nsig; i++)
+        printf("signal %d gain = %g\n", i, siarray[i].gain);
+    exit(0);
+@}
 @end example
 @c @end group
 
 @noindent
-Notice that the @code{for} loop is never executed if @code{isigopen}
-encounters an error, since @code{nsig} is less than 1 in such cases.
-The array of @code{WFDB_Siginfo} structures is declared @code{static}, a
-practice that is recommended for all arrays and data structures of any
-substantial size, to avoid run-time stack overflow.
+This program, unlike the example in the previous chapter, does not
+assume that the number of signals is known.  The first invocation of
+@code{isigopen} determines this number (and the program quits if there
+are no signals).  Next, the program allocates the array for the signal
+information, and then it opens the signals using the second
+invocation of @code{isigopen}, passing in the pointer @code{siarray} and the
+number of signals determined from the first call (@code{nsig}).
 
 An error message is produced if @code{isigopen} is unable to open
 @emph{any} of the signals listed in the @file{header} file.  It is not
 considered an error if only some of the signals can be opened, however.
 A signal will not be opened if its signal file is unreadable, if an
 input buffer cannot be allocated for it, or if opening all of the
-signals in its group would exceed the limits defined by @var{nsig} or
-@code{WFDB_MAXSIG}.  (On existing CD-ROMs containing database records, there is
-only one signal group for each record; as a consequence, @code{isigopen}
-fails if @var{nsig} is less than the number of available signals while
-attempting to read a CD-ROM record.)  If necessary, the caller can
+signals in its group would exceed the limits defined by @var{nsig}.
+(Note, however, that most records have only one signal group; as a
+consequence, @code{isigopen} fails if @var{nsig} is less than the
+total number of signals in such cases.)  If necessary, the caller can
 inspect the file names and signal descriptions in @var{siarray} to
 determine which signals were opened; 
 @iftex
@@ -1466,7 +1489,7 @@ Several of the example programs in chapter 6
 illustrate the use of @code{isigopen}; for example, @pxref{Example
 5}.
 
-If @var{nsig} is not positive, @code{isigopen} fills in up to
+If @var{nsig} is less than 0, @code{isigopen} fills in up to
 @iftex
 @minus{}@var{nsig}
 @end iftex
@@ -1480,10 +1503,6 @@ Note, however, that there is no guarantee that all (or indeed any) of the
 signals named in the @file{header} file are available to be opened.
 The features described in this paragraph were first introduced in
 version 4.4 of the WFDB library.
-
-As a special case, if @var{nsig} is 0, @var{siarray} can be @code{NULL}.
-This can be useful to force open input signal files to be closed without
-closing open annotation or output signal files.
 
 @c @group
 @node     osigopen, osigfopen, isigopen, selecting
@@ -1726,17 +1745,23 @@ example, this modified version of the example from chapter 1 reads and
 prints the first ten samples of each available input signal:
 
 @example
+#include <stdio.h>
+#include <malloc.h>
 #include <wfdb/wfdb.h>
 
 main()
 @{
     int i, j, nsig;
-    WFDB_Sample v[WFDB_MAXSIG];
-    static WFDB_Siginfo s[WFDB_MAXSIG];
+    WFDB_Sample *v;
+    WFDB_Siginfo *s;
 
-    nsig = isigopen("100s", s, WFDB_MAXSIG);
+    nsig = isigopen("100s", NULL, 0);
     if (nsig < 1)
+	exit(1);
+    s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+    if (isigopen("100s", s, nsig) != nsig)
         exit(1);
+    v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
     for (i = 0; i < 10; i++) @{
         if (getvec(v) < 0)
             break;
@@ -1748,13 +1773,10 @@ main()
 @}
 @end example
 
-Notice how the value returned by @code{isigopen} is used to determine
-how many input signals there are.  The array of @code{WFDB_Siginfo}
-structures is declared @code{static}, a practice that is recommended
-for all arrays and data structures of any substantial size, to avoid
-run-time stack overflow.  Several of the example programs in chapter 6
-illustrate the use of @code{getvec}; for example, @pxref{Example
-6}.
+Notice how the value returned by the first invocation of @code{isigopen}
+is used to determine how many input signals there are.  Several of the
+example programs in chapter 6 illustrate the use of @code{getvec}; for
+example, @pxref{Example 6}.
 
 @c @group
 @node    getframe, putvec, getvec, signal and annotation I/O

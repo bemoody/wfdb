@@ -1,5 +1,5 @@
 /* file: init.c		G. Moody	1 May 1990
-			Last revised: 28 July 2001
+			Last revised: 13 October 2001
 Initialization functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -30,7 +30,77 @@ _______________________________________________________________________________
 #include "xvwave.h"
 #include <xview/notice.h>
 
-static struct WFDB_siginfo df[WFDB_MAXSIG];
+static WFDB_Siginfo *df;
+static int maxnsig;
+
+void memerr()
+{
+#ifdef NOTICE
+    Xv_notice notice = xv_create((Frame)frame,
+				 NOTICE, XV_SHOW, TRUE,
+				 NOTICE_MESSAGE_STRINGS,
+				  "Insufficient memory", 0,
+				 NOTICE_BUTTON_YES, "Continue", NULL);
+    xv_destroy_safe(notice);
+#else
+    (void)notice_prompt((Frame)frame, (Event *)NULL,
+				NOTICE_MESSAGE_STRINGS,
+			         "Insufficient memory", 0,
+		      		NOTICE_BUTTON_YES, "Continue", NULL);
+#endif
+}
+
+void alloc_sigdata(ns)
+int ns;
+{
+    int i;
+
+    if ((df = realloc(df, ns * sizeof(WFDB_Siginfo))) == NULL ||
+	(signame = realloc(signame, ns * sizeof(char *))) == NULL ||
+	(sigunits = realloc(sigunits, ns * sizeof(char *))) == NULL ||
+	(calibrated = realloc(calibrated, ns * sizeof(char))) == NULL ||
+	(scope_v = realloc(scope_v, ns * sizeof(WFDB_Sample))) == NULL ||
+	(vref = realloc(vref, ns * sizeof(WFDB_Sample))) == NULL ||
+	(level_v = realloc(level_v, ns * sizeof(WFDB_Sample))) == NULL ||
+	(v = realloc(v, ns * sizeof(WFDB_Sample))) == NULL ||
+	(v0 = realloc(v0, ns * sizeof(WFDB_Sample))) == NULL ||
+	(vmax = realloc(vmax, ns * sizeof(WFDB_Sample))) == NULL ||
+	(vmin = realloc(vmin, ns * sizeof(WFDB_Sample))) == NULL ||
+	(level_name_string =
+		realloc(level_name_string, ns * sizeof(char **))) == NULL ||
+	(level_value_string =
+		realloc(level_value_string, ns * sizeof(char **))) == NULL ||
+	(level_units_string =
+		realloc(level_units_string, ns * sizeof(char **))) == NULL ||
+	(vscale = realloc(vscale, ns * sizeof(double))) == NULL ||
+	(base = realloc(base, ns * sizeof(int))) == NULL ||
+	(dc_coupled = realloc(dc_coupled, ns * sizeof(int))) == NULL ||
+	(sigbase = realloc(sigbase, ns * sizeof(int))) == NULL ||
+	(blabel = realloc(blabel, ns * sizeof(char *))) == NULL ||
+	(level_name =
+		realloc(level_name, ns * sizeof(Panel_item))) == NULL ||
+	(level_value =
+		realloc(level_value, ns * sizeof(Panel_item))) == NULL ||
+	(level_units =
+		realloc(level_units, ns * sizeof(Panel_item))) == NULL ||
+	(level = realloc(level, ns * sizeof(XSegment))) == NULL) {
+	memerr();
+    }
+    for (i = maxnsig; i < ns; i++) {
+	signame[i] = sigunits[i] = blabel[i] = NULL;
+	level_name[i] = level_value[i] = level_units[i] = (Panel_item)NULL;
+	scope_v[i] = vref[i] = level_v[i] = v[i] = v0[i] = vmax[i] =
+	    vmin[i] = 0;
+	vscale[i] = 1.0;
+	base[i] = dc_coupled[i] = 0;
+	if ((level_name_string[i] = calloc(1, 12)) == NULL ||
+	    (level_value_string[i] = calloc(1, 12)) == NULL ||
+	    (level_units_string[i] = calloc(1, 12)) == NULL) {
+	    memerr();
+	}
+    }
+    maxnsig = ns;
+}
 
 /* Open up a new ECG record. */
 int record_init(s)
@@ -61,8 +131,12 @@ char *s;
 
     /* Reset the frame title. */
     set_frame_title();
+
     /* Open as many signals as possible. */
-    nsig = isigopen(record, df, WFDB_MAXSIG);
+    nsig = isigopen(record, NULL, 0);
+    if (nsig > maxnsig)
+	alloc_sigdata(nsig);
+    nsig = isigopen(record, df, nsig);
     /* Get time resolution for annotations in sample intervals.  Except in
        WFDB_HIGHRES mode (selected using the -H option), the resolution is
        1 sample interval.  In WFDB_HIGHRES mode, when editing a multi-frequency
@@ -138,6 +212,10 @@ char *s;
     /* Initialize the signal list unless the new record name matches the
        old one. */
     if (rebuild_list) {
+	if (nsig > maxsiglistlen) {
+	    siglist = realloc(siglist, nsig * sizeof(int));
+	    maxsiglistlen = nsig;
+	}
 	for (i = 0; i < nsig; i++)
 	    siglist[i] = i;
 	siglistlen = nsig;

@@ -1,9 +1,9 @@
 /* file: pschart.c	G. Moody	 15 March 1988
-			Last revised:  10 January 2001
+			Last revised:  12 October 2001
 
 -------------------------------------------------------------------------------
 pschart: Produce annotated `chart recordings' on a PostScript device
-Copyright (C) 2000 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -43,10 +43,11 @@ will be correct even if `dpi' is incorrect, however.
 #else
 extern double atof();
 extern void exit();
+typedef long time_t;
 # ifndef NOMALLOC_H
 # include <malloc.h>
 # else
-extern char *calloc(), *malloc();
+extern char *calloc(), *malloc(), *realloc();
 # endif
 #endif
 #ifndef BSD
@@ -164,7 +165,6 @@ int Mflag = 0;			/* annotation/marker bar mode (0: do not print
 				   bars */
 int numberpages = 1;		/* if zero, suppress page numbering */
 int nosig = 0;			/* number of signals to be printed */
-int nosiglist = 1;		/* if non-zero, no signal list specified */
 int page = 1;			/* logical page number */
 int pages_written = 0;		/* number of pages written already */
 int prolog_written = 0;		/* if non-zero, prolog has been written */
@@ -173,13 +173,14 @@ char *pname;			/* the name by which this program is invoked */
 int pflag = 0;			/* if non-zero, pack strips side-by-side */
 int rflag = 0;			/* if non-zero, print record names */
 int Rflag = 0;			/* if non-zero, print record name in header */
-int siglist[WFDB_MAXSIG];		/* list of signals to be printed */
+int sflag = 0;			/* if non-zero, a signal list was specified */
+int *siglist;			/* list of signals to be printed */
 int smode = 1;			/* scale mode (0: no scales; 1: mm/unit in
 				   footers; 2: units/tick in footers; 3:
 				   mm/unit above strips; 4: units/tick above
 				   strips; 5: mm/unit within strips; 6: units/
 				   tick within strips) */
-
+char *sqstr;			/* signal quality string (1 char/signal) */
 double tpmv = TPMV;		/* grid ticks per millivolt */
 double tps = TPS;		/* grid ticks per second */
 double tscale = TSCALE;		/* time scale (mm/second) */
@@ -225,18 +226,12 @@ char *argv[];
 {
     char *p, *getenv();
     FILE *cfile = NULL;
-    int i;
+    int i, j;
     struct pscolor *colorp;
     struct tm *now;
-#ifdef __STDC__
     time_t t, time();
 
     t = time((time_t *)NULL);    /* get current time from system clock */
-#else
-    long t, time();
-
-    t = time((long *)NULL);
-#endif
     now = localtime(&t);
 
     pname = prog_name(argv[0]);
@@ -459,22 +454,25 @@ char *argv[];
 	    Rflag = 1;
 	    break;
 	  case 's':	/* specify signals to be printed */
-	    if (++i >= argc || *argv[i] < '0' || *argv[i] > '9') {
+	    sflag = 1;
+	    /* count the number of output signals */
+	    for (j = 0; ++i < argc && *argv[i] != '-'; j++)
+		;
+	    if (j == 0) {
 		(void)fprintf(stderr, "%s: signal list must follow -s\n",
 			pname);
 		exit(1);
 	    }
-	    nosig = 0;
-	    while (i < argc && '0' <= *argv[i] && *argv[i] <= '9') {
-		if (nosig == WFDB_MAXSIG) {
-		    (void)fprintf(stderr,
-				  "%s: too many output signals\n", pname);
-		    exit(1);
-		}
-		siglist[nosig++] = atoi(argv[i++]);
+	    /* allocate storage for the signal list and for sqstr */
+	    if ((siglist=realloc(siglist, (nosig+j) * sizeof(int))) == NULL ||
+		(sqstr = realloc(sqstr, (nosig+j+1) * sizeof(char))) == NULL) {
+		(void)fprintf(stderr, "%s: insufficient memory\n", pname);
+		exit(2);
 	    }
+	    /* fill the signal list */
+	    for (i -= j; i < argc && *argv[i] != '-'; )
+		siglist[nosig++] = atoi(argv[i++]);
 	    i--;
-	    nosiglist = 0;
 	    break;
 	  case 'S':	/* set modes for scale and time stamp printing */
 	    if (i >= argc-2 ||
@@ -559,16 +557,21 @@ char *argv[];
 
 /* Parameters set from the WFDB header file */
 int nisig;		/* number of signals in current record */
+int nimax;		/* largest value for nisig seen so far */
 int nsig;		/* number of signals to be printed */
 double sps;		/* sampling frequency (samples/second/signal) */
-WFDB_Siginfo s[WFDB_MAXSIG];	/* signal parameters, including gain */
-int uncal[WFDB_MAXSIG];	/* if non-zero, signal is uncalibrated */
+WFDB_Siginfo *s;	/* signal parameters, including gain */
+int *uncal;		/* if non-zero, signal is uncalibrated */
+
+/* Arrays indexed by signal # (allocated by process(), used by printstrip()) */
+int *buflen, *v, *vbase, **vbuf, *vmax, *vmin;
+long *vsum;
 
 /* Derived parameters */
 double dpmm = DPI/25.4;	/* pixels per millimeter */
 double dppt;		/* pixels per PostScript "printer's point" (PostScript
 			   "printer's points" are 1/72 inch;  true printer's
-			   points are 1/72.27 inch */
+			   points are 1/72.27 inch) */
 double dpsi;		/* pixels per sample interval */
 int nsamp;		/* number of samples/signal/strip */
 double sdur;		/* strip duration in seconds */
@@ -634,11 +637,35 @@ FILE *cfile;
 	    tstring = strtok((char *)NULL, " \t\n");
 	    title = strtok((char *)NULL, "\n");
 	    for (i = 0; i < nisig; i++)
-		uncal[siglist[i]] = 0;
+		uncal[i] = 0;
 	    if (tokptr == NULL || tstring == NULL ||
-		(nisig = isigopen(record, s, WFDB_MAXSIG)) < 0) continue;
+		(nisig = isigopen(record, NULL, 0)) < 0) continue;
+	    if (nisig > nimax) {
+		if ((s = realloc(s, nisig * sizeof(WFDB_Siginfo))) == NULL ||
+		    (buflen = realloc(buflen, nisig * sizeof(int))) == NULL ||
+		    (uncal = realloc(uncal, nisig * sizeof(int))) == NULL ||
+		    (v = realloc(v, nisig * sizeof(int))) == NULL ||
+		    (vbase = realloc(vbase, nisig * sizeof(int))) == NULL ||
+		    (vmax = realloc(vmax, nisig * sizeof(int))) == NULL ||
+		    (vmin = realloc(vmin, nisig * sizeof(int))) == NULL ||
+		    (vsum = realloc(vsum, nisig * sizeof(long))) == NULL ||
+		    (vbuf = realloc(vbuf, nisig * sizeof(int *))) == NULL) {
+		    (void)fprintf(stderr, "%s: insufficient memory\n", pname);
+		    exit(2);
+		}
+		if (!sflag &&
+		    ((siglist = realloc(siglist,nisig*sizeof(int))) == NULL ||
+		     (sqstr =realloc(sqstr,(nisig+1)*sizeof(char))) == NULL)) {
+		    (void)fprintf(stderr, "%s: insufficient memory\n", pname);
+		    exit(2);
+		}
+		while (nimax < nisig)
+		    buflen[nimax++] = 0;
+	    }
+	    if (isigopen(record, s, nisig) != nisig)
+		continue;
 	    (void)setpagetitle(0L);
-	    if (nosiglist) {
+	    if (!sflag) {
 		for (i = 0; i < nisig; i++)
 		    siglist[i] = i;
 		nsig = nosig = nisig;
@@ -648,7 +675,7 @@ FILE *cfile;
 		    if (siglist[i] < 0 || siglist[i] >= nisig) {
 			(void)fprintf(stderr,
 				      "record %s doesn't have a signal %d\n",
-				record, siglist[i]);
+				      record, siglist[i]);
 			wfdbquit();
 			return;
 		    }
@@ -708,9 +735,6 @@ char *record, *title;
     double curr_s_top;
     int i, j;
     int jmax, tm_y, *vp, x0, y0, ya[2];
-    int v[WFDB_MAXSIG], vbase[WFDB_MAXSIG], vmax[WFDB_MAXSIG], vmin[WFDB_MAXSIG];
-    long vsum[WFDB_MAXSIG];
-    static int buflen[WFDB_MAXSIG], *vbuf[WFDB_MAXSIG];
 
     /* Allocate buffers for the samples to be plotted, and initialize the
        range variables. */
@@ -724,12 +748,10 @@ char *record, *title;
 		vbuf[sig] = NULL;
 		buflen[sig] = 0;
 	    }
-#ifndef lint
 	    if ((vbuf[sig]=(int *)calloc((unsigned)nsamp,sizeof(int)))==NULL) {
 		(void)fprintf(stderr, "insufficient memory\n");
 		return (0);
 	    }
-#endif
 	    buflen[sig] = nsamp;
 	}
     }
@@ -1056,7 +1078,6 @@ char *record, *title;
     if (aflag) {
 	static WFDB_Annotation annot;
 	int x, y, c;
-	char buf[WFDB_MAXSIG+1];
 	unsigned int ia;
 
 	if (iannsettime(t0) < 0 && nann == 1) return (1);
@@ -1090,17 +1111,17 @@ char *record, *title;
 			int j = siglist[i];
 
 			if (j > 3)
-			    buf[i] = '*';	/* quality of input signal j
+			    sqstr[i] = '*';	/* quality of input signal j
 						   is undefined */
 			else if (annot.subtyp & (0x10 << j))
-			    buf[i] = 'u';	/* signal j is unreadable */
+			    sqstr[i] = 'u';	/* signal j is unreadable */
 			else if (annot.subtyp & (0x01 << j))
-			    buf[i] = 'n';	/* signal j is noisy */
+			    sqstr[i] = 'n';	/* signal j is noisy */
 			else
-			    buf[i] = 'c';	/* signal j is clean */
+			    sqstr[i] = 'c';	/* signal j is clean */
 		    }
-		    buf[i] = '\0';
-		    label(buf);
+		    sqstr[i] = '\0';
+		    label(sqstr);
 		    break;
 		  case STCH:
 		  case TCH:

@@ -114,6 +114,8 @@ int height;
     if (*record) {
 	set_baselines();
 	dismiss_mode();	/* read and set user-selected scales, if any */
+	alloc_sigdata(2);
+
 	vscale[0] = 0.;	/* force clear_cache() -- see calibrate() */
 	calibrate();
     }
@@ -331,7 +333,7 @@ Notify_signal_mode when;
 	if (p > new_record) p--;
 	*p = '\0';
     }
-    if (*new_annotator && strcmp(annotator[0], new_annotator))
+    if (*new_annotator && strcmp(annotator, new_annotator))
 	set_annot_item(new_annotator);
     if (*new_time)
 	set_start_time(new_time);

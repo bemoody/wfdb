@@ -1,10 +1,10 @@
 /* file: mainpan.c	G. Moody	30 April 1990
-			Last revised:    4 May 1999
+			Last revised:  12 October 2001
 Functions for the main control panel of WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -33,6 +33,10 @@ _______________________________________________________________________________
 #include <xview/notice.h>
 #include <xview/textsw.h>
 #include <xview/notify.h>
+
+#ifdef NOMKSTEMP
+#define mkstemp mktemp
+#endif
 
 Panel panel;	/* main control panel (above ECG window) */
 Panel load_panel;	/* File menu load command window */
@@ -115,7 +119,7 @@ static void create_load_panel()
 	PANEL_LABEL_STRING, "Annotator: ",
 	PANEL_VALUE_DISPLAY_LENGTH, 8,
 	PANEL_NOTIFY_PROC, disp_proc,
-	PANEL_VALUE, annotator[0],
+	PANEL_VALUE, annotator,
 	0);
     xv_create(load_panel, PANEL_BUTTON,
 	      PANEL_LABEL_STRING, "Reload",
@@ -295,13 +299,13 @@ static void create_edit_menu()
 	0);
 }
 
-static char *filename, *title;
+static char filename[20], *title;
 
 static void show_print()
 {
     char print_command[128];
 
-    if (filename) {
+    if (*filename) {
 	if (strncmp(filename, "/tmp/wave-s", 11) == 0)
 	    sprintf(print_command, "wfdbdesc $RECORD | %s\n", textprint);
 	else if (strncmp(filename, "/tmp/wave-a", 11) == 0)
@@ -407,17 +411,16 @@ void wait_for_file()
 			   &timer, NULL);
 }
 
-static char command[80], fname[20];
-char *mktemp();
+static char command[80];
 
 static void prop_signals()
 {
-    sprintf(fname, "/tmp/wave-s.XXXXXX");
+    sprintf(filename, "/tmp/wave-s.XXXXXX");
     /* The `echo' is to make sure that something gets written to the file,
        even if `wfdbdesc' doesn't work (so that check_file doesn't wait
        forever). */
-    sprintf(command, "(wfdbdesc $RECORD; echo =====) >%s\n",
-	    filename=mktemp(fname));
+    mkstemp(filename);
+    sprintf(command, "(wfdbdesc $RECORD; echo =====) >%s\n", filename);
     do_command(command);
     title = "Signals";
     wait_for_file();
@@ -426,12 +429,13 @@ static void prop_signals()
 static void prop_annotations()
 {
     post_changes();
-    sprintf(fname, "/tmp/wave-a.XXXXXX");
+    sprintf(filename, "/tmp/wave-a.XXXXXX");
+    mkstemp(filename);
     sprintf(command, "(sumann -r $RECORD -a $ANNOTATOR; echo =====) >%s\n",
-	    filename=mktemp(fname));
+	    filename);
     do_command(command);
     title = "Annotations";
-    wait_for_file(fname);
+    wait_for_file();
 }
 
 static void prop_wave()
@@ -439,7 +443,6 @@ static void prop_wave()
     static char fname[40];
 
     sprintf(fname, "%s/wave/wave.pro", helpdir);
-    filename = fname;
     title = "About WAVE";
     show_file();
 }
@@ -700,17 +703,17 @@ Event *event;
 	    }
 
 	if (!record_init((char *)xv_get(record_item, PANEL_VALUE))) return;
-	annotator[0][0] = '\0';	/* force re-initialization of annotator if
+	annotator[0] = '\0';	/* force re-initialization of annotator if
 				   record was changed */
 	savebackup = 1;
     }
 
     /* If a new annotator has been selected, re-initialize. */
     if (reload_annotations ||
-	strncmp(annotator[0], (char *)xv_get(annot_item,PANEL_VALUE),ANLMAX)) {
-	strncpy(annotator[0], (char *)xv_get(annot_item, PANEL_VALUE), ANLMAX);
-	if (annotator[0][0]) {
-	    af[0].name = annotator[0]; af[0].stat = WFDB_READ;
+	strncmp(annotator, (char *)xv_get(annot_item,PANEL_VALUE),ANLMAX)) {
+	strncpy(annotator, (char *)xv_get(annot_item, PANEL_VALUE), ANLMAX);
+	if (annotator[0]) {
+	    af.name = annotator; af.stat = WFDB_READ;
 	    nann = 1;
 	}
 	else
@@ -755,7 +758,7 @@ Event *event;
 	break;
       case ']':	/* Find next occurrence of specified annotation. */
       case '[':	/* Find previous occurrence of specified annotation. */
-	if (annotator[0][0]) {
+	if (annotator[0]) {
 	    char *fp = (char *)xv_get(find_item, PANEL_VALUE);
 	    static char auxstr[256];
 	    int mask, noise_mask, target;

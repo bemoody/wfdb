@@ -480,7 +480,7 @@ int use_overlays, use_color, grey;
 static int show_this_frame()
 {
     static char plane = 3, first_frame = 1;
-    int i, i0, tt, tt0 = 0, v[WFDB_MAXSIG], v0;
+    int i, i0, tt, tt0 = 0, v0;
     long t;
 
     if (first_frame && use_overlays) {
@@ -494,48 +494,44 @@ static int show_this_frame()
 	tt0 = (int)(-t);
 	t = 0L;
     }
-    if (isigsettime(t) < 0 || getvec(v) < 0) return (0);
+    if (isigsettime(t) < 0 || getvec(scope_v) < 0) return (0);
     switch (map2(scope_annp->this.anntyp)) {
       case NORMAL:
       case LEARN:
-	v0 = v[signal_choice] * vscale[signal_choice] - v0n;
+	v0 = scope_v[signal_choice] * vscale[signal_choice] - v0n;
 	break;
       case FUSION:
-	v0 = v[signal_choice] * vscale[signal_choice] - v0f;
+	v0 = scope_v[signal_choice] * vscale[signal_choice] - v0f;
 	break;
       case PVC:
-	v0 = v[signal_choice] * vscale[signal_choice] - v0v;
+	v0 = scope_v[signal_choice] * vscale[signal_choice] - v0v;
 	break;
     }
     if (tscale >= 1.0) {		/* resolution limited by input data */
 	for (i = i0 = tt0; i < scope_width; i++) {
-	    if (getvec(v) <= 0) break;
-	    sbuf[i].y = v[signal_choice] * vscale[signal_choice] - v0;
+	    if (getvec(scope_v) <= 0) break;
+	    sbuf[i].y = scope_v[signal_choice] * vscale[signal_choice] - v0;
 	}
 	i--;
     }
     else {			/* resolution limited by display */
 	int vmax, vmin, vv, x;
 
-	(void)getvec(v);
-	vmax = vmin = v[signal_choice];
+	(void)getvec(scope_v);
+	vmax = vmin = scope_v[signal_choice];
 	i = i0 = tt0*tscale;
 	if (i < scope_width)
-	    sbuf[i].y = v[signal_choice] * vscale[signal_choice] - v0;
-	for (tt = tt0 + 1; i < scope_width && getvec(v) > 0; tt++) {
+	    sbuf[i].y = scope_v[signal_choice] * vscale[signal_choice] - v0;
+	for (tt = tt0 + 1; i < scope_width && getvec(scope_v) > 0; tt++) {
+	    if (scope_v[signal_choice] > vmax) vmax = scope_v[signal_choice];
+	    else if (scope_v[signal_choice]<vmin) vmin=scope_v[signal_choice];
 	    if ((x = tt*tscale) > i) {
 		i = x;
-		if (v[signal_choice] > vmax) vmax = v[signal_choice];
-		else if (v[signal_choice] < vmin) vmin = v[signal_choice];
 		if (vmax - vv > vv - vmin)
 		    vv = vmin = vmax;
 		else
 		    vv = vmax = vmin;
 		sbuf[i].y = vv * vscale[signal_choice] - v0;
-	    }
-	    else {
-		if (v[signal_choice] > vmax) vmax = v[signal_choice];
-		else if (v[signal_choice] < vmin) vmin = v[signal_choice];
 	    }
 	}
     }

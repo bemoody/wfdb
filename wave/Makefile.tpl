@@ -1,9 +1,9 @@
-# file: Makefile.tpl		G. Moody		31 May 2000
-#				Last revised:		29 May 2001
+# file: Makefile.tpl		G. Moody	  31 May 2000
+#				Last revised:	13 October 2001
 # Change the settings below as appropriate for your setup.
 
 # WAVEVERSION is the WAVE version number.
-WAVEVERSION = 6.4
+WAVEVERSION = 6.5
 
 # Choose directories in which to install WAVE and its ancillary files by
 # editing the variables below.  You will need write permission in all of them

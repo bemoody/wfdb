@@ -1,5 +1,5 @@
 /* file: wave.h		G. Moody	26 April 1990
-			Last revised:    28 July 2001
+			Last revised:  12 October 2001
 Constants, macros, global variables, and function prototypes for WAVE
 
 -------------------------------------------------------------------------------
@@ -122,9 +122,30 @@ COMMON int make_sync_button;		/* if non-zero, this is the last WAVE
 					   process in this group -- make a
 					   sync button on the main panel */
 COMMON char record[RNLMAX+1];		/* record name */
-COMMON char *signame[WFDB_MAXSIG];	/* signal names */
-COMMON char *sigunits[WFDB_MAXSIG];	/* signal units */
-COMMON char calibrated[WFDB_MAXSIG];	/* 0: not calibrated, 1: calibrated */
+COMMON char **signame;			/* signal names */
+COMMON char **sigunits;			/* signal units */
+COMMON char *calibrated;		/* 0: not calibrated, 1: calibrated */
+COMMON WFDB_Sample *scope_v;		/* sample vector (see scope.c) */
+
+COMMON WFDB_Sample *vref;		/* see edit.c */
+COMMON WFDB_Sample *level_v;
+COMMON char **level_name_string;
+COMMON char **level_value_string;
+COMMON char **level_units_string;
+
+COMMON WFDB_Sample *v;			/* see sig.c */
+COMMON WFDB_Sample *v0;
+COMMON WFDB_Sample *vmax;
+COMMON WFDB_Sample *vmin;
+
+COMMON double *vscale;			/* amplitude scales for each signal
+					   (pixels/adu) */
+COMMON int *base;			/* baseline ordinate for each signal */
+COMMON int *dc_coupled;			/* if non-zero, signal is DC coupled
+					   (i.e., has a defined baseline) */
+COMMON int *sigbase;			/* baselines for DC-coupled signals */
+COMMON char **blabel;			/* baseline label strings */
+
 COMMON char *cfname;			/* calibration file name */
 COMMON char *helpdir;			/* name of directory containing on-line
 					   help files for WAVE */
@@ -132,9 +153,8 @@ COMMON char log_file_name[LNLMAX+1];	/* name of log file, if any */
 COMMON char description[DSLMAX+1];	/* description from log file */
 COMMON int nsig;			/* number of signals */
 COMMON int nann;			/* number of annotators (0 or 1) */
-COMMON char annotator[WFDB_MAXANN][ANLMAX+1];/* annotator names */
-COMMON struct WFDB_anninfo af[WFDB_MAXANN]; /* see <wfdb/wfdb.h>; passed to
-					       annopen */
+COMMON char annotator[ANLMAX+1];	/* annotator name */
+COMMON WFDB_Anninfo af;			/* annotator info, passed to annopen */
 COMMON int savebackup;			/* if non-zero, the current annotation
 					   file should be backed up if any
 					   edits are made */
@@ -155,17 +175,10 @@ COMMON long ref_mark_time;		/* sample number of REF_MARK marker
 COMMON double freq;			/* sampling frequency (Hz) */
 COMMON int atimeres;			/* annot time resolution in samples */
 COMMON double tscale;			/* time scale (pixels/samp interval) */
-COMMON double vscale[WFDB_MAXSIG];	/* amplitude scales for each signal
-					   (pixels/adu) */
 COMMON double mmpermv;			/* amplitude scale for export */
 COMMON double mmpersec;			/* time scale for export */
-COMMON int base[WFDB_MAXSIG];		/* baseline ordinate for each signal */
 COMMON int abase;			/* baseline ordinate for annotation
 					   display */
-COMMON int dc_coupled[WFDB_MAXSIG];	/* if non-zero, signal is DC coupled
-					   (i.e., has a defined baseline) */
-COMMON int sigbase[WFDB_MAXSIG];		/* baselines for DC-coupled signals */
-COMMON char *blabel[WFDB_MAXSIG];		/* baseline label strings */
 COMMON int use_overlays;		/* if non-zero, the grid, cursor,
 					   annotations, and signals can be
 					   erased independently */
@@ -213,9 +226,10 @@ COMMON int coarse_grid_mode;		/* as above, for use when tsa_index <=
 COMMON int fine_grid_mode;		/* as above, for use at other times */
 COMMON int signal_choice;		/* signal to be analyzed (from analyze
 					   panel) */
-COMMON int siglist[WFDB_MAXSIG];	/* signals to be analyzed (from analyze
+COMMON int *siglist;			/* signals to be analyzed (from analyze
 					   panel) */
 COMMON int siglistlen;			/* number of valid siglist entries */
+COMMON int maxsiglistlen;		/* length of siglist array */
 COMMON int freeze_siglist;		/* 1: don't rebuild in record_init */
 COMMON int scan_active;			/* 1: scope display is running */
 

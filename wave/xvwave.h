@@ -1,10 +1,10 @@
 /* file: xvwave.h    	G. Moody	27 April 1990
-			Last revised: 	29 April 1999
+			Last revised:  13 October 2001
 XView constants, macros, function prototypes, and global variables for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -116,10 +116,12 @@ struct display_list {
     int npoints;	/* number of (input) points per signal */
     int ndpts;		/* number of (output) points per signal */
     int xmax;		/* largest x, expressed as window abscissa */
-    int sb[WFDB_MAXSIG];/* signal baselines, expressed as window ordinates */
-    XPoint *vlist[WFDB_MAXSIG];  /* vertex list pointers for each signal */
+    int *sb;		/* signal baselines, expressed as window ordinates */
+    XPoint **vlist;	/* vertex list pointers for each signal */
 };
 COMMON struct display_list *first_list;
+COMMON Panel_item *level_name, *level_value, *level_units;  /* see edit.c */
+COMMON XSegment *level;
 
 /* Function prototypes for ANSI C and C++ compilers.  (Most of these are in
    wave.h;  those below are only for functions that use X or XView objects

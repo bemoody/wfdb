@@ -1,5 +1,5 @@
 /* file: edf2mit.c		G. Moody	16 October 1996
-				Last revised:	  29 July 2001
+				Last revised:	12 October 2001
 
 -------------------------------------------------------------------------------
 Convert EDF (European Data Format) file to MIT format header and signal files
@@ -26,6 +26,11 @@ _______________________________________________________________________________
 */
 
 #include <stdio.h>
+#ifndef NOMALLOC_H
+# include <malloc.h>
+#else
+extern char *calloc(), *malloc(), *realloc();
+#endif
 #include <wfdb/wfdb.h>
 
 char *pname;
@@ -34,21 +39,18 @@ main(argc, argv)
 int argc;
 char **argv;
 {
-    static FILE *ifile;
-    static char buf[81], record[20];
-    int big_endian = 0, fpb, h, i, j, k, l, nsig, nosig = 0,
-	siglist[WFDB_MAXSIG], spb[WFDB_MAXSIG], tspb = 0, tspf = 0,
-	vflag = 0;
-    char **vi, **vin;
+    char buf[81], record[WFDB_MAXRNL+1], **vi, **vin;
+    double *sigpmax, *sigpmin, *sampfreq, spr, sps;
+    FILE *ifile = NULL;
+    int big_endian = 0, fpb, h, i, j, k, l, nsig, nosig = 0, *siglist, *spb,
+	tspb = 0, tspf = 0, vflag = 0, day, month, year, hour, minute, second;
+    long adcrange, *sigdmax, *sigdmin;
     WFDB_Sample *vo, *vout;
-    int day, month, year, hour, minute, second;
-    long adcrange, sigdmax[WFDB_MAXSIG], sigdmin[WFDB_MAXSIG];
-    double sigpmax[WFDB_MAXSIG], sigpmin[WFDB_MAXSIG], sampfreq[WFDB_MAXSIG],
-        spr, sps;
-    static WFDB_Siginfo si[WFDB_MAXSIG], so[WFDB_MAXSIG];
+    WFDB_Siginfo *si, *so;
     void help();
 
     pname = argv[0];
+    record[0] = '\0';
     for (i = 1; i < argc; i++) {
 	if (*argv[i] == '-') switch (argv[i][1]) {
 	  case 'b':	/* input is in big-endian byte order */
@@ -67,21 +69,48 @@ char **argv;
 			fprintf(stderr, "%s: can't read %s\n", pname, argv[i]);
 			exit(1);
 		    }
+		    if (record[0] == 0) {
+			for (j = 0; j < WFDB_MAXRNL; j++) {
+			    char c = argv[i][j];
+
+			    if (('0' <= c && c <= '9') ||
+				('a' <= c && c <= 'z') ||
+				('A' <= c && c <= 'Z'))
+				record[j] = c;
+			    else if (c == '.') break;
+			    else record[j] = '_';
+			}
+			record[j] = '\0';
+		    }
 		}
 	    }
 	    break;
 	  case 'r':	/* record name follows */
 	    if (++i < argc)
-		strncpy(record, argv[i], 19);
+		strncpy(record, argv[i], WFDB_MAXRNL);
 	    else {
 		fprintf(stderr, "%s: record name must follow -r\n", pname);
 		exit(1);
 	    }
 	    break;
 	  case 's':	/* signal list follows */
-	    while (++i < argc && argv[i][0] != '-')
-		siglist[nosig++] = atoi(argv[i]);
-	    --i;
+	    /* count the number of output signals */
+	    for (j = 0; ++i < argc && *argv[i] != '-'; j++)
+		;
+	    if (j == 0) {
+		(void)fprintf(stderr, "%s: signal list must follow -s\n",
+			pname);
+		exit(1);
+	    }
+	    /* allocate storage for the signal list */
+	    if ((siglist=realloc(siglist, (nosig+j) * sizeof(int))) == NULL) {
+		(void)fprintf(stderr, "%s: insufficient memory\n", pname);
+		exit(2);
+	    }
+	    /* fill the signal list */
+	    for (i -= j; i < argc && *argv[i] != '-'; )
+		siglist[nosig++] = atoi(argv[i++]);
+	    i--;
 	    break;
 	  case 'v':	/* select verbose mode */
 	    vflag = 1;
@@ -110,11 +139,6 @@ char **argv;
     for (j = 80; j >= 0 && buf[j] == ' '; j--)
 	buf[j] = '\0';
     if (vflag) printf("Recording ID: '%s'\n", buf);
-    if (record[0] == 0) {
-	strncpy(record, buf, 19);
-	for (j = 0; j < 20; j++)
-	    if (record[j] == ' ') { record[j] = '\0'; break; }
-    }
 
     fread(buf, 1, 8, ifile);
     buf[8] = ' ';
@@ -167,8 +191,29 @@ char **argv;
     sscanf(buf, "%d", &nsig);
 
     if (nsig < 1) exit(1);
-    if (nsig > WFDB_MAXSIG) {
-	fprintf(stderr, "Too many signals!\n");
+
+    if ((si = malloc(nsig * sizeof(WFDB_Siginfo))) == NULL ||
+	(spb = malloc(nsig * sizeof(int))) == NULL ||
+	(sigdmax = malloc(nsig * sizeof(long))) == NULL ||
+	(sigdmin = malloc(nsig * sizeof(long))) == NULL ||
+	(sigpmax = malloc(nsig * sizeof(double))) == NULL ||
+	(sigpmin = malloc(nsig * sizeof(double))) == NULL ||
+	(sampfreq = malloc(nsig * sizeof(double))) == NULL) {
+	fprintf(stderr, "%s: insufficient memory\n", pname);
+	exit(2);
+    }      
+
+    if (nosig == 0) {	/* initialize signal list if necessary */
+	if ((siglist = malloc(nsig * sizeof(int))) == NULL) {
+	    fprintf(stderr, "%s: insufficient memory\n", pname);
+	    exit(2);
+	}
+	for ( ; nosig < nsig; nosig++)
+	    siglist[nosig] = nosig;
+    }
+
+    if ((so = malloc(nosig * sizeof(WFDB_Siginfo))) == NULL) {
+	fprintf(stderr, "%s: insufficient memory\n", pname);
 	exit(2);
     }
 
@@ -283,10 +328,6 @@ char **argv;
 	    printf("Signal %d free space: '%s'\n", i, buf);
     }
 
-    if (nosig == 0)	/* initialize signal list if necessary */
-	for ( ; nosig < nsig; nosig++)
-	    siglist[nosig] = nosig;
-
     /* Determine the base sampling frequency (the lowest sampling frequency for
        any signal in the signal list) */
     sps = 0;
@@ -321,25 +362,6 @@ char **argv;
 	if (vflag)
 	  printf(" Signal %d samples per second: %g (%d sample%s per frame)\n",
 		 i, sampfreq[siglist[i]], j, j > 1 ? "s" : "");
-    }
-    if (k > WFDB_MAXSPF) {
-	fprintf(stderr, "%s: too many samples of signal %d per frame\n\n",
-		pname, l);
-	fprintf(stderr,
-" There can be at most %d samples per signal per frame, and you would need\n",
-		WFDB_MAXSPF);
-	fprintf(stderr,
-" at least %d samples per signal per frame in order to convert this record.\n",
-		k);
-	fprintf(stderr,
-"\n You may avoid this problem by using the '-s' option to exclude one or\n");
-	fprintf(stderr,
-" more signals, or you can change WFDB_MAXSPF to a value of %d or more\n", k);
-	fprintf(stderr,
-" in wfdb.h, and then recompile the WFDB library and any applications\n");
-	fprintf(stderr,
-" that depend on WFDB_MAXSPF, including this one.\n\n");
-	exit(2);
     }
 
     vin = (char **)malloc(nsig * sizeof(char *));
