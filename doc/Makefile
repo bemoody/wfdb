@@ -1,5 +1,5 @@
 # file: Makefile	G. Moody	24 June 1989
-#			Last revised:  6 January 2000
+#			Last revised:  9 February 2000
 # `make' description file for WFDB software documentation
 #
 # -----------------------------------------------------------------------------
@@ -250,7 +250,7 @@ dbag.ps:
 	dvips $(D2PARGS) -o dbag4.ps install.dvi
 	latex eval
 	dvips $(D2PARGS) -o dbag5.ps eval.dvi
-	cat dbag[12345].ps >dbag.ps
+	cat dbag[12345].ps | grep -v '^%%' >dbag.ps
 
 # `make guide': print the Programmer's Guide
 guide:	dbpg.ps

@@ -1,10 +1,10 @@
 /* file: xvwave.c	G. Moody	27 April 1990
-			Last revised:   29 April 1999
+			Last revised:    5 March 2000
 XView support functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2000 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -238,6 +238,7 @@ void save_defaults()
 	defaults_set_integer("Wave.View.CoarseTimeScale", tsa_index);
     defaults_set_integer("Wave.View.AmplitudeScale", vsa_index);
     defaults_set_integer("Wave.View.AnnotationMode", ann_mode);
+    defaults_set_integer("Wave.View.AnnotationOverlap", overlap);
     defaults_set_integer("Wave.View.SignalMode", sig_mode);
     defaults_set_integer("Wave.View.TimeMode", time_mode);
     if (tsa_index > MAX_COARSE_TSA_INDEX)
@@ -626,6 +627,10 @@ int mode;
     if (ann_mode < 0)
 	ann_mode     = defaults_get_integer("wave.view.annotationmode",
 					    "Wave.View.AnnotationMode",
+					    0);
+    if (overlap < 0)
+	overlap      = defaults_get_integer("wave.view.annotationoverlap",
+					    "Wave.View.AnnotationOverlap",
 					    0);
     if (sig_mode < 0)
 	sig_mode     = defaults_get_integer("wave.view.signalmode",

@@ -1,10 +1,10 @@
 # file: Makefile	G. Moody	 9 June 1983
-#			Last revised:	25 August 1999
+#			Last revised:	3 March 2000
 # UNIX 'make' description file for WFDB applications
 #
 # -----------------------------------------------------------------------------
 # WFDB applications: programs for working with annotated signals
-# Copyright (C) 1999 George B. Moody
+# Copyright (C) 2000 George B. Moody
 #
 # These programs are free software; you can redistribute them and/or modify
 # them under the terms of the GNU General Public License as published by the
@@ -109,13 +109,13 @@ STRIP = strip
 CFILES = bxb.c calibrate.c ecgeval.c epic.c fir.c ihr.c mfilt.c mrgann.c \
  mxm.c nst.c plotstm.c pschart.c psfd.c rdann.c rdsamp.c rxr.c sampfreq.c \
  sample.c sigamp.c skewedit.c snip.c sortann.c sqrs.c sqrs125.c sumann.c \
- sumstats.c tach.c view.c vsetup.c wfdbcollate.c wfdbdesc.c wfdbwhich.c \
- wrann.c wrsamp.c wvscript.c xform.c
+ sumstats.c tach.c view.c vsetup.c wfdbcat.c wfdbcollate.c wfdbdesc.c \
+ wfdbwhich.c wrann.c wrsamp.c wvscript.c xform.c
 XFILES = bxb calibrate ecgeval epic fir ihr mfilt mrgann \
  mxm nst plotstm pschart psfd rdann rdsamp rxr sampfreq \
  sigamp skewedit snip sortann sqrs sqrs125 sumann \
- sumstats tach wfdbcollate wfdbdesc wfdbwhich \
- wrann wrsamp xform
+ sumstats tach wfdbcat wfdbcollate wfdbdesc \
+ wfdbwhich wrann wrsamp xform
 SCRIPTS = cshsetwfdb setwfdb
 PSFILES = pschart.pro psfd.pro
 OTHERFILES = cshsetwfdb setwfdb setwfdb.bat sample8.hea
@@ -176,3 +176,5 @@ psfd:		psfd.c
 	$(CC) $(CFLAGS) -DPROLOG=\"$(PSPDIR)/psfd.pro\" psfd.c -o $@ $(LDFLAGS)
 sigamp:		sigamp.c
 	$(CC) $(CFLAGS) sigamp.c -o $@ $(LDFLAGS) -lm
+wfdbcat:	wfdbcat.c
+	$(CC) $(CFLAGS) -DNETFILES wfdbcat.c -o $@ $(LDFLAGS)

@@ -1,9 +1,9 @@
 /* file wrann.c		G. Moody	 6 July 1983
-			Last revised:     5 May 1999
+			Last revised:  12 February 2000
 
 -------------------------------------------------------------------------------
 wrann: Translate an ASCII file in 'rdann' output format to an annotation file
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2000 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -113,7 +113,7 @@ char *argv[];
 	annot.time = tm; annot.subtyp = sub; annot.chan = ch; annot.num = nm;
 	for (p = line+40; *p; p++)
 	    if (*p == '\t') {
-		*p = strlen(p+1) + 1;
+		*p = strlen(p+1) - 1;
 		annot.aux = p;
 		break;
 	    }

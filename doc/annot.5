@@ -22,7 +22,7 @@ annotation type code, and the ten remaining bits (\fII\fR) specify the time
 of the annotation, measured in sample intervals from the previous annotation
 (or from the beginning of the record for the first annotation).
 If 0 < \fIA\fR <= \fBACMAX\fR, then \fIA\fR is defined in
-\fB<ecg/ecgcodes.h>\fR.  Several other possibilities exist:
+\fB<wfdb/ecgcodes.h>\fR.  Several other possibilities exist:
 .TP
 \fIA\fR = \fBSKIP\fR [59.]
 \fII\fR = 0;
@@ -53,7 +53,7 @@ null, not included in the byte count, is appended if \fII\fR is odd.
 .PP
 All annotations occupy exactly 16 bytes.  Within each block, the first byte is
 unused, the second byte contains the AHA annotation code (an ASCII character;
-see \fB<ecg/ecgmap.h>\fR), the third through sixth bytes contain the time (see
+see \fB<wfdb/ecgmap.h>\fR), the third through sixth bytes contain the time (see
 below) in PDP-11 long integer format as above, and the seventh and eighth bytes
 contain an annotation serial number.
 .PP

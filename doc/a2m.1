@@ -1,4 +1,4 @@
-.TH A2M 1 "11 January 2000" "WFDB software 10.0" "WFDB applications"
+.TH A2M 1 "6 February 2000" "WFDB software 10.0" "WFDB applications"
 .SH NAME
 a2m, ad2m, m2a, md2a \- utilities for converting between MIT and AHA DB formats
 .SH SYNOPSIS
@@ -80,8 +80,8 @@ directory, then type:
 	a2m -i 1201.ano -r 1201 -a atruth -t 3
 .br
 These commands produce files \fI1201.dat\fR (the signal file),
-\fIheader.1201\fR (the header file, named \fI1201.hea\fR under MS-DOS), and
-\fIatruth.1201\fR (the reference annotation file, named \fI1201.atr\fR under
+\fI1201.header\fR (the header file, named \fI1201.hea\fR under MS-DOS), and
+\fI1201.atruth\fR (the reference annotation file, named \fI1201.atr\fR under
 MS-DOS), all in the current directory.  Run \fIad2m\fR first, so that the
 new header file is available for the use of \fIa2m\fR.
 .SS "AHA DB short format tape"
@@ -141,7 +141,7 @@ first (see above), then type:
 .br
 to make a `short format' reference annotation file.  Continue (under UNIX) by:
 .br
-	cp header.1001 header.1201
+	cp 1001.header 1201.header
 .br
 or (under MS-DOS) by:
 .br

@@ -1,4 +1,4 @@
-.TH PSCHART 1 "11 January 2000" "WFDB software 10.1" "WFDB applications"
+.TH PSCHART 1 "12 February 2000" "WFDB software 10.1" "WFDB applications"
 .SH NAME
 pschart \- produce annotated `chart recordings' on a PostScript device
 .SH SYNOPSIS
@@ -39,6 +39,26 @@ include whitespace if it is quoted.  The characters `%d', if included in
 \fIstring\fR, are replaced by the current year.  A default copyright notice is
 printed if no \fB-c\fR option is specified.  To suppress printing the copyright
 notice, use `\fB-c ""\fR'.
+.TP
+\fB-C\fR
+Produce charts in color (default: black and white).
+.TP
+\fB-Ca \fIr g b\fR
+Draw annotations (if enabled) in the specified color. The color is
+specified using three numerical arguments (with values between 0 and 1
+inclusive) that indicate the amounts of red, green, and blue respectively.
+Examples: \fB-Ca 0.5 0.5 1.0\fR produces light blue (the default obtained
+using \fB-C\fR only); \fB-Ca 0 0.5 0\fR produces a deep green color.
+.TP
+\fB-Cg \fIr g b\fR
+Draw the grid (if enabled) in the specified color. Default: red (1 0 0).
+.TP
+\fB-Cl \fIr g b\fR
+Draw labels and other non-annotation text in the specified color.  Default:
+black (0 0 0).
+.TP
+\fB-Cs \fIr g b\fR
+Draw signals in the specified color.  Default: deep blue (0 0 0.5).
 .TP
 \fB-d \fIn\fR
 Set up for using a printer with a resolution of \fIn\fR dots per inch (default:
@@ -178,6 +198,13 @@ render zero-width lines correctly).
 .TP
 \fB-1\fR
 Print only the first character of each comment annotation.
+.SS Color output
+If none of the \fB-C\fR options is used, output is in black and white.  If
+any color option is used, output is in the default colors (light blue
+annotations, red grid, black labels, deep blue signals) unless overridden
+by one or more of the \fB-Ca\fR, \fB-Cg\fR, \fB-Cl\fR, or \fB-Cs\fR options.
+Color output can be rendered in greyscale by monochrome PostScript printers,
+although black-and-white output may look better in such cases.
 .SS Scripts:
 .PP
 Any argument that is not an option or an option argument is taken as the

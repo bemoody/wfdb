@@ -1,5 +1,5 @@
 # file: Makefile	G. Moody	 6 July 1983
-#			Last revised:  19 January 2000		Version 10.1.1
+#			Last revised:   11 March 2000		Version 10.1.2
 # UNIX 'make' description file for compiling the WFDB library
 #
 # _____________________________________________________________________________
@@ -65,7 +65,7 @@
 # Makefile (in the parent of this directory) for details.
 MAJOR = 10
 MINOR = 1
-RELEASE = 1
+RELEASE = 2
 VERSION = $(MAJOR).$(MINOR).$(RELEASE)
 
 # Historical note:  Versions earlier than 10.0.0, released between 1981 and

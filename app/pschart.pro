@@ -62,7 +62,7 @@ save 100 dict begin /pschart exch def
 % x0 y0 x1 y1 xtick ytick grid: print a grid with the lower corner at (x0, y0),
 %  the upper corner at (x1, y1), and ticks at intervals of xtick and ytick (in
 %  mm);  the units of x0, y0, x1, and y1 are printer coordinates.
-/grid { newpath 0 setgray 0 setlinecap
+/grid { newpath 0 setlinecap
  /dy1 exch dpi 25.4 div mul lw sub def /dy2 dy1 lw add 5 mul def
  /dx1 exch dpi 25.4 div mul lw sub def /dx2 dx1 lw add 5 mul def
  /y1 exch def /x1 exch def /y0 exch def /x0 exch def
@@ -90,7 +90,7 @@ save 100 dict begin /pschart exch def
  6 R show } def
 
 % dpi newpage: start page, resolution dpi dots per inch
-/newpage {/dpi exch def tm setmatrix newpath [] 0 setdash 0 setgray
+/newpage {/dpi exch def tm setmatrix newpath [] 0 setdash
  1 setlinecap /lw lwmm mm def mark } def
 
 % ss: set scales for plotting

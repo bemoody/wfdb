@@ -1,9 +1,9 @@
 /* file: fir.c		G. Moody	5 January 1987
-			Last revised:   30 April 1999
+			Last revised:   11 March 2000
 
 -------------------------------------------------------------------------------
 fir: General-purpose FIR filter for database records
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2000 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -150,7 +150,10 @@ char *argv[];
 			      pname);
 		exit(1);
 	    }
-	    nrec = argv[i];
+	    if (strlen(nrec = argv[i]) > WFDB_MAXRNL) {
+		(void)fprintf(stderr, "%s: new record name too long\n", pname);
+		exit(1);
+	    }
 	    break;
 	  case 'o':	/* output record name */
 	    if (++i >= argc) {
@@ -198,9 +201,26 @@ char *argv[];
 	help();
 	exit(1);
     }
-    if ((nsig = isigopen(irec, chin, WFDB_MAXSIG)) <= 0 ||
-	osigopen(orec, chout, (unsigned)nsig) <= 0)
+    if ((nsig = isigopen(irec, chin, WFDB_MAXSIG)) <= 0)
 	exit(2);
+    if (nrec) {
+	static char ofname[WFDB_MAXRNL+5];
+
+	sprintf(ofname, "%s.dat", nrec);
+	for (i = 0; i < nsig; i++) {
+	    chout[i] = chin[i];
+	    chout[i].fname = ofname;
+	    chout[i].group = 0;
+	}
+	if ((osigfopen(chout, nsig) < nsig)) {
+	    wfdbquit();
+	    exit(1);
+	}
+    }
+    else if (osigopen(orec, chout, (unsigned)nsig) <= 0) {
+	wfdbquit();
+	exit(2);
+    }
     if (from > 0L) {
 	from = strtim(argv[from]);
 	(void)isigsettime(from);

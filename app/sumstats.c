@@ -1,8 +1,8 @@
 /* file: sumstats.c	G. Moody	17 August 1989
-   			Last revised:	  4 May 1999
+   			Last revised:	9 February 2000
 -------------------------------------------------------------------------------
-sumstats: Derive aggregate statistics from bxb or rxr line-format output
-Copyright (C) 1999 George B. Moody
+sumstats: Derive aggregate statistics from bxb, rxr, or epic line-format output
+Copyright (C) 2000 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -22,14 +22,14 @@ You may contact the author by e-mail (george@mit.edu) or postal mail
 please visit PhysioNet (http://www.physionet.org/).
 _______________________________________________________________________________
 
-This program derives the aggregate statistics described in sections 4.6.1 and
-5.6 of "Testing and Reporting Performance Results of Ventricular Arrhythmia
-Detection Algorithms", an AAMI Recommended Practice (available from AAMI,
-Suite 400, 3330 Washington Blvd., Arlington, VA 22201;  publication
-AAMI ECAR-1987), and in section 4.2.20 of a draft AAMI standard for ambulatory
-ECGs.  The relevant sections of the draft standard are included in file
-`eval.doc'.  Information about using this program is contained in file
-`sumstats.1'.
+This program derives the aggregate statistics described in sections 3.5.2 and
+3.5.3 of the American National Standard, "Testing and reporting performance
+results of cardiac rhythm and ST segment measurement algorithms" (ANSI/AAMI
+EC57:1998, based on the earlier AAMI ECAR:1987), and in sections 4.2.14.4.1
+and 4.2.14.4.2 of the American National Standard, "Ambulatory electrocardio-
+graphs" (ANSI/AAMI EC38:1998).  These standards are available from AAMI,
+Suite 400, 3330 Washington Blvd., Arlington, VA 22201 USA
+(http://www.aami.org/).
 */
 
 #include <stdio.h>

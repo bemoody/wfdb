@@ -1,9 +1,9 @@
 # file: Makefile	G. Moody	9 December 1991
-#			Last revised:	  5 May 1999
+#			Last revised:  12 February 2000
 #
 # -----------------------------------------------------------------------------
 # `make' description file for PSD estimation programs
-# Copyright (C) 1999 George B. Moody
+# Copyright (C) 2000 George B. Moody
 #
 # These programs are free software; you can redistribute them and/or modify
 # them under the terms of the GNU General Public License as published by the
@@ -75,14 +75,23 @@ XFILES = coherence fft log10 lomb memse
 SCRIPTS = hrfft hrlomb hrmem hrplot plot2d plot3d
 
 # `make' or `make install':  build and install applications, clean up
-install:	all
-	cp $(XFILES) $(SCRIPTS) $(BINDIR)
-	cd $(BINDIR); $(SETXPERMISSIONS) $(XFILES) $(SCRIPTS)
+install:	all scripts
+	cp $(XFILES) $(BINDIR)
+	cd $(BINDIR); $(SETXPERMISSIONS) $(XFILES)
 	$(MAKE) clean
 
 # `make all': build applications
 all:	$(XFILES)
 	$(STRIP) $(XFILES)
+
+# `make scripts': customize and install scripts
+scripts:
+	sed s+/usr/local/bin+$(BINDIR)+g <hrfft >$(BINDIR)/hrfft
+	sed s+/usr/local/bin+$(BINDIR)+g <hrlomb >$(BINDIR)/htlomb
+	sed s+/usr/local/bin+$(BINDIR)+g <hrmem >$(BINDIR)/hrmem
+	sed s+/usr/local/bin+$(BINDIR)+g <hrplot >$(BINDIR)/hrplot
+	cp plot2d plot3d $(BINDIR)
+	$(SETXPERMISSIONS) $(SCRIPTS)
 
 coherence:	coherence.c
 	$(CC) -o coherence -O coherence.c -lm

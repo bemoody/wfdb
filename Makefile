@@ -1,5 +1,5 @@
 # file: Makefile	G. Moody	5 September 1990
-#			Last revised:    30 January 2000	Version 10.1.1
+#			Last revised:    11 March 2000     Version 10.1.2
 # UNIX 'make' description file for the WFDB software package
 #
 # -----------------------------------------------------------------------------
@@ -44,6 +44,15 @@
 # does not affect how the software is compiled.
 ARCH=`uname -m`-`uname -s`
 
+# Each release of the WFDB Software Package is identified by a three-part
+# version number, defined in this section.  See the top-level Makefile (in
+# the parent of this directory) for details.
+MAJOR = 10
+MINOR = 1
+RELEASE = 2
+VERSION = $(MAJOR).$(MINOR).$(RELEASE)
+VERDEFS= 
+
 # WFDBROOT specifies the common root of the directories where the installed
 # files go.  Reasonable choices are /usr, /usr/local, /opt, or $(HOME).  If
 # WFDBROOT is not /usr, you will probably need to specify -I and -L options
@@ -84,7 +93,8 @@ install:	config.cache install-slib
 # 'make install-slib': compile and install the dynamically-linked WFDB library
 # and include (*.h) files
 install-slib:
-	cd lib;      $(MAKE) $(WFDBDIRS) slib
+	cd lib;      $(MAKE) $(WFDBDIRS) MAJOR=$(MAJOR) \
+			MINOR=$(MINOR) RELEASE=$(RELEASE) slib
 
 # 'make all': compile the WFDB applications without installing them (requires
 # installation of the dynamically-linked WFDB library and includes)
@@ -116,9 +126,9 @@ clean:
 config.cache:
 	sh ./configure
 
-# 'make test-lib': compile the dynamically-linked WFDB library without
+# 'make slib-test': compile the dynamically-linked WFDB library without
 # installing it
-test-lib:
+slib-test:
 	cd lib;      $(MAKE) $(WFDBDIRS) slib-test
 
 # 'make test' or 'make test-all': compile the WFDB applications without
@@ -145,14 +155,16 @@ test-install:
 # tar source archives of the WFDB software package (with and without the
 # documentation), and generate PGP signature blocks for the archives
 tarballs:	clean
-	cd ..; tar --create --file wfdb.tar.gz --verbose --gzip \
-                '--exclude=wfdb/*CVS' wfdb
-	cd ..; tar --create --file wfdb-no-docs.tar.gz --verbose --gzip \
-                '--exclude=wfdb/*CVS' '--exclude=wfdb/*doc' wfdb
-	cd ..; pgps -b wfdb.tar.gz wfdb-no-docs.tar.gz
+	cd ..; tar --create --file wfdb-$(VERSION).tar.gz --verbose --gzip \
+                '--exclude=wfdb-$(VERSION)/*CVS' wfdb-$(VERSION)
+	cd ..; tar --create --file wfdb-no-docs-$(VERSION).tar.gz \
+		--verbose --gzip \
+                '--exclude=wfdb-$(VERSION)/*doc' \
+		'--exclude=wfdb-$(VERSION)/*CVS' wfdb-$(VERSION)
+	cd ..; pgps -b wfdb-$(VERSION).tar.gz wfdb-no-docs-$(VERSION).tar.gz
 
 # 'make bin-tarball': make a gzipped tar archive of the WFDB software package
 # binaries and other installed files
 bin-tarball:	test-install
-	cd $(HOME)/wfdb-test;  tar cfvz ../wfdb-$(ARCH).tar.gz .
-	cd ..; pgps -b wfdb-$(ARCH).tar.gz
+	cd $(HOME)/wfdb-test;  tar cfvz ../wfdb-$(VERSION)-$(ARCH).tar.gz .
+	cd ..; pgps -b wfdb-$(VERSION)-$(ARCH).tar.gz

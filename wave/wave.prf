@@ -37,9 +37,9 @@ For a copy of this document, print `HELPDIR/wave/wave.pro' (or click
 For a copy of the on-line help for WAVE, print `HELPDIR/wave/wave.hlp'.
 
 For a copy of the WAVE User's Guide (a tutorial introduction and reference
-manual for WAVE), use your web browser to open /usr/local/help/html/wug/wug.htm
+manual for WAVE), use your web browser to open HELPDIR/html/wug/wug.htm
 (or http://www.physionet.org/physiotools/wug/wug.htm), or print
-/usr/local/help/html/wug/wug.ps on a PostScript printer.
+HELPDIR/html/wug/wug.ps on a PostScript printer.
 
 Summary of changes from version 5.0
 -----------------------------------

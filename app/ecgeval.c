@@ -1,9 +1,9 @@
 /* file: ecgeval.c	G. Moody	22 March 1992
-			Last revised:	11 July 1995
+			Last revised:  9 February 2000
 
 -------------------------------------------------------------------------------
 ecgeval: Generate and run a script of commands to compare sets of annotations
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2000 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -177,21 +177,25 @@ main()
     (void)fprintf(stderr,
  "test annotation files by comparing them with reference annotation files\n");
     (void)fprintf(stderr,
- "in accordance with AAMI Recommended Practice ECAR-1987 and with ANSI/AAMI\n");
+ "in accordance with American National Standards ANSI/AAMI EC38:1998 and\n");
     (void)fprintf(stderr,
- "Standard EC38-1994 for ambulatory ECGs.  For some questions, a default\n");
+ "ANSI/AAMI EC57:1998 for ambulatory ECGs and for testing and reporting\n");
     (void)fprintf(stderr,
- "answer is provided in brackets;  press RETURN (ENTER) to accept the\n");
+ "performance results of cardiac rhythm and ST segment measurement\n");
     (void)fprintf(stderr,
- "default, or type the desired answer followed by RETURN.  After you have\n");
+"algorithms.  For some questions, a default answer is provided in brackets\n");
     (void)fprintf(stderr,
- "answered all of the questions, you are given a chance to change any of\n");
+ "press RETURN (ENTER) to accept the default, or type the desired answer\n");
     (void)fprintf(stderr,
- "your answers before beginning the actual evaluation.  At that time,\n");
+ "followed by RETURN.  After you have answered all of the questions, you\n");
     (void)fprintf(stderr,
- "you may exit from this program and examine the evaluation script which\n");
+ "are given a chance to change any of your answers before beginning the\n");
     (void)fprintf(stderr,
- "it has generated before running that script.\n\n");
+ "actual evaluation.  At that time, you may exit from this program and\n");
+    (void)fprintf(stderr,
+ "examine the evaluation script which it has generated before running that\n");
+    (void)fprintf(stderr,
+ "script.\n\n");
 
     (void)fprintf(stderr, "Press RETURN to begin: ");
     getans((char *)NULL, 5);

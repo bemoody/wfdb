@@ -11,7 +11,7 @@
 <B>Up:</B> <A HREF="../index.htm">Catalog of documents</A>
 <H1 ALIGN=CENTER>WFDB Applications Guide</H1>
 <P ALIGN=CENTER><STRONG>Tenth Edition<BR>
-11 January 2000<BR>
+11 March 2000<BR>
 <BR> 
 <BR> 
 <BR> 
@@ -105,7 +105,7 @@ into another language, under the above conditions for modified versions.
 <LI> <A HREF="snip-1.htm">snip</A>: copy an excerpt of a WFDB record
 <LI> <A HREF="sortan-1.htm">sortann</A>: rearrange annotations in canonical
 	order
-<LI> <A HREF="sqrs-1.htm">sqrs</A>: single-channel QRS detector
+<LI> <A HREF="sqrs-1.htm">sqrs, sqrs125</A>: single-channel QRS detector
 <LI> <A HREF="sumann-1.htm">sumann</A>: summarize the contents of a WFDB
 	annotation file
 <LI> <A HREF="sumsta-1.htm">sumstats</A>: derive aggregate statistics from
@@ -114,6 +114,7 @@ into another language, under the above conditions for modified versions.
 <LI> <A HREF="view-1.htm">view, vsetup</A>: WFDB browser for MS-DOS
 <LI> <A HREF="wave-1.htm">wave</A>: waveform analyzer, viewer, and editor for
 	the X Window System
+<LI> <A HREF="wfdbca-1.htm">wfdbcat</A>: copy WFDB files to standard output
 <LI> <A HREF="wfdbco-1.htm">wfdbcollate</A>: collate WFDB records into a
 	multi-segment record
 <LI> <A HREF="wfdbde-1.htm">wfdbdesc</A>: read signal specifications

@@ -1,4 +1,7 @@
-\documentstyle[twocolumn]{article}
+\documentclass[twoside]{article}
+\oddsidemargin 0.1in
+\evensidemargin -0.1in
+\def\textwidth{6.375 in}
 
 \title{Evaluating ECG Analyzers}
 \author{George B. Moody\\
@@ -6,15 +9,7 @@ Harvard-MIT Division of Health Sciences and Technology, Cambridge, MA, USA}
 \date{}
 
 \begin{document}
-\topmargin -0.5625in
-\oddsidemargin -0.25in
-\evensidemargin -0.25in
-\def\columnsep{0.3125 in}
-\def\textwidth{6.875 in}
-\def\textheight{224 mm}
-\flushbottom
-% \pagestyle{empty}	% uncomment to suppress page numbering
-\setcounter{page}{107}
+\setcounter{page}{109}
 
 \maketitle
 
@@ -23,14 +18,17 @@ This paper describes how to evaluate an automated ECG analyzer using
 available annotated ECG databases and software, in compliance with
 standard evaluation protocols.  These protocols have been adopted as
 parts of the {\em American National Standard for Ambulatory
-Electrocardiographs} (ANSI/AAMI EC-38, 1994);  they include earlier
+Electrocardiographs} (ANSI/AAMI EC38:1998, and its predecessor,
+ANSI/AAMI EC38:1994), and the {\em American National Standard for
+Testing and Reporting Performance Results of Cardiac Rhythm and ST
+Segment Measurement Algorithms} (ANSI/AAMI EC57:1998).  They include earlier
 evaluation protocols developed for an AAMI Recommended Practice,
 {\em Testing and Reporting Performance Results of Ventricular Arrhythmia
 Detection Algorithms} (AAMI ECAR, 1987).  It will be most useful
 to readers who plan to use the suite of evaluation software included
 in the WFDB Software Package available from MIT;  this suite of software
 includes the reference implementations of the evaluation protocols
-specified in EC-38.
+specified in EC38 and EC57.
 
 \section{Introduction}
 Continuous monitoring of the electrocardiogram in both inpatients and
@@ -110,10 +108,10 @@ certainty the effects of algorithm modifications on performance.
 
 At present, the following ECG databases are available:\footnote{Sources:
 ECRI, 5200 Butler Pike, Plymouth Meeting, PA 19462 USA (AHA DB); MIT-BIH
-Database Distribution, MIT Room 20A-113, 77 Massachusetts Avenue, Cambridge,
-MA 02139 USA (MIT, ESC, NST, and CU databases).  Outside of North America, the
-ESC DB is available from: CNR Institute of Clinical Physiology, Computer
-Laboratory, via Trieste, 41, 56100 Pisa, Italy.  Except for the AHA DB,
+Database Distribution, MIT Room E25-505A, 77 Massachusetts Avenue, Cambridge,
+MA 02139 USA (MIT, NST, and CU databases).  The ESC DB is available
+from: CNR Institute of Clinical Physiology, Computer Laboratory,
+via Trieste, 41, 56100 Pisa, Italy.  Except for the AHA DB,
 all are available in CD-ROM format.}
 \begin{itemize}
    \item {\bf AHA DB}: The American Heart Association Database for
@@ -158,28 +156,30 @@ designed to analyze higher-fidelity input signals.
 Between 1984 and 1987, the Association for the Advancement of Medical
 Instrumentation (AAMI) sponsored the development of a protocol for the
 use of the first two of these databases, which was published as an
-AAMI Recommended Practice.\footnote{{\it Testing and Reporting Performance
-Results of Ventricular Arrhythmia Detection
-Algorithms}. Publication AAMI ECAR (1987); available from AAMI, 3330
-Washington Boulevard, Suite 400, Arlington, VA 22201 USA.}  Between
-1990 and 1994, the ambulatory ECG subcommittee of the AAMI ECG committee
-developed a standard for ambulatory ECG monitors, significant
-portions of which address the issue of the accuracy of automated analysis
-performed by some of these devices.\footnote{{\it American National Standard
-for Ambulatory Electrocardiographs}.  Publication ANSI/AAMI EC-38 (1994);
-available from AAMI (address above).}  The ambulatory ECG standard (EC-38)
-builds on the evaluation protocol adopted for the earlier Recommended Practice
-(ECAR), incorporating provisions for the use of all five of the databases
-listed above, with extensions for assessing detection of
-supraventricular arrhythmias and transient ischemic ST changes.  The
-standard breaks new ground in establishing specific reporting requirements
-for the performance of automated ECG analyzers on standard tests using
-the databases listed above.
+AAMI Recommended Practice.\footnote{{\it Testing and Reporting
+Performance Results of Ventricular Arrhythmia Detection
+Algorithms}. Publication AAMI ECAR (1987); succeeded by ANSI/AAMI
+EC57:1998, available from AAMI, 3330 Washington Boulevard, Suite 400,
+Arlington, VA 22201 USA.}  Between 1990 and 1998, the ambulatory ECG
+subcommittee of the AAMI ECG committee developed and revised a
+standard for ambulatory ECG monitors, significant portions of which
+address the issue of the accuracy of automated analysis performed by
+some of these devices.\footnote{{\it American National Standard for
+Ambulatory Electrocardiographs}.  Publication ANSI/AAMI EC38:1998;
+available from AAMI (address above).}  The ambulatory ECG standard
+EC38:1998, and the ``testing and reporting performance results''
+standard EC57:1998, build on the evaluation protocol adopted for the
+earlier Recommended Practice (ECAR), incorporating provisions for the
+use of all five of the databases listed above, with extensions for
+assessing detection of supraventricular arrhythmias and transient
+ischemic ST changes.  The standard breaks new ground in establishing
+specific reporting requirements for the performance of automated ECG
+analyzers on standard tests using the databases listed above.
 
-A significant constraint imposed on evaluators by the EC-38 standard
+A significant constraint imposed on evaluators by the EC38 standard
 is that they must obtain annotation files containing the analysis
 results of the device under test.  Although the device itself need not
-produce these files, EC-38 specifically requires that they be produced
+produce these files, EC38 specifically requires that they be produced
 by an automated procedure, which must be fully disclosed.  The intent
 of this requirement is to permit reproducible independent evaluations
 in which neither the proprietary data of the developers (the analysis
@@ -201,7 +201,7 @@ incorporate the necessary ``hooks'' for producing annotation files.
 \subsection{Software to Support Evaluations}
 This paper describes a suite of programs that support evaluations
 of automated ECG analyzers in accordance with the methods described in
-the EC-38 standard (as well as those in the earlier ECAR Recommended
+the EC38 and EC57 standards (as well as those in the earlier ECAR Recommended
 Practice).  These methods are sufficiently complex that the
 development of such a suite of programs is not an afternoon's work.
 By making generally available reference implementations of the
@@ -319,7 +319,7 @@ fusion, supraventricular ectopic, and unclassifiable or paced beats
 respectively); devices need not be capable of producing all of these
 annotations, but any beat annotations that they do produce will be translated
 into one of these types.  The standard specifies the mapping used for the
-{\tt anntyp} values defined in {\tt <ecg/ecgcodes.h>}. (This file is
+{\tt anntyp} values defined in {\tt <wfdb/ecgcodes.h>}. (This file is
 supplied with all of the existing CD-ROM databases.)  Any beat annotations that
 appear in the first five minutes of a record (the ``learning period'') are
 ignored in the evaluation process.  The remainder of the record (the ``test
@@ -511,7 +511,7 @@ ecgeval
 The program asks for the test annotator name, the names of the databases
 used for testing, and what optional detector outputs should be evaluated.
 
-Only the statistics required by ECAR and EC38 are reported by {\tt
+Only the statistics required by EC38 and EC57 are reported by {\tt
 ecgeval}.  If more detailed evaluation data are needed, it will be
 necessary to run {\tt bxb}, {\tt rxr}, etc., separately.  If file
 space is extremely limited, it may be necessary to delete each test

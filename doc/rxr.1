@@ -1,34 +1,28 @@
-.TH RXR 1 "11 January 2000" "WFDB software 10.0" "WFDB applications"
+.TH RXR 1 "9 February 2000" "WFDB software 10.1" "WFDB applications"
 .SH NAME
 rxr \- ANSI/AAMI-standard run-by-run annotation comparator
 .SH SYNOPSIS
 \fBrxr -r \fIrecord\fB -a \fIreference-annotator test-annotator\fR [ \fIoptions ... \fR ]
 .SH DESCRIPTION
 .PP
-This program implements the run-by-run comparison algorithm
-described in \fITesting and Reporting Performance
-Results of Ventricular Arrhythmia Detection Algorithms\fR, an AAMI
-Recommended Practice (AAMI ECAR-1987).
-Using options \fB-C\fR, \fB-L\fR, or \fB-S\fR, \fIrxr\fR implements
-the run-by-run comparison algorithm specified by the current
-American National Standard for ambulatory ECG analyzers (ANSI/AAMI
-EC38:1998).  \fIrxr\fR is the reference implementation of these
-algorithms, and must be used to obtain the run-by-run performance
-statistics cited in EC38 in order to be in compliance with the
-standard (see EC38, section 5.2.14).  The EC38 comparison algorithm
-includes all of the ECAR statistics (so that both sets of requirements
-are satisfied by using the EC38 algorithm), with additional statistics
-on detection of runs of supraventricular ectopic beats (SVE runs).
+Using options \fB-C\fR, \fB-L\fR, or \fB-S\fR, \fIrxr\fR implements the
+run-by-run comparison algorithms described in AAMI/ANSI EC38:1998, the American
+National Standard for Ambulatory ECGs, and in AAMI EC57:1998, the American
+National Standard for Testing and Reporting Performance Results of Cardiac
+Rhythm and ST Segment Measurement Algorithms.  \fIrxr\fR is the reference
+implementation of these algorithms, and must be used to obtain the run-by-run
+performance statistics cited in EC38 and EC57 in order to be in compliance with
+the standards (see EC38, section 5.2.14, and EC57, section 4.2).
 .PP
 Input to this program consists of two annotation files associated with the same
 \fIrecord\fR.  One of these is designated the \fIreference\fR annotation file,
 the other the \fItest\fR annotation file (called the `algorithm' annotation
-file in EC38 and in ECAR).
+file in EC38 and in EC57).
 .PP
 \fIOptions\fR include:
 .TP
 \fB-c \fIfile\fR
-Append condensed reports (ECAR Table 10 format) to \fIfile\fR.
+Append condensed reports to \fIfile\fR.
 .TP
 \fB-C \fIfile\fR
 As for \fB-c\fR, but report SVE run statistics also.
@@ -41,13 +35,14 @@ beginning of the record).
 Print a usage summary.
 .TP
 \fB-l \fIfile\fR
-Append line-format reports (ECAR Table 13 format) to \fIfile\fR (see below).
+Append line-format reports (EC57 Table A.7 format) to \fIfile\fR (see below).
 .TP
 \fB-L \fIfile file2\fR
 As for \fB-l\fR, but report SVE run statistics in \fIfile2\fR.
 .TP
 \fB-s \fIfile\fR
-Append standard reports (ECAR Table 3 format) to \fIfile\fR.
+Append standard reports (EC38 section 5.2.14, EC57 Tables 7, 8 format) to
+\fIfile\fR.
 .TP
 \fB-S \fIfile\fR
 As for \fB-s\fR, but report SVE run statistics also.
@@ -95,11 +90,10 @@ bxb(1), ecgeval(1), epic(1), mxm(1), setwfdb(1), sumstats(1)
 .br
 \fIEvaluating ECG Analyzers\fR (in the \fIWFDB Applications Guide\fR)
 .br
-\fITesting and Reporting Performance Results of Ventricular Arrhythmia
-Detection Algorithms\fR (publication AAMI ECAR-1987)
+\fIAmbulatory Electrocardiographs\fR (ANSI/AAMI EC38:1998)
 .br
-\fIAmerican National Standard ANSI/AAMI EC38:1998, Ambulatory
-Electrocardiographs\fR
+\fITesting and Reporting Performance Results of Cardiac Rhythm and ST
+Segment Measurement Algorithms\fR (ANSI/AAMI EC57:1998)
 .br
 The last two publications are available from AAMI, 3330 Washington Blvd.,
 Suite 400, Arlington, VA 22201 USA (http://www.aami.org/).

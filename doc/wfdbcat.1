@@ -1,0 +1,19 @@
+.TH WFDBCAT 1 "11 March 2000" "WFDB software 10.1.2" "WFDB applications"
+.SH NAME
+wfdbcat \- copy WFDB files to standard output
+.SH SYNOPSIS
+\fBwfdbcat\fR \fIfile \fR [ \fIfile\fR ... ]
+.SH DESCRIPTION
+This program locates files anywhere in the WFDB path and copies them to the
+standard output.  If linked with a version of the WFDB library that has been
+compiled with NETFILES support, \fBwfdbcat\fR can be particularly useful for
+retrieving files from remote web (HTTP) and FTP servers.
+.PP
+The shell variable \fBWFDB\fR should be set and exported (see
+\fIsetwfdb\fR(1)).
+.SH SEE ALSO
+setwfdb(1)
+.SH AUTHOR
+George B. Moody (george@mit.edu)
+.SH SOURCE
+http://www.physionet.org/physiotools/wfdb/app/wfdbcat.c

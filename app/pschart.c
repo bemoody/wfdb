@@ -1,9 +1,9 @@
 /* file: pschart.c	G. Moody	 15 March 1988
-			Last revised:   19 November 1999
+			Last revised:   16 February 2000
 
 -------------------------------------------------------------------------------
 pschart: Produce annotated `chart recordings' on a PostScript device
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2000 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -140,6 +140,7 @@ char *copyright;		/* copyright notice string */
 char *defpagetitle;		/* default page title */
 char *rdpagetitle;		/* page title based on recording date */
 double dpi = DPI;		/* pixels per inch */
+int Cflag = 0;			/* if non-zero, produce color output */
 int eflag = 0;			/* if non-zero, do even/odd page handling */
 int Eflag = 0;			/* generate EPSF */
 int gflag = 0;			/* if non-zero, plot grid */
@@ -190,13 +191,21 @@ double t_sep = T_SEP;		/* distance from bottom of title to top of
 				   grid (mm) */
 double v_sep = V_SEP;		/* vertical space between strips (mm) */
 
+/* Color definitions. */
+struct pscolor {
+    float red, green, blue;
+};
+struct pscolor ac = { 0.5, 0.5, 1.0 };	/* annotations: light blue */
+struct pscolor gc = { 1.0, 0.0, 0.0 };	/* grid: red */
+struct pscolor lc = { 0.0, 0.0, 0.0 };	/* labels: black */
+struct pscolor sc = { 0.0, 0.0, 0.5 };	/* signals: dark blue */
 
 char *prog_name();
 int printstrip(), setpagedim(), setpagetitle();
 void append_scale(), cont(), ejectpage(), flush_cont(), grid(), help(),
     label(), larger(), move(), newpage(), plabel(), process(), rlabel(),
-    rtlabel(), setbar1(), setbar2(), setitalic(), setmargins(), setroman(),
-    smaller(), tlabel();
+    rtlabel(), setbar1(), setbar2(), setitalic(), setmargins(), setrgbcolor(),
+    setroman(), smaller(), tlabel();
 
 main(argc, argv)
 int argc;
@@ -205,6 +214,7 @@ char *argv[];
     char *p, *getenv();
     FILE *cfile = NULL;
     int i;
+    struct pscolor *colorp;
     struct tm *now;
 #ifdef __STDC__
     time_t t, time();
@@ -296,6 +306,36 @@ char *argv[];
 	    }
 	    else
 		copyright = "";
+	    break;
+	  case 'C':     /* set a color */
+	    switch (argv[i][2]) {
+	    case 'a':	colorp = &ac; break;
+	    case 'g':	colorp = &gc; break;
+	    case 'l':	colorp = &lc; break;
+	    case 's':	colorp = &sc; break;
+	    case '\0':  break;
+	    default:
+		(void)fprintf(stderr,
+			      "%s: unrecognized color specification '%s'\n",
+			      pname, argv[i]);
+		exit(1);
+	    }
+	    if (argv[i][2]) {
+	      if (i >= argc+3) {
+	         (void)fprintf(stderr, "%s: RGB triplet must follow '%s'\n",
+			       pname, argv[i]);
+		 exit(1);
+	      }
+	      if ((colorp->red = atof(argv[++i]))<0.0 || colorp->red   > 1.0 ||
+		  (colorp->green=atof(argv[++i]))<0.0 || colorp->green > 1.0 ||
+		  (colorp->blue =atof(argv[++i]))<0.0 || colorp->blue  > 1.0) {
+		  (void)fprintf(stderr,
+			   "%s: RGB values must be between 0 (black) and 1\n",
+				pname);
+		  exit(1);
+	      }
+	    }
+	    Cflag = 1;
 	    break;
 	  case 'd':	/* specify printer resolution in dpi */
 	    if (++i >= argc || ((dpi = atof(argv[i])) <= 0)) {
@@ -726,8 +766,11 @@ char *record, *title;
     s_right = s_left + s_width;
 
     /* Draw the grid and print the title, scales, and time markers. */
-    if (gflag)
+    if (gflag) {
+	setrgbcolor(&gc);
 	grid(mm(s_left), mm(s_bot), mm(s_right), mm(s_top), t_tick, v_tick);
+    }
+    setrgbcolor(&lc);
     setroman(8.);
     move(mm(s_left), mm(s_top + t_sep));
     if (rflag) { label("Record "); label(record); label("    "); }
@@ -859,6 +902,7 @@ char *record, *title;
 	int sig = siglist[i];
 	static WFDB_Calinfo ci;
 
+	setrgbcolor(&lc);
 	y0 = mm(s_top - (i + 0.5)*t_height);
 	if (s[sig].gain == 0.) {
 	    s[sig].gain = WFDB_DEFGAIN;
@@ -920,6 +964,7 @@ char *record, *title;
 	}
 	y0 -= adu(vbase[sig]);
 	vp = vbuf[sig];
+	setrgbcolor(&sc);
 	move(x0 + si(0), y0 + adu(*vp++));
 	for (j = 1; j < jmax; j++)
 	    cont(x0 + si(j), y0 + adu(*vp++));
@@ -959,6 +1004,7 @@ char *record, *title;
 	   least one second at the current time scale, go to the next line. */
 	if (s_left + tscale > lmargin + s_defwidth) {
 	    if (lflag) {
+		setrgbcolor(&lc);
 		setitalic(8.);
 		for (i = 0; i < nsig; i++) {
 		    char *d = s[siglist[i]].desc, *t;
@@ -986,6 +1032,7 @@ char *record, *title;
 	unsigned int ia;
 
 	if (iannsettime(t0) < 0 && nann == 1) return (1);
+	setrgbcolor(&ac);
 	for (ia = 0; ia < nann; ia++) {
 	    if (Mflag <= 2)
 		(void)printf("%d Ay\n", y = ya[ia]);
@@ -1269,6 +1316,7 @@ void newpage()
     if (lwmm > 0.)
 	(void)printf("/lwmm %f def\n", lwmm);
     (void)printf("%g newpage\n", dpi);
+    setrgbcolor(&lc);
     if (numberpages) {
 	pnx = p_width/2 + (rhpage() ? boff : -boff);
 	pny = title_y;
@@ -1290,6 +1338,7 @@ void ejectpage()
 {
     flush_cont();
     if (s_top != -9999.) {
+	setrgbcolor(&lc);
 	setroman(10.);
 	if (Rflag) {
 	    if (rhpage()) {
@@ -1348,6 +1397,31 @@ void ejectpage()
 	page++;
 	pages_written++;
     }
+}
+
+void setrgbcolor(color)
+struct pscolor *color;
+{
+  static struct pscolor currentcolor = { -1.0, -1.0, -1.0 };
+
+  if (Cflag == 0) {
+    color->red = 0;
+    color->green = 0;
+    color->blue = 0;
+  }
+  if (color->red == currentcolor.red &&
+    color->green == currentcolor.green &&
+    color->blue == currentcolor.blue)
+    return;
+  if (color->red < 0.0 || color->red > 1.0 ||
+    color->green < 0.0 || color->green > 1.0 ||
+    color->blue < 0.0 || color->blue > 1.0)
+    return;
+  if (Cflag == 0)
+    printf("0 setgray\n");
+  else
+    printf("%g %g %g setrgbcolor\n", color->red, color->green, color->blue);
+  currentcolor = *color;
 }
 
 static int bya, byd;
@@ -1580,6 +1654,11 @@ static char *help_strings[] = {
  " -A ANN    specify second annotator (default: none)",
  " -b N      set binding offset in mm (default: 0)",
  " -c STR    set copyright notice",
+ " -C        produce charts in color (default: black and white)",
+ " -CX RED GREEN BLUE  specify a color, where 'X' is 'a' (annotations),",
+ "   'g' (grid), 'l' (labels), or 's' (signals); and RED, GREEN, BLUE are",
+ "   between 0 and 1 inclusive (example: '-Cs 0 .5 1' causes the signals to",
+ "   be drawn in blue-green on a color-capable device)",
  " -d N      specify printer resolution in dpi (default: 300)",	/* ** DPI ** */
  " -e        even/odd processing for two-sided printing",
  " -E        generate EPSF",
@@ -1655,7 +1734,7 @@ static char *dprolog[] = {
 "/I {/Times-Italic findfont exch scalefont setfont}def",
 "/R {/Times-Roman findfont exch scalefont setfont}def",
 
-"/grid { newpath 0 setgray 0 setlinecap",
+"/grid { newpath 0 setlinecap",
 " /dy1 exch dpi 25.4 div mul lw sub def /dy2 dy1 lw add 5 mul def",
 " /dx1 exch dpi 25.4 div mul lw sub def /dx2 dx1 lw add 5 mul def",
 " /y1 exch def /x1 exch def /y0 exch def /x0 exch def",
@@ -1679,7 +1758,7 @@ static char *dprolog[] = {
 " /Symbol findfont 6 scalefont setfont (\323) show",
 " 6 R show } def",
 
-"/newpage {/dpi exch def tm setmatrix newpath [] 0 setdash 0 setgray",
+"/newpage {/dpi exch def tm setmatrix newpath [] 0 setdash",
 " 1 setlinecap /lw lwmm mm def mark } def",
 
 "/ss {72 dpi div dup scale /gm matrix currentmatrix def lw setlinewidth} def",

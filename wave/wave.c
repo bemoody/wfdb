@@ -1,10 +1,10 @@
 /* file: wave.c		G. Moody	 27 April 1990
-			Last revised:	10 October 1999
+			Last revised:	  5 March 2000
 main() function for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2000 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -51,7 +51,8 @@ char *argv[];
 
     /* Initialize non-zero global variables. */
     begin_analysis_time = end_analysis_time = -1L;
-    tsa_index = vsa_index = ann_mode = sig_mode = time_mode = grid_mode = -1;
+    tsa_index = vsa_index = ann_mode = overlap = sig_mode = time_mode =
+	grid_mode = -1;
     tscale = 1.0;
 
     if ((helpdir = getenv("HELPDIR")) == NULL) helpdir = HELPDIR;

@@ -1,5 +1,5 @@
 \" file: appguide.int		G. Moody	July 1989
-\"				Last revised: 6 January 2000
+\"				Last revised: 11 March 2000
 \" Table of contents and introduction to the WFDB Applications Guide.
 \"
 \" To print this document using GNU groff, use:
@@ -66,29 +66,30 @@ sumstats	derive aggregate statistics from bxb, rxr, etc., line-format output	61
 tach	heart rate tachometer	62
 view, vsetup	WFDB browser for MS-DOS	64
 wave	waveform analyzer, viewer, and editor for the X Window System	67
-wfdbcollate	collate WFDB records into a multi-segment record	77
-wfdbdesc	read signal specifications	79
-wfdbwhich	find a WFDB file and print its pathname	80
-wrann	write a WFDB annotation file	81
-wrsamp	write WFDB signal files	82
-wview	WFDB browser for MS Windows	84
-xform	sampling frequency, amplitude, and format conversion for WFDB records	88
+wfdbcat	copy WFDB records to standard output	77
+wfdbcollate	collate WFDB records into a multi-segment record	78
+wfdbdesc	read signal specifications	80
+wfdbwhich	find a WFDB file and print its pathname	81
+wrann	write a WFDB annotation file	82
+wrsamp	write WFDB signal files	83
+wview	WFDB browser for MS Windows	85
+xform	sampling frequency, amplitude, and format conversion for WFDB records	89
 
 
 \fBSection 3: WFDB library\fP
-wfdb	Waveform Database library	90
+wfdb	Waveform Database library	91
 
 
 \fBSection 5: WFDB file formats\fP
-annot	WFDB annotation file formats	93
-header	WFDB header file format	94
-signal	WFDB signal file formats	101
-wfdbcal	WFDB calibration file format	103
+annot	WFDB annotation file formats	94
+header	WFDB header file format	95
+signal	WFDB signal file formats	102
+wfdbcal	WFDB calibration file format	104
 
 
 \fBAppendices\fP
-	\fIInstalling the WFDB Software Package\fP	105
-	\fIEvaluating ECG Analyzers\fP	107
+	\fIInstalling the WFDB Software Package\fP	106
+	\fIEvaluating ECG Analyzers\fP	109
 .TE
 
 .LP

@@ -1,5 +1,5 @@
 # file: Makefile	G. Moody	 9 August 1992
-#			Last revised:	14 January 2000
+#			Last revised:	4 February 2000
 # `make' description file for printing the WAVE User's Guide
 
 # Copyright(C) Massachusetts Institute of Technology 2000. All rights reserved.
@@ -96,6 +96,7 @@ wugcover.psz:
 HTMLDIR = ../../../html
 
 html:	wug.ps 	# (we also need wug.aux, made with wug.dvi by 'make wug.ps')
+	-mkdir $(HTMLDIR)
 	-mkdir $(HTMLDIR)/wug
 	cp -f wug.ps $(HTMLDIR)/wug/wug.ps
 	cp -f icons/*.png *.png stdev.c example.xws $(HTMLDIR)/wug
