@@ -1,4 +1,4 @@
-.TH WFDB 3 "1 August 2002" "WFDB software 10.2.7" "WFDB Applications Guide"
+.TH WFDB 3 "7 April 2003" "WFDB software 10.3.6" "WFDB Applications Guide"
 .SH NAME
 wfdb \- Waveform Database library
 .SH SYNOPSIS
@@ -77,6 +77,8 @@ int putinfo(char *\fIinfo\fP)
 int putvec(WFDB_Sample *\fIvector\fP)
 .br
 WFDB_Frequency sampfreq(char *\fIrecord\fP)
+.br
+WFDB_Sample sample(WFDB_Signal \fIs\fP, WFDB_Time \fIt\fP)
 .br
 int setanndesc(int \fIannotation_code\fP, char *\fIannotation_description\fP)
 .br
@@ -187,8 +189,8 @@ using emacs \fIinfo\fR;  from within \fIemacs\fR, type control-H followed by
 \fI/usr/help/html/wpg\fP);  the most recent version can be viewed on-line at
 \fBhttp://www.physionet.org/physiotools/wpg/\fP.
 .PP
-The WFDB library can also be used with Fortran programs;  see the \fIGuide\fR
-for details.
+The WFDB library can also be used with Fortran programs;  see \fIwfdbf\fR(3)
+and the \fIGuide\fR for details.
 .SH DIAGNOSTICS
 All functions that return an \fBint\fR indicate errors with negative
 values.  Depending on context, zero returns may indicate success or

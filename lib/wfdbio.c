@@ -1,10 +1,10 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-			Last revised:	  12 July 2002		wfdblib 10.2.7
+			Last revised:	  1 April 2003		wfdblib 10.3.6
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 2002 George B. Moody
+Copyright (C) 2003 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -1089,23 +1089,54 @@ static HTChunk *www_get_url_range_chunk(const char *url, long startb, long len)
 	    }
 	}
 	if (chunk && (HTChunk_size(chunk) > len)) {
-	    /* While we may have received something, we did not receive the
-	       requested range (more precisely, a range of the same size as the
-	       one we requested).  Assume that we got the entire file instead.
-	       This seems to happen both if the file was in the cache or if
-	       the server does not support the range request.  Since the caller
-	       expects only a chunk of len bytes (not necessarily at the
-	       beginning of the file), we need to create a new chunk and return
-	       it to the caller.  HTChunk_new makes a new chunk, which grows as
-	       needed in multiples of its argument (in bytes). */
-	    extra_chunk = HTChunk_new(64);
-	    /* Copy the desired range out of the chunk we received into the new
-	       chunk. */
-	    HTChunk_putb(extra_chunk, &HTChunk_data(chunk)[startb], len);
-	    /* Discard the chunk we received. */
-	    HTChunk_delete(chunk);
-	    /* Arrange for the new chunk to be returned. */
-	    chunk = extra_chunk;
+	    /* We received a larger chunk than requested. */
+	    if (HTChunk_size(chunk) >= startb + len) {
+		/* If the chunk is large enough to include the requested range
+		   and everything before it, assume that that's what we have
+		   (it may be the entire file).  This might happen if the
+		   file was in the cache or if the server does not support the
+		   range request.  Since the caller expects only a chunk of
+		   len bytes beginning with the data of interest, we need to
+		   create a new chunk of the proper length, fill it, and
+		   return it to the caller.  HTChunk_new makes a new chunk,
+		   which grows as needed in multiples of its argument (in
+		   bytes). */
+		extra_chunk = HTChunk_new(len);
+		/* Copy the desired range out of the chunk we received into the
+		   new chunk. */
+		HTChunk_putb(extra_chunk, &HTChunk_data(chunk)[startb], len);
+		/* Discard the chunk we received. */
+		HTChunk_delete(chunk);
+		/* Arrange for the new chunk to be returned. */
+		chunk = extra_chunk;
+	    }
+	    else {
+		/* We received some chunk of the file (not the whole file, but
+		   not what we requested, either).  Since we don't know what
+		   we have, let's try again, but only once. */
+		static int retry = 1;
+
+		if (retry) {
+		    retry = 0;
+		    HTRequest_delete(request);
+		    fflush(stderr);
+		    chunk = www_get_url_range_chunk(url, startb, len);
+		    retry = 1;
+		    return (chunk);
+		}
+		else {
+		    /* We did no better the second time, so let's return an
+		       error to the caller. */
+		    wfdb_error(
+		   "www_get_url_range_chunk: fatal error requesting %s (%s)\n",
+		   url, range_req_str);
+		    if (chunk) {
+			HTChunk_delete(chunk);
+			chunk = NULL;
+		    }
+		    retry = 1;
+		}
+	    }
 	}
 	HTRequest_delete(request);
     }

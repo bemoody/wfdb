@@ -3,6 +3,7 @@ s+ecgeval-1.htm+ecgeva-1.htm+g
 s+ecgpuwave-1.htm+ecgpuw-1.htm+g
 s+edf2mit-1.htm+edf2mi-1.htm+g
 s+gtkwave-1.htm+gtkwav-1.htm+g
+s+imageplt-1.htm+imagep-1.htm+g
 s+pschart-1.htm+pschar-1.htm+g
 s+plotstm-1.htm+plotst-1.htm+g
 s+sampfreq-1.htm+sampfr-1.htm+g
@@ -12,9 +13,11 @@ s+wfdb-config-1.htm+wfdb-c-1.htm+g
 s+wfdbcal-5.htm+wfdbca-5.htm+g
 s+wfdbcollate-1.htm+wfdbco-1.htm+g
 s+wfdbwhich-1.htm+wfdbwh-1.htm+g
+s+<A HREF="    bc-1.htm">bc</B>(1)</A>+bc</B>(1)+g
 s+<A HREF="    cc-1.htm">cc</B>(1)</A>+cc</B>(1)+g
 s+<A HREF="     F-n.htm">F(n)</A>+F(n)+g
 s+<A HREF="     F-n.htm">F(n)</B></A>+F(n)</B>+g
+s+<A HREF="     F-n.htm">F(n)</I></A>+F(n)</I>+g
 s+<A HREF=" fseek-3.htm">fseek</B>(3)</A>+fseek</B>(3)+g
 s+<A HREF="   gcc-1.htm">gcc</B>(1)</A>+gcc</B>(1)+g
 s+<A HREF="gnuplot-1.htm">gnuplot</B>(1)</A>+gnuplot</B>(1)+g
@@ -26,6 +29,7 @@ s+<A HREF="     N-2.htm">N (2)</A>+N (2)+g
 s+<A HREF="     N-3.htm">N (3)</A>+N (3)+g
 s+<A HREF="     N-4.htm">N (4)</A>+N (4)+g
 s+<A HREF="     N-8.htm">N (8)</A>+N (8)+g
+s+<A HREF="osigfopen-nsig.htm">osigfopen(nsig)</A>+osigfopen(nsig)+g
 s+<A HREF="openwin-1.htm">openwin</B>(1)</A>+openwin</B>(1)+g
 s+<A HREF="  plot-1.htm">plot</B>(1)</A>+plot</B>(1)+g
 s+<A HREF="  plot-3.htm">plot</B>(3)</A>+plot</B>(3)+g

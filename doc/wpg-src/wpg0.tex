@@ -488,13 +488,30 @@ guide in June, 1999.  See @file{NEWS}, in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
+@unnumberedsubsec Changes in version 10.3.6
+
+The fix applied in @code{isigclose()} in 10.3.5 was incomplete but is now
+(really!) fixed.  Applications that use @code{sample()} should call 
+@code{wfdbquit()} to be certain that @code{sample}'s buffer is freed before
+exiting.
+
+Some long-standing problems in the code (in @file{lib/wfdbio.c}) that handles
+http range requests for NETFILES-enabled versions of the library have
+been partially addressed.  The underlying issue is that http servers
+do not always return the range of bytes requested;  when this happens,
+it is not difficult to determine that there is a problem, but it is
+tricky to figure out what to do about it.  Based on experiments with
+several different http servers, the strategy for handling such problems
+within the WFDB NETFILES code has been improved substantially, but
+there may be further room for improvement.
+
 @unnumberedsubsec Changes in version 10.3.5
 
-Fixed a bug in WFDB library function isigclose() (in lib/signal.c)
-that had caused sample()'s buffer to be freed inappropriately when
-switching segments in a multi-segment record.  Thanks to Dave
-Schaffer for the bug report and for a test case that illustrated
-the bug.
+Fixed a bug in WFDB library function @code{isigclose()} (in
+@file{lib/signal.c}) that had caused @code{sample()}'s buffer to be freed
+inappropriately when switching segments in a multi-segment record.
+Thanks to Dave Schaffer for the bug report and for a test case that
+illustrated the bug.
 
 (WFDB library versions 10.3.3 and 10.3.4 were identical to 10.3.2.)
 
@@ -509,7 +526,7 @@ the bug.
 
 @unnumberedsubsec Changes in version 10.3.0
 
-Fixed bugs in @file{lib/sample.c} that caused improper accounting of signal
+Fixed bugs in @file{lib/signal.c} that caused improper accounting of signal
 group numbers when reading from two or more records at the same time (as in
 @file{nst}), a bug that caused a segfault in @file{nst}, and a bug that
 referenced uninitialized memory in @code{newheader} if @code{nsig} = 0.
@@ -2571,6 +2588,10 @@ number zero of the specified signal.  If @var{t} specifies a sample
 number beyond the end of the record, the returned value is that of the
 last valid sample of the specified signal.  For an example of the use
 of @code{sample} and @code{sample_valid}, @pxref{Example 7}.
+
+Be sure to call @code{wfdbquit} before exiting from any program that
+uses @code{sample}, to be certain that dynamically allocated memory
+used by @code{sample} is freed.
 
 @page
 @node     conversion, calibration, non-sequential, Functions

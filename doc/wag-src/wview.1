@@ -231,7 +231,7 @@ The database path: a list of directories that contain database files.  An
 empty component is taken to refer to the current directory.  All applications
 built with the \fIwfdb\fR(3) library search for their database input files in
 the order specified by \fBWFDB\fR.  If \fBWFDB\fR is not set, searches are
-limited to the builtin WFDB path (see \fBsetwfdb\fR(3)).  Under
+limited to the builtin WFDB path (see \fBsetwfdb\fR(1)).  Under
 MS-DOS/MS-Windows, directory names are separated by semicolons (;), and the
 format of \fBWFDB\fR is that of the MS-DOS \fBPATH\fR variable (colons may be
 used following drive specifiers within \fBWFDB\fR in this case).
@@ -241,7 +241,7 @@ The name of the WFDB calibration file (see \fBwfdbcal\fR(5)), which must be in
 a directory named by \fBWFDB\fR (see immediately above).  This file is used by
 \fBwview\fR to determine standard scales for signals other than ECGs.  If
 \fBWFDBCAL\fR is not set, the default WFDB calibration file is used (see
-\fBsetwfdb\fR(3)).  If the calibration file is not readable, signals may be
+\fBsetwfdb\fR(1)).  If the calibration file is not readable, signals may be
 drawn at incorrect scales.
 .PP
 After determining appropriate values for these variables, you may wish to add

@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   31 March 2003		wfdblib 10.3.5
+			Last revised:    7 April 2003		wfdblib 10.3.6
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -95,6 +95,7 @@ have been included in all published versions of the WFDB library.)
 
 These functions, also defined here, are intended only for the use of WFDB
 library functions defined elsewhere:
+ wfdb_sampquit  (frees memory allocated by sample())
  wfdb_sigclose 	(closes signals and resets variables)
  wfdb_osflush	(flushes output signals)
 
@@ -881,7 +882,7 @@ static void isigclose()
     struct igdata *ig;
 
     if (nisig == 0) return;
-    if (sbuf && (!in_msrec || segp >= segend)) {
+    if (sbuf && !in_msrec) {
 	(void)free(sbuf);
 	sbuf = NULL;
 	sample_vflag = 0;
@@ -2891,6 +2892,15 @@ FINT sample_valid()
 }
 
 /* Private functions (for use by other WFDB library functions only). */
+
+void wfdb_sampquit()
+{
+    if (sbuf) {
+	(void)free(sbuf);
+	sbuf = NULL;
+	sample_vflag = 0;
+    }
+}
 
 void wfdb_sigclose()
 {

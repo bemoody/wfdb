@@ -1,3 +1,17 @@
+10.3.6:
+	The fix applied in isigclose() in 10.3.5 was incomplete but is now
+	(really!) fixed.  Applications that use sample() should call wfdbquit()
+	to be certain that sample's buffer is freed before exiting.
+
+	Some long-standing problems in the code (in lib/wfdbio.c) that handles
+	http range requests for NETFILES-enabled versions of the library have
+	been partially addressed.  The underlying issue is that http servers
+	do not always return the range of bytes requested;  when this happens,
+	it is not difficult to determine that there is a problem, but it is
+	tricky to figure out what to do about it.  Based on experiments with
+	several different http servers, the strategy for handling such problems
+	within the WFDB NETFILES code has been improved substantially, but
+	there may be further room for improvement.
 10.3.5:
 	Fixed a bug in WFDB library function isigclose() (in lib/signal.c)
 	that had caused sample()'s buffer to be freed inappropriately when

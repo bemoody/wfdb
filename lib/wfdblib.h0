@@ -1,5 +1,5 @@
 /* file: wfdblib.h	G. Moody	13 April 1989
-                        Last revised:  14 November 2002       wfdblib 10.3.0
+                        Last revised:    7 April 2003       wfdblib 10.3.6
 External definitions for WFDB library private functions
 
 _______________________________________________________________________________
@@ -298,6 +298,7 @@ extern void wfdb_wwwquit(void);
 #endif
 
 /* These functions are defined in signal.c */
+extern void wfdb_sampquit(void);
 extern void wfdb_sigclose(void);
 extern void wfdb_osflush(void);
 
@@ -315,8 +316,8 @@ extern WFDB_FILE *wfdb_open(), *wfdb_fopen();
 extern int wfdb_checkname(), wfdb_g16(), wfdb_parse_path();
 extern long wfdb_g32();
 extern void wfdb_p16(), wfdb_p32(), wfdb_addtopath(), wfdb_error(),
-    wfdb_setirec(), wfdb_sigclose(), wfdb_anclose(), wfdb_osflush(),
-    wfdb_oaflush();
+    wfdb_setirec(), wfdb_sampquit(), wfdb_sigclose(), wfdb_anclose(),
+    wfdb_osflush(), wfdb_oaflush();
 
 # if WFDB_NETFILES
 extern char *wfdb_fgets();

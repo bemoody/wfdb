@@ -1,9 +1,9 @@
 /* file: wfdbinit.c	G. Moody	 23 May 1983
-			Last revised:    23 May 2000		wfdblib 10.1.4
+			Last revised:    7 April 2003		wfdblib 10.3.6
 WFDB library functions wfdbinit, wfdbquit, and wfdbflush
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 2000 George B. Moody
+Copyright (C) 2003 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -49,6 +49,7 @@ FVOID wfdbquit()
 {
     wfdb_anclose();	/* close annotation files, reset variables */
     wfdb_sigclose();	/* close signals, reset variables */
+    wfdb_sampquit();	/* release sample data buffer */
 #if WFDB_NETFILES
     wfdb_wwwquit();	/* release any resources allocated by libwww */
 #endif
