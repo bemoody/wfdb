@@ -1,9 +1,9 @@
 /* file: edf2mit.c		G. Moody       16 October 1996
-				Last revised:  4 December 2002
+				Last revised:  13 February 2003
 
 -------------------------------------------------------------------------------
 Convert EDF (European Data Format) file to MIT format header and signal files
-Copyright (C) 2002 George B. Moody
+Copyright (C) 2003 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -35,10 +35,10 @@ int argc;
 char **argv;
 {
     char buf[81], record[WFDB_MAXRNL+1], **vi, **vin;
-    double *sigpmax, *sigpmin, *sampfreq, spr, sps;
+    double *sigpmax, *sigpmin, *sampfreq, spr, sps, gcd();
     FILE *ifile = NULL;
     int big_endian = 0, fpb, h, i, j, k, l, nsig, nosig = 0, *siglist = NULL,
-	*spb, tspb = 0, tspf = 0, vflag = 0,
+	*spb, tspb = 0, ispf = 0, tspf = 0, vflag = 0,
 	day, month, year, hour, minute, second;
     long adcrange, *sigdmax, *sigdmin;
     WFDB_Sample *vo, *vout;
@@ -118,7 +118,16 @@ char **argv;
 	help();
 	exit(1);
     }
+
     fread(buf, 1, 8, ifile);
+    /* Check to see that the input is an EDF file.  (This check will detect
+       up most but not all other types of files.) */
+    if (strncmp(buf, "0       ", 8)) {
+	(void)fprintf(stderr,
+           "%s: input does not appear to be EDF -- no conversion attempted.\n",
+		      pname);
+	exit(2);
+    }
     buf[8] = ' ';
     for (j = 8; j >= 0 && buf[j] == ' '; j--)
 	buf[j] = '\0';
@@ -207,6 +216,16 @@ char **argv;
 	for ( ; nosig < nsig; nosig++)
 	    siglist[nosig] = nosig;
     }
+    else {
+	for (i = 0; i < nosig; i++) {
+	    if (siglist[i] < 0 || siglist[i] >= nsig) {
+		fprintf(stderr,
+			"%s: invalid signal number, %d, in signal list\n",
+			pname, siglist[i]);
+		exit(1);
+	    }
+	}
+    }
 
     if ((so = malloc(nosig * sizeof(WFDB_Siginfo))) == NULL) {
 	fprintf(stderr, "%s: insufficient memory\n", pname);
@@ -231,7 +250,7 @@ char **argv;
 	if (vflag && j > 0)
 	    printf("Signal %d transducer type: '%s'\n", i, buf);
     }
-    
+
     for (i = 0; i < nsig; i++) {
 	fread(buf, 1, 8, ifile);
 	buf[8] = ' ';
@@ -324,16 +343,12 @@ char **argv;
 	    printf("Signal %d free space: '%s'\n", i, buf);
     }
 
-    /* Determine the base sampling frequency (the lowest sampling frequency for
-       any signal in the signal list) */
-    sps = 0;
-    for (i = 0; i < nosig; i++)
-	if (sampfreq[siglist[i]] > sps) sps = sampfreq[siglist[i]];
-    for (i = 0; i < nosig; i++)
-	if (sampfreq[siglist[i]] <= sps) {
-	    sps = sampfreq[siglist[i]];
-	    fpb = spb[siglist[i]];
-	}
+    /* Determine the base sampling frequency (the greatest common divisor of
+       all sampling frequencies for the signals in the signal list) */
+    sps = sampfreq[siglist[0]];
+    for (i = 1; i < nosig; i++)
+    if (sampfreq[siglist[i]] != sps)
+	sps = gcd(sps, sampfreq[siglist[i]]);
     setsampfreq(sps);
 
     sprintf(buf, "%02d:%02d:%02d %02d/%02d/%04d",
@@ -348,6 +363,10 @@ char **argv;
 	so[i] = si[siglist[i]];
     }
 
+    for (i = ispf = 0; i < nsig; i++)
+	ispf += (int)(sampfreq[i]/sps + 0.5);
+    fpb = spb[siglist[0]] / si[siglist[0]].spf;
+
     if (vflag)
 	printf("\nOUTPUT:\nBase sampling frequency: %g Hz\n", sps);
 
@@ -361,30 +380,29 @@ char **argv;
     }
 
     vin = (char **)malloc(nsig * sizeof(char *));
-    vi = (char **)malloc(nsig * sizeof(char *));
+    vi = (char **)malloc(nosig * sizeof(char *));
     for (i = 0; i < nsig; i++) {
 	vin[i] = (char *)malloc(spb[i] * 2);
     }
     vout = (WFDB_Sample *)malloc(tspf * sizeof(WFDB_Sample));
-
     osigfopen(so, nosig);
     while (1) {
 	for (i = 0; i < nsig; i++)
 	    j = fread(vin[i], 2, spb[i], ifile);
 	if (j == 0) break;
 	for (j = 0; j < nosig; j++)
-	    vi[siglist[j]] = vin[siglist[j]];
+	    vi[j] = vin[siglist[j]];
 	for (i = 0; i < fpb; i++) {
 	    vo = vout;
 	    for (j = 0; j < nosig; j++)
 		for (k = 0; k < so[j].spf; k++) {
 		    if (big_endian) {
-			h = *vi[siglist[j]]++;	/* high byte first */
-			l = *vi[siglist[j]]++;	/* then low byte */
+			h = *vi[j]++;	/* high byte first */
+			l = *vi[j]++;	/* then low byte */
 		    }
 		    else {
-			l = *vi[siglist[j]]++;	/* low byte first */
-			h = *vi[siglist[j]]++;	/* then high byte */
+			l = *vi[j]++;	/* low byte first */
+			h = *vi[j]++;	/* then high byte */
 		    }
 		    /* If a short int is not 16 bits, it may be necessary to
 		       modify the next line for proper sign extension. */
@@ -397,6 +415,26 @@ char **argv;
 
     newheader(record);
     wfdbquit();
+    exit(0);
+}
+
+/* Calculate the greatest common divisor of x and y.  This function uses
+   Euclid's algorithm, modified so that an exact answer is not required if the
+   (possibly non-integral) arguments do not have a common divisor that can be
+   represented exactly. */
+double gcd(x, y)
+double x, y;
+{
+    double tol;
+
+    if (x > y) tol = 0.001*y;
+    else tol = 0.001*x;
+
+    while (1) {
+	if (x > y && x-y > tol) x -= y;
+	else if (y > x && y-x > tol) y -= x;
+	else return (x);
+    }
 }
 
 static char *help_strings[] = {

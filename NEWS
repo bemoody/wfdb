@@ -7,6 +7,9 @@
 	a sample in the master signal window (using <control>+<middle mouse
 	button>).
 
+	WAVE now handles invalid entries in the signal list properly;  thanks
+	to Joe Mietus for the bug report.
+
 	Changed options in ann2rr to support more flexible output formatting.
 
 	Fixed a WFDB library bug that caused annotation sorting to fail
@@ -18,14 +21,17 @@
 	if no arguments were supplied on the command line;  thanks to Jesus
 	Olivan for the bug report.
 
+	Better input checking in edf2mit;  fixed bugs in handling of unusual
+	signal lists.
+
 	Fixed a bug in snip that caused a crash if -a was the last option
 	on the command line;  thanks to Joe Mietus for the bug report.
 
 	Corrected a documentation bug in WAVE's on-line help.
 
 	Revised rpm.spec and rules (in Makefile.tpl) for creating RPMs.
-	This is an interim solution;  in a future release there will be
-	separate wfdb-lib, wfdb-app, wfdb-doc, ... RPMs.
+	There are now separate wfdb, wfdb-devel, wfdb-app, wfdb-doc, and
+	wfdb-wave RPMs.
 
 10.3.1:
 	Added a -W option to ann2rr to create 2-column output containing

@@ -975,7 +975,7 @@ int gcd(x, y)	/* greatest common divisor of x and y (Euclid's algorithm) */
 int x, y;
 {
     while (x != y) {
-	if (x > y) x-=y;
+	if (x > y) x -= y;
 	else y -= x;
     }
     return (x);

@@ -149,6 +149,7 @@ make clean
 %{_bindir}/memse
 %{_bindir}/mfilt
 %{_bindir}/mit2edf
+%{_bindir}/mit2wav
 %{_bindir}/mrgann
 %{_bindir}/mxm
 %{_bindir}/nst
@@ -178,6 +179,7 @@ make clean
 %{_bindir}/tach
 %{_bindir}/url_view
 %{_bindir}/wabp
+%{_bindir}/wav2mit
 %{_bindir}/wfdbcat
 %{_bindir}/wfdbcollate
 %{_bindir}/wfdbdesc

@@ -1,10 +1,10 @@
 /* file: sig.c		G. Moody	27 April 1990
-			Last revised:  13 October 2001
+			Last revised:  13 February 2003
 Signal display functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2003 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -64,7 +64,7 @@ struct display_list *lp;
 	}
     else
 	for (i = 0; i < siglistlen; i++) {
-	    if (lp->vlist[siglist[i]]) {
+	    if (0 <= siglist[i] && siglist[i] < nsig && lp->vlist[siglist[i]]){
 		lp->vlist[siglist[i]][0].y += base[i];
 		XDrawLines(display, xid, draw_sig, lp->vlist[siglist[i]],
 			   lp->ndpts, CoordModePrevious);
@@ -445,8 +445,9 @@ static void show_signal_names()
 			signame[i], strlen(signame[i]));
     else
 	for (i = 0; i < siglistlen; i++)
-	    XDrawString(display, xid, draw_sig, xoff, base[i] - yoff,
-			signame[siglist[i]], strlen(signame[siglist[i]]));
+	    if (0 <= siglist[i] && siglist[i] < nsig)
+		XDrawString(display, xid, draw_sig, xoff, base[i] - yoff,
+			    signame[siglist[i]], strlen(signame[siglist[i]]));
 }
 
 static void show_signal_baselines(lp)
