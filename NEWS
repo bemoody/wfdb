@@ -1,3 +1,9 @@
+10.3.4:
+	xform now handles input and output sampling frequencies that are not
+	exact multiples of 1 Hz.
+
+	Added SRCDIR definition in configure and conf/cygwin.def.
+
 10.3.3:
 	Fixed man page installation bug;  thanks to Joe Mietus for the bug
 	report.

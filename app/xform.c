@@ -1,9 +1,9 @@
 /* file: xform.c	G. Moody        8 December 1983
-			Last revised:  14 November 2002
+			Last revised:    26 March 2003
 
 -------------------------------------------------------------------------------
 xform: Sampling frequency, amplitude, and format conversion for WFDB records
-Copyright (C) 2002 George B. Moody
+Copyright (C) 2003 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -29,7 +29,7 @@ _______________________________________________________________________________
 #include <wfdb/wfdb.h>
 
 char *pname, *prog_name();
-int gcd();
+double gcd();
 void help();
 
 main(argc, argv)
@@ -38,10 +38,10 @@ char *argv[];
 {
     char btstring[30], **description, **filename, *irec = NULL, *orec = NULL,
 	*nrec = NULL, *script = NULL, *startp = "0:0", **units;
-    double *gain;
+    double *gain, ifreq, ofreq = 0.0;
     int clip = 0, *deltav, fflag = 0, gflag = 0, Hflag = 0, i, iframelen,
-	ifreq, j, m, Mflag = 0, mn, *msiglist, n, nann = 0, nisig,
-	nminutes = 0, nosig = 0, oframelen, ofreq = 0, reopen = 0, sflag = 0,
+	j, m, Mflag = 0, mn, *msiglist, n, nann = 0, nisig,
+	nminutes = 0, nosig = 0, oframelen, reopen = 0, sflag = 0,
 	*siglist = NULL, spf, uflag = 0, use_irec_desc = 1, *v, *vin, *vmax,
 	*vmin, *vout, *vv;
     long from = 0L, it = 0L, nsamp = -1L, nsm = 0L, ot = 0L, spm, to = 0L;
@@ -262,7 +262,7 @@ char *argv[];
     if (Hflag)
 	setgvmode(WFDB_HIGHRES);
     spf = getspf();
-    ifreq = strtim("1") * spf;
+    ifreq = sampfreq(NULL) * spf;
     (void)setsampfreq(0.);
 
     if (isigopen(irec, dfin, nisig) != nisig) exit(2);
@@ -344,16 +344,16 @@ char *argv[];
 	if (Mflag) {
 	    ofreq = ifreq;
 	    (void)fprintf(stderr,
-		  "Sampling frequency (%d frames/sec) will be unchanged\n",
+		  "Sampling frequency (%g frames/sec) will be unchanged\n",
 			  ofreq);
 	}
 	else do {
 	    ofreq = ifreq;
 	    (void)fprintf(stderr,
-		  "Output sampling frequency (Hz per signal, > 0) [%d]: ",
+		  "Output sampling frequency (Hz per signal, > 0) [%g]: ",
 			  ofreq);
 	    (void)fgets(answer, sizeof(answer), ttyin);
-	    (void)sscanf(answer, "%d", &ofreq);
+	    (void)sscanf(answer, "%g", &ofreq);
 	} while (ofreq < 0);
 	if (ofreq == 0) ofreq = WFDB_DEFFREQ;
 	if (nosig > 0) {
@@ -540,7 +540,7 @@ char *argv[];
 	    cc = -129;
 	    while (getann((unsigned)i, &annot) == 0 &&
 		   (to == 0L || annot.time <= to)) {
-		annot.time = (annot.time - from) * ((double)ofreq*spf) / ifreq;
+		annot.time = (annot.time - from) * (ofreq*spf) / ifreq;
 		/* If the -u option was specified, make sure that the corrected
 		   annotation time is positive and that it is later than the
 		   previous annotation time (exception: if it matches the
@@ -695,10 +695,11 @@ char *argv[];
     /* If resampling is required, initialize the interpolation/decimation
        parameters. */
     if (ifreq != ofreq) {
+	double f = gcd(ifreq, ofreq);
+
 	fflag = 1;
-	i = gcd(ifreq, ofreq);
-	m = ifreq/i;
-	n = ofreq/i;
+	m = ifreq/f;
+	n = ofreq/f;
 	mn = m*n;
 	(void)getvec(vin);
 	for (i = 0; i < nosig; i++) 
@@ -929,7 +930,7 @@ char *argv[];
     if (nrec) {
 	char *info, *xinfo;
 
-	(void)setsampfreq((double)ofreq);
+	(void)setsampfreq(ofreq);
 	if (btstring[0] == '[') {
 	    btstring[strlen(btstring)-1] = '\0';  /* discard final ']' */
 	    (void)setbasetime(btstring+1);
@@ -971,14 +972,24 @@ char *argv[];
     exit(0);	/*NOTREACHED*/
 }
 
-int gcd(x, y)	/* greatest common divisor of x and y (Euclid's algorithm) */
-int x, y;
+
+/* Calculate the greatest common divisor of x and y.  This function uses
+   Euclid's algorithm, modified so that an exact answer is not required if the
+   (possibly non-integral) arguments do not have a common divisor that can be
+   represented exactly. */
+double gcd(x, y)
+double x, y;
 {
-    while (x != y) {
-	if (x > y) x -= y;
-	else y -= x;
+    double tol;
+
+    if (x > y) tol = 0.001*y;
+    else tol = 0.001*x;
+
+    while (1) {
+	if (x > y && x-y > tol) x -= y;
+	else if (y > x && y-x > tol) y -= x;
+	else return (x);
     }
-    return (x);
 }
 
 char *prog_name(s)

@@ -1,5 +1,5 @@
 # file: cygwin.def		G. Moody	6 June 2000
-#				Last revised:  4 March 2003
+#				Last revised:  30 March 2003
 #
 # This file contains default 'make' definitions for compiling the WFDB Software
 # Package under MS Windows using the free Cygwin/gcc ANSI C compiler, available
@@ -145,12 +145,12 @@ SETDPERMISSIONS = chmod 755
 SETLPERMISSIONS = chmod 644
 
 # SETXPERMISSIONS is the command needed to make the applications accessible.
-SETXPERMISSIONS = chmod 755
+SETXPERMISSIONS = $(SRCDIR)/conf/exechmod 755
 
 # STRIP is the command used to compact the compiled binaries by removing their
 # symbol tables.  'exestrip' is a script that appends the '.exe' suffix to the
 # files in its argument list before passing their names to 'strip' itself.
-STRIP = ../conf/exestrip
+STRIP = $(SRCDIR)/conf/exestrip
 # To retain the symbol tables for debugging, comment out the previous line, and
 # uncomment the next line.
 # STRIP = :

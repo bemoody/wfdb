@@ -1,4 +1,4 @@
-.TH XFORM 1 "1 August 2002" "WFDB 10.2.7" "WFDB Applications Guide"
+.TH XFORM 1 "30 March 2003" "WFDB 10.3.4" "WFDB Applications Guide"
 .SH NAME
 xform \- sampling frequency, amplitude, and format conversion for WFDB records
 .SH SYNOPSIS
@@ -87,24 +87,21 @@ specified, or with \fIoutput-record\fR otherwise.
 To process only a segment of the \fIinput-record\fR, specify the starting and
 ending times using the \fB-f\fR and \fB-t\fR options.
 .PP
-Sampling frequency changes are performed by linear
-interpolation;  any combination of input and output sampling frequencies
-is permissible, provided that both are integers (if non-integer sampling
-frequencies are specified, they are truncated to multiples of 1 Hz before
-the interpolation/decimation parameters are determined).
-This interpolation method has the advantage of being reasonably fast, an
-important consideration since it is often necessary to operate on a million
-or more samples.  Resampling noise is not a significant problem for the
-typical applications of \fBxform\fR (changing the sampling frequency by
-factors of five or less).  Aliasing can be a problem, however, when the input
-sampling frequency is greater than the output sampling frequency.  In such
-cases, if the input signals contain frequency components at or above half of
-the output sampling frequency, the input signals should be low-pass filtered
-(using, for example \fBfir\fR(1)) to remove these components before processing
-them with \fBxform\fR.  Conversely, if the output sampling frequency is
-substantially greater than the input sampling frequency, resampling noise
-introduced at frequencies in excess of half of the input sampling frequency
-can be removed by low-pass filtering the output signals.
+Sampling frequency changes are performed by linear interpolation; any
+combination of input and output sampling frequencies is permissible.  This
+interpolation method has the advantage of being reasonably fast, an important
+consideration since it is often necessary to operate on a million or more
+samples.  Resampling noise is not a significant problem for the typical
+applications of \fBxform\fR (changing the sampling frequency by factors of five
+or less).  Aliasing can be a problem, however, when the input sampling
+frequency is greater than the output sampling frequency.  In such cases, if the
+input signals contain frequency components at or above half of the output
+sampling frequency, the input signals should be low-pass filtered (using, for
+example \fBfir\fR(1)) to remove these components before processing them with
+\fBxform\fR.  Conversely, if the output sampling frequency is substantially
+greater than the input sampling frequency, resampling noise introduced at
+frequencies in excess of half of the input sampling frequency can be removed by
+low-pass filtering the output signals.
 .PP
 Normally, the ADC resolution fields in the header files are ignored, and
 scaling is determined by the ratios of the gain fields.  An undefined (0)

@@ -32,7 +32,7 @@ examples:
 
 	rdsamp -r mitdb/100 -t .1     (MIT-BIH Arrhythmia Database, record 100)
 	rdann -r slpdb/slp67x -a st   (MIT-BIH Polysomnographic Database,
-				       record slp67x
+				       record slp67x)
 	wave -r mimicdb/237/237	-a al (MIMIC Database, record 237 -- note that
 				       since each MIMIC record is kept in its
 				       own subdirectory of mimicdb, two levels
