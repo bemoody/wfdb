@@ -1,5 +1,5 @@
 /* file: wfdblib.h	G. Moody	13 April 1989
-                        Last revised:  25 October 2001       wfdblib 10.2.1
+                        Last revised:  7 November 2001       wfdblib 10.2.1
 External definitions for WFDB library private functions
 
 _______________________________________________________________________________
@@ -58,7 +58,7 @@ symbols reserved to the library begin with the characters "wfdb_".
 #endif
 
 #if defined(_WINDLL)
-#define WFDBNOSORT
+#define WFDBANNSORT 0
 #endif
 
 /* Define the symbol MSDOS if this library is to be used under MS-DOS or MS
@@ -73,7 +73,7 @@ symbols reserved to the library begin with the characters "wfdb_".
    software (recommended) or uncomment the next line. */
 /* #define FIXISOCD */
 
-/* DEFWFDBP is the default value of the WFDB path if the WFDB environment
+/* DEFWFDB is the default value of the WFDB path if the WFDB environment
    variable is not set.  This value is edited by the configuration script
    (../configure), which also edits this block of comments to match.
 
@@ -84,7 +84,7 @@ symbols reserved to the library begin with the characters "wfdb_".
    If WFDB_NETFILES support is enabled, the setting below adds the
    web-accessible PhysioBank databases to the default path; you may wish to
    change this to use a nearby PhysioNet mirror (for a list of mirrors, see
-   http://www.physionet.org/mirrors/).  DEFWFDBP must not be NULL, however.
+   http://www.physionet.org/mirrors/).  DEFWFDB must not be NULL, however.
    The default given below for the Macintosh specifies that the WFDB path is to
    be read from the file udb/dbpath.mac on the third edition of the MIT-BIH
    Arrhythmia Database CD-ROM (which has a volume name of `MITADB3'); you may
@@ -94,36 +94,54 @@ symbols reserved to the library begin with the characters "wfdb_".
 */
 #ifdef MAC
 # ifdef FIXISOCD
-#  define DEFWFDBP	"@MITADB3:UDB:DBPATH.MAC;1"
+#  define DEFWFDB	"@MITADB3:UDB:DBPATH.MAC;1"
 # else
-#  define DEFWFDBP	"@MITADB3:UDB:DBPATH.MAC"
+#  define DEFWFDB	"@MITADB3:UDB:DBPATH.MAC"
 # define __STDC__
 # endif
 #else
 # if WFDB_NETFILES
-#  define DEFWFDBP 	". DBDIR http://www.physionet.org/physiobank/database"
+# define DEFWFDB ". DBDIR http://www.physionet.org/physiobank/database"
 # else
-#  define DEFWFDBP	". DBDIR"
+#  define DEFWFDB	". DBDIR"
 # endif
 #endif
 
-/* DEFWFDBC is the name of the default WFDB calibration file, used if the
+/* DEFWFDBCAL is the name of the default WFDB calibration file, used if the
    WFDBCAL environment variable is not set.  This name need not include path
    information if the calibration file is located in a directory included in
    the WFDB path.  The value given below is the name of the standard
-   calibration file supplied on the various CD-ROM databases.  DEFWFDBC may be
-   NULL if you prefer not to have a default calibration file.  See calopen() in
-   calib.c for further information. */
-#define DEFWFDBC "wfdbcal"
+   calibration file supplied on the various CD-ROM databases.  DEFWFDBCAL may
+   be NULL if you prefer not to have a default calibration file.  See calopen()
+   in calib.c for further information. */
+#define DEFWFDBCAL "wfdbcal"
+
+/* WFDB applications may write annotations out-of-order, but in almost all
+   cases, they expect that annotations they read must be in order.  The
+   environment variable WFDBANNSORT specifies if wfdbquit() should attempt to
+   sort annotations in any output annotation files before closing them (it
+   does this if WFDBANNSORT is non-zero, or if WFDBANNSORT is not set, and
+   DEFWFDBANNSORT is non-zero). */
+#define DEFWFDBANNSORT 1
+
+/* When reading multifrequency records, getvec() can operate in two modes:
+   WFDB_LOWRES (returning one sample per signal per frame), or WFDB_HIGHRES
+   (returning each sample of any oversampled signals, and duplicating samples
+   of other signals as necessary).  If the operating mode is not selected by
+   invoking setgvmode(), the value of the environment variable WFDBGVMODE
+   determines the mode (0: WFDB_LOWRES, non-zero: WFDB_HIGHRES);  if WFDBGVMODE
+   is not set, the value of DEFWFDBMODE determines the mode. */
+#define DEFWFDBGVMODE 0
 
 /* putenv() is available in POSIX, SVID, and BSD Unices and in MS-DOS and
    32-bit MS Windows, but not under 16-bit MS Windows or under MacOS.  If it is
    available, getwfdb() (in wfdbio.c) detects when the environment variables
-   WFDB or WFDBCAL are not set, and sets them according to DEFWFDBP or DEFWFDBC
-   as needed using putenv().  This feature is useful mainly for programs such
-   as WAVE, where WFDB or WFDBCAL are set interactively and it is useful to
-   show their default values to the user; setwfdb() and getwfdb() do not depend
-   on it.
+   WFDB, WFDBCAL, WFDBANNSORT, and WFDBGVMODE are not set, and sets them
+   according to DEFWFDB, DEFWFDBCAL, DEFWFDBANNSORT, and DEFWFDBGVMODE as
+   needed using putenv().  This feature is useful mainly for programs such as
+   WAVE, where these variables are set interactively and it is useful to show
+   their default values to the user; setwfdb() and getwfdb() do not depend on
+   it.
 */
 #if !defined(_WIN16) && !defined(MAC)
 #define HAS_PUTENV

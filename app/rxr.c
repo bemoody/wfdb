@@ -1,9 +1,9 @@
 /* file: rxr.c		G. Moody	16 August 1989
-			Last revised:   9 February 2000
+			Last revised:   7 November 2001
 
 -------------------------------------------------------------------------------
 rxr: ANSI/AAMI-standard run-by-run annotation file comparator
-Copyright (C) 2000 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -27,7 +27,7 @@ This program implements the run-by-run comparison algorithms described in
 AAMI/ANSI EC38:1998, the American National Standard for ambulatory ECGs, and
 in AAMI EC57:1998, the American National Standard for Testing and Reporting
 Performance Results of Cardiac Rhythm and ST Segment Measurement Algorithms.
-These standards are available from AAMI, Suite 400, 3330 Washington Blvd.,
+These standards are available from AAMI, 1110 N Glebe Road, Suite 220,
 Arlington, VA 22201 USA (http://www.aami.org/)
 
 The -f, -t, and -w options modify the comparison algorithm used by rxr in ways

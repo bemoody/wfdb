@@ -10,7 +10,7 @@
 [OK]:  WFDB_DEFFREQ = 250
 [OK]:  WFDB_DEFGAIN = 200
 [OK]:  WFDB_DEFRES = 12
-[OK]:  Default WFDB path = . http://www.physionet.org/physiobank/database
+[OK]:  Default WFDB path = . /usr/database http://www.physionet.org/physiobank/database
 [OK]:  WFDB path modified successfully
 [OK]:  sampfreq(NULL) returned 0
 [OK]:  setsampfreq changed sampling frequency successfully

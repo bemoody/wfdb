@@ -1,10 +1,10 @@
 /* file: calib.c	G. Moody	4 July 1991
-			Last revised:  15 July 1999		wfdblib 10.0.1
+			Last revised:  7 November 2001		wfdblib 10.2.1
 WFDB library functions for signal calibration
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -42,7 +42,7 @@ was made so that calibration files can be more easily viewed and edited under
 MS-DOS.
 
 Beginning with version 8.3, calopen() uses the default calibration file name
-(DEFWFDBC, defined in wfdblib.h) if passed a NULL argument and if the WFDBCAL
+(DEFWFDBCAL, defined in wfdblib.h) if passed a NULL argument and if the WFDBCAL
 environment variable is not set.
 */
 
@@ -75,7 +75,7 @@ char *cfname;
 
     /* If no calibration file is specified, return immediately. */
     if (cfname == NULL && (cfname = getenv("WFDBCAL")) == NULL &&
-	(cfname = DEFWFDBC) == NULL)
+	(cfname = DEFWFDBCAL) == NULL)
 	return (0);
 
     if (*cfname == '+')		/* don't empty the calibration list */

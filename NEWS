@@ -1,3 +1,13 @@
+10.2.1:
+	Most users will no longer need to set the WFDB path explicitly, as a
+	result of several minor changes in the default path and in the
+	installer for the WFDB Software Package.
+
+	The environment variable WFDBNOSORT was replaced by WFDBANNSORT, and
+        the environment variable WFDBGVMODE was introduced (see 'Annotation
+        Order' and 'Multi-Frequency Records', in the WFDB Programmer's Guide,
+	for details).
+
 10.2.0:
 	The 10.2 series differs from all earlier releases in that the WFDB
 	library no longer imposes any fixed limits on the numbers of annotators

@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:  11 September 2001	wfdblib 10.2.0
+			Last revised:   7 November 2001		wfdblib 10.2.1
 WFDB library functions for annotations
 
 _______________________________________________________________________________
@@ -844,14 +844,17 @@ WFDB_Annotator n;
 	}
 	(void)wfdb_fclose(oa->file);
 	if (oa->out_of_order) {
-	    (void)sprintf(cmdbuf, "sortann -r %s -a %s",
-			  oa->rname, oa->info.name);
-#ifndef WFDBNOSORT
-	    if (getenv("WFDBNOSORT") == NULL) {
+	    int dosort = DEFWFDBANNSORT;
+	    char *p = getenv("WFDBANNSORT");
+
+	    if (p) dosort = atoi(p);
+	    if (dosort) {
 		if (system(NULL) != 0) {
 		    wfdb_error(
 			 "Rearranging annotations for output annotator %s ...",
 			 oa->info.name);
+		    (void)sprintf(cmdbuf, "sortann -r %s -a %s",
+				  oa->rname, oa->info.name);
 		    if (system(cmdbuf) == 0) {
 			wfdb_error("done!");
 			oa->out_of_order = 0;
@@ -863,7 +866,6 @@ WFDB_Annotator n;
 	    }
 	}
 	if (oa->out_of_order) {
-#endif
 	    wfdb_error("Use the command:\n  %s\n", cmdbuf);
 	    wfdb_error("to rearrange annotations in the correct order.\n");
 	}

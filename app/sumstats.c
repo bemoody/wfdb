@@ -1,8 +1,8 @@
 /* file: sumstats.c	G. Moody	17 August 1989
-   			Last revised:	9 February 2000
+   			Last revised:	7 November 2001
 -------------------------------------------------------------------------------
 sumstats: Derive aggregate statistics from bxb, rxr, or epic line-format output
-Copyright (C) 2000 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -28,8 +28,7 @@ results of cardiac rhythm and ST segment measurement algorithms" (ANSI/AAMI
 EC57:1998, based on the earlier AAMI ECAR:1987), and in sections 4.2.14.4.1
 and 4.2.14.4.2 of the American National Standard, "Ambulatory electrocardio-
 graphs" (ANSI/AAMI EC38:1998).  These standards are available from AAMI,
-Suite 400, 3330 Washington Blvd., Arlington, VA 22201 USA
-(http://www.aami.org/).
+1110 N Glebe Road, Suite 220, Arlington, VA 22201 USA (http://www.aami.org/).
 */
 
 #include <stdio.h>

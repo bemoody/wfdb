@@ -1,9 +1,9 @@
 /* file: epic.c		G. Moody	 3 March 1992
-			Last revised:	  4 May 1999
+			Last revised:	 7 November 2001
 
 -------------------------------------------------------------------------------
 epic: ANSI/AAMI-standard episode-by-episode annotation file comparator
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -27,10 +27,12 @@ This program implements the VF, AF, and ST episode-by-episode comparison
 algorithms described in ANSI/AAMI EC38:1998, the American National Standard for
 Ambulatory electrocardiographs and ANSI/AAMI EC57:1998, the American National
 Standard for Testing and reporting performance results of cardiac rhythm and
-ST segment measurement algorithms (both available from AAMI, Suite 400, 3330
-Washington Blvd., Arlington, VA 22201 USA).  The relevant provisions of these
-standards are described in file `eval.doc'.  Information about using this
-program is contained in file `epic.1'.
+ST segment measurement algorithms;  both standards are available from AAMI,
+1110 N Glebe Road, Suite 220, Arlington, VA 22201 USA (http://www.aami.org/).
+The relevant provisions of these standards are described in file `eval.tex',
+and information about using this program is contained in file `epic.1' (both
+of these files are included in the 'doc' directory of the WFDB Software
+Package).
 
 The -f and -t options modify the comparison algorithm used by epic in ways
 not permitted by these standards.  These options are provided for the use of

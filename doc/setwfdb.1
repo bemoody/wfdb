@@ -1,4 +1,4 @@
-.TH SETWFDB 1 "26 October 2001" "WFDB software 10.2.1" "WFDB applications"
+.TH SETWFDB 1 "31 October 2001" "WFDB software 10.2.1" "WFDB applications"
 .SH NAME
 setwfdb, cshsetwfdb \- set WFDB environment variables
 .SH SYNOPSIS
@@ -18,20 +18,17 @@ the default path specified at the time the WFDB library was compiled.
 The default path includes the current directory (``.''), the \fIdatabase\fR
 subdirectory within the WFDB software package's root directory, and
 the PhysioBank data archive (http://www.physionet.org/physiobank/database).
-
 .PP
 WFDB applications that need access to the signal calibration database
 find it in a file located on the WFDB path.  If the \fBWFDBCAL\fR
 environment variable has been set, its value specifies the name of the
 calibration file;  otherwise, applications look for the default calibration
 file, the name of which ("wfdbcal") is compiled into the WFDB library.
-
 .PP
 Many users will not need to change the defaults, but for those who do, the
 scripts described here may be helpful.  \fIImportant:\fR these programs must
 be customized before using them for the first time on a new machine.  Since
 they are text files, use any text editor to customize them.
-
 .SS \fIsh\fR, \fIbash\fR, and \fIksh\fR shell users:
 \fIsetwfdb\fR sets the environment variables \fBWFDB\fR and
 \fBWFDBCAL\fR.  It must be executed using the ``.'' as shown above.

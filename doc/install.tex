@@ -9,7 +9,7 @@ Harvard-MIT Division of Health Sciences and Technology, Cambridge, MA, USA}
 \date{}
 
 \begin{document}
-\setcounter{page}{114}
+\setcounter{page}{115}
 
 \maketitle
 
@@ -20,57 +20,33 @@ for the applications described in this manual; \LaTeX{}, {\tt texinfo}, and
 {\tt troff} sources for this and other manuals; and a one-minute sample record
 ({\tt 100s}).
 
-These notes are included here for those who may not have ready access to the
-World Wide Web.  For those who do, please visit PhysioNet, where quick-start
-guides including installation notes for popular operating systems are available
-(see {\tt http://www.physio\-net.org/physio\-tools/wfdb.shtml}
-
 \section*{Obtaining the WFDB Software Package}
 The latest version of the WFDB Software Package can always be downloaded in
-source form from PhysioNet and its mirrors (see
-{\tt http://www.physio\-net.org/physio\-tools/wfdb.shtml}); binaries for
-popular operating systems and development snapshots are also usually available
-for downloading there.  For information on obtaining the latest version of the
-WFDB Software Package on CD-ROM, {\tt Sources}.
+source form from PhysioNet and its mirrors (see {\tt
+http://www.physio\-net.org/physio\-tools/wfdb.shtml}); binaries for popular
+operating systems and development snapshots, as well as quick-start guides
+including installation notes for popular operating systems, are also usually
+available there.
 
-The WFDB Software Package is recommended to all who are able to use it, since
-it is freely available in source form and is actively maintained.  The
-predecessor of the WFDB Software Package (the DB Software Package) was included
-in source form in the second and third editions of the MIT-BIH Arrhythmia
-Database CD-ROM, and parts of it have been included on several other CD-ROMs
-that contain databases of ECGs and other signals, including the first edition
-of the MIT-BIH Arrhythmia Database CD-ROM, both editions of the European ST-T
-Database CD-ROM and the MIT-BIH Polysomnographic Database CD-ROM, and on the
-MGH/Marquette Foundation Waveform Database CD-ROMs ({\tt Sources}).  If you
-have one of these CD-ROMs and you cannot upgrade to the WFDB Software Package,
-see the files {\tt readme.doc} (in the root directory of the CD-ROM) and
-{\tt lib.doc} (in the {\tt lib} directory), or {\tt README.TXT} (in the
-{\tt software} directory).
-
-\subsection*{UNIX, Linux, and similar operating systems}
+\subsection*{UNIX, GNU/Linux, and similar operating systems}
 
 Before beginning the installation of the WFDB Software Package, obtain and
-install the {\tt libwww} package from {\tt http://www.w3.org/Library/} or
-from {\tt http://\-www.physio\-net.org/physio\-tools/libwww/}.  This package is
-provided with most current versions of Linux.  (If you have a program called
-{\tt libwww-config}, then {\tt libwww} is installed already.)  You may
+install the {\tt libwww} package from {\tt http://www.w3.org/Library/} or from
+{\tt http://\-www.physio\-net.org/physio\-tools/libwww/}.  This package is
+provided with most current versions of GNU/Linux.  (If you have a program
+called {\tt libwww-config}, then {\tt libwww} is installed already.)  You may
 omit this step if you do not wish to have NETFILES support.
 
 Also download and install the {\tt XView} software packages from {\tt
 http://www.\-physio\-net.org/\-physio\-tools/xview/} if you wish to use WAVE.
-Sources are available, as are binaries for several versions of Linux.  If you
-are using SunOS or Solaris, XView binaries are available in the Open Look
+Sources are available, as are binaries for several versions of GNU/Linux.  If
+you are using SunOS or Solaris, XView binaries are available in the Open Look
 Software Development package and may be installed already.  (If you have a
 program called {\tt textedit}, then {\tt XView} is installed already.) If you
 are able to use an existing set of binaries, these are recommended, since the
 sources may take a {\em long} time to compile.  Be sure that the directory
-containing {\tt textedit}, usually {\tt /usr/openwin/bin}, is in your
-{\tt PATH}.  You may omit this step if you do not wish to use {\em WAVE}.
-
-Select an existing directory in a writable file system for the WFDB Software
-Package installation; {\tt /usr/local/src} is a good choice in most cases.
-Make sure that at least 6 megabytes are available (most of this space can be
-recovered after the installation is complete).
+containing {\tt textedit}, usually {\tt /usr/openwin/bin}, is in your {\tt
+PATH}.  You may omit this step if you do not wish to use {\em WAVE}.
 
 If you have downloaded the software from PhysioNet or another source, you
 will have a {\tt gzip}-compressed {\tt tar} archive.  Unpack it using
@@ -81,43 +57,26 @@ gzip -d wfdb.tar.gz
 tar xfv wfdb.tar
 \end{verbatim}
 
-(If you have GNU {\tt tar}, as on Linux, you can combine these into a
+(If you have GNU {\tt tar}, as on GNU/Linux, you can combine these into a
 single command: {\tt tar xfvz wfdb.tar.gz}.)
 
 This will create a directory with a name of the form {\tt wfdb-}{\em m.n.r},
 where {\em m.n.r} is the version number of the included WFDB library (e.g.,
-{\tt 10.2.0}).  Enter this directory.
+{\tt 10.2.1}).  Enter this directory.
 
-If you are installing the software from a CD-ROM, copy the contents of the
-{\tt src/wfdb} directory to your writable file system and then enter that
-directory.  One way to do this is to change to the {\tt src} directory on the
-CD-ROM and then to type:
-
-\begin{verbatim}
-tar cfv - wfdb | ( cd /usr/local/src; tar xfv - )
-cd wfdb
-\end{verbatim}
-
-In either case, you should now be ready to configure, compile, and install
-the software, using the commands:
+You should now be ready to configure, compile, and install the software, using
+the commands:
 
 \begin{verbatim}
 ./configure
 make install
 \end{verbatim}
 
-The {\tt make} command requires root permissions, and installs the package
-in subdirectories of {\tt /usr}.  If you do not have root permissions,
-you may install the package in any writable directory by adding an
-appropriate option to the {\tt make} command above:
-
-\begin{verbatim}
-make install WFDBROOT={\em /path/to/another/directory}
-\end{verbatim}
-
-Note that in this case you will need to add {\em WFDBROOT}{\tt /bin}
-to your {\tt PATH}, and {\em WFDBROOT}{\tt /lib} to your
-{\tt LD\_LIBRARY\_PATH}.
+The {\tt ./configure} command asks where you wish to install the package.
+If you accept the default ({\tt /usr}), you will need root permissions when
+runnning {\tt make install}.  If you choose another location, follow the
+instructions given by {\tt configure} for setting your {\tt PATH} and
+{\tt LD\_LIBRARY\_PATH} environment variables.
 
 Depending on the speed of your system and of your C compiler, {\tt make} will
 generally require between 1 and 10 minutes.
@@ -164,11 +123,10 @@ The output of this command should be:
 /usr/bin/gcc
 \end{verbatim}
 
-If you don't see this output, repeat steps 1 and 2 above as necessary to
-correct the problem before continuing.
+If you don't see this output, repeat the steps above as necessary to correct
+the problem before continuing.
 
-If you have downloaded the WFDB software package from PhysioNet or another
-source, you will have a {\tt gzip}-compressed {\tt tar} archive.  Unpack it
+Unpack the {\tt gzip}-compressed {\tt tar} archive you downloaded earlier,
 using the {\tt tar} command included with the Cygwin package:
 
 \begin{verbatim}
@@ -186,18 +144,8 @@ This will create a directory with a name of the form {\tt wfdb-}{\em m.n.r},
 where {\em m.n.r} is the version number of the included WFDB library (e.g.,
 {\tt 10.2.0}).  Enter this directory.
 
-If you are installing the software from a CD-ROM, copy the contents of the
-{\tt src/wfdb} directory to your writable file system and then enter that
-directory.  One way to do this is to change to the {\tt src} directory on the
-CD-ROM and then to type:
-
-\begin{verbatim}
-tar cfv - wfdb | ( cd c:/usr/local/src; tar xfv - )
-cd wfdb
-\end{verbatim}
-
-In either case, you should now be ready to configure, compile, and install
-the software, using the commands:
+You should now be ready to configure, compile, and install the software, using
+the commands:
 
 \begin{verbatim}
 ./configure
@@ -219,22 +167,21 @@ and then {\tt sample.exe}.
 
 \subsection*{Other systems}
 
-If you are installing the software from a CD-ROM, copy the contents of the
-{\tt wfdb} directory to your hard disk.  Note that the text files are in
-UNIX format (i.e., lines are terminated by ASCII line-feed characters only).
-If your system expects text files in MS-DOS format (with both a carriage return
-and a line-feed at the end of each line; VMS is one such system), use
-{\tt u2d.exe} (available from PhysioNet or on the CD-ROM) to reformat the
-text files under MS-DOS.  If your system is a Macintosh (which expects that
-lines are terminated by carriage returns only), you will have to reformat the
-text files yourself, which may be done under MS-DOS a PC using {\tt u2m.exe},
-or on a Macintosh using third-party software.  Additional notes for Macintosh
-users may be found in file {\tt MAC} (within the {\tt wfdb} directory).
+Copy the contents of {\tt http://www.\-physio.\-net/physio\-tools/wfdb/} to
+your hard disk.  Note that the text files are in UNIX format (i.e., lines are
+terminated by ASCII line-feed characters only).  If your system expects text
+files in MS-DOS format (with both a carriage return and a line-feed at the end
+of each line; VMS is one such system), use {\tt u2d.exe} (available from
+PhysioNet) to reformat the text files under MS-DOS.  If your system is a
+Macintosh (which expects that lines are terminated by carriage returns only),
+you will have to reformat the text files yourself, which may be done under
+MS-DOS on a PC using {\tt u2m.exe}, or on a Macintosh using third-party
+software.
 
 The WFDB Software Package is written in highly portable C, and (with the
 exception of a few MS-DOS or UNIX-specific display or data-acquisition
 programs) should be easy to compile with any K\&R or ANSI C compiler.
-The UNIX and MS-DOS {\tt make} description files ({\tt makefile.unx}
-and {\tt makefile.dos} in {\tt wfdb} and in each of its subdirectories)
+The UNIX and MS-DOS {\tt make} description files ({\tt Makefile}
+and {\tt Makefile.dos} in {\tt wfdb} and in each of its subdirectories)
 should get you started.
 \end{document}

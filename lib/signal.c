@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  14 October 2001	wfdblib 10.2.0
+			Last revised:  7 November 2001	wfdblib 10.2.1
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -268,7 +268,8 @@ static int dsbi;		/* index to oldest sample in dsbuf (if < 0,
 				   dsbuf does not contain valid data) */
 static unsigned dsblen;		/* capacity of dsbuf, in samples */
 static unsigned framelen;	/* total number of samples per frame */
-static int gvmode = WFDB_LOWRES;/* getvec mode (WFDB_HIGHRES or WFDB_LOWRES) */
+static int gvmode = -1;		/* getvec mode (WFDB_HIGHRES or WFDB_LOWRES
+				   once initialized) */
 static int gvc;			/* getvec sample-within-frame counter */
 
 /* These variables relate to output signals. */
@@ -1552,7 +1553,6 @@ int nsig;
 	if (ispfmax < is->info.spf) ispfmax = is->info.spf;
 	if (skewmax < is->skew) skewmax = is->skew;
     }
-
     setgvmode(gvmode);	/* Reset sfreq if appropriate. */
     gvc = ispfmax;	/* Initialize getvec's sample-within-frame counter. */
     nisig += s;		/* Update the count of open input signals. */
@@ -1815,7 +1815,8 @@ all of its samples within the frame).  In WFDB_HIGHRES mode, each sample of any
 oversampled signal is returned by successive invocations of getvec; samples of
 signals sampled at lower frequencies are returned on two or more successive
 invocations of getvec as appropriate.  Function setgvmode can be used to change
-getvec's operating mode, which is WFDB_LOWRES by default.  When reading
+getvec's operating mode, which is determined by environment variable
+WFDBGVMODE or constant DEFWFDBGVMODE by default.  When reading
 ordinary records (with all signals sampled at the same frequency), getvec's
 behavior is independent of its operating mode. */
 
@@ -1827,6 +1828,15 @@ FINT getspf()
 FVOID setgvmode(mode)
 int mode;
 {
+    if (mode < 0) {	/* (re)set to default mode */
+	char *p;
+
+        if (p = getenv("WFDBGVMODE"))
+	    mode = atoi(p);
+	else
+	    mode = DEFWFDBGVMODE;
+    }
+
     if (mode == WFDB_HIGHRES) {
 	gvmode = WFDB_HIGHRES;
 	sfreq = ffreq * ispfmax;

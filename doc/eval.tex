@@ -21,14 +21,15 @@ parts of the {\em American National Standard for Ambulatory
 Electrocardiographs} (ANSI/AAMI EC38:1998, and its predecessor,
 ANSI/AAMI EC38:1994), and the {\em American National Standard for
 Testing and Reporting Performance Results of Cardiac Rhythm and ST
-Segment Measurement Algorithms} (ANSI/AAMI EC57:1998).  They include earlier
-evaluation protocols developed for an AAMI Recommended Practice,
-{\em Testing and Reporting Performance Results of Ventricular Arrhythmia
-Detection Algorithms} (AAMI ECAR, 1987).  It will be most useful
-to readers who plan to use the suite of evaluation software included
-in the WFDB Software Package available from MIT;  this suite of software
-includes the reference implementations of the evaluation protocols
-specified in EC38 and EC57.
+Segment Measurement Algorithms} (ANSI/AAMI EC57:1998).  They include
+earlier evaluation protocols developed for an AAMI Recommended
+Practice, {\em Testing and Reporting Performance Results of
+Ventricular Arrhythmia Detection Algorithms} (AAMI ECAR, 1987).  It
+will be most useful to readers who plan to use the suite of evaluation
+software included in the WFDB Software Package ({\tt
+http://www.\-physio\-net.\-org/\-physio\-tools\-wfdb.\-shtml}); this
+suite of software includes the reference implementations of the
+evaluation protocols specified in EC38 and EC57.
 
 \section{Introduction}
 Continuous monitoring of the electrocardiogram in both inpatients and
@@ -106,13 +107,14 @@ test in the digital domain if desired, allowing one to establish with
 certainty the effects of algorithm modifications on performance.
 \end{itemize}
 
-At present, the following ECG databases are available:\footnote{Sources:
-ECRI, 5200 Butler Pike, Plymouth Meeting, PA 19462 USA (AHA DB); MIT-BIH
-Database Distribution, MIT Room E25-505A, 77 Massachusetts Avenue, Cambridge,
-MA 02139 USA (MIT, NST, and CU databases).  The ESC DB is available
-from: CNR Institute of Clinical Physiology, Computer Laboratory,
-via Trieste, 41, 56100 Pisa, Italy.  Except for the AHA DB,
-all are available in CD-ROM format.}
+Standards EC38 and EC57 require the use of the following ECG
+databases:\footnote{Sources: ECRI, 5200 Butler Pike, Plymouth Meeting,
+PA 19462 USA (AHA DB); MIT-BIH Database Distribution, MIT Room
+E25-505A, 77 Massachusetts Avenue, Cambridge, MA 02139 USA (MIT, NST,
+and CU databases); CNR Institute of Clinical Physiology, Computer
+Laboratory, via Trieste, 41, 56100 Pisa, Italy (ESC DB).  Except for
+the AHA DB, all are available in whole or in part from PhysioNet
+({\tt http://www.\-physio\-net.\-org/}).}
 \begin{itemize}
    \item {\bf AHA DB}: The American Heart Association Database for
 Evaluation of Ventricular Arrhythmia Detectors (80 records, 35 minutes
@@ -125,11 +127,10 @@ Israel Hospital Arrhythmia Database (48 records, 30 minutes each)
 Database (90 records, two hours each)
 
    \item {\bf NST DB}: The Noise Stress Test Database (12 records, 30
-minutes each; supplied with the MIT DB)
+minutes each)
 
    \item {\bf CU DB}: The Creighton University Sustained Ventricular
-Arrhythmia Database (35 records, 8 minutes each; supplied on the
-second edition of the MIT DB CD-ROM)
+Arrhythmia Database (35 records, 8 minutes each)
 
 \end{itemize}
 Each of these databases represents a very substantial effort by many
@@ -159,7 +160,7 @@ use of the first two of these databases, which was published as an
 AAMI Recommended Practice.\footnote{{\it Testing and Reporting
 Performance Results of Ventricular Arrhythmia Detection
 Algorithms}. Publication AAMI ECAR (1987); succeeded by ANSI/AAMI
-EC57:1998, available from AAMI, 3330 Washington Boulevard, Suite 400,
+EC57:1998, available from AAMI, 1110 N Glebe Road, Suite 220,
 Arlington, VA 22201 USA.}  Between 1990 and 1998, the ambulatory ECG
 subcommittee of the AAMI ECG committee developed and revised a
 standard for ambulatory ECG monitors, significant portions of which
@@ -199,12 +200,12 @@ cooperation of the developers.  Newly-designed devices should
 incorporate the necessary ``hooks'' for producing annotation files.
 
 \subsection{Software to Support Evaluations}
-This paper describes a suite of programs that support evaluations
-of automated ECG analyzers in accordance with the methods described in
-the EC38 and EC57 standards (as well as those in the earlier ECAR Recommended
-Practice).  These methods are sufficiently complex that the
-development of such a suite of programs is not an afternoon's work.
-By making generally available reference implementations of the
+This paper describes a suite of programs that support evaluations of
+automated ECG analyzers in accordance with the methods described in
+the EC38 and EC57 standards (as well as those in the earlier ECAR
+Recommended Practice).  These methods are sufficiently complex that
+the development of such a suite of programs is not an afternoon's
+work.  By making generally available reference implementations of the
 evaluation algorithms, much needless duplication of effort may be
 avoided.  By circulating them in source form to other users, we may
 hope to find and correct any bugs, with the eventual result that
@@ -213,11 +214,8 @@ the evaluation technique itself.  By using them for evaluations, any
 ambiguities in the English specification of the evaluation algorithms
 are resolved in a consistent manner for each device tested.  These
 programs are written in C and run under MS-DOS or UNIX.  They have
-been made available as part of the WFDB Software Package
-from MIT\footnote{Source: MIT-BIH Database Distribution
-(address above).} and are included in the current edition of the
-MIT-BIH Arrhythmia Database CD-ROM.  In this paper, the names of these
-programs are printed {\tt like this}.
+been made available as part of the WFDB Software Package.  In this
+paper, the names of these programs are printed {\tt like this}.
 
 \section{Evaluating an ECG Analyzer}
 The major task facing an evaluator is that of presenting the reference signals
@@ -320,7 +318,7 @@ respectively); devices need not be capable of producing all of these
 annotations, but any beat annotations that they do produce will be translated
 into one of these types.  The standard specifies the mapping used for the
 {\tt anntyp} values defined in {\tt <wfdb/ecgcodes.h>}. (This file is
-supplied with all of the existing CD-ROM databases.)  Any beat annotations that
+included in the WFDB Software Package.)  Any beat annotations that
 appear in the first five minutes of a record (the ``learning period'') are
 ignored in the evaluation process.  The remainder of the record (the ``test
 period'') must be fully annotated.  Note in particular that the last beat of
@@ -352,7 +350,7 @@ for a byte with the value 5 (ASCII control-E).  Non-empty {\tt aux} fields
 always begin with a byte that specifies the number of data bytes that follow;
 in this case, the five characters ({\tt ( A F I B}) of the string.  The end of
 each episode should be marked with any other rhythm annotation (for example,
-``{\tt (N}'').
+\verb|"\02(N"|).
 
    \item {\em Heart rate measurements}.  Each type of heart rate measurement
 (including any heart rate or RR interval variability measurements) made by the
@@ -361,14 +359,15 @@ device under test should be assigned a measurement number, $m$, between 0 and
 measurement, with ${\tt subtyp} = m$ and with the measurement in the {\tt aux}
 field, as an ASCII-coded decimal number.
 
-   \item {\em ST deviation measurements}.  If available, these should be
-provided in the {\tt aux} fields of beat annotations, as ASCII-coded decimal
-numbers indicating the deviations in microvolts from reference levels
-established for each signal from the first 30 seconds of each record.  For
-example, ``25 -104'' indicates a 25 $\mu$V elevation in signal 0 and a 104
-$\mu$V depression in signal 1.  If ST measurements are omitted from any beat
-annotation, the evaluation software assumes they are unchanged from their
-previous values.
+   \item {\em ST deviation measurements}.  If available, these should
+be provided in the {\tt aux} fields of beat annotations, as
+ASCII-coded decimal numbers indicating the deviations in microvolts
+from reference levels established for each signal from the first 30
+seconds of each record.  For example, ``{\tt 25 -104}'' indicates a 25
+$\mu$V elevation in signal 0 and a 104 $\mu$V depression in signal 1.
+If ST measurements are omitted from any beat annotation, the
+evaluation software assumes they are unchanged from their previous
+values.
 
    \item {\em Ischemic ST change annotations}.  These {\tt STCH} annotations
 should mark the beginning and end of each detected episode of ischemic ST
@@ -382,6 +381,12 @@ criteria depend on features of both signals.  The extremum of each episode may
 optionally be marked with an ``{\tt AST}{\it nsm}'' annotation, where {\it n}
 and {\it s} are defined as above, and {\it m} is the ST deviation in
 microvolts, relative to a reference level established as above.
+
+   \item {\em Comment annotations}.  Annotations with {\tt anntyp = NOTE}
+and any desired string data in {\tt aux} may be included anywhere in
+an annotation file.  {\tt NOTE} annotations are ignored by the
+standard evaluation software;  they may be used, for example, to
+record the values of internal algorithm variables for debugging purposes.
 \end{itemize}
 Note that only beat annotations are absolutely required in test annotation
 files.  ST deviation measurements within beat annotations, and the other
@@ -649,17 +654,17 @@ and Cees Zeelenberg.
 \appendix
 \section{Using the AHA Database}
 
-Since the AHA DB is not available in CD-ROM format, the WFDB Software
-Package includes a pair of programs that convert files read from AHA
-DB distribution tapes or floppy disks into files formatted in the same
-way as those in the CD-ROM databases.  {\tt a2m} converts AHA
-annotation files, and {\tt ad2m} converts AHA signal files and also
-generates header ({\tt *.hea}) files.  (Run these programs without
-command-line arguments to obtain instructions on their use.)  Using
-{\tt a2m} and {\tt ad2m}, all 80 AHA DB records can be stored in
-roughly 130 Mb of disk space (assuming use of the standard 35-minute
-records).  These programs can also reformat old (pre-1989) MIT DB
-tapes written in the AHA DB distribution format.
+Since the AHA DB is not available in the standard PhysioBank format
+used by all of the other databases, the WFDB Software Package includes
+a pair of programs that convert files read from AHA DB distribution
+tapes or floppy disks into files in PhysioBank format.  {\tt a2m}
+converts AHA annotation files, and {\tt ad2m} converts AHA signal
+files and also generates header ({\tt *.hea}) files.  (Run these
+programs without command-line arguments to obtain instructions on
+their use.)  Using {\tt a2m} and {\tt ad2m}, all 80 AHA DB records can
+be stored in roughly 130 Mb of disk space (assuming use of the
+standard 35-minute records).  These programs can also reformat old
+(pre-1989) MIT DB tapes written in the AHA DB distribution format.
 
 It is also possible to read and write AHA tape-format files directly using
 the WFDB library;  refer to the {\it WFDB Programmer's Guide}
@@ -736,5 +741,6 @@ unless an existing protocol annotation file is supplied as input.  To
 change these parameters, simply edit the protocol annotation file
 (using, for example, {\tt rdann} to convert it to text form, any text
 editor to make the modifications, and {\tt wrann} to convert it back
-to annotation file format).
+to annotation file format), then rerun {\tt nst} using the protocol
+file to generate a new record.
 \end{document}

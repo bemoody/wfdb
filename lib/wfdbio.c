@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-			Last revised:	7 September 2001	wfdblib 10.2.0
+			Last revised:	 7 November 2001	wfdblib 10.2.1
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -151,7 +151,7 @@ module.
 files to be opened for reading.  Under UNIX or MS-DOS, this list is obtained
 from the shell (environment) variable WFDB, which may be set by the user
 (typically as part of the login script).  A default value may be set at compile
-time (DEFWFDBP in wfdblib.h);  this is necessary when compiling for the
+time (DEFWFDB in wfdblib.h);  this is necessary when compiling for the
 Macintosh OS.  If the value of WFDB is of the form `@FILE', wfdb_getiwfdb()
 reads the WFDB path from the specified FILE. */
 
@@ -168,13 +168,13 @@ FSTRING getwfdb()
 	if (wfdbpath == NULL) {
 #ifdef HAS_PUTENV
 	    static char *p;
-	    if (p == NULL) p = (char *)malloc(strlen(DEFWFDBP)+6);
+	    if (p == NULL) p = (char *)malloc(strlen(DEFWFDB)+6);
 	    if (p) {
-		sprintf(p, "WFDB=%s", DEFWFDBP);
+		sprintf(p, "WFDB=%s", DEFWFDB);
 		putenv(p);
 	    }
 #endif
-	    wfdbpath = DEFWFDBP;
+	    wfdbpath = DEFWFDB;
 	}
     }
     getiwfdb_count = 0;
@@ -184,12 +184,30 @@ FSTRING getwfdb()
 #ifdef HAS_PUTENV
     if (getenv("WFDBCAL") == NULL) {
 	static char *p;
-	if (p == NULL) p = malloc(strlen(DEFWFDBC)+9);
+	if (p == NULL) p = malloc(strlen(DEFWFDBCAL)+9);
 	if (p) {
-	    sprintf(p, "WFDBCAL=%s", DEFWFDBC);
+	    sprintf(p, "WFDBCAL=%s", DEFWFDBCAL);
 	    putenv(p);
 	}
     }
+    if (getenv("WFDBANNSORT") == NULL) {
+	static char *p;
+	if (p == NULL) p = malloc(32);
+	if (p) {
+	    sprintf(p, "WFDBANNSORT=%d", DEFWFDBANNSORT);
+	    putenv(p);
+	}
+    }
+    if (getenv("WFDBGVMODE") == NULL) {
+	static char *p;
+	if (p == NULL) p = malloc(32);
+	if (p) {
+	    sprintf(p, "WFDBGVMODE=%d", DEFWFDBGVMODE == 0 ? 0 : 1);
+	    putenv(p);
+	}
+    }
+
+
 #endif
     return (wfdbpath);
 }
