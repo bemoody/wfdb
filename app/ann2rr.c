@@ -1,5 +1,5 @@
-/* file: ann2rr.c		G. Moody	 16 May 1995
-				Last revised:  15 January 2002
+/* file: ann2rr.c		G. Moody	16 May 1995
+				Last revised:	20 May 2002
 -------------------------------------------------------------------------------
 ann2rr: Calculate RR intervals from an annotation file
 Copyright (C) 2002 George B. Moody
@@ -161,16 +161,17 @@ char *argv[];
     if (to) {
 	if (*argv[(int)to] == '#') {
 	    if ((beat_number = atol(argv[(int)to]+1)) <  1L) beat_number = 1L;
-	    to = 0L;
+	    to = (WFDB_Time)0;
 	}
 	else {
 	    beat_number = -1L;
 	    to = strtim(argv[(int)to]);
+	    if (to < (WFDB_Time)0) to = -to;
 	}
     }
 
     tp = from;
-    while (getann(0, &annot) == 0 && (to == 0L || annot.time <= to)) {
+    while (getann(0, &annot) == 0 && (to == (WFDB_Time)0 || annot.time <= to)){
 	if (!isann(annot.anntyp)) continue;
 	if ((flag[0] && isqrs(annot.anntyp)) || flag[annot.anntyp]) {
 	    if (cflag == 0 || previous_annot_valid == 1) {

@@ -1,17 +1,18 @@
 # file: Makefile.tpl		G. Moody		23 May 2000
-#				Last revised:		6 December 2000
+#				Last revised:		27 April 2002
 # This section of the Makefile should not need to be changed.
 
 CFILES = ann2rr.c bxb.c calsig.c ecgeval.c epic.c fir.c ihr.c mfilt.c \
  mrgann.c mxm.c nst.c plotstm.c pscgen.c pschart.c psfd.c rdann.c rdsamp.c \
  rr2ann.c rxr.c sampfreq.c sample.c sigamp.c skewedit.c snip.c sortann.c \
  sqrs.c sqrs125.c sumann.c sumstats.c tach.c view.c vsetup.c wfdbcat.c \
- wfdbcollate.c wfdbdesc.c wfdbwhich.c wrann.c wrsamp.c wvscript.c xform.c
+ wfdbcollate.c wfdb-config.c wfdbdesc.c wfdbwhich.c wrann.c wrsamp.c \
+ wvscript.c xform.c
 XFILES = ann2rr bxb calsig ecgeval epic fir ihr mfilt \
  mrgann mxm nst plotstm pscgen pschart psfd rdann rdsamp \
  rr2ann rxr sampfreq sigamp skewedit snip sortann \
  sqrs sqrs125 sumann sumstats tach wfdbcat \
- wfdbcollate wfdbdesc wfdbwhich wrann wrsamp xform
+ wfdbcollate wfdb-config wfdbdesc wfdbwhich wrann wrsamp xform
 SCRIPTS = cshsetwfdb setwfdb
 PSFILES = pschart.pro psfd.pro 12lead.pro
 OTHERFILES = cshsetwfdb setwfdb setwfdb.bat sample8.hea
@@ -77,3 +78,6 @@ psfd:		psfd.c
 	$(CC) $(CFLAGS) -DPROLOG=\"$(PSPDIR)/psfd.pro\" psfd.c -o $@ $(LDFLAGS)
 sigamp:		sigamp.c
 	$(CC) $(CFLAGS) sigamp.c -o $@ $(LDFLAGS) -lm
+wfdb-config:	wfdb-config.c Makefile
+	$(CC) -DVERSION='"$(VERSION)"' -DCFLAGS='"-I$(INCDIR)"' \
+	  -DLDFLAGS='"$(LDFLAGS)"' -o $@ wfdb-config.c

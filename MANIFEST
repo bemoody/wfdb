@@ -46,6 +46,7 @@ app/view.c
 app/vsetup.c
 app/wfdbcat.c
 app/wfdbcollate.c
+app/wfdb-config.c
 app/wfdbdesc.c
 app/wfdbwhich.c
 app/wrann.c
@@ -300,6 +301,7 @@ doc/wag-src/wfdbcal.5
 doc/wag-src/wfdbcat.1
 doc/wag-src/wfdbcollate.1
 doc/wag-src/wfdbdesc.1
+doc/wag-src/wfdbf.3
 doc/wag-src/wfdbwhich.1
 doc/wag-src/wrann.1
 doc/wag-src/wrsamp.1
@@ -423,6 +425,7 @@ examples/Makefile.dos
 examples/Makefile.top
 examples/Makefile.tpl
 examples/psamples.c
+examples/psamplesx.c
 examples/README
 examples/refhr.c
 examples/stdev.c

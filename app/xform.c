@@ -1,9 +1,9 @@
 /* file: xform.c	G. Moody       8 December 1983
-			Last revised:  14 October 2001
+			Last revised:    20 May 2002
 
 -------------------------------------------------------------------------------
 xform: Sampling frequency, amplitude, and format conversion for WFDB records
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -502,7 +502,7 @@ char *argv[];
     if (from) startp = argv[(int)from];
     from = strtim(startp);
     if (from < 0L) from = -from;
-    strcpy(btstring, timstr(-from));
+    strcpy(btstring, mstimstr(-from));
     if (to) {
 	to = strtim(argv[(int)to]);
 	if (to < 0L) to = -to;

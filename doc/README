@@ -1,5 +1,5 @@
 file: README		G. Moody	7 September 1989
-			Last revised:	  10 March 2002
+			Last revised:	  18 March 2002
 
 This directory and its subdirectories contain documentation for the WFDB
 Software Package, including UNIX man pages in troff source format for the WFDB
@@ -10,12 +10,12 @@ under MS-Windows with the Cygwin toolkit, this material can be printed or
 installed on-line by following the instructions in `Makefile'.
 
 If you follow the instructions for a standard installation of the WFDB Software
-Package, the man pages from the wfdb-apps subdirectory will be installed so
-they can be read using 'man', 'xman', etc.  If you have the necessary
-formatting software, these man pages and a large amount of other documentation
-can be produced in a wide variety of formats from the sources in in this
-directory (see 'Makefile').  Here is a brief list of available formats and the
-commands needed to produce them:
+Package, the man pages from the wag-src subdirectory will be installed so they
+can be read using 'man', 'xman', etc.  If you have the necessary formatting
+software, these man pages and a large amount of other documentation can be
+produced in a wide variety of formats from the sources in in this directory
+(see 'Makefile').  Here is a brief list of available formats and the commands
+needed to produce them:
 
 WFDB Applications Guide
   printed copy	'make wag-book'(requires troff, tbl, latex, dvips, & a printer)

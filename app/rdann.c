@@ -1,9 +1,9 @@
 /* file rdann.c	    T. Baker and G. Moody	27 July 1981
-		    Last revised:	        26 February 2001
+		    Last revised:	        20 May 2002
 
 -------------------------------------------------------------------------------
 rdann: Print an annotation file in ASCII form
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -232,11 +232,12 @@ char *argv[];
     if (to) {
 	if (*argv[(int)to] == '#') {
 	    if ((beat_number = atol(argv[(int)to]+1)) <  1L) beat_number = 1L;
-	    to = 0L;
+	    to = (WFDB_Time)0;
 	}
 	else {
 	    beat_number = -1L;
 	    to = strtim(argv[(int)to]);
+	    if (to < (WFDB_Time)0) to = -to;
 	}
     }
 

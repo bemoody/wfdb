@@ -1,10 +1,10 @@
 # file: Makefile	G. Moody	24 June 1989
-#			Last revised: 18 December 2001
+#			Last revised:  11 March 2002
 # `make' description file for WFDB software documentation
 #
 # -----------------------------------------------------------------------------
 # WFDB applications: programs for working with annotated signals
-# Copyright (C) 2001 George B. Moody
+# Copyright (C) 2002 George B. Moody
 #
 # These programs are free software; you can redistribute them and/or modify
 # them under the terms of the GNU General Public License as published by the
@@ -69,25 +69,25 @@
 # of available formats and the commands needed to produce them:
 
 # WFDB Applications Guide
-# printed copy	'make ag'      (requires troff, tbl, latex, dvips, & a printer)
-# HTML		'make ag.html' (requires rman, latex2html, and perl)
-# man pages	'make ag.man'
-# PDF		'make ag.pdf'  (requires troff, tbl, latex, dvips, and ps2pdf)
-# PostScript	'make ag.ps'   (requires troff, tbl, latex, and dvips)
+# printed copy	'make wag-book' (requires troff, tbl, latex, dvips, a printer)
+# HTML		'make wag.html' (requires rman, latex2html, and perl)
+# man pages	'make wag.man'
+# PDF		'make wag.pdf'  (requires troff, tbl, latex, dvips, and ps2pdf)
+# PostScript	'make wag.ps'   (requires troff, tbl, latex, and dvips)
 #
 # WFDB Programmer's Guide
-# printed copy	'make pg'      (requires troff, texi2dvi, dvips, & a printer)
-# Windows help	'make pg.hlp'  (requires makertf and hcrtf)
-# HTML		'make pg.html' (requires texi2html and perl)
-# info		'make pg.info' (requires makeinfo or GNU emacs)
-# PDF		'make pg.pdf'  (requires texi2dvi)
-# PostScript	'make pg.ps'   (requires texi2dvi and dvips)
+# printed copy	'make wpg-book' (requires troff, texi2dvi, dvips, & a printer)
+# Windows help	'make wpg.hlp'  (requires makertf and hcrtf)
+# HTML		'make wpg.html' (requires texi2html and perl)
+# info		'make wpg.info' (requires makeinfo or GNU emacs)
+# PDF		'make wpg.pdf'  (requires texi2dvi)
+# PostScript	'make wpg.ps'   (requires texi2dvi and dvips)
 #
 # WAVE User's Guide
-# printed copy	'make ug'       (requires troff, latex, dvips, and a printer)
-# HTML		'make ug.html'  (requires latex2html and perl)
-# PDF		'make ug.pdf'   (requires pdflatex)
-#  PostScript	'make ug.ps'    (requires latex and dvips)
+# printed copy	'make wug-book' (requires troff, latex, dvips, and a printer)
+# HTML		'make wug.html' (requires latex2html and perl)
+# PDF		'make wug.pdf'  (requires pdflatex)
+#  PostScript	'make wug.ps'   (requires latex and dvips)
 
 # If GNU emacs or GNU info has been installed on your system, a hypertext
 # version of the WFDB Programmer's Guide may be installed by typing `make

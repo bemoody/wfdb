@@ -1,5 +1,5 @@
-# file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:  15 January 2002
+# file: Makefile.tpl		G. Moody	24 May 2000
+#				Last revised:  11 March 2002
 # This section of the Makefile should not need to be changed.
 
 # ARCH specifies the type of CPU and the operating system (e.g., 'i686-Linux').
@@ -54,7 +54,7 @@ clean:
 	cd waverc;   $(MAKE) clean
 	cd wview;    $(MAKE) -f clean
 	test -d doc && ( cd doc; $(MAKE) clean )
-	rm -f *~ conf/*~ conf/prompt config.cache */*.exe
+	rm -f *~ conf/*~ conf/prompt config.cache */*.exe $(PACKAGE)-*.spec
 
 # 'make config.cache': check configuration
 config.cache:
@@ -123,6 +123,12 @@ tarballs:	clean
 # binaries and other installed files
 bin-tarball:	test-install
 	cd $(HOME)/wfdb-test;  tar cfvz ../$(PACKAGE)-$(ARCH).tar.gz .
+
+# 'make doc-tarball': make a gzipped tar archive of formatted documents
+# (requires many freely-available utilities that are not part of this
+# package;  see doc/Makefile.top for details)
+doc-tarball:
+	cd doc; $(MAKE) tarball
 
 # 'make rpms': make source and binary RPMs
 RPMROOT=/usr/src/redhat

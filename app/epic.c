@@ -947,12 +947,16 @@ char *argv[];
        the test period. */
     if (min_length)
 	min_length = strtim(argv[min_length]);
-    if (start_time)
+    if (start_time) {
 	start_time = strtim(argv[(int)start_time]);
+	if (start_time < (WFDB_Time)0) start_time = -start_time;
+    }
     else
 	start_time = strtim("5:0");			/* 5 minutes */
-    if (end_time)
+    if (end_time) {
 	end_time = strtim(argv[(int)end_time]);
+	if (end_time < (WFDB_Time)0) end_time = -end_time;
+    }
     else if ((end_time = strtim("e")) == 0L)
 	end_time = -1L;		/* record length unavailable -- go to end of
 				   reference annotation file */

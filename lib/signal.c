@@ -1,10 +1,10 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  7 November 2001	wfdblib 10.2.1
+			Last revised:    21 May 2002	wfdblib 10.2.6
 WFDB library functions for signals
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -39,6 +39,7 @@ visible outside of this file:
  osigclose	(closes output signals)
  isgsetframe	(skips to a specified frame number in a specified signal group)
  getskewedframe	(reads an input frame, without skew correction)
+ rgetvec        (reads a sample from each input signal without resampling)
 
 This file also contains low-level I/O routines for signals in various formats;
 typically, the input routine for format N signals is named rN(), and the output
@@ -51,7 +52,7 @@ This file also contains definitions of the following WFDB library functions:
  osigfopen	(opens output signals by name)
  getspf [9.6]	(returns number of samples returned by getvec per frame)
  setgvmode [9.0](sets getvec operating mode)
- getvec		(reads a sample from each input signal)
+ getvec		(reads a (possibly resampled) sample from each input signal)
  getframe [9.0]	(reads an input frame)
  putvec		(writes a sample to each output signal)
  isigsettime	(skips to a specified time in each signal)
@@ -68,8 +69,10 @@ This file also contains definitions of the following WFDB library functions:
  wfdbsetstart [9.4](sets byte offset to be written by setheader)
  getinfo [4.0]	(reads a line of info for a record)
  putinfo [4.0]	(writes a line of info for a record)
- sampfreq	(gets the sampling frequency of a record)
- setsampfreq	(sets the sampling frequency)
+ rawsampfreq [10.2.6] (returns the rgetvec sampling frequency)
+ setisampfreq [10.2.6](sets the getvec sampling frequency)
+ sampfreq	(returns the getvec sampling frequency)
+ setsampfreq	(sets the putvec sampling frequency)
  setbasetime	(sets the base time and date)
  timstr		(converts sample intervals to time strings)
  mstimstr	(converts sample intervals to time strings with milliseconds)
@@ -191,9 +194,10 @@ static struct hsdata {
    for use by the strtim, timstr, etc., conversion functions.
 */
 static WFDB_Frequency ffreq;	/* frame rate (frames/second) */
-static WFDB_Frequency sfreq;	/* sampling frequency (samples/second) */
+static WFDB_Frequency ifreq;	/* samples/second/signal returned by getvec */
+static WFDB_Frequency sfreq;	/* samples/second/signal read by getvec */
 static WFDB_Frequency cfreq;	/* counter frequency (ticks/second) */
-static WFDB_Time btime;		/* base time (seconds since midnight) */
+static long btime;		/* base time (milliseconds since midnight) */
 static WFDB_Date bdate;		/* base date (Julian date) */
 static WFDB_Time nsamples;	/* duration of signals (in samples) */
 static double bcount;		/* base count (counter value at sample 0) */
@@ -222,7 +226,7 @@ static double bcount;		/* base count (counter value at sample 0) */
 static int segments;		/* number of segments found by readheader() */
 static int in_msrec;		/* current input record is: 0: a single-segment
 				   record; 1: a multi-segment record */
-static WFDB_Time msbtime;	/* base time for multi-segment record */
+static long msbtime;		/* base time for multi-segment record */
 static WFDB_Date msbdate;	/* base date for multi-segment record */
 static WFDB_Time msnsamples;	/* duration of multi-segment record */
 static struct segrec {
@@ -595,7 +599,7 @@ char *record;
 
     /* Determine the base time and date, if present and not set already. */
     if ((p = strtok((char *)NULL,"\n\r")) != NULL &&
-	btime == (WFDB_Time)0L && setbasetime(p) < 0)
+	btime == 0L && setbasetime(p) < 0)
 	return (-2);	/* error message will come from setbasetime */
 
     /* Special processing for master header of a multi-segment record. */
@@ -850,15 +854,17 @@ static void hsdfree()
 {
     struct hsdata *hs;
 
-    while (maxhsig)
-	if (hs = hsd[--maxhsig]) {
-	    if (hs->info.fname) (void)free(hs->info.fname);
-	    if (hs->info.units) (void)free(hs->info.units);
-	    if (hs->info.desc)  (void)free(hs->info.desc);
-	    (void)free(hs);
-	}
-    (void)free(hsd);
-    hsd = NULL;
+    if (hsd) {
+	while (maxhsig)
+	    if (hs = hsd[--maxhsig]) {
+		if (hs->info.fname) (void)free(hs->info.fname);
+		if (hs->info.units) (void)free(hs->info.units);
+		if (hs->info.desc)  (void)free(hs->info.desc);
+		(void)free(hs);
+	    }
+	(void)free(hsd);
+	hsd = NULL;
+    }
     maxhsig = 0;
 }
 		
@@ -868,25 +874,33 @@ static void isigclose()
     struct igdata *ig;
 
     if (nisig == 0) return;
-    while (nisig)
-	if (is = isd[--nisig]) {
-	    if (is->info.fname) (void)free(is->info.fname);
-	    if (is->info.units) (void)free(is->info.units);
-	    if (is->info.desc)  (void)free(is->info.desc);
-	    (void)free(is);
-	}
-    (void)free(isd);
-    isd = NULL;
+    if (isd) {
+	while (nisig)
+	    if (is = isd[--nisig]) {
+		if (is->info.fname) (void)free(is->info.fname);
+		if (is->info.units) (void)free(is->info.units);
+		if (is->info.desc)  (void)free(is->info.desc);
+		(void)free(is);
+	    }
+	(void)free(isd);
+	isd = NULL;
+    }
+    else
+	nisig = 0;
     maxisig = 0;
 
-    while (nigroups)
-	if (ig = igd[--nigroups]) {
-	    if (ig->fp) wfdb_fclose(ig->fp);
-	    if (ig->buf) (void)free(ig->buf);
-	    (void)free(ig);
-	}
-    (void)free(igd);
-    igd = NULL;
+    if (igd) {
+	while (nigroups)
+	    if (ig = igd[--nigroups]) {
+		if (ig->fp) wfdb_fclose(ig->fp);
+		if (ig->buf) (void)free(ig->buf);
+		(void)free(ig);
+	    }
+	(void)free(igd);
+	igd = NULL;
+    }
+    else
+	nigroups = 0;
     maxigroup = 0;
 
     istime = 0L;
@@ -905,39 +919,46 @@ static void osigclose()
     struct ogdata *og;
 
     if (nosig == 0) return;
-    while (nosig)
-	if (os = osd[--nosig]) {
-	    if (os->info.fname) (void)free(os->info.fname);
-	    if (os->info.units) (void)free(os->info.units);
-	    if (os->info.desc)  (void)free(os->info.desc);
-	    (void)free(os);
-	}
-    (void)free(osd);
-    osd = NULL;
+    if (osd) {
+	while (nosig)
+	    if (os = osd[--nosig]) {
+		if (os->info.fname) (void)free(os->info.fname);
+		if (os->info.units) (void)free(os->info.units);
+		if (os->info.desc)  (void)free(os->info.desc);
+		(void)free(os);
+	    }
+	(void)free(osd);
+	osd = NULL;
+    }
+    else
+	nosig = 0;
     maxosig = 0;
 
-    while (nogroups)
-	if (og = ogd[--nogroups]) {
-	    if (og->fp) {
-		/* If a block size has been defined, null-pad the buffer. */
-		if (og->bsize)
-		    while (og->bp != og->be)
-			*(og->bp++) = '\0';
-		/* Flush the last block unless it's empty. */
-		if (og->bp != og->buf)
-		    (void)wfdb_fwrite(og->buf, 1, og->bp - og->buf,
-				      og->fp);
-		/* Close file (except stdout, which will be closed on exit). */
-		if (og->fp->fp != stdout) {
-		    (void)wfdb_fclose(og->fp);
-		    og->fp = NULL;
+    if (ogd) {
+	while (nogroups)
+	    if (og = ogd[--nogroups]) {
+		if (og->fp) {
+		    /* If a block size has been defined, null-pad the buffer */
+		    if (og->bsize)
+			while (og->bp != og->be)
+			    *(og->bp++) = '\0';
+		    /* Flush the last block unless it's empty. */
+		    if (og->bp != og->buf)
+			(void)wfdb_fwrite(og->buf, 1, og->bp-og->buf, og->fp);
+		    /* Close file (except stdout, which is closed on exit). */
+		    if (og->fp->fp != stdout) {
+			(void)wfdb_fclose(og->fp);
+			og->fp = NULL;
+		    }
 		}
+		if (og->buf) (void)free(og->buf);
+		(void)free(og);
 	    }
-	    if (og->buf) (void)free(og->buf);
-	    (void)free(og);
-	}
-    (void)free(ogd);
-    ogd = NULL;
+	(void)free(ogd);
+	ogd = NULL;
+    }
+    else
+	nogroups = 0;
     maxogroup = 0;
 
     ostime = 0L;
@@ -1407,6 +1428,47 @@ WFDB_Sample *vector;
     return (stat);
 }
 
+static int rgetvec(vector)
+WFDB_Sample *vector;
+{
+    WFDB_Sample *tp;
+    WFDB_Signal s;
+    static int stat;
+
+    if (ispfmax < 2)	/* all signals at the same frequency */
+	return (getframe(vector));
+
+    if (gvmode == WFDB_LOWRES) {/* return one sample per frame, decimating
+				   (by averaging) if necessary */
+	unsigned c;
+	long v;
+
+	stat = getframe(tvector);
+	for (s = 0, tp = tvector; s < nisig; s++) {
+	    int sf = isd[s]->info.spf;
+
+	    for (c = v = 0; c < sf; c++)
+		v += *tp++;
+	    *vector++ = v/sf;
+	}
+    }
+    else {			/* return ispfmax samples per frame, using
+				   zero-order interpolation if necessary */
+	if (gvc >= ispfmax) {
+	    stat = getframe(tvector);
+	    gvc = 0;
+	}
+	for (s = 0, tp = tvector; s < nisig; s++) {
+	    int sf = isd[s]->info.spf;
+
+	    *vector++ = tp[(sf*gvc)/ispfmax];
+	    tp += sf;
+	}
+	gvc++;
+    }
+    return (stat);
+}
+
 /* WFDB library functions. */
 
 FINT isigopen(record, siarray, nsig)
@@ -1435,7 +1497,7 @@ int nsig;
 	    /* Open the first segment to get signal information. */
 	    if ((navail = readheader(segp->recname)) >= 0) {
 		if (msbtime == 0L) msbtime = btime;
-		if (msbdate == 0L) msbdate = bdate;
+		if (msbdate == (WFDB_Date)0) msbdate = bdate;
 	    }
 	}
 	if (navail == 0 && nsig)
@@ -1513,6 +1575,7 @@ int nsig;
 	    /* Skip this group if the signal file can't be opened. */
 	    if (ig->fp == NULL) {
 	        (void)free(ig->buf);
+		ig->buf = NULL;
 		continue;
 	    }
 	}
@@ -1847,45 +1910,71 @@ int mode;
     }
 }
 
+/* An application can specify the input sampling frequency it prefers by
+   calling setifreq after opening the input record. */
+
+static int mticks, nticks, mnticks, rgvstat;
+static WFDB_Time rgvtime, gvtime;
+static WFDB_Sample *gv0, *gv1;
+
+FINT setifreq(f)
+WFDB_Frequency f;
+{
+    if (f > 0.0) {
+	WFDB_Frequency g = sfreq;
+
+	gv0 = realloc(gv0, nisig*sizeof(WFDB_Sample));
+	gv1 = realloc(gv1, nisig*sizeof(WFDB_Sample));
+	if (gv0 == NULL || gv1 == NULL) {
+	    wfdb_error("setifreq: too many (%d) input signals\n", nisig);
+	    if (gv0) (void)free(gv0);
+	    ifreq = 0.0;
+	    return (-2);
+	}
+	ifreq = f;
+	while (fabs(f - g) > 0.005)
+	    if (f > g) f -= g;
+	    else g -= f;
+        mticks = (int)(sfreq/f + 0.5);
+	nticks = (int)(ifreq/f + 0.5);
+	mnticks = mticks * nticks;
+	gvtime = 0;
+	rgvstat = rgetvec(gv0);
+	rgvstat = rgetvec(gv1);
+	rgvtime = nticks;
+	return (0);
+    }
+    else {
+	ifreq = 0.0;
+	return (-1);
+    }
+}
+
 FINT getvec(vector)
 WFDB_Sample *vector;
 {
-    WFDB_Sample *tp;
-    WFDB_Signal s;
-    static int stat;
+    int i;
 
-    if (ispfmax < 2)	/* all signals at the same frequency */
-	return (getframe(vector));
+    if (ifreq == 0.0 || ifreq == sfreq)	/* no resampling necessary */
+	return (rgetvec(vector));
 
-    if (gvmode == WFDB_LOWRES) {/* return one sample per frame, decimating
-				   (by averaging) if necessary */
-	unsigned c;
-	long v;
-
-	stat = getframe(tvector);
-	for (s = 0, tp = tvector; s < nisig; s++) {
-	    int sf = isd[s]->info.spf;
-
-	    for (c = v = 0; c < sf; c++)
-		v += *tp++;
-	    *vector++ = v/sf;
-	}
+    /* Resample the input. */
+    if (rgvtime > mnticks) {
+	rgvtime -= mnticks;
+	gvtime  -= mnticks;
     }
-    else {			/* return ispfmax samples per frame, using
-				   zero-order interpolation if necessary */
-	if (gvc >= ispfmax) {
-	    stat = getframe(tvector);
-	    gvc = 0;
-	}
-	for (s = 0, tp = tvector; s < nisig; s++) {
-	    int sf = isd[s]->info.spf;
-
-	    *vector++ = tp[(sf*gvc)/ispfmax];
-	    tp += sf;
-	}
-	gvc++;
+    while (gvtime > rgvtime) {
+	for (i = 0; i < nisig; i++)
+	    gv0[i] = gv1[i];
+	rgvstat = rgetvec(gv1);
+	rgvtime += nticks;
     }
-    return (stat);
+    for (i = 0; i < nisig; i++) {
+	vector[i] = gv0[i] + (gvtime%nticks)*(gv1[i]-gv0[i])/nticks;
+        gv0[i] = gv1[i];
+    }
+    gvtime += mticks;
+    return (rgvstat);
 }
 
 FINT getframe(vector)
@@ -1898,7 +1987,7 @@ WFDB_Sample *vector;
 
 	/* First, obtain the samples needed. */
 	if (dsbi < 0) {	/* dsbuf contents are invalid -- refill dsbuf */
-	    for (dsbi = 0; dsbi < dsblen; dsbi += framelen)
+	    for (dsbi = i = 0; i < dsblen; dsbi = i += framelen)
 		stat = getskewedframe(dsbuf + dsbi);
 	    dsbi = 0;
 	}
@@ -2000,6 +2089,10 @@ WFDB_Time t;
     /* Handle negative arguments as equivalent positive arguments. */
     if (t < 0L) t = -t;
 
+    /* Convert t to raw sample intervals if we are resampling. */
+    if (ifreq > (WFDB_Frequency)0)
+	t = (WFDB_Time)(t * sfreq/ifreq);
+
     /* If we're in WFDB_HIGHRES mode, convert t from samples to frames, and
        save the remainder (if any) in trem. */
     if (sfreq != ffreq) {
@@ -2010,11 +2103,17 @@ WFDB_Time t;
 
     if ((stat = isgsetframe(g, t)) == 0 && g == 0) {
 	while (trem-- > 0) {
-	    if (getvec(uvector) < 0) {
+	    if (rgetvec(uvector) < 0) {
 		wfdb_error("isigsettime: improper seek on signal group %d\n",
 			   g);
 		return (-1);
 	    }
+	}
+	if (ifreq > (WFDB_Frequency)0 && ifreq != sfreq) {
+	    gvtime = 0;
+	    rgvstat = rgetvec(gv0);
+	    rgvstat = rgetvec(gv1);
+	    rgvtime = nticks;
 	}
     }
     return (stat);
@@ -2108,8 +2207,14 @@ unsigned int nsig;
 	    (void)wfdb_fprintf(oheader, "(%g)", bcount);
     }
     (void)wfdb_fprintf(oheader, " %ld", siarray[0].nsamp);
-    if (btime || bdate)
-	(void)wfdb_fprintf(oheader, " %s", timstr((WFDB_Time)(btime*sfreq)));
+    if (btime != 0L || bdate != (WFDB_Date)0) {
+        if (btime % 1000 == 0)
+	    (void)wfdb_fprintf(oheader, " %s",
+			   timstr((WFDB_Time)(btime*sfreq/1000.0)));
+	else
+	    (void)wfdb_fprintf(oheader, " %s",
+			   mstimstr((WFDB_Time)(btime*sfreq/1000.0)));
+    }
     if (bdate)
 	(void)wfdb_fprintf(oheader, "%s", datstr(bdate));
     (void)wfdb_fprintf(oheader, "\r\n");
@@ -2239,8 +2344,14 @@ unsigned nsegments;
 	    (void)wfdb_fprintf(oheader, "(%g)", msbcount);
     }
     (void)wfdb_fprintf(oheader, " %ld", msnsamples);
-    if (msbtime || msbdate)
-	(void)wfdb_fprintf(oheader, " %s", timstr((WFDB_Time)(msbtime*sfreq)));
+    if (msbtime != 0L || msbdate != (WFDB_Date)0) {
+        if (msbtime % 1000 == 0)
+	    (void)wfdb_fprintf(oheader, " %s",
+			   timstr((WFDB_Time)(msbtime*sfreq/1000.0)));
+	else
+	    (void)wfdb_fprintf(oheader, " %s",
+			   mstimstr((WFDB_Time)(msbtime*sfreq/1000.0)));
+    }
     if (msbdate)
 	(void)wfdb_fprintf(oheader, "%s", datstr(msbdate));
     (void)wfdb_fprintf(oheader, "\r\n");
@@ -2401,20 +2512,20 @@ char *string;
 	bdate = strdat(date_string);
 	(void)sprintf(time_string, "%d:%d:%d",
 		now->tm_hour, now->tm_min, now->tm_sec);
-	btime = (WFDB_Time)(strtim(time_string)/sfreq);
+	btime = (long)(strtim(time_string)*1000.0/sfreq);
 #endif
 	return (0);
     }
     while (*string == ' ') string++;
     if (p = strchr(string, ' '))
         *p++ = '\0';	/* split time and date components */
-    if ((btime = strtim(string)) == 0L ||
-	(p && (bdate = strdat(p)) == 0L)) {
+    if ((btime = strtim(string)) == 0L) {
 	if (p) *(--p) = ' ';
 	wfdb_error("setbasetime: incorrect time format, '%s'\n", string);
 	return (-1);
     }
-    btime = (WFDB_Time)(btime/sfreq);
+    if (p) bdate = strdat(p);
+    btime *= 1000.0/sfreq;
     return (0);
 }
 
@@ -2424,7 +2535,7 @@ WFDB_Time t;
     char *p;
 
     p = strtok(mstimstr(t), ".");		 /* discard msec field */
-    if (t <= 0L && (btime != 0L || bdate != 0L)) {	/* time of day */
+    if (t <= 0L && (btime != 0L || bdate != (WFDB_Date)0)) { /* time of day */
 	(void)strcat(p, date_string);		  /* append dd/mm/yyyy */
 	(void)strcat(p, "]");
     }
@@ -2436,12 +2547,16 @@ static WFDB_Date pdays = -1;
 FSTRING mstimstr(t)
 WFDB_Time t;
 {
-    double f = (sfreq > 0.) ? sfreq : 1.;
+    double f;
     int hours, minutes, seconds, msec;
     WFDB_Date days;
     long s;
 
-    if (t > 0L || (btime == 0L && bdate == 0L)) {	/* time interval */
+    if (ifreq > 0.) f = ifreq;
+    else if (sfreq > 0.) f = sfreq;
+    else f = 1.0;
+
+    if (t > 0L || (btime == 0L && bdate == (WFDB_Date)0)) { /* time interval */
 	if (t < 0L) t = -t;
 	/* Convert from sample intervals to seconds. */
 	s = t / f;
@@ -2460,7 +2575,7 @@ WFDB_Time t;
     }
     else {			/* time of day */
 	/* Convert to sample intervals since midnight. */
-	t = (WFDB_Time)(btime*sfreq) - t;
+	t = (WFDB_Time)(btime*sfreq/1000.0) - t;
 	/* Convert from sample intervals to seconds. */
 	s = t / f;
 	msec = (t - s*f)*1000/f;
@@ -2515,24 +2630,26 @@ char *string;
     WFDB_Date days = 0L;
     WFDB_Time t;
 
-    f = (sfreq > 0.) ? sfreq : 1.;
+    if (ifreq > 0.) f = ifreq;
+    else if (sfreq > 0.) f = sfreq;
+    else f = 1.0;
     while (*string==' ' || *string=='\t' || *string=='\n' || *string=='\r')
 	string++;
     switch (*string) {
       case 'c': return (cfreq > 0. ?
-			(WFDB_Time)((atof(string+1)-bcount)*sfreq/cfreq) :
+			(WFDB_Time)((atof(string+1)-bcount)*f/cfreq) :
 			(WFDB_Time)atol(string+1));
       case 'e':	return (in_msrec ? msnsamples : nsamples);
-      case 'f': return ((WFDB_Time)(atol(string+1)*sfreq/ffreq));
+      case 'f': return ((WFDB_Time)(atol(string+1)*f/ffreq));
       case 'i':	return (istime * (gvmode==WFDB_LOWRES ? 1: ispfmax));
       case 'o':	return (ostime);
       case 's':	return ((WFDB_Time)atol(string+1));
       case '[':	  /* time of day, possibly with date or days since start */
 	if (p = strchr(string, ' ')) {
 	    if (strchr(p, '/')) days = strdat(p) - bdate;
-	    else days = atol(p);
+	    else days = atol(p+1);
 	}
-	t = strtim(string+1) - (WFDB_Time)(btime*sfreq);
+	t = strtim(string+1) - (WFDB_Time)(btime*f/1000.0);
 	if (days > 0L) t += (WFDB_Time)(days*24*60*60*f);
 	return (-t);
       default:
@@ -2663,7 +2780,7 @@ void wfdb_sigclose()
     isigclose();
     osigclose();
     btime = bdate = nsamples = msbtime = msbdate = msnsamples = (WFDB_Time)0;
-    sfreq = ffreq = (WFDB_Frequency)0;
+    sfreq = ifreq = ffreq = (WFDB_Frequency)0;
     pdays = (WFDB_Date)-1;
     segments = in_msrec = skewmax = 0;
     if (dsbuf) {
@@ -2687,6 +2804,9 @@ void wfdb_sigclose()
 	    }
 	}
     }
+    if (gv0) (void)free(gv0);
+    if (gv1) (void)free(gv1);
+    gv0 = gv1 = NULL;
 }
 
 void wfdb_osflush()

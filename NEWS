@@ -1,3 +1,31 @@
+10.2.6:
+	Added setifreq() to the WFDB library.  This function allows the
+	caller to resample an input record at any convenient sampling
+	frequency, using getvec() to perform xform's resampling algorithm
+	transparently.  Thanks to Pat Hamilton for the inspiration!
+	NOTE:  The application must still keep track of the original
+	sampling frequency if it needs to read or write annotations, since
+	annotation times are in (unresampled) sample intervals in this
+	release.
+
+	Added 'wfdb-config', a tiny program (in app) that reports the WFDB
+	library version and linking information (similar to libwww-config,
+	gtk-config, etc.).
+
+	The WFDB library now records the base time with millisecond precision
+	(previous versions did so with one-second precision), and 'xform'
+	provides starting times to the library function 'setbasetime' with
+	millisecond precision.  Thanks to Allavatam Venuopal for providing
+	examples that illustrated the need for these features.
+
+	Fixed handling of absolute time strings in 'ann2rr', 'bxb', 'epic',
+	'fir', 'ihr', 'mxm', 'pscgen', 'rdann', and 'rxr' (all in app).
+
+	Fixed deskewing buffer initialization in getframe() (in lib/signal.c).
+	broken by 10.2.0 update, which introduced an infinite loop when
+	reading a record that requires skew correction starting at sample 0.
+	Thanks to Andrew Walsh for finding an example that triggered this bug.
+
 10.2.5:
 	New output format options in 'ann2rr' and 'ihr'.
 

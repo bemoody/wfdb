@@ -1,4 +1,5 @@
 s/sampfreq-1.htm/sampfr-1.htm/g
+s/wfdbcal-1.htm/wfdbca-1.htm/g
 s/wfdbwhich-1.htm/wfdbwh-1.htm/g
 s/sumstats-1.htm/sumsta-1.htm/g
 s/ecgeval-1.htm/ecgeva-1.htm/g

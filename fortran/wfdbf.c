@@ -1,5 +1,5 @@
 /* file: wfdbf.c	G. Moody	23 August 1995
-			Last revised:  6 February 2002
+			Last revised:   11 March 2002
 
 _______________________________________________________________________________
 wfdbf: Fortran wrappers for the WFDB library functions
@@ -213,7 +213,7 @@ long *nsig;
     return (osigopen(record, sinfo, (unsigned int)(*nsig)));
 }
 
-/* Before using osigfopen_, use setsiginfo to set the contents of the signal
+/* Before using osigfopen_, use setsiginfo_ to set the contents of the signal
    information structures. */
 long osigfopen_(nsig)
 long *nsig;
@@ -221,8 +221,8 @@ long *nsig;
     return (osigfopen(sinfo, (unsigned int)(*nsig)));
 }
 
-/* Before using wfdbinit_, use setanninfo and setsiginfo to set the contents of
-   the annotation and signal information structures. */
+/* Before using wfdbinit_, use setanninfo_ and setsiginfo_ to set the contents
+   of the annotation and signal information structures. */
 long wfdbinit_(record, nann, nsig)
 char *record;
 long *nann, *nsig;
@@ -239,7 +239,8 @@ long *mode;
     return (0L);
 }
 
-long getspf_(void)
+long getspf_(dummy)
+long *dummy;
 {
     return (getspf());
 }

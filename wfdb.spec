@@ -34,6 +34,12 @@ make install
 %clean
 make clean
 
+%post
+/sbin/ldconfig
+
+%postun
+/sbin/ldconfig
+
 %files
 %defattr(-,root,root)
 %doc checkpkg doc examples fortran lib/COPYING.LIB wave/anntab wave/wavemenu.def COPYING INSTALL MANIFEST NEWS README README.NETFILES

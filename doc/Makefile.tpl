@@ -1,5 +1,5 @@
-# file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:  20 December 2001
+# file: Makefile.tpl		G. Moody	24 May 2000
+#				Last revised:  11 March 2002
 # Change the settings below as appropriate for your setup.
 
 # Set COLORS to 'color' if you have a color printer and would like to print
@@ -64,7 +64,8 @@ MAN5 = $(MANDIR)/man5
 MAN7 = $(MANDIR)/man7
 # If you want to put the man pages somewhere else, edit 'maninst.sh' first.
 
-# PERL is the full pathname of your perl interpreter, needed for 'make htmlpg'.
+# PERL is the full pathname of your perl interpreter, needed for
+# 'make wpg.html'.
 PERL = /usr/bin/perl
 
 # PSPRINT is the name of the program that prints PostScript files. If your
@@ -74,7 +75,7 @@ PERL = /usr/bin/perl
 PSPRINT = lpr
 
 # TROFF is the name of the program that prints UNIX troff files (needed to
-# 'make ag' and for the covers of the guides).  Use 'groff' if you have
+# 'make wag-book' and for the covers of the guides).  Use 'groff' if you have
 # GNU groff (the preferred formatter).
 TROFF = groff
 # Use 'ptroff' if you have Adobe TranScript software.

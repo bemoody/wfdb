@@ -1,9 +1,9 @@
 /* file: bxb.c		G. Moody	14 December 1987
-			Last revised:	 7 November 2001
+			Last revised:	  20 May 2002
 
 -------------------------------------------------------------------------------
 bxb: ANSI/AAMI-standard beat-by-beat annotation file comparator
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -778,12 +778,25 @@ char *argv[];
 	match_dt = (int)strtim(argv[match_dt]);
     else
 	match_dt = (int)strtim(".15");		/* 150 milliseconds */
-    if (start)
+    if (start) {
 	start = strtim(argv[(int)start]);
+	/* If the header file defines a base time (absolute time of day),
+	   the start and end times can be supplied in the form '[hh:mm:ss]',
+	   and strtim returns a negative value (to signal that the user
+	   specified the time in this way).  In this case, the magnitude of
+	   the returned value is the elapsed time in sample intervals.  We
+	   don't care how the user entered the time here, so we throw away
+	   the sign information and keep the elapsed time. */
+	if (start < (WFDB_Time)0)
+	    start = -start;
+    }
     else
 	start = strtim("5:0");			/* 5 minutes */
-    if (end_time)
+    if (end_time) {
 	end_time = strtim(argv[(int)end_time]);
+	/* See the comments about strtim in the previous block (above). */
+	if (end_time < (WFDB_Time)0) end_time = -end_time;
+    }
     else if ((end_time = strtim("e")) == 0L)
 	end_time = -1L;		/* record length unavailable -- go to end of
 				   reference annotation file */

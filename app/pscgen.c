@@ -1,9 +1,9 @@
 /* file: pscgen.c	G. Moody	26 November 1990
-			Last revised:	  4 May 1999
+			Last revised:	  20 May 2002
 
 -------------------------------------------------------------------------------
 pscgen: Generate a script for pschart
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -80,6 +80,7 @@ char *argv[];
 		exit(1);
 	    }
 	    from = strtim(argv[i]);
+	    if (from < (WFDB_Time)0) from = -from;
 	    break;
 	  case 'l':	/* specify strip length */
 	    if (++i >= argc) {
@@ -94,6 +95,7 @@ char *argv[];
 		exit(1);
 	    }
 	    to = strtim(argv[i]);
+	    if (to < (WFDB_Time)0) to = -to;
 	    break;
 	}
 	else {

@@ -1,5 +1,5 @@
 /* file ihr.c		G. Moody      12 November 1992
-			Last revised: 15 January 2002
+			Last revised:   20 May 2002
 
 -------------------------------------------------------------------------------
 ihr: Generate instantaneous heart rate data from annotation file
@@ -167,7 +167,10 @@ char *argv[];
 	exit(2);
 
     if (from && iannsettime(strtim(argv[(int)from])) < 0) exit(2);
-    if (to) to = strtim(argv[(int)to]);
+    if (to) {
+        to = strtim(argv[(int)to]);
+	if (to < (WFDB_Time)0) to = -to;
+    }
 
     if (flag[0])    /* neither -i nor -p used -- include only normal beats */
 	for (j = 0; j <= ACMAX; j++)

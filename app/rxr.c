@@ -1,9 +1,9 @@
 /* file: rxr.c		G. Moody	16 August 1989
-			Last revised:   7 November 2001
+			Last revised:     20 May 2002
 
 -------------------------------------------------------------------------------
 rxr: ANSI/AAMI-standard run-by-run annotation file comparator
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -701,12 +701,16 @@ char *argv[];
 	match_dt = (int)strtim(argv[match_dt]);
     else
 	match_dt = (int)strtim(".15");		/* 150 milliseconds */
-    if (start)
+    if (start) {
 	start = strtim(argv[(int)start]);
+	if (start < (WFDB_Time)0) start = -start;
+    }
     else
 	start = strtim("5:0");			/* 5 minutes */
-    if (end_time)
+    if (end_time) {
 	end_time = strtim(argv[(int)end_time]);
+	if (end_time < (WFDB_Time)0) end_time = -end_time;
+    }
     else if ((end_time = strtim("e")) == 0L)
 	end_time = -1L;		/* record length unavailable -- go to end of
 				   reference annotation file */

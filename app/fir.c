@@ -1,9 +1,9 @@
 /* file: fir.c		G. Moody	5 January 1987
-			Last revised:   9 October 2001
+			Last revised:     20 May 2002
 
 -------------------------------------------------------------------------------
 fir: General-purpose FIR filter for database records
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -227,10 +227,13 @@ char *argv[];
     }
     if (from > 0L) {
 	from = strtim(argv[from]);
+	if (from < (WFDB_Time)0) from = -from;
 	(void)isigsettime(from);
     }
-    if (to > 0L)
+    if (to > 0L) {
 	to = strtim(argv[to]);
+	if (to < (WFDB_Time)0) to = -to;
+    }
     nsamp = (to > 0L) ? to - from : -1L;
     if ((vout = (int *)calloc((unsigned)nsig, sizeof(int))) == NULL ||
 	(vin = (int **)calloc((unsigned)flen, sizeof(int *))) == NULL)
