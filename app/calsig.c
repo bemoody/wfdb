@@ -1,9 +1,9 @@
 /* file: calsig.c	G. Moody	 4 March 1991
-			Last revised:    24 May 2000
+			Last revised:   9 October 2001
 
 -------------------------------------------------------------------------------
 calsig: measure gains and baselines in a DB record and rewrite header
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -75,29 +75,29 @@ extern char *malloc();
 
 #define UNITSLEN	20
 
-int nsig;
-static char units[WFDB_MAXSIG][UNITSLEN+1];
-static double high[WFDB_MAXSIG], low[WFDB_MAXSIG];
-static int do_cal[WFDB_MAXSIG];
-static int dc[WFDB_MAXSIG];	/* dc[i] is 1 if signal i is DC-coupled */
-static struct info_rec {
+int isiglist = 0, ncsig = 0, nsig;
+int *vhigh, *vlow;
+char **units;
+double *high, *low;
+int *do_cal;
+int *dc;		/* dc[i] is 1 if signal i is DC-coupled */
+struct info_rec {
     struct info_rec *next;
     char *info_string;
 } *first_rec, *current_rec, *last_rec;
 char *pname, *prog_name();
 void rewrite_header(), help();
-static WFDB_Siginfo s[WFDB_MAXSIG];
-static WFDB_Sample b[WFDB_MAXSIG];
-static WFDB_Gain g[WFDB_MAXSIG];
+WFDB_Siginfo *s;
+WFDB_Sample *b;
+WFDB_Gain *g;
 
 main(argc, argv)
 int argc;
 char *argv[];
 {
     char *cfname=NULL, *p, *record = NULL, *t0p = NULL, *t1p = NULL, *getenv();
-    int do_skip = 1,  *h[WFDB_MAXSIG], *ho[WFDB_MAXSIG], i, multi_seg = 0,
-	n = 0, o[WFDB_MAXSIG], qflag = 0, Qflag = 0, v[WFDB_MAXSIG], vflag = 0,
-	vmax[WFDB_MAXSIG], vmin[WFDB_MAXSIG];
+    int do_skip = 1,  **h, **ho, i, multi_seg = 0, n = 0, *o, qflag = 0,
+	Qflag = 0, *v, vflag = 0, *vmax, *vmin;
     long nsamp, t, t0 = 0L, t1;
 
     /* Read and interpret command-line arguments. */
@@ -137,20 +137,14 @@ char *argv[];
 	    }
 	    record = argv[i];
 	    break;
-	  case 's':
-	    while (++i < argc && *argv[i] != '-') {
-		int sig;
-
-		sig = atoi(argv[i]);
-		if (0 <= sig && sig < WFDB_MAXSIG) {
-		    do_cal[sig] = 1;
-		    n++;
-		}
+	  case 's':	/* signal list follows */
+	    isiglist = i+1; /* index of first argument containing a signal # */
+	    while (i+1 < argc && *argv[i+1] != '-') {
+		i++;
+		ncsig++;	/* number of elements in signal list */
 	    }
-	    --i;
-	    if (n < 1) {
-		(void)fprintf(stderr,
-			"%s: one or more signal numbers must follow -s\n",
+	    if (ncsig == 0) {
+		(void)fprintf(stderr, "%s: signal list must follow -s\n",
 			pname);
 		exit(1);
 	    }
@@ -185,20 +179,51 @@ char *argv[];
     }
 
     /* Open the record. */
-    if ((nsig = isigopen(record, s, WFDB_MAXSIG)) < 1) exit(2);
+    if ((nsig = isigopen(record, NULL, 0)) < 1) exit(2);
+    if ((s = malloc(nsig * sizeof(WFDB_Siginfo))) == NULL ||
+	(b = malloc(nsig * sizeof(WFDB_Sample))) == NULL ||
+	(g = malloc(nsig * sizeof(WFDB_Gain))) == NULL ||
+	(units = malloc(nsig * sizeof(char **))) == NULL ||
+	(high = malloc(nsig * sizeof(double))) == NULL ||
+	(low = malloc(nsig * sizeof(double))) == NULL ||
+	(do_cal = malloc(nsig * sizeof(int))) == NULL ||
+	(dc = malloc(nsig * sizeof(int))) == NULL ||
+	(vhigh = malloc(nsig * sizeof(int))) == NULL ||
+	(vlow = malloc(nsig * sizeof(int))) == NULL ||
+	(h = malloc(nsig * sizeof(int *))) == NULL ||
+	(ho = malloc(nsig * sizeof(int *))) == NULL ||
+	(o = malloc(nsig * sizeof(int))) == NULL ||
+	(v = malloc(nsig * sizeof(int))) == NULL ||
+	(vmax = malloc(nsig * sizeof(int))) == NULL ||
+	(vmin = malloc(nsig * sizeof(int))) == NULL) {
+	fprintf(stderr, "%s: insufficient memory\n", pname);
+	exit(2);
+    }
+    for (i = 0; i < nsig; i++)
+	if ((units[i] = malloc((UNITSLEN+1) * sizeof(char))) == NULL) {
+	    fprintf(stderr, "%s: insufficient memory\n", pname);
+	    exit(2);
+	}
+    if (isigopen(record, s, nsig) != nsig) exit(2);
+
     if (strtim("e") != s[0].nsamp) multi_seg = 1;
 
     /* If a signal list was provided, validate it;  otherwise, generate one. */
-    if (n > 0) {
-	for (i = nsig; i < WFDB_MAXSIG; i++)
-	    if (do_cal[i]) { do_cal[i] = 0; n--; }
+    if (isiglist > 0) {
+	for (i = 0; i < nsig; i++)
+	    do_cal[i] = 0;
+	for (i = 0; i < ncsig; i++) {
+	    n = atoi(argv[isiglist+i]);
+	    if (0 <= n && n < nsig)
+		do_cal[i] = 1;
+	}
     }
     else {
 	for (i = 0; i < nsig; i++)
 	    do_cal[i] = 1;
-	n = nsig;
+	ncsig = nsig;
     }
-    if (n < 1) {
+    if (ncsig < 1) {
 	(void)fprintf(stderr, "%s: no signals to be calibrated\n", pname);
 	exit(2);
     }
@@ -318,7 +343,7 @@ char *argv[];
        endpoints as representing the high and low values of the calibration
        pulse. */
     if (qflag) {
-	int vhigh[WFDB_MAXSIG], vlow[WFDB_MAXSIG], vtemp;
+	int vtemp;
 
 	if (getvec(vlow) < nsig) exit(2);
 	if (do_skip) {
@@ -345,8 +370,6 @@ char *argv[];
        takes the maximum and minimum sample values as representing the high
        and low values of the calibration pulse. */
     else if (Qflag) {
-	int vhigh[WFDB_MAXSIG], vlow[WFDB_MAXSIG];
-
 	if (getvec(vlow) < nsig) exit(2);
 	for (i = 0; i < nsig; i++)
 	    vhigh[i] = vlow[i];
@@ -375,14 +398,12 @@ char *argv[];
 	for (i = 0; i < nsig; i++)
 	    if (do_cal[i]) {
 		if (s[i].adcres < 1) s[i].adcres = WFDB_DEFRES;
-#ifndef lint
 		if ((h[i] = (int *)calloc((unsigned)(1<<s[i].adcres),
 					  sizeof(int))) == NULL) {
 		    (void)fprintf(stderr, "%s: insufficient memory\n",
 				  pname);
 		    exit(3);
 		}
-#endif
 		ho[i] = h[i] + (o[i] = (1 << (s[i].adcres-1)) - s[i].adczero);
 		vmax[i] = s[i].adczero + (1 << (s[i].adcres-1)) - 1;
 		vmin[i] = s[i].adczero - (1 << (s[i].adcres-1));
@@ -418,12 +439,10 @@ char *argv[];
 		   length of the window is wl (the larger of 8 and n/256, where
 		   n is the number of bins in the histogram). */
 		if ((wl = n >> 8) < 8) wl = 8;
-#ifndef lint
 		if ((r = (int *)malloc((unsigned)(wl+1)*sizeof(int))) == NULL){
 		    (void)fprintf(stderr, "%s: insufficient memory\n", pname);
 		    exit(3);
 		}
-#endif
 	        for (jj = 0; jj < wl+1; jj++)
 		    r[jj] = (jj >= (wl/2)+1) ? hp[jj-(wl/2)-1] : 0;
 		/* hs is the smoothed histogram value for bin j, and dhs is the
@@ -529,7 +548,7 @@ char *argv[];
 	    for (p = buf; *p && *p != ' '; p++)
 		;
 	    *p = '\0';
-	    (void)isigopen(buf, s, -WFDB_MAXSIG);
+	    (void)isigopen(buf, s, -nsig);
 	    rewrite_header(buf);
 	    wfdbquit();
 	}

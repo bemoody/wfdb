@@ -1,9 +1,9 @@
 /* file: nst.c		G. Moody	8 December 1983
-			Last revised:  19 September 1999
+			Last revised:	10 October 2001
 
 -------------------------------------------------------------------------------
 nst: Noise stress test
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -32,27 +32,26 @@ _______________________________________________________________________________
 #else
 #include <strings.h>
 #endif
+#ifdef NOMKSTEMP
+#define mkstemp mktemp
+#endif
 #ifdef __STDC__
 # include <stdlib.h>
 # if _MSC_VER >= 700
-#  define mktemp _mktemp
+#  define mkstemp _mktemp
 #  define unlink _unlink
 # endif
 #else
 extern double atof();
 extern void exit();
 # ifdef NOMALLOC_H
-extern char *malloc();
+extern char *calloc(), *malloc(), *realloc();
 # else
 # include <malloc.h>
 # endif
 #endif
 #include <wfdb/wfdb.h>
 #include <wfdb/ecgcodes.h>
-
-#ifdef lint
-char *mktemp();	/* just to keep lint happy -- return value not used */
-#endif
 
 /* Define the WFDB path component separator (OS-dependent). */
 #ifdef MSDOS		/* for MS-DOS, OS/2, etc. */
@@ -66,8 +65,9 @@ char *mktemp();	/* just to keep lint happy -- return value not used */
 #endif
 
 char *pname, *prog_name();
-int format = 16;	/* format for output signal file */
-static WFDB_Siginfo si[WFDB_MAXSIG];
+double *gn;
+int format = 16, nisig, nnsig, *nse, *vin, *vout, *z, *zz;
+WFDB_Siginfo *si;
 
 main(argc, argv)
 int argc;
@@ -75,11 +75,9 @@ char *argv[];
 {
     static char answer[10], buf[256], *wfdbp, irec[10], nrec[21], nnrec[20],
         orec[10], refaname[10], *protocol, tfname[9], *p, *s;
-    double anoise[WFDB_MAXSIG], asig[WFDB_MAXSIG], nsr, r[WFDB_MAXSIG],
-        snr = -999999.0;
-    static double g[WFDB_MAXSIG], nsf, ssf;
+    double *anoise, *asig, *g, nsf = 0.0, nsr, *r, snr = -999999.0, ssf = 0.0;
     FILE *ifile;
-    int i, nisig, nnsig;
+    int i;
     long t, t0, tf, dt;
     WFDB_Anninfo ai;
     static WFDB_Annotation annot;
@@ -160,25 +158,25 @@ char *argv[];
 	}
     }
 
-    /* Make sure that the WFDB path begins with an empty component (otherwise,
-       nst may not be able to find the protocol file it generates). */
+    /* Make sure that the WFDB path begins with a '.' (current directory)
+       component or an empty component (otherwise, nst may not be able to find
+       the protocol file it generates). */
     wfdbp = getwfdb();
-    if (*wfdbp != PSEP) {
-#ifndef lint
+    if (*wfdbp != PSEP &&
+	!(*wfdbp = '.' && ((*wfdbp+1) == PSEP || *(wfdbp+1) == ' '))) {
 	char *nwfdbp;
 
 	if ((nwfdbp = (char *)malloc(strlen(wfdbp+2))) == NULL) {
-	    fprintf(stderr, "%s: memory allocation error\n", pname);
+	    fprintf(stderr, "%s: insufficient memory\n", pname);
 	    exit(1);
 	}
 	(void)sprintf(nwfdbp, "%c%s", PSEP, wfdbp);
 	setwfdb(nwfdbp);
-#endif
     }
 
     /* Generate a temporary file name for use below. */
     (void)strcpy(tfname, "nsXXXXXX");
-    (void)mktemp(tfname);
+    (void)mkstemp(tfname);
 
     /* Set the reference annotator name if it was not specified with -a. */
     if (refaname[0] == '\0')
@@ -220,6 +218,33 @@ char *argv[];
 	orec[strlen(orec)-1] = '\0';
     }
 
+    /* Count the input signals. */
+    if ((nisig = isigopen(irec, NULL, 0)) < 1) exit(2);
+    wfdbquiet();   /* suppress warning if sampling frequencies don't match */
+    if ((nnsig = isigopen(nrec, NULL, 0)) < 1) {
+	(void)fprintf(stderr, "%s: can't read record %s\n", pname, nrec+1);
+	exit(2);
+    }
+    wfdbverbose();
+
+    /* Allocate storage. */
+    if ((si = malloc((nisig+nnsig) * sizeof(WFDB_Siginfo))) == NULL ||
+	(anoise = malloc(nnsig * sizeof(double))) == NULL ||
+	(asig = malloc(nisig * sizeof(double))) == NULL ||
+	(r = malloc(nisig * sizeof(double))) == NULL ||
+	(g = malloc(nisig * sizeof(double))) == NULL ||
+	(gn = malloc(nisig * sizeof(double))) == NULL ||
+	(nse = malloc(nisig * sizeof(int))) == NULL ||
+	(vin = malloc(nisig * sizeof(int))) == NULL ||
+	(vout = malloc(nisig * sizeof(int))) == NULL ||
+	(z = calloc(nisig, sizeof(int))) == NULL ||
+	(zz = calloc(nisig, sizeof(int))) == NULL) {
+	(void)fprintf(stderr, "%s: insufficient memory\n", pname);
+	exit(2);
+    }
+    for (i = 0; i < nisig; i++)
+	g[i] = 0.;
+
     /* If the protocol was unspecified, generate one. */
     if (protocol == (char*)NULL) {
 	/* Get the SNR if it was not specified using -s. */
@@ -242,11 +267,11 @@ char *argv[];
 			  "%s: can't read temporary file %s\n", pname, tfname);
 	    exit(1);
 	}
-	for (nnsig = 1; fscanf(ifile, "%lf", &anoise[nnsig]) == 1; nnsig++) {
-	    if (anoise[nnsig] == 0.0) {
+	for (i = 1; fscanf(ifile, "%lf", &anoise[i]) == 1; i++) {
+	    if (anoise[i] == 0.0) {
 		(void)fprintf(stderr,
 		 "%s: noise signal %d amplitude is zero -- can't normalize\n",
-			      pname, nnsig);
+			      pname, i);
 		exit(2);
 	    }
 	}
@@ -263,11 +288,11 @@ char *argv[];
 			  tfname);
 	    exit(1);
 	}
-	for (nisig = 1; fscanf(ifile, "%lf", &asig[nisig]) == 1; nisig++) {
-	    if (asig[nisig] == 0.0) {
+	for (i = 1; fscanf(ifile, "%lf", &asig[i]) == 1; i++) {
+	    if (asig[i] == 0.0) {
 		(void)fprintf(stderr,
 		    "%s: ECG signal %d amplitude is zero -- can't normalize\n",
-			      pname, nisig);
+			      pname, i);
 		exit(2);
 	    }
 	}
@@ -367,7 +392,7 @@ char *argv[];
 	    (void)strcpy(nrec+1, nnrec);
 	}
 	else {
-	    if ((nnsig = isigopen(nrec+1, si, -WFDB_MAXSIG)) <= 0) {
+	    if (isigopen(nrec+1, si, -nnsig) != nnsig) {
 		(void)fprintf(stderr, "\n%s: can't read record %s\n", pname,
 			      nrec+1);
 		exit(2);
@@ -417,21 +442,18 @@ char *irec, *nrec, *protocol, *orec;
 double snr;
 {
     char buf[80], ofname[20], *p;
-    int errct = 0, i, nisig, nnsig, nse[WFDB_MAXSIG-1], vin[WFDB_MAXSIG],
-        vout[WFDB_MAXSIG-1];
-    static int z[WFDB_MAXSIG-1], zz[WFDB_MAXSIG-1];
+    int errct = 0, i;
     long nlen, nend, t = 0L, dt, next_tick;
-    double gn[WFDB_MAXSIG-1];
     WFDB_Annotation annot;
     WFDB_Anninfo ai;
 
-    /* Initialization section.  Open ECG signals first. */
-    if ((nisig = isigopen(irec, si, WFDB_MAXSIG-1)) < 1) exit(2);
+    /* Open ECG signals. */
+    if (isigopen(irec, si, nisig) != nisig) exit(2);
 
     /* Open the noise record. */
     wfdbquiet();
-    if ((nnsig = isigopen(nrec, si+nisig, WFDB_MAXSIG-nisig)) < 1) {
-	(void)fprintf(stderr, "%s: can't read record %s\n", nrec+1);
+    if (isigopen(nrec, si+nisig, nnsig) != nnsig) {
+	(void)fprintf(stderr, "%s: can't read record %s\n", pname, nrec+1);
 	exit(2);
     }
     wfdbverbose();

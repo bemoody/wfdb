@@ -1,5 +1,5 @@
 /* file: wfdbcollate.c        G. Moody        28 April 1994
-			      Last revised:  10 September 2001
+			      Last revised:   9 October 2001
 
 -------------------------------------------------------------------------------
 wfdbcollate: Collate WFDB records into a multi-segment record
@@ -79,8 +79,15 @@ however, that older applications can generally be updated without source
 changes simply by recompiling them and linking them with the current WFDB
 library.  */
 
-
 #include <stdio.h>
+#ifndef __STDC__
+extern void exit();
+#endif
+#ifndef NOMALLOC_H
+#include <malloc.h>
+#else
+extern char *malloc();
+#endif
 #include <wfdb/wfdb.h>
 
 #define DEFSEGLEN	"10:0"	/* segments are 10 minutes long by default */
@@ -89,8 +96,8 @@ library.  */
 char *pname, *prog_name();
 WFDB_Anninfo ai;
 WFDB_Annotation annot;
-WFDB_Sample v[WFDB_MAXSIG*WFDB_MAXSPF];
-WFDB_Siginfo si[WFDB_MAXSIG];
+WFDB_Sample *v;
+WFDB_Siginfo *si;
 
 int collate();
 void help(), splitrecord();
@@ -107,7 +114,7 @@ void splitrecord(argc, argv)
 int argc;
 char *argv[];
 {
-    int i, segnumber = 0, nsig;
+    int framelen, i, segnumber = 0, nsig;
     static char *irecname, *orecname, segname[10], sigfname[15];
     static char irecbase[30], segbase[30];
     static WFDB_Time seglen, t, tf;
@@ -147,8 +154,24 @@ char *argv[];
 	help();
 	exit(1);
     }
-    if ((nsig = isigopen(irecname, si, WFDB_MAXSIG)) <= 0)
+    /* Determine the number of signals in the record. */
+    if ((nsig = isigopen(irecname, NULL, 0)) <= 0)
 	exit(2);
+    /* Allocate storage for the signal information structures. */
+    if ((si = malloc(nsig * sizeof(WFDB_Siginfo))) == NULL) {
+	fprintf(stderr, "%s: insufficient memory\n", pname);
+	exit(3);
+    }
+    /* Open the input signals. */
+    if (isigopen(irecname, si, nsig) != nsig)
+	exit(2);
+    /* Allocate storage for the sample frame. */
+    for (i = framelen = 0; i < nsig; i++)
+	framelen += si[i].spf;
+    if ((v = malloc(framelen * sizeof(WFDB_Sample))) == NULL) {
+	fprintf(stderr, "%s: insufficient memory\n", pname);
+	exit(3);
+    }
     if (newheader(orecname) < 0)
 	exit(2);
     if (seglen > 0) {
@@ -216,7 +239,7 @@ char *argv[];
 	wfdbquit();
 	fprintf(stderr, " done\ncollating segments ...");
 
-	/* build argument list for main() */
+	/* build argument list for collate() */
 	sprintf(lastsegstr, "%d", segnumber);
 	cargv[0] = pname;
 	cargv[1] = orecname;
@@ -318,6 +341,18 @@ char *argv[];
 	if (annopen(orecname, &ai, 1) < 0)
 	    exit(3);
 	ai.stat = WFDB_READ;
+	/* Determine the number of signals in the first segment of the
+	   record.  (We assume this is constant for all segments.) */
+	if ((nsig = isigopen(irecname[0], NULL, 0)) <= 0)
+	    exit(2);
+	/* Allocate storage for the signal information structures. */
+	if ((si = malloc(nsig * sizeof(WFDB_Siginfo))) == NULL) {
+	    fprintf(stderr, "%s: insufficient memory\n", pname);
+	    exit(3);
+	}
+	/* Assume that segments are of the default length unless the
+	   header tells us otherwise (after invoking isigopen below). */
+	si[0].nsamp = strtim(DEFSEGLEN);
 	for (i = 0; i < nsegments; i++) {
 	    sprintf(buf, "+%s", irecname[i]);
 	    if (annopen(buf, &ai, 1) == 0) {
@@ -327,11 +362,13 @@ char *argv[];
 		}
 		iannclose(0);	/* close input file, leave output file open */
 	    }
-	    (void)isigopen(irecname[i], si, -WFDB_MAXSIG);
-	    /* If isigopen fails, the contents of si are undisturbed.  In this
-	       case, we need to guess the length of the segment.  A good guess
-	       is that it is the same length as the previous segment -- so we
-	       can use si[0].nsamp irrespective of the success of isigopen! */
+	    /* Fill the signal info structures without opening the signals. */
+	    (void)isigopen(irecname[i], si, -nsig);
+	    /* If isigopen fails, the previous contents of si are undisturbed.
+	       In this case, we need to guess the length of the segment.  A
+	       good guess is that it is the same length as the previous segment
+	       -- so we can use si[0].nsamp irrespective of the success of
+	       isigopen! */
 	    t0 += si[0].nsamp;
 	}
 	wfdbquit();

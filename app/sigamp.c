@@ -1,9 +1,9 @@
 /* file: sigamp.c	G. Moody	30 November 1991
-			Last revised:	   4 May 1999
+			Last revised:	 9 October 2001
 
 -------------------------------------------------------------------------------
 sigamp: Measure signal amplitudes
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -31,6 +31,11 @@ _______________________________________________________________________________
 #ifndef __STDC__
 extern void exit();
 #endif
+#ifndef NOMALLOC_H
+#include <malloc.h>
+#else
+extern char *malloc();
+#endif
 
 #include <wfdb/wfdb.h>
 #define isqrs
@@ -47,7 +52,8 @@ int namp;
 int nsig;
 int pflag;		/* if non-zero, print physical units */
 int vflag;		/* if non-zero, print individual measurements */
-double amp[WFDB_MAXSIG][NMAX];
+int *v0, *vmax, *vmin, *vv;
+double **amp, *vmean, *vsum;
 long dt1, dt2, dtw;
 
 main(argc, argv)
@@ -55,9 +61,9 @@ int argc;
 char *argv[];
 {
     char *record = NULL, *prog_name();
-    int i, j, jlow, jhigh, ampcmp(), getptp(), getrms();
+    int i, j, jlow, jhigh, nmax = NMAX, ampcmp(), getptp(), getrms();
     long from = 0L, to = 0L, t;
-    static WFDB_Siginfo si[WFDB_MAXSIG];
+    static WFDB_Siginfo *si;
     static WFDB_Anninfo ai;
     void help();
 
@@ -94,6 +100,15 @@ char *argv[];
 	  case 'h':	/* help requested */
 	    help();
 	    exit(0);
+	    break;
+	  case 'n':
+	    if (++i >= argc) {
+		(void)fprintf(stderr,
+			      "%s: number of measurements must follow -n\n",
+			      pname);
+		exit(1);
+	    }
+	    if ((nmax = atoi(argv[i])) < 1) nmax = NMAX;
 	    break;
 	  case 'p':
 	    pflag = 1;
@@ -144,9 +159,26 @@ char *argv[];
 	help();
 	exit(1);
     }
-    if ((nsig = isigopen(record, si, WFDB_MAXSIG)) <= 0) exit(2);
-    for (i = 0; i < nsig; i++)
+    if ((nsig = isigopen(record, NULL, 0)) <= 0) exit(2);
+    if ((si = malloc(nsig * sizeof(WFDB_Siginfo))) == NULL ||
+	(v0 = malloc(nsig * sizeof(int))) == NULL ||
+	(vmax = malloc(nsig * sizeof(int))) == NULL ||
+	(vmin = malloc(nsig * sizeof(int))) == NULL ||
+	(vv = malloc(nsig * sizeof(int))) == NULL ||
+	(amp = malloc(nsig * sizeof(double *))) == NULL ||
+	(vmean = malloc(nsig * sizeof(double))) == NULL ||
+	(vsum = malloc(nsig * sizeof(double))) == NULL) {
+	(void)fprintf(stderr, "%s: insufficient memory\n", pname);
+	exit(3);
+    }
+    if (isigopen(record, si, nsig) != nsig) exit(2);
+    for (i = 0; i < nsig; i++) {
 	if (si[i].gain == 0.0) si[i].gain = WFDB_DEFGAIN;
+	if ((amp[i] = malloc(nmax * sizeof(double))) == NULL) {
+	    (void)fprintf(stderr, "%s: insufficient memory\n", pname);
+	    exit(3);
+	}
+    }    
     if (from > 0L) from = strtim(argv[(int)from]);
     if (to > 0L) to = strtim(argv[(int)to]);
     if (from < 0L) from = -from;
@@ -179,7 +211,7 @@ char *argv[];
 	}
 	if (dt1 == dt2) dt2++;
 	if (iannsettime(from) < 0) exit(2);
-	while (getann(0, &annot) == 0 && namp < NMAX &&
+	while (getann(0, &annot) == 0 && namp < nmax &&
 	       (to == 0L || annot.time < to)) {
 	    if (map1(annot.anntyp) == NORMAL) {
 		if (getptp(annot.time) < 0) break;
@@ -206,7 +238,7 @@ char *argv[];
 	if (dtw == 0L || (dtw = strtim(argv[(int)dtw])) <= 0L)
 	    dtw = strtim("1");
 	if (from > 0L && isigsettime(from) < 0L) exit(2);
-	for (t = from; namp < NMAX && (to == 0L || t < to); namp++, t += dtw) {
+	for (t = from; namp < nmax && (to == 0L || t < to); namp++, t += dtw) {
 	    if (getrms(t) < 0) break;
 	    if (vflag) {
 		(void)printf("%s", mstimstr(t));
@@ -243,9 +275,8 @@ char *argv[];
 int getrms(t)
 long t;
 {
-    int i, v, vv[WFDB_MAXSIG], v0[WFDB_MAXSIG];
+    int i, v;
     long tt;
-    double vmean[WFDB_MAXSIG], vsum[WFDB_MAXSIG];
 
     if (getvec(vv) < nsig) return (-1);
 
@@ -289,7 +320,7 @@ long t;
 int getptp(t)
 long t;
 {
-    int i, vmax[WFDB_MAXSIG], vmin[WFDB_MAXSIG], vv[WFDB_MAXSIG];
+    int i;
     long tt;
 
     if (isigsettime(t + dt1) < 0) return (-1);
@@ -350,6 +381,8 @@ static char *help_strings[] = {
  "              DT2 = 0.05 (seconds after annotation)",
  " -f TIME     begin at specified time",
  " -h          print this usage summary",
+ " -n NMAX     make up to NMAX measurements per signal (default: 300)",
+				   /* default NMAX is defined as 300 above */
  " -p          print results in physical units (default: ADC units)",
  " -t TIME     stop at specified time",
  " -v          verbose mode: print individual measurements",

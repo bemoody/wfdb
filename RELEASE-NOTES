@@ -1,0 +1,36 @@
+10.2.0pre8:
+	The 10.2 series differs from all earlier releases in that the WFDB
+	library no longer imposes any fixed limits on the numbers of signals
+	or annotators that can be open simultaneously.  See lib/wfdb.h for
+	details.
+
+	In this beta release, most of the programs in the 'app' directory have
+	been revised so that they can handle arbitrary numbers of signals and
+	annotation files.  In a future release in this series, the following
+	programs will also be revised along the same lines:
+
+		edf2mit
+		pschart
+		psfd
+		wave
+
+	as well as programs in the 'examples' directory.
+
+	'man' pages in the 'doc' directory should be up-to-date, but the WFDB
+	Programmer's Guide (doc/dbu.tex) is only partially updated.
+
+	Also please note the new 'checkpkg' directory, which contains a variety
+	of tests to check the basic functionality of the WFDB library and many
+	of the WFDB applications.  From the base directory, run the tests by:
+
+		make check
+
+	These tests will check the currently installed version of the WFDB
+	software package.  If you use them to check an old version, there may
+	be minor discrepancies because of changes in the output formats;  you
+	should not encounter any discrepancies if you use these tests after
+	installing this version of the WFDB software package.
+
+	As always, your comments are welcome!
+
+	George (george@mit.edu)

@@ -1,4 +1,4 @@
-.TH SIGAMP 1 "24 May 2000" "WFDB software 10.1.4" "WFDB applications"
+.TH SIGAMP 1 "9 October 2001" "WFDB software 10.2.0" "WFDB applications"
 .SH NAME
 sigamp \- measure signal amplitudes of a WFDB record
 .SH SYNOPSIS
@@ -7,10 +7,10 @@ sigamp \- measure signal amplitudes of a WFDB record
 .PP
 \fIsigamp\fR measures either baseline-corrected RMS amplitudes or (for
 suitably annotated ECG signals) normal QRS peak-to-peak amplitudes
-for all signals of the specified \fIrecord\fR.  It makes up to 250
-measurements for each signal and calculates trimmed means (by
-discarding the largest and smallest 5% of the measurements and taking
-the mean of the remaining 90%).
+for all signals of the specified \fIrecord\fR.  It makes up to 300
+measurements (but see \fB-n\fR below) for each signal and calculates
+trimmed means (by discarding the largest and smallest 5% of the measurements
+and taking the mean of the remaining 90%).
 .PP
 \fIOptions\fR include:
 .TP
@@ -29,6 +29,9 @@ Begin at the specified \fItime\fR in \fIrecord\fR (default: the beginning of
 .TP
 \fB-h\fR
 Print a usage summary.
+.TP
+\fB-n\fI nmax\fR
+Make up to \fInmax\fR measurements on each signal (default: 300).
 .TP
 \fB-p\fR
 Print results in physical units (default: ADC units).

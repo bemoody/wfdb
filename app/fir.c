@@ -1,9 +1,9 @@
 /* file: fir.c		G. Moody	5 January 1987
-			Last revised:   11 March 2000
+			Last revised:   9 October 2001
 
 -------------------------------------------------------------------------------
 fir: General-purpose FIR filter for database records
-Copyright (C) 2000 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -29,6 +29,11 @@ _______________________________________________________________________________
 #include <math.h>
 #ifndef __STDC__
 extern void exit();
+#endif
+#ifndef NOMALLOC_H
+#include <malloc.h>
+#else
+extern char *malloc(), *calloc(), *realloc();
 #endif
 
 #include <wfdb/wfdb.h>
@@ -82,11 +87,10 @@ int argc;
 char *argv[];
 {
     char *irec = "16", *orec = "16";
-    char *calloc(), *realloc();
     double *tc = NULL, atof();
     int i, n = 128, s;
     long from = 0L, shift = 0L, to = 0L;
-    static WFDB_Siginfo chin[WFDB_MAXSIG], chout[WFDB_MAXSIG];
+    static WFDB_Siginfo *chin, *chout;
     FILE *ifile;
 
     pname = prog_name(argv[0]);
@@ -94,10 +98,8 @@ char *argv[];
 	if (*argv[i] == '-') switch (*(argv[i]+1)) {
 	  case 'c':	/* filter coefficients follow */
 	    flen = argc - (++i);
-#ifndef lint
 	    if ((c=tc=(double *)calloc((unsigned)flen,sizeof(double))) == NULL)
 		memerr();
-#endif
 	    while (i < argc)
 		*tc++ = atof(argv[i++]);
 	    break;
@@ -110,16 +112,12 @@ char *argv[];
 		(void)fprintf(stderr, "%s: can't open %s\n", pname, argv[i]);
 		exit(1);
 	    }
-#ifndef lint
 	    if ((c = (double *)calloc((unsigned)n,sizeof(double))) == NULL)
 		memerr();
-#endif
 	    while (fscanf(ifile, "%lf", &c[flen]) == 1)
 		if (++flen >= n) {
 		    n += 128;
-#ifndef lint
 		    c=(double *)realloc((char *)c,(unsigned)n*sizeof(double));
-#endif
 		    if (c == NULL)
 			memerr();
 		}
@@ -201,7 +199,13 @@ char *argv[];
 	help();
 	exit(1);
     }
-    if ((nsig = isigopen(irec, chin, WFDB_MAXSIG)) <= 0)
+    if ((nsig = isigopen(irec, NULL, 0)) <= 0)
+	exit(2);
+    if ((chin = malloc(nsig * sizeof(WFDB_Siginfo))) == NULL ||
+	(chout = malloc(nsig * sizeof(WFDB_Siginfo))) == NULL) {
+	memerr();
+    }
+    if (isigopen(irec, chin, nsig) != nsig)
 	exit(2);
     if (nrec) {
 	static char ofname[WFDB_MAXRNL+5];
@@ -228,14 +232,12 @@ char *argv[];
     if (to > 0L)
 	to = strtim(argv[to]);
     nsamp = (to > 0L) ? to - from : -1L;
-#ifndef lint
     if ((vout = (int *)calloc((unsigned)nsig, sizeof(int))) == NULL ||
 	(vin = (int **)calloc((unsigned)flen, sizeof(int *))) == NULL)
 	memerr();
     for (i = 0; i < flen; i++)
 	if ((vin[i] = (int *)calloc((unsigned)nsig, sizeof(int))) == NULL)
 	    memerr();
-#endif
     if (shift > 0) {
 	shift = strtim(argv[shift]);
 	i = flen - (shift % flen);

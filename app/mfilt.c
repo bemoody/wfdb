@@ -1,9 +1,9 @@
 /* file: mfilt.c	G. Moody	27 June 1993
-			Last revised:  30 April 1999
+			Last revised:  9 October 2001
 
 -------------------------------------------------------------------------------
 mfilt: General-purpose median filter for database records
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -29,7 +29,11 @@ _______________________________________________________________________________
 #ifndef __STDC__
 extern void exit();
 #endif
-
+#ifndef NOMALLOC_H
+#include <malloc.h>
+#else
+extern char *malloc(), *calloc(), *realloc();
+#endif
 #include <wfdb/wfdb.h>
 
 char *pname;	/* name by which this program was invoked */
@@ -39,7 +43,7 @@ int median;	/* offset of median element within vtemp array after sorting */
 int nsig;	/* number of signals to be filtered */
 int **vin;	/* pointers to input vectors */
 int *vtemp;	/* temporary array for calculating medians */
-int vout[WFDB_MAXSIG];	/* output vector */
+int *vout;	/* output vector */
 long from = 0L;	/* first sample to be processed */
 long to = 0L;	/* (if > 0) sample following last sample to be processed */
 long spm;	/* samples per minute */
@@ -104,9 +108,9 @@ void init(argc, argv)
 int argc;
 char *argv[];
 {
-    char *irec = "16", ofname[40], *orec = "16", *calloc();
+    char *irec = "16", *ofname, *orec = "16";
     int format, i;
-    static WFDB_Siginfo si[WFDB_MAXSIG], so[WFDB_MAXSIG];
+    static WFDB_Siginfo *si, *so;
 
     pname = prog_name(argv[0]);
     for (i = 1; i < argc; i++) {
@@ -178,19 +182,23 @@ char *argv[];
     }
     median = flen/2;
 
-    if ((nsig = isigopen(irec, si, WFDB_MAXSIG)) <= 0)
+    if ((nsig = isigopen(irec, NULL, 0)) <= 0)
 	exit(2);
-
-#ifndef lint
-    if ((vtemp = (int *)calloc((unsigned)flen, sizeof(int))) == NULL ||
-	(vin = (int **)calloc((unsigned)flen, sizeof(int *))) == NULL)
+    if ((si = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo))) == NULL ||
+	(so = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo))) == NULL ||
+	(vtemp = (int *)calloc((unsigned)flen, sizeof(int))) == NULL ||
+	(vin = (int **)calloc((unsigned)flen, sizeof(int *))) == NULL ||
+	(vout = (int *)malloc(nsig * sizeof(int))) == NULL)
 	memerr();
     for (i = 0; i < flen; i++)
 	if ((vin[i] = (int *)calloc((unsigned)nsig, sizeof(int))) == NULL)
 	    memerr();
-#endif
+    if (isigopen(irec, si, (unsigned)nsig) != nsig)
+	exit(2);
 
     if (nrec) {
+	if ((ofname = (char *)malloc(strlen(nrec)+5)) == NULL)
+	    memerr();
 	(void)sprintf(ofname, "%s.dat", nrec);
 	format = si[0].fmt;
 	for (i = 0; i < nsig; i++) {
@@ -200,7 +208,7 @@ char *argv[];
 	if (osigfopen(si, (unsigned)nsig) < nsig)
 	    exit(2);
     }
-    else if ((nsig = osigopen(orec, so, (unsigned)nsig)) <= 0)
+    else if (osigopen(orec, so, (unsigned)nsig) != nsig)
 	exit(2);
 
     if (from > 0L) {
@@ -217,13 +225,11 @@ char *argv[];
     tt = from + spm;		/* time to print next progress indicator */
 }
 
-#ifndef lint
 void memerr()
 {
     (void)fprintf(stderr, "%s: insufficient memory\n", pname);
     exit(2);
 }
-#endif
 
 char *prog_name(s)
 char *s;
