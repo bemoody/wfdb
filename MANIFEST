@@ -63,6 +63,7 @@ checkpkg/expected/
 checkpkg/expected/100s.a2r
 checkpkg/expected/100s.mix
 checkpkg/expected/100s.qrs
+checkpkg/expected/100s.sigavg
 checkpkg/expected/100s.wqrs
 checkpkg/expected/100s.wra
 checkpkg/expected/100w.dat

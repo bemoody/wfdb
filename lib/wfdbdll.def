@@ -1,6 +1,6 @@
 LIBRARY	WFDB
 
-DESCRIPTION 'WFDB library, version 10.2.9  Copyright (C) George B. Moody 2002.'
+DESCRIPTION 'WFDB library, version 10.3.1  Copyright (C) George B. Moody 2002.'
 
 EXETYPE	WINDOWS
 
@@ -81,4 +81,6 @@ EXPORTS
     oannclose   @66
     setifreq    @67
     setmsheader @68
-    WEP		@69 RESIDENTNAME
+    sample      @69
+    sample_valid @70
+    WEP		@71 RESIDENTNAME

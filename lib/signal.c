@@ -2836,7 +2836,9 @@ this has been done, the caller may request samples in any order. */
 
 #define BUFLN   4096	/* must be a power of 2, see sample() */
 
-WFDB_Sample sample(WFDB_Signal s, WFDB_Time t)
+FSAMPLE sample(s, t)
+WFDB_Signal s;
+WFDB_Time t;
 {
     static WFDB_Time tt;
 
@@ -2876,7 +2878,7 @@ WFDB_Sample sample(WFDB_Signal s, WFDB_Time t)
     return (*(sbuf + nisig * (t&(BUFLN-1)) + s));
 }
 
-int sample_valid(void)
+FINT sample_valid()
 {
     return (sample_vflag);
 }

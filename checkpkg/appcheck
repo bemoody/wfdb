@@ -1,6 +1,6 @@
 #!/bin/sh
 # file: appcheck		G. Moody       7 September 2001
-#                               Last revised:  26 November 2002
+#                               Last revised:  27 November 2002
 #
 # This script checks the functionality of the WFDB applications in the 'app'
 # directory.
@@ -268,6 +268,18 @@ TESTS=`expr $TESTS + 1`
 echo Testing sigamp ...
 F=sigamp.out
 sigamp -r 100s -a atr >$F
+if ( ./checkfile $F )
+then
+    PASS=`expr $PASS + 1`
+    rm -f $F
+else
+    FAIL=`expr $FAIL + 1`
+fi
+TESTS=`expr $TESTS + 1`
+
+echo Testing sigavg ...
+F=100s.sigavg
+sigavg -r 100s -a atr -v>$F
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`

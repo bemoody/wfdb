@@ -1,5 +1,5 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised: 14 November 2002	wfdblib 10.3.0
+			Last revised: 27 November 2002	wfdblib 10.3.1
 WFDB library type, constant, structure, and function interface definitions
 
 _______________________________________________________________________________
@@ -33,7 +33,7 @@ _______________________________________________________________________________
 /* WFDB library version. */
 #define WFDB_MAJOR   10
 #define WFDB_MINOR   3
-#define WFDB_RELEASE 0
+#define WFDB_RELEASE 1
 #define WFDB_NETFILES 1	/* if 1, library includes code for HTTP, FTP clients */
 
 /* Determine what type of compiler is being used. */
@@ -264,6 +264,8 @@ extern FINT adumuv(WFDB_Signal s, WFDB_Sample a);
 extern FSAMPLE muvadu(WFDB_Signal s, int microvolts);
 extern FDOUBLE aduphys(WFDB_Signal s, WFDB_Sample a);
 extern FSAMPLE physadu(WFDB_Signal s, double v);
+extern FSAMPLE sample(WFDB_Signal s, WFDB_Time t);
+extern FINT sample_valid();
 extern FINT calopen(char *calibration_filename);
 extern FINT getcal(char *description, char *units, WFDB_Calinfo *cal);
 extern FINT putcal(WFDB_Calinfo *cal);
@@ -307,9 +309,10 @@ extern FINT annopen(), isigopen(), osigopen(), wfdbinit(), getspf(),
     isigsettime(), isgsettime(), iannsettime(), strecg(), setecgstr(),
     strann(), setannstr(), setanndesc(), adumuv(), newheader(), setheader(),
     setmsheader(), setsampfreq(), setbasetime(), putinfo(), setibsize(),
-    setobsize(), calopen(), getcal(), putcal(), newcal(), wfdbgetskew();
+    setobsize(), calopen(), getcal(), putcal(), newcal(), wfdbgetskew(),
+    sample_valid();
 extern FLONGINT wfdbgetstart();
-extern FSAMPLE muvadu(), physadu();
+extern FSAMPLE muvadu(), physadu(), sample();
 extern FSTRING ecgstr(), annstr(), anndesc(), timstr(), mstimstr(),
     datstr(), getwfdb(), getinfo(), wfdberror(), wfdbfile();
 extern FSITIME strtim();
