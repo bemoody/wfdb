@@ -1,0 +1,177 @@
+<HTML>
+<HEAD>
+<TITLE>WFDB Applications Guide</TITLE>
+<META NAME="description" CONTENT="WFDB Applications Guide">
+<META NAME="keywords" CONTENT="wag">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+</HEAD>
+<BODY bgcolor="#FFFF80">
+<BR> <P>
+<B>Up:</B> <A HREF="../manuals.shtml">Books about PhysioToolkit</A>
+<H1 ALIGN=CENTER>WFDB Applications Guide</H1>
+<P ALIGN=CENTER><STRONG>Tenth Edition<BR>
+(Revised for release 10.2.4)<BR>
+20 December 2001<BR>
+<BR> 
+<BR> 
+<BR> 
+George B. Moody<BR> 
+Harvard-MIT Division of Health Sciences and Technology</STRONG></P><P>
+<P>
+Copyright &#169;1980-2001 George B. Moody
+<P>
+The most recent versions of the programs described in this guide may be freely
+downloaded from <A HREF="http://www.physionet.org/">PhysioNet</A>.  For
+further information, write to:
+<P>
+<BLOCKQUOTE>George B. Moody<BR> 
+MIT Room E25-505A<BR> 
+Cambridge, MA 02139<BR> 
+USA<BR> 
+</BLOCKQUOTE>
+<P>
+<A HREF="wag.ps">PostScript</A> and <A HREF="wag.pdf">PDF</A> versions of this
+guide are available.  The latest version can be downloaded from
+<A HREF="http://www.physionet.org/">PhysioNet</A>.
+<P>
+Permission is granted to make and distribute verbatim copies of this
+guide provided that the copyright notice and this permission notice are
+preserved on all copies.
+<P>
+Permission is granted to copy and distribute modified versions of this
+guide under the conditions for verbatim copying, provided also that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+<P>
+Permission is granted to copy and distribute translations of this guide
+into another language, under the above conditions for modified versions.
+<P>
+<BR> <HR>
+<H2>Contents</H2>
+<A HREF="intro.htm"><H3>Introduction</H3></A>
+<H3>Applications</H3>
+<UL> 
+<LI> <A HREF="a2m-1.htm">a2m, ad2m, m2a, md2a</A>: utilities for converting
+	between MIT and AHA DB formats
+<LI> <A HREF="ann2rr-1.htm">ann2rr, rr2ann</A>: convert annotation files to
+	interval lists and vice versa
+<LI> <A HREF="bxb-1.htm">bxb</A>: ANSI/AAMI-standard beat-by-beat annotation
+	comparator
+<LI> <A HREF="calsig-1.htm">calsig</A>: calibrate signals of a WFDB record
+<LI> <A HREF="cohere-1.htm">coherence</A>: estimate coherence and
+	cross-spectrum of two time series
+<LI> <A HREF="ecgeva-1.htm">ecgeval</A>: generate and run ECG analyzer
+	evaluation script
+<LI> <A HREF="epic-1.htm">epic</A>: ANSI/AAMI-standard episode-by-episode
+	annotation comparator
+<LI> <A HREF="fft-1.htm">fft</A>: fast Fourier transform
+<LI> <A HREF="fir-1.htm">fir</A>: general-purpose FIR filter for WFDB records
+<LI> <A HREF="hrfft-1.htm">hrfft, hrlomb, hrmem, hrplot</A>: calculate and
+	plot heart rate power spectra
+<LI> <A HREF="ihr-1.htm">ihr</A>: calculate instantaneous heart rate
+<LI> <A HREF="log10-1.htm">log10</A>: calculate common logarithms of
+	two-column data
+<LI> <A HREF="lomb-1.htm">lomb</A>: estimate power spectrum using the Lomb
+	periodogram method
+<LI> <A HREF="memse-1.htm">memse</A>: estimate power spectrum using the
+	maximum entropy (all poles) method
+<LI> <A HREF="mfilt-1.htm">mfilt</A>: general-purpose median filter for WFDB
+	records
+<LI> <A HREF="mrgann-1.htm">mrgann</A>: merge annotation files
+<LI> <A HREF="mxm-1.htm">mxm</A>: ANSI/AAMI-standard
+	measurement-by-measurement comparator
+<LI> <A HREF="nst-1.htm">nst</A>: noise stress test for ECG analysis programs
+<LI> <A HREF="plot2d-1.htm">plot2d, plot3d</A>: make 2-D or 3-D plots from
+	text files of data, using <I>gnuplot</I>
+<LI> <A HREF="plotst-1.htm">plotstm</A>: produce scatter plot of ST measurement
+	errors on a PostScript device
+<LI> <A HREF="pschar-1.htm">pschart</A>: produce annotated `chart recordings'
+	on a PostScript device
+<LI> <A HREF="psfd-1.htm">psfd</A>: produce annotated `full disclosure' plots
+	on a PostScript device
+<LI> <A HREF="rdann-1.htm">rdann</A>: read a WFDB annotation file
+<LI> <A HREF="rdsamp-1.htm">rdsamp</A>: read WFDB signal files
+<LI> <A HREF="rxr-1.htm">rxr</A>: ANSI/AAMI-standard run-by-run annotation
+	comparator
+<LI> <A HREF="sampfr-1.htm">sampfreq</A>: show sampling frequency for a record
+<LI> <A HREF="sample-1.htm">sample</A>: digitize and replay analog signals
+	(MS-DOS only)
+<LI> <A HREF="setwfd-1.htm">setwfdb, cshsetwfdb</A>: set WFDB environment
+	variables
+<LI> <A HREF="sigamp-1.htm">sigamp</A>: measure signal amplitudes of a WFDB
+	record
+<LI> <A HREF="skewed-1.htm">skewedit</A>: edit skew fields of header file(s)
+<LI> <A HREF="snip-1.htm">snip</A>: copy an excerpt of a WFDB record
+<LI> <A HREF="sortan-1.htm">sortann</A>: rearrange annotations in canonical
+	order
+<LI> <A HREF="sqrs-1.htm">sqrs, sqrs125</A>: single-channel QRS detector
+<LI> <A HREF="sumann-1.htm">sumann</A>: summarize the contents of a WFDB
+	annotation file
+<LI> <A HREF="sumsta-1.htm">sumstats</A>: derive aggregate statistics from
+	bxb, rxr, etc., line-format output
+<LI> <A HREF="tach-1.htm">tach</A>: heart rate tachometer
+<LI> <A HREF="view-1.htm">view, vsetup</A>: WFDB browser for MS-DOS
+<LI> <A HREF="wave-1.htm">wave</A>: waveform analyzer, viewer, and editor for
+	the X Window System
+<LI> <A HREF="wfdbca-1.htm">wfdbcat</A>: copy WFDB files to standard output
+<LI> <A HREF="wfdbco-1.htm">wfdbcollate</A>: collate WFDB records into a
+	multi-segment record
+<LI> <A HREF="wfdbde-1.htm">wfdbdesc</A>: read signal specifications
+<LI> <A HREF="wfdbwh-1.htm">wfdbwhich</A>: find a WFDB file and print its
+        pathname
+<LI> <A HREF="wrann-1.htm">wrann</A>: write a WFDB annotation file
+<LI> <A HREF="wrsamp-1.htm">wrsamp</A>: write WFDB signal files
+<LI> <A HREF="wview-1.htm">wview</A>: WFDB browser for MS Windows
+<LI> <A HREF="xform-1.htm">xform</A>: sampling frequency, amplitude, and
+	format conversion for WFDB records
+</UL>
+<H3>Functions</H3>
+<UL>
+<LI> <A HREF="wfdb-3.htm">wfdb</A>: Waveform Database library
+</UL>
+<H3>File formats</H3>
+<UL>
+<LI> <A HREF="annot-5.htm">annot</A>: WFDB annotation file format
+<LI> <A HREF="header-5.htm">header</A>: WFDB header file format
+<LI> <A HREF="signal-5.htm">signal</A>: WFDB signal file format
+<LI> <A HREF="wfdbca-5.htm">wfdbcal</A>: WFDB calibration file format
+</UL>
+<H3>Appendices</H3>
+<UL>
+<LI><I><A HREF="install.htm">Installing the WFDB Software Package</A></I>
+<LI><I><A HREF="eval.htm">Evaluating ECG Analyzers</A></I>
+</UL>
+<BR><HR>
+<H2>Other links of interest</H2>
+<UL>
+<LI><A HREF="http://www.physionet.org/">PhysioNet</A><BR>
+PhysioNet offers free access via the web to large collections of
+recorded physiologic signals and related open-source software.
+PhysioNet is a public service of the Research Resource for
+Complex Physiologic Signals, funded by the National Center for
+Research Resources of the National Institutes of Health.  
+The most recent version of this guide, and of the software it
+describes, may be obtained from PhysioNet.
+<LI><A HREF="http://ecg.mit.edu/">The MIT-BIH Database Distribution
+Home Page</A><BR>
+Information about obtaining CD-ROMs containing many of the databases
+available from PhysioNet can be found here.
+<LI><I><A HREF="../wpg/wpg.htm">WFDB Programmer's Guide</A></I>
+<BR>
+Includes tutorial and reference material relating to the WFDB library,
+a portable set of functions (subroutines) for reading and writing files in the
+formats supported by the applications described here.  The WFDB library may be
+used with C, C++, or Fortran programs;  the guide primarily describes the C
+interface.
+<LI><I><A HREF="../wug/wug.htm">WAVE User's Guide</A></I><BR>
+A comprehensive tutorial, with extensive reference material, for
+<STRONG>WAVE</STRONG>, an interactive waveform browser with facilities for
+annotation editing and control of external analysis programs.
+<STRONG>WAVE</STRONG> runs on PCs under the free Linux operating system, and
+on SPARC-based systems under SunOS or Solaris.
+</UL>
+<BR> <HR>
+<P><I><ADDRESS>
+<A HREF="mailto:george@mit.edu">George B. Moody (<tt>george@mit.edu</tt>)</A>
+</ADDRESS></I><BR>

@@ -1,0 +1,1377 @@
+This is wpg, produced by makeinfo version 4.0 from wpg.tex.
+
+
+File: wpg,  Node: introduction to functions,  Next: selecting,  Prev: Functions,  Up: Functions
+
+About these functions
+=====================
+
+   Each function description begins with an ANSI C function prototype,
+which specifies the types of any arguments as well as the type of the
+quantity returned by the function (see `K&R', pp. 217-218).  Note that
+many of these functions take pointer arguments.  These can be traps for
+newcomers to C.  Study the examples carefully!  Often a function will
+return information to the caller in a variable or structure to which the
+pointer argument points.  *It is necessary in such cases for the caller
+to allocate storage for the variables or structures and to initialize
+the pointers so that they point to the allocated storage.  If you fail
+to do so, the compiler probably will not warn you of your error;
+instead your program will fail mysteriously, probably with a core dump
+and an "illegal memory reference" error message.*
+
+   With few exceptions, WFDB library functions return integers that
+indicate success or failure.  The tables that follow the function
+prototypes list the possible returns and their meanings.  By
+convention, a return code of -1 indicates end-of-file on input files,
+and no error message is printed.  Other negative return codes signify
+other types of errors, and are usually accompanied by descriptive
+messages on the standard error output (but *note wfdbquiet and
+wfdbverbose::).  Zero may indicate success or failure, depending on
+context (see the descriptions of the individual functions below).
+Positive codes (returned by only a few functions) always indicate
+success.
+
+   A comprehensive discussion of database files appears later in this
+guide (*note Database Files::).  Most readers should not need to learn
+about the gruesome details of how the data are actually stored.  You
+should know, however, that there are files that contain digitized
+signals, other files that contain annotations, and still others (called
+"header" files) that describe attributes of the signals such as
+sampling frequency.  The database path lists directories in which
+database files are found; the WFDB library functions can find them given
+only the record (and annotator) names, provided that `WFDB' has been
+properly set (*note WFDB path::).  WFDB library functions responsible
+for opening signal files find them by reading the header file (which
+contains their names) first.
+
+   The first part of this chapter describes functions that extract
+information from header files in order to gain access to signal and
+annotation files.  The following two sections describe functions that
+deal with signal and annotation files.  Many readers will not need to
+go any further; the remaining sections deal with special-purpose
+functions that exist to serve unusual applications.
+
+
+File: wpg,  Node: selecting,  Next: signal and annotation I/O,  Prev: introduction to functions,  Up: Functions
+
+Selecting Database Records
+==========================
+
+* Menu:
+
+* annopen::		Opening input and output annotation files.
+* isigopen::		Opening input signal files.
+* osigopen::		Opening output signal files.
+* osigfopen::		Opening output signal files by name.
+* wfdbinit::		`annopen' and `isigopen' in one function.
+
+
+File: wpg,  Node: annopen,  Next: isigopen,  Prev: selecting,  Up: selecting
+
+annopen
+-------
+
+     int annopen(char *RECORD, WFDB_Anninfo *AIARRAY, unsigned int NANN)
+
+*Return:*
+ 0
+     Success
+
+-3
+     Failure: unable to open input annotation file
+
+-4
+     Failure: unable to open output annotation file
+
+-5
+     Failure: illegal `stat' (in AIARRAY) specified for annotation file
+
+This function opens input and output annotation files for a selected
+record.  If RECORD begins with `+', previously opened annotation files
+are left open, and the record name is taken to be the remainder of
+RECORD after discarding the `+'.  Otherwise, `annopen' closes any
+previously opened annotation files, and takes all of RECORD as the
+record name.  AIARRAY is a pointer to an array of `WFDB_Anninfo'
+structures (*note WFDB_Anninfo structures::), one for each annotator to
+be opened.  NANN is the number of `WFDB_Anninfo' structures in AIARRAY.
+The caller must fill in the `WFDB_Anninfo' structures to specify the
+names of the annotators, and to indicate which annotators are to be
+read, and which are to be written.  Input and output annotators may be
+listed in any order in AIARRAY.  "Annotator numbers" (for both input and
+output annotators) are assigned in the order in which the annotators
+appear in AIARRAY.  For example, this code fragment
+
+     ...
+     char *record = "100s";
+     WFDB_Anninfo a[3];
+     
+     a[0].name = "a"; a[0].stat = WFDB_READ;
+     a[1].name = "b"; a[1].stat = WFDB_WRITE;
+     a[2].name = "c"; a[2].stat = WFDB_READ;
+     if (annopen(record, a, 3) < 0)
+     ...
+
+attempts to open three annotation files for record `100s'.  Annotator
+`a' becomes input annotator 0, `b' becomes output annotator 0, and `c'
+becomes input annotator 1.  Thus `getann(1, &annot)' (*note getann::)
+will read an annotation from annotator `c', and `putann(0, &annot)'
+will write an annotation for annotator `b'.  Input annotation files
+will be found if they are located in any of the directories specified
+by `WFDB' (*note WFDB path::); output annotators are created in the
+current directory (but note that, under Unix at least, it is possible
+to specify annotator names such as `/here' or `zzz/there' or even
+`../somewhere/else'; *note Annotation Files::, for details of how file
+names are constructed from annotator and record names).  Several of the
+example programs in chapter 6 illustrate the use of `annopen'; for
+example, *note Example 1::.
+
+   As a special case, if NANN is 0, AIARRAY can be `NULL'.  This can be
+useful to force open annotation files to be closed without closing open
+signal files.
+
+
+File: wpg,  Node: isigopen,  Next: osigopen,  Prev: annopen,  Up: selecting
+
+isigopen
+--------
+
+     int isigopen(char *RECORD, WFDB_Siginfo *SIARRAY, int NSIG)
+
+*Return:*
+>0
+     Success: the returned value is the number of input signals (i.e.,
+     the number of valid entries in SIARRAY)
+
+ 0
+     Failure: no input signals available
+
+-1
+     Failure: unable to read header file (probably incorrect record
+     name)
+
+-2
+     Failure: incorrect header file format
+
+This function opens input signal files for a selected record.  If
+RECORD begins with `+', previously opened input signal files are left
+open, and the record name is taken to be the remainder of RECORD after
+discarding the `+'.  Otherwise, `isigopen' closes any previously opened
+input signal files, and takes all of RECORD as the record name.  If the
+record name is `-', `isigopen' reads the standard input rather than a
+`hea' file.  SIARRAY is a pointer to an array of `WFDB_Siginfo'
+structures (*note WFDB_Siginfo structures::), one for each signal to be
+opened.
+
+   As a special case, if NSIG is 0, SIARRAY can be `NULL'.  In this
+case, `isigopen' closes any open input signals, then returns the number
+of signals in RECORD without opening them.  Use this feature to
+determine the amount of storage needed for signal-related variables, as
+in the example below, or to force open input signal files to be closed
+without closing open annotation or output signal files.  This action
+also sets internal WFDB library variables that record the base time and
+date, the length of the record, and the sampling and counter
+frequencies, so that time conversion functions such as `strtim' that
+depend on these quantities will work properly.
+
+   If `nsig' is greater than 0, `isigopen' normally returns the number
+of input signals it actually opened, which may be less than NSIG but is
+never greater than NSIG.  The caller must allocate storage for the
+`WFDB_Siginfo' structures; `isigopen' will fill them in with
+information about the signals.  "Signal numbers" are assigned in the
+order in which signals are specified in the `hea' file for the record;
+on return from `isigopen', information for signal I will be found in
+SIARRAY[I].  For example, we can read the `gain' attributes of each
+signal in record `100s' like this:
+
+     #include <stdio.h>
+     #include <malloc.h>
+     #include <wfdb/wfdb.h>
+     
+     main()
+     {
+         int i, nsig;
+         WFDB_Siginfo *siarray;
+     
+         nsig = isigopen("100s", NULL, 0);
+         if (nsig < 1)
+             exit(1);
+         siarray = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+         nsig = isigopen("100s", siarray, nsig);
+         for (i = 0; i < nsig; i++)
+             printf("signal %d gain = %g\n", i, siarray[i].gain);
+         exit(0);
+     }
+
+This program, unlike the example in the previous chapter, does not
+assume that the number of signals is known.  The first invocation of
+`isigopen' determines this number (and the program quits if there are
+no signals).  Next, the program allocates the array for the signal
+information, and then it opens the signals using the second invocation
+of `isigopen', passing in the pointer `siarray' and the number of
+signals determined from the first call (`nsig').
+
+   An error message is produced if `isigopen' is unable to open _any_
+of the signals listed in the header file.  It is not considered an
+error if only some of the signals can be opened, however.  A signal
+will not be opened if its signal file is unreadable, if an input buffer
+cannot be allocated for it, or if opening all of the signals in its
+group would exceed the limits defined by NSIG.  (Note, however, that
+most records have only one signal group; as a consequence, `isigopen'
+fails if NSIG is less than the total number of signals in such cases.)
+If necessary, the caller can inspect the file names and signal
+descriptions in SIARRAY to determine which signals were opened; *note
+WFDB_Siginfo structures::.  Several of the example programs in chapter 6
+illustrate the use of `isigopen'; for example, *note Example 5::.
+
+   If NSIG is less than 0, `isigopen' fills in up to -NSIG members of
+SIARRAY, based on information from the header file for RECORD, but _no
+signals are actually opened_.  The value returned in this case is the
+number of signals named in the `hea' file.  Note, however, that there
+is no guarantee that all (or indeed any) of the signals named in the
+`hea' file are available to be opened.  The features described in this
+paragraph were first introduced in version 4.4 of the WFDB library.
+
+
+File: wpg,  Node: osigopen,  Next: osigfopen,  Prev: isigopen,  Up: selecting
+
+osigopen
+--------
+
+     int osigopen(char *RECORD, WFDB_Siginfo *SIARRAY, unsigned int NSIG)
+
+*Return:*
+>0
+     Success: the returned value is the number of output signals; this
+     number should match NSIG
+
+-1
+     Failure: unable to read header file
+
+-2
+     Failure: incorrect header file format
+
+-3
+     Failure: unable to open output signal(s)
+
+This function opens output signal files.  Use it only if signals are to
+be _written_ using `putvec'.  The signal specifications, including the
+file names, are read from the header file for a specified record.
+Unmodified MIT or AHA database `hea' files cannot be used, since
+`osigopen' would attempt to overwrite the (write-protected) signal
+files named within.  If RECORD begins with `+', previously opened
+output signal files are left open, and the record name is taken to be
+the remainder of RECORD after discarding the `+'.  Otherwise,
+`osigopen' closes any previously opened output signal files, and takes
+all of RECORD as the record name.  If the record name is `-',
+`osigopen' reads the standard input rather than a `hea' file.  SIARRAY
+is a pointer to an uninitialized array of `WFDB_Siginfo' structures;
+SIARRAY must contain at least NSIG members.  The caller must allocate
+storage for the `WFDB_Siginfo' structures.  On return, `osigopen' will
+have filled in the `WFDB_Siginfo' structures with the signal
+specifications.
+
+   No more than NSIG (additional) output signals will be opened by
+`osigopen', even if the header file contains specifications for more
+than NSIG signals.  For example, this code fragment
+
+     ...
+     WFDB_Siginfo s[2];
+     int i, nsig;
+     
+     nsig = osigopen("8l", s, 2);
+     for (i = 0; i < nsig; i++)
+         printf("signal %d will be written into `%s'\n", i, s[i].fname);
+     ...
+
+creates 2 output signals named `data0' and `data1' (*note Piped and
+Local Records::).  *Note Example 6::, and *note Example 7::, for
+illustrations of the use of `osigopen'.
+
+   As a special case, if NSIG is 0, SIARRAY can be `NULL'.  This can be
+useful to force open output signal files to be closed without closing
+open annotation or input signal files.
+
+
+File: wpg,  Node: osigfopen,  Next: wfdbinit,  Prev: osigopen,  Up: selecting
+
+osigfopen
+---------
+
+     int osigfopen(WFDB_Siginfo *SIARRAY, unsigned int NSIG)
+
+*Return:*
+>0
+     Success: the returned value is the number of output signals;  this
+     number should match NSIG
+
+-2
+     Failure: error in signal specification (`fname' or `desc' too
+     long, illegal `fmt' or `bsize', or incorrect signal group
+     assignment)
+
+-3
+     Failure: unable to open output signal(s)
+
+This function opens output signals as does `osigopen', but the signal
+specifications, including the signal file names, are supplied by the
+caller to `osigfopen', rather than read from a header file as in
+`osigopen'.  Any previously open output signals are closed by
+`osigfopen'.  SIARRAY is a pointer to an array of `WFDB_Siginfo'
+structures (*note WFDB_Siginfo structures::), one for each signal to be
+opened.  NSIG is the number of `WFDB_Siginfo' structures in SIARRAY.
+
+   Before invoking `osigfopen', the caller must fill in the fields of
+the `WFDB_Siginfo' structures in SIARRAY (*note Data Types::; the
+`initval', `nsamp', and `cksum' fields may be left uninitialized,
+however).  To make a multiplexed signal file, specify the same `fname'
+and `group' for each signal to be included (*note Multiplexed Signal
+Files::).  For ordinary (non-multiplexed) signal files, specify a
+unique `fname' and `group' for each signal.  *Note Example 8::, for an
+illustration of the use of `osigfopen'.
+
+   As a special case, if NSIG is 0, SIARRAY can be `NULL'.  This can be
+useful to force open output signal files to be closed without closing
+open annotation or input signal files.
+
+
+File: wpg,  Node: wfdbinit,  Prev: osigfopen,  Up: selecting
+
+wfdbinit
+--------
+
+     int wfdbinit(char *RECORD, WFDB_Anninfo *AIARRAY, unsigned int NANN,
+                WFDB_Siginfo *SIARRAY, unsigned int NSIG)
+
+*Return:*
+>0
+     Success: the returned value is the number of input signals (i.e.,
+     the number of valid entries in SIARRAY)
+
+ 0
+     Annotation files opened successfully, input signals unavailable
+     (not an error for programs that don't need them; no error message
+     is printed if NSIG is 0)
+
+-1
+     Failure: unable to read header file (probably incorrect record
+     name)
+
+-2
+     Failure: incorrect header file format
+
+-3
+     Failure: unable to open input annotation file
+
+-4
+     Failure: unable to open output annotation file
+
+-5
+     Failure: illegal `stat' (in AIARRAY) specified for annotation file
+     (*note WFDB_Anninfo structures::)
+
+This function opens database files other than output signal files for a
+selected record.  The code
+
+     n = wfdbinit(record, a, na, s, ns);
+
+is exactly equivalent to
+
+     n = annopen(record, a, na);
+     if (n == 0)
+         n = isigopen(record, s, ns);
+
+*Note Example 9::, for an illustration of the use of `wfdbinit'.  *Note
+osigopen::, and *note osigfopen::, for methods of opening output signal
+files.
+
+
+File: wpg,  Node: signal and annotation I/O,  Next: non-sequential,  Prev: selecting,  Up: Functions
+
+Reading and Writing Signals and Annotations
+===========================================
+
+* Menu:
+
+* getvec::		Reading input signals.
+* getframe::            Reading input signals from multifrequency records.
+* putvec::		Writing output signals.
+* getann::		Reading annotations.
+* ungetann::		Pushing an annotation onto an input stream.
+* putann::		Writing annotations.
+
+
+File: wpg,  Node: getvec,  Next: getframe,  Prev: signal and annotation I/O,  Up: signal and annotation I/O
+
+getvec
+------
+
+     int getvec(WFDB_Sample *VECTOR)
+
+*Return:*
+>0
+     Success;  the returned value is the number of input signals (the
+     number of valid entries in VECTOR)
+
+-1
+     End of data (contents of VECTOR not valid)
+
+-3
+     Failure: unexpected physical end of file
+
+-4
+     Failure: checksum error (detected only at end of file)
+
+This function reads a sample from each input signal.  The caller should
+allocate storage for an array of `WFDB_Sample's (integers) and pass a
+pointer to this array to `getvec'.  (The length of the array must be no
+less than the number of input signals, as obtained from `isigopen' or
+`wfdbinit'.)  On return, VECTOR[I] contains the next sample from signal
+I.  For example, this modified version of the example from chapter 1
+reads and prints the first ten samples of each available input signal:
+
+     #include <stdio.h>
+     #include <malloc.h>
+     #include <wfdb/wfdb.h>
+     
+     main()
+     {
+         int i, j, nsig;
+         WFDB_Sample *v;
+         WFDB_Siginfo *s;
+     
+         nsig = isigopen("100s", NULL, 0);
+         if (nsig < 1)
+             exit(1);
+         s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+         if (isigopen("100s", s, nsig) != nsig)
+             exit(1);
+         v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
+         for (i = 0; i < 10; i++) {
+             if (getvec(v) < 0)
+                 break;
+             for (j = 0; j < nsig; j++)
+                 printf("%8d", v[j]);
+             printf("\n");
+         }
+         exit(0);
+     }
+
+   Notice how the value returned by the first invocation of `isigopen'
+is used to determine how many input signals there are.  Several of the
+example programs in chapter 6 illustrate the use of `getvec'; for
+example, *note Example 6::.
+
+
+File: wpg,  Node: getframe,  Next: putvec,  Prev: getvec,  Up: signal and annotation I/O
+
+getframe
+--------
+
+     int getframe(WFDB_Sample *VECTOR)
+
+*Return:*
+>0
+     Success;  the returned value is the number of input signals
+
+-1
+     End of data (contents of VECTOR not valid)
+
+-3
+     Failure: unexpected physical end of file
+
+-4
+     Failure: checksum error (detected only at end of file)
+
+This function reads a vector of samples, including at least one sample
+from each open input signal.  If all signals are sampled at the same
+frequency, only one sample is read from each signal.  Otherwise,
+signals sampled at multiples of the frame frequency are represented by
+two or more consecutive elements of the returned VECTOR.  For example,
+if the frame frequency is 125 Hz, signal 0 is sampled at 500 Hz, and
+the remaining 3 signals are sampled at 125 Hz each, then the returned
+VECTOR has 7 valid components: the first 4 are samples of signal 0, and
+the remaining 3 are samples of signals 1, 2, and 3.  The caller should
+allocate storage for an array of `WFDB_Sample's (integers) and pass a
+pointer to this array to `getframe'.  The length of VECTOR must be
+determined by summing the values of the `spf' (samples per frame)
+fields in the `WFDB_Siginfo' structures associated with the input
+signals (*note isigopen::).
+
+
+File: wpg,  Node: putvec,  Next: getann,  Prev: getframe,  Up: signal and annotation I/O
+
+putvec
+------
+
+     int putvec(WFDB_Sample *VECTOR)
+
+*Return:*
+>0
+     Success: the returned value is the number of output signals (the
+     number of entries in VECTOR that were written)
+
+ 0
+     Slew rate too high for one or more signals (difference format
+     only; the DC level(s) will be corrected as soon as the slew rate
+     permits)
+
+-1
+     Failure: write error
+
+This function writes a sample to each input signal.  The caller should
+fill an array of `WFDB_Sample's with the samples and pass a pointer to
+this array to `putvec'.  (The length of the array must be no less than
+the number of output signals, as given to `osigfopen' or `osigopen'.)
+On entry, VECTOR[I] contains the next sample from signal I.  For
+example, this modified version of the previous example (*note getvec::)
+copies the first ten samples of each available input signal:
+
+     #include <stdio.h>
+     #include <wfdb/wfdb.h>
+     
+     main()
+     {
+         int i, j, nsig;
+         WFDB_Sample *v;
+         WFDB_Siginfo *s;
+     
+         nsig = isigopen("100s", NULL, 0);
+         if (nsig < 1)
+             exit(1);
+         s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+         if (isigopen("100s", s, nsig) != nsig ||
+             osigopen("8l", s, nsig) != nsig)
+             exit(1);
+         v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
+         for (i = 0; i < 10; i++)
+             if (getvec(v) < 0 || putvec(v) < 0)
+                 break;
+         wfdbquit();
+         exit(0);
+     }
+
+   All programs that write signals or annotations _must_ invoke
+`wfdbquit' to close the output files properly (*note wfdbquit::).  This
+example uses record `8l' (*note Piped and Local Records::) for the
+output signal specifications; the output signal files will be named
+`data0' and `data1' in the current directory.  Several of the example
+programs in chapter 6 illustrate the use of `putvec'; for example,
+*note Example 6::.
+
+
+File: wpg,  Node: getann,  Next: ungetann,  Prev: putvec,  Up: signal and annotation I/O
+
+getann
+------
+
+     int getann(WFDB_Annotator AN, WFDB_Annotation *ANNOT)
+
+*Return:*
+ 0
+     Success
+
+-1
+     End of file (*ANNOT is not valid)
+
+-2
+     Failure: incorrect annotator number specified
+
+-3
+     Failure: unexpected physical end of file
+
+This function reads the next annotation from the input annotator
+specified by AN into the annotation structure (*note WFDB_Annotation
+structures::) pointed to by ANNOT.  The caller must allocate storage
+for the annotation structure.  Input annotators are numbered 0, 1, 2,
+etc.  This short program uses `getann' to read the contents of the
+reference (`atr') annotation file for record `100s':
+
+     #include <wfdb/wfdb.h>
+     
+     main()
+     {
+         WFDB_Anninfo a;
+         WFDB_Annotation annot;
+     
+         a.name = "atr"; a.stat = WFDB_READ;
+         if (annopen("100s", &a, 1) < 0)
+             exit(1);
+         while (getann(0, &annot) == 0)
+             printf("%s %s\n", mstimstr(annot.time), annstr(annot.anntyp);
+         exit(0);
+     }
+
+   *Note WFDB_Anninfo structures::, for information on the contents of
+the `WFDB_Anninfo' structure, and *note timstr and strtim::, and *note
+annstr and strann::, for details of the functions used to print
+portions of the annotations read by `getann' in this example.
+
+
+File: wpg,  Node: ungetann,  Next: putann,  Prev: getann,  Up: signal and annotation I/O
+
+ungetann
+--------
+
+     int ungetann(WFDB_Annotator AN, WFDB_Annotation *ANNOT)
+
+*Return:*
+ 0
+     Success
+
+-1
+     Failure: push-back buffer full (`*ANNOT' was not pushed back)
+
+-2
+     Failure: incorrect annotator number specified
+
+This function arranges for the annotation structure pointed to by ANNOT
+to be the next one read by `getann' from input annotator AN.  The
+pushed-back annotation need not necessarily be one originally read by
+`getann'.  No more than one annotation may be pushed back at a time for
+each input annotator.  (This function was first introduced in WFDB
+library version 5.3.)
+
+
+File: wpg,  Node: putann,  Prev: ungetann,  Up: signal and annotation I/O
+
+putann
+------
+
+     int putann(WFDB_Annotator AN, WFDB_Annotation *ANNOT)
+
+*Return:*
+ 0
+     Success
+
+-1
+     Failure: write error
+
+-2
+     Failure: incorrect annotator number specified
+
+This function writes the next annotation for the output annotator
+specified by AN from the annotation structure pointed to by ANNOT.
+Output annotators are numbered 0, 1, 2, etc.  The caller must fill in
+all fields of the annotation structure.  Using version 9.7 and later
+versions of the WFDB library, annotations may be written in any order
+(*note Annotation Order::).  Earlier versions require that annotations
+be supplied to `putann' in canonical order, and return an error code of
+-3 if an out-of-order annotation is supplied.  All programs that write
+signals or annotations _must_ invoke `wfdbquit' to close the output
+files properly (*note wfdbquit::).  Several of the example programs in
+chapter 6 illustrate the use of `putann'; for example, *note Example
+1::.
+
+
+File: wpg,  Node: non-sequential,  Next: conversion,  Prev: signal and annotation I/O,  Up: Functions
+
+Non-Sequential Access to WFDB Files
+===================================
+
+   The next three functions permit random access to signal and
+annotation files.  It is not possible, however, to skip backwards on
+piped input.
+
+* Menu:
+
+* isigsettime::			Setting time of next samples read.
+* isgsettime::			As above, but for one signal group only.
+* iannsettime::			Setting time of next annotations read.
+
+
+File: wpg,  Node: isigsettime,  Next: isgsettime,  Prev: non-sequential,  Up: non-sequential
+
+isigsettime
+-----------
+
+     int isigsettime(WFDB_Time T)
+
+*Return:*
+ 0
+     Success
+
+-1
+     Failure: EOF reached or improper seek
+
+This function resets the input signal file pointers so that the next
+samples returned from `getvec' will be those with sample number |T|.
+Only the magnitude of T is significant, not its sign; hence values
+returned by `strtim' can always be used safely as arguments to
+`isigsettime' (*note timstr and strtim::).  This function will fail if
+a pipe is used for input and |T| is less than the current sample
+number.  *Note Example 7::, and *note Example 9::, for illustrations of
+the use of `isigsettime'.
+
+
+File: wpg,  Node: isgsettime,  Next: iannsettime,  Prev: isigsettime,  Up: non-sequential
+
+isgsettime
+----------
+
+     int isgsettime(WFDB_Group SGROUP, WFDB_Time T)
+
+*Return:*
+ 0
+     Success
+
+-1
+     Failure: EOF reached or improper seek
+
+-2
+     Failure: incorrect signal group number specified
+
+This function does the job of `isigsettime', but only for the signal
+group specified by SGROUP.  This function may be of use if more than
+one record is open simultaneously (*note Multiple Record Access::).
+
+
+File: wpg,  Node: iannsettime,  Prev: isgsettime,  Up: non-sequential
+
+iannsettime
+-----------
+
+     int iannsettime(WFDB_Time T)
+
+*Return:*
+ 0
+     Success
+
+-1
+     Failure: EOF reached or improper seek
+
+-3
+     Failure: unexpected physical end of file
+
+This function resets the input annotation file pointers so that the next
+annotation read by `getann' from each input annotation file will be the
+first occurring on or after sample number |T| in that file.  Only the
+magnitude of T is significant, not its sign; hence values returned by
+`strtim' can always be used safely as arguments to `iannsettime' (*note
+timstr and strtim::).  This function will fail if a pipe is used for
+input and |T| is less than the time of the most recent annotation read
+from the pipe.  *Note Example 9::, for an illustration of the use of
+`iannsettime'.
+
+   The version of `iannsettime' that is included on the first edition
+of the MIT-BIH Arrhythmia Database CD-ROM contains a bug that can
+occasionally cause incorrect results.  To avoid this problem when using
+that version of the library, make at least one call to `getann' before
+using `iannsettime'.  The bug was corrected in version 4.0 of the
+library.
+
+
+File: wpg,  Node: conversion,  Next: calibration,  Prev: non-sequential,  Up: Functions
+
+Conversion Functions
+====================
+
+   Functions in this section perform various useful conversions:
+between annotation codes and printable strings, between times in sample
+intervals and printable strings, between Julian dates and printable
+strings, and between ADC units and physical units.
+
+* Menu:
+
+* annstr and strann::		annotation code <-> string
+* timstr and strtim::		time in sample intervals <-> HH:MM:SS string
+* datstr and strdat::		Julian date <-> DD/MM/YYYY string
+* aduphys and physadu::		ADC units <-> physical units
+
+
+File: wpg,  Node: annstr and strann,  Next: timstr and strtim,  Prev: conversion,  Up: conversion
+
+annstr, anndesc, and ecgstr
+---------------------------
+
+     char *annstr(int CODE)
+     char *anndesc(int CODE)
+     char *ecgstr(int CODE)
+
+*Return:*
+(char *)
+     pointer to a printable string that describes the code, or `NULL'
+
+These functions translate the annotation code specified by their
+argument into a string (*note Annotation Codes::).  Illegal or
+undefined codes are translated by `annstr' and `ecgstr' into decimal
+numerals surrounded by brackets (e.g., `[55]'); `anndesc' returns `NULL'
+in such cases.  The strings returned by `annstr' are mnemonics (usually
+only one character), which may be modified either by `setannstr' or by
+the presence of "modification labels" in an input annotation file
+(*note annstr and strann::).  The strings returned by `anndesc' are
+brief descriptive strings, usually those given in the table of
+annotation codes (*note Annotation Codes::).  The strings returned by
+`ecgstr' are usually the same as those returned by `annstr', but they
+can be modified only by `setecgstr', and not by the presence of
+modification labels as for `annstr'.  The intent is that `ecgstr'
+should be used rather than `annstr' only when it is necessary that a
+fixed set of mnemonics be used, independent of any modification labels.
+
+   Here is a little program that prints a table of the codes, mnemonic
+strings, and descriptions:
+
+     #include <stdio.h>
+     #include <wfdb/wfdb.h>
+     #include <wfdb/ecgcodes.h>
+     
+     main()
+     {
+         int i;
+     
+         printf("Code\tMnemonic\tDescription\n");
+         for (i = 1; i <= ACMAX; i++) {
+             printf("%3d\t%s", i, annstr(i));
+             if (anndesc(i) != NULL)
+                 printf("\t\t%s", anndesc(i));
+             printf("\n");
+         }
+     }
+
+   `ACMAX' is defined in `<wfdb/ecgcodes.h>'.  The range from 1 through
+`ACMAX' includes all legal annotation codes; if you run this program,
+you will find some undefined but legal annotation codes in this range.
+*Note Example 3::, for another illustration of the use of `annstr'.
+(`annstr' and `anndesc' were first introduced in WFDB library version
+5.3.)
+
+strann and strecg
+-----------------
+
+     int strann(char *STRING)
+     int strecg(char *STRING)
+
+*Return:*
+(int)
+     annotation code
+
+These functions translate the null-terminated ASCII character strings to
+which their arguments point into annotation codes.  Illegal strings are
+translated into `NOTQRS'.  Input strings for `strann' and `strecg'
+should match those returned by `annstr' and `ecgstr' respectively.
+*Note Example 9::, for an illustration of the use of `strann'.
+(`strann' was first introduced in WFDB library version 5.3.)
+
+setannstr, setanndesc, and setecgstr
+------------------------------------
+
+     int setannstr(int CODE, char *STRING)
+     int setanndesc(int CODE, char *STRING)
+     int setecgstr(int CODE, char *STRING)
+
+*Return:*
+ 0
+     Success
+
+-1
+     Failure: illegal `code'
+
+These functions modify translation tables used by functions that
+convert between annotation codes and strings.  `setannstr' modifies the
+table shared by `annstr' and `strann'; `setanndesc' modifies the table
+used by `anndesc'; and `setecgstr' modifies the table shared by
+`ecgstr' and `strecg'.  They may be used to redefine strings for
+defined annotation codes as well as to define strings for undefined
+annotation codes.  For example, `setannstr(NORMAL, "\\267")' redefines
+the string for normal beats as a PostScript bullet, `*' (`NORMAL' is
+defined in `<wfdb/ecgcodes.h>').  These functions do not copy their
+string arguments, which must therefore be kept valid by the caller.
+
+   An important difference between `setannstr' (or `setanndesc') and
+`setecgstr' is that `annopen' and `wfdbinit' insert modification labels
+in any output annotation files that are created _after_ invoking
+`setannstr' or `setanndesc'; `setecgstr' does not have this side
+effect.  By using `setannstr' before `annopen', a WFDB application may
+create annotation files with self-contained code tables, which can be
+read properly by other WFDB applications without the need to inform them
+explicitly about non-standard codes.  For this scheme to work as
+intended, all custom code mnemonics and descriptions must be defined
+before the output annotation files are opened.
+
+   By passing a negative value as CODE to `setannstr' or `setanndesc',
+the translation for -CODE can be modified without triggering the
+generation of a modification label.  This feature can be useful for
+programs that use alternate sets of mnemonics or descriptions for
+speakers of different languages.
+
+   Note that it is possible, though not desirable, to define identical
+strings for two or more codes; the behavior of `strann' and `strecg' in
+such cases is implementation-dependent.  (`setannstr' and `setanndesc'
+were first introduced in WFDB library version 5.3.)
+
+
+File: wpg,  Node: timstr and strtim,  Next: datstr and strdat,  Prev: annstr and strann,  Up: conversion
+
+   The next three functions convert between "standard time format"
+strings and times in units of sample intervals.  Normally they should be
+invoked after `isigopen', `wfdbinit', or `sampfreq', any of which will
+determine the duration of a sample interval and the base time from a
+header file, or after defining these quantities using `setsampfreq' and
+`setbasetime'.  If this is not done, or if these time-conversion
+functions are used after `wfdbquit', they will perform conversions in
+units of seconds (i.e., the sample interval is taken to be one second
+in such cases).
+
+[ms]timstr
+----------
+
+     char *timstr(WFDB_Time T)
+     char *mstimstr(WFDB_Time T)
+
+*Return:*
+(char *)
+     pointer to a string that represents the time
+
+These functions convert times or time intervals into null-terminated
+ASCII strings.  If the argument, T, is greater than zero, it is treated
+as a time interval, and converted directly into HH:MM:SS format by
+`timstr', or to HH:MM:SS.SSS format by `mstimstr', with leading zero
+digits and colons suppressed.  If T is zero or negative, it is taken to
+represent negated elapsed time from the beginning of the record, and it
+is converted to a time of day using the base time for the record as
+indicated by the `hea' file or the caller (*note setbasetime::); in
+this case, if the base time is defined, the string will contain all
+digits even if there are leading zeroes, it will include the date if a
+base date is defined, and it will be marked as a time of day by being
+bracketed (e.g., `[08:45:00 23/04/1989]').  The result of the
+conversion is truncated to a multiple of a second by `timstr', or to a
+multiple of a millisecond by `mstimstr'.  Note in each case that the
+returned pointer addresses static data (shared by `timstr' and
+`mstimstr'), the contents of which are overwritten by subsequent calls.
+*Note Example 3::, for an illustration of the use of `mstimstr'; also
+*note Example 5::, for an example of the use of `timstr'.
+
+strtim
+------
+
+     WFDB_Time strtim(char *STRING)
+
+*Return:*
+(WFDB_Time) >0
+     number of sample intervals corresponding to the argument
+     interpreted as a time interval
+
+(WFDB_Time) <0
+     (negated) elapsed time in sample intervals from the beginning of
+     the record, corresponding to the argument interpreted as a time of
+     day
+
+(WFDB_Time)  0
+     a legal return if the argument matches the base time;  otherwise
+     an error return indicating an incorrectly formatted argument
+
+This function converts an ASCII string in "standard time format" to a
+time in units of sample intervals.  Examples of standard time format:
+`2:14.875'
+     2 minutes + 14.875 seconds
+
+`[13:6:0]'
+     13:06 (1:06 PM)
+
+`[8:0:0 1]'
+     8 AM on the day following the base date
+
+`[12:0:0 1/3/1992]'
+     noon on 1 March 1992
+
+`143'
+     143 seconds (2 minutes + 23 seconds)
+
+`4:02:01'
+     4 hours + 2 minutes + 1 second
+
+`s12345'
+     12345 sample intervals
+
+`c350.5'
+     counter value 350.5
+
+`e'
+     time of the end of the record (if defined)
+
+`i'
+     time of the next sample in input signal 0
+
+`o'
+     (the letter `o') time of the next sample in output signal 0
+
+   If the argument is bracketed (as in the second, third, and fourth
+examples), it is taken as a time of day, and `strtim' uses the base
+time defined by the header file or by the caller (*note setbasetime::);
+in this case, the value returned is zero or negative (and can be
+converted into elapsed time from the beginning of the record by simply
+negating it).  If the argument is not bracketed, it is taken as a time
+interval, and converted directly into a positive number of sample
+intervals.  These notations match those used by `timstr' and
+`mstimstr', which are (approximately) inverse functions of `strtim'; in
+fact, for MIT DB and AHA DB records (and any others with sampling
+frequencies below 1 KHz), `strtim(mstimstr(T))' = T, for any T.  The
+`s'-format (as in the seventh example above) is provided to allow
+"conversion" of time intervals already expressed in sample intervals.
+The similar `c'-format converts counter values (*note counter
+conversion::) into sample intervals.  The length of the record in
+sample intervals can be obtained using `strtim("e")', which evaluates
+to zero if this quantity is undefined.  The sample number of the next
+sample to be read or written can be determined using `strtim("i")' or
+`strtim("o")'.  If the argument string is incorrectly formatted,
+`strtim' returns zero (indistinguishable from a correct input that
+evokes a zero output); this may be considered a feature.  Several of
+the programs in chapter 6 illustrate the use of `strtim' (for example,
+*note Example 7::).
+
+
+File: wpg,  Node: datstr and strdat,  Next: aduphys and physadu,  Prev: timstr and strtim,  Up: conversion
+
+   The next two functions convert between Julian dates and ASCII
+strings.  Julian dates as defined by astronomers begin at noon GMT;
+these begin at midnight local time.
+
+datstr
+------
+
+     char *datstr(WFDB_Date DATE)
+
+*Return:*
+(char *)
+     pointer to a string that represents the date
+
+This function converts the Julian date represented by DATE into an
+ASCII string in the form DD/MM/YYYY.
+
+strdat
+------
+
+     WFDB_Date strdat(char *STRING)
+
+*Return:*
+(WFDB_Date)
+     Julian date corresponding to the argument
+
+This function converts STRING into a Julian date.  The argument should
+be in the format used by `datstr'; if STRING is improperly formatted,
+`strdat' returns zero.  Note that dates such as `15/3/89' refer to the
+first century A.D., not the twentieth.  For example, the interval in
+days between the events commemorated by the French and American
+national holidays is `strdat("14/7/1789")' - `strdat("4/7/1776")'.
+
+
+
+
+File: wpg,  Node: aduphys and physadu,  Prev: datstr and strdat,  Up: conversion
+
+   The next four functions convert between analog-to-digital converter
+(ADC) units and physical units, using as a conversion factor the gain
+for the specified input signal.  The first two (`aduphys' and
+`physadu') are general-purpose functions that convert absolute levels
+(i.e., they account for non-zero `baseline' values); the last two
+(`adumuv' and `muvadu') are for use with millivolt-dimensioned signals
+only, and convert potential differences (i.e., `adumuv(S, 0)' =
+`muvadu(S, 0)' = 0 for all S, irrespective of the `baseline' values
+specified in the header file).  Normally, these functions should be
+invoked after `isigopen' or `wfdbinit', either of which will determine
+the gain from the `hea' file.  If this is not done, or if the header
+file indicates that the gain is uncalibrated, or if the specified input
+signal is not currently open, a gain of `WFDB_DEFGAIN' (defined in
+`<wfdb/wfdb.h>') ADC units per millivolt, and a baseline of zero, are
+assumed.  If the physical units (*note WFDB_Siginfo structures::) are
+not millivolts, `adumuv' and `muvadu' convert to and from thousandths
+of the defined physical units.  Note that `adumuv' and `muvadu' deal
+exclusively with integers, but `aduphys' returns and `physadu' accepts
+double-precision floating point physical values.
+
+aduphys
+-------
+
+     double aduphys(WFDB_Signal S, WFDB_Sample A)
+
+*Return:*
+(double)
+     physical value corresponding to a sample value of A ADC units
+
+This function converts the sample value A from ADC units to physical
+units, based on the `gain' and `baseline' for input signal S.
+(`aduphys' was first introduced in WFDB library version 6.0.)
+
+physadu
+-------
+
+     WFDB_Sample physadu(WFDB_Signal S, double V)
+
+*Return:*
+(WFDB_Sample)
+     sample value, in ADC units, corresponding to V, in physical units
+
+This function converts the value V from physical units to ADC units,
+based on the `gain' and `baseline' for input signal S.  (`physadu' was
+first introduced in WFDB library version 6.0.)
+
+adumuv
+------
+
+     int adumuv(WFDB_Signal S, WFDB_Sample A)
+
+*Return:*
+(int)
+     number of microvolts corresponding to A ADC units
+
+This function converts the potential difference A from ADC units to
+microvolts, based on the `gain' for input signal S.
+
+muvadu
+------
+
+     WFDB_Sample muvadu(WFDB_Signal S, int V)
+
+*Return:*
+(int)
+     number of ADC units corresponding to V microvolts
+
+This function converts the potential difference V from microvolts to
+ADC units, based on the `gain' for input signal S.
+
+
+File: wpg,  Node: calibration,  Next: miscellaneous functions,  Prev: conversion,  Up: Functions
+
+Calibration Functions
+=====================
+
+   Functions in this section are used to determine specifications for
+calibration pulses and customary scales for plotting signals.  All of
+them make use of the "calibration list", which is maintained in memory
+and which contains entries for various types of signals.
+
+* Menu:
+
+* calopen::			read a calibration file into list
+* getcal::			retrieve calibration data from list
+* putcal::			append calibration data to list
+* newcal::			write calibration list to a file
+* flushcal::			discard contents of calibration list
+
+
+File: wpg,  Node: calopen,  Next: getcal,  Prev: calibration,  Up: calibration
+
+calopen
+-------
+
+     int calopen(char *FILE)
+
+*Return:*
+ 0
+     Success
+
+-1
+     Failure: insufficient memory for calibration list
+
+-2
+     Failure: unable to open calibration file
+
+This function reads the specified calibration FILE (which must be
+located in one of the directories specified by `WFDB', *note WFDB
+path::) into the calibration list.  If FILE is `NULL', the file named
+by `WFDBCAL' is read.  Normally, the current contents of the
+calibration list are discarded before reading the calibration file; if
+FILE begins with `+', however, the `+' is stripped from the file name
+and the contents of the file are appended to the current calibration
+list.  If FILE is `-', `calopen' reads the standard input rather than a
+calibration file.  (This function was first introduced in WFDB library
+version 6.0.)
+
+
+File: wpg,  Node: getcal,  Next: putcal,  Prev: calopen,  Up: calibration
+
+getcal
+------
+
+     int getcal(char *DESC, char *UNITS, WFDB_Calinfo *CAL)
+
+*Return:*
+ 0
+     Success;  `*CAL' contains the requested data
+
+-1
+     Failure: no match found
+
+This function attempts to find calibration data for signals of type
+DESC, having physical units as given by UNITS.  If successful, it fills
+in the contents of the `WFDB_Calinfo' structure (*note WFDB_Calinfo
+structures::) pointed to by CAL.  The caller must allocate storage for
+the `WFDB_Calinfo' structure, and must not modify the contents of the
+strings addressed by the `sigtype' and `units' fields of the
+`WFDB_Calinfo' structure after `getcal' returns.  `getcal' returns data
+from the first entry in the calibration list that contains a `sigtype'
+field that is either an exact match or a prefix of DESC, and a `units'
+field that is an exact match of UNITS; if either DESC or UNITS is
+`NULL', however, it is ignored for the purpose of finding a match.
+`getcal' cannot succeed unless the calibration list has been
+initialized by a previous invocation of `calopen' or `putcal'.  (This
+function was first introduced in WFDB library version 6.0.)
+
+
+File: wpg,  Node: putcal,  Next: newcal,  Prev: getcal,  Up: calibration
+
+putcal
+------
+
+     int putcal(WFDB_Calinfo *CAL)
+
+*Return:*
+ 0
+     Success
+
+-1
+     Failure: insufficient memory
+
+This function adds the `WFDB_Calinfo' structure pointed to by CAL to
+the end of the calibration list.  (This function was first introduced
+in WFDB library version 6.0.)
+
+
+File: wpg,  Node: newcal,  Next: flushcal,  Prev: putcal,  Up: calibration
+
+newcal
+------
+
+     int newcal(char *FILE)
+
+*Return:*
+ 0
+     Success
+
+-1
+     Failure: unable to open FILE
+
+This function creates a new calibration FILE (in the current directory)
+containing the contents of the calibration list (which is not
+modified).  FILE must satisfy the standard conditions for a WFDB file
+name, i.e., it may contain letters, digits, or underscores.  (This
+function was first introduced in WFDB library version 6.0.)
+
+
+File: wpg,  Node: flushcal,  Prev: newcal,  Up: calibration
+
+flushcal
+--------
+
+     void flushcal()
+
+This function discards the current calibration list and returns the
+memory that it occupied to the heap.  Note that `wfdbquit' does _not_
+perform the function of `flushcal'.  (This function was first
+introduced in WFDB library version 6.0.)
+
+
+File: wpg,  Node: miscellaneous functions,  Prev: calibration,  Up: Functions
+
+Miscellaneous WFDB Functions
+============================
+
+* Menu:
+
+* newheader::			Creating a `hea' file for a new WFDB
+				record.
+* setheader::			Creating or changing a `hea' file.
+* setmsheader::                 Creating a `hea' for a multi-segment
+                                record.
+* wfdbquit::			Closing WFDB files.
+* iannclose and oannclose::     Closing annotation files.
+* wfdbquiet and wfdbverbose::	Suppressing error messages from the WFDB library.
+* wfdberror::			Retrieving error messages from the WFDB library.
+* sampfreq::			Reading the sampling frequency of a WFDB record.
+* setsampfreq::			Setting the sampling frequency.
+* setbasetime::			Setting the base time.
+* setgvmode::                   Setting the resolution for a multifrequency
+                                record.
+* getspf::                      Determining the number of samples per frame.
+* counter conversion::		Functions for reading and setting counter
+				conversion parameters.
+* setwfdb::			Dynamically changing the database path.
+* getwfdb::			Reading the database path.
+* wfdbfile::			Obtaining the pathname of a WFDB file.
+* wfdbflush::			Flushing buffered output annotations and
+				samples.
+* getinfo::			Reading info strings from a `hea' file.
+* putinfo::			Writing info strings into a `hea' file.
+* setibsize::			Setting the default input buffer size.
+* setobsize::			Setting the default output buffer size.
+* wfdbgetskew::                 Reading intersignal skew.
+* wfdbsetskew::                 Recording intersignal skew.
+* wfdbgetstart::                Reading the prolog size in a signal file.
+* wfdbsetstart::                Recording the prolog size in a signal file.
+
+
+File: wpg,  Node: newheader,  Next: setheader,  Prev: miscellaneous functions,  Up: miscellaneous functions
+
+newheader
+---------
+
+     int newheader(char *RECORD)
+
+*Return:*
+ 0
+     Success
+
+-1
+     Failure: unable to create header file
+
+This function creates a `hea' file (in the current directory, unless
+RECORD includes path information).  Use `newheader' just after you have
+finished writing the signal files, but before calling `wfdbquit'.  If
+RECORD begins with `+', the `+' is discarded and the remainder of
+RECORD is taken as the record name.  Otherwise, all of RECORD
+(excluding any path information) is taken to be the record name.  If
+the record name is `-', the header file is written to the standard
+output.  Record names may include letters in lower or upper case,
+digits, and underscores (`_'); they may not include any other
+characters.  If RECORD does not conform to these requirements,
+`newheader' will return -1; *note Example 8::, for an illustration of
+the use of `newheader' to check the validity of a record name.  For
+compatibility with the widest range of operating systems, keep record
+names short (6 characters or less) and avoid those that are
+distinguished by case alone.  To avoid confusion with MIT DB and AHA DB
+records, do not use three- or four-digit record names.
+
+
+File: wpg,  Node: setheader,  Next: setmsheader,  Prev: newheader,  Up: miscellaneous functions
+
+setheader
+---------
+
+     int setheader(char *RECORD, WFDB_Siginfo *SIARRAY, unsigned int NSIG)
+
+*Return:*
+ 0
+     Success
+
+-1
+     Failure: unable to create header file
+
+This function creates or recreates a header file (in the current
+directory) for the specified RECORD, based on the contents of the first
+NSIG members of SIARRAY.  The preferred way to create a header file for
+a new record is using `newheader', which records signal checksum and
+length variables maintained by `putvec'.  The intended use of
+`setheader' is for editing header files, e.g., to change recorded
+signal gains from a calibration program, or to add signal descriptions
+or "info" strings.  In the following code fragment, the header file for
+record `old' is used to create a header file for record `new':
+
+     ...
+     int nsig, status;
+     WFDB_Siginfo *s;
+     
+     nsig = isigopen("old", NULL, 0);
+     s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+     nsig = isigopen("old", s, -nsig);
+     if (nsig > 0) {
+         s[0].gain = 100.0;
+         status = setheader("new", s, (unsigned int)nsig);
+     }
+     ...
+
+The header file for record `new' will contain the same signal
+information as that for record `old', except that the `gain' for signal
+0 will have been changed as shown.  Any "info" strings in the `hea'
+file for record `old' must be copied explicitly; *note getinfo::, and
+*note putinfo::.  (This function was first introduced in WFDB library
+version 5.0.)
+

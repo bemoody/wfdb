@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:	15 October 2001
+#				Last revised:  18 December 2001
 # This section of the Makefile should not need to be changed.
 
 # ARCH specifies the type of CPU and the operating system (e.g., 'i686-Linux').
@@ -27,7 +27,7 @@ install:	config.cache
 	cd psd;      $(MAKE) install
 	cd convert;  $(MAKE) install
 	cd data;     $(MAKE) install
-	cd doc;      $(MAKE) install
+	test -d doc && ( cd doc; $(MAKE) install )
 
 uninstall:	config.cache
 	cd lib;	     $(MAKE) uninstall
@@ -37,7 +37,7 @@ uninstall:	config.cache
 	cd psd;      $(MAKE) uninstall
 	cd convert;  $(MAKE) uninstall
 	cd data;     $(MAKE) uninstall
-	cd doc;      $(MAKE) uninstall
+	test -d doc && ( cd doc; $(MAKE) uninstall )
 	./uninstall.sh $(WFDBROOT)
 
 # 'make clean': remove binaries, other cruft from source directories
@@ -46,7 +46,6 @@ clean:
 	cd checkpkg; $(MAKE) clean
 	cd convert;  $(MAKE) clean
 	cd data;     $(MAKE) clean
-	cd doc;      $(MAKE) clean
 	cd examples; $(MAKE) clean
 	cd fortran;  $(MAKE) clean
 	cd lib;      $(MAKE) clean
@@ -54,6 +53,7 @@ clean:
 	cd wave;     $(MAKE) clean
 	cd waverc;   $(MAKE) clean
 	cd wview;    $(MAKE) -f clean
+	test -d doc && ( cd doc; $(MAKE) clean )
 	rm -f *~ conf/*~ conf/prompt config.cache */*.exe
 
 # 'make config.cache': check configuration
@@ -61,6 +61,12 @@ config.cache:
 	exec ./configure
 	@echo "(Ignore any error that may appear on the next line.)"
 	@false	# force an immediate exit from `make'
+
+conf/prompt:
+	echo -n >echo.out
+	-test -s echo.out && ln -sf prompt-c conf/prompt
+	-test -s echo.out || ln -sf prompt-n conf/prompt
+	rm echo.out
 
 # 'make test' or 'make test-all': compile the WFDB applications without
 # installing them (installs the dynamically-linked WFDB library and includes
@@ -74,7 +80,7 @@ test-install: $(TESTDIRS)
 	$(MAKE) WFDBROOT=$(HOME)/wfdb-test install
 
 # 'make check': test currently installed version of the WFDB software package
-check:		config.cache
+check:		config.cache conf/prompt
 	cd checkpkg; $(MAKE) all
 
 # Create directories for test installation if necessary.

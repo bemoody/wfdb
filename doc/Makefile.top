@@ -1,5 +1,5 @@
 # file: Makefile	G. Moody	24 June 1989
-#			Last revised: 25 November 2001
+#			Last revised: 18 December 2001
 # `make' description file for WFDB software documentation
 #
 # -----------------------------------------------------------------------------
@@ -56,36 +56,53 @@
 # (follow the links from http://www.physionet.org/physiotools/manuals.shtml).
 # Use any web browser to read them.
 
-# You may create and install a local copy of the HTML versions of these guides
-# by typing `make html'.  In order to do this successfully, you must have
-# installed `latex2html' (to translate the WAVE User's Guide and the appendices
-# of the WFDB Applications Guide), and `rman' (to translate the man pages in
-# the WFDB Applications Guide).  You also need `texi2html' (to translate the
-# WFDB Programmer's Guide), and Perl (in order to run `latex2html' and
-# `texi2html').  Links to all of these are available from
-# http://www.physionet.org/, along with the latest versions of the files in
-# this directory.
-
-# To install the man pages (the text of the WFDB Applications Guide) on-line,
-# type `make install' (or just `make').  The individual pages will be
+# If you follow the instructions for a standard installation of the WFDB
+# Software Package, the man pages from this directory will be installed so they
+# can be read using 'man', 'xman', etc.  The individual pages will be
 # accessible to the UNIX `man' command, and to similar commands such as `xman',
 # provided that MANDIR (see below) is in your MANPATH (type `man man' for
 # further information).
 
+# If you have the necessary formatting software, these man pages and a large
+# amount of other documentation can be produced in a wide variety of formats
+# from the sources in in this directory (see 'Makefile').  Here is a brief list
+# of available formats and the commands needed to produce them:
+
+# WFDB Applications Guide
+# printed copy	'make ag'      (requires troff, tbl, latex, dvips, & a printer)
+# HTML		'make ag.html' (requires rman, latex2html, and perl)
+# man pages	'make ag.man'
+# PDF		'make ag.pdf'  (requires troff, tbl, latex, dvips, and ps2pdf)
+# PostScript	'make ag.ps'   (requires troff, tbl, latex, and dvips)
+#
+# WFDB Programmer's Guide
+# printed copy	'make pg'      (requires troff, texi2dvi, dvips, & a printer)
+# Windows help	'make pg.hlp'  (requires makertf and hcrtf)
+# HTML		'make pg.html' (requires texi2html and perl)
+# info		'make pg.info' (requires makeinfo or GNU emacs)
+# PDF		'make pg.pdf'  (requires texi2dvi)
+# PostScript	'make pg.ps'   (requires texi2dvi and dvips)
+#
+# WAVE User's Guide
+# printed copy	'make ug'       (requires troff, latex, dvips, and a printer)
+# HTML		'make ug.html'  (requires latex2html and perl)
+# PDF		'make ug.pdf'   (requires pdflatex)
+#  PostScript	'make ug.ps'    (requires latex and dvips)
+
 # If GNU emacs or GNU info has been installed on your system, a hypertext
 # version of the WFDB Programmer's Guide may be installed by typing `make
-# info'.  Once the info files have been installed, provided that INFODIR is in
-# your INFOPATH (see below), you can browse the guide from within emacs by
-# typing C-h i to enter the info system, and selecting `WFDB library' from
-# the top-level menu.  Note that `make info' adds an entry for the Guide to the
+# pg.info'.  Once the info files have been installed, provided that INFODIR is
+# in your INFOPATH (see below), you can browse the guide from within emacs by
+# typing C-h i to enter the info system, and selecting `WFDB library' from the
+# top-level menu.  Note that `make info' adds an entry for the Guide to the
 # top-level `info' file ($INFODIR/dir).  If you install a GNU emacs update,
-# this entry may disappear; to restore it, simply `make info' again.
+# this entry may disappear; to restore it, simply `make pg.info' again.
 
 # The WFDB Programmer's Guide can also be formatted as an MS-Windows help file,
 # using 'makertf' and 'hcrtf'.  This requires 'makertf' (open-source, from
 # http://makertf.sourceforge.net/) and 'hcrtf' (see the 'makertf' page above
 # for further information).  Install both of these programs in your PATH before
-# trying to generate dbu.hlp.
+# trying to generate pg.hlp.
 
 
 # Printed documentation
@@ -95,17 +112,21 @@
 # man and emacs respectively, or (from the HTML versions) using your web
 # browser's print facilities.  Complete printed copies of the guides can be
 # obtained in one of these ways:
-#  - Preformatted versions can be downloaded from PhysioNet for printing on
+#  - The PostScript versions can be downloaded from PhysioNet for printing on
 #    a PostScript printer.  If you don't have a PostScript printer, you may
 #    still be able to use Ghostscript (available freely from 
 #    http://www.ghostscript.com/) to print these versions on your printer
 #    (most popular laser, inkjet, and dot matrix printers are supported by
 #    Ghostscript).
+#  - The PDF versions can be downloaded from PhysioNet for printing using
+#    Acrobat reader (available freely from http://www.adobe.com/).  These
+#    can also be read and printed using GhostScript (see above), but there
+#    is no advantage in doing so; use the PostScript versions with GhostScript.
 #  - The sources for these guides are provided in this directory;  you should
 #    use these if you have made additions to the guides or wish to customize
 #    them in any other way.  To format the sources, you will need groff or
 #    troff, gtbl or tbl, TeX, LaTeX, texi2dvi, and dvips.  To format and print
-#    the WFDB Applications Guide, type `make appguide' (but read `tmac.dif'
+#    the WFDB Applications Guide, type `make ag' (but read `tmac.dif'
 #    first, unless you are using groff).  To print the WAVE User's Guide, type
-#    `make wguide'.  To print the WFDB Programmer's Guide, type `make guide'.
+#    `make ug'.  To print the WFDB Programmer's Guide, type `make pg'.
 # _____________________________________________________________________________

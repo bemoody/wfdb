@@ -1,0 +1,189 @@
+\documentclass[twoside]{article}
+\oddsidemargin 0.1in
+\evensidemargin -0.1in
+\def\textwidth{6.375 in}
+
+\title{Installing the WFDB Software Package}
+\author{George B. Moody\\
+Harvard-MIT Division of Health Sciences and Technology, Cambridge, MA, USA}
+\date{}
+
+\begin{document}
+\setcounter{page}{115}
+
+\maketitle
+
+\section*{Summary}
+This appendix briefly describes how to install the WFDB Software Package on a
+new system.  The package includes C-language sources for the WFDB library and
+for the applications described in this manual; \LaTeX{}, {\tt texinfo}, and
+{\tt troff} sources for this and other manuals; and a one-minute sample record
+({\tt 100s}).
+
+\section*{Obtaining the WFDB Software Package}
+The latest version of the WFDB Software Package can always be downloaded in
+source form from PhysioNet and its mirrors (see {\tt
+http://www.physio\-net.org/physio\-tools/wfdb.shtml}); binaries for popular
+operating systems and development snapshots, as well as quick-start guides
+including installation notes for popular operating systems, are also usually
+available there.
+
+\subsection*{UNIX, GNU/Linux, and similar operating systems}
+
+Before beginning the installation of the WFDB Software Package, obtain and
+install the {\tt libwww} package from {\tt http://www.w3.org/Library/} or from
+{\tt http://\-www.physio\-net.org/physio\-tools/libwww/}.  This package is
+provided with most current versions of GNU/Linux.  (If you have a program
+called {\tt libwww-config}, then {\tt libwww} is installed already.)  You may
+omit this step if you do not wish to have NETFILES support.
+
+Also download and install the {\tt XView} software packages from {\tt
+http://www.\-physio\-net.org/\-physio\-tools/xview/} if you wish to use WAVE.
+Sources are available, as are binaries for several versions of GNU/Linux.  If
+you are using SunOS or Solaris, XView binaries are available in the Open Look
+Software Development package and may be installed already.  (If you have a
+program called {\tt textedit}, then {\tt XView} is installed already.) If you
+are able to use an existing set of binaries, these are recommended, since the
+sources may take a {\em long} time to compile.  Be sure that the directory
+containing {\tt textedit}, usually {\tt /usr/openwin/bin}, is in your {\tt
+PATH}.  You may omit this step if you do not wish to use {\em WAVE}.
+
+If you have downloaded the software from PhysioNet or another source, you
+will have a {\tt gzip}-compressed {\tt tar} archive.  Unpack it using
+the commands:
+
+\begin{verbatim}
+gzip -d wfdb.tar.gz
+tar xfv wfdb.tar
+\end{verbatim}
+
+(If you have GNU {\tt tar}, as on GNU/Linux, you can combine these into a
+single command: {\tt tar xfvz wfdb.tar.gz}.)
+
+This will create a directory with a name of the form {\tt wfdb-}{\em m.n.r},
+where {\em m.n.r} is the version number of the included WFDB library (e.g.,
+{\tt 10.2.1}).  Enter this directory.
+
+You should now be ready to configure, compile, and install the software, using
+the commands:
+
+\begin{verbatim}
+./configure
+make install
+\end{verbatim}
+
+The {\tt ./configure} command asks where you wish to install the package.
+If you accept the default ({\tt /usr}), you will need root permissions when
+runnning {\tt make install}.  If you choose another location, follow the
+instructions given by {\tt configure} for setting your {\tt PATH} and
+{\tt LD\_LIBRARY\_PATH} environment variables.
+
+Depending on the speed of your system and of your C compiler, {\tt make} will
+generally require between 1 and 10 minutes.
+
+\subsection*{MS-Windows}
+
+If you have not already done so, install the Cygwin development environment
+(freely available from {\tt http://sources.redhat.com/cygwin/}).  This includes
+{\tt gcc} (the GNU C/C++ compiler) as well as a comprehensive assortment of
+other Unix utilities ported to MS-Windows.  Accept the defaults suggested by
+the installer.
+
+\emph{Important:} Although you may be able to compile the WFDB software
+package using a proprietary compiler, this is \emph{not supported}.  The
+{\tt Makefile.dos} files in several of the subdirectories of the package's
+source tree can be used with the {\tt make} utilities provided with most
+commercial C compilers, although you will need to customize them for your
+compiler. Your feedback is appreciated.
+
+Before beginning the installation of the WFDB Software Package, obtain and
+install the {\tt libwww} package from {\tt http://www.w3.org/Library/} or
+from {\tt http://\-www.physio\-net.org/physio\-tools/libwww/}.  You may
+omit this step if you do not wish to have NETFILES support.
+
+Download
+{\tt http://www.physio\-net.org/physio\-tools/binaries/win\-dows/bin/which.exe}
+and put it into a directory in your PATH.  (This utility is needed by
+{\tt configure} in a later step.  The sources for {\tt which.exe} are available
+within {\tt http://www.physio\-net.org/physio\-tools/util\-ities/}.)
+
+Open a Cygwin terminal window (the Cygwin installer will have added this to
+your MS-Windows start menu).  Perform the remaining steps by typing the
+commands given below into the terminal window.
+
+Check that {\tt which} and {\tt gcc} are accessible by typing the command:
+
+\begin{verbatim}
+which gcc
+\end{verbatim}
+
+The output of this command should be:
+
+\begin{verbatim}
+/usr/bin/gcc
+\end{verbatim}
+
+If you don't see this output, repeat the steps above as necessary to correct
+the problem before continuing.
+
+Unpack the {\tt gzip}-compressed {\tt tar} archive you downloaded earlier,
+using the {\tt tar} command included with the Cygwin package:
+
+\begin{verbatim}
+tar xfvz wfdb.tar.gz
+\end{verbatim}
+
+If your browser decompressed the file during the download, use this command
+instead:
+
+\begin{verbatim}
+tar xfv wfdb.tar
+\end{verbatim}
+
+This will create a directory with a name of the form {\tt wfdb-}{\em m.n.r},
+where {\em m.n.r} is the version number of the included WFDB library (e.g.,
+{\tt 10.2.0}).  Enter this directory.
+
+You should now be ready to configure, compile, and install the software, using
+the commands:
+
+\begin{verbatim}
+./configure
+make install
+\end{verbatim}
+
+If you have Microsoft or Turbo C or C++, and a Microstar Laboratories DAP 1200-
+or 2400-series analog interface board, you can compile {\tt sample} (a program
+for creating database records from analog signals, and for replaying them in
+analog form).  To do so successfully, you must first have installed the
+Microstar {\tt \#include} files and DAP interface library on your system.
+Specifically, files {\tt c\_lib.c}, {\tt clock.h}, and {\tt ioutil.h} must be
+installed in your {\tt include} directory, and the version of the file
+{\tt cdapl.lib} that is compatible with your compiler must be installed in a
+directory in which libraries are found by your linker.  Read and customize
+{\tt lib/Makefile.dos} and {\tt app/Makefile.dos} as appropriate for your
+compiler, and use your compiler's {\tt make} utility to generate {\tt wfdb.lib}
+and then {\tt sample.exe}.
+
+\subsection*{Other systems}
+
+Copy the contents of {\tt http://www.\-physio\-net.\-org/physio\-tools/wfdb/}
+to your hard disk.  Note that the text files are in UNIX format (i.e., lines
+are terminated by ASCII line-feed characters only).  If your system expects
+text files in MS-DOS format (with both a carriage return and a line-feed at the
+end of each line; VMS is one such system), use {\tt u2d.exe} (available from
+PhysioNet) to reformat the text files under MS-DOS.  If your system is a
+Macintosh (which expects that lines are terminated by carriage returns only),
+you will have to reformat the text files yourself, which may be done under
+MS-DOS on a PC using {\tt u2m.exe}, or on a Macintosh using third-party
+software.
+
+The WFDB Software Package is written in highly portable C, and (with the
+exception of a few MS-DOS or UNIX-specific display or data-acquisition
+programs) should be easy to compile with any K\&R or ANSI C compiler.
+The UNIX and MS-DOS {\tt make} description files ({\tt Makefile}
+and {\tt Makefile.dos} in {\tt wfdb} and in each of its subdirectories)
+should get you started.
+\newpage
+\center{[This page intentionally left blank.]}
+\end{document}

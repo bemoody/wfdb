@@ -1,0 +1,1034 @@
+This is wpg, produced by makeinfo version 4.0 from wpg.tex.
+
+
+File: wpg,  Node: Top,  Next: Overview,  Prev: (dir),  Up: (dir)
+
+   This guide documents the Waveform Database interface library (the
+WFDB library).  This file contains the text of the Tenth Edition of the
+`WFDB Programmer's Guide' (December,2001), with revisions for release
+10.2.4 of the WFDB library.
+
+* Menu:
+
+* Overview::			What is the WFDB library?
+* Recent changes::              New material, not included in the most
+                                recent printed edition of this guide.
+* Usage::			How to compile and run a program that uses
+				the WFDB library.
+* Functions::			Call and return syntax of each function, with
+				descriptions and program examples.
+* Data Types::		        Annotator and signal information structures,
+				and annotation structures.
+* Annotation Codes::    	Table of codes, descriptions of mapping macros.
+* Database Files::		A description of the standard file types, and
+				notes about reading from nonstandard sources.
+* Examples::			Annotated example programs.
+* Exercises::			Test yourself.
+* Glossary::			So you think you know what `time' is, eh?
+				A guide for the perplexed.
+* Installation::		Notes on installing the WFDB software package.
+* WFDB Applications::		Brief descriptions of the WFDB application
+				programs provided with the WFDB software package.
+* Extensions::			Notes on extending the capabilities of the
+				WFDB library.
+* Sources::			Where to get the WFDB software package, databases
+				of ECGs and other signals, and related items.
+Indices
+
+* Concept Index::		An item for each concept.
+* Function and Macro Index::	An item for each WFDB library function and macro.
+
+* Copying::                     You can make copies of this guide.  Here are
+                                the terms for doing so.
+
+
+File: wpg,  Node: Overview,  Next: Recent changes,  Prev: Top,  Up: Top
+
+Preface
+*******
+
+   This guide documents the Waveform Database interface library (the
+"WFDB library"), a package of C-callable functions that provide clean
+and uniform access to digitized, annotated signals stored in a variety
+of formats.  These functions were originally designed for use with
+databases of electrocardiograms, including the MIT-BIH Arrhythmia
+Database ("MIT DB") and the AHA Database for the Evaluation of
+Ventricular Arrhythmia Detectors ("AHA DB").  In February 1990, the
+predefined annotation set was expanded to accommodate the needs of the
+European ST-T Database ("ESC DB").  The WFDB library is sufficiently
+general, however, to be useful for dealing with any similar collection
+of digitized signals, which may or may not be annotated.  The WFDB
+library has evolved to support the development of numerous other
+databases that include signals such as blood pressure, respiration,
+oxygen saturation, EEG, as well as ECGs.  Among these multi-parameter
+databases are the MIT-BIH Polysomnographic Database, the MGH/Marquette
+Foundation Waveform Database, and the MIMIC Database.  Thus the WFDB
+library is considerably more than an _ECG_ database interface.
+
+   This guide describes how to write C-language programs that use
+databases of ECGs and other signals.  A standard set of such programs
+is included in the WFDB Software Package, and is described in the `WFDB
+Applications Guide'; other documents describe the databases themselves,
+and existing programs that use them (*note Sources::, for information
+about obtaining these and related items).
+
+   There are a few important concepts that should be well understood
+before going further.  These concepts include "records"; "signals",
+"samples", and "time"; and "annotations".
+
+* Menu:
+
+* Concepts 1::			Records (``tapes'') and record names.
+* Concepts 2::			Signals, samples, and time.
+* Concepts 3::			Annotations and annotation files.
+
+_If this is your first exposure to the WFDB library,
+study the three nodes above before going on._
+
+* Applications::		Examples of programs based on the WFDB library.
+* Guide::			What's in this guide, and where.
+                		What you need to know to get started.
+				Acknowledgments, where to send your
+				comments, and how to get your very own
+				printed copy of this guide.
+
+
+File: wpg,  Node: Concepts 1,  Next: Concepts 2,  Prev: Overview,  Up: Overview
+
+Records
+=======
+
+   The databases for which the WFDB library was designed consist of a
+small number of "records", each of which is quite large (typically a
+megabyte or more).  Database records usually originate as multi-channel
+analog tape recordings that have been digitized and stored as disk
+files.  For this historical reason, they are often referred to as
+"tapes".  Each record contains a continuous recording from a single
+subject.  A typical application program accesses only a single record,
+and most (if not all) of the access within the record is sequential.
+Much less frequently, it may be of interest to compare the contents of
+several records, or to select sets of records.  These databases are
+therefore qualitatively different from those for which conventional
+database management software is written.
+
+   Records are identified by "record names", which are three-digit
+numbers for MIT DB records, four-digit numbers for AHA DB records, and
+four-digit numbers prefixed by `e' for ESC DB records.  You may create
+database records with names containing letters, digits, and
+underscores.  Case is significant in record names that contain letters,
+even in environments such as MS-DOS for which case translation is
+normally performed by the operating system on file names; thus `e0104'
+is the name of a record found in the ESC DB, whereas `E0104' is not.  A
+record is comprised of several files, which contain signals,
+annotations, and specifications of signal attributes; each file
+belonging to a given record normally includes the record name as the
+first part of its name.  A record is an extensible collection of files,
+which need not all be located in the same directory, or even on the
+same physical device.  Thus it is possible, for example, to create on a
+magnetic disk a file of your own annotations for a record distributed
+on a CD-ROM, and to treat your file as part of the record.
+
+
+File: wpg,  Node: Concepts 2,  Next: Concepts 3,  Prev: Concepts 1,  Up: Overview
+
+Signals, Samples, and Time
+==========================
+
+   Signals are commonly understood to be functions of time obtained by
+observation of physical variables.  In this guide, a "signal" is
+defined more restrictively as a finite sequence of integer "samples",
+usually obtained by digitizing a continuous observed function of time
+at a fixed "sampling frequency" expressed in Hz (samples per second).
+The time interval between any pair of adjacent samples in a given
+signal is a "sample interval"; all sample intervals for a given signal
+are equal.  The integer value of each sample is usually interpreted as
+a voltage, and the units are called analog-to-digital converter units,
+or "adu".  The "gain" defined for each signal specifies how many adus
+correspond to one "physical unit" (usually one millivolt, the nominal
+amplitude of a normal QRS complex on a body-surface ECG lead roughly
+parallel to the mean cardiac electrical axis).  All signals in a given
+record are usually sampled at the same frequency, but not necessarily
+at the same gain (*note Multi-Frequency Records::, for exceptions to
+this rule).  MIT DB records are sampled at 360 Hz; AHA and ESC DB
+records are sampled at 250 Hz.
+
+   The "sample number" is an attribute of a sample, defined as the
+number of samples of the same signal that precede it;  thus the sample
+number of the first sample in each signal is zero.  Within this guide,
+the units of "time" are sample intervals;  hence the "time" of a sample
+is synonymous with its sample number.
+
+   Samples having the same sample number in different signals of the
+same record are treated as simultaneous.  In truth, they are usually not
+_precisely_ simultaneous, since most multi-channel digitizers sample
+signals in "round-robin" fashion.  If this subtlety makes a difference
+to you, you should be prepared to compensate for inter-signal sampling
+skew in your programs.
+
+
+File: wpg,  Node: Concepts 3,  Next: Applications,  Prev: Concepts 2,  Up: Overview
+
+Annotations
+===========
+
+   MIT DB records are each 30 minutes in duration, and are "annotated"
+throughout; by this we mean that each beat (QRS complex) is described by
+a label called an "annotation".  Typically an "annotation file" for an
+MIT DB record contains about 2000 beat annotations, and smaller numbers
+of rhythm and signal quality annotations.  AHA DB records are either 35
+minutes or 3 hours in duration, and only the last 30 minutes of each
+record are annotated.  ESC DB records are each 2 hours long, and are
+annotated throughout.  The "time" of an annotation is simply the sample
+number of the sample with which the annotation is associated.
+Annotations may be associated with a single signal, if desired.  Like
+samples in signals, annotations are kept in time and signal order in
+annotation files (but *note Annotation Order::, for exceptions to this
+rule).  No more than one annotation in a given annotation file may be
+associated with any given sample of any given signal.  There may be many
+annotation files associated with the same record, however; they are
+distinguished by "annotator names".  The annotator name `atr' is
+reserved to identify "reference annotation files" supplied by the
+developers of the databases to document correct beat labels.  You may
+use other annotator names (which may contain letters, digits and
+underscores, as for record names) to identify annotation files that you
+create.  You may wish to adopt the convention that the annotator name is
+the name of the file's creator (a program or a person).
+
+   Annotations are visible to the WFDB library user as C structures, the
+fields of which specify time, beat type, and several user-definable
+variables.  The WFDB library performs efficient conversions between
+these structures and a compact bit-packed representation used for
+storage of annotations in annotation files.
+
+
+File: wpg,  Node: Applications,  Next: Guide,  Prev: Concepts 3,  Up: Overview
+
+Applications
+============
+
+   Some typical uses of the WFDB library are these:
+
+   * A _waveform editor_, such as `wave' (*note Sources::), reads the
+     digitized signals of a database record and displays them with
+     annotations superimposed on the waveforms.  Such a program allows
+     the user to select any portion of the signals for display at
+     various scales, and to add, delete, or correct annotations.
+
+   * _Signal processing programs_ (e.g., *note Example 7::) apply
+     digital filters to the signals of a database record and then
+     record the filtered signals as a new record.  Similar programs
+     perform sampling frequency conversion.
+
+   * _Analysis programs_ (e.g., *note Example 10::) read the digitized
+     signals, analyze them, and then record their own annotations.
+
+   * An _annotation comparator_, such as `bxb' (*note WFDB
+     Applications::), reads two or more sets of annotations
+     corresponding to a given record, and tabulates discrepancies
+     between them.  If the reference annotations supplied with the
+     database are compared in this way with annotations produced using
+     an analysis program, this comparison is a means of establishing
+     the accuracy of the analysis program's output.
+
+   The WFDB library provides the means for programs such as those
+described above to select a database record, read and write signals,
+read and write annotations, jump to arbitrary points in the record, and
+determine attributes of the signals such as the sampling frequency.
+The library also provides a variety of other more specialized services
+for programs that need them.  The library defines an interface between
+programs and the database that is sufficiently powerful, general, and
+efficient to eliminate the need for _ad hoc_ user-written database I/O.
+
+
+File: wpg,  Node: Guide,  Prev: Applications,  Up: Overview
+
+About this Guide
+================
+
+   You should have a good grasp of the C language in order to make the
+best use of this guide.  If ANSI C prototypes, used here to document
+the WFDB library functions, are unfamiliar to you, see pp. 217-218 in
+the second edition of `The C Programming Language' by Kernighan and
+Ritchie, Prentice Hall, 1988.  (This is the famous `K&R'; all `K&R'
+references in this guide include page numbers for the second edition.
+Newcomers to C should have a copy for ready reference while reading
+this guide.)  It may also be helpful to have a copy of a database
+directory, such as the `MIT-BIH Arrhythmia Database Directory'
+(`http://www.physionet.org/physiobank/database/mitdb/mitdbdir/').  The
+`WFDB Applications Guide'
+(`http://www.physionet.org/physiotools/dbag/') will be useful as a
+reference for existing WFDB library-based applications (available from
+PhysioNet, `http://www.physionet.org/').
+
+   You should have access to a computer that has the WFDB library and at
+least one or two database records on-line, or access to the World Wide
+Web, where database records can be obtained from PhysioNet and other
+sources.  (If you are installing the WFDB library on a new computer for
+the first time, please read the installation notes supplied with the
+WFDB library first, or *note Installing the WFDB Software Package:
+Installation., then return here.)  You should know how to create a C
+source file using your favorite editor, and you should know how to
+compile it and how to run the resulting executable program.
+
+   Resist all temptation to plunge into the esoteric details of file
+formats.  (Those who find such details irresistible will find them in
+Section 5 of the `WFDB Applications Guide'; note, however, that support
+for new file formats is added to the WFDB library from time to time, so
+that the information you find there may be incomplete.)  The WFDB
+library provides an efficient means of reading and writing files in
+many formats; it is not a trivial task to duplicate it, and time spent
+doing so is time that could be spent doing something useful, enjoyable,
+or possibly both.  If you really think you need to understand the file
+formats in order to translate them into whatever the ECGWhizz Model 666
+needs, consider instead writing a format translator using the WFDB
+library to read the files; then you will at least have a program that
+requires only recompilation with a new version of the WFDB library when
+file formats change.  _In extremis_, use `rdann' and `rdsamp' --
+available from PhysioNet in source and ready-to run formats -- to
+translate files into text format.
+
+   Chapter 1 of this guide begins with a simple example program that
+reads a few samples from a database record.  This example should help
+you understand the mechanics of compiling and using a program that does
+something with an ECG database.  Chapter 2 introduces the library
+functions themselves, with a number of brief examples; you may wish to
+skim through this material on a first reading to get acquainted with
+what is available, and then refer to it as needed while writing your
+programs.  Data structures for annotations and for signal and annotator
+attributes are described in chapter 3.  Chapter 4 contains a table of
+annotation types and descriptions of several annotation-mapping macros.
+Database files and related topics are discussed in chapter 5, which can
+be skipped on a first reading.  Chapter 6 contains additional example
+programs that illuminate a few of the darker corners of the WFDB
+library.  The glossary defines the ordinary-sounding words such as
+"signal" that have specialized meanings in this guide; such words are
+"emphasized" in their first appearances in order to warn you that you
+should look them up in the glossary on a first reading (*note
+Glossary::).
+
+   If the WFDB library has not yet been installed on your system, *note
+Installing the WFDB Software Package: Installation..  Another appendix
+(*note WFDB Applications::) includes brief descriptions of the
+application programs that are distributed with the WFDB library as part
+of the WFDB software package.
+
+   Another appendix discusses porting the WFDB library to new machines
+or operating systems, and includes notes on adding support for new file
+formats, annotation codes, and other enhancements (*note Extensions::).
+The WFDB library has been written with portability in mind.  It runs on
+a wide variety of machines and operating systems, including Unix (BSD
+4.x, System V, SunOS, Solaris, HP-UX, OSF/1, Version 7, XENIX, VENIX,
+ULTRIX, GNU/Linux, OpenBSD, IRIX, AIX, AUX, Darwin, MacOS/X, SCO,
+Coherent, and more), MS-DOS, MS-Windows, VMS, and the Macintosh OS.
+This guide was written for Unix users (with notes for MS-Windows and
+MS-DOS users where differences exist), but others should find only minor
+differences.
+
+   At the end of the guide is a list of sources for databases and other
+materials that may be useful to readers (*note Sources::).
+
+   Many friends have contributed to the development of the WFDB
+library.  Thanks to Paul Albrecht, Ted Baker, Phil Devlin, Scott
+Greenwald, David Israel, Roger Mark, Joe Mietus, Warren Muldrow, and
+especially to Paul Schluter, whose elegant 8080 assembly language
+functions inspired these (long live `getann'!).  Pat Hamilton and Bob
+Farrell contributed ports, to the Macintosh and the MS 32-bit Windows
+environments, respectively.  Jose Garcia Moros and Salvador Olmos
+contributed Matlab/Octave reimplementations of a useful subset of the
+WFDB library.  Thanks also to the many readers of earlier versions of
+this guide; if this edition answers your questions, it is because
+someone else has already asked them, and hounded the author until he
+produced comprehensible answers.
+
+   Before May, 1999, and the release of version 10.0.0 of the library,
+the WFDB library was known as the DB library, and this guide was the
+`ECG Database Programmer's Guide'.  The name of the library was changed
+because of confusion caused by the recent proliferation of another
+library with the same name (a reimplementation of the Berkeley Unix DBM
+library).  The names of this guide, and of the `WFDB Applications
+Guide' (formerly the `ECG Database Applications Guide'), have been
+changed in view of the increasingly broad range of applications in
+which the library is being used.
+
+   The first edition of this guide was written as a tutorial for MIT
+students using the ECG databases for a variety of signal-processing and
+analysis projects.  The guide, and the WFDB library itself, have been
+extensively revised since they first appeared in 1981.  Your comments
+and suggestions are welcome.  Please send them to:
+
+     George B. Moody
+     MIT Room E25-505
+     Cambridge, MA 02139
+     USA
+     
+     (e-mail: `george@mit.edu')
+
+   An HTML version of this guide, suitable for viewing using any web
+browser, is included with the WFDB Software Package.  The latest
+version may always be viewed at
+`http://www.physionet.org/physiotools/dbpg/' using your web browser.
+
+   You can format and print copies of this guide using TeX if you have
+it (see `makefile' in the `doc' directory of the library distribution
+for instructions on doing so).  You may obtain a preformatted version
+suitable for output on any PostScript device from
+`http://www.physionet.org/'.
+
+
+File: wpg,  Node: Recent changes,  Next: Usage,  Prev: Overview,  Up: Top
+
+Recent changes
+==============
+
+   This section contains a brief summary of changes to the WFDB library
+and to this guide since the first printing of the tenth edition of this
+guide in June, 1999.  See `NEWS', in the top-level directory of the
+WFDB Software Package distribution, for information on any more recent
+changes that may not be described here.
+
+Changes in version 10.2.4
+-------------------------
+
+   Code in `wfdbio.c' that required the use of the string `header' to
+identify a header file has been revised so that the standard `hea' is
+now usable for this purpose in all cases.
+
+Changes in version 10.2.3
+-------------------------
+
+   Portability fixes in `wfdblib.h'.  (WFDB library version 10.2.2 was
+identical to 10.2.1.)
+
+Changes in version 10.2.1
+-------------------------
+
+   Most users will no longer need to set the WFDB path explicitly, as a
+result of several minor changes in the default path and in the
+installer for the WFDB Software Package.
+
+   The environment variable `WFDBNOSORT' was replaced by `WFDBANNSORT',
+and the environment variable `WFDBGVMODE' was introduced (*note
+Annotation Order::, and *note Multi-Frequency Records::, for details).
+
+Changes in version 10.2.0
+-------------------------
+
+   There are no longer any fixed limits on the numbers of signals or
+annotation files that can be opened simultaneously, or on the number of
+samples per signal per frame.  In previous versions of the WFDB
+library, the symbols `WFDB_MAXSIG', `WFDB_MAXANN', and `WFDB_MAXSPF'
+(all defined in `<wfdb/wfdb.h>') specified limits on these parameters
+that could be modified only by recompiling the WFDB library.  These
+symbols are still defined for compatibility with older applications
+that use them (typically to determine the size of static arrays).
+
+   Since version 10.1.1, record names may include path information (see
+the notes for version 10.1.1 below), but if such names are used to
+generate names of WFDB output files, the user has been required to
+ensure that the target directory exists.  This requirement is
+eliminated in version 10.2.0.  If an output file is specified to be
+located in a non-existent directory, the WFDB library will attempt to
+create the directory (including, if necessary, any non-existent parent
+directories).  This feature simplifies the use of record names that
+include directory information, as is common when reading data from a
+CD-ROM or a web server such as PhysioNet.  For example, using the WFDB
+path (`. http://www.physionet.org/physiobank/database'), if the current
+directory, `.', does not contain a subdirectory named `mitdb', the
+command:
+
+     sqrs -r mitdb/100
+
+will read its input from
+`http://www.physionet.org/physiobank/database/mitdb/', will create a
+directory named `mitdb' within the current directory, and will write
+its output annotation file (`100.qrs') into this newly-created
+directory.  If we then use the command:
+
+     rdann -r mitdb/100 -a qrs
+
+the header file is still read from the remote directory, but the
+annotation file is read from `./mitdb'.  (The programs `sqrs' and
+`rdann' are standard applications that use the WFDB library;  see the
+`WFDB Applications Guide' for details.)
+
+   Also new is the WFDB test suite (located in the `checkpkg' directory
+of the WFDB source tree, at the same level as the `lib' directory
+containing the WFDB library sources).  This set of programs can be used
+to help verify that a newly-installed version of the WFDB library
+behaves properly.
+
+Changes in version 10.1.6
+-------------------------
+
+   The WFDB library requires that the record name specified in the
+first line of a header file must match the name of the record with
+which the header file is associated (this is done in order to detect
+corrupted or erroneously renamed header files).  Version 10.1.6
+requires that only the final portion of the record name (stripped of
+any path information) must match.
+
+Changes in version 10.1.5
+-------------------------
+
+   More changes in the `make' description files, for Cygwin
+compatibility.
+
+Changes in version 10.1.4
+-------------------------
+
+   The symbol `WFDB_NETFILES' replaces the old `NETFILES'.
+
+Changes in version 10.1.3
+-------------------------
+
+   More changes in the `make' description files, to support a
+configuration script.
+
+Changes in version 10.1.2
+-------------------------
+
+   Changes in the `make' description files.
+
+Changes in version 10.1.1
+-------------------------
+
+   Record names may contain (absolute or relative) path information as
+a prefix, and if (as a result) an input file is found in a location
+that does not appear explicitly in the WFDB path, that location is
+appended to the end of the WFDB path.  For example, if the WFDB path is
+`. http://www.physionet.org/physiobank/database', and the record name
+`mitdb/100' is supplied to `wfdbinit', the WFDB library will find the
+header file at
+`http://www.physionet.org/physiobank/database/mitdb/100.hea', and will
+then add `http://www.physionet.org/physiobank/database/mitdb/' to the
+end of the WFDB path so that the signal file (specified as `100.dat' in
+the header file) can be found.
+
+Changes in version 10.1.0
+-------------------------
+
+   Version 10.1.0 supports a new signal file format (311), and contains
+numerous minor changes in the NETFILES support code introduced in
+10.0.1.
+
+Changes in version 10.0.1
+-------------------------
+
+   Beginning with version 10.0.1, the WFDB library supports reading not
+only local files, but also remote files made available by web (HTTP) or
+FTP servers.  To make use of this feature, link your application with
+both the WFDB library and the `libwww' library (freely available for
+all versions of Unix, and for most recent versions of MS Windows, from
+`http://www.w3.org/Library').  (In some cases, notably under GNU/Linux,
+`libwww' is linked together with the dynamically-loaded version of the
+WFDB library, so that you do not need to link `libwww' explicitly.)
+All access to remote files is read-only.  If you do not wish to allow
+access to remote files, or if `libwww' is not available for your OS,
+simply do not define the symbol NETFILES when compiling the WFDB
+library.  For further details, see `wfdbio.c' in the WFDB library
+sources.
+
+   The WFDB environment variable may now contain whitespace (space,
+tab, or newline characters) as path component separators under any OS.
+Multiple consecutive whitespace characters are treated as a single path
+component separator.  Use a `.' to specify the current directory as a
+path component when using whitespace as a path component separator.  A
+semicolon (`;') is also acceptable as a path component separator under
+any OS.  A colon (`:') is still acceptable as a path component
+separator under Unix (Linux, etc.), provided only that the colon is not
+immediately followed by `//'.
+
+   If the WFDB path includes components of the forms
+`http://somewhere.net/mydata' or `ftp://somewhere.else/yourdata', the
+sequence `://' is explicitly recognized as part of a URL prefix (under
+any OS), and the `:' and `/' characters within the `://' are not
+interpreted further.  Note that the MS-DOS `\' is _not_ acceptable as
+an alternative to `/' in a URL prefix.  To make WFDB paths containing
+URL prefixes more easily (human) readable, use whitespace for path
+component separators.
+
+   Previous versions of the WFDB library that were compiled for
+environments other than MS-DOS used file names in the format
+TYPE.RECORD.  This file name format is no longer supported.
+
+Changes in version 10.0.0
+-------------------------
+
+   Beginning with version 10.0.0, the name of the library is WFDB.  All
+earlier versions were named DB.  All library symbols have been similarly
+renamed, with `WFDB' and `wfdb' replacing `DB' and `db' everywhere, in
+names of library functions, constants, type and structure definitions,
+library source file names, and names of environment variables (e.g.,
+the DB environment variable is now the WFDB environment variable).
+
+   Version 10.0.0 of the WFDB library is functionally identical with the
+final release (version 9.7.4) of the DB library, except for the name
+changes.  It should be possible to recompile existing applications
+written for DB library version 9.x without modification, and to link
+them with WFDB library version 10.0.0.  This is possible because two
+sets of `#include' files are provided with the WFDB library.  The first
+set, accessible via `#include <wfdb/...>', works with applications
+written as described in this guide.  The alternate set, accessible via
+`#include <ecg/...>', is compatible with DB 9.x applications as
+described in previous editions of this guide.
+
+
+File: wpg,  Node: Usage,  Next: Functions,  Prev: Recent changes,  Up: Top
+
+Using the WFDB Library
+**********************
+
+   This chapter gives a brief overview of the steps needed to compile,
+load, and run a program that uses the WFDB library.  It assumes that you
+are able to log onto a Unix-based computer on which the WFDB Software
+Package has been installed (*note Installing the WFDB Software Package:
+Installation.), and that you know how to create a source file using a
+text editor such as `emacs' or `vi'.  If you are using an MS-DOS
+system, there are a few differences noted below.
+
+* Menu:
+
+* print samples::		A trivial example program.
+* compiling::			Compiling a C program with the WFDB library.
+* other languages::             Using the WFDB library with C++ or Fortran.
+* WFDB path::			WFDB library environment variables.
+* running example::		Running the example program.
+* name restrictions::		Names to avoid when writing your programs.
+* WFDB path syntax::		Customizing the WFDB path.
+* exercises 1::			A few questions.
+
+
+File: wpg,  Node: print samples,  Next: compiling,  Prev: Usage,  Up: Usage
+
+A Trivial Example Program in C
+==============================
+
+   Suppose we wish to print the first ten samples of record `100s'.
+(Record `100s' is the first minute of MIT-BIH Arrhythmia Database
+record `100', supplied as a sample in the `data' directory of all
+source distributions of the WFDB Software Package.)  We might begin by
+creating a source file called `psamples.c' that contains:
+
+     #include <wfdb/wfdb.h>
+     
+     main()
+     {
+         int i;
+         WFDB_Sample v[2];
+         WFDB_Siginfo s[2];
+     
+         if (isigopen("100s", s, 2) < 1)
+             exit(1);
+         for (i = 0; i < 10; i++) {
+             if (getvec(v) < 0)
+                 break;
+             printf("%d\t%d\n", v[0], v[1]);
+         }
+         exit(0);
+     }
+
+   All programs that use the WFDB library _must_ include the statement
+
+     #include <wfdb/wfdb.h>
+
+which defines function interfaces, data types (such as the
+`WFDB_Sample' and `WFDB_Siginfo' types used in this example), and a few
+useful constants.  (Most MS-DOS C compilers accept `/' as a directory
+separator.  If you prefer to use the non-portable `\' under MS-DOS,
+remember to quote it: `#include <wfdb\\wfdb.h>'.)
+
+   The functions used in the example are described in detail in the next
+chapter, and the data types are described in the following chapter
+(*note Data Types::).  For now, note that `isigopen' prepares a record
+to be read by `getvec', which reads a sample from each of the two
+signals each time it is called.
+
+
+File: wpg,  Node: compiling,  Next: other languages,  Prev: print samples,  Up: Usage
+
+Compiling a Program with the WFDB Library
+=========================================
+
+   To compile the example program on a Unix system, we can say:
+
+     cc -o psamples psamples.c -lwfdb
+
+to produce an executable program called `psamples'.  (Your C compiler
+may be named `gcc', `acc', `CC', or something else, rather than `cc',
+but under any version of Unix, it will almost certainly work as shown
+above.)  You may use any other compiler options you choose, but the
+`-lwfdb' option must appear in the `cc' command line following any and
+all source (`*.c') and object (`*.o') file names, in order to instruct
+the loader to search the WFDB library for any functions that the
+program needs (in this case, `isigopen' and `getvec').  Some programs
+will need additional libraries, and the corresponding `-l' options can
+usually be given before or after the `-lwfdb' option.
+
+   Under MS-Windows, it will be easiest to use `gcc', the GNU C/C++
+compiler, which is included in the freely available Cygwin software
+development system (`http://source.redhat.com/cygwin/'), and also in
+the freely available MinGW package (`http://www.mingw.org/').  An
+MS-DOS version of `gcc' is available in the free djgpp package
+(`http://www.delorie.com/djgpp/'). These are used within a Cygwin
+terminal emulator window or an MS-DOS box in exactly the same way as
+described above for Unix C compilers.
+
+   Each proprietary C or C++ compiler has its own idiosyncratic syntax,
+so no general rule can be given for these.  With Microsoft C/C++, use:
+
+     cl psamples.c -link wfdb
+
+With Borland C/C++, use:
+
+     bcc -LLIBDIR psamples.c wfdb.lib
+
+where LIBDIR is the directory in which `wfdb.lib' (the WFDB library)
+has been installed.  (Substitute `tcc' for `bcc' if you are using Turbo
+C or C++.)  See your compiler manual for further information.
+
+
+File: wpg,  Node: other languages,  Next: WFDB path,  Prev: compiling,  Up: Usage
+
+Using the WFDB library with other languages
+===========================================
+
+   If you prefer to write your applications in C++, you may do so, but
+note that the WFDB library is written in C.  (Most C++ compilers can be
+run in ANSI/ISO C compatibility mode in order to compile the WFDB
+library itself.)  Each C++ source file that uses WFDB library functions
+must include `<wfdb/wfdb.h>', in order to instruct your compiler to use
+C conventions for argument passing and to use unmangled names for the
+WFDB library functions.  In order for this to work, your C++ compiler
+should predefine `__cplusplus' or `c_plusplus'; if it predefines
+neither of these symbols, modify `<wfdb/wfdb.h>' so that the symbols
+`wfdb_CPP' and `wfdb_PROTO' are defined at the top of the file, or
+define `__cplusplus' in each of your source files before including
+`<wfdb/wfdb.h>'.  Compile and link your program using whatever standard
+methods are supported by your compiler for linking C++ programs with C
+libraries.  See your compiler manual for further information.
+
+   A set of wrapper functions is also available for those who wish to
+use the WFDB library together with applications written in Fortran.
+These functions, defined in `wfdbf.c', provide a thin `wrapper' around
+the WFDB library functions, by accepting Fortran-compatible arguments
+(there are no structures, and all arguments are passed by reference
+rather than by value).  For example, here is the Fortran equivalent of
+the example program in the previous section:
+
+             integer i, v(2), g
+     
+             i = isigopen("100s", 2)
+             do i = 1, 10
+              g = getvec(v)
+              write (6,3) v(1), v(2)
+      3      format("v(1) = ", i4, "    v(2) = ", i4)
+             end do
+             end
+
+To compile this program using `g77' (the GNU Fortran compiler), save it
+as `fsamples.f', copy `wfdbf.c' from the `fortran' directory of the
+WFDB Software Package sources or from
+`http://www.physionet.org/physiotools/wfdb/fortran/wfdbf.c', then type:
+
+     g77 -o fsamples -fwritable-strings fsamples.f wfdbf.c -lwfdb
+
+The Fortran wrapper functions are not discussed in this guide; for
+further information, refer to `fortran/README' in the WFDB Software
+Package.
+
+   It should be possible to write a similar set of wrapper functions
+for use with Matlab, Octave (a freely available open-source language
+that is compatible with Matlab, available from
+`http://www.che.wisc.edu/octave/'), or Scilab (an open-source
+scientific software package for numerical computations, with a language
+similar to that of Matlab, available from
+`http://www-rocq.inria.fr/scilab/').  At this time, such wrappers are
+not available, but a reimplementation of a useful subset of the WFDB
+library in native m-code (contributed by Jose Garcia Moros and Salvador
+Olmos) is available from
+`http://www.physionet.org/physiotools/matlab/'.  Jesus Olivan Palacios
+has written a tutorial (available at
+`http://www.neurotraces.com/scilab/sciteam/') on using the WFDB
+Software Package with Scilab.
+
+
+File: wpg,  Node: WFDB path,  Next: running example,  Prev: other languages,  Up: Usage
+
+The Database Path and Other Environment Variables
+=================================================
+
+   WFDB applications make use of several "environment variables", which
+are named `WFDB', `WFDBCAL', `WFDBGVMODE', and `WFDBANNSORT'.  If these
+variables have not been otherwise defined by the user, their values are
+those given by `DEFWFDB', `DEFWFDBCAL', `DEFWFDBGVMODE', and
+`DEFWFDBANNSORT' (defined in `wfdblib.h' at the time the WFDB library
+was compiled).  Unless you have a non-standard setup, you may not need
+to set these variables, but it will be helpful to read this section to
+understand how they influence the behavior of WFDB applications.
+
+   When WFDB applications _read_ database files, they must be able to
+find them in various locations that may vary from system to system.  The
+WFDB library refers to a character string that consists of an ordered
+list of locations to be searched _for input files_.  This string is
+called the "database path", or the "WFDB path".
+
+   On most systems, the environment variable `WFDB', if set, specifies
+the value of the WFDB path, and overrides the default value.  If you
+need to use a non-default WFDB path, you must set the `WFDB'
+environment variable appropriately before running any WFDB applications,
+so that the WFDB path can be examined by the running program.  The WFDB
+software package includes easily customizable shell scripts (batch
+files) that illustrate how to do this for popular shells and command
+interpreters; see _setwfdb_(1), in the `WFDB Applications Guide'.  (On
+the Macintosh, for which the concept of environment variables is
+foreign, the WFDB path may be set only by using `DEFWFDB'.)  For
+further information, *note WFDB path syntax::.
+
+   The shell scripts that set `WFDB' also set the `WFDBCAL' environment
+variable, which is important if you make use of records that contain
+signals other than ECGs.  `WFDBCAL' names a "calibration file" located
+in one of the directories named by `WFDB'.  (The symbol `DEFWFDBCAL' is
+usually defined in `wfdblib.h' to specify the name of a default
+calibration file, to be used by the WFDB library if `WFDBCAL' has not
+been set.)  Each signal type may be represented by an entry in the
+calibration file.  Entries specify the characteristics of any
+calibration pulses that may be present, and customary scales for
+plotting the signals.
+
+   The other environment variables are less frequently used than `WFDB'
+and `WFDBCAL', and in most cases, the compiled-in defaults will be
+appropriate (*note Annotation Order::, and *note Multi-Frequency
+Records::, for details).
+
+
+File: wpg,  Node: running example,  Next: name restrictions,  Prev: WFDB path,  Up: Usage
+
+Running the Example Program
+===========================
+
+   If `WFDB' is properly set, MIT DB record `100s' is on-line and
+readable, and the example program was compiled correctly, it can be run
+by typing
+
+     psamples
+
+and its output will appear as:
+
+     995     1011
+     995     1011
+     995     1011
+     995     1011
+     995     1011
+     995     1011
+     995     1011
+     995     1011
+     1000    1008
+     997     1008
+
+   The left column contains samples from signal 0, and the right column
+contains those from signal 1.
+
+
+File: wpg,  Node: name restrictions,  Next: WFDB path syntax,  Prev: running example,  Up: Usage
+
+A Note on Identifiers
+=====================
+
+   External identifiers that begin with the underscore (`_') character
+are reserved under the rules of ANSI C to the compiler and libraries.
+In order to make the WFDB library as portable as possible, its own
+external identifiers do not begin with underscores (since otherwise
+they might conflict with external identifiers used by a standard
+library).
+
+   External identifiers beginning with `wfdb_' are reserved for the use
+of the WFDB library.  These names are used for functions and global
+variables that are intended for the private use of the WFDB library;
+your programs should not need to use them.  You should avoid defining
+functions or global variables with such names in your programs.
+
+   External identifiers beginning with `WFDB_' are used for constants
+and data types defined within `<wfdb/wfdb.h>'.  Use these identifiers
+as needed in your programs, but avoid redefining them.
+
+
+File: wpg,  Node: WFDB path syntax,  Next: exercises 1,  Prev: name restrictions,  Up: Usage
+
+More About the WFDB Path
+========================
+
+   When a WFDB file must be opened for input, the WFDB library attempts
+to locate it by attaching each of the components of the WFDB path (one
+at a time) as a prefix to the file name.  If two or more matching files
+exist in different locations in the WFDB path, the WFDB library opens
+only the file that resides in the first of these locations.  Any other
+matching files are effectively invisible to WFDB applications unless
+the WFDB path is rearranged.
+
+   The default WFDB path is specified at the time the WFDB library is
+compiled, by defining a value for the symbol `DEFWFDB' in `wfdblib.h'.
+Current versions of the WFDB library are compiled with a
+three-component default WFDB path; the first component is empty (i.e.,
+it refers to the current directory), the second component names the
+"system-wide database directory" (which contains the sample WFDB files
+supplied with the WFDB software package), and the third component is
+`http://www.physionet.org/physiobank/database' (referring to the
+PhysioBank data archives).  Note that this default may be changed at the
+time the WFDB library is compiled.  Normally, however, this means that
+any record available from PhysioBank is readable by any WFDB application
+provided that PhysioBank is accessible from the user's computer and that
+the database name is included in the record name (for example,
+`slpdb/slp60' or `nsrdb/16265').
+
+   Under Unix and VMS, the WFDB path can be given as a colon-separated
+list of prefixes, in the format used for the Bourne shell's `PATH'
+variable.  Under MS-Windows, MS-DOS, and MacOS, the WFDB path can be
+given in the format used for the MS-DOS `PATH' variable, with
+semicolons used to separate prefixes (colons retain their customary
+meanings, as drive letter suffixes under MS-DOS, or as directory
+separators on the Macintosh).  Alternatively, components of the WFDB
+path may be separated by whitespace (under any operating system); this
+also implies that embedded spaces are not permitted within path
+components.  *For this reason, avoid using directories with names such
+as `My Documents', or their subdirectories, to store WFDB files.*
+
+   When WFDB applications _write_ database files, these files are
+generally written to the current directory.  (As an example, an
+application that analyzes one or more signals in a record may record its
+findings in an annotation file in the current directory.)  If the record
+name (as provided by the application to the WFDB library) contains path
+information, however, output files are written to the corresponding
+subdirectory of the current directory.  (For example, if a WFDB
+application writes an annotation file for record `edb/e0103', the file
+will be written in the `edb' subdirectory of the current directory.
+The `edb' subdirectory will be created by the WFDB library if does not
+exist already.  This feature was introduced in WFDB library version
+10.2.0.)
+
+   Note particularly that the current directory is _not_ necessarily
+part of the WFDB path.  If you modify your WFDB path, you must
+explicitly include an empty (null) component, which corresponds to the
+current directory, in order to be sure that your WFDB applications can
+read any WFDB files that you have previously written.  In most cases,
+this null component should be the first in the WFDB path.  Thus, if you
+write into the current directory a modified version of an existing WFDB
+file, any later actions that would read this file will read your
+modified version rather than the original.
+
+   The WFDB path may contain `http://' and `ftp://' URL prefixes (other
+schema, such as `file://' and `https://', may also be supported if they
+are supported by your version of `libwww').  If NETFILES support is not
+compiled into the WFDB library, any WFDB path components containing
+`://' are ignored.  (These features were first introduced in WFDB
+library version 10.1.0.)
+
+   If the WFDB library finds that the value assigned to the WFDB path
+is of the form `@FILE', it replaces that value with the contents of the
+specified FILE.  (This feature was first introduced in WFDB library
+version 8.0.)  Indirect WFDB path files may be nested up to ten levels
+(this arbitrary limit is imposed to avoid infinite recursion if the
+contents of the indirect file are incorrect).  This method of indirect
+assignment is useful on the Macintosh, where recompilation of the WFDB
+library would otherwise be necessary in order to change the WFDB path.
+It may also be useful under MS-DOS to reduce the need for environment
+space, or if the length of the command needed to set the `WFDB'
+environment variable would otherwise approach or exceed the 128-byte
+limit for MS-DOS commands.
+
+   If a WFDB header file (*note Database Files::) specifies that a
+signal file is to be found in a directory that is not already in the
+WFDB path, that directory is appended to the end of the WFDB path; in
+this case, if the WFDB path is not set, it is created with an initial
+null component followed by the directory that contains the signal file.
+(This feature was first introduced in WFDB library version 6.2.)
+
+   The string `%r' is replaced by the current record name wherever it
+appears in the WFDB path;  `%Nr' is replaced by the first N digits of
+the record name, if N is a non-zero digit.  For example, if (under
+Unix) the WFDB path is `:/cdrom/mimicdb/%3r:/cdrom/mitdb', a request to
+read a file associated with record 055n will cause the WFDB library to
+look first in the current directory (since the WFDB path begins with an
+empty component), then in `/cdrom/mimicdb/055', and then in
+`/cdrom/mitdb'.  If `%' is followed by any character other than `r' or
+a non-zero digit followed by `r', that character is used as is in the
+WFDB path;  thus a literal `%' can be included in the WFDB path by
+`escaping' it as `%%'.  (Substitutions of `%'-strings in the WFDB path
+were first introduced in WFDB library version 9.7.)
+
+
+File: wpg,  Node: exercises 1,  Prev: WFDB path syntax,  Up: Usage
+
+Exercises
+=========
+
+   These exercises should require only a few minutes.  If you work
+through them, you will have an opportunity to become acquainted with a
+few of the most common errors in using the WFDB library.
+
+  1. Compile the example program in this chapter and run it.  If the
+     WFDB Software Package has not already been installed on your
+     system, download and install the most recent version from
+     PhysioNet first (*note Installing the WFDB Software Package:
+     Installation.).
+
+  2. Find out where database records are kept on your system.  What
+     records are available locally?
+
+  3. Modify the example program so that you can specify the record to be
+     opened, either as a command-line argument or by having the program
+     prompt you to type a record name.  If you are unfamiliar with
+     command-line argument processing, *note Example 2::.
+
+  4. Use the modified version of the example to read samples from
+     records `mitdb/200', `edb/e0103', `slpdb/slp04', and
+     `mimicdb/237/237'.  The last two of these records have 4 and 6
+     signals respectively, so you will need to make a few additional
+     changes to the program in order to read these records successfully.
+
+  5. Once again using the modified version of the example, what happens
+     if you omit the path information from one of the records in the
+     previous exercise (for example, if you try to open `e0103' instead
+     of `edb/e0103'?  Figure out how to set the WFDB path so that the
+     program will work properly in this case.  (Hint: use the
+     application `wfdbwhich', included with the WFDB Software Package,
+     to find the header file for record `edb/e0103'; this information
+     will help you to determine how to set the WFDB path.)
+
+  6. If you use MS-DOS or MS-Windows, explore and explain what happens
+     in the previous exercise if you type the record name using
+     upper-case letters, or if you type a `\' (backslash) instead of `/'
+     (forward slash).  (Hint: record names are _not_ filenames!)
+
+  7. What happens when you compile the example program as shown, but
+     with the `#include' statement omitted?  with the `-lwfdb' (`-link
+     wfdb', etc.) omitted?
+
+  8. What is the type of the argument to `getvec'?  Why can't `getvec'
+     simply return the value it reads, as in `v = getvec()'?
+
+
+File: wpg,  Node: Functions,  Next: Data Types,  Prev: Usage,  Up: Top
+
+WFDB Library Functions
+**********************
+
+   This chapter describes the functions that are available to programs
+compiled with the `-lwfdb' option.  The functions are introduced in
+several groups, with examples to illustrate their usage.
+
+* Menu:
+
+* introduction to functions::	General notes on functions.
+				This node discusses arguments, return codes,
+				and the organization of this section of
+				the guide.
+
+The remainder of the nodes in this section describe functions for:
+
+* selecting::			Selecting database records (opening files).
+* signal and annotation I/O::	Reading and writing signals and annotations.
+* non-sequential::		Non-sequential access to WFDB files.
+* conversion::			Time and other conversion functions.
+* calibration::			Calibrating signals.
+* miscellaneous functions::	Attribute-reading and other functions.
+

@@ -1,0 +1,635 @@
+This is wpg, produced by makeinfo version 4.0 from wpg.tex.
+
+
+File: wpg,  Node: Concept Index,  Next: Function and Macro Index,  Prev: Answers,  Up: Top
+
+Concept Index
+*************
+
+* Menu:
+
+* AC-coupled signal (defined):           Glossary.
+* AC-coupled signals:                    WFDB_Calinfo structures.
+* access to multiple records:            Multiple Record Access.
+* ADC (defined):                         Glossary.
+* ADC resolution:                        WFDB_Siginfo structures.
+* ADC resolution (defined):              Glossary.
+* ADC zero:                              WFDB_Siginfo structures.
+* ADC zero (defined):                    Glossary.
+* adu <1>:                               WFDB_Siginfo structures.
+* adu:                                   Concepts 2.
+* adu (conversion to and from physical units): aduphys and physadu.
+* adu (conversion to and from voltage):  aduphys and physadu.
+* adu (defined):                         Glossary.
+* AHA annotation code:                   Mapping macros.
+* AHA DB <1>:                            Sources.
+* AHA DB:                                Overview.
+* AHA DB (defined):                      Glossary.
+* AHA format:                            AHA Format Files.
+* AHA format (defined):                  Glossary.
+* AHA-format annotation file:            WFDB_Anninfo structures.
+* annotation:                            Concepts 3.
+* annotation (canonical order) <1>:      Glossary.
+* annotation (canonical order) <2>:      Annotation Order.
+* annotation (canonical order) <3>:      iannclose and oannclose.
+* annotation (canonical order) <4>:      wfdbquit.
+* annotation (canonical order):          WFDB path.
+* annotation (changing or deleting):     Annotation Order.
+* annotation (defined):                  Glossary.
+* annotation aux string <1>:             Annotation Codes.
+* annotation aux string:                 WFDB_Annotation structures.
+* annotation code:                       Annotation Codes.
+* annotation code (conversion to and from string): annstr and strann.
+* annotation code (defined):             Glossary.
+* annotation code (legal):               Mapping macros.
+* annotation code field:                 WFDB_Annotation structures.
+* annotation code mapping:               Mapping macros.
+* annotation code strings (setting):     annstr and strann.
+* annotation comparator <1>:             Evaluation.
+* annotation comparator:                 Applications.
+* annotation editor:                     Applications.
+* annotation file:                       Annotation Files.
+* annotation file (defined):             Glossary.
+* annotation files (opening):            annopen.
+* annotation I/O:                        putvec.
+* annotation location:                   Annotation Order.
+* annotation location (defined):         Glossary.
+* annotation order:                      Annotation Order.
+* annotation structure:                  WFDB_Annotation structures.
+* annotation subtype:                    WFDB_Annotation structures.
+* annotation time:                       WFDB_Annotation structures.
+* annotation type:                       WFDB_Annotation structures.
+* annotations (non-sequential access):   iannsettime.
+* annotations (reading) <1>:             ungetann.
+* annotations (reading):                 getann.
+* annotations (writing):                 putann.
+* annotator:                             Concepts 3.
+* annotator information structure:       WFDB_Anninfo structures.
+* annotator name:                        WFDB_Anninfo structures.
+* annotator name (defined):              Glossary.
+* annotator number:                      WFDB_Anninfo structures.
+* annotator number (defined):            Glossary.
+* arguments:                             introduction to functions.
+* atr:                                   Concepts 3.
+* atr (defined):                         Glossary.
+* attributes of annotators:              WFDB_Anninfo structures.
+* attributes of signals (global):        WFDB_Siginfo structures.
+* attributes of signals (local):         WFDB_Annotation structures.
+* aux string (annotation) <1>:           Annotation Codes.
+* aux string (annotation):               WFDB_Annotation structures.
+* base counter value:                    counter conversion.
+* base counter value (defined):          Glossary.
+* base time (defined):                   Glossary.
+* base time (setting):                   setbasetime.
+* baseline:                              WFDB_Siginfo structures.
+* baseline amplitude (defined):          Glossary.
+* beat label:                            Concepts 3.
+* block size:                            WFDB_Siginfo structures.
+* buffer size (setting) <1>:             setobsize.
+* buffer size (setting):                 setibsize.
+* byte offset <1>:                       Glossary.
+* byte offset <2>:                       wfdbsetstart.
+* byte offset:                           wfdbgetstart.
+* C++ bindings:                          other languages.
+* calibration (retrieving):              getcal.
+* calibration (storing):                 putcal.
+* calibration file <1>:                  Calibration Files.
+* calibration file:                      WFDB path.
+* calibration file (defined):            Glossary.
+* calibration file (reading):            calopen.
+* calibration functions:                 calibration.
+* calibration information structure:     WFDB_Calinfo structures.
+* calibration list <1>:                  WFDB_Calinfo structures.
+* calibration list:                      calibration.
+* calibration list (defined):            Glossary.
+* calibration list (discarding):         flushcal.
+* calibration list (writing):            newcal.
+* calibration pulse limits:              WFDB_Calinfo structures.
+* calibration pulse shape:               WFDB_Calinfo structures.
+* canonical order of annotations <1>:    Glossary.
+* canonical order of annotations <2>:    Annotation Order.
+* canonical order of annotations <3>:    iannclose and oannclose.
+* canonical order of annotations <4>:    wfdbquit.
+* canonical order of annotations:        WFDB path.
+* CD-ROM:                                Sources.
+* CD-ROM (defined):                      Glossary.
+* changing an annotation:                Annotation Order.
+* changing annotation code strings:      annstr and strann.
+* changing sampling frequency:           setsampfreq.
+* changing the WFDB path:                setwfdb.
+* character devices (as signal files):   Special Files.
+* checksum of signal file:               WFDB_Siginfo structures.
+* closing annotation files:              iannclose and oannclose.
+* closing WFDB files:                    wfdbquit.
+* code (annotation):                     Annotation Codes.
+* comparator (annotation) <1>:           Evaluation.
+* comparator (annotation):               Applications.
+* compiling:                             compiling.
+* concatenating records:                 Multi-Segment Records.
+* conversion between adus and physical units: aduphys and physadu.
+* conversion between adus and voltage:   aduphys and physadu.
+* conversion between annotation code and string: annstr and strann.
+* conversion between Julian date and string: datstr and strdat.
+* conversion between time and string:    timstr and strtim.
+* conversion functions:                  conversion.
+* counter (base) <1>:                    Glossary.
+* counter (base):                        counter conversion.
+* counter frequency:                     counter conversion.
+* counter frequency (defined):           Glossary.
+* counter value:                         counter conversion.
+* counter value (defined):               Glossary.
+* creating a record:                     Example 8.
+* creating annotation files:             annopen.
+* creating header files <1>:             setmsheader.
+* creating header files <2>:             setheader.
+* creating header files:                 newheader.
+* creating signal files <1>:             osigfopen.
+* creating signal files:                 osigopen.
+* cruft (in signal files) <1>:           Glossary.
+* cruft (in signal files) <2>:           wfdbsetstart.
+* cruft (in signal files):               wfdbgetstart.
+* current time:                          setbasetime.
+* Cygwin:                                Sources.
+* database path:                         Glossary.
+* database path (changing):              setwfdb.
+* database path (default):               WFDB path syntax.
+* database path (defined):               Glossary.
+* database path (reading):               getwfdb.
+* database path (setting):               WFDB path.
+* database path file (indirect) <1>:     setwfdb.
+* database path file (indirect):         WFDB path syntax.
+* date (conversion to and from string):  datstr and strdat.
+* DC-coupled signal (defined):           Glossary.
+* DC-coupled signals:                    WFDB_Calinfo structures.
+* decimation <1>:                        getspf.
+* decimation:                            setgvmode.
+* deleting an annotation:                Annotation Order.
+* detector (QRS) <1>:                    Signal processing.
+* detector (QRS) <2>:                    Evaluation.
+* detector (QRS):                        Example 10.
+* difference format:                     WFDB_Siginfo structures.
+* digital filter <1>:                    Signal processing.
+* digital filter <2>:                    Example 10.
+* digital filter <3>:                    Example 7.
+* digital filter <4>:                    Example 6.
+* digital filter:                        Applications.
+* directories for WFDB files:            WFDB path.
+* discarding calibration list:           flushcal.
+* display scale:                         WFDB_Calinfo structures.
+* djgpp:                                 Sources.
+* duration of signal file:               WFDB_Siginfo structures.
+* ECG annotation code:                   Annotation Codes.
+* ECG waveform editor:                   Graphics.
+* elapsed time:                          timstr and strtim.
+* emptying calibration list:             flushcal.
+* error suppression:                     wfdbquiet and wfdbverbose.
+* errors:                                introduction to functions.
+* ESC DB:                                Sources.
+* ESC DB (defined):                      Glossary.
+* examples:                              Examples.
+* external identifiers (restrictions):   name restrictions.
+* file containing WFDB path <1>:         setwfdb.
+* file containing WFDB path:             WFDB path syntax.
+* file names:                            Concepts 1.
+* file types:                            Database Files.
+* filenames of WFDB files (obtaining):   wfdbfile.
+* filter (digital) <1>:                  Signal processing.
+* filter (digital) <2>:                  Example 10.
+* filter (digital) <3>:                  Example 7.
+* filter (digital) <4>:                  Example 6.
+* filter (digital):                      Applications.
+* finding WFDB files:                    WFDB path.
+* first difference:                      WFDB_Siginfo structures.
+* flushing calibration list:             flushcal.
+* flushing output annotations and samples: wfdbflush.
+* flushing WFDB I/O:                     wfdbquit.
+* format (annotation file):              WFDB_Anninfo structures.
+* format (signal file):                  WFDB_Siginfo structures.
+* Fortran bindings:                      other languages.
+* frame (defined):                       Glossary.
+* frame (of samples):                    Multi-Frequency Records.
+* frame interval (defined):              Glossary.
+* frame rate:                            WFDB_Siginfo structures.
+* frame rate (defined):                  Glossary.
+* frames (reading):                      getframe.
+* frequency (counter) <1>:               Glossary.
+* frequency (counter):                   counter conversion.
+* frequency multiplier:                  Multi-Frequency Records.
+* ftp:                                   NETFILES.
+* function arguments:                    introduction to functions.
+* function name restrictions:            name restrictions.
+* function return codes:                 introduction to functions.
+* functions in the WFDB library:         Functions.
+* gain <1>:                              WFDB_Siginfo structures.
+* gain:                                  Concepts 2.
+* gain (defined):                        Glossary.
+* getvec buffer size:                    setibsize.
+* GNU emacs:                             Sources.
+* GNU/Linux:                             Sources.
+* hea (defined):                         Glossary.
+* hea file:                              Header Files.
+* header file (defined):                 Glossary.
+* header files (creating) <1>:           setmsheader.
+* header files (creating) <2>:           setheader.
+* header files (creating):               newheader.
+* header files (modifying):              setheader.
+* header info (reading):                 getinfo.
+* header info (writing):                 putinfo.
+* high-resolution mode (defined):        Glossary.
+* http:                                  NETFILES.
+* I/O (completing):                      wfdbquit.
+* indirect WFDB path <1>:                setwfdb.
+* indirect WFDB path:                    WFDB path syntax.
+* info (in header files) <1>:            putinfo.
+* info (in header files):                getinfo.
+* info string (defined):                 Glossary.
+* information structure (annotator):     WFDB_Anninfo structures.
+* information structure (signal):        WFDB_Siginfo structures.
+* initial value of signal:               WFDB_Siginfo structures.
+* initialization:                        selecting.
+* input buffer size:                     setibsize.
+* interpolation <1>:                     getspf.
+* interpolation:                         setgvmode.
+* intersignal skew <1>:                  Glossary.
+* intersignal skew <2>:                  wfdbsetskew.
+* intersignal skew:                      wfdbgetskew.
+* isoelectric level:                     WFDB_Siginfo structures.
+* Julian date (conversion to and from string): datstr and strdat.
+* label (beat):                          Concepts 3.
+* legal annotation code:                 Mapping macros.
+* length of signal file:                 WFDB_Siginfo structures.
+* library functions:                     Functions.
+* Linux:                                 Sources.
+* loader options:                        compiling.
+* local record:                          Piped and Local Records.
+* local record (defined):                Glossary.
+* location (of annotation):              Annotation Order.
+* location (of annotations):             Glossary.
+* low-resolution mode (defined):         Glossary.
+* macros:                                Mapping macros.
+* mapping annotation codes:              Mapping macros.
+* Matlab bindings:                       other languages.
+* MGH DB:                                Sources.
+* MinGW:                                 Sources.
+* MIT DB <1>:                            Sources.
+* MIT DB:                                Overview.
+* MIT DB (defined):                      Glossary.
+* MIT format (defined):                  Glossary.
+* MIT-format annotation file:            WFDB_Anninfo structures.
+* mnemonic (annotation):                 annstr and strann.
+* modification label:                    annstr and strann.
+* modification label (defined):          Glossary.
+* modifying header files:                setheader.
+* multi-frequency record (defined):      Glossary.
+* multi-frequency records <1>:           Multi-Frequency Records.
+* multi-frequency records:               WFDB_Siginfo structures.
+* multi-frequency records (reading) <1>: getspf.
+* multi-frequency records (reading):     setgvmode.
+* multi-segment record (defined):        Glossary.
+* multi-segment records:                 Multi-Segment Records.
+* multi-segment records (creating):      setmsheader.
+* multifrequency records:                getframe.
+* multiple record access:                Multiple Record Access.
+* multiplexed signal file <1>:           Multiplexed Signal Files.
+* multiplexed signal file:               WFDB_Siginfo structures.
+* multiplexed signal file (defined):     Glossary.
+* nested records:                        Multi-Segment Records.
+* NETFILES <1>:                          NETFILES.
+* NETFILES <2>:                          wfdbfile.
+* NETFILES <3>:                          setwfdb.
+* NETFILES <4>:                          WFDB path syntax.
+* NETFILES:                              Recent changes.
+* NETFILES (defined):                    Glossary.
+* nine-track tape:                       Special Files.
+* nine-track tape (defined):             Glossary.
+* noise stress test:                     Evaluation.
+* noisy signals (annotating):            Annotation Codes.
+* non-sequential access:                 non-sequential.
+* NOTQRS (annotation code):              Annotation Codes.
+* Octave bindings:                       other languages.
+* opening annotation files:              annopen.
+* opening database files:                selecting.
+* opening signal files:                  isigopen.
+* operating systems (supported):         Guide.
+* order of annotations:                  Annotation Order.
+* output buffer size:                    setobsize.
+* oversampled signal (defined):          Glossary.
+* oversampled signals:                   WFDB_Siginfo structures.
+* path (database):                       WFDB path.
+* pathnames of WFDB files (obtaining):   wfdbfile.
+* physical unit (defined):               Glossary.
+* physical units <1>:                    WFDB_Calinfo structures.
+* physical units <2>:                    WFDB_Siginfo structures.
+* physical units:                        Concepts 2.
+* physical units (conversion to and from adus): aduphys and physadu.
+* physical zero (defined):               Glossary.
+* physical zero level:                   WFDB_Siginfo structures.
+* PhysioBank:                            NETFILES.
+* PhysioNet:                             Glossary.
+* piped record:                          Piped and Local Records.
+* piped record (defined):                Glossary.
+* pipes (as WFDB files):                 Standard I/O.
+* plotting scale:                        WFDB_Calinfo structures.
+* pointer arguments:                     introduction to functions.
+* programming examples:                  Examples.
+* prolog (defined):                      Glossary.
+* prolog (in signal files) <1>:          Glossary.
+* prolog (in signal files) <2>:          wfdbsetstart.
+* prolog (in signal files):              wfdbgetstart.
+* pulse limits (calibration):            WFDB_Calinfo structures.
+* pulse shape (calibration):             WFDB_Calinfo structures.
+* putvec buffer size:                    setobsize.
+* QRS annotation code:                   Mapping macros.
+* QRS detector <1>:                      Signal processing.
+* QRS detector <2>:                      Evaluation.
+* QRS detector:                          Example 10.
+* QRS label:                             Concepts 3.
+* random access:                         non-sequential.
+* reading 9-track tape:                  Special Files.
+* reading annotations <1>:               ungetann.
+* reading annotations:                   getann.
+* reading calibration files:             calopen.
+* reading signals <1>:                   getframe.
+* reading signals:                       getvec.
+* reading the WFDB path:                 getwfdb.
+* record:                                Concepts 1.
+* record (defined):                      Glossary.
+* record (piped):                        Piped and Local Records.
+* record name:                           Concepts 1.
+* record name (defined):                 Glossary.
+* record names (restrictions):           newheader.
+* records (creating):                    Example 8.
+* reference annotation file (defined):   Glossary.
+* reference annotations:                 Concepts 3.
+* reference point (on QRS):              WFDB_Annotation structures.
+* resampling <1>:                        getspf.
+* resampling:                            setgvmode.
+* resolution <1>:                        Glossary.
+* resolution:                            WFDB_Siginfo structures.
+* restrictions on function and variable names: name restrictions.
+* retrieving calibration data:           getcal.
+* return codes:                          introduction to functions.
+* sample:                                Concepts 2.
+* sample (defined):                      Glossary.
+* sample frame:                          Multi-Frequency Records.
+* sample interval:                       Concepts 2.
+* sample interval (defined):             Glossary.
+* sample number:                         Concepts 2.
+* sample number (defined):               Glossary.
+* samples per frame:                     WFDB_Siginfo structures.
+* sampling frequency <1>:                Multi-Frequency Records.
+* sampling frequency:                    Concepts 2.
+* sampling frequency (changing):         setsampfreq.
+* sampling frequency (defined):          Glossary.
+* scale (amplitude) <1>:                 WFDB_Calinfo structures.
+* scale (amplitude):                     WFDB_Siginfo structures.
+* scales (time and amplitude):           Concepts 2.
+* Scilab bindings:                       other languages.
+* selecting database records:            selecting.
+* setting annotation code strings:       annstr and strann.
+* signal:                                Concepts 2.
+* signal (associating annotation with):  WFDB_Annotation structures.
+* signal (defined):                      Glossary.
+* signal file:                           Signal Files.
+* signal file (defined):                 Glossary.
+* signal file (local):                   Piped and Local Records.
+* signal file (on tape):                 Special Files.
+* signal file (piped):                   Piped and Local Records.
+* signal file checksum:                  WFDB_Siginfo structures.
+* signal file description:               WFDB_Siginfo structures.
+* signal file format:                    WFDB_Siginfo structures.
+* signal file length:                    WFDB_Siginfo structures.
+* signal file name:                      WFDB_Siginfo structures.
+* signal files (creating) <1>:           osigfopen.
+* signal files (creating):               osigopen.
+* signal files (opening):                isigopen.
+* signal group <1>:                      Multiplexed Signal Files.
+* signal group:                          WFDB_Siginfo structures.
+* signal group (defined):                Glossary.
+* signal group number (defined):         Glossary.
+* signal I/O:                            signal and annotation I/O.
+* signal information structure:          WFDB_Siginfo structures.
+* signal number:                         WFDB_Siginfo structures.
+* signal number (defined):               Glossary.
+* signal type:                           WFDB_Calinfo structures.
+* signals (non-sequential access) <1>:   isgsettime.
+* signals (non-sequential access):       isigsettime.
+* signals (oversampled):                 WFDB_Siginfo structures.
+* signals (reading) <1>:                 getframe.
+* signals (reading):                     getvec.
+* signals (writing):                     putvec.
+* simultaneous records:                  Multiple Record Access.
+* skew <1>:                              wfdbsetskew.
+* skew:                                  wfdbgetskew.
+* skew (defined):                        Glossary.
+* skipping through WFDB files:           non-sequential.
+* sortann:                               Annotation Order.
+* special files (as signal files):       Special Files.
+* standard annotation file:              WFDB_Anninfo structures.
+* standard I/O (as WFDB files) <1>:      Piped and Local Records.
+* standard I/O (as WFDB files):          Standard I/O.
+* standard time format (defined):        Glossary.
+* standard time format (examples):       timstr and strtim.
+* start of sample data <1>:              Glossary.
+* start of sample data <2>:              wfdbsetstart.
+* start of sample data:                  wfdbgetstart.
+* storing calibration data:              putcal.
+* string (conversion to and from annotation code): annstr and strann.
+* string (conversion to and from Julian date): datstr and strdat.
+* string (conversion to and from time):  timstr and strtim.
+* structure (annotation):                WFDB_Annotation structures.
+* structure (annotator information):     WFDB_Anninfo structures.
+* structure (signal information):        WFDB_Siginfo structures.
+* subtyp (in NOISE annotation):          Annotation Codes.
+* subtype (annotation):                  WFDB_Annotation structures.
+* suppressing errors:                    wfdbquiet and wfdbverbose.
+* system-wide database directory (defined): Glossary.
+* tape:                                  Concepts 1.
+* tape (defined):                        Glossary.
+* tape counter <1>:                      Glossary.
+* tape counter:                          counter conversion.
+* time:                                  Concepts 2.
+* time (conversion to and from string):  timstr and strtim.
+* time (defined):                        Glossary.
+* time of annotation:                    WFDB_Annotation structures.
+* time of day (setting):                 setbasetime.
+* type (annotation):                     WFDB_Annotation structures.
+* units (ADC) <1>:                       WFDB_Siginfo structures.
+* units (ADC):                           Concepts 2.
+* units (physical) <1>:                  WFDB_Calinfo structures.
+* units (physical) <2>:                  WFDB_Siginfo structures.
+* units (physical):                      Concepts 2.
+* Unix character devices (as signal files): Special Files.
+* unreading annotations:                 ungetann.
+* unsorted annotation files:             Annotation Order.
+* URL:                                   NETFILES.
+* user-defined fields in annotation:     WFDB_Annotation structures.
+* variable name restrictions:            name restrictions.
+* virtual array of annotations:          Annotation Order.
+* voltage (conversion to and from adus): aduphys and physadu.
+* waveform editor <1>:                   Sources.
+* waveform editor <2>:                   Graphics.
+* waveform editor:                       Applications.
+* Web browser:                           Sources.
+* WFDB (environment variable):           WFDB path.
+* WFDB files (finding):                  WFDB path.
+* WFDB library:                          Overview.
+* WFDB library (compiling with):         compiling.
+* WFDB library functions:                Functions.
+* WFDB path:                             Glossary.
+* WFDB_AHA_READ:                         WFDB_Anninfo structures.
+* WFDB_AHA_WRITE:                        WFDB_Anninfo structures.
+* WFDB_Anninfo structure (defined):      WFDB_Anninfo structures.
+* WFDB_Annotation structure (defined):   WFDB_Annotation structures.
+* WFDB_Annotator (defined):              Data Types.
+* WFDB_Calinfo structure (defined):      WFDB_Calinfo structures.
+* WFDB_Date (defined):                   Data Types.
+* WFDB_Frequency (defined):              Data Types.
+* WFDB_Gain (defined):                   Data Types.
+* WFDB_Group (defined):                  Data Types.
+* WFDB_READ:                             WFDB_Anninfo structures.
+* WFDB_Sample (defined):                 Data Types.
+* WFDB_Siginfo structure (defined):      WFDB_Siginfo structures.
+* WFDB_Signal (defined):                 Data Types.
+* WFDB_Time (defined):                   Data Types.
+* WFDB_WRITE:                            WFDB_Anninfo structures.
+* WFDBANNSORT (environment variable) <1>: Annotation Order.
+* WFDBANNSORT (environment variable):    WFDB path.
+* WFDBCAL (environment variable) <1>:    calopen.
+* WFDBCAL (environment variable):        WFDB path.
+* WFDBGVMODE (environment variable) <1>: Multi-Frequency Records.
+* WFDBGVMODE (environment variable):     WFDB path.
+* wrappers for Fortran:                  other languages.
+* wrappers for Matlab, Octave, or Scilab: other languages.
+* writing 9-track tape:                  Special Files.
+* writing annotations:                   putann.
+* writing calibration list:              newcal.
+* writing signals:                       putvec.
+* X Window System:                       Sources.
+* X11:                                   Sources.
+
+
+File: wpg,  Node: Function and Macro Index,  Next: Copying,  Prev: Concept Index,  Up: Top
+
+Function and Macro Index
+************************
+
+   For a number of entries below, the function name is followed by the
+version number of the WFDB library in which the function first appeared.
+Functions for which no such number appears have been present in all
+numbered versions of the WFDB library.
+
+* Menu:
+
+* adumuv:                                aduphys and physadu.
+* aduphys (6.0):                         aduphys and physadu.
+* ammap:                                 Mapping macros.
+* anndesc (5.3):                         annstr and strann.
+* annopen:                               annopen.
+* annpos (6.0):                          Mapping macros.
+* annstr (5.3):                          annstr and strann.
+* calopen (6.0):                         calopen.
+* datstr:                                datstr and strdat.
+* ecgstr:                                annstr and strann.
+* flushcal (6.0):                        flushcal.
+* getann:                                getann.
+* getbasecount (5.2):                    counter conversion.
+* getcal (6.0):                          getcal.
+* getcfreq (5.2):                        counter conversion.
+* getframe (9.0):                        getframe.
+* getinfo (4.0):                         getinfo.
+* getspf (9.6):                          getspf.
+* getvec:                                getvec.
+* getwfdb:                               getwfdb.
+* iannclose (9.1):                       iannclose and oannclose.
+* iannsettime:                           iannsettime.
+* isann:                                 Mapping macros.
+* isgsettime:                            isgsettime.
+* isigopen:                              isigopen.
+* isigsettime:                           isigsettime.
+* isqrs:                                 Mapping macros.
+* mamap:                                 Mapping macros.
+* map1:                                  Mapping macros.
+* map2:                                  Mapping macros.
+* mstimstr:                              timstr and strtim.
+* muvadu:                                aduphys and physadu.
+* newcal (6.0):                          newcal.
+* newheader:                             newheader.
+* oannclose (9.1):                       iannclose and oannclose.
+* osigfopen:                             osigfopen.
+* osigopen:                              osigopen.
+* physadu (6.0):                         aduphys and physadu.
+* putann:                                putann.
+* putcal (6.0):                          putcal.
+* putinfo (4.0):                         putinfo.
+* putvec:                                putvec.
+* sampfreq:                              sampfreq.
+* setanndesc (5.3):                      annstr and strann.
+* setannpos (6.0):                       Mapping macros.
+* setannstr (5.3):                       annstr and strann.
+* setbasecount (5.2):                    counter conversion.
+* setbasetime:                           setbasetime.
+* setcfreq (5.2):                        counter conversion.
+* setecgstr:                             annstr and strann.
+* setgvmode (9.0):                       setgvmode.
+* setheader (5.0):                       setheader.
+* setibsize (5.0):                       setibsize.
+* setisqrs (6.0):                        Mapping macros.
+* setmap1 (6.0):                         Mapping macros.
+* setmap2 (6.0):                         Mapping macros.
+* setmsheader (9.1):                     setmsheader.
+* setobsize (5.0):                       setobsize.
+* setsampfreq:                           setsampfreq.
+* setwfdb:                               setwfdb.
+* strann (5.3):                          annstr and strann.
+* strdat:                                datstr and strdat.
+* strecg:                                annstr and strann.
+* strtim:                                timstr and strtim.
+* timstr:                                timstr and strtim.
+* ungetann (5.3):                        ungetann.
+* wfdberror (4.5):                       wfdberror.
+* wfdbfile (4.3):                        wfdbfile.
+* wfdbflush:                             wfdbflush.
+* wfdbgetskew (9.4):                     wfdbgetskew.
+* wfdbgetstart (9.4):                    wfdbgetstart.
+* wfdbinit:                              wfdbinit.
+* wfdbquiet:                             wfdbquiet and wfdbverbose.
+* wfdbquit:                              wfdbquit.
+* wfdbsetskew (9.4):                     wfdbsetskew.
+* wfdbsetstart (9.4):                    wfdbsetstart.
+* wfdbverbose (4.0):                     wfdbquiet and wfdbverbose.
+
+
+File: wpg,  Node: Copying,  Prev: Function and Macro Index,  Up: Top
+
+   WFDB Programmer's Guide
+
+   Tenth Edition (revised and with additions for WFDB library version
+10.2.4)
+
+   George B. Moody
+
+   Copyright (C) 1989 - 2001 George B. Moody
+
+   Permission is granted to make and distribute verbatim copies of this
+guide provided that the copyright notice and this permission notice are
+preserved on all copies.
+
+   Permission is granted to copy and distribute modified versions of
+this guide under the conditions for verbatim copying and under the
+conditions that follow in this paragraph.  Each copy of the resulting
+derived work must contain a notice that it is a modified version of
+this guide.  The notice must state which edition of this guide was the
+source for the derived work, and it must credit the authors of this
+guide and of the modifications.  The entire resulting derived work must
+be distributed under the terms of a permission notice identical to this
+one.
+
+   Permission is granted to copy and distribute translations of this
+guide into another language, under the above conditions for modified
+versions.
+
+   The author would appreciate receiving copies of any modified or
+translated versions of this guide for reference purposes.
+
+

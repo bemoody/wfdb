@@ -1,0 +1,969 @@
+This is wpg, produced by makeinfo version 4.0 from wpg.tex.
+
+
+File: wpg,  Node: Glossary,  Next: Installation,  Prev: Exercises,  Up: Top
+
+Glossary
+********
+
+_AC-coupled signal_
+     A signal, such as an ECG, for which only variations in level,
+     rather than absolute levels, are significant.  Such signals are
+     usually passed through high-pass filters before they are
+     digitized, in order to remove any DC component (baseline offset),
+     so that the gain can be chosen optimally for the range of
+     variation in the signal.
+
+_ADC_
+     Analog-to-digital converter.
+
+_ADC resolution_
+     The number of significant bits per sample.  Typical ADCs yield
+     between 8 and 16 bits of resolution.
+
+_ADC zero_
+     The value produced by the ADC given a 0 volt input.  For bipolar
+     ADCs, this value is usually 0, but for the unipolar (offset
+     binary) converter used for the MIT DB, the ADC zero was 1024.
+
+_adu_
+     The unit of amplitude for samples.
+
+_AHA DB_
+     The American Heart Association Database for the Evaluation of
+     Ventricular Arrhythmia Detectors, consisting of 80 records
+     identified by four-digit record names.
+
+_AHA format_
+     The format used for interchange of AHA DB and MIT DB records on
+     9-track tape between institutions, not used for on-line files
+     because it is relatively wasteful of storage space compared to MIT
+     format (q.v.).
+
+_Annotation_
+     A label, associated with a particular sample, which describes a
+     feature of the signal at that time.  Most annotations are QRS
+     annotations and indicate the QRS type (normal, PVC, SVPB, etc.).
+     Annotations are written by `putann' and read by `getann'.
+
+_Annotation code_
+     An integer in the range of 1 to `ACMAX' (defined in
+     `<wfdb/ecgcodes.h>') inclusive, which denotes an event type.
+
+_Annotation file_
+     A set of annotations in time order.
+
+_Annotator name_
+     A name associated with an annotation file.  On writable Unix and
+     Macintosh file systems, the annotation file name is constructed
+     from the annotator name by appending a `.' and the record name.
+     On CD-ROMs and MS-DOS file systems, the annotator name is
+     restricted to three characters, and the annotation file name is
+     constructed from the record name by appending a `.' and the
+     annotator name.  Unix and Macintosh versions of the WFDB library
+     can locate and read annotation files named using either convention.
+
+_Annotator [number]_
+     An integer by which an annotation file, once opened, is known.
+     Input annotators and output annotators each have their own series
+     of annotator numbers assigned in serial order beginning with 0.
+
+_Application program_
+     In this guide, a program that uses the WFDB library to do
+     something.
+
+_`atr'_
+     The annotator name for the reference annotation files (originally,
+     `atruth', i.e., the "truth" annotations).
+
+_Base counter value_
+     The counter value (q.v.) that corresponds to sample 0.  The base
+     counter value is read by `getbasecount', and set by `setbasecount'
+     (or by any of the functions that read header files).  If not
+     defined explicitly, the base counter value is taken to be 0.
+
+_Base time_
+     The time of day that corresponds to sample 0 in a given record.
+     For MIT, AHA, and ESC DB records, the base time was not recorded
+     and is taken to be 0:0:0 (midnight).
+
+_Baseline [amplitude]_
+     The sample value that corresponds to the baseline (isoelectric
+     level or physical zero level) in the signal.  This quantity may
+     drift during the record for a variety of reasons, in which case
+     the `baseline' field of the `WFDB_Siginfo' object that describes
+     the signal is only an approximation.  The baseline is _not_ the
+     same as the ADC zero (q.v.), which is a fixed characteristic of
+     the digitizer.
+
+_Calibration file_
+     A file containing data used to build a calibration list (q.v.).
+
+_Calibration list_
+     A memory-resident linked list of `WFDB_Calinfo' objects (*note
+     WFDB_Calinfo structures::).  Each such structure specifies the
+     size and type of the calibration pulse, and the customary plotting
+     scale, for a particular type of signal.
+
+_CD-ROM_
+     A read-only medium used for distribution of the MIT-BIH and ESC
+     databases, among others.  CD-ROMs are physically identical in
+     appearance to audio compact disks.
+
+_Closing [a record]_
+     The process of completing I/O associated with a record.
+
+_Counter frequency_
+     The difference between counter values (q.v.) that are separated by
+     an interval of one second.  The counter frequency is constant
+     throughout any given record.  It may be undefined, in which case
+     it is treated as equivalent to the sampling frequency (q.v.) by
+     the WFDB library.  The counter frequency is read by `getcfreq',
+     and set by `setcfreq' (or by any of the functions that read header
+     files).
+
+_Counter value_
+     A number that serves as a time reference, in a record for which a
+     counter frequency is defined.  A counter value may be converted to
+     the time in seconds from the beginning of the record by
+     subtracting the base counter value (q.v.) and dividing the
+     remainder by the counter frequency.  The units of `c'-prefixed
+     `strtim' arguments are counter values.
+
+_Database files_
+     Those files (annotation files, header files, signal files, and
+     calibration files) that are accessed via the WFDB library.
+
+_Database path_
+     The names of the directories in which header, annotation, and
+     calibration files are kept.  (Signal files may be located in these
+     directories or elsewhere; header files specify their locations.)
+     To modify the database path, the environment variable `WFDB' must
+     be set by the user and exported accordingly.
+
+_DC-coupled signal_
+     A signal, such as a blood pressure signal, for which absolute
+     levels are significant.  Such signals must be digitized without
+     being passed through high-pass filters, in order to preserve
+     absolute levels.
+
+_ESC DB_
+     The European ST-T Database, consisting of 90 records identified by
+     `e'-prefixed four-digit record names.
+
+_Frame_
+     A set of samples, containing all samples that occur within a given
+     frame interval.  For an ordinary record, a frame contains exactly
+     one sample of each signal;  for a multi-frequency record, a frame
+     contains _at least_ one sample of each signal, and more than one
+     sample of each oversampled signal (q.v.).
+
+_Frame interval_
+     A time interval during which at least one sample exists for each
+     signal.  For an ordinary record, the frame interval and the
+     sampling interval are identical.  For a multi-frequency record,
+     the frame interval is chosen to be an integer multiple of each
+     sampling frequency used.
+
+_Frame rate_
+     The basic sampling frequency defined for a multi-frequency record;
+     the reciprocal of the frame interval.  The frame rate is usually
+     the lowest sampling frequency used for any signal included in the
+     record.
+
+_Gain_
+     In this context, the number of adus (q.v.) per physical unit,
+     referred to the original analog signal.  Gain in this sense is
+     directly proportional to the degree of amplification (the usual
+     meaning of the word) of the analog signal prior to digitization.
+     Gain may vary between signals in a record.
+
+_`hea'_
+     The suffix (extension) that designates a header file (originally
+     `header').
+
+_header file_
+     A file accessible via the WFDB library that describes the signal
+     files associated with a given database record.  A header file has
+     a name of the form `RECORD`.hea'', where RECORD is the record name
+     (q.v.).
+
+_High-resolution mode_
+     An alternative mode for reading a multi-frequency record using
+     `getvec', that can be selected using `setgvmode'.  In
+     high-resolution mode, `getvec' replicates samples of signals
+     digitized at less than the maximum sampling frequency, so that each
+     sample of any oversampled signals appear in at least one sample
+     vector.
+
+_Info string_
+     Free text within a header file.  Info strings can be read using
+     `getinfo' and written using `putinfo'.
+
+_Local record_
+     A record for which the signal files reside in the current
+     directory, typically used for user-created signals.  Records `8l'
+     and `16l' are local records.
+
+_Location [of an annotation]_
+     Every annotation has both `time' and `chan' attributes that define
+     its location within a virtual array of annotations.  See
+     "Canonical order of annotations".
+
+_Canonical order of annotations_
+     Normally, annotations are arranged in time order within an
+     annotation file.  Annotations that have identical `time'
+     attributes are arranged in `chan' order.  Annotations that have
+     identical "locations" (i.e., identical `time' and `chan'
+     attributes) should not normally occur in a single annotation file;
+     if this does happen, the last annotation at any given location is
+     treated as a replacement of any previous annotations at that
+     location.
+
+_Low-resolution mode_
+     The default mode for reading a multi-frequency record using
+     `getvec'.  In low-resolution mode, `getvec' returns one sample per
+     signal per frame, by decimating any oversampled signals to the
+     frame rate.
+
+_MIT DB_
+     The Massachusetts Institute of Technology-Beth Israel Hospital
+     Arrhythmia Database, consisting of 48 records identified by
+     three-digit record names.
+
+_MIT format_
+     The standard format for storage of WFDB records on CD-ROMs, used
+     on the MIT, ESC, and MGH DB CD-ROMs, among others, and on
+     PhysioNet.
+
+_Modification label_
+     An "invisible" annotation at the beginning of an annotation file.
+     A modification label defines an annotation mnemonic and a
+     corresponding description.  When `annopen' (or `wfdbinit') opens
+     an annotation file that contains modification labels, it
+     automatically calls `setannstr' and `setanndesc' to add the
+     mnemonics and descriptions to the translation tables used by
+     `annstr', `strann', and `anndesc'.  When `annopen' (or `wfdbinit')
+     creates an annotation file, it automatically generates
+     modification labels, for each annotation code that has been
+     (re)defined using `setannstr' or `setanndesc'.  For this reason,
+     you should normally make all of your calls to `setannstr' and
+     `setanndesc' _before_ calling `annopen' or `wfdbinit'.  (An
+     exception is if you are simply _translating_ mnemonics and
+     descriptions into another language, rather than _redefining_ them.)
+     Version 5.3 and later versions of the WFDB library support reading
+     and writing modification labels;  earlier versions read
+     modification labels as `NOTE' annotations.
+
+_Multi-frequency record_
+     A record containing signals sampled at two or more sampling
+     frequencies.  Version 9.0 and later versions of the WFDB library
+     support reading and writing multi-frequency records.
+
+_Multi-segment record_
+     A composite record that is the concatenation of two or more
+     ordinary (single-segment) records.  Multi-segment records do not
+     have their own signal files (the signal files of their constituent
+     segments are read when it is necessary to read signals of
+     multi-segment records), but they have their own header files
+     (created using `setmsheader'), and may have their own annotation
+     files as well (annotation files for the constituent segments of a
+     multi-segment record are _not_ concatenated automatically when the
+     record is read).  The WFDB Software Package includes
+     `wfdbcollate', an application that can create multi-segment
+     records from sets of single-segment records.  Version 9.1 and
+     later versions of the WFDB library support reading and writing
+     multi-segment records.
+
+_Multiplexed signal file_
+     A set of vectors in time order, each consisting of two or more
+     integer samples, thus representing an equal number of signals.
+
+_NETFILES_
+     WFDB files made available by an FTP or HTTP (web) server;  readable
+     by applications linked with a NETFILES-enabled WFDB library.  A
+     NETFILES-enabled WFDB library can be created by compiling the WFDB
+     library sources with the symbol `WFDB_NETFILES' defined (to
+     anything; its value is not important, only that it is defined) and
+     then linking them with the `libwww' library available from the
+     World Wide Web Consortium (`http://www.w3.org/Library/').
+
+_9-track tape_
+     A medium used for archival storage of WFDB records, which was once
+     nearly universally available on minicomputers and larger systems.
+     The important parameters are tape density (typically 800 or 1600
+     bpi) and block size (typically some multiple of 512 bytes).
+     Higher tape density and larger block size permit more data to be
+     stored on a tape.
+
+_Opening [a database record or a file]_
+     The process of making a database record or a file accessible, if
+     necessary by creating it.
+
+_Oversampled signal_
+     In a multi-frequency record, any signal recorded at a sampling
+     frequency greater than the frame rate (q.v.).
+
+_Physical unit_
+     The natural unit of measurement of the original analog signal
+     (e.g., millivolts, liters per second, degrees).  To convert
+     samples into physical units, subtract the ADC zero and divide the
+     remainder by the gain.
+
+_Physical zero_
+     The level (in physical units) that corresponds to the baseline (in
+     adu), normally zero physical units.  For example, physical zero
+     for a pressure signal with units of mmHg is 0 mmHg.
+
+_PhysioNet_
+     The home of the WFDB library, and a source for recorded
+     physiologic signals and software for use with them.  All materials
+     on PhysioNet are freely available.  The main PhysioNet server is
+     `http://www.physionet.org/', located at MIT in Cambridge,
+     Massachusetts; PhysioNet mirror sites are located around the world
+     (see `http://www.physionet.org/mirrors/' for a list).
+
+_Piped record_
+     A database record for which a signal file is designated as `-',
+     signifying that it is to be read from the standard input or
+     written to the standard output.  Records `8' and `16' are piped
+     records, as are those defined within the `pipe' subdirectory of
+     the system-wide database directory (q.v.)
+
+_Prolog_
+     Extraneous bytes at the beginning of a signal file that are not to
+     be read as samples.  Signal files created using the WFDB library
+     do not contain prologs, but signal files created using other means
+     may contain prologs.  To read such a signal file using the WFDB
+     library, provided that the sample data are in a supported format,
+     it is sufficient to record the length of the prolog (in bytes) in
+     the appropriate locations in a header file that names the signal
+     file.  If you need to create such a header file, refer to the
+     description of the byte offset field in `header(5)' (the
+     specification of the header file format in the `WFDB Applications
+     Guide', or *note wfdbsetstart::.
+
+_Record_
+     An extensible set of files that may include signal files,
+     annotation files, and a header file, all of which are associated
+     with the same original signals.  Only the header file is mandatory.
+     Although records are sometimes called tapes for historical reasons,
+     records are now more commonly maintained on CD-ROMs or magnetic
+     disks than on tape.
+
+_Record name_
+     A character string that identifies a database record.  Record
+     names of MIT DB records are 3-digit numerals, those of AHA DB
+     records are 4-digit numerals, and those of ESC DB records are
+     4-digit numerals with a prefixed `e'.  Record names may contain up
+     to `WFDB_MAXRNL' (defined in `<wfdb/wfdb.h>') characters,
+     including any combination of letters, digits, and underscores.
+     Case (the difference between `e' and `E', for example) is
+     significant in record names, even under operating systems such as
+     MS-DOS that do not treat case as significant in file names.
+
+_Reference annotation file_
+     An annotation file supplied by the creator of a record to document
+     its contents as accurately and thoroughly as possible.  The
+     annotator name `atr' is reserved for reference annotation files.
+
+_Sample_
+     An integer (of at least 16 bits) that corresponds to a voltage
+     measured at a given instant by an analog-to-digital converter.
+     Samples are written by `putvec' and read by `getvec'.
+
+_Sample interval_
+     The unit of time;  the interval between consecutive samples of a
+     given signal.
+
+_Sample number_
+     An attribute of a sample defined as the number of samples of the
+     same signal that precede it; thus the first sample of any signal
+     has sample number 0.  Sample numbers are long integers (32 bits).
+     Samples that have the same sample number in different signals of a
+     given record may be treated as having been observed simultaneously.
+
+_Sampling frequency_
+     The number of samples of a given signal that represent one second
+     of the original analog signal.  The sampling frequency is constant
+     throughout a signal file, and is the same for all signals in a
+     given record.
+
+_Signal_
+     A continuously varying function of time that is approximated by
+     discrete samples.
+
+_Signal file_
+     A set of samples in time order, which represent a signal or signal
+     group.
+
+_Signal group_
+     A set of signals that are multiplexed together and stored in the
+     same file.  It is possible to reset input pointers for all signals
+     in a given signal group (*note isgsettime::), but not
+     independently for individual signals within a signal group.
+
+_Signal group number_
+     A number by which a signal file, once opened, is known.
+
+_Signal number_
+     An integer by which a signal, once opened, is known.  Input and
+     output signals each have their own series of signal numbers
+     assigned in serial order beginning with 0.
+
+_Skew_
+     The time difference between samples having the same sample number
+     but belonging to different signals.  Ideally the skew is zero (or
+     less than one sample interval), but in some cases this is not so.
+     For example, if the signals were originally recorded on multitrack
+     analog tape, very small differences in the azimuth of the
+     recording and playback heads may result in measurable skew among
+     signals.  If the skew can be measured (for example, by reference
+     to features of two signals with a known time difference), it can
+     be recorded in the header file for a record; once this has been
+     done, `getvec' and `getframe' correct for skew automatically.  If
+     you need to correct for skew, see `skewedit(1)' and `header(5)'
+     (in the `WFDB Applications Guide'), or *note wfdbsetskew::.
+     Prospectively, if you anticipate that skew may be a problem, it is
+     a good idea to apply an easily identifiable synchronization pulse
+     to all your inputs simultaneously while recording;  you can then
+     locate this pulse in each digitized signal and use these
+     measurements to correct for skew.
+
+_Standard time format_
+     Any string format legal as an argument for `strtim' (*note timstr
+     and strtim::).
+
+_System-wide database directory_
+     The directory that contains local copies of the default WFDB
+     calibration file, WFDB sample record `100s', and local, piped, and
+     tape header files.  This directory is created when the WFDB
+     Software Package is installed, and by default it is included in
+     the WFDB path (as the second component, following the user's
+     current directory).  It is called the "system-wide" database
+     directory because it is shared by all users of the system on which
+     it resides.  Under Unix, the system-wide database directory is
+     usually `/usr/database' or `/usr/local/database';  under MS-DOS or
+     MS-Windows, it is usually `c:\database'.
+
+_Tape_
+     A database record.
+
+_Time_
+     In this guide, synonymous with sample number (q.v.).  Thus the
+     "time of an annotation" is the sample number of the sample to
+     which the annotation "points".
+
+_WFDB library_
+     A set of functions (subroutines), able to read and write database
+     files, callable by C and C++ programs, and described in this guide.
+
+_WFDB path_
+     The database path (q.v.).
+
+
+File: wpg,  Node: Installation,  Next: WFDB Applications,  Prev: Glossary,  Up: Top
+
+Installing the WFDB Software Package
+************************************
+
+   This appendix briefly describes how to install the WFDB Software
+Package on a new system.  The package includes C-language sources for
+the WFDB library and for a variety of applications (*note WFDB
+Applications::), TeX source for this manual, `troff' source for Unix
+`man' pages for the package, and a one-minute sample record (`100s').
+
+* Menu:
+
+* Distribution::	How to obtain the latest version of the WFDB
+			Software Package.
+* Unix installation::	Installing the WFDB Software Package on Unix,
+			GNU/Linux, and similar systems.
+* MS-Windows installation::	Installing the WFDB Software Package on
+                                MS-Windows PCs.
+* Other installation::	Installing the WFDB Software Package on other systems.
+
+
+File: wpg,  Node: Distribution,  Next: Unix installation,  Prev: Installation,  Up: Installation
+
+How to obtain the WFDB Software Package
+=======================================
+
+   The latest version of the WFDB Software Package can always be
+downloaded in source form from PhysioNet and its mirrors (see
+`http://www.physionet.org/physiotools/wfdb.shtml'); binaries for
+popular operating systems and development snapshots, as well as
+quick-start guides including installation notes for popular operating
+systems, are also usually available there.
+
+
+File: wpg,  Node: Unix installation,  Next: MS-Windows installation,  Prev: Distribution,  Up: Installation
+
+Unix, GNU/Linux, and similar operating systems
+==============================================
+
+   Before beginning the installation of the WFDB Software Package,
+obtain and install the `libwww' package from
+`http://www.w3.org/Library/' or from
+`http://www.physionet.org/physiotools/libwww/'.  This package is
+provided with most current versions of GNU/Linux.  (If you have a
+program called `libwww-config', then `libwww' is installed already.)
+You may omit this step if you do not wish to have NETFILES support.
+
+   Also download and install the `XView' software from
+`http://www.physionet.org/physiotools/xview/' if you wish to use
+_WAVE_.  Sources are available, as are binaries for several versions of
+GNU/Linux.  If you are using SunOS or Solaris, XView binaries are
+available in the Open Look Software Development package and may be
+installed already.  (If you have a program called `textedit', then
+`XView' is installed already.) If you are able to use an existing set
+of binaries, these are recommended, since the sources may take a _long_
+time to compile.  Be sure that the directory containing `textedit',
+usually `/usr/openwin/bin', is in your `PATH'.  You may omit this step
+if you do not wish to use _WAVE_.
+
+   If you have downloaded the software from PhysioNet or another
+source, you will have a `gzip'-compressed `tar' archive.  Unpack it
+using the commands:
+
+     gzip -d wfdb.tar.gz
+     tar xfv wfdb.tar
+
+   (If you have GNU `tar', as on GNU/Linux, you can combine these into a
+single command: `tar xfvz wfdb.tar.gz'.)
+
+   This will create a directory with a name of the form `wfdb-'M.N.R,
+where M.N.R is the version number of the included WFDB library (e.g.,
+`10.2.4').  Enter this directory.
+
+   You should now be ready to configure, compile, and install the
+software, using the commands:
+
+     ./configure
+     make install
+
+   The `./configure' command asks where you wish to install the package.
+If you accept the default (`/usr'), you will need root permissions when
+runnning `make install'.  If you choose another location, follow the
+instructions given by `configure' for setting your `PATH' and
+`LD\_LIBRARY\_PATH' environment variables.
+
+   Depending on the speed of your system and of your C compiler, `make'
+will generally require between 1 and 10 minutes.
+
+
+File: wpg,  Node: MS-Windows installation,  Next: Other installation,  Prev: Unix installation,  Up: Installation
+
+MS-Windows
+==========
+
+   If you have not already done so, install the Cygwin development
+environment (freely available from
+`http://sources.redhat.com/cygwin/').  This includes `gcc' (the GNU
+C/C++ compiler) as well as a comprehensive assortment of other Unix
+utilities ported to MS-Windows.  Accept the defaults suggested by the
+installer.
+
+   _Important:_ Although you may be able to compile the WFDB software
+package using a proprietary compiler, this is _not supported_.  The
+`Makefile.dos' files in several of the subdirectories of the package's
+source tree can be used with the `make' utilities provided with most
+commercial C compilers, although you will need to customize them for
+your compiler. Your feedback is appreciated.
+
+   Before beginning the installation of the WFDB Software Package,
+obtain and install the `libwww' package from
+`http://www.w3.org/Library/' or from
+`http://www.physionet.org/physiotools/libwww/'.  You may omit this step
+if you do not wish to have NETFILES support.
+
+   Download
+`http://www.physionet.org/physiotools/binaries/windows/bin/which.exe'
+and put it into a directory in your PATH.  (This utility is needed by
+`configure' in a later step.  The sources for `which.exe' are available
+within `http://www.physionet.org/physiotools/utilities/'.)
+
+   Open a Cygwin terminal window (the Cygwin installer will have added
+this to your MS-Windows start menu).  Perform the remaining steps by
+typing the commands given below into the terminal window.
+
+   Check that `which' and `gcc' are accessible by typing the command:
+
+     which gcc
+
+   The output of this command should be:
+
+     /usr/bin/gcc
+
+   If you don't see this output, repeat the steps above as necessary to
+correct the problem before continuing.
+
+   Unpack the `gzip'-compressed `tar' archive you downloaded earlier,
+using the `tar' command included with the Cygwin package:
+
+     tar xfvz wfdb.tar.gz
+
+   If your browser decompressed the file during the download, use this
+command instead:
+
+     tar xfv wfdb.tar
+
+   This will create a directory with a name of the form `wfdb-'_m.n.r_,
+where _m.n.r_ is the version number of the included WFDB library (e.g.,
+`10.2.4').  Enter this directory.
+
+   You should now be ready to configure, compile, and install the
+software, using the commands:
+
+     ./configure
+     make install
+
+   If you have Microsoft or Turbo C or C++, and a Microstar
+Laboratories DAP 1200- or 2400-series analog interface board, you can
+instruct the `install' procedure to compile `sample' (a program for
+creating database records from analog signals, and for replaying them
+in analog form).  To do so successfully, you must first have installed
+the Microstar `#include' files and DAP interface library on your
+system.  Specifically, files `c_lib.c', `clock.h', and `ioutil.h' must
+be installed in your `include' directory, and the version of the file
+`cdapl.lib' that is compatible with your compiler must be installed in
+a directory in which libraries are found by your linker.  Read and
+customize `lib/Makefile.dos' and `app/Makefile.dos' as appropriate for
+your compiler, and use your compiler's `make' utility to generate
+`wfdb.lib' and then `sample.exe'.
+
+
+File: wpg,  Node: Other installation,  Prev: MS-Windows installation,  Up: Installation
+
+Other systems
+=============
+
+   Copy the contents of `http://www.physio.net/physiotools/wfdb/' to
+your hard disk.  Note that the text files are in Unix format (i.e.,
+lines are terminated by ASCII line-feed characters only).  If your
+system expects text files in MS-DOS format (with both a carriage return
+and a line-feed at the end of each line; VMS is one such system), use
+`u2d.exe' (available from PhysioNet) to reformat the text files under
+MS-DOS.  If your system is a Macintosh (which expects that lines are
+terminated by carriage returns only), you will have to reformat the
+text files yourself, which may be done under MS-DOS on a PC using
+`u2m.exe', or on a Macintosh using third-party software.
+
+   The WFDB Software Package is written in highly portable C, and (with
+the exception of a few MS-DOS or Unix-specific display or
+data-acquisition programs) should be easy to compile with any K&R or
+ANSI C compiler.  The Unix and MS-DOS `make' description files
+(`Makefile' and `Makefile.dos' in `wfdb' and in each of its
+subdirectories) should get you started.
+
+
+File: wpg,  Node: WFDB Applications,  Next: Extensions,  Prev: Installation,  Up: Top
+
+WFDB Application Programs
+*************************
+
+   This appendix briefly describes the application programs that are
+included with the WFDB Software Package.  Except where noted otherwise,
+these applications are usable on all systems for which the WFDB library
+is available.  For details on using these programs, refer to the `WFDB
+Applications Guide'.  (On Unix systems, the contents of the
+`Applications Guide' may also be available as on-line `man' pages.)
+
+* Menu:
+
+* Using::		Notes on using these programs.
+* Annotation I/O::	Programs that read, write, summarize, and
+			otherwise process annotation files.
+* Evaluation::		Programs for evaluating the performance of ECG
+			analysis programs.
+* Signal processing::	Programs that read, excerpt, reformat, resample,
+			filter, combine, analyze, acquire, and replay signals.
+* Graphics::		Programs for viewing or plotting signals and
+			annotations.
+
+
+File: wpg,  Node: Using,  Next: Annotation I/O,  Prev: WFDB Applications,  Up: WFDB Applications
+
+How to use these programs
+=========================
+
+   These programs are kept in directories that vary from system to
+system; they may not be in the default search path.  If you cannot find
+them, consult an expert (such as the person who installed the WFDB
+library on your system).  If you use these programs often, you may wish
+to include the directory in which they are kept in your search path.
+
+   To use any of these programs, you will need to set the database path
+first (*note WFDB path::), unless the default database path (`.
+http://www.physionet.org/physiobank/database') is suitable.  Programs
+that accept _time_ arguments or commands (usually shown as FROM and TO
+below) use `strtim' to convert these strings into sample intervals;
+hence they accept any of the varieties of standard time format
+described earlier (*note timstr and strtim::).  Programs that accept
+annotation mnemonics as arguments or commands (usually shown as CODE
+below) use `strann' to interpret them; for a list of legal mnemonics,
+*note Annotation Codes::.  Where record or annotator names are required
+as command arguments, they are indicated below as RECORD or ANNOTATOR.
+
+   In the remainder of this appendix, you will find usage examples and
+capsule descriptions of the standard WFDB application programs.  The
+square brackets (`[ ]') in some of the usage examples surround
+arguments that may be omitted;  the brackets themselves are not to be
+included in the command line.  Where an ellipsis (`...')  appears, it
+indicates that the previous argument may be repeated.  If invoked
+without any arguments, or with a `-h' (help) option, most of these
+programs print a brief synopsis of how they are used.
+
+
+File: wpg,  Node: Annotation I/O,  Next: Evaluation,  Prev: Using,  Up: WFDB Applications
+
+Annotation File Processing
+==========================
+
+     ann2rr -a ANNOTATOR -r RECORD [ OPTIONS ... ]
+     rr2ann -a ANNOTATOR -r RECORD [ OPTIONS ... ]
+     rdann -a ANNOTATOR -r RECORD [ -f FROM -t TO -p TYPE ... ]
+     wrann -a ANNOTATOR -r RECORD
+     sumann -a ANNOTATOR -r RECORD
+     tach -a ANNOTATOR -r RECORD [ OPTIONS ... ]
+
+   Programs `ann2rr' and `rr2ann' respectively list RR (inter-beat)
+intervals in text format from an annotation file, and create an
+annotation file from a text-format list of RR intervals.
+
+   The program `rdann' is an annotation printer similar to the one
+shown in chapter 6 (*note Example 3::).  The optional FROM and TO
+arguments (in standard time format) specify a portion of the annotation
+file to be printed, and one or more TYPE arguments (annotation
+mnemonics) can be given to restrict the output to annotations that are
+of the specified type(s).
+
+   The output of `rdann' can be converted back into an annotation file
+by providing it as the standard input of `wrann'.  This can be useful
+for editing annotation files in some cases;  they can be converted to
+ASCII format by `rdann', edited using any text editor, and converted
+back into annotation files by `wrann'.
+
+   A summary of the contents of an annotation file can be obtained using
+`sumann'.  The summary includes the number of annotations of each type,
+and the duration and number of episodes of each rhythm and signal
+quality.
+
+   `tach' generates a uniformly sampled, smoothed, instantaneous heart
+rate sequence from an annotation file.
+
+
+File: wpg,  Node: Evaluation,  Next: Signal processing,  Prev: Annotation I/O,  Up: WFDB Applications
+
+Evaluation of ECG Analyzers
+===========================
+
+     bxb -r RECORD -a REFERENCE-ANNOTATOR TEST-ANNOTATOR [ OPTIONS ... ]
+     rxr -r RECORD -a REFERENCE-ANNOTATOR TEST-ANNOTATOR [ OPTIONS ... ]
+     mxm -r RECORD -a REFERENCE-ANNOTATOR TEST-ANNOTATOR [ OPTIONS ... ]
+     epic -r RECORD -a REFERENCE-ANNOTATOR TEST-ANNOTATOR [ OPTIONS ... ]
+     sumstats FILE
+     plotstm FILE
+     ecgeval
+     nst [ OPTIONS ... ]
+
+   The motivation for developing the MIT and AHA databases was to
+provide material for evaluating the accuracy of arrhythmia detectors,
+particularly with respect to ventricular arrhythmias.  Between 1984 and
+1987, the Association for the Advancement of Medical Instrumentation
+(AAMI) sponsored the development of a recommended practice (designated
+ECAR) for using the databases for this purpose.  The aim of ECAR was to
+specify the evaluation methodology in sufficient detail to permit
+reproducible testing, and to encourage informed comparisons of the
+performance of ventricular arrhythmia detectors in the analysis of these
+standard test recordings.  More recently, the AAMI has developed, and
+ANSI has adopted as American National Standards, a standard (ANSI/AAMI
+EC38:1998) for ambulatory electrocardiographs, and a companion standard
+(ANSI/AAMI EC57:1998) for testing and reporting performance results of
+cardiac rhythm and ST segment measurement algorithms.  EC38 and EC57
+specify standard protocols for evaluating the automated analysis
+algorithms that are included in many such devices.  These protocols
+include those developed for the earlier recommended practice, and
+extend them to evaluation of supraventricular arrhythmia and ischemia
+detection.  EC38 and EC57 specify the use of `bxb', `rxr', `mxm', and
+`epic' to perform evaluations, and further specifies the use of the MIT
+DB (as well as two other databases included on the MIT-BIH Arrhythmia
+Database CD-ROM), the AHA DB, and (for devices that perform analysis of
+the ST segment) the ESC DB.  If you are interested in this subject,
+obtain copies of the American National Standards for `Ambulatory
+Electrocardiographs' (ANSI/AAMI EC38:1998) and for `Testing and
+Reporting Performance Results of Cardiac Rhythm and ST Segment
+Measurements Algorithms' (ANSI/AAMI EC57:1998; *note Sources::).
+
+   To evaluate an arrhythmia detector using this software, obtain for
+each WFDB record to be used in the test an annotation file containing
+the detector's analysis of each beat.  These are referred to as the
+`test' annotation files (or the `algorithm' annotation files, in EC38
+and EC57).  The placement of the beat annotations must match those in
+the reference annotations within 150 msec; thus it is not necessary to
+place annotations precisely at the PQ junction (as in the AHA DB
+reference annotations) or on the major local extremum (as in the MIT DB
+reference annotations).  If the detector is capable of shut-down (i.e.,
+if it inhibits its QRS detection function during periods that it judges
+are unreadable), the test annotation files should include a `NOISE'
+annotation with `subtyp = -1' at the beginning of each period of
+shut-down, and a `NOISE' annotation with any other `subtyp' at the end
+of each such period.  (If the record ends while the detector is shut
+down, the annotation file should include a final `end of shut-down'
+annotation as above to permit correct shut-down accounting.)  If the
+detector is capable of ventricular fibrillation detection, the test
+annotation files should also include `VFON' and `VFOFF' annotations; it
+is not necessary to mark flutter waves (use `FLWAV' annotations to do
+so if desired).  See the `man' page for `epic', in the `WFDB
+Applications Guide', for information on marking atrial fibrillation,
+ischemic ST episodes, and ST deviation measurements in test annotation
+files.  Any annotations that appear in the first five minutes of an
+annotation file are treated as belonging to the detector's learning
+period, and are not used in the evaluation.  The evaluation software
+examines such annotations only to determine the detector's state
+(normal, shut down, or in VF) at the beginning of the test period.
+
+   Program `bxb' implements the beat-by-beat comparison algorithm
+described in EC38 (section 4.2.14.2.2) and EC57 (section 4.3.2).  By
+default, the output is in a self-explanatory matrix format.  The `-L'
+option, which must be followed by two file names, specifies that the
+output of `bxb' should be written in line format, for further
+processing by `sumstats'.  The line-format output includes column
+headings only if the output file must be created from scratch.  In this
+way, `bxb' can be used repeatedly to build up a line-format tables for
+multiple records.  Among the other options is `-o', which causes `bxb'
+to generate an output annotation file (with annotator name `bxb')
+indicating agreements and discrepancies between the input annotators.
+
+   `rxr' can be used to performed the run-by-run comparison described
+in EC38 (section 5.2.14) and in EC57 (sections 4.4.3 and 4.4.4).  `mxm'
+compares heart rate, HRV, or other measurements, as described in EC38
+(section 4.2.14.2.3).  `epic' evaluates VF and AF detection, and ST
+analysis, as described in EC38 (sections 5.2.14), and EC57 (sections
+4.5 and 4.6).  These programs also accept a `-L' option to produce
+line-format output as for `bxb'.
+
+   `sumstats' derives the record-by-record, episode-by-episode, and
+aggregate performance statistics described in EC38 (section 4.2.14.3)
+and in EC57 (sections 3.5.2 and 3.5.3) from line-format output files
+produced by `bxb', `rxr', `mxm', and `epic'.  The input file must
+include the column headings so that `sumstats' can recognize the file
+type.  The output includes a copy of the input, with aggregate
+statistics appended at the end.  `plotstm' generates a PostScript
+scatter plot of ST measurement comparisons gathered by `epic', as
+described in EC57 (section 4.6.2).
+
+   The easiest way to use these programs is to run `ecgeval', which
+generates a script (batch) file to run `bxb', `rxr', etc., for each
+record in a database.  See `Evaluating ECG Analyzers' (in the `WFDB
+Applications Guide') for details.
+
+   By adding noise to annotated ECG records, the noise tolerance of an
+arrhythmia detector can be measured.  This idea was described by the
+author, along with W.K. Muldrow and R.G. Mark, in "A noise stress test
+for arrhythmia detectors", `Computers in Cardiology' *11*:381-384
+(1984).  Program `nst' adds calibrated amounts of noise to ECGs (or
+other signals), generating an output record in WFDB format.  `nst' was
+used to generate the graded series of noisy ECG records in the `nstdb'
+directory of the MIT-BIH Arrhythmia Database CD-ROM.  These records are
+among those specified as standard test material by EC38 (section
+4.2.14.2) and EC57 (section 3.2).
+
+
+File: wpg,  Node: Signal processing,  Next: Graphics,  Prev: Evaluation,  Up: WFDB Applications
+
+Signal Processing Applications
+==============================
+
+     rdsamp -r RECORD [ OPTIONS ... ]
+     wrsamp -r RECORD [ OPTIONS ... ]
+     snip -i INPUT-RECORD -n NEW-RECORD [ OPTIONS ... ]
+     xform -i INPUT-RECORD [ OPTIONS ... ]
+     fir [ OPTIONS ... ] -c COEFFICIENT ...
+     sigamp -r RECORD [ OPTIONS ...]
+     sqrs -r RECORD [ OPTIONS ... ]
+     sample [ OPTIONS ... ]
+     calsig -r RECORD [ OPTIONS ... ]
+
+   `rdsamp' prints samples from the specified record;  `-f' and `-t'
+options may be used to specify a range of sample numbers, and a subset
+of signal numbers may be selected using the `-s' option.  The output of
+`rdsamp', or any similar text, can be converted into a WFDB record
+using `wrsamp'.
+
+   To copy an excerpt of a longer record, use `snip', which creates new
+header and signal files for NEW-RECORD in the current directory.  The
+beginning and end of the excerpt are specified using `-f' and `-t'
+options as for `rdsamp'.  Annotator names may follow a `-a' option; in
+this case excerpts from the specified annotation files are copied as
+well (the annotations are appropriately time-shifted).
+
+   `xform' is a more general version of `snip'; its main uses are for
+reformatting, rescaling, and sampling rate conversion.  You may create a
+`hea' file specifying the desired format, sampling frequency, ADC zero
+levels, signal gains, etc., and supply it to `xform' using the `-o'
+option; if you do not do so, `xform' obtains the required information
+interactively.  `xform' accepts all of the options used by `snip', as
+well as several others.
+
+   Program `fir' is a general-purpose FIR filter for WFDB records,
+similar to the one discussed in chapter 6 (*note Example 7::).
+
+   `sigamp' measures signal amplitudes (either baseline-corrected RMS
+amplitudes or peak-to-peak amplitudes);  it may be useful for
+calibrating signals (together with `calsig') or for determining signal
+gains for `nst'.
+
+   `sqrs' is a slightly modified version of the QRS detector discussed
+in chapter 6 (*note Example 10::).  Options allow specification of the
+signal and interval to be analyzed and the detection threshold.
+
+   Program `sample' is an MS-DOS application that uses a Microstar
+Laboratories DAP 1200- or 2400-series ISA (AT bus) analog interface
+board (*note Sources::) to generate database records from analog
+signals, or to generate analog signals from database records.  If you
+wish to use other hardware for these purposes, refer to chapter 6
+(*note Example 8::) and to the source for `sample' as models.
+
+   If you create your own database records using `sample' or other
+means, program `calsig' may be useful for determining signal gains and
+offsets if your signals include standard calibration pulses or
+identifiable signal levels. `calsig' incorporates two independent
+algorithms for measuring calibration pulses; it rewrites header files
+based on its measurements.
+
+
+File: wpg,  Node: Graphics,  Prev: Signal processing,  Up: WFDB Applications
+
+Graphical Applications
+======================
+
+     wave -r RECORD [ -a ANNOTATOR ]
+     view RECORD ANNOTATOR
+     wview RECORD ANNOTATOR
+     pschart [ [ OPTIONS ... ] SCRIPT ... ]
+     psfd [ [ OPTIONS ... ] SCRIPT ... ]
+
+   `wave' is an X Window System client application for viewing and
+editing WFDB records.  (`wave' is not included in the WFDB software
+package, but is available separately; *note Sources::.)  `wave' can be
+run on Unix systems, and can be accessed remotely using networked PCs or
+other systems for which X11 servers are available.  Run `wave' without
+any arguments to obtain instructions for printing its on-line manual.
+
+   `view', included on the MIT-BIH Arrhythmia Database and European ST-T
+Database CD-ROMs, among others, is an MS-DOS application for viewing
+WFDB records on CGA, EGA, VGA, SVGA, XGA, or Hercules graphics-capable
+PCs.  See `bin.doc' in the `bin' directory of the CD-ROM for more
+information.
+
+   `wview', included on recent (1995 and later) CD-ROMs and also
+available separately (*note Sources::, is an MS-Windows application for
+viewing WFDB records.  It has most of the display capabilities of
+`wave', but lacks support for annotation editing.
+
+   `pschart' and `psfd' produce annotated "chart recordings" and
+"full-disclosure" plots that can be printed on PostScript devices.
+These programs were used to prepare the `MIT-BIH Arrhythmia Database
+Directory' and the `European ST-T Database Directory'.
+

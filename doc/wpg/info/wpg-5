@@ -1,0 +1,846 @@
+This is wpg, produced by makeinfo version 4.0 from wpg.tex.
+
+
+File: wpg,  Node: Example 7,  Next: Example 8,  Prev: Example 6,  Up: Examples
+
+Example 7:  A General-Purpose FIR Filter
+========================================
+
+   This program illustrates a useful technique for obtaining something
+close to random access to signals, a technique that is particularly
+useful for implementing digital filters.  The first argument is the
+record name, the second and third arguments are the start time and the
+duration of the segment to be filtered, and the rest of the arguments
+are finite-impulse-response (FIR) filter coefficients.  For example, if
+this program were compiled into an executable program called `filter',
+it might be used by
+     filter 100 5:0 20 .2 .2 .2 .2 .2
+
+which would apply a five-point moving average (rectangular window)
+filter to 20 seconds of record `100', beginning 5 minutes into the
+record.  The output of the program is readable as record `out', for
+which a header file is created in the current directory.
+
+      1  #include <stdio.h>
+      2  #include <wfdb/wfdb.h>
+      3  #define BUFLN 512
+      4  int nsig, sample_ok = 1;
+      5  WFDB_Sample *sbuf;
+      6
+      7  sample(s, t)
+      8  int s;
+      9  long t;
+     10  {
+     11      static long tt = -1L;
+     12
+     13      if (t <= tt - BUFLN)
+     14          fprintf(stderr, "sample: buffer too short\n");
+     15      while (t > tt)
+     16          if (getvec(sbuf + nsig * ((++tt)&(BUFLN-1))) < 0)
+     17              sample_ok = 0;
+     18      return (*(sbuf + nsig * (t&(BUFLN-1)) + s));
+     19  }
+     20
+     21  main(argc, argv)
+     22  int argc;
+     23  char *argv[];
+     24  {
+     25      double *c, one = 1.0, vv, atof();
+     26      int i, j, nc = argc - 4;
+     27      long nsamp, t;
+     28      static WFDB_Sample *v;
+     29      static WFDB_Siginfo *s;
+     30
+     31      if (argc < 4) {
+     32          fprintf(stderr,
+     33            "usage: %s record start duration [ coefficients ... ]\n",
+     34                  argv[0]);
+     35          exit(1);
+     36      }
+     37      if (nc < 1) {
+     38          nc = 1; c = &one;
+     39      }
+     40      else if (nc >= BUFLN ||
+     41               (c = (double *)calloc(nc, sizeof(double))) == NULL) {
+     42          fprintf(stderr, "%s: too many coefficients\n", argv[0]);
+     43          exit(2);
+     44      }
+     45      for (i = 0; i < nc; i++)
+     46          c[i] = atof(argv[i+4]);
+     47      if ((nsig = isigopen(argv[1], NULL, 0)) < 1)
+     48          exit(3);
+     49      s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+     50      v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
+     51      sbuf = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample)*BUFLN);
+     52      if (s == NULL || v == NULL || sbuf == NULL) {
+     53          fprintf(stderr, "insufficient memory\n");
+     54          exit(3);
+     55      }
+     56      if (isigopen(argv[1], s, nsig) != nsig)
+     57          exit(3);
+     58      if (isigsettime(strtim(argv[2])) < 0)
+     59          exit(4);
+     60      if ((nsamp = strtim(argv[3])) < 1) {
+     61          fprintf(stderr, "%s: inappropriate value for duration\n",
+     62                  argv[0]);
+     63          exit(5);
+     64      }
+     65      if (osigopen("16l", s, nsig) != nsig)
+     66          exit(6);
+     67
+     68      for (t = 0; t < nsamp && sample_ok; t++) {
+     69          for (j = 0; j < nsig; j++) {
+     70              for (i = 0, vv = 0.; i < nc; i++)
+     71                  if (c[i] != 0.) vv += c[i]*sample(j, t+i);
+     72              v[j] = (int)vv;
+     73          }
+     74          if (putvec(v) < 0) break;
+     75      }
+     76
+     77      (void)newheader("out");
+     78      wfdbquit();
+     79      exit(0);
+     80  }
+
+*Notes:*
+
+_Line 3:_
+     `BUFLN' must be a power of 2 (why? see lines 16 and 18), and it
+     should be larger than the length of the filter (i.e., the caller
+     should not look back further than `BUFLN-1' samples into the past,
+     relative to the most recent sample that has been read).
+
+_Lines 7-19:_
+     This function supplies input samples to the `main' routine as
+     needed, and frees the `main' routine of the need to read them in
+     strict time order.  The `sample' function returns the sample from
+     signal `s' with adjusted sample number `t' (i.e., relative to the
+     beginning of the segment to be processed), either by retrieving it
+     from a circular buffer of samples recently read, or by reading it
+     using `getvec'.  The ugly-looking `getvec' argument is simply the
+     next slot in the circular buffer; note that `tt' is an internal
+     "clock" for `sample', which records the adjusted sample number of
+     the most recently read sample.  In this program, the test in line
+     13 is redundant (why?)  and might be removed for efficiency's sake.
+
+_Lines 37-39:_
+     If no coefficients are provided on the command line, the program
+     will simply copy the selected segment of the input signals.
+
+_Lines 40-46:_
+     If there are more coefficients than there are samples in the
+     circular buffer, or if memory cannot be allocated for the
+     coefficient vector, the program cannot work properly, so it exits
+     with an error message.  In lines 45 and 46, the ASCII strings that
+     represent the coefficients are converted to `double' format and
+     stored in the coefficient vector.
+
+_Lines 47-59:_
+     The record name is `argv[1]', and the start time is `argv[2]'; if
+     the record can't be opened, or the start time is inappropriate, the
+     program exits.  See the previous example for details on how
+     `isigopen' is used.
+
+_Lines 60-64:_
+     The DURATION argument should be a time interval in HH:MM:SS
+     format; `strtim' converts it to the appropriate number of samples.
+
+_Lines 65-66:_
+     The output signals will be written to files in the current
+     directory according to the specifications for record `16l' (*note
+     Piped and Local Records::).  If we can't write as many output
+     signals as there are input signals, the program exits.
+
+_Lines 68-75:_
+     Here's where the work is done.  The outer loop is executed once per
+     sample vector, the middle loop once per signal, and the inner loop
+     once per coefficient.  In line 71, we retrieve an input sample,
+     multiply it by a filter coefficient, and add it to a running sum.
+     The sum (`vv') is initialized to zero in line 70 before we begin,
+     and is converted to an `int' in line 72 when we are finished.  Once
+     an entire sample vector has been filtered, it is written out in
+     line 74.  The entire process is repeated up to `nsamp' times, or
+     until we run out of input samples.
+
+_Line 77:_
+     The program creates a header file for record `out', using the
+     signal specifications from record `16l' and the sampling frequency
+     from the input record.
+
+
+File: wpg,  Node: Example 8,  Next: Example 9,  Prev: Example 7,  Up: Examples
+
+Example 8:  Creating a New Database Record
+==========================================
+
+   This program creates a new record from scratch.  It asks the user for
+information about the signals to be sampled, then records them, and
+finally creates a `hea' file for the new record.  Details of data
+acquisition are hardware-dependent and are not shown here.
+
+       1  #include <stdio.h>
+       2  #include <wfdb/wfdb.h>
+       3
+       4  main()
+       5  {
+       6      char answer[32], record[8], directory[32];
+       7      int i, nsig = 0;
+       8      long nsamp, t;
+       9      double freq = 0.;
+      10      char **filename, **description, **units;
+      11      WFDB_Sample *v;
+      12      WFDB_Siginfo *s;
+      13
+      14      do {
+      15          printf("Choose a record name [up to 6 characters]: ");
+      16          fgets(record, 8, stdin); record[strlen(record)-1] = '\0';
+      17      } while (newheader(record) < 0);
+      18      do {
+      19          printf("Number of signals to be recorded [>0]: ");
+      20          fgets(answer, 32, stdin); sscanf(answer, "%d", &nsig);
+      21      } while (nsig < 1);
+      22      s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+      23      v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
+      24      filename = (char **)malloc(nsig * sizeof(char *));
+      25      description = (char **)malloc(nsig * sizeof(char *));
+      26      units = (char **)malloc(nsig * sizeof(char *));
+      27      if (s == NULL || v == NULL || filename == NULL ||
+      28          description == NULL || units == NULL) {
+      29          fprintf(stderr, "insufficient memory\n");
+      30          exit(1);
+      31      }
+      32      for (i = 0; i < nsig; i++) {
+      33          if ((filename[i] = (char *)malloc(32)) == NULL ||
+      34              (description[i] = (char *)malloc(32)) == NULL ||
+      35              (units[i] = (char *)malloc(32)) == NULL) {
+      36              fprintf(stderr, "insufficient memory\n");
+      37              exit(1);
+      38          }
+      39      }
+      40      do {
+      41          printf("Sampling frequency [Hz per signal, > 0]: ");
+      42          fgets(answer, 32, stdin); sscanf(answer, "%lf", &freq);
+      43      } while (setsampfreq(freq) < 0);
+      44      do {
+      45          printf("Length of record (H:M:S): ");
+      46          fgets(answer, 32, stdin);
+      47      } while ((nsamp = strtim(answer)) < 1L);
+      48      printf("Directory for signal files [up to 30 characters]: ");
+      49      fgets(directory, 32, stdin);
+      50      directory[strlen(directory)-1] = '\0';
+      51      printf("Save signals in difference format? [y/n]: ");
+      52      fgets(answer, 32, stdin);
+      53      s[0].fmt = (answer[0] == 'y') ? 8 : 16;
+      54      printf("Save all signals in one file? [y/n]: ");
+      55      fgets(answer, 32, stdin);
+      56      if (answer[0] == 'y') {
+      57          sprintf(filename[0], "%s/d.%s", directory, record);
+      58          for (i = 0; i < nsig; i++) {
+      59               s[i].fname = filename[0];
+      60               s[i].group = 0;
+      61          }
+      62      }
+      63      else {
+      64          for (i = 0; i < nsig; i++) {
+      65               sprintf(filename[i], "%s/d%d.%s", directory,i,record);
+      66               s[i].fname = filename[i];
+      67               s[i].group = i;
+      68          }
+      69      }
+      70      for (i = 0; i < nsig; i++) {
+      71          s[i].fmt = s[0].fmt; s[i].bsize = 0;
+      72          printf("Signal %d description [up to 30 characters]: ", i);
+      73          fgets(description[i], 32, stdin);
+      74          description[i][strlen(description[i])-1] = '\0';
+      75          s[i].desc = description[i];
+      76          printf("Signal %d units [up to 20 characters]: ", i);
+      77          fgets(units[i], 22, stdin);
+      78          units[i][strlen(units[i])-1] = '\0';
+      79          s[i].units = (*units[i]) ? units[i] : "mV";
+      80          do {
+      81              printf(" Signal %d gain [adu/%s]: ", i, s[i].units);
+      82              fgets(answer, 32, stdin);
+      83              sscanf(answer, "%lf", &s[i].gain);
+      84          } while (s[i].gain < 0.);
+      85          do {
+      86              printf(" Signal %d ADC resolution in bits [8-16]: ",i);
+      87              fgets(answer, 32, stdin);
+      88              sscanf(answer, "%d", &s[i].adcres);
+      89          } while (s[i].adcres < 8 || s[i].adcres > 16);
+      90          printf(" Signal %d ADC zero level [adu]: ", i);
+      91          fgets(answer, 32, stdin);
+      92          sscanf(answer, "%d", &s[i].adczero);
+      93      }
+      94      if (osigfopen(s, nsig) < nsig) exit(1);
+      95      printf("To begin sampling, press RETURN;  to specify a\n");
+      96      printf(" start time other than the current time, enter\n");
+      97      printf(" it in H:M:S format before pressing RETURN: ");
+      98      fgets(answer, 32, stdin); answer[strlen(answer)-1] = '\0';
+      99      setbasetime(answer);
+     100
+     101      adinit();
+     102
+     103      for (t = 0; t < nsamp; t++) {
+     104          for (i = 0; i < nsig; i++)
+     105              v[i] = adget(i);
+     106          if (putvec(v) < 0) break;
+     107      }
+     108
+     109      adquit();
+     110
+     111      (void)newheader(record);
+     112      wfdbquit();
+     113      exit(0);
+     114  }
+
+*Notes:*
+_Lines 14-17:_
+     This code uses `newheader' to determine if a legal record name was
+     entered (since we don't want to digitize the signals and then find
+     out that we can't create the header file).  The header file
+     created in line 17 will be overwritten in line 111.
+
+_Lines 57-62:_
+     This code generates a file name and initializes the `fname' and
+     `group' fields of the array of `WFDB_Siginfo' objects so that all
+     signals will be saved in one file.
+
+_Lines 63-69:_
+     This code generates unique file names and groups for each signal.
+
+_Lines 70-93:_
+     Here, information specific to individual signals is gathered.
+
+_Line 94:_
+     If the signal files can't be created, this program can do nothing
+     else useful, so it quits with an error message from `osigfopen'.
+
+_Lines 95-99:_
+     Just before sampling begins, we set the base time.  Note that an
+     empty string argument for `setbasetime' gives us the current time
+     read from the system clock.
+
+_Line 101:_
+     What goes here will be hardware dependent.  Typically it is
+     necessary to set up a timer for the ADC, allocate DMA buffers,
+     specify interrupt vectors, and initiate the first conversion(s).
+     This program might also be used to create a database record from
+     prerecorded data in a non-supported format; in this case, we might
+     simply open the file containing the prerecorded data here.
+
+_Lines 103-107:_
+     Here is where the samples are acquired (using hardware-dependent
+     code not shown here) and recorded (using `putvec').  At high
+     sampling frequencies, it is critical to make this code as fast as
+     possible.  It could be made faster by judicious use of `register'
+     and pointer variables if necessary.  In an extreme case the entire
+     loop, possibly including `putvec' itself, can be written in
+     assembly language; since it is only a small fraction of the entire
+     program, doing so is within reason.
+
+_Line 109:_
+     This final piece of hardware-dependent code typically clears the
+     ADC control register, stops the timer, and frees any system
+     resources such as DMA channels or interrupts.
+
+_Line 111:_
+     All of the information needed to generate the header file has been
+     stored in WFDB library internal data structures by `osigfopen' and
+     `putvec';  we call `newheader' here (before `wfdbquit') to create
+     the new `hea' file.
+
+_Line 112:_
+     It is still necessary to use `wfdbquit' to close the signal
+     file(s), even after calling `newheader'.  (In fact, it would be
+     possible, though not likely to be useful, to record more samples
+     and to generate another header file before calling `wfdbquit'.)
+
+
+File: wpg,  Node: Example 9,  Next: Example 10,  Prev: Example 8,  Up: Examples
+
+Example 9: A Signal Averager
+============================
+
+   The following program is considerably more complex than the previous
+examples in this chapter.  It reads an annotation file (for which the
+annotator name is specified in its first argument, and the record name
+in the second argument) and selects beats of a specified type to be
+averaged.  The program selects segments of the signals that are within
+50 milliseconds of the time of the specified beat annotations,
+subtracts a baseline estimate from each sample, and calculates an
+average waveform (by default, the average normal QRS complex).
+
+      1  #include <stdio.h>
+      2  #include <wfdb/wfdb.h>
+      3  #include <wfdb/ecgmap.h>
+      4
+      5  main(argc, argv)
+      6  int argc;
+      7  char *argv[];
+      8  {
+      9      int btype, i, j, nbeats = 0, nsig, hwindow, window;
+     10      long stoptime = 0L, **sum;
+     11      WFDB_Anninfo a;
+     12      WFDB_Annotation annot;
+     13      WFDB_Sample *v, *vb;
+     14      WFDB_Siginfo *s;
+     15      void *calloc();
+     16
+     17      if (argc < 3) {
+     18          fprintf(stderr,
+     19                  "usage: %s annotator record [beat-type from to]\n",
+     20                  argv[0]);
+     21          exit(1);
+     22      }
+     23      a.name = argv[1]; a.stat = WFDB_READ;
+     24      if ((nsig = isigopen(argv[2], NULL, 0)) < 1) exit(2);
+     25      s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+     26      v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
+     27      vb = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
+     28      sum = (long **)malloc(nsig * sizeof(long *));
+     29      if (s == NULL || v == NULL || vb == NULL || sum == NULL) {
+     30          fprintf(stderr, "%s: insufficient memory\n", argv[0]);
+     31          exit(2);
+     32      }
+     33      for (i = 0; i < nsig; i++)
+     34          if ((sum[i]=(long *)calloc(window,sizeof(long))) == NULL) {
+     35              fprintf(stderr, "%s: insufficient memory\n", argv[0]);
+     36              exit(2);
+     37          }
+     38      if (wfdbinit(argv[2], &a, 1, s, nsig) != nsig) exit(3);
+     39      hwindow = strtim(".05"); window = 2*hwindow + 1;
+     40      btype = (argc > 3) ? strann(argv[3]) : NORMAL;
+     41      if (argc > 4) iannsettime(strtim(argv[4]));
+     42      if (argc > 5) {
+     43          if ((stoptime = strtim(argv[5])) < 0L)
+     44              stoptime = -stoptime;
+     45          if (s[0].nsamp > 0L && stoptime > s[0].nsamp)
+     46              stoptime = s[0].nsamp;
+     47      }
+     48      else stoptime = s[0].nsamp;
+     49      if (stoptime > 0L) stoptime -= hwindow;
+     50      while (getann(0, &annot) == 0 && annot.time < hwindow)
+     51          ;
+     52      do {
+     53          if (annot.anntyp != btype) continue;
+     54          isigsettime(annot.time - hwindow - 1);
+     55          getvec(vb);
+     56          for (j = 0; j < window && getvec(v) > 0; j++)
+     57              for (i = 0; i < nsig; i++)
+     58                  sum[i][j] += v[i] - vb[i];
+     59          nbeats++;
+     60      } while (getann(0, &annot) == 0 &&
+     61               (stoptime == 0L || annot.time < stoptime));
+     62      if (nbeats < 1) {
+     63          fprintf(stderr, "%s: no `%s' beats found\n",
+     64                  argv[0], annstr(btype));
+     65          exit(4);
+     66      }
+     67      printf("Average of %d `%s' beats:\n", nbeats, annstr(btype));
+     68      for (j = 0; j < window; j++)
+     69          for (i = 0; i < nsig; i++)
+     70              printf("%g%c", (double)sum[i][j]/nbeats,
+     71                     (i == nsig-1) ? '\n' : '\t');
+     72      exit(0);
+     73  }
+
+*Notes:*
+
+_Lines 33-37:_
+     Here we allocate memory for the `sum' vectors that will be used to
+     store the running totals.  See `K&R', page 167, for a description
+     of `calloc'.
+
+_Line 39:_
+     The "half-window" is 50 milliseconds wide, and the "window" (the
+     duration of a segment to be entered into the average) is one
+     sample more than twice that amount (i.e., 50 milliseconds to
+     either side of the fiducial point defined by the annotation).
+
+_Line 40:_
+     If a third argument is present on the command line, it is taken as
+     an annotation code mnemonic for the desired beat type;  otherwise,
+     the program will average `NORMAL' QRS complexes.
+
+_Line 41:_
+     If a fourth argument is present on the command line, it is taken
+     as the start time; we arrange for the first annotation to be read
+     by `getann' to be the first annotation that occurs after the chosen
+     start time.
+
+_Lines 42-49:_
+     This code similarly determines when the averaging should stop.
+     Unless no stop time was specified on the command line and the
+     signal length is not defined in the `hea' file for the record,
+     `stoptime' will have a positive value in line 49, which makes a
+     tiny adjustment so that if a beat annotation occurs within 50
+     milliseconds of the end of the averaging period, the beat will not
+     be included in the average.
+
+_Lines 50-51:_
+     This code addresses the (admittedly unlikely) prospect that the
+     first annotation(s) might occur within the first 50 milliseconds
+     of the record; any such annotations will be excluded from the
+     average.
+
+_Lines 52-61:_
+     Here we read annotations (the first is already in `annot' when we
+     enter the loop, and subsequent annotations are read in line 60);
+     select the desired ones (line 53); skip to the correct spot in the
+     signals (line 54; the sample selected there is the one just before
+     the beginning of the window); read a sample from each signal (line
+     55) into the `vb' vector, which will be used as a crude baseline
+     estimate; read `window' samples from each signal (line 56),
+     subtracting the baseline from each and adding the result into the
+     running totals; update a beat counter (line 59); and check for
+     loop termination conditions (line 61).
+
+_Lines 62-71:_
+     This is the output section.  If no beats of type `btype' were
+     found, obviously no average can be printed; note that the message
+     goes to the standard error output, so the user will notice it even
+     if the standard output has been redirected to a file.  In the
+     usual case, the averages are printed out as a table, with a column
+     allocated to each signal.  Note the cast in line 70 (necessary to
+     preserve precision), and the trick used in line 71 to print a tab
+     after each column but the last in each line.
+
+
+File: wpg,  Node: Example 10,  Prev: Example 9,  Up: Examples
+
+Example 10: A QRS Detector
+==========================
+
+   This program reads a single ECG signal, attempts to detect QRS
+complexes, and records their locations in an annotation file.  The
+detector algorithm is based on a Pascal program written by W.A.H.
+Engelse and C. Zeelenberg, "A single scan algorithm for QRS-detection
+and feature extraction", `Computers in Cardiology' 6:37-42 (1979).
+
+      1  #include <stdio.h>
+      2  #include <wfdb/wfdb.h>
+      3  #include <wfdb/ecgcodes.h>
+      4
+      5  #define abs(A)  ((A) >= 0 ? (A) : -(A))
+      6
+      7  main(argc, argv)
+      8  int argc;
+      9  char *argv[];
+     10  {
+     11      int filter, time=0, slopecrit, sign, maxslope=0, nsig, nslope=0,
+     12          qtime, maxtime, t0, t1, t2, t3, t4, t5, t6, t7, t8, t9,
+     13          ms160, ms200, s2, scmax, scmin = 0;
+     14      WFDB_Anninfo a;
+     15      WFDB_Annotation annot;
+     16      WFDB_Sample *v;
+     17      WFDB_Siginfo *s;
+     18
+     19      if (argc < 2) {
+     20          fprintf(stderr, "usage: %s record [threshold]\n", argv[0]);
+     21          exit(1);
+     22      }
+     23      a.name = "qrs"; a.stat = WFDB_WRITE;
+     24
+     25      if ((nsig = isigopen(argv[1], NULL, 0)) < 1) exit(2);
+     26      s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+     27      v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
+     28      if (s == NULL || v == NULL) {
+     29          fprintf(stderr, "%s: insufficient memory\n", argv[0]);
+     30          exit(2);
+     31      }
+     32      if (wfdbinit(argv[1], &a, 1, s, nsig) != nsig) exit(2);
+     33      if (sampfreq(NULL) != 250.)
+     34          fprintf(stderr,"warning: %s is designed for 250 Hz input\n",
+     35                  argv[0]);
+     36      if (argc > 2) scmin = muvadu(0, atoi(argv[2]));
+     37      if (scmin < 1) scmin = muvadu(0, 1000);
+     38      slopecrit = scmax = 10 * scmin;
+     39      ms160 = strtim("0.16"); ms200 = strtim("0.2"); s2 = strtim("2");
+     40      annot.subtyp = annot.chan = annot.num = 0; annot.aux = NULL;
+     41      (void)getvec(v);
+     42      t9 = t8 = t7 = t6 = t5 = t4 = t3 = t2 = t1 = v[0];
+     43
+     44      do {
+     45          filter = (t0 = v[0]) + 4*t1 + 6*t2 + 4*t3 + t4
+     46                  - t5         - 4*t6 - 6*t7 - 4*t8 - t9;
+     47          if (time % s2 == 0) {
+     48              if (nslope == 0) {
+     49                  slopecrit -= slopecrit >> 4;
+     50                  if (slopecrit < scmin) slopecrit = scmin;
+     51              }
+     52              else if (nslope >= 5) {
+     53                  slopecrit += slopecrit >> 4;
+     54                  if (slopecrit > scmax) slopecrit = scmax;
+     55              }
+     56          }
+     57          if (nslope == 0 && abs(filter) > slopecrit) {
+     58              nslope = 1; maxtime = ms160;
+     59              sign = (filter > 0) ? 1 : -1;
+     60              qtime = time;
+     61          }
+     62          if (nslope != 0) {
+     63              if (filter * sign < -slopecrit) {
+     64                  sign = -sign;
+     65                  maxtime = (++nslope > 4) ? ms200 : ms160;
+     66              }
+     67              else if (filter * sign > slopecrit &&
+     68                       abs(filter) > maxslope)
+     69                  maxslope = abs(filter);
+     70              if (maxtime-- < 0) {
+     71                  if (2 <= nslope && nslope <= 4) {
+     72                      slopecrit += ((maxslope>>2) - slopecrit) >> 3;
+     73                      if (slopecrit < scmin) slopecrit = scmin;
+     74                      else if (slopecrit > scmax) slopecrit = scmax;
+     75                      annot.time = strtim("i") - (time - qtime) - 4;
+     76                      annot.anntyp = NORMAL; (void)putann(0, &annot);
+     77                      time = 0;
+     78                  }
+     79                  else if (nslope >= 5) {
+     80                      annot.time = strtim("i") - (time - qtime) - 4;
+     81                      annot.anntyp = ARFCT; (void)putann(0, &annot);
+     82                  }
+     83                  nslope = 0;
+     84              }
+     85          }
+     86          t9 = t8; t8 = t7; t7 = t6; t6 = t5; t5 = t4;
+     87          t4 = t3; t3 = t2; t2 = t1; t1 = t0; time++;
+     88      } while (getvec(v) > 0);
+     89
+     90      wfdbquit();
+     91      exit(0);
+     92  }
+
+*Notes:*
+
+_Line 5:_
+     A macro that evaluates to the absolute value of its argument.
+
+_Lines 11-12:_
+     The names of these variables match those in the original Pascal
+     program.
+
+_Lines 33-35:_
+     Most of this program is independent of sampling frequency, but the
+     filter (lines 45-46) and the threshold are as specified by the
+     authors of the original program for human ECGs sampled at 250 Hz
+     (e.g., the AHA DB).  The program will work for MIT DB records
+     sampled at 360 Hz, but better results can be obtained if the
+     filter is optimized for the correct sampling frequency.
+
+_Lines 36-38:_
+     The threshold is actually a slope criterion (with units of
+     amplitude/time); these lines normalize the threshold with respect
+     to the signal gain.  The default value is used unless the user
+     supplies an acceptable alternative.  The variables `scmin' and
+     `scmax' are lower and upper bounds for the adaptive threshold
+     `slopecrit'.
+
+_Lines 41-42:_
+     Here we read the first sample and copy it into the variables that
+     will be used to store the ten most recent samples.
+
+_Lines 45-46:_
+     This FIR filter differentiates and low-pass filters the input
+     signal.
+
+_Lines 47-56:_
+     Here we adjust the threshold if more than two seconds have elapsed
+     since a QRS was detected.  In line 49, `slopecrit' is set to 15/16
+     of its previous value if no slopes have been found;  in line 53,
+     it is set to 17/16 of its previous value if 5 or more slopes were
+     found (suggesting the presence of noise).
+
+_Lines 57-61:_
+     If the condition in line 48 is satisfied, we may have found the
+     beginning of a QRS complex.  We record that a slope has been
+     found, set the timer `maxtime' to 160 msec, and save the sign of
+     the slope and the current time relative to the previous beat.
+
+_Lines 62-85:_
+     This code is executed once we have found a slope.  Each time the
+     filter output crosses the threshold, we record another slope and
+     begin looking for a threshold crossing of the opposite sign (lines
+     63-66), which must occur within a specified time.  We record the
+     maximum absolute value of the filter in `maxslope' (lines 67-69)
+     for eventual use in updating the threshold (lines 72-74).  Once a
+     sufficient interval has elapsed following the last threshold
+     crossing (line 70), if there were between 2 and 4 slopes, we have
+     (apparently) found a QRS complex, and the program records a
+     `NORMAL' annotation (lines 75-76).  If there were 5 or more
+     slopes, the program records an artifact annotation (lines 80-81).
+     If only 1 slope was found, it is assumed to represent a baseline
+     shift and no output is produced.
+
+_Lines 86-88:_
+     At the end of the loop, the samples are shifted through the `tN'
+     variables and another sample is read.
+
+
+File: wpg,  Node: Exercises,  Next: Glossary,  Prev: Examples,  Up: Top
+
+Exercises
+*********
+
+   These exercises are based on the material in the previous chapters.
+Answers to some of them are at the back of the book, but try to work
+through them first.
+
+  1. Type in the first program from the previous chapter, compile it,
+     and run it.  Remember to set and export the environment variable
+     `WFDB' (*note WFDB path::).  It is a good idea to include this
+     step in your `.profile', `.cshrc', or `autoexec.bat'.  As input,
+     try record `100s', input annotator `atr', and output annotator
+     `normal'.  The program should finish in five seconds or less.  The
+     annotations will have been written into a file called `100s.nor'
+     in the current directory.  Now type "`rdann -r 100s -a atr'" and
+     observe the output for a few seconds, then try "`rdann -r 100s -a
+     nor'" and notice the difference.
+
+  2. Modify the program from the previous exercise so that the non-QRS
+     annotations are put into a second output annotation file.
+     Remember that you will need three annotation files in all (one
+     input and two output).
+
+  3. The next five short exercises are to be worked out on paper,
+     although you may wish to check your work on the computer.  All of
+     them assume that we are given a signal sampled at 100 Hz with the
+     following specifications:
+          fname = "signal.dat"
+          desc = "BP"
+          units = "mmHg"
+          gain = 10
+          initval = 80
+          group = 0
+          fmt = 212
+          spf = 1
+          bsize = 0
+          adcres = 12
+          adczero = 0
+          baseline = -300
+          nsamp = 1000000
+          cksum = 3109
+     For starters, convert a sample value of 280 into physical units.
+
+  4. Convert 120 mmHg into adus.
+
+  5. What are the maximum and minimum possible sample values in adu?  in
+     mmHg?
+
+  6. How large is `signal.dat', in bytes?  How much space could we save
+     if we converted it to format 8 (eight-bit first-differences)?
+     What is the maximum slew rate (in mmHg/second) that we can
+     represent in that format?
+
+  7. Oops!  We have just discovered that the maximum slew rate in our
+     signal is 1500 mmHg/sec.  Is there any way to store it at full
+     precision in one of the supported formats, that saves space
+     compared to its present format?
+
+  8. Figure out how to plot or display the first 1000 points from
+     signal 0 of a record in amplitude vs. time format.  You may wish
+     to begin with the example program from the first chapter.  Arrange
+     for the record name to be read from the command line (see `K&R',
+     pp. 114-115, if you don't know how to do this).
+
+  9. Try plotting VCGs by modifying the program from the previous
+     exercise to plot pairs of samples from each of two signals rather
+     than sample number/value pairs.
+
+ 10. Modify the program from the previous exercise, or Example 2 from
+     the previous chapter, so that you can specify a segment of the
+     record to be processed with start and end times.  For example, the
+     command
+          YOUR-PROGRAM RECORD 10:0 10:10
+     should skip the first ten minutes, then process the next ten
+     seconds of signals from RECORD.
+
+ 11. Wesley Q. Phortran, IV, wrote this program to print beat times (in
+     minutes and seconds) and R-R intervals for the reference
+     annotation file of record `100'.  Why doesn't it work?
+           1  #include <wfdb/wfdb.h>
+           2
+           3  main()
+           4  {
+           5      WFDB_Annotation *annot;
+           6      WFDB_Anninfo ai;
+           7      int t;
+           8
+           9      ai.name = "atr";
+          10      ai.stat = WFDB_READ;
+          11      if (annopen(100, ai, 1)) {
+          12          while (getann(1, annot)) {
+          13              printf("%s\t(%d)\t%s\n", timstr(annot.time),
+          14                     annot.time, mstimstr(annot.time - t));
+          15              t = annot.time;
+          16          }
+          17      }
+          18  }
+     Extra credit: Without actually trying it out, what _does_ it
+     produce on the standard output?
+
+ 12. Using `isigsettime' on a format 8 signal introduces a random offset
+     into the signal, since the contents of a format 8 signal file are
+     first differences rather than amplitudes.  For an AC-coupled
+     signal such as an ECG, this is usually inconsequential, but a
+     DC-coupled signal such as a blood pressure signal is usually
+     useful only if absolute levels are known.  If we store such a
+     signal in format 8, we must read it sequentially from the
+     beginning in order to get correct sample values.  If we intend to
+     do a lot of non-sequential processing of such a signal, it may be
+     worthwhile to build a table containing the correct sample values
+     at periodic intervals; then we can use `isigsettime' to skip to a
+     sample in the table, and read forward sequentially from that
+     point.  Write a program to build such a table, and wrappers for
+     `isigsettime' and `getvec' to give random access to format 8
+     signal files without introducing offset errors.  On your system,
+     how many sample intervals should be allowed between table entries
+     in order to obtain an `isigsettime' equivalent that executes in an
+     average of 100 msec or less?
+
+ 13. This exercise assumes that you have access to the MIT-BIH
+     Arrhythmia Database, either on a CD-ROM or via PhysioNet.  Since
+     the 360 Hz sampling frequency used in that database is an integer
+     multiple of 60 Hz, it is quite easy to design a 60 Hz notch filter
+     that can be applied to the database.  Write a program that filters
+     two input signals and writes out the filtered data using `putvec'
+     (*note Example 7::, for a model program).  Try it out on MIT-BIH
+     record `122' (or use record `mitdb/x_mitdb/x_122' from PhysioNet).
+     Use your programs from the previous exercises to display your
+     output.
+
+ 14. If you used Example 7 as a model in the previous exercise, you may
+     have noticed that it is quite slow.  Make it faster by arranging
+     for `sample' to return a pointer to a vector of samples from all
+     signals (thereby reducing the number of function calls).  Speed it
+     up further by defining a macro that calls the function only if the
+     proper sample vector is not already in the circular buffer;
+     otherwise the macro should evaluate to a pointer to the correct
+     sample vector.
+
+ 15. Prof. Nottin Ventedhier says, "Real programmers don't use
+     inefficient library I/O routines -- they write their own, in
+     assembly language."  Implement a version of the QRS detector in
+     Example 10 _without_ using the WFDB library.  (To keep it simple,
+     assume that only one input format -- of your choice -- needs to be
+     supported.)  How much faster than the original is your version?
+
+ 16. (Non-trivial) Write a QRS detector that is independent of sampling
+     frequency.  Some useful constants (for adult human ECGs): average
+     normal QRS duration = 80 milliseconds, average QRS amplitude = 1
+     millivolt, average R-R interval = 1 second; assume that upper and
+     lower limits for these quantities are within a factor of 3 of the
+     average values.  Run your detector on MIT-BIH Arrhythmia Database
+     record `200'.  (This record is available on PhysioNet.  If you
+     have a NETFILES-enabled WFDB library, use the default WFDB path,
+     and open record `mitdb/200'; otherwise, download the record from
+     `http://www.physionet.org/physiobank/database/mitdb/'.)  Read the
+     documentation on the annotation comparator, `bxb', and figure out
+     how to use it to compare the annotation file produced by your
+     program against the reference annotator `atr'.  How does your
+     detector compare to Example 10?
+
+ 17. If the previous exercise was too easy, modify your detector so
+     that the annotations it generates match those in the `atr' file.
+     Copying the `atr' file is not permitted.  You may find this rather
+     difficult.  Good luck!
+

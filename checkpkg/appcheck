@@ -1,6 +1,6 @@
 #!/bin/sh
 # file: appcheck		G. Moody	7 September 2001
-#                               Last revised:   11 December 2001
+#                               Last revised:   18 December 2001
 #
 # This script checks the functionality of the WFDB applications in the 'app'
 # directory.
@@ -145,6 +145,7 @@ TESTS=`expr $TESTS + 1`
 
 echo Testing ecgeval ...
 F=ecgeval.out
+rm -f eval-qrs-mit qrs-mit-evaluation
 ecgeval <input/ecgeval >$F 2>&1
 grep -v file: eval-qrs-mit >>$F
 grep -v file: qrs-mit-evaluation >>$F

@@ -1,0 +1,1245 @@
+This is wpg, produced by makeinfo version 4.0 from wpg.tex.
+
+
+File: wpg,  Node: setmsheader,  Next: wfdbquit,  Prev: setheader,  Up: miscellaneous functions
+
+setmsheader
+-----------
+
+     int setmsheader(char *RECORD, char *SNARRAY[], unsigned int NSEGMENTS)
+
+*Return:*
+ 0
+     Success
+
+-1
+     Failure: illegal record name, or no segments specified, or header
+     not writable
+
+-2
+     Failure: segment name too long, or insufficient memory
+
+-3
+     Failure: attempt to nest multi-segment records, or unreadable
+     segment header
+
+-4
+     Failure: segment length unspecified, or numbers of signals or
+     sampling frequencies don't match between segments
+
+This function creates a header file (in the current directory) for a
+multi-segment RECORD (*note Multi-Segment Records::.  SNARRAY contains
+the names of the segments, each of which must be an existing
+(single-segment) record; NSEGMENTS specifies the number of segments in
+SNARRAY.  Once a header has been created by `setmsheader', any WFDB
+application can read the concatenated signal files of the constituent
+segment simply by opening the multi-segment record (using `isigopen' or
+`wfdbinit').  Note that the signal files themselves are not modified in
+any way, nor are they copied; rather, the other WFDB library functions
+that read signals (`getvec', `getframe', `isigsettime', and
+`isgsettime') automatically switch among the signal files of the
+segments as required.  For an example of the use of `setmsheader', see
+`app/wfdbcollate.c' in the WFDB Software Package.  (This function was
+first introduced in WFDB library version 9.1.)
+
+
+File: wpg,  Node: wfdbquit,  Next: iannclose and oannclose,  Prev: setmsheader,  Up: miscellaneous functions
+
+wfdbquit
+--------
+
+     void wfdbquit(void)
+
+This function closes all open database files.  It also resets the
+following:
+
+   * the factors used for converting between samples, seconds, and
+     counter values (reset to 1), the base time (reset to 0, i.e.,
+     midnight), and the base counter value (reset to 0); (*note timstr
+     and strtim::)
+
+   * the parameters used for converting between adus and physical units
+     (reset to `WFDB_DEFGAIN' adu/mV, a quantity defined in
+     `<wfdb/wfdb.h>'); (*note aduphys and physadu::)
+
+   * internal variables used to determine output signal specifications;
+     *note newheader::.
+
+   If any annotations have been written out-of-order (*note Annotation
+Order::), this function attempts to run `sortann' (see the `WFDB
+Applications Guide') as a subprocess to restore the annotations to
+canonical order.  If this cannot be done, it prints a warning message
+indicating that the annotations are not in order, and providing
+instructions for putting them in order.
+
+   Programs that do not write annotations or signals need not use
+`wfdbquit'.
+
+
+File: wpg,  Node: iannclose and oannclose,  Next: wfdbquiet and wfdbverbose,  Prev: wfdbquit,  Up: miscellaneous functions
+
+iannclose
+---------
+
+     void iannclose(WFDB_Annotator AN)
+
+This function closes the annotation file associated with input annotator
+AN.  It was first introduced in WFDB library version 9.1.
+
+oannclose
+---------
+
+     void oannclose(WFDB_Annotator AN)
+
+This function closes the annotation file associated with output
+annotator AN.  It was first introduced in WFDB library version 9.1.
+
+   If any annotations have been written out-of-order (*note Annotation
+Order::), this function attempts to run `sortann' (see the `WFDB
+Applications Guide') as a subprocess to restore the annotations to
+canonical order.  If this cannot be done, it prints a warning message
+indicating that the annotations are not in order, and providing
+instructions for putting them in order.
+
+
+File: wpg,  Node: wfdbquiet and wfdbverbose,  Next: wfdberror,  Prev: iannclose and oannclose,  Up: miscellaneous functions
+
+wfdbquiet
+---------
+
+     `void wfdbquiet(void)'
+
+This function suppresses error reporting on the standard error output
+from the WFDB library functions.
+
+wfdbverbose
+-----------
+
+     `void wfdbverbose(void)'
+
+This function can be used to restore normal error reporting after using
+`wfdbquiet'.  (This function was first introduced in WFDB library
+version 4.0.)
+
+
+File: wpg,  Node: wfdberror,  Next: sampfreq,  Prev: wfdbquiet and wfdbverbose,  Up: miscellaneous functions
+
+wfdberror
+---------
+
+     `char *wfdberror(void)'
+
+*Return:*
+(char *)
+     pointer to error string
+
+This function returns a pointer to a string containing the text of the
+most recent WFDB library error message (or to a string containing the
+WFDB library version number, if there have been no errors).  Function
+`wfdberror' is primarily intended for use in applications for which the
+standard error output is unavailable or inadequate, such as in X Window
+System applications.  (Note that this function may be unnecessary for
+MS-Windows applications, since the MS-Windows version of the WFDB
+library generates a message box for error messages, unless `wfdbquiet'
+has been used to silence them.)  This function was first introduced in
+WFDB library version 4.5.  Versions earlier than 9.4 return an empty
+string rather than the library version number if there have been no
+errors.
+
+
+File: wpg,  Node: sampfreq,  Next: setsampfreq,  Prev: wfdberror,  Up: miscellaneous functions
+
+sampfreq
+--------
+
+     WFDB_Frequency sampfreq(char *RECORD)
+
+*Return:*
+(WFDB_Frequency)>0.
+     Success: the returned value is the sampling frequency in Hz
+
+(WFDB_Frequency)-1.
+     Failure: unable to read header file
+
+(WFDB_Frequency)-2.
+     Failure: incorrect header file format
+
+This function determines the sampling frequency (in Hz) for the record
+specified by its argument.  If its argument is NULL, `sampfreq' returns
+the currently defined sampling frequency, if any.  It also sets the
+internal variables used by the time-conversion functions (*note timstr
+and strtim::) for converting between sample intervals and seconds.
+*Note Example 3::, for an illustration of the use of `sampfreq'.  Note
+that the value returned by `sampfreq' for a multifrequency record
+depends on the current `getvec' mode (*note setgvmode::).
+
+
+File: wpg,  Node: setsampfreq,  Next: setbasetime,  Prev: sampfreq,  Up: miscellaneous functions
+
+setsampfreq
+-----------
+
+     int setsampfreq(WFDB_Frequency FREQ)
+
+*Return:*
+ 0
+     Success
+
+-1
+     Failure:  illegal sampling frequency specified (FREQ must not be
+     negative)
+
+This function sets the sampling frequency used by the time-conversion
+functions (*note timstr and strtim::).  Use `setsampfreq' before
+creating a new `hea' file (*note newheader::).  *Note Example 8::, for
+an illustration of the use of `setsampfreq'.
+
+
+File: wpg,  Node: setbasetime,  Next: setgvmode,  Prev: setsampfreq,  Up: miscellaneous functions
+
+setbasetime
+-----------
+
+     int setbasetime(char *STRING)
+
+*Return:*
+ 0
+     Success
+
+-1
+     Failure: incorrect string format
+
+This function sets the base time used by the time-conversion functions
+`timstr' and `strtim'.  Its argument is a null-terminated ASCII string
+in HH:MM:SS format.  An optional base date in DD/MM/YYYY format can
+follow the time in STRING; if present, the date should be separated
+from the time by a space or tab character.  If STRING is empty or
+`NULL', the current date and time are read from the system clock.  Use
+`setbasetime' after defining the sampling frequency and before creating
+a header file (*note newheader::).  *Note Example 8::, for an
+illustration of the use of `setbasetime'.
+
+
+File: wpg,  Node: setgvmode,  Next: getspf,  Prev: setbasetime,  Up: miscellaneous functions
+
+setgvmode
+---------
+
+     void setgvmode(int *MODE)
+
+This function sets the mode used by `getvec' when reading a
+multi-frequency record (*note Multi-Frequency Records::).  If MODE is
+`WFDB_LOWRES', `getvec' decimates any signals sampled at multiples of
+the frame rate, so that one sample is returned per signal per frame
+(i.e., the oversampled signals are resampled by simple averaging of the
+samples for each signal within each frame).  If MODE is `WFDB_HIGHRES',
+each sample of any oversampled signal is returned by successive
+invocations of `getvec', and each sample of any signal sampled at a
+lower frequency is returned by two or more successive invocations of
+`getvec' (i.e., the less frequently sampled signals are resampled using
+zero-order interpolation).  `getvec' operates in `WFDB_LOWRES' mode by
+default.  `WFDB_LOWRES' and `WFDB_HIGHRES' are defined in
+`<wfdb/wfdb.h>'.
+
+   In WFDB library version 9.6 and later versions, `setgvmode' also
+affects how annotations are read and written.  If
+`setgvmode(WFDB_HIGHRES)' is invoked _before_ using `annopen',
+`wfdbinit', `getvec', `sampfreq', `strtim', or `timstr', then all
+`WFDB_Time' data (including the `time' attributes of annotations read
+by `getann' or written by `putann') visible to the application are in
+units of the high-resolution sampling intervals.  (Otherwise,
+`WFDB_Time' data are in units of frame intervals.)
+
+
+File: wpg,  Node: getspf,  Next: counter conversion,  Prev: setgvmode,  Up: miscellaneous functions
+
+getspf
+------
+
+     int getspf(void)
+
+*Return:*
+(int)
+     the number of samples per signal per frame
+
+Unless the application has used `setgvmode(WFDB_HIGHRES)' and has then
+opened a multi-frequency record, this function returns 1.  For the case
+of a multi-frequency record being read in high resolution mode,
+however, `getspf' returns the number of samples per signal per frame
+(hence `sampfreq(NULL)/getspf()' is the number of frames per second).
+
+
+
+
+File: wpg,  Node: counter conversion,  Next: setwfdb,  Prev: getspf,  Up: miscellaneous functions
+
+   Database records are sometimes obtained from analog tapes for which a
+tape counter is available.  Since many analog tape recorders lack
+elapsed time indicators, it is often useful to identify events in the
+analog tape using counter values.  A similar situation may arise if a
+chart recording or other hard copy with numbered pages is to be compared
+with a database record.  To simplify cross-referencing between the
+analog tape or chart and the digital database record, the WFDB library
+supports conversion of counter values (or page numbers) to time.  For
+this to be possible, the counter must be linear (i.e., it must change
+at the same rate throughout the tape; this is not true of those that
+count the number of revolutions of the supply or take-up reel), and the
+base counter value (the counter value or page number corresponding to
+sample 0) and the counter frequency (the difference between counter
+values separated by a one-second interval, or the reciprocal of the
+number of seconds per page) must be defined.  The following four
+functions, first introduced in WFDB library version 5.2, are used to
+obtain or set the values of these parameters.
+
+getcfreq
+--------
+
+     WFDB_Frequency getcfreq(void)
+
+*Return:*
+(WFDB_Frequency)
+     the counter frequency in Hz
+
+This function returns the currently-defined counter frequency.  The
+counter frequency is set by the functions that read header files, or by
+`setcfreq'.  If the counter frequency has not been defined explicitly,
+`getcfreq' returns the sampling frequency.
+
+setcfreq
+--------
+
+     void setcfreq(WFDB_Frequency FREQ)
+
+This function sets the counter frequency.  Use `setcfreq' before
+creating a `hea' file (*note newheader::).  The effect of `setcfreq' is
+nullified by later invoking any of the functions that read header
+files.  If FREQ is zero or negative, the counter frequency is treated
+as equivalent to the sampling frequency.
+
+getbasecount
+------------
+
+     double getbasecount(void)
+
+*Return:*
+(double)
+     base counter value
+
+This function returns the base counter value, which is set by the
+functions that read header files, or by `setbasecount'.  If the base
+counter value has not been set explicitly, `getbasecount' returns zero.
+
+setbasecount
+------------
+
+     void setbasecount(double COUNT)
+
+This function sets the base counter value.  Use `setbasecount' before
+creating a header file (*note newheader::).  The effect of
+`setbasecount' is nullified by later invoking any of the functions that
+read `hea' files.
+
+
+File: wpg,  Node: setwfdb,  Next: getwfdb,  Prev: counter conversion,  Up: miscellaneous functions
+
+setwfdb
+-------
+
+     void setwfdb(char *STRING)
+
+This function may be used to set or change the database path (*note
+WFDB path::) within a running program.  The argument points to a
+null-terminated string that specifies the desired database path (but see
+the next paragraph for an exception).  The string contains a list of
+locations where input files may be found.  These locations may be
+absolute directory names (such as `/usr/local/database' under Unix, or
+`d:/database' under MS-DOS), relative directory names (e.g.,
+`../mydata'), or URL prefixes (e.g.,
+`http://www.physionet.org/physiobank/database').  If NETFILES support
+is unavailable, any URL prefixes in the string are ignored.  The
+special form `.' refers to the current directory.  Entries in the list
+may be separated by whitespace or by semicolons; under Unix, colons may
+also be used as separators.  An empty component, indicated by an
+initial or terminal separator, or by two consecutive separators, will be
+understood to specify the current directory (which may also be indicated
+by a component consisting of a single `.').  If the string is empty or
+`NULL', the database path is limited to the current directory.
+
+   If STRING begins with `@', the remaining characters of STRING are
+taken as the name of a file from which the WFDB path is to be read.
+This file may contain either the WFDB path, as described in the
+previous paragraph, or another indirect WFDB path specification.
+Indirect WFDB path specifications may be nested no more than ten levels
+deep (an arbitrary limit imposed to avoid infinite recursion).
+Evaluation of indirect WFDB paths is deferred until `getwfdb' is
+invoked, either explicitly or by the WFDB library while attempting to
+open an input file (e.g., using `annopen' or `isigopen').  (The
+features described in this paragraph were first introduced in WFDB
+library version 8.0.)
+
+   The `setwfdb' function does not copy the string itself, which must
+therefore be kept valid by the caller, nor does it modify the
+environment variable `WFDB', which will be inherited by any processes
+spawned from the caller.  For portability, as well as efficiency, it is
+better to use `setwfdb' than to manipulate `WFDB' directly (via
+`putenv', for example); furthermore, doing the latter is ineffective
+(within the current process) once the first WFDB file has been opened.
+*Note getwfdb::, for an example of the use of `setwfdb'.
+
+
+File: wpg,  Node: getwfdb,  Next: wfdbfile,  Prev: setwfdb,  Up: miscellaneous functions
+
+getwfdb
+-------
+
+     char *getwfdb(void)
+
+*Return:*
+(char *)
+     pointer to the database path string
+
+This function returns the current database path.  For example, this code
+fragment
+
+     ...
+     char *oldp, *newp;
+     
+     oldp = getwfdb();
+     if (newp = malloc(strlen("/usr/mydb;") + strlen(oldp) + 1)) {
+         sprintf(newp, "/usr/mydb;%s", oldp);
+         setwfdb(newp);
+     }
+     ...
+
+adds the directory `/usr/mydb' to the beginning of the database path.
+(The standard `/' directory separator can be used, even under MS-DOS; if
+you elect to use the alternate `\', remember to quote it within a C
+string as `\\'.)
+
+
+File: wpg,  Node: wfdbfile,  Next: wfdbflush,  Prev: getwfdb,  Up: miscellaneous functions
+
+wfdbfile
+--------
+
+     char *wfdbfile(char *TYPE, char *RECORD)
+
+*Return:*
+(char *)
+     pointer to a filename, or `NULL'
+
+This function attempts to locate an existing WFDB file by searching the
+database path (*note WFDB path::).  Normally, the file is specified by
+its TYPE (e.g., `hea', or an annotator name such as `atr') and by the
+RECORD to which it belongs.  A file that does not include a record name
+as part of its name can be found by `wfdbfile' if the name is passed in
+the TYPE variable and RECORD is `NULL'.  The string returned by
+`wfdbfile' includes the appropriate component of the database path;
+since the database path may include empty or non-absolute components,
+the string is not necessarily an absolute pathname.  If the WFDB
+library has been compiled with NETFILES support, and the WFDB path
+includes one or more URL prefixes, the string returned may be a URL
+rather than a pathname.  If the file cannot be found, `wfdbfile'
+returns `NULL'.  (This function was first introduced in WFDB library
+version 4.3.)
+
+
+File: wpg,  Node: wfdbflush,  Next: getinfo,  Prev: wfdbfile,  Up: miscellaneous functions
+
+wfdbflush
+---------
+
+     void wfdbflush(void)
+
+This function brings database output files up-to-date by forcing any
+output annotations or samples that are buffered to be written to the
+output files.
+
+
+File: wpg,  Node: getinfo,  Next: putinfo,  Prev: wfdbflush,  Up: miscellaneous functions
+
+getinfo
+-------
+
+     char *getinfo(char *RECORD)
+
+*Return:*
+(char *)
+     pointer to an "info" string, or `NULL'
+
+This function reads an "info" string from the `hea' file for the
+specified RECORD.  Info strings are null-terminated and do not contain
+newline characters.  The `hea' files of some records may contain no
+info strings;  others may contain more than one info string.  To read
+additional info strings after the first, use `getinfo(NULL)'.  For
+example, the following code fragment may be used to read and print all
+of the info for record `100s':
+
+     ...
+     char *info;
+     
+     if (info = getinfo("100s"))
+         do {
+             puts(info);
+         } while (info = getinfo(NULL));
+     ...
+
+   (This function was first introduced in WFDB library version 4.0.)
+
+
+File: wpg,  Node: putinfo,  Next: setibsize,  Prev: getinfo,  Up: miscellaneous functions
+
+putinfo
+-------
+
+     int putinfo(char *S)
+
+*Return:*
+ 0
+     Success
+
+-1
+     Failure: header not initialized
+
+This function writes S as an "info" string into the `hea' file that was
+created by the most recent invocation of `newheader'.  The string
+argument, S, must be null-terminated and should not contain newline
+characters.  No more than 254 characters may be written in a single
+invocation of `putinfo'.  Two or more info strings may be written to
+the same header by successive invocations of `putinfo'.  Note that
+`newheader' or `setheader' must be used before `putinfo'.  (This
+function was first introduced in WFDB library version 4.0.)
+
+
+File: wpg,  Node: setibsize,  Next: setobsize,  Prev: putinfo,  Up: miscellaneous functions
+
+setibsize
+---------
+
+     int setibsize(int SIZE)
+
+*Return:*
+>0
+     Success: the returned value is the new input buffer size in bytes
+
+-1
+     Failure: buffer size could not be changed
+
+-2
+     Failure: illegal value for SIZE
+
+This function can be used to change the default size of the input
+buffers allocated by `getvec'.  It cannot be used while input signals
+are open (i.e., after invoking `isigopen' or `wfdbinit' and before
+invoking `wfdbquit').  If SIZE is positive, the default input buffers
+will be SIZE bytes;  if SIZE is zero, the system default buffer size
+(`BUFSIZ') is used.  Note that the default buffer size has no effect on
+reading signals for which an explicit buffer size is given in the
+header file, i.e., those for which the `bsize' field of the
+`WFDB_Siginfo' structure (*note WFDB_Siginfo structures::) is non-zero.
+(This function was first introduced in WFDB library version 5.0.)
+
+
+File: wpg,  Node: setobsize,  Next: wfdbgetskew,  Prev: setibsize,  Up: miscellaneous functions
+
+setobsize
+---------
+
+     int setobsize(int SIZE)
+
+*Return:*
+>0
+     Success: the returned value is the new output buffer size in bytes
+
+-1
+     Failure: buffer size could not be changed
+
+-2
+     Failure: illegal value for SIZE
+
+This function can be used to change the default size of the output
+buffers allocated by `putvec'.  It cannot be used while output signals
+are open (i.e., after invoking `osigopen' or `osigfopen' and before
+invoking `wfdbquit').  If SIZE is positive, the default output buffers
+will be SIZE bytes; if SIZE is zero, the system default buffer size
+(`BUFSIZ') is used.  Note that the default buffer size has no effect on
+writing signals for which an explicit buffer size is given in the `hea'
+file read by `osigopen', or in the `bsize' field of the `WFDB_Siginfo'
+structure (*note WFDB_Siginfo structures::) passed to `osigfopen'.
+(This function was first introduced in WFDB library version 5.0.)
+
+
+File: wpg,  Node: wfdbgetskew,  Next: wfdbsetskew,  Prev: setobsize,  Up: miscellaneous functions
+
+wfdbgetskew
+-----------
+
+     int wfdbgetskew(WFDB_Signal S)
+
+*Return:*
+(int)
+     the skew (in frames) for input signal S
+
+This function returns the "skew" (as recorded in the `hea' file, but in
+frame intervals rather than in sample intervals) of the specified input
+signal, or 0 if S is not a valid input signal number.  Since sample
+vectors returned by `getvec' or `getframe' are already corrected for
+skew, `wfdbgetskew' is useful primarily for programs that need to
+rewrite existing `hea' files, where it is necessary to preserve the
+previously recorded skews.  The following code fragment demonstrates
+how this can be done:
+
+     char *record;
+     int nsig;
+     WFDB_Signal s;
+     static WFDB_Siginfo *si;
+     
+     ...
+     
+     if ((nsig = isigopen(record, NULL, 0)) < 1)
+         exit(1);
+     si = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+     if (si == NULL || isigopen(record, siarray, nsig)!= nsig)
+         exit(1);
+     for (s = 0; s < nsig; s++) {
+         wfdbsetskew(s, wfdbgetskew(s));
+         wfdbsetstart(s, wfdbgetstart(s));
+     }
+     setheader(record, siarray, (unsigned)nsig);
+
+Note that this function does not _determine_ the skew between signals;
+the problem of doing so is not possible to solve in the general case.
+`wfdbgetskew' merely reports what has previously been determined by
+other means and recorded in the header file for the input record.
+(This function was first introduced in WFDB library version 9.4.)
+
+
+File: wpg,  Node: wfdbsetskew,  Next: wfdbgetstart,  Prev: wfdbgetskew,  Up: miscellaneous functions
+
+wfdbsetskew
+-----------
+
+     void wfdbsetskew(WFDB_Signal S, int SKEW)
+
+This function sets the specified SKEW (in frames) to be recorded by
+`newheader' or `setheader' for signal S.  For an example of the use of
+`wfdbsetskew', *note wfdbgetskew::.  Note that `wfdbsetskew' has no
+effect on the skew correction performed by `getframe' (or `getvec'),
+which is determined solely by the skews that were recorded in the
+header file at the time the input signals were opened.  (This function
+was first introduced in WFDB library version 9.4.)
+
+
+File: wpg,  Node: wfdbgetstart,  Next: wfdbsetstart,  Prev: wfdbsetskew,  Up: miscellaneous functions
+
+wfdbgetstart
+------------
+
+     long wfdbgetstart(WFDB_Signal S)
+
+*Return:*
+(long)
+     the length of the prolog of the file that contains input signal S
+
+This function returns the number of bytes in the "prolog" of the signal
+file that contains the specified input signal, as recorded in the
+header file.  Note that `wfdbgetstart' does not _determine_ the length
+of the prolog by inspection of the signal file; it merely reports what
+has been determined by other means and recorded in the `hea' file.
+Since the prolog is not readable using the WFDB library, and since
+functions such as `isigopen' and `isigsettime' take the prolog into
+account when calculating byte offsets for `getframe' and `getvec',
+`wfdbgetstart' is useful primarily for programs that need to rewrite
+existing `hea' files, where it is necessary to preserve the previously
+recorded byte offsets.  For an example of how this can be done, *note
+wfdbgetskew::.  (This function was first introduced in WFDB library
+version 9.4.)
+
+
+File: wpg,  Node: wfdbsetstart,  Prev: wfdbgetstart,  Up: miscellaneous functions
+
+wfdbsetstart
+------------
+
+     void wfdbsetstart(WFDB_Signal S, long BYTES)
+
+This function sets the specified prolog length (BYTES) to be recorded
+by `newheader' or `setheader' for signal S.  For an example of the use
+of `wfdbsetstart', *note wfdbgetskew::.  Note that `wfdbsetstart' has
+no effect on the calculations of byte offsets within signal files as
+performed by `isigsettime', which are determined solely by the contents
+of the `hea' file at the time the signals were opened.  (This function
+was first introduced in WFDB library version 9.4.)
+
+
+File: wpg,  Node: Data Types,  Next: Annotation Codes,  Prev: Functions,  Up: Top
+
+Data Types
+**********
+
+_Simple data types_ used by the WFDB library are defined in
+`<wfdb/wfdb.h>'.  These include:
+
+`WFDB_Sample'
+     a signed integer type (at least 16 bits) used to represent sample
+     values, in units of adus.
+
+`WFDB_Time'
+     a signed integer type (at least 32 bits) used to represent times
+     and time intervals, in units of sample intervals.  Only the
+     magnitude is significant;  the sign of a `WFDB_Time' variable
+     indicates how it is to be printed by `timstr' or `mstimstr'.
+
+`WFDB_Date'
+     a signed integer type (at least 32 bits) used to represent Julian
+     dates, in units of days.
+
+`WFDB_Frequency'
+     a floating point type used to represent sampling and counter
+     frequencies, in units of Hz.
+
+`WFDB_Gain'
+     a floating point type used to represent signal gains, in units of
+     adus per physical unit.
+
+`WFDB_Group'
+     an unsigned integer type used to represent signal group numbers.
+
+`WFDB_Signal'
+     an unsigned integer type used to represent signal numbers.
+
+`WFDB_Annotator'
+     an unsigned integer type used to represent annotator numbers.
+
+_Composite data types_ used by the WFDB library are also defined in
+`<wfdb/wfdb.h>'.  These types, described in detail in the following
+sections, include:
+
+`WFDB_Siginfo'
+     an object containing the name and global attributes of a given
+     signal.
+
+`WFDB_Calinfo'
+     an object containing calibration specifications for signals of a
+     given type.
+
+`WFDB_Anninfo'
+     an object containing the name and attributes of a given annotator.
+
+`WFDB_Annotation'
+     an object describing one or more attributes of one or more signals
+     at a given time.
+
+* Menu:
+
+* WFDB_Siginfo structures::		Signal names and attributes.
+* WFDB_Calinfo structures::		Signal calibration specifications.
+* WFDB_Anninfo structures::		Annotator names and file types.
+* WFDB_Annotation structures::		Annotation contents.
+
+
+File: wpg,  Node: WFDB_Siginfo structures,  Next: WFDB_Calinfo structures,  Prev: Data Types,  Up: Data Types
+
+Signal Information Structures
+=============================
+
+   The SIARRAY argument for `isigopen', `osigopen', `wfdbinit', and
+`osigfopen' is a pointer to an array of objects of type `WFDB_Siginfo'.
+The first three of these functions fill in the `WFDB_Siginfo' objects
+to which SIARRAY points, but the caller must supply initialized
+`WFDB_Siginfo' objects to `osigfopen'.  Each object specifies the
+attributes of a signal:
+
+`char *fname'
+     a pointer to a null-terminated string that names the file in which
+     samples of the associated signal are stored.  Input signal files
+     are found by prefixing `fname' with each of the components of the
+     database path in turn (*note WFDB path::).  `fname' may include
+     relative or absolute path specifications if necessary; the use of
+     an absolute pathname, combined with an initial null component in
+     `WFDB', reduces the time needed to find the signal file to a
+     minimum.  If `fname' is `-', it refers to the standard input or
+     output.
+
+`char *desc'
+     a pointer to a null-terminated string without embedded newlines
+     (e.g., `ECG lead V1' or `trans-thoracic impedance').  The length of
+     the `desc' string is restricted to a maximum of `WFDB_MAXDSL'
+     (defined in `<wfdb/wfdb.h>') characters, not including the null.
+
+`char *units'
+     a pointer to a null-terminated string without embedded whitespace.
+     The string specifies the physical units of the signal; if NULL,
+     the units are assumed to be millivolts.  The length of the `units'
+     string is restricted to a maximum of `WFDB_MAXUSL' (defined in
+     `<wfdb/wfdb.h>') characters (not including the null).
+
+`WFDB_Gain gain'
+     the number of analog-to-digital converter units (adus) per
+     physical unit (see previous item) relative to the original analog
+     signal; for an ECG, this is roughly equal to the amplitude of a
+     normal QRS complex.  If `gain' is zero, no amplitude calibration
+     is available; in this case, a `gain' of `WFDB_DEFGAIN' (defined in
+     `<wfdb/wfdb.h>') may be assumed.
+
+`WFDB_Sample initval'
+     the initial value of the associated signal (i.e., the value of
+     sample number 0).
+
+`WFDB_Group group'
+     the signal group number.  All signals in a given group are stored
+     in the same file.  If there are two or more signals in a group,
+     the file is called a "multiplexed signal file".  Group numbers
+     begin at 0; arrays of `WFDB_Siginfo' structures are always kept
+     ordered with respect to the group number, so that signals
+     belonging to the same group are described by consecutive entries
+     in SIARRAY.
+
+`int fmt'
+     the signal storage format.  The most commonly-used formats are
+     format 8 (8-bit first differences), format 16 (16-bit amplitudes),
+     and format 212 (pairs of 12-bit amplitudes bit-packed into byte
+     triplets).  See `<wfdb/wfdb.h>' for a complete list of supported
+     formats.  All signals belonging to the same group must be stored
+     in the same format.
+
+`int spf'
+     the number of samples per frame.  This is 1, for all except
+     oversampled signals in multi-frequency records, for which `spf'
+     may be any positive integer.  Note that non-integer values are not
+     permitted (thus the frame rate must be chosen such that all
+     sampling frequencies used in the record are integer multiples of
+     the frame rate).
+
+`int bsize'
+     the block size, in bytes.  For signal files that reside on Unix
+     character device special files (or their equivalents), the `bsize'
+     field indicates how many bytes must be read or written at a time
+     (*note Special Files::).  For ordinary disk files, `bsize' is zero.
+     All signals belonging to a given group have the same `bsize'.
+
+`int adcres'
+     the ADC resolution in bits.  Typical ADCs have resolutions between
+     8 and 16 bits inclusive.
+
+`int adczero'
+     the ADC output given an input that falls exactly at the center of
+     the ADC range (normally 0 VDC).  Bipolar ADCs produce two's
+     complement output; for these, `adczero' is usually zero.  For the
+     MIT DB, however, an offset binary ADC was used, and `adczero' was
+     1024.
+
+`int baseline'
+     the value of ADC output that would map to 0 physical units input.
+     The value of `adczero' is not synonymous with that of `baseline'
+     (the isoelectric or physical zero level of the signal);  the
+     `baseline' is a characteristic of the _signal_, while `adczero' is
+     a characteristic of the _digitizer_.  The value of `baseline' need
+     not necessarily lie within the output range of the ADC;  for
+     example, if the `units' are `degrees_Kelvin', and the ADC range is
+     200-300 degrees Kelvin, `baseline' corresponds to absolute zero,
+     and lies well outside the range of values actually produced by the
+     ADC.
+
+`long nsamp'
+     the number of samples in the signal.  (Exception: in
+     multi-frequency records, `nsamp' is the number of samples divided
+     by `spf', see above, i.e., the number of frames.)  All signals in
+     a given record must have the same `nsamp'.  If `nsamp' is zero,
+     the number of samples is unspecified, and the `cksum' (see the
+     next item) is not used; this is useful for specifying signals that
+     are obtained from pipes, for which the length may not be known.
+
+`int cksum'
+     a 16-bit checksum of all samples.  This field is not usually
+     accessed by application programs; `newheader' records checksums
+     calculated by `putvec' when it creates a new `hea' file, and
+     `getvec' compares checksums that it calculates against `cksum' at
+     the end of the record, provided that the entire record was read
+     through without skipping samples.
+
+   The number of `WFDB_Siginfo' structures in SIARRAY is given by the
+NSIG argument of the functions that open signal files.  Input and
+output signal numbers are assigned beginning with 0 in the order in
+which the signals are given in SIARRAY.  Note that input signal 0 and
+output signal 0 are distinct.  Input signal numbers are supplied to
+`aduphys', `physadu', `adumuv', and `muvadu' in their first arguments.
+*Note Example 5::, for an illustration of how to read signal
+specifications from `WFDB_Siginfo' structures.
+
+
+File: wpg,  Node: WFDB_Calinfo structures,  Next: WFDB_Anninfo structures,  Prev: WFDB_Siginfo structures,  Up: Data Types
+
+Calibration Information Structures
+==================================
+
+   The CAL argument for `getcal' and `putcal' is a pointer to an object
+of type `WFDB_Calinfo'.  A `WFDB_Calinfo' object contains information
+about signals of a specified type:
+
+`char *sigtype'
+     a pointer to a null-terminated string without embedded tabs or
+     newlines.  This field describes the type(s) of signals to which
+     the calibration specifications apply.  Usually, `sigtype' is an
+     exact match to (or a prefix of) the `desc' field of the
+     `WFDB_Siginfo' object that describes a matching signal.
+
+`char *units'
+     a pointer to a null-terminated string without embedded whitespace.
+     This field specifies the physical units of signals to which the
+     calibration specifications apply.  Usually, the `units' field of a
+     `WFDB_Calinfo' structure must exactly match the `units' field of
+     the `WFDB_Siginfo' structure that describes a matching signal.
+
+`double scale'
+     the customary plotting scale, in physical units per centimeter.
+     WFDB applications that produce graphical output may use `scale' as
+     a default.  Except in unusual circumstances, signals of different
+     types should be plotted at equal multiples of their respective
+     `scale's.
+
+`double low'
+`double high'
+     values (in physical units) corresponding to the low and high
+     levels of a calibration pulse.  If the signal is AC-coupled (see
+     below), `low' is zero, and `high' is the pulse amplitude.
+
+`int caltype'
+     a small integer that specifies the shape of the calibration pulse
+     (see `<wfdb/wfdb.h>' for definitions).  `caltype' is even if
+     signals of the corresponding `sigtype' are AC-coupled, and odd if
+     they are DC-coupled.
+
+   The calibration list is a memory-resident linked list of
+`WFDB_Calinfo' structures.  It is accessible only via `calopen',
+`getcal', `putcal', `newcal', and `flushcal'.
+
+
+File: wpg,  Node: WFDB_Anninfo structures,  Next: WFDB_Annotation structures,  Prev: WFDB_Calinfo structures,  Up: Data Types
+
+Annotator Information Structures
+================================
+
+   The AIARRAY argument for `annopen' and `wfdbinit' is a pointer to an
+array of objects of type `WFDB_Anninfo'.  Each member of the array
+contains information provided to `annopen' and `wfdbinit' about an
+annotation file associated with the record:
+
+`char *name'
+     the annotator name.  The name `atr' is reserved for a "reference
+     annotation file" supplied by the creator of the database record to
+     document its contents as accurately and thoroughly as possible.
+     You may use other annotator names to identify annotation files
+     that you create; unless there are compelling reasons not to do so,
+     follow the convention that the annotator name is the name of the
+     file's creator (a program or a person).  To avoid confusion, do
+     not use `dat', `dataN', `dN', or `hea' (all of which are commonly
+     used as parts of WFDB file names) as annotator names.  The special
+     name `-' refers to the standard input or output.  Other annotator
+     names may contain upper- or lower-case letters, digits, and
+     underscores.  Annotation files are normally created in the current
+     directory and found in any of the directories in the database path
+     (*note WFDB path::).
+
+`int stat'
+     the file type/access code.  Usually, `stat' is either `WFDB_READ'
+     or `WFDB_WRITE', to specify standard ("MIT format") annotation
+     files to be read by `getann' or to be written by `putann'.  Both
+     MIT DB and AHA DB annotation files are kept on-line in MIT format.
+     The symbols `WFDB_READ' and `WFDB_WRITE' are defined in
+     `<wfdb/wfdb.h>'. An AHA-format annotation file can be read by
+     `getann' or written by `putann' if the `stat' field is set to
+     `WFDB_AHA_READ' or `WFDB_AHA_WRITE' before calling `annopen' or
+     `wfdbinit' (*note Example 2::).  Other formats may be supported
+     via a similar mechanism; consult `<wfdb/wfdb.h>' for more
+     information.
+
+   The number of `WFDB_Anninfo' objects in AIARRAY is given by the NANN
+argument of `annopen' and `wfdbinit'.  The annotation-reading function,
+`getann', knows the annotators by number only; `annopen' and `wfdbinit'
+assign input annotator numbers beginning with 0 in the order in which
+they are given in the array of `WFDB_Anninfo' objects.  Output
+annotator numbers used by `putann' also start at 0; note that input
+annotator 0 and output annotator 0 are distinct.  Annotator numbers are
+supplied to `getann' and `putann' in their first arguments.  *Note
+annopen::, for an example of how to set the contents of an array of
+`WFDB_Anninfo' objects.
+
+
+File: wpg,  Node: WFDB_Annotation structures,  Prev: WFDB_Anninfo structures,  Up: Data Types
+
+Annotation Structures
+=====================
+
+   The ANNOT argument of `getann' and `putann' is an object of type
+`WFDB_Annotation' containing these fields:
+
+`long time'
+     time of the annotation, in samples from the beginning of the
+     record.  The times of beat annotations in the `atr' files for the
+     MIT DB generally coincide with the R-wave peak in signal 0; for
+     the AHA DB, they generally coincide with the PQ-junction.
+
+`char anntyp'
+     annotation code; an integer between 1 and `ACMAX'.  *Note
+     Annotation Codes::, for a list of legal annotation codes.  `ACMAX'
+     is defined in `<wfdb/ecgcodes.h>'.
+
+`signed char subtyp'
+`signed char chan'
+`signed char num'
+     numbers between -128 and 127.  In MIT DB `atr' files, the `subtyp'
+     field is used with noise and artifact annotations to indicate
+     which signals are affected (*note Annotation Codes::).  The `chan'
+     field is intended to indicate the signal to which the annotation
+     is attached.  More than one annotation may be written with the
+     same `time' if the `chan' fields are distinct and in ascending
+     order.  The semantics of the `chan' field are unspecified,
+     however; users may assign any desired meaning, which need not have
+     anything to do with signal numbers.  In user-created annotation
+     files, these fields can be used to store arbitrary small integers.
+     The `subtyp' field requires no space in a standard annotation file
+     unless it is non-zero; the `chan' and `num' fields require no
+     space unless they have changed since the previous annotation.
+
+`char *aux'
+     a free text string.  The first byte is interpreted as an `unsigned
+     char' that specifies the number of bytes that follow (up to 255).
+     In MIT DB `atr' files, the `aux' field is used with rhythm change
+     annotations to specify the new rhythm, and with comment
+     annotations to store the text of the comment The string can
+     contain arbitrary binary data, including embedded nulls.  It is
+     unwise to store anything but ASCII strings, however, if the
+     annotation file may be transported to a system with a different
+     architecture (e.g., on which multiple-byte quantities may have
+     different sizes or byte layouts).  The `aux' field requires no
+     space in a standard annotation file if it is `NULL'.  Note that
+     conversion of annotation files to other formats may entail
+     truncation or loss of the `aux' string.  Note also that the `aux'
+     pointer returned by `getann' points to a small static buffer
+     (separately allocated for each input annotator beginning with WFDB
+     library version 9.4) that may be overwritten by subsequent calls.
+
+   *Note Example 3::, for a short program that examines the contents of
+a `WFDB_Annotation'.
+
+
+File: wpg,  Node: Annotation Codes,  Next: Database Files,  Prev: Data Types,  Up: Top
+
+Annotation Codes
+****************
+
+* Menu:
+
+* Mapping macros::		Macros for mapping annotation codes.
+
+   Application programs that deal with annotations should include the
+line
+
+     #include <wfdb/ecgcodes.h>
+
+which provides the symbolic definitions of annotation codes given in the
+first column of the table below.  (The second column of the table shows
+the strings returned by `annstr' and `ecgstr'.)
+
+     _Beat annotation codes:_
+     NORMAL   N   Normal beat
+     LBBB     L   Left bundle branch block beat
+     RBBB     R   Right bundle branch block beat
+     BBB      B   Bundle branch block beat (unspecified)
+     APC      A   Atrial premature beat
+     ABERR    a   Aberrated atrial premature beat
+     NPC      J   Nodal (junctional) premature beat
+     SVPB     S   Supraventricular premature or ectopic beat (atrial or nodal)
+     PVC      V   Premature ventricular contraction
+     RONT     r   R-on-T premature ventricular contraction
+     FUSION   F   Fusion of ventricular and normal beat
+     AESC     e   Atrial escape beat
+     NESC     j   Nodal (junctional) escape beat
+     SVESC    n   Supraventricular escape beat (atrial or nodal) [1]
+     VESC     E   Ventricular escape beat
+     PACE     /   Paced beat
+     PFUS     f   Fusion of paced and normal beat
+     UNKNOWN  Q   Unclassifiable beat
+     LEARN    ?   Beat not classified during learning
+     
+     _Non-beat annotation codes:_
+     VFON     [   Start of ventricular flutter/fibrillation
+     FLWAV    !   Ventricular flutter wave
+     VFOFF    ]   End of ventricular flutter/fibrillation
+     NAPC     x   Non-conducted P-wave (blocked APC) [4]
+     WFON     (   Waveform onset [4]
+     WFOFF    )   Waveform end [4]
+     PWAVE    p   Peak of P-wave [4]
+     TWAVE    t   Peak of T-wave [4]
+     UWAVE    u   Peak of U-wave [4]
+     PQ       `   PQ junction
+     JPT      '   J-point
+     PACESP   ^   (Non-captured) pacemaker artifact
+     ARFCT    |   Isolated QRS-like artifact [2]
+     NOISE    ~   Change in signal quality [2]
+     RHYTHM   +   Rhythm change [3]
+     STCH     s   ST segment change [1,3]
+     TCH      T   T-wave change [1,3,4]
+     SYSTOLE  *   Systole [1]
+     DIASTOLE D   Diastole [1]
+     MEASURE  =   Measurement annotation [1,3]
+     NOTE     "   Comment annotation [3]
+     LINK     @   Link to external data [5]
+
+*Notes:*
+  1. Codes `SVESC', `STCH', and `TCH' were first introduced in WFDB
+     library version 4.0.  Codes `SYSTOLE', `DIASTOLE', and `MEASURE'
+     were first introduced in WFDB library version 7.0.
+
+  2. In MIT and ESC DB `atr' files, each non-zero bit in the `subtyp'
+     field indicates that the corresponding signal contains noise (the
+     least significant bit corresponds to signal 0).
+
+  3. The `aux' field contains an ASCII string (with prefixed byte count)
+     describing the rhythm, ST segment, T-wave change, measurement, or
+     the nature of the comment.  By convention, the character that
+     follows the byte count in the `aux' field of a `RHYTHM' annotation
+     is `('.  See the `MIT-BIH Arrhythmia Database Directory' for a
+     list of rhythm annotation strings.
+
+  4. Codes `WFON', `WFOFF', `PWAVE', `TWAVE', and `UWAVE' were first
+     introduced in DB library version 8.3.  The `p' mnemonic now
+     assigned to `PWAVE' was formerly assigned to `NAPC', and the `t'
+     mnemonic now assigned to `TWAVE' was formerly assigned to `TCH'.
+     The obsolete codes `PQ' (designating the PQ junction) and `JPT'
+     (designating the J-point) are still defined in
+     `<wfdb/ecgcodes.h>', but are identical to `WFON' and `WFOFF'
+     respectively.
+
+  5. The `LINK' code was first introduced in WFDB library version 9.6.
+     The `aux' field of a `LINK' annotation contains a URL (a uniform
+     resource locator, in the form `http://machine.name/some/data',
+     suitable for passing to a Web browser such as Netscape or Mosaic).
+     `LINK' annotations may be used to associate extended text,
+     images, or other data with an annotation file.  If the `aux' field
+     contains any whitespace, text following the first whitespace is
+     taken as descriptive text to be displayed by a WFDB browser such
+     as `WAVE'.
+
+
+   The annotation codes in the table above are the predefined values of
+the `anntyp' field in a `WFDB_Annotation'.  Other values in the range
+of 1 to `ACMAX' (defined in `<wfdb/ecgcodes.h>') are legal but do not
+have preassigned meanings.  The constant `NOTQRS', also defined in
+`<wfdb/ecgcodes.h>', is not a legal value for `anntyp', but is a
+possible output of the macros discussed below.
+
+
+File: wpg,  Node: Mapping macros,  Prev: Annotation Codes,  Up: Annotation Codes
+
+Macros for Mapping Annotation Codes
+===================================
+
+   Application programs that use the macros described in this section
+should include the line
+     #include <wfdb/ecgmap.h>
+
+which will make their definitions, and those in `<wfdb/ecgcodes.h>',
+available.
+
+`isann(C)'
+     true (1) if C is a legal annotation code, false (0) otherwise
+
+`isqrs(C)'
+     true (1) if C denotes a QRS complex, false (0) otherwise
+
+`map1(C)'
+     maps C into one of the set {`NOTQRS', `NORMAL', `PVC', `FUSION',
+     `LEARN'}
+
+`map2(C)'
+     maps C into one of the set {`NOTQRS', `NORMAL', `SVPB', `PVC',
+     `FUSION', `LEARN'}
+
+`annpos(C)'
+     maps C into one of the set {`APUNDEF', `APSTD', `APHIGH', `APLOW',
+     `APATT', `APAHIGH', `APALOW'} (see `<wfdb/ecgmap.h>' for
+     definitions of these symbols;  this macro was first introduced in
+     WFDB library version 6.0)
+
+   If you define your own annotation codes, you may wish to modify the
+tables used by the macros above.  The file `<wfdb/ecgmap.h>' also
+defines `setisqrs(C, X)', `setmap1(C, X)', `setmap2(C, X)', and
+`setannpos(C, X)' for this purpose.  In each case, X is the value to be
+returned when the corresponding mapping macro is invoked with an
+argument of C.  (These macros were first introduced in WFDB library
+version 6.0.)
+
+   The macros below convert between AHA and MIT annotation codes;  they
+are also defined in `<wfdb/ecgmap.h>'.
+
+`ammap(A)'
+     maps A (an AHA annotation code) into an MIT annotation code (one
+     of the set {`NORMAL', `PVC', `FUSION', `RONT', `VESC', `PACE',
+     `UNKNOWN', `VFON', `VFOFF', `NOISE', `NOTE'}), or `NOTQRS'
+
+`mamap(C, S)'
+     maps C (an MIT annotation code) into an AHA annotation code (one
+     of the set {`N', `V', `F', `R', `E', `P', `Q', `[', `]', `U',
+     `O'}); S is the MIT annotation `subtyp' (significant only if C is
+     `NOISE')
+
+
+File: wpg,  Node: Database Files,  Next: Examples,  Prev: Annotation Codes,  Up: Top
+
+Database Files
+**************
+
+   The WFDB library has been constructed to provide a standard interface
+between the database files and application programs.  Alternate means of
+access to database files is strongly discouraged, since file formats may
+change.  Database files are located in the directories specified by
+`WFDB' (*note WFDB path::).
+
+   Recall that a WFDB record is not a file; rather, it is an extensible
+_collection_ of database files (*note Records: Concepts 1.).  Thus, for
+example, record 100 of the MIT-BIH Arrhythmia Database consists of the
+files named `100.hea', `100.dat', and `100.atr' in the `mitdb'
+directory of the MIT-BIH Arrhythmia Database CD-ROM (or in PhysioBank,
+within `http://www.physionet.org/physiobank/database/mitdb/'), together
+with any additional files in other directories that you may have
+associated with record 100 (such as your own annotation file).  All
+files associated with a given record include the record name as the
+first part of the file name.  No explicit action (other than choosing
+the file name, and locating the file in the WFDB path) is needed in
+order to associate a new file with an existing WFDB record.
+
+   To find the location of a database file easily, you can use
+`wfdbwhich', an application included with the WFDB Software Package.
+Type `wfdbwhich' for brief instructions on its use, or see the `WFDB
+Applications Guide'.
+
+File Types
+==========
+
+   There are four types of files supported by the WFDB library:
+
+* Menu:
+
+* Header Files::		contain signal file names and attributes.
+* Signal Files::		contain signals.
+* Annotation Files::		contain annotations.
+* Calibration Files::		contain signal calibration specifications.
+
+The other topics in this section deal with special types of database access:
+
+* AHA Format Files::		not used for on-line WFDB records.
+* Standard I/O::		pipes and I/O redirection for WFDB files.
+* Multiplexed Signal Files::	signal groups.
+* Multi-Frequency Records::     signals sampled at different frequencies within
+                                 within a given record.
+* Multi-Segment Records::       concatenated records.
+* Multiple Record Access::	how to have more than one record open.
+* Special Files::		signal I/O using block and character devices.
+* Piped and Local Records::	records for use with user-created signals.
+* NETFILES::			input directly from web and FTP servers.
+* Annotation Order::            the canonical order for annotations:
+                                 how and why to break the rules, and how
+                                 to deal with the consequences of doing so.
+
