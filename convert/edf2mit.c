@@ -1,9 +1,9 @@
 /* file: edf2mit.c		G. Moody	16 October 1996
-				Last revised:	   7 May 1999
+				Last revised:	  29 July 2001
 
 -------------------------------------------------------------------------------
 Convert EDF (European Data Format) file to MIT format header and signal files
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -36,26 +36,30 @@ char **argv;
 {
     static FILE *ifile;
     static char buf[81], record[20];
-    int fpb, h, i, j, k, l, nsig, nosig = 0, siglist[WFDB_MAXSIG], spr,
-	spb[WFDB_MAXSIG], tspb = 0, tspf = 0, vflag = 0;
+    int big_endian = 0, fpb, h, i, j, k, l, nsig, nosig = 0,
+	siglist[WFDB_MAXSIG], spb[WFDB_MAXSIG], tspb = 0, tspf = 0,
+	vflag = 0;
     char **vi, **vin;
     WFDB_Sample *vo, *vout;
     int day, month, year, hour, minute, second;
     long adcrange, sigdmax[WFDB_MAXSIG], sigdmin[WFDB_MAXSIG];
     double sigpmax[WFDB_MAXSIG], sigpmin[WFDB_MAXSIG], sampfreq[WFDB_MAXSIG],
-        sps;
+        spr, sps;
     static WFDB_Siginfo si[WFDB_MAXSIG], so[WFDB_MAXSIG];
     void help();
 
     pname = argv[0];
     for (i = 1; i < argc; i++) {
 	if (*argv[i] == '-') switch (argv[i][1]) {
+	  case 'b':	/* input is in big-endian byte order */
+	    big_endian = 1;
+	    break;
 	  case 'h':	/* show usage and quit */
 	    help();
 	    exit(0);
 	  case 'i':	/* file name follows */
 	    if (++i < argc) {
-		if (strcmp(argv[i], "-"))
+		if (!strcmp(argv[i], "-"))
 		    ifile = stdin;
 		else {
 		    ifile = fopen(argv[i], "rb");
@@ -152,8 +156,8 @@ char **argv;
     for (j = 8; j >= 0 && buf[j] == ' '; j--)
 	buf[j] = '\0';
     if (vflag) printf("Duration of each data record in seconds: '%s'\n", buf);
-    sscanf(buf, "%d", &spr);
-    if (spr < 1) spr = 1;
+    sscanf(buf, "%lf", &spr);
+    if (spr <= 0.0) spr = 1.0;
 
     fread(buf, 1, 4, ifile);
     buf[4] = ' ';
@@ -307,6 +311,36 @@ char **argv;
 	so[i] = si[siglist[i]];
     }
 
+    if (vflag)
+	printf("\nOUTPUT:\nBase sampling frequency: %g Hz\n", sps);
+
+    for (i = j = k = 0; i < nosig; i++) {
+	if ((j = si[siglist[i]].spf) > k)
+	    k = j;
+	if (vflag)
+	  printf(" Signal %d samples per second: %g (%d sample%s per frame)\n",
+		 i, sampfreq[siglist[i]], j, j > 1 ? "s" : "");
+    }
+    if (k > WFDB_MAXSPF) {
+	fprintf(stderr, "%s: too many samples of signal %d per frame\n\n",
+		pname, i);
+	fprintf(stderr,
+" There can be at most %d samples per signal per frame, and you would need\n",
+		WFDB_MAXSPF);
+	fprintf(stderr,
+" at least %d samples per signal per frame in order to convert this record.\n",
+		k);
+	fprintf(stderr,
+"\n You may avoid this problem by using the '-s' option to exclude one or\n");
+	fprintf(stderr,
+" more signals, or you can change WFDB_MAXSPF to a value of %d or more\n", k);
+	fprintf(stderr,
+" in wfdb.h, and then recompile the WFDB library and any applications\n");
+	fprintf(stderr,
+" that depend on WFDB_MAXSPF, including this one.\n\n");
+	exit(2);
+    }
+
     vin = (char **)malloc(nsig * sizeof(char *));
     vi = (char **)malloc(nsig * sizeof(char *));
     for (i = 0; i < nsig; i++) {
@@ -325,8 +359,14 @@ char **argv;
 	    vo = vout;
 	    for (j = 0; j < nosig; j++)
 		for (k = 0; k < so[j].spf; k++) {
-		    h = *vi[siglist[j]]++;	/* high byte first */
-		    l = *vi[siglist[j]]++;	/* then low byte */
+		    if (big_endian) {
+			h = *vi[siglist[j]]++;	/* high byte first */
+			l = *vi[siglist[j]]++;	/* then low byte */
+		    }
+		    else {
+			l = *vi[siglist[j]]++;	/* low byte first */
+			h = *vi[siglist[j]]++;	/* then high byte */
+		    }
 		    /* If a short int is not 16 bits, it may be necessary to
 		       modify the next line for proper sign extension. */
 		    *vo++ = ((int)((short)((h << 8) | (l &0xff))));
@@ -343,6 +383,7 @@ char **argv;
 static char *help_strings[] = {
  "usage: %s [OPTIONS ...]\n",
  "where OPTIONS may include:",
+ " -b          input is in big-endian byte order (default: little-endian)",
  " -h          print this usage summary",
  " -i EDFILE   read the specified European Data Format file",
  " -r RECORD   create the specified RECORD (default: use patient id)",

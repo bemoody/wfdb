@@ -1,5 +1,5 @@
 /* file: wave.h		G. Moody	26 April 1990
-			Last revised:    29 May 2001
+			Last revised:    28 July 2001
 Constants, macros, global variables, and function prototypes for WAVE
 
 -------------------------------------------------------------------------------
@@ -216,6 +216,7 @@ COMMON int signal_choice;		/* signal to be analyzed (from analyze
 COMMON int siglist[WFDB_MAXSIG];	/* signals to be analyzed (from analyze
 					   panel) */
 COMMON int siglistlen;			/* number of valid siglist entries */
+COMMON int freeze_siglist;		/* 1: don't rebuild in record_init */
 COMMON int scan_active;			/* 1: scope display is running */
 
 COMMON char psprint[80];		/* command used to print PostScript */

@@ -1,10 +1,10 @@
 /* file: init.c		G. Moody	1 May 1990
-			Last revised: 29 April 1999
+			Last revised: 28 July 2001
 Initialization functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -47,9 +47,15 @@ char *s;
     if (post_changes() == 0)
 	return (0);
 
-    /* Check to see if the signal list must be rebuilt. */
-    rebuild_list = (siglistlen == 0) | strcmp(record, s);
-
+    /* Check to see if the signal list must be rebuilt.  Normally, this is
+       done whenever the signal list is empty or if the record name has
+       changed, but accept_remote_command (see xvwave.c) can force record_init
+       not to rebuild the signal list by setting freeze_siglist. */
+    if (freeze_siglist)
+	freeze_siglist = rebuild_list = 0;
+    else
+	rebuild_list = (siglistlen == 0) | strcmp(record, s);
+	
     /* Save the name of the new record in local storage. */
     strncpy(record, s, RNLMAX);
 

@@ -1,5 +1,5 @@
 /* file: xvwave.c	G. Moody	27 April 1990
-			Last revised:    30 May 2001
+			Last revised:    28 July 2001
 XView support functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -342,16 +342,25 @@ Notify_signal_mode when;
 	    mode_undo();	/* change setting in View panel to match */
 	    set_baselines();	/* recalculate display positions of signals */
 	}
+	freeze_siglist = 1;
+	/* avoid undoing the effects of setting siglist here, by
+	   suppressing the rebuild of siglist that would normally be
+	   done by record_init (see init.c) */
     }
     fclose(sfile);
     if (wave_ppid) {	/* synch parent WAVE, if any, with this one */
 	if (*new_time == '\0')
 	    strcpy(new_time, mstimstr(display_start_time));
 	if (*new_record)
-	    sprintf(buf, "wave-remote -pid %d -r %s -f '%s'\n", wave_ppid,
-		    new_record, new_time);
+	    sprintf(buf, "wave-remote -pid %d -r %s -f '%s'",
+		    wave_ppid, new_record, new_time);
 	else
-	    sprintf(buf, "wave-remote -pid %d -f '%s'\n", wave_ppid, new_time);
+	    sprintf(buf, "wave-remote -pid %d -f '%s'", wave_ppid, new_time);
+	if (*new_siglist) {
+	    strcat(buf, " -s ");
+	    strcat(buf, new_siglist);
+	}
+	strcat(buf, "\n");
 	system(buf);
     }
     disp_proc(XV_NULL, (Event *) '.');	/* redraw display */

@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-			Last revised:	19 Julyy 2001		wfdblib 10.1.6
+			Last revised:	  19 July 2001		wfdblib 10.1.6
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________

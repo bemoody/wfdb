@@ -1,5 +1,5 @@
 /* file: wavescript.c		G. Moody	10 October 1996
-				Last revised:	  30 May 2001
+				Last revised:	 1 August 2001
 Remote control for WAVE via script
 
 -------------------------------------------------------------------------------
@@ -127,9 +127,9 @@ char **environ;
 #ifndef BINDIR
 #define BINDIR /usr/bin
 #endif
-#define STRING(A)	#A
-#define WAVE(A)		STRING(A) ## "/wave"
 #define MAXARGS		(WFDB_MAXSIG+12)
+#define STRING(A)	#A
+#define PATH(A,B)	STRING(A) "/" #B
 
 int start_new_wave(record, annotator, ptime, siglist, path)
 char *record, *annotator, *ptime, **siglist, *path;
@@ -138,7 +138,7 @@ char *record, *annotator, *ptime, **siglist, *path;
 	static char *arg[MAXARGS+1];
 	int nargs;
 
-	arg[0] = "wave";
+	arg[0] = PATH(BINDIR, wave);
 	arg[1] = "-r";
 	arg[2] = record;
 	nargs = 3;
@@ -160,6 +160,7 @@ char *record, *annotator, *ptime, **siglist, *path;
 		arg[nargs++] = *siglist++;
 	}
 	arg[nargs] = NULL;
+
 	/* Send the standard error output to /dev/null.  This avoids having
 	   such error output appear as dialog boxes when wavescript is run from
 	   Netscape.  WAVE's and the WFDB library's error messages are
@@ -167,7 +168,7 @@ char *record, *annotator, *ptime, **siglist, *path;
            the XView library sometimes generates warning messages that may be
 	   safely ignored. */
 	freopen("/dev/null", "w", stderr);
-	return (execve(WAVE(BINDIR), arg, environ));
+	return (execve(arg[0], arg, environ));
     }
 
     else {	/* We can't start WAVE without specifying which record to open
@@ -241,7 +242,8 @@ char **argv, **env;
     }
     if (argc == 4 && strncmp(argv[2], "-p", 2) == 0) {	/* pid specified */
 	pid = atoi(argv[3]);
-	if (pid == 0) exit(start_new_wave(record, annotator, ptime, path));
+	if (pid == 0)
+	  exit(start_new_wave(record, annotator, ptime, siglist, path));
 	sprintf(fname, "/tmp/.wave.%d.%d", (int)getuid(), pid);
 	if ((ofile = fopen(fname, "r")) == NULL) {
 	    fprintf(stderr,
@@ -269,7 +271,7 @@ char **argv, **env;
 	    sleep(2);			/* give WAVE a chance to empty it */
 	    if ((ofile = fopen(fname, "r")) == NULL)
 		/* WAVE must have just exited, or someone else cleaned up. */
-		exit(start_new_wave(record, annotator, ptime, path));
+		exit(start_new_wave(record, annotator, ptime, siglist, path));
 	    if (fgetc(ofile) != EOF) {
 		/* The mailbox is still full -- WAVE may be stuck, or
 		   it may have crashed without removing the mailbox. */
@@ -278,7 +280,7 @@ char **argv, **env;
 		fprintf(stderr,
 	    "WAVE process %d not responding -- starting new WAVE process\n",
 			pid);
-		exit(start_new_wave(record, annotator, ptime, path));
+		exit(start_new_wave(record, annotator, ptime, siglist, path));
 	    }
 	}
 
@@ -295,7 +297,7 @@ char **argv, **env;
 	    fprintf(ofile, "\n");
 	}
 	fclose(ofile);
-
+    
 	kill(pid, SIGUSR1);	/* signal to WAVE that the message is ready */
 	exit(0);
     }
