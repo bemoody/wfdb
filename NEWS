@@ -1,3 +1,10 @@
+10.3.5:
+	Fixed a bug in WFDB library function isigclose() (in lib/signal.c)
+	that had caused sample()'s buffer to be freed inappropriately when
+	switching segments in a multi-segment record.  Thanks to Dave
+	Schaffer for the bug report and for a test case that illustrated
+	the bug.
+
 10.3.4:
 	xform now handles input and output sampling frequencies that are not
 	exact multiples of 1 Hz.

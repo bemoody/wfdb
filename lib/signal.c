@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  12 February 2003		wfdblib 10.3.2
+			Last revised:   31 March 2003		wfdblib 10.3.5
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -881,7 +881,7 @@ static void isigclose()
     struct igdata *ig;
 
     if (nisig == 0) return;
-    if (sbuf) {
+    if (sbuf && (!in_msrec || segp >= segend)) {
 	(void)free(sbuf);
 	sbuf = NULL;
 	sample_vflag = 0;

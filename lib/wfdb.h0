@@ -1,5 +1,5 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised:   30 March 2003	wfdblib 10.3.4
+			Last revised:   31 March 2003	wfdblib 10.3.5
 WFDB library type, constant, structure, and function interface definitions
 
 _______________________________________________________________________________
@@ -33,7 +33,7 @@ _______________________________________________________________________________
 /* WFDB library version. */
 #define WFDB_MAJOR   10
 #define WFDB_MINOR   3
-#define WFDB_RELEASE 4
+#define WFDB_RELEASE 5
 #define WFDB_NETFILES 1	/* if 1, library includes code for HTTP, FTP clients */
 
 /* Determine what type of compiler is being used. */
