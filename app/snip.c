@@ -1,8 +1,8 @@
 /* file: snip.c		G. Moody	30 July 1989
-			Last revised:  14 November 2002
+			Last revised:  7 February 2003
 -------------------------------------------------------------------------------
 snip: Copy an excerpt of a database record
-Copyright (C) 2002 George B. Moody
+Copyright (C) 2003 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -59,8 +59,8 @@ char *argv[];
 	    a = i;
 	    do {
 	        nann++;
-	    } while (i < argc && *argv[++i] != '-');
-	    i--;
+	    } while (++i < argc && *argv[i] != '-');
+	    if (i < argc) i--;
 	    break;
 	  case 'f':	/* starting time */
 	    if (++i >= argc) {

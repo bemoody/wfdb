@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:	13 December 2001
+#				Last revised:	18 December 2002
 # This section of the Makefile should not need to be changed.
 
 # Programs to be compiled.
@@ -18,15 +18,18 @@ install:	$(BINDIR) all scripts
 	../install.sh $(BINDIR) $(XFILES)
 	$(MAKE) clean
 
-# `make scripts': customize and install scripts
+# `make scripts': install scripts
 scripts:
+	cp $(SCRIPTS) $(BINDIR)
+	cd $(BINDIR); $(SETXPERMISSIONS) $(SCRIPTS)
+
+# `make custom-scripts': customize and install scripts
 	sed s+/usr/local/bin+$(BINDIR)+g <hrfft >$(BINDIR)/hrfft
 	sed s+/usr/local/bin+$(BINDIR)+g <hrlomb >$(BINDIR)/hrlomb
 	sed s+/usr/local/bin+$(BINDIR)+g <hrmem >$(BINDIR)/hrmem
 	sed s+/usr/local/bin+$(BINDIR)+g <hrplot >$(BINDIR)/hrplot
 	cp plot2d plot3d $(BINDIR)
-	$(SETXPERMISSIONS) $(BINDIR)/hrfft $(BINDIR)/hrlomb $(BINDIR)/hrmem \
-	 $(BINDIR)/hrplot $(BINDIR)/plot2d $(BINDIR)/plot3d
+	cd $(BINDIR); $(SETXPERMISSIONS) $(SCRIPTS)
 
 uninstall:
 	../uninstall.sh $(BINDIR) $(XFILES) $(SCRIPTS)

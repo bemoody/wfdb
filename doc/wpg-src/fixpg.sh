@@ -42,3 +42,8 @@ R=`grep -l "<TITLE>WFDB Programmer's Guide: strtim" *.htm`
 if [ "x$R" != "x" ]; then ln -s $R strtim.htm
 else echo "Can't find strtim.htm"
 fi
+
+R=`grep -l "Compiling a Program with the WFDB Library </H2>" *.htm`
+if [ "x$R" != "x" ]; then ln -s $R compiling.htm
+else echo "Can't find compiling.htm"
+fi

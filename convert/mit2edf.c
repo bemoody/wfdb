@@ -1,5 +1,5 @@
 /* file: mit2edf.c		G. Moody	2 November 2002
-				Last revised:   4 December 2002
+				Last revised:   5 December 2002
 -------------------------------------------------------------------------------
 Convert MIT format header and signal files to EDF (European Data Format) file
 Copyright (C) 2002 George B. Moody
@@ -81,6 +81,12 @@ char **argv;
 	}
     }
 
+    /* Quit if no record was specified. */
+    if (record == NULL) {
+	help();
+	exit(1);
+    }
+
     /* Construct or validate the name of the output file. */
     if (ofname == NULL) {
 	for (p = record + strlen(record); p > record; p--)
@@ -102,10 +108,6 @@ char **argv;
     }
 
     /* Open the input record. */
-    if (record == NULL) {
-	help();
-	exit(1);
-    }
     if ((nsig = isigopen(record, NULL, 0)) <= 0) exit(2);
     if ((si = malloc(nsig * sizeof(WFDB_Siginfo))) == NULL) {
 	(void)fprintf(stderr, "%s: insufficient memory\n", pname);

@@ -1,5 +1,5 @@
 /* file: mainpan.c	G. Moody	30 April 1990
-			Last revised:	10 March 2002
+			Last revised: 18 December 2002
 Functions for the main control panel of WAVE
 
 -------------------------------------------------------------------------------
@@ -440,7 +440,7 @@ static void prop_annotations()
 
 static void prop_wave()
 {
-    sprintf(filename, "%s/wave/wave.pro", helpdir);
+    sprintf(filename, "%s/wave/news.hlp", helpdir);
     title = "About WAVE";
     show_file();
 }

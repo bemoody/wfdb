@@ -146,12 +146,14 @@ wag.man:
 	$(LN) $(MAN1)/a2m.1 $(MAN1)/m2a.1
 	$(LN) $(MAN1)/a2m.1 $(MAN1)/md2a.1
 	$(LN) $(MAN1)/ann2rr.1 $(MAN1)/rr2ann.1
+	$(LN) $(MAN1)/edf2mit.1 $(MAN1)mit2edf.1
 	$(LN) $(MAN1)/hrfft.1 $(MAN1)/hrlomb.1
 	$(LN) $(MAN1)/hrfft.1 $(MAN1)/hrmem.1
 	$(LN) $(MAN1)/hrfft.1 $(MAN1)/hrplot.1
 	$(LN) $(MAN1)/plot2d.1 $(MAN1)/plot3d.1
 	$(LN) $(MAN1)/setwfdb.1 $(MAN1)/cshsetwfdb.1
 	$(LN) $(MAN1)/view.1 $(MAN1)/vsetup.1
+	$(LN) $(MAN1)/wav2mit.1 $(MAN1)/mit2wav.1
 	$(LN) $(MAN1)/wave.1 $(MAN1)/gtkwave.1
 
 # 'make wag.pdf': format the WFDB Applications Guide as PDF

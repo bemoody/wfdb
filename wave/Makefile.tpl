@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	31 May 2000
-#				Last revised: 21 November 2002
+#				Last revised: 18 December 2002
 # Change the settings below as appropriate for your setup.
 
 # Choose directories in which to install WAVE and its ancillary files by
@@ -20,14 +20,14 @@
 # HELPDIR specifies the directory in which the on-line help files are kept.
 # The installation procedure creates a subdirectory, `wave', in HELPDIR, and
 # installs several files there.
-HELPDIR = $(WFDBROOT)/help
+HELPDIR = /usr/help
 
 # MENUDIR specifies the directory in which the default analysis menu file is
 # kept.
-MENUDIR = $(WFDBROOT)/lib
+MENUDIR = /usr/lib
 
 # RESDIR specifies the directory in which X11 client resource files are kept.
-RESDIR = $(WFDBROOT)/lib/X11/app-defaults
+RESDIR = /usr/lib/X11/app-defaults
 
 # It should not be necessary to modify anything below this line.
 # -----------------------------------------------------------------------------
@@ -37,30 +37,25 @@ CFILES = wave.c init.c mainpan.c modepan.c helppan.c logpan.c annpan.c edit.c \
  grid.c sig.c annot.c analyze.c scope.c search.c xvwave.c help.c
 OFILES = wave.o init.o mainpan.o modepan.o helppan.o logpan.o annpan.o edit.o \
  grid.o sig.o annot.o analyze.o scope.o search.o xvwave.o $(HELPOBJ)
-HELPFILES = analysis.hlp buttons.hlp editing.hlp intro.hlp log.hlp \
+HELPFILES = analysis.hlp buttons.hlp editing.hlp intro.hlp log.hlp news.hlp \
  printing.hlp resource.hlp
-OTHERFILES = wave.hl0 wave.info wave.pro demo.txt Wave.res wavemenu.def \
- Makefile
+OTHERFILES = wave.hl0 wave.info demo.txt Wave.res wavemenu.def Makefile
 
 all:	wave
 
 # `make install':  compile and install WAVE and its help files
-install:	$(BINDIR) $(HELPDIR)/wave $(MENUDIR) $(RESDIR) wave wave.hlp
-	sed s/WAVEVERSION/$(WAVEVERSION)/ <wave.prf | sed "s/WHEN/`date`/" | \
-	 sed "s%HELPDIR%$(HELPDIR)%" >wave.pro
+install:  $(BINDIR) $(HELPDIR)/wave $(MENUDIR) $(RESDIR) wave wave.hlp news.hlp
 	$(STRIP) wave; $(SETXPERMISSIONS) wave;	../install.sh $(BINDIR) wave
-	cp $(HELPFILES) wave.hlp wave.info wave.pro demo.txt $(HELPDIR)/wave
-	-ln -sf $(HELPDIR)/wave/wave.pro $(HELPDIR)/wave/news.hlp
-	cd $(HELPDIR)/wave; $(SETPERMISSIONS) $(HELPFILES) news.hlp wave.info \
-	 wave.pro demo.txt
+	cp $(HELPFILES) wave.hlp wave.info demo.txt $(HELPDIR)/wave
+	cd $(HELPDIR)/wave; $(SETPERMISSIONS) $(HELPFILES) wave.info demo.txt
 	-cp wavemenu.def $(MENUDIR) && \
 	 $(SETPERMISSIONS) $(MENUDIR)/wavemenu.def
 	-cp Wave.res $(RESDIR)/Wave && $(SETPERMISSIONS) $(RESDIR)/Wave
 
 uninstall:
 	../uninstall.sh $(BINDIR) wave
-	../uninstall.sh $(HELPDIR)/wave $(HELPFILES) wave.hlp wave.info wave.pro \
-	  demo.txt news.hlp
+	../uninstall.sh $(HELPDIR)/wave $(HELPFILES) wave.hlp wave.info \
+	  demo.txt
 	rmdir $(HELPDIR) || echo "(Ignored)"
 	../uninstall.sh $(MENUDIR) wavemenu.def
 	../uninstall.sh $(RESDIR) Wave
@@ -98,9 +93,9 @@ soelim:		soelim.c
 wave.hlp:	soelim wave.hl0 $(HELPFILES)
 	./soelim wave.hl0 >wave.hlp
 
-wave.pro:
+news.hlp:
 	sed s/WAVEVERSION/$(WAVEVERSION)/ <wave.prf | sed "s/WHEN/`date`/" | \
-	 sed "s%WAVEPRO%$(HELPDIR)/wave/wave.pro%" >wave.pro
+	 sed "s%HELPDIR%$(HELPDIR)%" >news.hlp
 
 # `make manual': print the on-line manual
 manual:
@@ -116,10 +111,10 @@ TAGS:		$(HFILES) $(CFILES)
 
 # `make clean':  remove intermediate and backup files
 clean:
-	rm -f soelim wave wave-static *.o *~ wave.hlp wave.pro
+	rm -f soelim wave wave-static *.o *~ wave.hlp news.hlp
 
 # `make listing':  print a listing of WAVE sources
-listing:	wave.hlp wave.pro
+listing:	wave.hlp news.hlp
 	$(PRINT) README REGCARD $(HFILES) $(CFILES) $(HELPFILES) $(OTHERFILES)
 
 # Dependencies and special rules for compilation of the modules of `wave'

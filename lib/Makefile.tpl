@@ -34,7 +34,7 @@ compat:		$(INCLUDES) $(COMPAT_INCLUDES)
 
 # `make clean':  also remove previously compiled versions of the library
 clean:
-	rm -f $(OFILES) libwfdb.* *~
+	rm -f $(OFILES) libwfdb.* *~ wfdb.h wfdblib.h
 
 # `make TAGS':  make an `emacs' TAGS file
 TAGS:		$(HFILES) $(CFILES)

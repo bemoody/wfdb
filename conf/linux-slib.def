@@ -100,8 +100,8 @@ make-all:	all
 
 # `make lib-post-install' should be run after installing the WFDB library.
 lib-post-install:
-	cd $(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_BASENAME)
-	cd $(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_SONAME)
+	-(cd $(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_SONAME))
+	-(cd $(LIBDIR); ln -sf $(WFDBLIB_SONAME) $(WFDBLIB_BASENAME))
 	@$(LDCONFIG) || echo Warning: "$(LDCONFIG)" was unsuccessful
 
 lib-post-uninstall:

@@ -1,5 +1,5 @@
-# file: Makefile.tpl		G. Moody	24 May 2000
-#				Last revised:  8 August 2002
+# file: Makefile.tpl		G. Moody	 24 May 2000
+#				Last revised: 17 December 2002
 # This section of the Makefile should not need to be changed.
 
 # ARCH specifies the type of CPU and the operating system (e.g., 'i686-Linux').
@@ -110,6 +110,8 @@ $(HOME)/wfdb-test/lib:		$(HOME)/wfdb-test
 # documentation), and check that the MANIFEST (list of files in the package)
 # is correct.
 tarballs:	clean
+	rm -f ../$(PACKAGE)-MANIFEST ../$(PACKAGE).tar.gz \
+	  ../$(PACKAGE)-no-docs.tar.gz
 	cd lib; $(SETPERMISSIONS) *.h
 	cd ..; tar --create --file $(PACKAGE).tar.gz --verbose --gzip \
           '--exclude=$(PACKAGE)/*CVS' $(PACKAGE) | sed s+${PACKAGE}/++ | \
@@ -136,10 +138,14 @@ RPMROOT=/usr/src/redhat
 
 rpms:		tarballs
 	cp -p ../$(PACKAGE).tar.gz $(RPMROOT)/SOURCES
-	sed s/VERSION/$(VERSION)/ <wfdb.spec | \
+	sed s/VERSION/$(VERSION)/g <wfdb.spec | \
+	 sed s/MAJOR/$(MAJOR)/g | sed s/MINOR/$(MINOR)/g | \
 	 sed s/RPMRELEASE/$(RPMRELEASE)/ >$(PACKAGE)-$(RPMRELEASE).spec
 	cp -p $(PACKAGE)-$(RPMRELEASE).spec $(RPMROOT)/SPECS
-	rpm -ba $(PACKAGE)-$(RPMRELEASE).spec
-	mv $(RPMROOT)/RPMS/*/$(PACKAGE)-$(RPMRELEASE).*.rpm ..
+	if [ -x /usr/bin/rpmbuild ]; \
+	 then rpmbuild -ba $(PACKAGE)-$(RPMRELEASE).spec; \
+	 else echo "rpmbuild not found in /usr/bin; attempting to use rpm"; \
+	  rpm -ba $(PACKAGE)-$(RPMRELEASE).spec; fi
+	mv $(RPMROOT)/RPMS/*/wfdb*-$(VERSION)-$(RPMRELEASE).*.rpm ..
 	mv $(RPMROOT)/SRPMS/$(PACKAGE)-$(RPMRELEASE).src.rpm ..
 	rm -f $(PACKAGE)-$(RPMRELEASE).spec

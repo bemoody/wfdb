@@ -1964,6 +1964,7 @@ left).  Close the {\tt textedit} window and experiment with changing the {\sf
 Start}, {\sf End}, and {\sf Signal} fields of the {\sf Analyze} window, and
 running {\tt sqrs}, until you are familiar with the results.
 
+\label{sec:analysis-example}
 \section{Analysis example: Generating a heart rate signal}
 In the rest of this exercise, we'll develop a command for generating a heart
 rate signal, add it to the \WAVE{} menu, and test it.  First, set the {\sf
@@ -6320,6 +6321,16 @@ it contains a \button{Sync} button, which may be used to synchronize the other
 signal windows with the master at any time.  By synchronizing, we mean that the
 other windows are redrawn as necessary so that the times shown in their lower
 left corners match that shown in the master signal window.
+
+It is also possible to synchronize by clicking on a point of interest in the
+master signal window.  To do this, press and hold \keycap{Ctrl} while clicking
+with the middle mouse button.  The master signal window will be unaffected,
+but the other windows are redrawn so that they begin at the time corresponding
+to the point of interest.  This feature is particularly useful if you have
+a derived record such as in the heart rate signal analysis example (see
+section~\ref{sec:analysis-example}) open in the master signal window, and
+the raw signals in another window;  you can then click on a feature in the
+derived signal and instantly see the corresponding raw signals.
 
 Remote-control applications such as {\tt wavescript} and {\tt wave-remote} can
 also start or control a \WAVE{} process group.  All signal windows in the

@@ -156,9 +156,11 @@ convert/Makefile.tpl
 convert/makeid.c
 convert/md2a.c
 convert/mit2edf.c
+convert/mit2wav.c
 convert/readid.c
 convert/README
 convert/revise.c
+convert/wav2mit.c
 COPYING
 data/
 data/100s.atr
@@ -269,6 +271,7 @@ doc/wag-src/getpagenos.c
 doc/wag-src/header.5
 doc/wag-src/hrfft.1
 doc/wag-src/ihr.1
+doc/wag-src/imageplt.1
 doc/wag-src/install0.tex
 doc/wag-src/intro.ht0
 doc/wag-src/.latex2html-init
@@ -290,6 +293,7 @@ doc/wag-src/nst.1
 doc/wag-src/plot2d.1
 doc/wag-src/plotstm.1
 doc/wag-src/plt.1
+doc/wag-src/pltf.1
 doc/wag-src/pschart.1
 doc/wag-src/psfd.1
 doc/wag-src/rdann.1
@@ -316,6 +320,7 @@ doc/wag-src/wag.cover
 doc/wag-src/wag.ht0
 doc/wag-src/wag.ht1
 doc/wag-src/wag.tex
+doc/wag-src/wav2mit.1
 doc/wag-src/wave.1
 doc/wag-src/wfdb.3
 doc/wag-src/wfdbcal.5
@@ -480,10 +485,9 @@ lib/makelib
 lib/README
 lib/signal.c
 lib/wfdbdll.def
-lib/wfdb.h
+lib/wfdb.h0
 lib/wfdbinit.c
 lib/wfdbio.c
-lib/wfdblib.h
 lib/wfdblib.h0
 Makefile
 Makefile.top

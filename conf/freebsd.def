@@ -1,5 +1,5 @@
 # file: freebsd.def		G. Moody	5 March 2002
-#				Last revised: 21 November 2002
+#				Last revised: 18 December 2002
 # 'make' definitions for compiling the WFDB Software Package under FreeBSD
 #
 # Based on 'linux.def', with edits for FreeBSD thanks to Giuseppe Pagnoni.
@@ -56,7 +56,7 @@ LIBDIR = $(WFDBROOT)/lib
 
 # PSPDIR specifies the name of a directory in which to install the PostScript
 # prolog (*.pro) files from the 'app' directory.
-PSPDIR = $(WFDBROOT)/lib/ps
+PSPDIR = /usr/lib/ps
 
 # CC is the name of your C compiler.
 CC = gcc

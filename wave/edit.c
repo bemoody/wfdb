@@ -1,10 +1,10 @@
 /* file: edit.c		G. Moody	 1 May 1990
-			Last revised:  14 October 2001
+			Last revised:  12 February 2003
 Annotation-editing functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2003 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -1013,13 +1013,23 @@ Notify_arg arg;
 	    /* The middle button was pressed:
 	         1. If the left or right button is down, ignore this event.
 		 2. Draw marker bars above and below the pointer.
-		 3. If there is an attached annotation, and the pointer is
+		 3. If the <Control> key is depressed and this instance of
+		    WAVE has a sync button, signal other WAVE processes to
+		    recenter their signal windows at the time indicated by
+		    the mouse, and return.
+		 4. If there is an attached annotation, and the pointer is
 		    outside the box, detach the annotation (erase the box).
 	    */
 	    if (left_down || right_down || ann_template.anntyp < 0) break;
 	    middle_down = 1;
 	    bar(x, y /* ? */, 1);
-	    if (attached && !in_box(x, y))
+	    if (event_ctrl_is_down(event) && wave_ppid) {
+		char buf[80];
+		sprintf(buf, "wave-remote -pid %d -f '%s'\n", wave_ppid,
+			mstimstr(-t));
+		system(buf);
+	    }
+	    else if (attached && !in_box(x, y))
 		detach_ann();
 	    break;
 	}

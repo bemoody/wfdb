@@ -1,15 +1,15 @@
 WAVE: Waveform Analyzer, Viewer, and Editor
 
-Copyright (C) 1990-2001 George B. Moody
+Copyright (C) 1990-2002 George B. Moody
 
 WAVE is an extensible interactive graphical environment for manipulating sets
 of digitized signals with optional annotations.  WAVE is built using the WFDB
 library developed for physiologic signal processing, so it can be applied to
 any of a wide variety of data formats supported by the WFDB library.  WAVE can
 run on Linux PCs, Sun workstations, and other systems that support the X
-Window System and the public-domain XView toolkit; in addition, it can be
-accessed remotely using networked PCs, Macintoshes, or other systems for which
-X11 servers are available.
+Window System and the free XView toolkit; in addition, it can be accessed
+remotely using networked PCs, Macintoshes, or other systems for which X11
+servers are available.
 
 Among WAVE's capabilities are:
  - fast display of waveforms and annotations at various calibrated scales
@@ -29,6 +29,11 @@ Move the mouse pointer over any control and press the HELP key (or F1 if there
 is no HELP key) for information about that control.  (If your window manager
 does not cooperate, this may not work;  in that case, select `Buttons' from the
 `Help Topics' panel for information about controls.)
+
+The answers to many frequently asked questions about WAVE can be found in
+the WAVE FAQ (http://www.physionet.org/physiotools/wug/wave-faq.htm), which
+is part of the WAVE User's Guide (http://www.physionet.org/physiotools/wug/),
+a book-length tutorial and reference manual for WAVE.
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software

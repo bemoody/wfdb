@@ -32,7 +32,7 @@ For updates to this software, please visit PhysioNet
 
 _______________________________________________________________________________
 
-For a copy of this document, print `HELPDIR/wave/wave.pro' (or click
+For a copy of this document, print `HELPDIR/wave/news.hlp' (or click
 `Print' at the top of the window if you are viewing this from within WAVE).
 For a copy of the on-line help for WAVE, print `HELPDIR/wave/wave.hlp'.
 
@@ -87,9 +87,11 @@ New features
   of the others.  The `master WAVE process', corresponding to the last named
   record, has an extra button (labelled `Sync') in the control panel;  clicking
   on this button causes all of the other windows in the process group to become
-  synchronized with the master WAVE process.  It is also possible to open the
-  same record in two or more windows, and to select different displays for each
-  one, by a command such as
+  synchronized with the master WAVE process.  (This can also be done by
+  clicking on any point in the signal window of the master WAVE process,
+  using the middle mouse button while also pressing <control>.)  It is also
+  possible to open the same record in two or more windows, and to select
+  different displays for each one, by a command such as
 	wave -r 100+100 +0/-display +0/some.other.cpu:0
   (which opens record 100 in a window on `some.other.cpu', and also in a
   master WAVE window on the local display;  for this to be done successfully,

@@ -1,4 +1,4 @@
-.TH ANN2RR 1 "1 November 2002" "WFDB 10.3.0" "WFDB Applications Guide"
+.TH ANN2RR 1 "8 February 2003" "WFDB 10.3.2" "WFDB Applications Guide"
 .SH NAME
 ann2rr, rr2ann \- convert annotation files to interval lists and vice versa
 .SH SYNOPSIS
@@ -17,6 +17,11 @@ annotation file.  By default, the intervals are listed in units of sample
 intervals (use \fBsampfreq\fR(1) to determine the sampling frequency of the
 input record if necessary).  Options for \fBann2rr\fR include:
 .TP
+\fB-A\fR
+Print all intervals between annotations.  By default, \fBann2rr\fR prints
+only RR intervals (those between QRS (beat) annotations).  This option
+overrides the \fB-c\fR and \fB-p\fR options.
+.TP
 \fB-c\fR
 Print intervals between consecutive valid annotations only.  (See discussion
 below).
@@ -28,8 +33,17 @@ beginning of the record.
 \fB-h\fR
 Print a usage summary.
 .TP
+\fB-i\fR \fIformat\fR
+Print intervals in the specified \fIformat\fR.  By default, intervals are
+printed in units of sample intervals.  Other \fIformat\fRs include \fBs\fR
+(seconds), \fBm\fR (minutes), \fBh\fR (hours), and \fBt\fR (time interval
+in hh:mm:ss format).  Formats \fBs\fR, \fBm\fR, and \fBh\fR may be followed
+by an integer between 0 and 15 inclusive, specifying the number of decimal
+places (default: 3).  For example, use the option \fB-is8\fR to obtain
+intervals in seconds with 8 decimal places.
+.TP
 \fB-p\fR \fItype\fR [ \fItype\fR ... ]
-Print intervals between annotations of the specified \fItypes\fR only.
+Print intervals ended by annotations of the specified \fItypes\fR only.
 The \fItype\fR arguments should be annotation mnemonics (e.g., \fBN\fR),
 as normally printed by \fBrdann\fR(1) in the third column.  More than one
 \fB-p\fR option may be used in a single command, and each \fB-p\fR option may
@@ -38,33 +52,51 @@ with ``-'', however, it must immediately follow \fB-p\fR (standard annotation
 mnemonics do not begin with ``-'', but modification labels in an annotation
 file may define such mnemonics).
 .TP
+\fB-p\fR \fItype\fR [ \fItype\fR ... ]
+Print intervals begun by annotations of the specified \fItypes\fR only.
+.TP
 \fB-t\fR \fItime\fR
 Stop at the specified \fItime\fR.
 .TP
-\fB-v\fR, \fB-vs\fR, \fB-vm\fR, \fB-vh\fR, \fB-V\fR, \fB-Vs\fR, \fB-Vm\fR, \fB-Vh\fR
-Print the elapsed times from the beginning of the record to the annotations
-that begin each interval, as sample number (using \fB-v\fR), or in seconds
-(using \fB-vs\fR), minutes (using \fB-vm\fR), or hours (using \fB-vh\fR)
-before each heart rate value.  The options \fB-V\fR, \fB-Vs\fR, \fB-Vm\fR, and
-\fB-Vh\fR work in the same way, but the printed times are those for the
-annotations that end the intervals.  Only one of these options can be used at
-a time;  if none is chosen, only the RR intervals are printed, in units of
-sample intervals.  When using \fB-vs\fR, \fB-vm\fR, \fB-vh\fR, \fB-Vs\fR,
-\fB-Vm\fR, or \fB-Vh\fR, intervals are printed in units of seconds.
+\fB-v\fR \fIformat\fR
+Print final times (the times of occurrence of the annotations that end each
+interval).  This option accepts all of the \fIformat\fRs defined for \fB-i\fR,
+as well as \fBT\fR (to print the date and time in [hh:mm:ss dd/mm/yyyy] if the
+starting time and date have been recorded in the header file for \fIrecord\fR).
+If this option is chosen, the times appear at the end of each line of output.
+.TP
+\fB-V\fR \fIformat\fR
+Print initial times (the times of occurrence of the annotations that begin each
+interval).  Any of the \fIformat\fRs usable for the \fB-v\fR option may be used
+with \fB-V\fR.  If this option is chosen, the times appear at the beginning of
+each line of output.
 .TP
 \fB-w\fR
-Print the type (\fBN\fR, \fBV\fR, etc., as for \fB-p\fR above) of the
-annotation that ends each interval, at the end of each line of output.
+Print final annotations (the types (\fBN\fR, \fBV\fR, etc., as for \fB-p\fR
+above) of the annotations that end each interval), immediately following the
+intervals in each line of output.
+.TP
+\fB-W\fR
+Print initial annotations (the types of the annotations that end each
+interval), immediately before the interval in each line of output.
 .PP
 The \fB-c\fR option, used without the \fB-p\fR option, causes \fBann2rr\fR to
 filter out intervals between beats that have intervening non-beat annotations,
-such as rhythm or signal quality change annotations.  Used with the \fB-p\fR
-option, the \fB-c\fR option causes \fBann2rr\fR to reject intervals between
-annotations of the type(s) specified by \fB-p\fR if there are annotations of
-any other types intervening;  thus, for example, the combination of \fB-c\fR
-and \fB-p N\fR would yield only intervals between consecutive normal beats,
-and intervals between pairs of normal beats surrounding an ectopic beat would
-be discarded from the output.
+such as rhythm or signal quality change annotations.  Used with the \fB-P\fR
+and \fB-p\fR options, the \fB-c\fR option causes \fBann2rr\fR to reject
+intervals between annotations of the type(s) specified by \fB-p\fR if there are
+annotations of any other types intervening;  thus, for example,
+``\fB-c -P N -p N\fR'' yields only intervals between consecutive normal beats,
+and intervals between pairs of normal beats surrounding an ectopic beat are
+discarded from the output.  As another example, ``\fB-c -P N -p V\fR'' yields
+premature ventricular coupling intervals only (a coupling interval is the
+interval between a normal beat and an immediately following premature
+ventricular contraction).
+.PP
+The default output contains a single column of intervals only;  by using the
+\fB-v\fR, \fB-V\fR, \fB-w\fR, and \fB-W\fR options, up to five columns,
+separated by tabs, may be output.  The order of the columns is fixed (initial
+times, initial annotations, intervals, final annotations, final times).
 
 .SS "rr2ann"
 .PP
@@ -81,9 +113,9 @@ and (if it does not exist already) a text header file (\fIrecord\fR.hea).
 Options for \fBrr2ann\fR include:
 .TP
 \fB-F\fR \fIfrequency\fR
-Assume the specified sampling \fIfrequency\fR.  This option has no effect unless
-it is necessary for \fBrr2ann\fR to create a header file;  in this case, a sampling
-frequency of 250 Hz is assumed if the \fB-F\fR option is omitted.
+Assume the specified sampling \fIfrequency\fR.  This option has no effect
+unless it is necessary for \fBrr2ann\fR to create a header file;  in this case,
+a sampling frequency of 250 Hz is assumed if the \fB-F\fR option is omitted.
 .TP
 \fB-h\fR
 Print a usage summary.

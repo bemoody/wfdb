@@ -1,5 +1,5 @@
 # file: linux.def		G. Moody	31 May 2000
-#				Last revised: 21 November 2002
+#				Last revised: 18 December 2002
 # 'make' definitions for compiling the WFDB Software Package under Linux
 
 # Choose a value for WFDBROOT to determine where the WFDB Software Package will
@@ -54,7 +54,7 @@ LIBDIR = $(WFDBROOT)/lib
 
 # PSPDIR specifies the name of a directory in which to install the PostScript
 # prolog (*.pro) files from the 'app' directory.
-PSPDIR = $(WFDBROOT)/lib/ps
+PSPDIR = /usr/lib/ps
 
 # CC is the name of your C compiler.
 CC = gcc

@@ -1,10 +1,10 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  22 November 2002		wfdblib 10.3.0
+			Last revised:  12 February 2003		wfdblib 10.3.2
 WFDB library functions for signals
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 2002 George B. Moody
+Copyright (C) 2003 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -202,6 +202,9 @@ static long btime;		/* base time (milliseconds since midnight) */
 static WFDB_Date bdate;		/* base date (Julian date) */
 static WFDB_Time nsamples;	/* duration of signals (in samples) */
 static double bcount;		/* base count (counter value at sample 0) */
+static long prolog_bytes;	/* length of prolog, as told to wfdbsetstart
+				   (used only by setheader, if output signal
+				   file(s) are not open) */
 
 /* The next set of variables contains information about multi-segment records.
    The first two of them ('segments' and 'in_msrec') are used primarily as
@@ -2263,11 +2266,13 @@ unsigned int nsig;
 	(void)wfdb_fprintf(oheader, "%s %d", siarray[s].fname, siarray[s].fmt);
 	if (siarray[s].spf > 1)
 	    (void)wfdb_fprintf(oheader, "x%d", siarray[s].spf);
-	if (osd[s]->skew)
+	if (osd && osd[s]->skew)
 	    (void)wfdb_fprintf(oheader, ":%d", osd[s]->skew*siarray[s].spf);
-	if (ogd[osd[s]->info.group]->start)
+	if (ogd && ogd[osd[s]->info.group]->start)
 	    (void)wfdb_fprintf(oheader, "+%ld",
 			       ogd[osd[s]->info.group]->start);
+	else if (prolog_bytes)
+	    (void)wfdb_fprintf(oheader, "+%ld", prolog_bytes);
 	(void)wfdb_fprintf(oheader, " %g", siarray[s].gain);
 	if (siarray[s].baseline != siarray[s].adczero)
 	    (void)wfdb_fprintf(oheader, "(%d)", siarray[s].baseline);
@@ -2280,7 +2285,8 @@ unsigned int nsig;
 	    (void)wfdb_fprintf(oheader, " %s", p);
 	(void)wfdb_fprintf(oheader, "\r\n");
     }
-
+    prolog_bytes = 0L;
+    (void)wfdb_fflush(oheader);
     return (0);
 }
 
@@ -2451,6 +2457,7 @@ long bytes;
 {
     if (s < nosig)
         ogd[osd[s]->info.group]->start = bytes;
+    prolog_bytes = bytes;
 }
 
 FSTRING getinfo(record)

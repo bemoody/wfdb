@@ -1,3 +1,32 @@
+10.3.2:
+	New applications wav2mit and mit2wav create WFDB-format records from
+	files in the widely-used .wav audio format and vice versa.
+
+	When running multiple WAVE processes started from a single command,
+	it is now possible to update all of the signal windows by selecting
+	a sample in the master signal window (using <control>+<middle mouse
+	button>).
+
+	Changed options in ann2rr to support more flexible output formatting.
+
+	Fixed a WFDB library bug that caused annotation sorting to fail
+	if a new header file had been written.  Thanks to Winton Baker for
+	reporting this problem and for providing an example that illustrated
+	the bug.
+
+	Fixed a bug in mit2edf that caused a crash instead of printing help
+	if no arguments were supplied on the command line;  thanks to Jesus
+	Olivan for the bug report.
+
+	Fixed a bug in snip that caused a crash if -a was the last option
+	on the command line;  thanks to Joe Mietus for the bug report.
+
+	Corrected a documentation bug in WAVE's on-line help.
+
+	Revised rpm.spec and rules (in Makefile.tpl) for creating RPMs.
+	This is an interim solution;  in a future release there will be
+	separate wfdb-lib, wfdb-app, wfdb-doc, ... RPMs.
+
 10.3.1:
 	Added a -W option to ann2rr to create 2-column output containing
 	intervals in seconds and annotation mnemonics, and modified the

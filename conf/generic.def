@@ -1,5 +1,5 @@
 # file: generic.def		G. Moody	31 May 2000
-#				Last revised: 21 November 2002
+#				Last revised: 18 December 2002
 # This file contains default 'make' definitions for compiling the WFDB Software
 # Package under versions of UNIX that are not otherwise recognized by
 # 'configure'.
@@ -70,7 +70,7 @@ LIBDIR = $(WFDBROOT)/lib
 
 # PSPDIR specifies the name of a directory in which to install the PostScript
 # prolog (*.pro) files from the 'app' directory.
-PSPDIR = $(WFDBROOT)/lib/ps
+PSPDIR = /usr/lib/ps
 
 # CC is the name of your C compiler.  The WFDB library can be compiled with K&R
 # C compilers (`cc' on most if not all UNIX systems) as well as with ANSI C

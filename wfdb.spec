@@ -1,173 +1,202 @@
-Summary: Waveform Database library and applications
+# Note that this is NOT a relocatable package
+
+Summary: Waveform Database library
 Name: wfdb
 Version: VERSION
 Release: RPMRELEASE
-Copyright: GPL
-Group: Applications/Engineering
+License: GPL
+Group: Libraries
 Source: http://www.physionet.org/physiotools/archives/wfdb-VERSION.tar.gz
 URL: http://www.physionet.org/physiotools/wfdb.shtml
 Packager: George Moody <george@mit.edu>
 Requires: w3c-libwww >= 5.2
 Requires: w3c-libwww-devel >= 5.2
+BuildRoot: /var/tmp/%{name}-root
+
+%changelog
+* Wed Dec 18 2002 George B Moody <george@mit.edu>
+- split into wfdb, wfdb-devel, wfdb-app, wfdb-doc, wfdb-wave packages
+
+* Sun Dec 8 2002 George B Moody <george@mit.edu>
+- paths now use rpm's variables where possible
+
+%description
+The WFDB (Waveform Database) library supports creating, reading, and annotating
+digitized signals in a wide variety of formats.  Input can be from local files
+or directly from web or FTP servers (via the W3C's libwww).  WFDB applications
+need not be aware of the source or format of their input, since input files are
+located by searching a path that may include local and remote components, and
+all data are transparently converted on-the-fly into a common format.  Although
+created for use with physiologic signals such as those in PhysioBank
+(http://www.physionet.org/physiobank/), the WFDB library supports a broad
+range of general-purpose signal processing applications.
+
+%package devel
+Summary: WFDB developer's toolkit
+Group: Development/Libraries
+Requires: wfdb = VERSION
+
+%description devel
+This package includes files needed to develop new WFDB applications in C, C++,
+and Fortran, examples in C and in Fortran, and miscellaneous documentation.
+
+%package app
+Summary: WFDB applications.
+Group: Applications/Scientific
+URL: http://www.physionet.org/physiotools/wag/
+Requires: wfdb >= VERSION
+
+%description app
+About 60 applications for creating, reading, transforming, analyzing,
+annotating, and viewing digitized signals, especially physiologic signals.
+Applications include digital filtering, event detection, signal averaging,
+power spectrum estimation, and many others.
+
+%package wave
+Summary: Waveform Analyzer, Viewer, and Editor.
+Group: X11/Applications/Science
+URL: http://www.physionet.org/physiotools/wug/
+Requires: wfdb >= VERSION
+Requires: wfdb-app
 Requires: xview >= 3.2
 Requires: xview-devel >= 3.2
 
-%description
-Applications for creating, reading, analyzing, and viewing digitized signals in
-a wide variety of formats, with optional annotations.  The WFDB library,
-included here, works together with the W3C's libwww to provide HTTP and FTP
-client support to applications that use it, such as those in this package.
-Although created for use with physiologic signals such as those available from
-PhysioBank (http://www.physionet.org/physiobank/), many of the programs in this
-package are general-purpose signal processing applications.
+%description wave
+WAVE provides an environment for exploring digitized signals and time series.
+It provides fast, high-quality views of data stored locally or on remote
+web or FTP servers, flexible control of standard and user-provided analysis
+modules, efficient interactive annotation editing, and support for multiple
+views on the same or different displays to support collaborative analysis and
+annotation projects.  WAVE has been used to develop annotations for most of
+the PhysioBank databases (http://www.physionet.org/physiobank/).
+
+WAVE uses the XView graphical user interface.  A (beta) version of WAVE that
+uses GTK+ is available at http://www.physionet.org/physiotools/beta/gtkwave/.
+
+#%package doc
+#Summary: WFDB documentation.
+#Group: Documentation
+#URL: http://www.physionet.org/physiotools/manuals.shtml
+#
+#%description doc
+#This package includes HTML, PostScript, and PDF versions of the WFDB
+#Programmer's Guide, the WFDB Applications Guide, and the WAVE User's Guide.
 
 %prep
 %setup
-PATH=$PATH:/usr/openwin/bin ./configure --prefix=/usr
+PATH=$PATH:/usr/openwin/bin ./configure --prefix=%{_prefix}
 
 %build
 make
+#( cd doc/wag-src; make )
+#( cd doc/wpg-src; make )
+#( cd doc/wug-src; make )
 
 %install
-make install
+rm -rf $RPM_BUILD_ROOT
+make WFDBROOT=$RPM_BUILD_ROOT/usr install
+mkdir -p $RPM_BUILD_ROOT/usr/lib/X11/app-defaults
+cp -p /usr/lib/wavemenu.def $RPM_BUILD_ROOT/usr/lib
+cp -p /usr/lib/X11/app-defaults/Wave $RPM_BUILD_ROOT/usr/lib/X11/app-defaults
+mkdir -p $RPM_BUILD_ROOT/usr/lib/ps
+cp -pr /usr/lib/ps/pschart.pro /usr/lib/ps/12lead.pro /usr/lib/ps/psfd.pro \
+ $RPM_BUILD_ROOT/usr/lib/ps
+mkdir -p $RPM_BUILD_ROOT/usr/help
+cp -pr /usr/help/wave $RPM_BUILD_ROOT/usr/help
 
 %clean
+rm -rf $RPM_BUILD_ROOT
 make clean
 
-%post
-/sbin/ldconfig
+%post -p /sbin/ldconfig
 
-%postun
-/sbin/ldconfig
+%postun -p /sbin/ldconfig
 
 %files
 %defattr(-,root,root)
-%doc checkpkg doc examples fortran lib/COPYING.LIB wave/anntab wave/wavemenu.def COPYING INSTALL MANIFEST NEWS README README.NETFILES
+%{_libdir}/libwfdb.so*
 
-/usr/bin/a2m
-/usr/bin/ad2m
-/usr/bin/ahaconvert
-/usr/bin/ann2rr
-/usr/bin/bxb
-/usr/bin/calsig
-/usr/bin/coherence
-/usr/bin/cshsetwfdb
-/usr/bin/ecgeval
-/usr/bin/edf2mit
-/usr/bin/epicmp
-/usr/bin/fft
-/usr/bin/fir
-/usr/bin/hrfft
-/usr/bin/hrlomb
-/usr/bin/hrmem
-/usr/bin/hrplot
-/usr/bin/ihr
-/usr/bin/log10
-/usr/bin/lomb
-/usr/bin/m2a
-/usr/bin/makeid
-/usr/bin/md2a
-/usr/bin/memse
-/usr/bin/mfilt
-/usr/bin/mit2edf
-/usr/bin/mrgann
-/usr/bin/mxm
-/usr/bin/nst
-/usr/bin/plot2d
-/usr/bin/plot3d
-/usr/bin/plotstm
-/usr/bin/pscgen
-/usr/bin/pschart
-/usr/bin/psfd
-/usr/bin/rdann
-/usr/bin/rdsamp
-/usr/bin/readid
-/usr/bin/revise
-/usr/bin/rr2ann
-/usr/bin/rxr
-/usr/bin/sampfreq
-/usr/bin/setwfdb
-/usr/bin/sigamp
-/usr/bin/sigavg
-/usr/bin/skewedit
-/usr/bin/snip
-/usr/bin/sortann
-/usr/bin/sqrs
-/usr/bin/sqrs125
-/usr/bin/sumann
-/usr/bin/sumstats
-/usr/bin/tach
-/usr/bin/url_view
-/usr/bin/wave
-/usr/bin/wave-remote
-/usr/bin/wavescript
-/usr/bin/wfdbcat
-/usr/bin/wfdbcollate
-/usr/bin/wfdb-config
-/usr/bin/wfdbdesc
-/usr/bin/wfdbwhich
-/usr/bin/wqrs
-/usr/bin/wrann
-/usr/bin/wrsamp
-/usr/bin/xform
-/usr/database/100s.atr
-/usr/database/100s.dat
-/usr/database/100s.hea
-/usr/database/16.hea
-/usr/database/16l.hea
-/usr/database/8.hea
-/usr/database/8l.hea
-/usr/database/ahalist
-/usr/database/ahaxlist
-/usr/database/culist
-/usr/database/dbcal
-/usr/database/dblist
-/usr/database/esclist
-/usr/database/mitlist
-/usr/database/mitxlist
-/usr/database/multi.hea
-/usr/database/nstlist
-/usr/database/null.hea
-/usr/database/pipe/16x10.hea
-/usr/database/pipe/16x11.hea
-/usr/database/pipe/16x12.hea
-/usr/database/pipe/16x13.hea
-/usr/database/pipe/16x14.hea
-/usr/database/pipe/16x15.hea
-/usr/database/pipe/16x16.hea
-/usr/database/pipe/16x1.hea
-/usr/database/pipe/16x2.hea
-/usr/database/pipe/16x3.hea
-/usr/database/pipe/16x4.hea
-/usr/database/pipe/16x5.hea
-/usr/database/pipe/16x6.hea
-/usr/database/pipe/16x7.hea
-/usr/database/pipe/16x8.hea
-/usr/database/pipe/16x9.hea
-/usr/database/pipe/8x10.hea
-/usr/database/pipe/8x11.hea
-/usr/database/pipe/8x12.hea
-/usr/database/pipe/8x13.hea
-/usr/database/pipe/8x14.hea
-/usr/database/pipe/8x15.hea
-/usr/database/pipe/8x16.hea
-/usr/database/pipe/8x1.hea
-/usr/database/pipe/8x2.hea
-/usr/database/pipe/8x3.hea
-/usr/database/pipe/8x4.hea
-/usr/database/pipe/8x5.hea
-/usr/database/pipe/8x6.hea
-/usr/database/pipe/8x7.hea
-/usr/database/pipe/8x8.hea
-/usr/database/pipe/8x9.hea
-/usr/database/tape/10240.hea
-/usr/database/tape/1024.hea
-/usr/database/tape/4096.hea
-/usr/database/tape/512.hea
-/usr/database/tape/6144d.hea
-/usr/database/tape/ahatape.hea
-/usr/database/tape/mittape.hea
-/usr/database/wfdbcal
+%files devel
+%{_bindir}/wfdb-config
+%{_prefix}/include/wfdb
+%doc checkpkg examples fortran lib/COPYING.LIB COPYING INSTALL MANIFEST NEWS README README.NETFILES
+
+%files app
+%defattr(-,root,root)
+%{_bindir}/a2m
+%{_bindir}/ad2m
+%{_bindir}/ahaconvert
+%{_bindir}/ann2rr
+%{_bindir}/bxb
+%{_bindir}/calsig
+%{_bindir}/coherence
+%{_bindir}/cshsetwfdb
+%{_bindir}/ecgeval
+%{_bindir}/edf2mit
+%{_bindir}/epicmp
+%{_bindir}/fft
+%{_bindir}/fir
+%{_bindir}/hrfft
+%{_bindir}/hrlomb
+%{_bindir}/hrmem
+%{_bindir}/hrplot
+%{_bindir}/ihr
+%{_bindir}/log10
+%{_bindir}/lomb
+%{_bindir}/m2a
+%{_bindir}/makeid
+%{_bindir}/md2a
+%{_bindir}/memse
+%{_bindir}/mfilt
+%{_bindir}/mit2edf
+%{_bindir}/mrgann
+%{_bindir}/mxm
+%{_bindir}/nst
+%{_bindir}/plot2d
+%{_bindir}/plot3d
+%{_bindir}/plotstm
+%{_bindir}/pscgen
+%{_bindir}/pschart
+%{_bindir}/psfd
+%{_bindir}/rdann
+%{_bindir}/rdsamp
+%{_bindir}/readid
+%{_bindir}/revise
+%{_bindir}/rr2ann
+%{_bindir}/rxr
+%{_bindir}/sampfreq
+%{_bindir}/setwfdb
+%{_bindir}/sigamp
+%{_bindir}/sigavg
+%{_bindir}/skewedit
+%{_bindir}/snip
+%{_bindir}/sortann
+%{_bindir}/sqrs
+%{_bindir}/sqrs125
+%{_bindir}/sumann
+%{_bindir}/sumstats
+%{_bindir}/tach
+%{_bindir}/url_view
+%{_bindir}/wabp
+%{_bindir}/wfdbcat
+%{_bindir}/wfdbcollate
+%{_bindir}/wfdbdesc
+%{_bindir}/wfdbwhich
+%{_bindir}/wqrs
+%{_bindir}/wrann
+%{_bindir}/wrsamp
+%{_bindir}/xform
+%{_prefix}/database
+/usr/lib/ps/12lead.pro
+/usr/lib/ps/pschart.pro
+/usr/lib/ps/psfd.pro
+%{_prefix}/local/man
+
+%files wave
+%defattr(-,root,root)
+%{_bindir}/wave
+%{_bindir}/wave-remote
+%{_bindir}/wavescript
 /usr/help/wave/analysis.hlp
 /usr/help/wave/buttons.hlp
 /usr/help/wave/demo.txt
@@ -179,13 +208,10 @@ make clean
 /usr/help/wave/resource.hlp
 /usr/help/wave/wave.hlp
 /usr/help/wave/wave.info
-/usr/help/wave/wave.pro
-/usr/include/wfdb/ecgcodes.h
-/usr/include/wfdb/ecgmap.h
-/usr/include/wfdb/wfdb.h
-/usr/lib/libwfdb.so.10.2
-/usr/lib/ps/12lead.pro
-/usr/lib/ps/pschart.pro
-/usr/lib/ps/psfd.pro
-/usr/lib/wavemenu.def
-/usr/lib/X11/app-defaults/Wave
+%config /usr/lib/wavemenu.def
+%config /usr/lib/X11/app-defaults/Wave
+%doc wave/anntab
+
+#%files doc
+#%defattr(-,root,root)
+#%doc doc/wag doc/wpg doc/wug

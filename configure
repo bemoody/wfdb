@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody         24 May 2000
-#                             Last revised:  25 November 2002
+#                             Last revised:  18 December 2002
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -229,8 +229,7 @@ then
     mv conf/site.tmp conf/site.def
     sed "s/LWC = libwww-config/LWC = :/" <conf/site-slib.def >conf/site.tmp
     mv conf/site.tmp conf/site-slib.def
-    sed "s/WFDB_NETFILES 1/WFDB_NETFILES 0/" <lib/wfdb.h >lib/wfdb.tmp
-    mv lib/wfdb.tmp lib/wfdb.h
+    sed "s/WFDB_NETFILES 1/WFDB_NETFILES 0/" <lib/wfdb.h0 >lib/wfdb.h
     WITHNF=without
 else
     echo "The WFDB software will be compiled with NETFILES access."
@@ -244,8 +243,7 @@ else
     fi
     sed "s/LWC = :/LWC = libwww-config/" <conf/site-slib.def >conf/site.tmp
     mv conf/site.tmp conf/site-slib.def
-    sed "s/WFDB_NETFILES 0/WFDB_NETFILES 1/" <lib/wfdb.h >lib/wfdb.temp
-    mv lib/wfdb.temp lib/wfdb.h
+    sed "s/WFDB_NETFILES 0/WFDB_NETFILES 1/" <lib/wfdb.h0 >lib/wfdb.h
     WITHNF=with
 fi
 
