@@ -1,3 +1,11 @@
+10.2.2:
+	WAVE can now be used to view and edit annotations for records that
+	have no signals.
+
+	The WAVE User's Guide has been moved to the 'doc' directory, and
+	the process of formatting it is now better integrated with that for
+	the other WFDB guides.
+
 10.2.1:
 	Most users will no longer need to set the WFDB path explicitly, as a
 	result of several minor changes in the default path and in the

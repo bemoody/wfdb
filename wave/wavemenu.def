@@ -1,9 +1,9 @@
 # file: wavemenu.def	G. Moody	17 August 1990
-#			Last revised:	 19 June 2000
+#			Last revised:  27 November 2001
 # WAVE analysis menu
 # -----------------------------------------------------------------------------
 # WAVE: Waveform analyzer, viewer, and editor
-# Copyright (C) 2000 George B. Moody
+# Copyright (C) 2001 George B. Moody
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -100,7 +100,20 @@ Print full disclosure	echo $RECORD $START-$END | \
 #			 lpr -r -s ~/.psfd.$$
 
 # Use the following entry to export WAVE's variables to your shell environment.
-# This version is usable if your shell is `csh' or `tcsh':
+# This version is usable if your shell is 'ash', `bash', `ksh', 'sh', or 'zsh':
+Set variables		RECORD=$RECORD; ANNOTATOR=$ANNOTATOR; START=$START; \
+			 END=$END; DURATION=$DURATION; LEFT=$LEFT; \
+			 RIGHT=$RIGHT; WIDTH=$WIDTH; SIGNAL=$SIGNAL; \
+			 SIGNALS="$SIGNALS"; LOG=$LOG; WFDB=$WFDB; \
+			 WFDBCAL=$WFDBCAL; TSCALE=$TSCALE; VSCALE=$VSCALE; \
+			 DISPMODE=$DISPMODE; PSPRINT="$PSPRINT"; \
+			 TEXTPRINT="$TEXTPRINT"; URL=$URL; \
+			 export RECORD ANNOTATOR START END DURATION LEFT \
+			 RIGHT WIDTH SIGNAL SIGNALS LOG WFDB WFDBCAL TSCALE \
+			 VSCALE DISPMODE PSPRINT TEXTPRINT URL
+
+# Here is an alternate version of the previous entry, for use with `csh' or
+# `tcsh':
 #Set variables		setenv RECORD $RECORD; setenv ANNOTATOR $ANNOTATOR; \
 #			 setenv START $START; setenv END $END; \
 #			 setenv DURATION $DURATION; setenv LEFT $LEFT; \
@@ -112,18 +125,6 @@ Print full disclosure	echo $RECORD $START-$END | \
 #			 setenv DISPMODE $DISPMODE; setenv PSPRINT "$PSPRINT";\
 #			 setenv TEXTPRINT "$TEXTPRINT"; setenv URL $URL
 
-# Here is an alternate version of the previous entry, for use with `sh', `ksh',
-# or `bash':
-Set variables		RECORD=$RECORD; ANNOTATOR=$ANNOTATOR; START=$START; \
-			 END=$END; DURATION=$DURATION; LEFT=$LEFT; \
-			 RIGHT=$RIGHT; WIDTH=$WIDTH; SIGNAL=$SIGNAL; \
-			 SIGNALS="$SIGNALS"; LOG=$LOG; WFDB=$WFDB; \
-			 WFDBCAL=$WFDBCAL; TSCALE=$TSCALE; VSCALE=$VSCALE; \
-			 DISPMODE=$DISPMODE; PSPRINT="$PSPRINT"; \
-			 TEXTPRINT="$TEXTPRINT"; URL=$URL; \
-			 export RECORD ANNOTATOR START END DURATION LEFT \
-			 RIGHT WIDTH SIGNAL SIGNALS LOG WFDB WFDBCAL TSCALE \
-			 VSCALE DISPMODE PSPRINT TEXTPRINT URL
 
 # The label `<Print>' defines the command that is executed when the `Print'
 # button in the File menu is selected.  If you wish to have a button with the
@@ -153,6 +154,12 @@ Set variables		RECORD=$RECORD; ANNOTATOR=$ANNOTATOR; START=$START; \
 # consult your browser's documentation).
 <Open URL>		url_view $URL
 
+# The remainder of this file contains more examples of how to create analysis
+# buttons.  These examples are commented out to avoid cluttering up the
+# default Analyze window.  To try any of them out, simply remove the '#'
+# characters at the beginning of the lines that define them, then reread the
+# menu within WAVE.
+
 # The next two buttons use a file created using WAVE's Log window.  Typically,
 # the file contains the times of interesting events selected by the user,
 # with optional comments about each event.  The log is maintained in pschart
@@ -170,12 +177,12 @@ Set variables		RECORD=$RECORD; ANNOTATOR=$ANNOTATOR; START=$START; \
 # The current version of the annotation file (before merging) is saved as the
 # backup version (with a prefixed `_' in the annotator name);  any existing
 # backup with the same name is overwritten by this process.
-Mark QRSs & merge	mv -f $ANNOTATOR.$RECORD _$ANNOTATOR.$RECORD; \
-			 sqrs -r $RECORD -f $START -t $END -s $SIGNAL; \
-			 mv qrs.$RECORD a$$.$RECORD; \
-			 mrgann -r $RECORD -i a$$ _$ANNOTATOR -o $ANNOTATOR \
-			  -m2 0 -m1 $START -m2 $END; \
-			 rm -f a$$.$RECORD
+# Mark QRSs & merge	mv -f $ANNOTATOR.$RECORD _$ANNOTATOR.$RECORD; \
+#			 sqrs -r $RECORD -f $START -t $END -s $SIGNAL; \
+#			 mv qrs.$RECORD a$$.$RECORD; \
+#			 mrgann -r $RECORD -i a$$ _$ANNOTATOR -o $ANNOTATOR \
+#			  -m2 0 -m1 $START -m2 $END; \
+#			 rm -f a$$.$RECORD
 
 # The next several entries illustrate how `wave' can be used to select data
 # to be plotted by `gnuplot' (in these examples, via the `plot2d' and `plot3d'
@@ -183,69 +190,33 @@ Mark QRSs & merge	mv -f $ANNOTATOR.$RECORD _$ANNOTATOR.$RECORD; \
 
 # This entry derives a uniformly sampled instantaneous heart rate signal from
 # the open annotation file (using `tach'), and displays it on-screen.
-Plot HR (tach)		tach -r $RECORD -a $ANNOTATOR -f $START -t $END -Vm | \
-			 plot2d 0 1 -x "Time (minutes)" -y "HR (bpm)" \
-			  -t "Record $RECORD ($START - $END)"
+# Plot HR (tach)	tach -r $RECORD -a $ANNOTATOR -f $START -t $END -Vm | \
+#			 plot2d 0 1 -x "Time (minutes)" -y "HR (bpm)" \
+#			  -t "Record $RECORD ($START - $END)"
 
 # The next entry prints the same plot that the previous entry displays.  Note
 # that PRINTER is an ordinary environment variable (not interpreted by `wave');
 # set it so that `lpr -P$PRINTER' prints on the desired printer.
-Print HR (tach)		tach -r $RECORD -a $ANNOTATOR -f $START -t $END -Vm | \
-			 plot2d 0 1 -x "Time (minutes)" -y "HR (bpm)" \
-			  -t "Record $RECORD ($START - $END)" -T $PRINTER
+# Print HR (tach)	tach -r $RECORD -a $ANNOTATOR -f $START -t $END -Vm | \
+#			 plot2d 0 1 -x "Time (minutes)" -y "HR (bpm)" \
+#			  -t "Record $RECORD ($START - $END)" -T $PRINTER
 
 # The next two entries make plots resembling VCGs (vectorcardiograms), by
 # plotting the first signal in the signal list vs. the second one.  To obtain
 # the proper plot titles, and for efficiency, be sure that the signal list
 # contains only two signals.
-VCG			rdsamp -r $RECORD -f $LEFT -t $RIGHT -s $SIGNALS -p | \
-			 plot2d 1 2 -x "Amplitude (mV)" -y "Amplitude (mV)" -t \
-			 "Record $RECORD, Signals: $SIGNALS ($LEFT - $RIGHT)"
+# VCG			rdsamp -r $RECORD -f $LEFT -t $RIGHT -s $SIGNALS -p | \
+#			 plot2d 1 2 -x "Amplitude (mV)" -y "Amplitude (mV)" -t \
+#			 "Record $RECORD, Signals: $SIGNALS ($LEFT - $RIGHT)"
 
-VCG (with time axis)	rdsamp -r $RECORD -f $LEFT -t $RIGHT -s $SIGNALS -p | \
-			 plot3d 0 1 2 -x "Time (seconds)" -y "Amplitude (mV)" \
-			  -z "Amplitude (mV)" -rx 60 -rz 30 -t \
-			  "Record $RECORD, Signals: $SIGNALS ($LEFT - $RIGHT)"
+# VCG (with time axis)	rdsamp -r $RECORD -f $LEFT -t $RIGHT -s $SIGNALS -p | \
+#			 plot3d 0 1 2 -x "Time (seconds)" -y "Amplitude (mV)" \
+#			  -z "Amplitude (mV)" -rx 60 -rz 30 -t \
+#			  "Record $RECORD, Signals: $SIGNALS ($LEFT - $RIGHT)"
+
 # The previous entry can be modified easily to plot a 3D VCG (just change
 # `0 1 2' to '1 2 3', correct the x-axis label, and make sure that the signal
 # list contains three signals).  Adjust the -rx and -rz options to obtain the
 # desired viewpoint.
-
-# The plot produced by this entry can take a long time -- try it out with a
-# short data segment (ten seconds or so) the first time.  The `-100' argument
-# to `format3d' specifies the time offset in samples between the annotation
-# marks and the left edge of the plot (at x=0);  changing it to `-50' shifts the
-# waveforms to the left.
-`Waterfall' plot	rdsamp -r $RECORD -f $START -t $END -s $SIGNAL -p | \
-			 format3d -100 \
-			  `rr -r $RECORD -a $ANNOTATOR -f $START -t $END` | \
-			 plot3d 1 -x "Time (samples)" -y "Beat number" \
-			  -z "Amplitude (mV)" -rx 60 -rz 355 \
-			  -t "Record $RECORD, Signal $SIGNAL ($START - $END)"
-
-# The next group of entries is useful with the MIMIC Database.  You will need
-# to install `rdtxt' (from the software/mimicmsc directory of a MIMIC CD-ROM)
-# in order to use these buttons.
-Plot HR from `txt'	rdtxt -r $RECORD -p HR -f $START -t $END | \
-			 plot2d 0 2 -x "Time (minutes)" -y "HR (bpm)" \
-			  -t "Record $RECORD ($START - $END)"
-Plot mean ABP		rdtxt -r $RECORD -p ABP -f $START -t $END | \
-			 plot2d 0 2 -x "Time (minutes)" -y "mean ABP (mmHg)" \
-			  -t "Record $RECORD ($START - $END)" -ya 0 300
-Plot systolic ABP	rdtxt -r $RECORD -p ABP -n 2 -f $START -t $END | \
-			 plot2d 0 3 -x "Time (minutes)" -ya 0 300 \
-			  -y "systolic ABP (mmHg)" \
-			  -t "Record $RECORD ($START - $END)"
-Plot diastolic ABP	rdtxt -r $RECORD -p ABP -n 3 -f $START -t $END | \
-			 plot2d 0 4 -x "Time (minutes)" -ya 0 300 \
-			  -y "diastolic ABP (mmHg)" \
-			  -t "Record $RECORD ($START - $END)"
-Plot RESP		rdtxt -r $RECORD -p RESP -f $START -t $END | \
-			 plot2d 0 2 -x "Time (minutes)" -ya 0 50 \
-			  -y "Respiration (breaths/min)" \
-			  -t "Record $RECORD ($START - $END)"
-Plot SpO2		rdtxt -r $RECORD -p SpO2 -f $START -t $END | \
-			 plot2d 0 2 -x "Time (minutes)" -y "SpO2 (%)" \
-			  -ya 80 100 -t "Record $RECORD ($START - $END)"
 
 # Add additional entries below.

@@ -52,7 +52,6 @@ clean:
 	cd lib;      $(MAKE) clean
 	cd psd;      $(MAKE) clean
 	cd wave;     $(MAKE) clean
-	cd wave-doc; $(MAKE) clean
 	cd waverc;   $(MAKE) clean
 	cd wview;    $(MAKE) -f clean
 	rm -f *~ conf/*~ config.cache */*.exe

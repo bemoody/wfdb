@@ -1,7 +1,6 @@
 #LaTeX2HTML Version 96.1 : dot.latex2html-init
 #
-# This version has been customized for use in translating the appendices in
-# the WFDB Applications Guide.
+# This version has been customized for use with the WFDB software package.
 #
 ### Command Line Argument Defaults #######################################
 
@@ -121,8 +120,8 @@ $DEBUG = 0;
 #  of the navigation panel in the first node/page of a converted document
 #  will point to $EXTERNAL_UP_LINK. $EXTERNAL_UP_TITLE should be set
 #  to some text which describes this external link.
-$EXTERNAL_UP_LINK = "dbag.html";
-$EXTERNAL_UP_TITLE = "WFDB Applications Guide";
+# $EXTERNAL_UP_LINK = "../index.html"
+# $EXTERNAL_UP_TITLE = "Catalog of Documents";
 
 # If this is set then the resulting HTML will look marginally better if viewed 
 # with Netscape.

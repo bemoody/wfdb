@@ -1,5 +1,5 @@
-/* file: init.c		G. Moody	1 May 1990
-			Last revised: 14 October 2001
+/* file: init.c		G. Moody	 1 May 1990
+			Last revised: 26 November 2001
 Initialization functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -145,10 +145,10 @@ char *s;
        second per signal. */
     if (nsig < 0 || (freq = sampfreq(NULL)) <= 0.) freq = WFDB_DEFFREQ;
 
-    /* Quit unless at least one signal can be read. */
-    if (nsig < 1)
+    /* Quit if isigopen failed. */
+    if (nsig < 0)
 	sprintf(ts, "Record %s is unavailable\n", record);
-    if (nsig < 1) {
+    if (nsig < 0) {
 #ifdef NOTICE
 	Xv_notice notice = xv_create((Frame)frame, NOTICE,
 				     XV_SHOW, TRUE,
@@ -247,7 +247,12 @@ void set_baselines()
     else
 	for (i = 0; i < siglistlen; i++)
 	    base[i] = canvas_height*(2*i+1.)/(2.*siglistlen);
-    abase = (nsig > 1) ? (base[i/2] + base[i/2-1])/2 : canvas_height*4/5;
+    if (nsig > 1)
+	abase = (base[i/2] + base[i/2-1])/2;
+    else if (nsig > 0)
+	abase = canvas_height*4/5;
+    else
+	abase = canvas_height/2;
 }
 
 /* Calibrate() sets scales for the display.  Ordinate (amplitude) scaling

@@ -1,0 +1,19 @@
+#! /bin/sh
+# file: wugfigures
+#
+# Copy WAVE User's Guide PostScript figures into the doc directory.  The
+# doc directory must be the current directory when this script is run.
+
+if [ $# -eq 1 ]; then OPT=$1
+else OPT=-grey
+fi
+
+case $OPT in
+  -clean) (cd wave/grey;  for i in *.ps; do rm -f ../../$i; done)
+	  (cd wave/color; for i in *.ps; do rm -f ../../$i; done) ;;
+  -color) cp -f wave/grey/*.ps .
+	  cp -f wave/color/*.ps . ;;
+  -grey)  cp -f wave/grey/*.ps . ;;
+esac
+
+

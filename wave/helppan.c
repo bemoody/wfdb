@@ -1,10 +1,10 @@
 /* file: helppan.c	G. Moody         1 May 1990
-			Last revised:  7 January 2000
+			Last revised:  27 November 2001
 Help panel functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 2000 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -84,7 +84,7 @@ void help()
     }
     fprintf(stderr, "\nFor more information, type `more %s/wave/%s',\n",
 	    helpdir, HELPFILE);
-    fprintf(stderr, "or open `%s' using your web browser.\n", url);
+    fprintf(stderr, "or open `%s' using\nyour web browser.\n", url);
     exit(1);
 }
 
@@ -217,7 +217,7 @@ void create_help_popup()
 	      0);
     xv_create(help_panel, PANEL_MESSAGE,
 	      PANEL_LABEL_STRING,
-	     "Copyright \251 George B. Moody 1999.",
+	     "Copyright \251 1990-2001 George B. Moody.",
 	      0);
 
     xv_create(help_panel, PANEL_BUTTON,

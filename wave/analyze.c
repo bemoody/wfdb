@@ -1,5 +1,5 @@
 /* file: analyze.c	G. Moody	10 August 1990
-			Last revised:	14 October 2001
+			Last revised:  26 November 2001
 Functions for the analysis panel of WAVE
 
 -------------------------------------------------------------------------------
@@ -306,7 +306,8 @@ void create_analyze_popup()
 			    PANEL_VALUE_DISPLAY_LENGTH, 3,
 			    PANEL_VALUE, signal_choice,
 			    PANEL_MIN_VALUE, 0,
-			    PANEL_MAX_VALUE, nsig-1,
+			    PANEL_MAX_VALUE, nsig > 0 ? nsig-1 : 0,
+			    PANEL_INACTIVE, nsig > 0 ? FALSE : TRUE,
 			    PANEL_NOTIFY_PROC, set_signal, 0);
     signal_name_item = xv_create(analyze_panel, PANEL_MESSAGE,
 				 PANEL_LABEL_STRING, "xxxxxxxxxxxxxx", 0);
@@ -341,6 +342,7 @@ void create_analyze_popup()
 			     XV_HELP_DATA, "wave:file.analyze.signal_list",
 			     PANEL_VALUE_DISPLAY_LENGTH, 15,
 			     PANEL_VALUE_STORED_LENGTH, 1024,
+			     PANEL_INACTIVE, nsig > 0 ? FALSE : TRUE,
 			     PANEL_NOTIFY_PROC, set_siglist, 0);
     reset_siglist();
 	      
@@ -814,7 +816,7 @@ void reset_siglist()
 	    maxrssiglistlen = siglistlen;
 	}
 	p = sigliststring;
-	*p = '\0';
+	if (p) *p = '\0';
 	for (i = 0; i < siglistlen; i++) {
 	    sprintf(p, "%d ", siglist[i]);
 	    p += strlen(p);
@@ -828,9 +830,11 @@ void reset_siglist()
 void reset_maxsig()
 {
     if (analyze_popup_active >= 0) {
-	xv_set(signal_item, PANEL_MAX_VALUE, nsig-1, 0);
+	xv_set(signal_item, PANEL_INACTIVE, nsig > 0 ? FALSE : TRUE, 0);
+	xv_set(signal_item, PANEL_MAX_VALUE, nsig > 0 ? nsig-1 : 0, 0);
 	if (signal_choice >= nsig || signal_choice < 0)
 	    xv_set(signal_item, PANEL_VALUE, signal_choice = 0, 0);
+	xv_set(signal_name_item, PANEL_INACTIVE, nsig > 0 ? FALSE : TRUE, 0);
 	xv_set(signal_name_item, PANEL_LABEL_STRING,signame[signal_choice], 0);
     }
 }

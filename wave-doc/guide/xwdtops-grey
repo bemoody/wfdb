@@ -1,1 +1,0 @@
-xwd -frame | xwdtopnm | pnmdepth 255 | ppmtopgm | pnmtops -noturn -rle -scale .5

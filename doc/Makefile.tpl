@@ -1,6 +1,13 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:  12 December 2000
+#				Last revised:  25 November 2001
 # Change the settings below as appropriate for your setup.
+
+# Set COLORS to 'color' if you have a color printer and would like to print
+# in color, or if your non-color printer accepts and prints color PostScript
+# acceptably (most modern PostScript printers do, and Ghostscript also converts
+# color to shades of grey acceptably.)  Set COLORS to 'grey' otherwise.
+COLORS = color
+#COLORS = grey
 
 # DOSCHK is a command for checking file and directory names within the current
 # directory for MS-DOS compatibility, used by `make html'.  If you have GNU
@@ -25,7 +32,7 @@ T2DARGS = -t @letterpaper
 # from the sources in this directory.
 HTMLDIR = ../../html
  
-# INFODIR is the GNU emacs info directory (needed to `make info').  One of the
+# INFODIR is the GNU info directory (needed to `make info').  One of the
 # following definitions should be correct.
 INFODIR = /usr/info
 # INFODIR = /usr/local/info
@@ -52,29 +59,33 @@ MAKEINFO = makeinfo --force --no-warn
 # something like /usr/man or /usr/local/man (type `man man' to find out).
 MANDIR = /usr/local/man
 
-# MAN1, MAN3, and MAN5 are the directories in which local man pages for
-# section 1 (commands), section 3 (libraries), and section 5 (formats) go.
-# You may wish to use $(MANDIR)/manl for all of these; if so, uncomment
-# the next three lines.
+# MAN1, MAN3, MAN5, and MAN7 are the directories in which local man pages for
+# section 1 (commands), section 3 (libraries), section 5 (formats), and
+# section 7 (conventions and miscellany) go.  You may wish to use
+# $(MANDIR)/manl for all of these; if so, uncomment the next four lines.
 # MAN1 = $(MANDIR)/manl
 # MAN3 = $(MANDIR)/manl
 # MAN5 = $(MANDIR)/manl
-# Uncomment the next three lines to put the man pages in with the standard
+# MAN7 = $(MANDIR)/manl
+# Uncomment the next four lines to put the man pages in with the standard
 # ones.
 MAN1 = $(MANDIR)/man1
 MAN3 = $(MANDIR)/man3
 MAN5 = $(MANDIR)/man5
+MAN7 = $(MANDIR)/man7
 # If you want to put the man pages somewhere else, edit `maninst.sh' first.
 
 # PERL is the full pathname of your perl interpreter, needed for `make htmlpg'.
 PERL = /usr/bin/perl
 
-# PSPRINT is the name of the program that prints PostScript files (needed to
-# `make guide' and to `make appguide').
+# PSPRINT is the name of the program that prints PostScript files. If your
+# printer is not a PostScript printer, see the GhostScript documentation to see
+# how to do this (since the figure files are in PostScript form, it is not
+# sufficient to use a non-PostScript dvi translator such as dvilj).
 PSPRINT = lpr
 
 # TROFF is the name of the program that prints UNIX troff files (needed to
-# `make appguide' and for the covers of both guides).  Use `groff' if you have
+# `make appguide' and for the covers of the guides).  Use `groff' if you have
 # GNU groff (the preferred formatter).
 TROFF = groff
 # Use `ptroff' if you have Adobe TranScript software.
@@ -106,8 +117,8 @@ TMS = -mgs
 all:
 
 # `make' or `make install': install the man pages
-install:	$(MAN1) $(MAN3) $(MAN5)
-	./maninst.sh $(MAN1) $(MAN3) $(MAN5) "$(SETPERMISSIONS)"
+install:	$(MAN1) $(MAN3) $(MAN5) $(MAN7)
+	./maninst.sh $(MAN1) $(MAN3) $(MAN5) $(MAN7) "$(SETPERMISSIONS)"
 	$(LN) $(MAN1)/a2m.1 $(MAN1)/ad2m.1
 	$(LN) $(MAN1)/a2m.1 $(MAN1)/m2a.1
 	$(LN) $(MAN1)/a2m.1 $(MAN1)/md2a.1
@@ -124,6 +135,7 @@ uninstall:
 	 hrmem.1 hrplot.1 plot3d.1 cshsetwfdb.1 vsetup.1
 	../uninstall.sh $(MAN3) *.3
 	../uninstall.sh $(MAN5) *.5
+	../uninstall.sh $(MAN7) *.7
 
 # Create directories for installation if necessary.
 $(MAN1):
@@ -132,6 +144,8 @@ $(MAN3):
 	mkdir -p $(MAN3); $(SETDPERMISSIONS) $(MAN3)
 $(MAN5):
 	mkdir -p $(MAN5); $(SETDPERMISSIONS) $(MAN5)
+$(MAN7):
+	mkdir -p $(MAN7); $(SETDPERMISSIONS) $(MAN7)
 
 # `make appguide': print the man pages (the Applications Guide)
 appguide:
@@ -156,6 +170,24 @@ dbag.ps:
 	latex eval
 	dvips $(D2PARGS) -o dbag5.ps eval.dvi
 	cat dbag[12345].ps | grep -v '^%%' >dbag.ps
+
+# `make wguide': print the WAVE User's Guide
+wguide:	wug.ps
+	$(TROFF) cover.wug >wug0.ps
+	$(PSPRINT) wug0.ps wug.ps
+
+# LaTeX needs three passes to generate the table of contents, list of figures,
+# and index correctly.  LaTeX, makeindex, and dvips are included in the TeX
+# distribution.
+wug.ps:	wug.tex
+	wave/scripts/wugfigures -$(COLORS)	# get a set of figures
+	latex wug
+	makeindex wug.idx
+	latex wug
+	makeindex wug.idx
+	latex wug
+	dvips $(D2PARGS) -o wug.ps wug.dvi
+	wave/scripts/wugfigures -clean	# remove figures from this directory
 
 # `make guide': print the Programmer's Guide
 guide:	dbpg.ps
@@ -182,16 +214,17 @@ $(INFODIR):
 	mkdir -p $(INFODIR); $(SETDPERMISSIONS) $(INFODIR)
 
 # `make html': create HTML files, check for anything not accessible to MSDOS
-html:	makehtmldirs htmlag htmlpg
+html:	makehtmldirs htmlag htmlpg htmlwg
 	cd $(HTMLDIR); $(DOSCHK); ln -s index.htm index.html
 
-makehtmldirs:  $(HTMLDIR)/dbpg $(HTMLDIR)/dbag
+makehtmldirs:  $(HTMLDIR)/dbpg $(HTMLDIR)/dbag $(HTMLDIR)/wug
 	-mkdir $(HTMLDIR)
 	cp -p index.ht0 $(HTMLDIR)/index.htm
 	date '+%e %B %Y' >>$(HTMLDIR)/index.htm
 	cat foot.ht0 >>$(HTMLDIR)/index.htm
 	-mkdir $(HTMLDIR)/dbpg
 	-mkdir $(HTMLDIR)/dbag
+	-mkdir $(HTMLDIR)/wug
 
 $(HTMLDIR):
 	mkdir -p $(HTMLDIR); $(SETDPERMISSIONS) $(HTMLDIR)
@@ -199,12 +232,16 @@ $(HTMLDIR)/dbag:	$(HTMLDIR)
 	mkdir -p $(HTMLDIR)/dbag; $(SETDPERMISSIONS) $(HTMLDIR)/dbag
 $(HTMLDIR)/dbpg:	$(HTMLDIR)
 	mkdir -p $(HTMLDIR)/dbpg; $(SETDPERMISSIONS) $(HTMLDIR)/dbpg
+$(HTMLDIR)/wug:	$(HTMLDIR)
+	mkdir -p $(HTMLDIR)/wug; $(SETDPERMISSIONS) $(HTMLDIR)/wugg
 
 htmlag:	makehtmldirs dbag.ps
 	cp -p icons/* dbag.ps fixag.sh fixag.sed $(HTMLDIR)/dbag
-	./manhtml.sh $(HTMLDIR)/dbag *.1 *.3 *.5
-	latex2html -dir $(HTMLDIR)/dbag -local_icons -prefix in install
-	latex2html -dir $(HTMLDIR)/dbag -local_icons -prefix ev eval
+	./manhtml.sh $(HTMLDIR)/dbag *.1 *.3 *.5 *.7
+	latex2html -dir $(HTMLDIR)/dbag -local_icons -prefix in \
+	 -up_url="dbag.htm" -up_title="WFDB Applications Guide" install
+	latex2html -dir $(HTMLDIR)/dbag -local_icons -prefix ev \
+	 -up_url="dbag.htm" -up_title="WFDB Applications Guide" eval
 	rm -f $(HTMLDIR)/dbag/index.html
 	cd $(HTMLDIR)/dbag; ./fixag.sh *.html; rm -f fixag.sh images.*
 	cd $(HTMLDIR)/dbag; rm -f .I* .ORIG_MAP *.html *.pl fixag.sed
@@ -227,6 +264,21 @@ htmlpg:	makehtmldirs dbpg.ps
 	cat foot.ht0 >>$(HTMLDIR)/dbpg/dbpg.htm
 	cd $(HTMLDIR)/dbpg; ln -s dbpg.htm index.html
 
+htmlwg: makehtmldirs wug.ps
+	cp -p icons/* wave/png/* wug.ps ../examples/stdev.c \
+	 wave/misc/example.xws $(HTMLDIR)/wug
+	wave/scripts/wugfigures -color	# get a set of figures
+	latex2html -dir $(HTMLDIR)/wug -local_icons \
+	 -up_url="../manuals.shtml" -up_title="Books about PhysioToolkit" wug
+	wave/scripts/wugfigures -clean	# remove figures from this directory
+	cp wave/scripts/dossify-html wave/scripts/fixlinks $(HTMLDIR)/wug
+	cd $(HTMLDIR)/wug; ./dossify-html *.html
+	cd $(HTMLDIR)/wug; rm -f dossify-html fixlinks *.html *.orig
+	cd $(HTMLDIR)/wug; rm -f .ID_MAP .IMG_PARAMS .ORIG_MAP images.*
+	mv $(HTMLDIR)/wug/*.pl .
+	cd $(HTMLDIR)/wug; ln -s wug.htm index.html; find `pwd` -print | doschk
+	wave/scripts/fixinfo >../wave/wave.info
+
 # `make listing': print listings of programs in this directory
 listing:
 	$(PRINT) README Makefile fixag.sed fixag.sh fixpg.sed fixpg.sh \
@@ -239,4 +291,6 @@ listing:
 
 # `make clean': remove intermediate and backup files
 clean:
-	rm -f *.aux *.dvi *.log db*.toc db*.?? db*.??s dbpg* *~ texindex
+	rm -f *.aux *.dvi *.log db*.toc db*.?? db*.??s dbpg* *~ texindex \
+	 wug.ind wug.ilg wug.toc wug.idx wug.ps labels.pl internals.pl
+
