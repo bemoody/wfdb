@@ -1,5 +1,5 @@
 /* file: wavescript.c		G. Moody	10 October 1996
-				Last revised:	 9 March 2002
+				Last revised:	 19 June 2002
 Remote control for WAVE via script
 
 -------------------------------------------------------------------------------
@@ -140,7 +140,7 @@ char *record, *annotator, *ptime, **siglist, *path;
 	if (*annotator) nargs += 2;
 	if (*ptime) nargs += 2;
 	if (*path) nargs += 2;
-	if (*siglist) {
+	if (siglist) {
 	    for (i = 0; siglist[i]; i++)
 		;
 	    nargs += i+1;
@@ -162,7 +162,7 @@ char *record, *annotator, *ptime, **siglist, *path;
 	    arg[nargs++] = "-p";
 	    arg[nargs++] = path;
 	}
-	if (*siglist) {
+	if (siglist) {
 	    arg[nargs++] = "-s";
 	    while (*siglist)
 		arg[nargs++] = *siglist++;
@@ -312,7 +312,8 @@ char **argv, **env;
 	if (*record) fprintf(ofile, "-r %s\n", record);
 	if (*annotator) fprintf(ofile, "-a %s\n", annotator);
 	if (*ptime) fprintf(ofile, "-f %s\n", ptime);
-	if (siglist[0]) {
+	if (*path) fprintf(ofile, "-p %s\n", path);
+	if (siglist && siglist[0]) {
 	    fprintf(ofile, "-s %s", siglist[0]);
 	    for (i = 1; siglist[i]; i++)
 		fprintf(ofile, " %s", siglist[i]);

@@ -1,9 +1,9 @@
 file: README.NETFILES		G. Moody	14 September 1999
-				Last revised:	 6 September 2001
+				Last revised:	  21 June 2002
 
-This version of the WFDB software package contains experimental NETFILES
-support in the WFDB library, which is compiled if you have previously
-installed libwww (see http://www.w3.org/Library/).
+This version of the WFDB software package contains NETFILES support in the
+WFDB library, which is compiled if you have previously installed libwww
+(see http://www.w3.org/Library/).
 
 NETFILES support is known to work well under Linux, Solaris, and MS-Windows.
 When compiling the WFDB library as a static library with NETFILES support, it
@@ -15,13 +15,13 @@ To use NETFILES once this software has been compiled and installed, the WFDB
 path should contain one or more components that refer to remote files available
 via http or ftp.  If NETFILES support is included, the default WFDB path
 (defined in lib/wfdblib.h) is
-	. http://www.physionet.org/physiobank/database
-(i.e., the first component is the current (local) directory, and the second
-component is the top-level PhysioBank database directory).  If you use a
-local PhysioBank mirror, you may wish to change www.physionet.org to the
-hostname of your local mirror in lib/wfdblib.h before compiling the WFDB
-library.  You may always override this path by setting the WFDB environment
-variable.
+	. /usr/database http://www.physionet.org/physiobank/database
+(i.e., the first component is the current (local) directory, the second is
+/usr/database in the local file system, and the third component is the
+top-level PhysioBank database directory).  If you use a local PhysioBank
+mirror, you may wish to change www.physionet.org to the hostname of your local
+mirror in lib/wfdblib.h before compiling the WFDB library.  You may always
+override this path by setting the WFDB environment variable.
 
 Provided that a remote path component (one beginning with http:// or ftp://)
 is included in the WFDB path, all WFDB applications that read local files will
@@ -58,4 +58,4 @@ special way in this case, since wavescript will do this automatically based on
 information it receives from your browser.)
 
 NETFILES support was originally implemented by Michael Dakin as part of his
-summer UROP project at MIT.  Thanks, Mike!
+summer 1999 UROP project at MIT.  Thanks, Mike!

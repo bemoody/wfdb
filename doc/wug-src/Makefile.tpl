@@ -1,5 +1,5 @@
-# file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:  20 December 2001
+# file: Makefile.tpl		G. Moody	24 May 2000
+#				Last revised:	20 June 2002
 # Change the settings below as appropriate for your setup.
 
 # Set COLORS to 'color' if you have a color printer and would like to print
@@ -58,20 +58,26 @@ wug-book:	wug.ps
 	$(PSPRINT) wugcover.ps wug.ps
 
 # 'make wug.html': format the WAVE User's Guide as HTML
-wug.html:
+#   'wug.aux' is listed as a prerequisite because the figure numbers are
+#   recorded there.  It doesn't matter if it was created by latex or pdflatex.
+#   Note that the file 'wug.html' created at the end of this process is empty;
+#   it is created only so that 'make' can easily determine if the real HTML
+#   files (in ../wug/) are up-to-date.
+wug.html:	wug.tex wug.aux
 	cp -p ../misc/icons/* wave/png/* ../../examples/stdev.c \
 	 wave/misc/example.xws ../wug
 	wave/scripts/wugfigures -color	# get a set of figures
 	latex2html -dir ../wug -local_icons \
 	 -up_url="../manuals.shtml" -up_title="Books about PhysioToolkit" wug
-	wave/scripts/wugfigures -clean	# remove figures from this directory
 	cp wave/scripts/dossify-html wave/scripts/fixlinks ../wug
 	cd ../wug; ./dossify-html *.html
 	cd ../wug; rm -f dossify-html fixlinks *.html *.orig
 	cd ../wug; rm -f .ID_MAP .IMG_PARAMS .ORIG_MAP images.*
 	mv ../wug/*.pl .
+	wave/scripts/fixwug.sh ../wug
 	cd ../wug; ln -s wug.htm index.html; find `pwd` -print | doschk
 	wave/scripts/fixinfo >../../wave/wave.info
+	touch wug.html
 
 # 'make wug.pdf': format the WAVE User's Guide as PDF
 wug.pdf:	wug.tex
@@ -89,10 +95,9 @@ wug.pdf:	wug.tex
 	pdflatex wug
 	makeindex wug.idx
 	pdflatex wug
-	wave/scripts/wugfigures -clean
 
 # 'make wug.ps': format the WAVE User's Guide as PostScript
-wug.ps:	wug.tex
+wug.ps:		wug.tex
 	wave/scripts/wugfigures -$(COLORS)	# get a set of figures
 	rm -f wug.aux wug.idx wug.ind wug.toc
 	latex wug
@@ -101,9 +106,16 @@ wug.ps:	wug.tex
 	makeindex wug.idx
 	latex wug
 	dvips $(D2PARGS) -o wug.ps wug.dvi
-	wave/scripts/wugfigures -clean	# remove figures from this directory
+
+# 'wug.aux' is created by 'latex wug' or 'pdflatex wug' (which make slightly
+# different versions of 'wug.aux').  It is a separate target because it is
+# needed by 'make wug.html' (to obtain the figure numbers).  Either version
+# of 'wug.aux' is acceptable for 'make wug.html'.
+wug.aux:	wug.tex
+	$(MAKE) wug.ps
 
 # 'make clean': remove intermediate and backup files
 clean:
-	rm -rf internals.pl labels.pl wug.aux wug.dvi wug.idx wug.ilg wug.ind \
-	 wug.log wug.out wug.pdf wug.ps wug.toc .xvpics *~
+	wave/scripts/wugfigures -clean	# remove figures from this directory
+	rm -rf internals.pl labels.pl wug.aux wug.dvi wug.html wug.idx \
+	 wug.ilg wug.ind wug.log wug.out wug.pdf wug.ps wug.toc .xvpics *~

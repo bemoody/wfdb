@@ -1,5 +1,5 @@
 file: INSTALL			G. Moody	30 January 2000
-				Last revised:	  2 June 2002
+				Last revised:	 19 June 2002
 WFDB Software Package installation notes
 
 These notes are included here for those who may not have ready access to the
@@ -18,15 +18,19 @@ Under UNIX or Linux:
    support for reading input files from remote web and FTP servers.  See
    README.NETFILES for further information about this option.
 
-2. Install the XView library (see http://www.physionet.org/physiotools/xview/)
+2. WAVE is an optional part of the WFDB Software Package.  If the XView
+   toolkit is available for your system, installing WAVE is highly recommended.
+   Otherwise, go on to step 3;  after completing the WFDB software package
+   installation, you may wish to try GTKWave (an experimental version of WAVE
+   that uses the GTK+ GUI, which is available for many other versions of Unix).
+
+   Install the XView library (see http://www.physionet.org/physiotools/xview/)
    if you want to use WAVE, and be sure that the directory that contains the
    XView application 'textedit' (usually /usr/openwin/bin) is in your PATH.
    For information about WAVE, see the WAVE User's Guide,
    http://www.physionet.org/physiotools/wug/.
 
-   WAVE uses Netscape (or another web browser, if you've made the appropriate
-   changes in waverc/Makefile) for some of its on-line help.  Copy the
-   contents of http://www.physionet.org/physiotools/wug/ into
+   Copy the contents of http://www.physionet.org/physiotools/wug/ into
    /usr/local/help/html/wug if you wish to read the help from local files;
    otherwise, edit wave/wave.info and change all occurrences of
    '/usr/local/help/html/' into 'http://www.physionet.org/physiotools/wug/'.

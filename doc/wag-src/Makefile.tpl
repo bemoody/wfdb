@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:    7 June 2002
+#				Last revised:    24 June 2002
 # Change the settings below as appropriate for your setup.
 
 # D2PARGS is a list of options for dvips.  Uncomment one of these to set the
@@ -75,13 +75,14 @@ TMS = -mgs
 # printed or viewed directly, but most (perhaps all) viewers are incapable of
 # allowing the user to jump to a random page in a PostScript file that lacks
 # DSCs, and it's not easy to select a subset of pages to print in such a
-# file.  If you have ps2pdf and acroread (or pdftops), you can translate
-# wag0.ps into PDF (adding the DSCs in the process), and then translate the PDF
-# file back into PostScript with DSCs.  A disadvantage of this is that the PDF
-# version is roughly 25% larger than wag0.ps, and the final PostScript version
-# is nearly twice as large as wag0.ps, and takes longer to render as a
-# result.  To enable creation of PostScript with DSCs in this way, uncomment
-# the next two lines:
+# file.  If you have ghostscript version 7.x or later (earlier versions will
+# not work properly), ps2pdf (included with ghostscript) and acroread (or
+# pdftops), you can translate wag0.ps into PDF (adding the DSCs in the
+# process), and then translate the PDF file back into PostScript with DSCs.
+# A disadvantage of this is that the PDF version is roughly 25% larger than
+# wag0.ps, and the final PostScript version is nearly twice as large as
+# wag0.ps, and takes longer to render as a result.  To enable creation of
+# PostScript with DSCs in this way, uncomment the next two lines:
 WAGPSREQ = wag.pdf
 MAKEWAGPS = acroread -toPostScript wag.pdf
 # You can use pdftops instead of acroread by commenting out the previous line

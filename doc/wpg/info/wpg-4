@@ -1,6 +1,335 @@
 This is wpg, produced by makeinfo version 4.0b from wpg.tex.
 
 
+File: wpg,  Node: WFDB_Anninfo structures,  Next: WFDB_Annotation structures,  Prev: WFDB_Calinfo structures,  Up: Data Types
+
+Annotator Information Structures
+================================
+
+   The AIARRAY argument for `annopen' and `wfdbinit' is a pointer to an
+array of objects of type `WFDB_Anninfo'.  Each member of the array
+contains information provided to `annopen' and `wfdbinit' about an
+annotation file associated with the record:
+
+`char *name'
+     the annotator name.  The name `atr' is reserved for a "reference
+     annotation file" supplied by the creator of the database record to
+     document its contents as accurately and thoroughly as possible.
+     You may use other annotator names to identify annotation files
+     that you create; unless there are compelling reasons not to do so,
+     follow the convention that the annotator name is the name of the
+     file's creator (a program or a person).  To avoid confusion, do
+     not use `dat', `dataN', `dN', or `hea' (all of which are commonly
+     used as parts of WFDB file names) as annotator names.  The special
+     name `-' refers to the standard input or output.  Other annotator
+     names may contain upper- or lower-case letters, digits, and
+     underscores.  Annotation files are normally created in the current
+     directory and found in any of the directories in the database path
+     (*note WFDB path::).
+
+`int stat'
+     the file type/access code.  Usually, `stat' is either `WFDB_READ'
+     or `WFDB_WRITE', to specify standard ("MIT format") annotation
+     files to be read by `getann' or to be written by `putann'.  Both
+     MIT DB and AHA DB annotation files are kept on-line in MIT format.
+     The symbols `WFDB_READ' and `WFDB_WRITE' are defined in
+     `<wfdb/wfdb.h>'. An AHA-format annotation file can be read by
+     `getann' or written by `putann' if the `stat' field is set to
+     `WFDB_AHA_READ' or `WFDB_AHA_WRITE' before calling `annopen' or
+     `wfdbinit' (*note Example 2::).  Other formats may be supported
+     via a similar mechanism; consult `<wfdb/wfdb.h>' for more
+     information.
+
+   The number of `WFDB_Anninfo' objects in AIARRAY is given by the NANN
+argument of `annopen' and `wfdbinit'.  The annotation-reading function,
+`getann', knows the annotators by number only; `annopen' and `wfdbinit'
+assign input annotator numbers beginning with 0 in the order in which
+they are given in the array of `WFDB_Anninfo' objects.  Output
+annotator numbers used by `putann' also start at 0; note that input
+annotator 0 and output annotator 0 are distinct.  Annotator numbers are
+supplied to `getann' and `putann' in their first arguments.  *Note
+annopen::, for an example of how to set the contents of an array of
+`WFDB_Anninfo' objects.
+
+
+File: wpg,  Node: WFDB_Annotation structures,  Prev: WFDB_Anninfo structures,  Up: Data Types
+
+Annotation Structures
+=====================
+
+   The ANNOT argument of `getann' and `putann' is an object of type
+`WFDB_Annotation' containing these fields:
+
+`long time'
+     time of the annotation, in samples from the beginning of the
+     record.  The times of beat annotations in the `atr' files for the
+     MIT DB generally coincide with the R-wave peak in signal 0; for
+     the AHA DB, they generally coincide with the PQ-junction.
+
+`char anntyp'
+     annotation code; an integer between 1 and `ACMAX'.  *Note
+     Annotation Codes::, for a list of legal annotation codes.  `ACMAX'
+     is defined in `<wfdb/ecgcodes.h>'.
+
+`signed char subtyp'
+`signed char chan'
+`signed char num'
+     numbers between -128 and 127.  In MIT DB `atr' files, the `subtyp'
+     field is used with noise and artifact annotations to indicate
+     which signals are affected (*note Annotation Codes::).  The `chan'
+     field is intended to indicate the signal to which the annotation
+     is attached.  More than one annotation may be written with the
+     same `time' if the `chan' fields are distinct and in ascending
+     order.  The semantics of the `chan' field are unspecified,
+     however; users may assign any desired meaning, which need not have
+     anything to do with signal numbers.  In user-created annotation
+     files, these fields can be used to store arbitrary small integers.
+     The `subtyp' field requires no space in a standard annotation file
+     unless it is non-zero; the `chan' and `num' fields require no
+     space unless they have changed since the previous annotation.
+
+`char *aux'
+     a free text string.  The first byte is interpreted as an `unsigned
+     char' that specifies the number of bytes that follow (up to 255).
+     In MIT DB `atr' files, the `aux' field is used with rhythm change
+     annotations to specify the new rhythm, and with comment
+     annotations to store the text of the comment The string can
+     contain arbitrary binary data, including embedded nulls.  It is
+     unwise to store anything but ASCII strings, however, if the
+     annotation file may be transported to a system with a different
+     architecture (e.g., on which multiple-byte quantities may have
+     different sizes or byte layouts).  The `aux' field requires no
+     space in a standard annotation file if it is `NULL'.  Note that
+     conversion of annotation files to other formats may entail
+     truncation or loss of the `aux' string.  Note also that the `aux'
+     pointer returned by `getann' points to a small static buffer
+     (separately allocated for each input annotator beginning with WFDB
+     library version 9.4) that may be overwritten by subsequent calls.
+
+   *Note Example 3::, for a short program that examines the contents of
+a `WFDB_Annotation'.
+
+
+File: wpg,  Node: Annotation Codes,  Next: Database Files,  Prev: Data Types,  Up: Top
+
+Annotation Codes
+****************
+
+* Menu:
+
+* Mapping macros::		Macros for mapping annotation codes.
+
+   Application programs that deal with annotations should include the
+line
+
+     #include <wfdb/ecgcodes.h>
+
+which provides the symbolic definitions of annotation codes given in the
+first column of the table below.  (The second column of the table shows
+the strings returned by `annstr' and `ecgstr'.)
+
+     _Beat annotation codes:_
+     NORMAL   N   Normal beat
+     LBBB     L   Left bundle branch block beat
+     RBBB     R   Right bundle branch block beat
+     BBB      B   Bundle branch block beat (unspecified)
+     APC      A   Atrial premature beat
+     ABERR    a   Aberrated atrial premature beat
+     NPC      J   Nodal (junctional) premature beat
+     SVPB     S   Supraventricular premature or ectopic beat (atrial or nodal)
+     PVC      V   Premature ventricular contraction
+     RONT     r   R-on-T premature ventricular contraction
+     FUSION   F   Fusion of ventricular and normal beat
+     AESC     e   Atrial escape beat
+     NESC     j   Nodal (junctional) escape beat
+     SVESC    n   Supraventricular escape beat (atrial or nodal) [1]
+     VESC     E   Ventricular escape beat
+     PACE     /   Paced beat
+     PFUS     f   Fusion of paced and normal beat
+     UNKNOWN  Q   Unclassifiable beat
+     LEARN    ?   Beat not classified during learning
+     
+     _Non-beat annotation codes:_
+     VFON     [   Start of ventricular flutter/fibrillation
+     FLWAV    !   Ventricular flutter wave
+     VFOFF    ]   End of ventricular flutter/fibrillation
+     NAPC     x   Non-conducted P-wave (blocked APC) [4]
+     WFON     (   Waveform onset [4]
+     WFOFF    )   Waveform end [4]
+     PWAVE    p   Peak of P-wave [4]
+     TWAVE    t   Peak of T-wave [4]
+     UWAVE    u   Peak of U-wave [4]
+     PQ       `   PQ junction
+     JPT      '   J-point
+     PACESP   ^   (Non-captured) pacemaker artifact
+     ARFCT    |   Isolated QRS-like artifact [2]
+     NOISE    ~   Change in signal quality [2]
+     RHYTHM   +   Rhythm change [3]
+     STCH     s   ST segment change [1,3]
+     TCH      T   T-wave change [1,3,4]
+     SYSTOLE  *   Systole [1]
+     DIASTOLE D   Diastole [1]
+     MEASURE  =   Measurement annotation [1,3]
+     NOTE     "   Comment annotation [3]
+     LINK     @   Link to external data [5]
+
+*Notes:*
+  1. Codes `SVESC', `STCH', and `TCH' were first introduced in WFDB
+     library version 4.0.  Codes `SYSTOLE', `DIASTOLE', and `MEASURE'
+     were first introduced in WFDB library version 7.0.
+
+  2. In MIT and ESC DB `atr' files, each non-zero bit in the `subtyp'
+     field indicates that the corresponding signal contains noise (the
+     least significant bit corresponds to signal 0).
+
+  3. The `aux' field contains an ASCII string (with prefixed byte count)
+     describing the rhythm, ST segment, T-wave change, measurement, or
+     the nature of the comment.  By convention, the character that
+     follows the byte count in the `aux' field of a `RHYTHM' annotation
+     is `('.  See the `MIT-BIH Arrhythmia Database Directory' for a
+     list of rhythm annotation strings.
+
+  4. Codes `WFON', `WFOFF', `PWAVE', `TWAVE', and `UWAVE' were first
+     introduced in DB library version 8.3.  The `p' mnemonic now
+     assigned to `PWAVE' was formerly assigned to `NAPC', and the `t'
+     mnemonic now assigned to `TWAVE' was formerly assigned to `TCH'.
+     The obsolete codes `PQ' (designating the PQ junction) and `JPT'
+     (designating the J-point) are still defined in
+     `<wfdb/ecgcodes.h>', but are identical to `WFON' and `WFOFF'
+     respectively.
+
+  5. The `LINK' code was first introduced in WFDB library version 9.6.
+     The `aux' field of a `LINK' annotation contains a URL (a uniform
+     resource locator, in the form `http://machine.name/some/data',
+     suitable for passing to a Web browser such as Netscape or Mosaic).
+     `LINK' annotations may be used to associate extended text,
+     images, or other data with an annotation file.  If the `aux' field
+     contains any whitespace, text following the first whitespace is
+     taken as descriptive text to be displayed by a WFDB browser such
+     as `WAVE'.
+
+
+   The annotation codes in the table above are the predefined values of
+the `anntyp' field in a `WFDB_Annotation'.  Other values in the range
+of 1 to `ACMAX' (defined in `<wfdb/ecgcodes.h>') are legal but do not
+have preassigned meanings.  The constant `NOTQRS', also defined in
+`<wfdb/ecgcodes.h>', is not a legal value for `anntyp', but is a
+possible output of the macros discussed below.
+
+
+File: wpg,  Node: Mapping macros,  Prev: Annotation Codes,  Up: Annotation Codes
+
+Macros for Mapping Annotation Codes
+===================================
+
+   Application programs that use the macros described in this section
+should include the line
+     #include <wfdb/ecgmap.h>
+
+which will make their definitions, and those in `<wfdb/ecgcodes.h>',
+available.
+
+`isann(C)'
+     true (1) if C is a legal annotation code, false (0) otherwise
+
+`isqrs(C)'
+     true (1) if C denotes a QRS complex, false (0) otherwise
+
+`map1(C)'
+     maps C into one of the set {`NOTQRS', `NORMAL', `PVC', `FUSION',
+     `LEARN'}
+
+`map2(C)'
+     maps C into one of the set {`NOTQRS', `NORMAL', `SVPB', `PVC',
+     `FUSION', `LEARN'}
+
+`annpos(C)'
+     maps C into one of the set {`APUNDEF', `APSTD', `APHIGH', `APLOW',
+     `APATT', `APAHIGH', `APALOW'} (see `<wfdb/ecgmap.h>' for
+     definitions of these symbols;  this macro was first introduced in
+     WFDB library version 6.0)
+
+   If you define your own annotation codes, you may wish to modify the
+tables used by the macros above.  The file `<wfdb/ecgmap.h>' also
+defines `setisqrs(C, X)', `setmap1(C, X)', `setmap2(C, X)', and
+`setannpos(C, X)' for this purpose.  In each case, X is the value to be
+returned when the corresponding mapping macro is invoked with an
+argument of C.  (These macros were first introduced in WFDB library
+version 6.0.)
+
+   The macros below convert between AHA and MIT annotation codes;  they
+are also defined in `<wfdb/ecgmap.h>'.
+
+`ammap(A)'
+     maps A (an AHA annotation code) into an MIT annotation code (one
+     of the set {`NORMAL', `PVC', `FUSION', `RONT', `VESC', `PACE',
+     `UNKNOWN', `VFON', `VFOFF', `NOISE', `NOTE'}), or `NOTQRS'
+
+`mamap(C, S)'
+     maps C (an MIT annotation code) into an AHA annotation code (one
+     of the set {`N', `V', `F', `R', `E', `P', `Q', `[', `]', `U',
+     `O'}); S is the MIT annotation `subtyp' (significant only if C is
+     `NOISE')
+
+
+File: wpg,  Node: Database Files,  Next: Examples,  Prev: Annotation Codes,  Up: Top
+
+Database Files
+**************
+
+   The WFDB library has been constructed to provide a standard interface
+between the database files and application programs.  Alternate means of
+access to database files is strongly discouraged, since file formats may
+change.  Database files are located in the directories specified by
+`WFDB' (*note WFDB path::).
+
+   Recall that a WFDB record is not a file; rather, it is an extensible
+_collection_ of database files (*note Records: Concepts 1.).  Thus, for
+example, record 100 of the MIT-BIH Arrhythmia Database consists of the
+files named `100.hea', `100.dat', and `100.atr' in the `mitdb'
+directory of the MIT-BIH Arrhythmia Database CD-ROM (or in PhysioBank,
+within `http://www.physionet.org/physiobank/database/mitdb/'), together
+with any additional files in other directories that you may have
+associated with record 100 (such as your own annotation file).  All
+files associated with a given record include the record name as the
+first part of the file name.  No explicit action (other than choosing
+the file name, and locating the file in the WFDB path) is needed in
+order to associate a new file with an existing WFDB record.
+
+   To find the location of a database file easily, you can use
+`wfdbwhich', an application included with the WFDB Software Package.
+Type `wfdbwhich' for brief instructions on its use, or see the `WFDB
+Applications Guide'.
+
+File Types
+==========
+
+   There are four types of files supported by the WFDB library:
+
+* Menu:
+
+* Header Files::		contain signal file names and attributes.
+* Signal Files::		contain signals.
+* Annotation Files::		contain annotations.
+* Calibration Files::		contain signal calibration specifications.
+
+The other topics in this section deal with special types of database access:
+
+* AHA Format Files::		not used for on-line WFDB records.
+* Standard I/O::		pipes and I/O redirection for WFDB files.
+* Multiplexed Signal Files::	signal groups.
+* Multi-Frequency Records::     signals sampled at different frequencies within
+                                 within a given record.
+* Multi-Segment Records::       concatenated records.
+* Multiple Record Access::	how to have more than one record open.
+* Special Files::		signal I/O using block and character devices.
+* Piped and Local Records::	records for use with user-created signals.
+* NETFILES::			input directly from web and FTP servers.
+* Annotation Order::            the canonical order for annotations:
+                                 how and why to break the rules, and how
+                                 to deal with the consequences of doing so.
+
+
 File: wpg,  Node: Header Files,  Next: Signal Files,  Prev: Database Files,  Up: Database Files
 
 Header Files
@@ -363,9 +692,9 @@ incorporate one or more URL prefixes in the WFDB path.
 (defined in the WFDB library source file `wfdblib.h', and used as the
 WFDB path if the WFDB environment variable is undefined) is `.
 /usr/database http://www.physionet.org/physiobank/database'.  (The
-second component,, after the `.' that specifies the current
-directory,may vary, depending on your platform and the choices made
-during installation.)  The URL prefix (the third component) points to
+second component, after the `.' that specifies the current directory,
+may vary, depending on your platform and the choices made during
+installation.)  The URL prefix (the third component) points to
 PhysioBank, an on-line archive for a wide variety of standard databases
 of physiologic signals.  The databases are kept in subdirectories of
 `http://www.physionet.org/physiobank/database'.  For example, the
@@ -466,6 +795,10 @@ applications that use the WFDB library.  The line numbers are for
 reference only; they are not part of the programs.  Any of these
 examples can be compiled (under Unix) using a command of the form
      cc FILE.C -lwfdb
+
+or, if the WFDB library or its `*.h' files are not in the standard
+locations:
+     cc `wfdb-config --cflags` FILE.C `wfdb-config --libs`
 
 where FILE.C is the name of the file containing the source; *note Using
 the WFDB Library: Usage., for further information.  The sources for
@@ -707,269 +1040,4 @@ _Lines 24-25:_
      This expression evaluates to an empty string unless the `aux'
      string is non-empty.  It makes the assumption that `aux' is a
      printable ASCII string; the printable part follows the length byte.
-
-
-File: wpg,  Node: Example 4,  Next: Example 5,  Prev: Example 3,  Up: Examples
-
-Example 4: Generating an R-R Interval Histogram
-===============================================
-
-   This program reads an annotation file, determines the intervals
-between beat annotations (assumed to be the R-R intervals), and
-accumulates a histogram of them.
-
-      1  #include <stdio.h>
-      2  #include <wfdb/wfdb.h>
-      3  #include <wfdb/ecgmap.h>
-      4
-      5  main(argc, argv)
-      6  int argc;
-      7  char *argv[];
-      8  {
-      9      int rr, *rrhist, rrmax;
-     10      long t;
-     11      WFDB_Anninfo a;
-     12      WFDB_Annotation annot;
-     13      void *calloc();
-     14
-     15      if (argc < 3) {
-     16          fprintf(stderr, "usage: %s annotator record\n", argv[0]);
-     17          exit(1);
-     18      }
-     19      a.name = argv[1]; a.stat = WFDB_READ;
-     20      if (annopen(argv[2], &a, 1) < 0) exit(2);
-     21      if ((rrmax = (int)(3*sampfreq(argv[2]))) <= 0) exit(3);
-     22      if ((rrhist = (int *)calloc(rrmax+1, sizeof(int))) == NULL) {
-     23          fprintf(stderr, "%s: insufficient memory\n", argv[0]);
-     24          exit(4);
-     25      }
-     26      while (getann(0, &annot) == 0 && !isqrs(annot.anntyp))
-     27          ;
-     28      t = annot.time;
-     29      while (getann(0, &annot) == 0)
-     30          if (isqrs(annot.anntyp)) {
-     31              if ((rr = annot.time - t) > rrmax) rr = rrmax;
-     32              rrhist[rr]++;
-     33              t = annot.time;
-     34          }
-     35      for (rr = 1; rr < rrmax; rr++)
-     36          printf("%4d %s\n", rrhist[rr], mstimstr((long)rr));
-     37      printf("%4d %s (or longer)\n", rrhist[rr], mstimstr((long)rr));
-     38      exit(0);
-     39  }
-
-*Notes:*
-_Lines 21-25:_
-     Here we allocate storage for the histogram.  The value returned by
-     `sampfreq', if positive, specifies the number of sample intervals
-     per second; we will allocate 3 seconds' worth of bins, initialized
-     to zero.  See `K&R', page 167, for a description of `calloc'.
-
-_Lines 26-28:_
-     This code sets `t' to the time of the first annotated beat in the
-     record.
-
-_Lines 29-34:_
-     Here we read the remainder of the annotations, skipping any
-     non-beat annotations.  The difference between the values of
-     `annot.time' for consecutive beat annotations defines an R-R
-     interval (`rr').  Each possible value of `rr' up to `rrmax' is
-     assigned a bin in `rrhist'.  Intervals longer than 3 seconds
-     (`rrmax') are counted in the bin corresponding to `rr' = `rrmax'.
-
-_Lines 35-37:_
-     The histogram is printed as a two-column table, with the number of
-     intervals in the first column and the length of the interval (with
-     millisecond resolution) in the second column. (What happens if
-     `rr' starts at 0 rather than 1 in line 35?)
-
-
-File: wpg,  Node: Example 5,  Next: Example 6,  Prev: Example 4,  Up: Examples
-
-Example 5: Reading Signal Specifications
-========================================
-
-   This program reads the signal specifications of the record named as
-its argument:
-
-      1  #include <stdio.h>
-      2  #include <wfdb/wfdb.h>
-      3
-      4  main(argc, argv)
-      5  int argc;
-      6  char *argv[];
-      7  {
-      8      WFDB_Siginfo *s;
-      9      int i, nsig;
-     10
-     11      if (argc < 2) {
-     12          fprintf(stderr, "usage: %s record\n", argv[0]);
-     13          exit(1);
-     14      }
-     15      nsig = isigopen(argv[1], NULL, 0);
-     16      if (nsig < 1) exit(2);
-     17      s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
-     18      if (s == NULL) {
-     19          fprintf(stderr, "insufficient memory\n");
-     20	        exit(3);
-     21      }
-     22      if (isigopen(argv[1], s, nsig) != nsig) exit(2);
-     23      printf("Record %s\n", argv[1]);
-     24      printf("Starting time: %s\n", timstr(0L));
-     25      printf("Sampling frequency: %g Hz\n", sampfreq(argv[1]));
-     26      printf("%d signals\n", nsig);
-     27      for (i = 0; i < nsig; i++) {
-     28          printf("Group %d, Signal %d:\n", s[i].group, i);
-     29          printf(" File: %s\n", s[i].fname);
-     30          printf(" Description: %s\n", s[i].desc);
-     31          printf(" Gain: ");
-     32          if (s[i].gain == 0.)
-     33              printf("uncalibrated; assume %g", WFDB_DEFGAIN);
-     34          else printf("%g", s[i].gain);
-     35          printf(" adu/%s\n", s[i].units ? s[i].units : "mV");
-     36          printf(" Initial value: %d\n", s[i].initval);
-     37          printf(" Storage format: %d\n", s[i].fmt);
-     38          printf(" I/O: ");
-     39          if (s[i].bsize == 0) printf("can be unbuffered\n");
-     40          else printf("%d-byte blocks\n", s[i].bsize);
-     41          printf(" ADC resolution: %d bits\n", s[i].adcres);
-     42          printf(" ADC zero: %d\n", s[i].adczero);
-     43          if (s[i].nsamp > 0L) {
-     44              printf(" Length: %s (%ld sample intervals)\n",
-     45                     timstr(s[i].nsamp), s[i].nsamp);
-     46              printf(" Checksum: %d\n", s[i].cksum);
-     47          }
-     48          else printf(" Length undefined\n");
-     49      }
-     50      exit(0);
-     51  }
-
-*Notes:*
-
-_Line 15:_
-     The command-line argument, `argv[1]', is the record name.  The
-     number of signals listed in the header file for the record is
-     returned by `isigopen' as `nsig'.  If `nsig' < 1, `isigopen' will
-     print an error message; in this case the program can't do anything
-     useful, so it exits.
-
-_Line 17:_
-     We allocate `nsig' signal information (`WFDB_Siginfo') objects.
-
-_Line 22:_
-     On the second invocation of `isigopen', we pass the pointer to the
-     signal information objects and the number of signals we expect to
-     open.  `isigopen' returns the number of signals it is able to
-     open;  if any of those named in the header file are unreadable,
-     the return value will not match `nsig', and the program exits.
-
-_Line 24:_
-     Invoking `timstr' with an argument of zero (here written `0L' to
-     emphasize to the compiler that the argument is a `long' integer)
-     will obtain the starting time of the record.  If no starting time
-     is defined, `timstr' will return "`0:00:00'".
-
-_Lines 31-34:_
-     Notice how a zero value for `gain' is interpreted.
-
-_Line 35:_
-     If the `units' field is NULL, the physical units are assumed to be
-     millivolts ("mV").
-
-_Lines 38-40:_
-     If `bsize' is zero, I/O can be performed in blocks of any
-     reasonable size;  otherwise it must be performed in blocks of
-     exactly the specified `bsize'.
-
-_Lines 43-48:_
-     If the length of the record is defined, it is printed in both
-     hours, minutes, and seconds, and in sample intervals.  Since the
-     argument of `timstr' in line 39 is positive, it is interpreted as
-     a time interval.  The checksum is defined only if the record
-     length is defined.
-
-
-File: wpg,  Node: Example 6,  Next: Example 7,  Prev: Example 5,  Up: Examples
-
-Example 6: A Differentiator
-===========================
-
-   The program below inverts and differentiates the signals read by
-`getvec' and writes the results with `putvec'.  The output is readable
-as record `dif'.  A wide variety of simple digital filters can be
-modelled on this example; *note Example 7::, for a more general
-approach.
-
-      1  #include <stdio.h>
-      2  #include <wfdb/wfdb.h>
-      3
-      4  main(argc, argv)
-      5  int argc;
-      6  char *argv[];
-      7  {
-      8      WFDB_Siginfo *s;
-      9      int i, nsig, nsamp=1000;
-     10      WFDB_Sample *vin, *vout;
-     11
-     12      if (argc < 2) {
-     13          fprintf(stderr, "usage: %s record\n", argv[0]); exit(1);
-     14      }
-     15      if ((nsig = isigopen(argv[1], NULL, 0)) <= 0) exit(2);
-     16      s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
-     17      vin = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
-     18      vout = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
-     19      if (s == NULL || vin == NULL || vout == NULL) {
-     20          fprintf(stderr, "insufficient memory\n");
-     21          exit(3);
-     22      }
-     23      if (isigopen(argv[1], s, nsig) != nsig) exit(2);
-     24      if (osigopen("8l", s, nsig) <= 0) exit(3);
-     25      while (nsamp-- > 0 && getvec(vin) > 0) {
-     26          for (i = 0; i < nsig; i++)
-     27              vout[i] -= vin[i];
-     28          if (putvec(vout) < 0) break;
-     29          for (i = 0; i < nsig; i++)
-     30              vout[i] = vin[i];
-     31      }
-     32      (void)newheader("dif");
-     33      wfdbquit();
-     34      exit(0);
-     35  }
-
-*Notes:*
-
-_Line 24:_
-     Here we attempt to open as many output signals as there are input
-     signals; if we cannot do so, the program exits after `osigopen'
-     prints an error message.
-
-_Line 25:_
-     The main loop of the program begins here.  If 1000 samples can be
-     read from each signal, the loop will end normally; if `getvec'
-     fails before 1000 samples have been read, the loop ends
-     prematurely.
-
-_Lines 26-27:_
-     For each signal, we compute the negated first difference by
-     subtracting the new sample from the previous sample.
-
-_Line 28:_
-     One sample of each output signal is written here.
-
-_Lines 29-30:_
-     The new input samples are copied into the output sample vector in
-     preparation for the next iteration.
-
-_Line 32:_
-     This step is optional.  It creates a header file for a new record
-     to be called `dif', which we can then open with another program if
-     we want to read the signals that this program has written.  Since
-     the RECORD argument for `osigopen' was `8l', we can also read
-     these files using record `8l'; one reason for making a new `hea'
-     file here is that the `hea' file for `8l' may not necessarily
-     indicate the proper sampling frequency for these signals.
-
-_Line 33:_
-     Since the program writes output signals, it must invoke `wfdbquit'
-     to close the files properly.
 

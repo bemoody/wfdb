@@ -352,6 +352,7 @@ doc/wug-src/wave/
 doc/wug-src/wave/misc/
 doc/wug-src/wave/misc/example.xws
 doc/wug-src/wave/misc/html.sty
+doc/wug-src/wave/misc/pstoimg
 doc/wug-src/wave/misc/wave.inf
 doc/wug-src/wave/png/
 doc/wug-src/wave/png/chart2.png
@@ -369,6 +370,8 @@ doc/wug-src/wave/ppm/file-load.ppm.gz
 doc/wug-src/wave/ppm/file-print.ppm.gz
 doc/wug-src/wave/ppm/file-save.ppm.gz
 doc/wug-src/wave/ppm/find-window.ppm.gz
+doc/wug-src/wave/ppm/galeon-new-helper.ppm.gz
+doc/wug-src/wave/ppm/GTKWave.ppm.gz
 doc/wug-src/wave/ppm/help-intro.ppm.gz
 doc/wug-src/wave/ppm/help-topics.ppm.gz
 doc/wug-src/wave/ppm/level-window.ppm.gz
@@ -378,6 +381,7 @@ doc/wug-src/wave/ppm/main-control-panel.ppm.gz
 doc/wug-src/wave/ppm/main-window.ppm.gz
 doc/wug-src/wave/ppm/main-with-hr.ppm.gz
 doc/wug-src/wave/ppm/main-with-markers.ppm.gz
+doc/wug-src/wave/ppm/mozilla-new-helper.ppm.gz
 doc/wug-src/wave/ppm/netscape-new-helper.ppm.gz
 doc/wug-src/wave/ppm/noedit.ppm.gz
 doc/wug-src/wave/ppm/nomatch.ppm.gz
@@ -402,6 +406,7 @@ doc/wug-src/wave/scripts/
 doc/wug-src/wave/scripts/dossify-html
 doc/wug-src/wave/scripts/fixinfo
 doc/wug-src/wave/scripts/fixlinks
+doc/wug-src/wave/scripts/fixwug.sh
 doc/wug-src/wave/scripts/savewin
 doc/wug-src/wave/scripts/wave2d
 doc/wug-src/wave/scripts/wugfigures
@@ -497,7 +502,6 @@ wave/buttons.hlp
 wave/demo.txt
 wave/edit.c
 wave/editing.hlp
-wave/faq.hlp
 wave/grid.c
 wave/help.c
 wave/helppan.c
@@ -518,7 +522,7 @@ waverc/
 waverc/Makefile
 waverc/Makefile.top
 waverc/Makefile.tpl
-waverc/urlvhead
+waverc/url_view
 waverc/wave-remote.c
 waverc/wave-remote-test.c
 waverc/wavescript.c

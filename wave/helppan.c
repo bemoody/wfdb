@@ -52,6 +52,20 @@ void find_user_guide()
 	strcpy(url, "http://www.physionet.org/physiotools/wug/");
 }
 
+void find_faq()
+{
+    FILE *ifile;
+
+    sprintf(url, "%s/html/wug/wave-faq.htm", helpdir);
+    if (ifile = fopen(url, "r")) fclose(ifile);
+    else if (ifile = fopen("wave-faq.htm", "r")) {
+	fclose(ifile);
+	sprintf(url, "%s/wave-faq.htm", getcwd(NULL, 256));
+    }
+    else
+	strcpy(url, "http://www.physionet.org/physiotools/wug/wave-faq.htm");
+}
+
 void help()
 {
     find_user_guide();
@@ -113,6 +127,14 @@ Panel_item item;
 Event *event;
 {
     find_user_guide();
+    open_url();
+}
+/* Open the WAVE FAQ in a web browser. */
+static void help_faq(item, event)
+Panel_item item;
+Event *event;
+{
+    find_faq();
     open_url();
 }
 
@@ -268,11 +290,11 @@ void create_help_popup()
 	      PANEL_NOTIFY_PROC, help_select,
 	      PANEL_CLIENT_DATA, (caddr_t) 'n',
 	      0);
+
     xv_create(help_panel, PANEL_BUTTON,
 	      PANEL_LABEL_STRING, "Frequently asked questions",
 	      XV_HELP_DATA, "wave:help.faq",
-	      PANEL_NOTIFY_PROC, help_select,
-	      PANEL_CLIENT_DATA, (caddr_t) 'f',
+	      PANEL_NOTIFY_PROC, help_faq,
 	      0);
 
     xv_create(help_panel, PANEL_BUTTON,

@@ -1,5 +1,5 @@
 /* file: wave-remote.c		G. Moody	10 October 1996
-				Last revised:	 9 March 2002
+				Last revised:	 19 June 2002
 Remote control for WAVE
 
 -------------------------------------------------------------------------------
@@ -118,8 +118,9 @@ char **argv;
 {
     char fname[30];
     FILE *ofile;
-    int i, j = 0, pid, *siglist;
+    int i, j = 0, pid;
     static char *ppid, *record, *annotator, *ptime;
+    static int *siglist;
 
     pname = argv[0];
     for (i = 1; i < argc; i++) {	/* read command-line arguments */
@@ -170,13 +171,13 @@ char **argv;
 		exit(2);
 	    }
 	    /* fill the signal list */
+	    siglist[j] = -1;
 	    for (i -= j, j = 0; i < argc && argv[i][0] != '-'; )
 		siglist[j++] = atoi(argv[i++]);
 	    i--;
 	    break;
 	}
     }
-    siglist[j] = -1;
     if (annotator == NULL && ptime == NULL && record == NULL && j == 0) {
 	help();
 	exit(1);
@@ -194,7 +195,7 @@ char **argv;
 	    if (annotator) sprintf(command+strlen(command),
 				   " -a %s", annotator);
 	    if (ptime) sprintf(command+strlen(command), " -f %s", ptime);
-	    if (siglist[0] >= 0) {
+	    if (siglist && (siglist[0] >= 0)) {
 		sprintf(command+strlen(command), " -s %d", siglist[0]);
 		for (j = 1; siglist[j] >= 0; j++)
 		    sprintf(command+strlen(command), " %d", siglist[j]);
@@ -226,7 +227,7 @@ char **argv;
     if (record) fprintf(ofile, "-r %s\n", record);
     if (annotator) fprintf(ofile, "-a %s\n", annotator);
     if (ptime) fprintf(ofile, "-f %s\n", ptime);
-    if (siglist[0] >= 0) {
+    if (siglist && (siglist[0] >= 0)) {
 	fprintf(ofile, "-s %d", siglist[0]);
 	for (j = 1; siglist[j] >= 0; j++)
 	    fprintf(ofile, " %d", siglist[j]);

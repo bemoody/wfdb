@@ -1,6 +1,188 @@
 This is wpg, produced by makeinfo version 4.0b from wpg.tex.
 
 
+File: wpg,  Node: WFDB path syntax,  Next: exercises 1,  Prev: name restrictions,  Up: Usage
+
+More About the WFDB Path
+========================
+
+   When a WFDB file must be opened for input, the WFDB library attempts
+to locate it by attaching each of the components of the WFDB path (one
+at a time) as a prefix to the file name.  If two or more matching files
+exist in different locations in the WFDB path, the WFDB library opens
+only the file that resides in the first of these locations.  Any other
+matching files are effectively invisible to WFDB applications unless
+the WFDB path is rearranged.
+
+   The default WFDB path is specified at the time the WFDB library is
+compiled, by defining a value for the symbol `DEFWFDB' in `wfdblib.h'.
+Current versions of the WFDB library are compiled with a
+three-component default WFDB path; the first component is empty (i.e.,
+it refers to the current directory), the second component names the
+"system-wide database directory" (which contains the sample WFDB files
+supplied with the WFDB software package), and the third component is
+`http://www.physionet.org/physiobank/database' (referring to the
+PhysioBank data archives).  Note that this default may be changed at the
+time the WFDB library is compiled.  Normally, however, this means that
+any record available from PhysioBank is readable by any WFDB application
+provided that PhysioBank is accessible from the user's computer and that
+the database name is included in the record name (for example,
+`slpdb/slp60' or `nsrdb/16265').
+
+   Under Unix and VMS, the WFDB path can be given as a colon-separated
+list of prefixes, in the format used for the Bourne shell's `PATH'
+variable.  Under MS-Windows, MS-DOS, and MacOS, the WFDB path can be
+given in the format used for the MS-DOS `PATH' variable, with
+semicolons used to separate prefixes (colons retain their customary
+meanings, as drive letter suffixes under MS-DOS, or as directory
+separators on the Macintosh).  Alternatively, components of the WFDB
+path may be separated by whitespace (under any operating system); this
+also implies that embedded spaces are not permitted within path
+components.  *For this reason, avoid using directories with names such
+as `My Documents', or their subdirectories, to store WFDB files.*
+
+   When WFDB applications _write_ database files, these files are
+generally written to the current directory.  (As an example, an
+application that analyzes one or more signals in a record may record its
+findings in an annotation file in the current directory.)  If the record
+name (as provided by the application to the WFDB library) contains path
+information, however, output files are written to the corresponding
+subdirectory of the current directory.  (For example, if a WFDB
+application writes an annotation file for record `edb/e0103', the file
+will be written in the `edb' subdirectory of the current directory.
+The `edb' subdirectory will be created by the WFDB library if does not
+exist already.  This feature was introduced in WFDB library version
+10.2.0.)
+
+   Note particularly that the current directory is _not_ necessarily
+part of the WFDB path.  If you modify your WFDB path, you must
+explicitly include an empty (null) component, which corresponds to the
+current directory, in order to be sure that your WFDB applications can
+read any WFDB files that you have previously written.  In most cases,
+this null component should be the first in the WFDB path.  Thus, if you
+write into the current directory a modified version of an existing WFDB
+file, any later actions that would read this file will read your
+modified version rather than the original.
+
+   The WFDB path may contain `http://' and `ftp://' URL prefixes (other
+schema, such as `file://' and `https://', may also be supported if they
+are supported by your version of `libwww').  If NETFILES support is not
+compiled into the WFDB library, any WFDB path components containing
+`://' are ignored.  (These features were first introduced in WFDB
+library version 10.1.0.)
+
+   If the WFDB library finds that the value assigned to the WFDB path
+is of the form `@FILE', it replaces that value with the contents of the
+specified FILE.  (This feature was first introduced in WFDB library
+version 8.0.)  Indirect WFDB path files may be nested up to ten levels
+(this arbitrary limit is imposed to avoid infinite recursion if the
+contents of the indirect file are incorrect).  This method of indirect
+assignment is useful under classic MacOS, where recompilation of the
+WFDB library would otherwise be necessary in order to change the WFDB
+path.  It may also be useful under MS-DOS to reduce the need for
+environment space, or if the length of the command needed to set the
+`WFDB' environment variable would otherwise approach or exceed the
+128-byte limit for MS-DOS commands.
+
+   If a WFDB header file (*note Database Files::) specifies that a
+signal file is to be found in a directory that is not already in the
+WFDB path, that directory is appended to the end of the WFDB path; in
+this case, if the WFDB path is not set, it is created with an initial
+null component followed by the directory that contains the signal file.
+(This feature was first introduced in WFDB library version 6.2.)
+
+   The string `%r' is replaced by the current record name wherever it
+appears in the WFDB path;  `%Nr' is replaced by the first N digits of
+the record name, if N is a non-zero digit.  For example, if (under
+Unix) the WFDB path is `:/cdrom/mimicdb/%3r:/cdrom/mitdb', a request to
+read a file associated with record 055n will cause the WFDB library to
+look first in the current directory (since the WFDB path begins with an
+empty component), then in `/cdrom/mimicdb/055', and then in
+`/cdrom/mitdb'.  If `%' is followed by any character other than `r' or
+a non-zero digit followed by `r', that character is used as is in the
+WFDB path;  thus a literal `%' can be included in the WFDB path by
+`escaping' it as `%%'.  (Substitutions of `%'-strings in the WFDB path
+were first introduced in WFDB library version 9.7.)
+
+
+File: wpg,  Node: exercises 1,  Prev: WFDB path syntax,  Up: Usage
+
+Exercises
+=========
+
+   These exercises should require only a few minutes.  If you work
+through them, you will have an opportunity to become acquainted with a
+few of the most common errors in using the WFDB library.
+
+  1. Compile the example program in this chapter and run it.  If the
+     WFDB Software Package has not already been installed on your
+     system, download and install the most recent version from
+     PhysioNet first (*note Installing the WFDB Software Package:
+     Installation.).
+
+  2. Find out where database records are kept on your system.  What
+     records are available locally?
+
+  3. Modify the example program so that you can specify the record to be
+     opened, either as a command-line argument or by having the program
+     prompt you to type a record name.  If you are unfamiliar with
+     command-line argument processing, *note Example 2::.
+
+  4. Use the modified version of the example to read samples from
+     records `mitdb/200', `edb/e0103', `slpdb/slp04', and
+     `mimicdb/237/237'.  The last two of these records have 4 and 6
+     signals respectively, so you will need to make a few additional
+     changes to the program in order to read these records successfully.
+
+  5. Once again using the modified version of the example, what happens
+     if you omit the path information from one of the records in the
+     previous exercise (for example, if you try to open `e0103' instead
+     of `edb/e0103'?  Figure out how to set the WFDB path so that the
+     program will work properly in this case.  (Hint: use the
+     application `wfdbwhich', included with the WFDB Software Package,
+     to find the header file for record `edb/e0103'; this information
+     will help you to determine how to set the WFDB path.)
+
+  6. If you use MS-DOS or MS-Windows, explore and explain what happens
+     in the previous exercise if you type the record name using
+     upper-case letters, or if you type a `\' (backslash) instead of `/'
+     (forward slash).  (Hint: record names are _not_ filenames!)
+
+  7. What happens when you compile the example program as shown, but
+     with the `#include' statement omitted?  with the `-lwfdb' (`-link
+     wfdb', etc.) omitted?
+
+  8. What is the type of the argument to `getvec'?  Why can't `getvec'
+     simply return the value it reads, as in `v = getvec()'?
+
+
+File: wpg,  Node: Functions,  Next: Data Types,  Prev: Usage,  Up: Top
+
+WFDB Library Functions
+**********************
+
+   This chapter describes the functions that are available to programs
+compiled with the WFDB library.  The functions are introduced in
+several groups, with examples to illustrate their usage.
+
+* Menu:
+
+* introduction to functions::	General notes on functions.
+				This node discusses arguments, return codes,
+				and the organization of this section of
+				the guide.
+
+The remainder of the nodes in this section describe functions for:
+
+* selecting::			Selecting database records (opening files).
+* special input modes::         Setting the input sampling frequency and more.
+* signal and annotation I/O::	Reading and writing signals and annotations.
+* non-sequential::		Non-sequential access to WFDB files.
+* conversion::			Time and other conversion functions.
+* calibration::			Calibrating signals.
+* miscellaneous functions::	Attribute-reading and other functions.
+
+
 File: wpg,  Node: introduction to functions,  Next: selecting,  Prev: Functions,  Up: Functions
 
 About these functions
@@ -44,15 +226,16 @@ properly set (*note WFDB path::).  WFDB library functions responsible
 for opening signal files find them by reading the header file (which
 contains their names) first.
 
-   The first part of this chapter describes functions that extract
-information from header files in order to gain access to signal and
-annotation files.  The following two sections describe functions that
-deal with signal and annotation files.  Many readers will not need to
-go any further; the remaining sections deal with special-purpose
+   The first two sections of this chapter describes functions that
+extract information from header files in order to gain access to signal
+and annotation files, and functions that control how these files are
+read and written.  The following two sections describe functions that
+read and write signal and annotation files.  Many readers will not need
+to go any further; the remaining sections deal with special-purpose
 functions that exist to serve unusual applications.
 
 
-File: wpg,  Node: selecting,  Next: signal and annotation I/O,  Prev: introduction to functions,  Up: Functions
+File: wpg,  Node: selecting,  Next: special input modes,  Prev: introduction to functions,  Up: Functions
 
 Selecting Database Records
 ==========================
@@ -385,7 +568,147 @@ osigopen::, and *note osigfopen::, for methods of opening output signal
 files.
 
 
-File: wpg,  Node: signal and annotation I/O,  Next: non-sequential,  Prev: selecting,  Up: Functions
+File: wpg,  Node: special input modes,  Next: signal and annotation I/O,  Prev: selecting,  Up: Functions
+
+Special Input Modes
+===================
+
+* Menu:
+
+* setifreq::			Setting the input sampling frequency.
+* getifreq::                    Determining the input sampling frequency.
+* setgvmode::                   Setting the resolution for a multifrequency
+                                record.
+* getspf::                      Determining the number of samples per frame.
+
+
+File: wpg,  Node: setifreq,  Next: getifreq,  Prev: special input modes,  Up: special input modes
+
+setifreq
+--------
+
+     void setifreq(WFDB_Frequency FREQUENCY)
+
+This function sets the current input sampling frequency (in samples per
+second per signal).  It should be invoked after opening the input
+signals (using `isigopen' or `wfdbinit'), and before using any of
+`getvec', `getann', `putann', `isigsettime', `isgsettime', `timstr',
+`mstimstr', or `strtim'.  _Note that the operation of `getframe' is
+unaffected by `setifreq'._
+
+   Use `setifreq' when your application requires input samples at a
+specific frequency.  After invoking `setifreq', `getvec' resamples the
+digitized signals from the input signals at the desired frequency
+(*note getvec::), and all of the WFDB library functions that accept or
+return times in sample intervals automatically convert between the
+actual sampling intervals and those corresponding to the desired
+frequency.  This slightly elaborated version of the example program from
+the previous chapter invokes `setifreq', passing it the desired sampling
+frequency from the command line, then prints the samples in record 100s,
+beginning 1 second (`t0') and ending 2 seconds (`t1') from the
+beginning of the record:
+
+     #include <wfdb/wfdb.h>
+     
+     main(int argc, char **argv)
+     {
+         WFDB_Frequency f = (WFDB_Frequency)0;
+         WFDB_Sample v[2];
+         WFDB_Siginfo s[2];
+         WFDB_Time t, t0, t1;
+     
+         if (argc > 1) sscanf(argv[1], "%lf", &f);
+         if (f <= (WFDB_Frequency)0) f = sampfreq("100s");
+     
+         if (isigopen("100s", s, 2) < 1)
+             exit(1);
+         setifreq(f);
+         t0 = strtim("1");
+         isigsettime(t0);
+         t1 = strtim("2");
+         for (t = t0; t <= t1; t++) {
+             if (getvec(v) < 0)
+                 break;
+             printf("%d\t%d\n", v[0], v[1]);
+         }
+         exit(0);
+     }
+
+(The source for this program, `psamplex.c', can be found in the
+`examples' directory of the WFDB source tree.  Compile it as shown in
+the previous chapter, then run it using a command such as `psamplex
+100'.)  The QRS detector in chapter 6 also illustrates the use of
+`setifreq' (*note Example 10::).
+
+
+File: wpg,  Node: getifreq,  Next: setgvmode,  Prev: setifreq,  Up: special input modes
+
+getifreq
+--------
+
+     WFDB_Frequency getifreq(void)
+
+*Return:*
+(WFDB_Frequency)
+     the input sampling frequency
+
+This function returns the current input sampling frequency (in samples
+per second per signal), which is either the raw sampling frequency for
+the record (as would be returned by `sampfreq', *note sampfreq::), or
+the frequency chosen using a previous invocation of `setifreq'.
+
+
+File: wpg,  Node: setgvmode,  Next: getspf,  Prev: getifreq,  Up: special input modes
+
+setgvmode
+---------
+
+     void setgvmode(int *MODE)
+
+This function sets the mode used by `getvec' when reading a
+multi-frequency record (*note Multi-Frequency Records::).  If MODE is
+`WFDB_LOWRES', `getvec' decimates any signals sampled at multiples of
+the frame rate, so that one sample is returned per signal per frame
+(i.e., the oversampled signals are resampled by simple averaging of the
+samples for each signal within each frame).  If MODE is `WFDB_HIGHRES',
+each sample of any oversampled signal is returned by successive
+invocations of `getvec', and each sample of any signal sampled at a
+lower frequency is returned by two or more successive invocations of
+`getvec' (i.e., the less frequently sampled signals are resampled using
+zero-order interpolation).  `getvec' operates in `WFDB_LOWRES' mode by
+default.  `WFDB_LOWRES' and `WFDB_HIGHRES' are defined in
+`<wfdb/wfdb.h>'.
+
+   In WFDB library version 9.6 and later versions, `setgvmode' also
+affects how annotations are read and written.  If
+`setgvmode(WFDB_HIGHRES)' is invoked _before_ using `annopen',
+`wfdbinit', `getvec', `sampfreq', `strtim', or `timstr', then all
+`WFDB_Time' data (including the `time' attributes of annotations read
+by `getann' or written by `putann') visible to the application are in
+units of the high-resolution sampling intervals.  (Otherwise,
+`WFDB_Time' data are in units of frame intervals.)
+
+
+File: wpg,  Node: getspf,  Prev: setgvmode,  Up: special input modes
+
+getspf
+------
+
+     int getspf(void)
+
+*Return:*
+(int)
+     the number of samples per signal per frame
+
+Unless the application is operating in `WFDB_HIGHRES' mode (*note
+setgvmode::) and has then opened a multi-frequency record, this
+function returns 1.  For the case of a multi-frequency record being read
+in high resolution mode, however, `getspf' returns the number of
+samples per signal per frame (hence `sampfreq(NULL)/getspf()' is the
+number of frames per second).
+
+
+File: wpg,  Node: signal and annotation I/O,  Next: non-sequential,  Prev: special input modes,  Up: Functions
 
 Reading and Writing Signals and Annotations
 ===========================================
@@ -460,6 +783,19 @@ reads and prints the first ten samples of each available input signal:
 is used to determine how many input signals there are.  Several of the
 example programs in chapter 6 illustrate the use of `getvec'; for
 example, *note Example 6::.
+
+   If `setifreq' has been used to modify the input sampling rate,
+`getvec' resamples the input signals at the desired rate, using linear
+interpolation between the pair of samples nearest in time to that of
+the sample to be returned.  The results will generally be satisfactory,
+provided that the original signals do not contain frequencies near or
+above the Nyquist limit (half of the desired sampling frequency).  If
+this is a concern, you may wish to low-pass filter the input signals
+using, for example, `fir' (see the `WFDB Applications Guide') before
+resampling them.  If you use `setifreq' to _increase_ the sampling
+frequency by a large factor, you may wish to filter the resampled
+signals within your application to remove harmonics of the original
+sampling frequency introduced by resampling.
 
 
 File: wpg,  Node: getframe,  Next: putvec,  Prev: getvec,  Up: signal and annotation I/O
@@ -897,481 +1233,4 @@ speakers of different languages.
 strings for two or more codes; the behavior of `strann' and `strecg' in
 such cases is implementation-dependent.  (`setannstr' and `setanndesc'
 were first introduced in WFDB library version 5.3.)
-
-
-File: wpg,  Node: timstr and strtim,  Next: datstr and strdat,  Prev: annstr and strann,  Up: conversion
-
-   The next three functions convert between "standard time format"
-strings and times in units of sample intervals.  Normally they should be
-invoked after `isigopen', `wfdbinit', or `sampfreq', any of which will
-determine the duration of a sample interval and the base time from a
-header file, or after defining these quantities using `setsampfreq' and
-`setbasetime'.  If this is not done, or if these time-conversion
-functions are used after `wfdbquit', they will perform conversions in
-units of seconds (i.e., the sample interval is taken to be one second
-in such cases).
-
-[ms]timstr
-----------
-
-     char *timstr(WFDB_Time T)
-     char *mstimstr(WFDB_Time T)
-
-*Return:*
-(char *)
-     pointer to a string that represents the time
-
-These functions convert times or time intervals into null-terminated
-ASCII strings.  If the argument, T, is greater than zero, it is treated
-as a time interval, and converted directly into HH:MM:SS format by
-`timstr', or to HH:MM:SS.SSS format by `mstimstr', with leading zero
-digits and colons suppressed.  If T is zero or negative, it is taken to
-represent negated elapsed time from the beginning of the record, and it
-is converted to a time of day using the base time for the record as
-indicated by the `hea' file or the caller (*note setbasetime::); in
-this case, if the base time is defined, the string will contain all
-digits even if there are leading zeroes, it will include the date if a
-base date is defined, and it will be marked as a time of day by being
-bracketed (e.g., `[08:45:00 23/04/1989]').  The result of the
-conversion is truncated to a multiple of a second by `timstr', or to a
-multiple of a millisecond by `mstimstr'.  Note in each case that the
-returned pointer addresses static data (shared by `timstr' and
-`mstimstr'), the contents of which are overwritten by subsequent calls.
-*Note Example 3::, for an illustration of the use of `mstimstr'; also
-*note Example 5::, for an example of the use of `timstr'.
-
-strtim
-------
-
-     WFDB_Time strtim(char *STRING)
-
-*Return:*
-(WFDB_Time) >0
-     number of sample intervals corresponding to the argument
-     interpreted as a time interval
-
-(WFDB_Time) <0
-     (negated) elapsed time in sample intervals from the beginning of
-     the record, corresponding to the argument interpreted as a time of
-     day
-
-(WFDB_Time)  0
-     a legal return if the argument matches the base time;  otherwise
-     an error return indicating an incorrectly formatted argument
-
-This function converts an ASCII string in "standard time format" to a
-time in units of sample intervals.  Examples of standard time format:
-`2:14.875'
-     2 minutes + 14.875 seconds
-
-`[13:6:0]'
-     13:06 (1:06 PM)
-
-`[8:0:0 1]'
-     8 AM on the day following the base date
-
-`[12:0:0 1/3/1992]'
-     noon on 1 March 1992
-
-`143'
-     143 seconds (2 minutes + 23 seconds)
-
-`4:02:01'
-     4 hours + 2 minutes + 1 second
-
-`s12345'
-     12345 sample intervals
-
-`c350.5'
-     counter value 350.5
-
-`e'
-     time of the end of the record (if defined)
-
-`i'
-     time of the next sample in input signal 0
-
-`o'
-     (the letter `o') time of the next sample in output signal 0
-
-   If the argument is bracketed (as in the second, third, and fourth
-examples), it is taken as a time of day, and `strtim' uses the base
-time defined by the header file or by the caller (*note setbasetime::);
-in this case, the value returned is zero or negative (and can be
-converted into elapsed time from the beginning of the record by simply
-negating it).  If the argument is not bracketed, it is taken as a time
-interval, and converted directly into a positive number of sample
-intervals.  These notations match those used by `timstr' and
-`mstimstr', which are (approximately) inverse functions of `strtim'; in
-fact, for MIT DB and AHA DB records (and any others with sampling
-frequencies below 1 KHz), `strtim(mstimstr(T))' = T, for any T.  The
-`s'-format (as in the seventh example above) is provided to allow
-"conversion" of time intervals already expressed in sample intervals.
-The similar `c'-format converts counter values (*note counter
-conversion::) into sample intervals.  The length of the record in
-sample intervals can be obtained using `strtim("e")', which evaluates
-to zero if this quantity is undefined.  The sample number of the next
-sample to be read or written can be determined using `strtim("i")' or
-`strtim("o")'.  If the argument string is incorrectly formatted,
-`strtim' returns zero (indistinguishable from a correct input that
-evokes a zero output); this may be considered a feature.  Several of
-the programs in chapter 6 illustrate the use of `strtim' (for example,
-*note Example 7::).
-
-
-File: wpg,  Node: datstr and strdat,  Next: aduphys and physadu,  Prev: timstr and strtim,  Up: conversion
-
-   The next two functions convert between Julian dates and ASCII
-strings.  Julian dates as defined by astronomers begin at noon GMT;
-these begin at midnight local time.
-
-datstr
-------
-
-     char *datstr(WFDB_Date DATE)
-
-*Return:*
-(char *)
-     pointer to a string that represents the date
-
-This function converts the Julian date represented by DATE into an
-ASCII string in the form DD/MM/YYYY.
-
-strdat
-------
-
-     WFDB_Date strdat(char *STRING)
-
-*Return:*
-(WFDB_Date)
-     Julian date corresponding to the argument
-
-This function converts STRING into a Julian date.  The argument should
-be in the format used by `datstr'; if STRING is improperly formatted,
-`strdat' returns zero.  Note that dates such as `15/3/89' refer to the
-first century A.D., not the twentieth.  For example, the interval in
-days between the events commemorated by the French and American
-national holidays is `strdat("14/7/1789")' - `strdat("4/7/1776")'.
-
-
-
-
-File: wpg,  Node: aduphys and physadu,  Prev: datstr and strdat,  Up: conversion
-
-   The next four functions convert between analog-to-digital converter
-(ADC) units and physical units, using as a conversion factor the gain
-for the specified input signal.  The first two (`aduphys' and
-`physadu') are general-purpose functions that convert absolute levels
-(i.e., they account for non-zero `baseline' values); the last two
-(`adumuv' and `muvadu') are for use with millivolt-dimensioned signals
-only, and convert potential differences (i.e., `adumuv(S, 0)' =
-`muvadu(S, 0)' = 0 for all S, irrespective of the `baseline' values
-specified in the header file).  Normally, these functions should be
-invoked after `isigopen' or `wfdbinit', either of which will determine
-the gain from the `hea' file.  If this is not done, or if the header
-file indicates that the gain is uncalibrated, or if the specified input
-signal is not currently open, a gain of `WFDB_DEFGAIN' (defined in
-`<wfdb/wfdb.h>') ADC units per millivolt, and a baseline of zero, are
-assumed.  If the physical units (*note WFDB_Siginfo structures::) are
-not millivolts, `adumuv' and `muvadu' convert to and from thousandths
-of the defined physical units.  Note that `adumuv' and `muvadu' deal
-exclusively with integers, but `aduphys' returns and `physadu' accepts
-double-precision floating point physical values.
-
-aduphys
--------
-
-     double aduphys(WFDB_Signal S, WFDB_Sample A)
-
-*Return:*
-(double)
-     physical value corresponding to a sample value of A ADC units
-
-This function converts the sample value A from ADC units to physical
-units, based on the `gain' and `baseline' for input signal S.
-(`aduphys' was first introduced in WFDB library version 6.0.)
-
-physadu
--------
-
-     WFDB_Sample physadu(WFDB_Signal S, double V)
-
-*Return:*
-(WFDB_Sample)
-     sample value, in ADC units, corresponding to V, in physical units
-
-This function converts the value V from physical units to ADC units,
-based on the `gain' and `baseline' for input signal S.  (`physadu' was
-first introduced in WFDB library version 6.0.)
-
-adumuv
-------
-
-     int adumuv(WFDB_Signal S, WFDB_Sample A)
-
-*Return:*
-(int)
-     number of microvolts corresponding to A ADC units
-
-This function converts the potential difference A from ADC units to
-microvolts, based on the `gain' for input signal S.
-
-muvadu
-------
-
-     WFDB_Sample muvadu(WFDB_Signal S, int V)
-
-*Return:*
-(int)
-     number of ADC units corresponding to V microvolts
-
-This function converts the potential difference V from microvolts to
-ADC units, based on the `gain' for input signal S.
-
-
-File: wpg,  Node: calibration,  Next: miscellaneous functions,  Prev: conversion,  Up: Functions
-
-Calibration Functions
-=====================
-
-   Functions in this section are used to determine specifications for
-calibration pulses and customary scales for plotting signals.  All of
-them make use of the "calibration list", which is maintained in memory
-and which contains entries for various types of signals.
-
-* Menu:
-
-* calopen::			read a calibration file into list
-* getcal::			retrieve calibration data from list
-* putcal::			append calibration data to list
-* newcal::			write calibration list to a file
-* flushcal::			discard contents of calibration list
-
-
-File: wpg,  Node: calopen,  Next: getcal,  Prev: calibration,  Up: calibration
-
-calopen
--------
-
-     int calopen(char *FILE)
-
-*Return:*
- 0
-     Success
-
--1
-     Failure: insufficient memory for calibration list
-
--2
-     Failure: unable to open calibration file
-
-This function reads the specified calibration FILE (which must be
-located in one of the directories specified by `WFDB', *note WFDB
-path::) into the calibration list.  If FILE is `NULL', the file named
-by `WFDBCAL' is read.  Normally, the current contents of the
-calibration list are discarded before reading the calibration file; if
-FILE begins with `+', however, the `+' is stripped from the file name
-and the contents of the file are appended to the current calibration
-list.  If FILE is `-', `calopen' reads the standard input rather than a
-calibration file.  (This function was first introduced in WFDB library
-version 6.0.)
-
-
-File: wpg,  Node: getcal,  Next: putcal,  Prev: calopen,  Up: calibration
-
-getcal
-------
-
-     int getcal(char *DESC, char *UNITS, WFDB_Calinfo *CAL)
-
-*Return:*
- 0
-     Success;  `*CAL' contains the requested data
-
--1
-     Failure: no match found
-
-This function attempts to find calibration data for signals of type
-DESC, having physical units as given by UNITS.  If successful, it fills
-in the contents of the `WFDB_Calinfo' structure (*note WFDB_Calinfo
-structures::) pointed to by CAL.  The caller must allocate storage for
-the `WFDB_Calinfo' structure, and must not modify the contents of the
-strings addressed by the `sigtype' and `units' fields of the
-`WFDB_Calinfo' structure after `getcal' returns.  `getcal' returns data
-from the first entry in the calibration list that contains a `sigtype'
-field that is either an exact match or a prefix of DESC, and a `units'
-field that is an exact match of UNITS; if either DESC or UNITS is
-`NULL', however, it is ignored for the purpose of finding a match.
-`getcal' cannot succeed unless the calibration list has been
-initialized by a previous invocation of `calopen' or `putcal'.  (This
-function was first introduced in WFDB library version 6.0.)
-
-
-File: wpg,  Node: putcal,  Next: newcal,  Prev: getcal,  Up: calibration
-
-putcal
-------
-
-     int putcal(WFDB_Calinfo *CAL)
-
-*Return:*
- 0
-     Success
-
--1
-     Failure: insufficient memory
-
-This function adds the `WFDB_Calinfo' structure pointed to by CAL to
-the end of the calibration list.  (This function was first introduced
-in WFDB library version 6.0.)
-
-
-File: wpg,  Node: newcal,  Next: flushcal,  Prev: putcal,  Up: calibration
-
-newcal
-------
-
-     int newcal(char *FILE)
-
-*Return:*
- 0
-     Success
-
--1
-     Failure: unable to open FILE
-
-This function creates a new calibration FILE (in the current directory)
-containing the contents of the calibration list (which is not
-modified).  FILE must satisfy the standard conditions for a WFDB file
-name, i.e., it may contain letters, digits, or underscores.  (This
-function was first introduced in WFDB library version 6.0.)
-
-
-File: wpg,  Node: flushcal,  Prev: newcal,  Up: calibration
-
-flushcal
---------
-
-     void flushcal()
-
-This function discards the current calibration list and returns the
-memory that it occupied to the heap.  Note that `wfdbquit' does _not_
-perform the function of `flushcal'.  (This function was first
-introduced in WFDB library version 6.0.)
-
-
-File: wpg,  Node: miscellaneous functions,  Prev: calibration,  Up: Functions
-
-Miscellaneous WFDB Functions
-============================
-
-* Menu:
-
-* newheader::			Creating a `hea' file for a new WFDB
-				record.
-* setheader::			Creating or changing a `hea' file.
-* setmsheader::                 Creating a `hea' for a multi-segment
-                                record.
-* wfdbquit::			Closing WFDB files.
-* iannclose and oannclose::     Closing annotation files.
-* wfdbquiet and wfdbverbose::	Suppressing error messages from the WFDB library.
-* wfdberror::			Retrieving error messages from the WFDB library.
-* sampfreq::			Reading the sampling frequency of a WFDB record.
-* setsampfreq::			Setting the sampling frequency.
-* setbasetime::			Setting the base time.
-* setgvmode::                   Setting the resolution for a multifrequency
-                                record.
-* getspf::                      Determining the number of samples per frame.
-* counter conversion::		Functions for reading and setting counter
-				conversion parameters.
-* setwfdb::			Dynamically changing the database path.
-* getwfdb::			Reading the database path.
-* wfdbfile::			Obtaining the pathname of a WFDB file.
-* wfdbflush::			Flushing buffered output annotations and
-				samples.
-* getinfo::			Reading info strings from a `hea' file.
-* putinfo::			Writing info strings into a `hea' file.
-* setibsize::			Setting the default input buffer size.
-* setobsize::			Setting the default output buffer size.
-* wfdbgetskew::                 Reading intersignal skew.
-* wfdbsetskew::                 Recording intersignal skew.
-* wfdbgetstart::                Reading the prolog size in a signal file.
-* wfdbsetstart::                Recording the prolog size in a signal file.
-
-
-File: wpg,  Node: newheader,  Next: setheader,  Prev: miscellaneous functions,  Up: miscellaneous functions
-
-newheader
----------
-
-     int newheader(char *RECORD)
-
-*Return:*
- 0
-     Success
-
--1
-     Failure: unable to create header file
-
-This function creates a `hea' file (in the current directory, unless
-RECORD includes path information).  Use `newheader' just after you have
-finished writing the signal files, but before calling `wfdbquit'.  If
-RECORD begins with `+', the `+' is discarded and the remainder of
-RECORD is taken as the record name.  Otherwise, all of RECORD
-(excluding any path information) is taken to be the record name.  If
-the record name is `-', the header file is written to the standard
-output.  Record names may include letters in lower or upper case,
-digits, and underscores (`_'); they may not include any other
-characters.  If RECORD does not conform to these requirements,
-`newheader' will return -1; *note Example 8::, for an illustration of
-the use of `newheader' to check the validity of a record name.  For
-compatibility with the widest range of operating systems, keep record
-names short (6 characters or less) and avoid those that are
-distinguished by case alone.  To avoid confusion with MIT DB and AHA DB
-records, do not use three- or four-digit record names.
-
-
-File: wpg,  Node: setheader,  Next: setmsheader,  Prev: newheader,  Up: miscellaneous functions
-
-setheader
----------
-
-     int setheader(char *RECORD, WFDB_Siginfo *SIARRAY, unsigned int NSIG)
-
-*Return:*
- 0
-     Success
-
--1
-     Failure: unable to create header file
-
-This function creates or recreates a header file (in the current
-directory) for the specified RECORD, based on the contents of the first
-NSIG members of SIARRAY.  The preferred way to create a header file for
-a new record is using `newheader', which records signal checksum and
-length variables maintained by `putvec'.  The intended use of
-`setheader' is for editing header files, e.g., to change recorded
-signal gains from a calibration program, or to add signal descriptions
-or "info" strings.  In the following code fragment, the header file for
-record `old' is used to create a header file for record `new':
-
-     ...
-     int nsig, status;
-     WFDB_Siginfo *s;
-     
-     nsig = isigopen("old", NULL, 0);
-     s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
-     nsig = isigopen("old", s, -nsig);
-     if (nsig > 0) {
-         s[0].gain = 100.0;
-         status = setheader("new", s, (unsigned int)nsig);
-     }
-     ...
-
-The header file for record `new' will contain the same signal
-information as that for record `old', except that the `gain' for signal
-0 will have been changed as shown.  Any "info" strings in the `hea'
-file for record `old' must be copied explicitly; *note getinfo::, and
-*note putinfo::.  (This function was first introduced in WFDB library
-version 5.0.)
 

@@ -161,8 +161,10 @@ Concept Index
 * date (conversion to and from string):  datstr and strdat.
 * DC-coupled signal (defined):           Glossary.
 * DC-coupled signals:                    WFDB_Calinfo structures.
-* decimation <1>:                        getspf.
-* decimation:                            setgvmode.
+* decimation <1>:                        getvec.
+* decimation <2>:                        getspf.
+* decimation <3>:                        setgvmode.
+* decimation:                            setifreq.
 * deleting an annotation:                Annotation Order.
 * detector (QRS) <1>:                    Signal processing.
 * detector (QRS) <2>:                    Evaluation.
@@ -248,8 +250,11 @@ Concept Index
 * initial value of signal:               WFDB_Siginfo structures.
 * initialization:                        selecting.
 * input buffer size:                     setibsize.
-* interpolation <1>:                     getspf.
-* interpolation:                         setgvmode.
+* interpolation <1>:                     getvec.
+* interpolation <2>:                     getspf.
+* interpolation <3>:                     setgvmode.
+* interpolation <4>:                     setifreq.
+* interpolation:                         Recent changes.
 * intersignal skew <1>:                  Glossary.
 * intersignal skew <2>:                  wfdbsetskew.
 * intersignal skew:                      wfdbgetskew.
@@ -362,8 +367,11 @@ Concept Index
 * reference annotation file (defined):   Glossary.
 * reference annotations:                 Concepts 3.
 * reference point (on QRS):              WFDB_Annotation structures.
-* resampling <1>:                        getspf.
-* resampling:                            setgvmode.
+* resampling <1>:                        getvec.
+* resampling <2>:                        getspf.
+* resampling <3>:                        setgvmode.
+* resampling <4>:                        setifreq.
+* resampling:                            Recent changes.
 * resolution <1>:                        Glossary.
 * resolution:                            WFDB_Siginfo structures.
 * restrictions on function and variable names: name restrictions.
@@ -476,7 +484,17 @@ Concept Index
 * WFDB library:                          Overview.
 * WFDB library (compiling with):         compiling.
 * WFDB library functions:                Functions.
-* WFDB path:                             Glossary.
+* WFDB path <1>:                         Extensions.
+* WFDB path <2>:                         Using.
+* WFDB path <3>:                         Glossary.
+* WFDB path <4>:                         NETFILES.
+* WFDB path <5>:                         Database Files.
+* WFDB path <6>:                         wfdbfile.
+* WFDB path <7>:                         getwfdb.
+* WFDB path <8>:                         setwfdb.
+* WFDB path <9>:                         WFDB path syntax.
+* WFDB path <10>:                        WFDB path.
+* WFDB path:                             Recent changes.
 * WFDB_AHA_READ:                         WFDB_Anninfo structures.
 * WFDB_AHA_WRITE:                        WFDB_Anninfo structures.
 * WFDB_Anninfo structure (defined):      WFDB_Anninfo structures.
@@ -537,6 +555,8 @@ numbered versions of the WFDB library.
 * getcal (6.0):                          getcal.
 * getcfreq (5.2):                        counter conversion.
 * getframe (9.0):                        getframe.
+* getifreq (10.2.6) <1>:                 getifreq.
+* getifreq (10.2.6):                     Recent changes.
 * getinfo (4.0):                         getinfo.
 * getspf (9.6):                          getspf.
 * getvec:                                getvec.
@@ -574,6 +594,9 @@ numbered versions of the WFDB library.
 * setgvmode (9.0):                       setgvmode.
 * setheader (5.0):                       setheader.
 * setibsize (5.0):                       setibsize.
+* setifreq (10.2.6) <1>:                 getvec.
+* setifreq (10.2.6) <2>:                 setifreq.
+* setifreq (10.2.6):                     Recent changes.
 * setisqrs (6.0):                        Mapping macros.
 * setmap1 (6.0):                         Mapping macros.
 * setmap2 (6.0):                         Mapping macros.
@@ -605,7 +628,7 @@ File: wpg,  Node: Copying,  Prev: Function and Macro Index,  Up: Top
    WFDB Programmer's Guide
 
    Tenth Edition (revised and with additions for WFDB library version
-10.2.5)
+10.2.6)
 
    George B. Moody
 

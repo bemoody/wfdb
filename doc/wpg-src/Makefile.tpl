@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:  20 December 2001
+#				Last revised:	24 June 2002
 # Change the settings below as appropriate for your setup.
 
 # D2PARGS is a list of options for dvips.  Uncomment one of these to set the
@@ -54,6 +54,8 @@ TROFF = groff
 .IGNORE:
 
 all:	wpg.html wpg.ps wpg.pdf
+	$(MAKE) INFODIR=../wpg/info wpg.info
+	rm -f ../wpg/info/dir
 	cp -p wpg.ps wpg.pdf ../wpg
 
 install:
@@ -122,4 +124,4 @@ wpg.ps:		wpg.tex
 clean:
 	rm -f info.tar.gz info/wpg* wpg.aux wpg.cp wpg.cps wpg.dvi wpg.fn \
 	 wpg.fns wpg.ky wpg.log wpg.pdf wpg.ps wpg.pg wpg.toc wpg.tp wpg.vr \
-	 wpgcover.ps *~
+	 wpgcover.ps *~ ../wpg/info/dir

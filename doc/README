@@ -1,5 +1,5 @@
 file: README		G. Moody	7 September 1989
-			Last revised:	  18 March 2002
+			Last revised:	  24 June 2002
 
 This directory and its subdirectories contain documentation for the WFDB
 Software Package, including UNIX man pages in troff source format for the WFDB
@@ -34,7 +34,7 @@ WFDB Programmer's Guide
 
 WAVE User's Guide
   printed copy	'make wug-book'(requires troff, latex, dvips, and a printer)
-  HTML		'make wug.html'(requires latex2html and perl)
+  HTML		'make wug.html'(requires latex2html and perl) **
   PDF		'make wug.pdf' (requires pdflatex)
   PostScript	'make wug.ps'  (requires latex and dvips)
 
@@ -45,6 +45,13 @@ PhysioNet (look in http://www.physionet.org/physiotools/manuals.shtml).
   references properly.  If you encounter errors while attempting to make
   wpg.pdf, try replacing pdflatex's copy of texinfo.tex with a version dated
   June 2001 or later.  This problem occurs under Red Hat Linux 7.2.
+
+** Recent versions of Red Hat Linux have included several different versions
+  of latex2html and of the utilities it uses, with a variety of bugs in the
+  image-generation process.  If some of the images generated using 'make
+  wug.html' have a black border at the left and lower edges, replace
+  /usr/bin/pstoimg with the version found in wug-src/wave/misc and try again.
+  These problems occur under Red Hat Linux 7.1, 7.2, and 7.3.
 
 The following files will be found in this directory:
 

@@ -54,14 +54,10 @@ _Annotation file_
      A set of annotations in time order.
 
 _Annotator name_
-     A name associated with an annotation file.  On writable Unix and
-     Macintosh file systems, the annotation file name is constructed
-     from the annotator name by appending a `.' and the record name.
-     On CD-ROMs and MS-DOS file systems, the annotator name is
-     restricted to three characters, and the annotation file name is
-     constructed from the record name by appending a `.' and the
-     annotator name.  Unix and Macintosh versions of the WFDB library
-     can locate and read annotation files named using either convention.
+     A name associated with an annotation file.  The annotation file
+     name is constructed from the record name by appending a `.' and
+     the annotator name.  On CD-ROMs and MS-DOS file systems, the
+     annotator name is restricted to three characters.
 
 _Annotator [number]_
      An integer by which an annotation file, once opened, is known.
@@ -341,7 +337,7 @@ _Prolog_
      file.  If you need to create such a header file, refer to the
      description of the byte offset field in `header(5)' (the
      specification of the header file format in the `WFDB Applications
-     Guide', or *note wfdbsetstart::.
+     Guide') or *note wfdbsetstart::.
 
 _Record_
      An extensible set of files that may include signal files,
@@ -395,7 +391,8 @@ _Signal_
 
 _Signal file_
      A set of samples in time order, which represent a signal or signal
-     group.
+     group.  Signal files usually have names of the form RECORD`.dat',
+     but this is only a convention and is not required.
 
 _Signal group_
      A set of signals that are multiplexed together and stored in the
@@ -534,7 +531,7 @@ single command: `tar xfvz wfdb.tar.gz'.)
 
    This will create a directory with a name of the form `wfdb-'M.N.R,
 where M.N.R is the version number of the included WFDB library (e.g.,
-`10.2.5').  Enter this directory.
+`10.2.6').  Enter this directory.
 
    You should now be ready to configure, compile, and install the
 software, using the commands:
@@ -577,17 +574,11 @@ obtain and install the `libwww' package from
 `http://www.physionet.org/physiotools/libwww/'.  You may omit this step
 if you do not wish to have NETFILES support.
 
-   Download
-`http://www.physionet.org/physiotools/binaries/windows/bin/which.exe'
-and put it into a directory in your PATH.  (This utility is needed by
-`configure' in a later step.  The sources for `which.exe' are available
-within `http://www.physionet.org/physiotools/utilities/'.)
-
    Open a Cygwin terminal window (the Cygwin installer will have added
 this to your MS-Windows start menu).  Perform the remaining steps by
 typing the commands given below into the terminal window.
 
-   Check that `which' and `gcc' are accessible by typing the command:
+   Check that `gcc' is accessible by typing the command:
 
      which gcc
 
@@ -610,7 +601,7 @@ command instead:
 
    This will create a directory with a name of the form `wfdb-'_m.n.r_,
 where _m.n.r_ is the version number of the included WFDB library (e.g.,
-`10.2.5').  Enter this directory.
+`10.2.6').  Enter this directory.
 
    You should now be ready to configure, compile, and install the
 software, using the commands:

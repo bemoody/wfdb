@@ -2,20 +2,13 @@
 #				Last revised:		19 June 2000
 # Change the settings below as appropriate for your setup.
 
-# URLV is the command that starts your web browser if necessary and opens the
-# URL named in its first argument.  The following works properly with Netscape
-# 1.1 and later versions;  if you are using a different browser, consult its
-# documentation.
-URLV='( netscape -remote "openURL($$1)" 2>/dev/null || netscape $$1 ) &'
-
-# `make all' creates url_view, wavescript, and wave-remote without installing
-# them.
+# `make all' creates wavescript and wave-remote without installing them.
 all:	wavescript wave-remote
 
-# `make install' installs `wavescript' and `wave-remote'.  See the WAVE User's
-# Guide for instructions on setting up `wavescript' as a helper application for
-# your Web browser.
-install:	$(BINDIR) url_view wavescript wave-remote
+# `make install' installs `url_view', `wavescript', and `wave-remote'.  See
+# the WAVE User's Guide for instructions on setting up `wavescript' as a helper
+# application for  your Web browser.
+install:	$(BINDIR) wavescript wave-remote
 	$(STRIP) wavescript
 	$(STRIP) wave-remote
 	$(SETXPERMISSIONS) url_view wavescript wave-remote
@@ -23,11 +16,6 @@ install:	$(BINDIR) url_view wavescript wave-remote
 
 uninstall:
 	../uninstall.sh $(BINDIR) url_view wavescript wave-remote
-
-# `url_view' opens a web browser to view a named URL.
-url_view:	Makefile
-	cp urlvhead url_view
-	echo $(URLV) >>url_view
 
 # `wavescript' reads commands from a named file and passes them to WAVE.
 wavescript:	wavescript.c
@@ -46,7 +34,7 @@ wave-remote-test:	wave-remote-test.c
 
 # `make clean':  remove intermediate and backup files
 clean:
-	rm -f url_view wavescript wave-remote wave-remote-test *~
+	rm -f wavescript wave-remote wave-remote-test *~
 
 # Create directory for installation if necessary.
 $(BINDIR):

@@ -1,5 +1,5 @@
-# file: Makefile.tpl		G. Moody	  31 May 2000
-#				Last revised:	13 October 2001
+# file: Makefile.tpl		G. Moody	31 May 2000
+#				Last revised:	24 June 2002
 # Change the settings below as appropriate for your setup.
 
 # WAVEVERSION is the WAVE version number.
@@ -71,7 +71,7 @@ CFILES = wave.c init.c mainpan.c modepan.c helppan.c logpan.c annpan.c edit.c \
  grid.c sig.c annot.c analyze.c scope.c search.c xvwave.c help.c
 OFILES = wave.o init.o mainpan.o modepan.o helppan.o logpan.o annpan.o edit.o \
  grid.o sig.o annot.o analyze.o scope.o search.o xvwave.o $(HELPOBJ)
-HELPFILES = analysis.hlp buttons.hlp editing.hlp faq.hlp intro.hlp log.hlp \
+HELPFILES = analysis.hlp buttons.hlp editing.hlp intro.hlp log.hlp \
  printing.hlp resource.hlp
 OTHERFILES = wave.hl0 wave.info wave.pro demo.txt Wave.res wavemenu.def \
  Makefile

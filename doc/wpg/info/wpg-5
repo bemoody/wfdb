@@ -1,6 +1,271 @@
 This is wpg, produced by makeinfo version 4.0b from wpg.tex.
 
 
+File: wpg,  Node: Example 4,  Next: Example 5,  Prev: Example 3,  Up: Examples
+
+Example 4: Generating an R-R Interval Histogram
+===============================================
+
+   This program reads an annotation file, determines the intervals
+between beat annotations (assumed to be the R-R intervals), and
+accumulates a histogram of them.
+
+      1  #include <stdio.h>
+      2  #include <wfdb/wfdb.h>
+      3  #include <wfdb/ecgmap.h>
+      4
+      5  main(argc, argv)
+      6  int argc;
+      7  char *argv[];
+      8  {
+      9      int rr, *rrhist, rrmax;
+     10      long t;
+     11      WFDB_Anninfo a;
+     12      WFDB_Annotation annot;
+     13      void *calloc();
+     14
+     15      if (argc < 3) {
+     16          fprintf(stderr, "usage: %s annotator record\n", argv[0]);
+     17          exit(1);
+     18      }
+     19      a.name = argv[1]; a.stat = WFDB_READ;
+     20      if (annopen(argv[2], &a, 1) < 0) exit(2);
+     21      if ((rrmax = (int)(3*sampfreq(argv[2]))) <= 0) exit(3);
+     22      if ((rrhist = (int *)calloc(rrmax+1, sizeof(int))) == NULL) {
+     23          fprintf(stderr, "%s: insufficient memory\n", argv[0]);
+     24          exit(4);
+     25      }
+     26      while (getann(0, &annot) == 0 && !isqrs(annot.anntyp))
+     27          ;
+     28      t = annot.time;
+     29      while (getann(0, &annot) == 0)
+     30          if (isqrs(annot.anntyp)) {
+     31              if ((rr = annot.time - t) > rrmax) rr = rrmax;
+     32              rrhist[rr]++;
+     33              t = annot.time;
+     34          }
+     35      for (rr = 1; rr < rrmax; rr++)
+     36          printf("%4d %s\n", rrhist[rr], mstimstr((long)rr));
+     37      printf("%4d %s (or longer)\n", rrhist[rr], mstimstr((long)rr));
+     38      exit(0);
+     39  }
+
+*Notes:*
+_Lines 21-25:_
+     Here we allocate storage for the histogram.  The value returned by
+     `sampfreq', if positive, specifies the number of sample intervals
+     per second; we will allocate 3 seconds' worth of bins, initialized
+     to zero.  See `K&R', page 167, for a description of `calloc'.
+
+_Lines 26-28:_
+     This code sets `t' to the time of the first annotated beat in the
+     record.
+
+_Lines 29-34:_
+     Here we read the remainder of the annotations, skipping any
+     non-beat annotations.  The difference between the values of
+     `annot.time' for consecutive beat annotations defines an R-R
+     interval (`rr').  Each possible value of `rr' up to `rrmax' is
+     assigned a bin in `rrhist'.  Intervals longer than 3 seconds
+     (`rrmax') are counted in the bin corresponding to `rr' = `rrmax'.
+
+_Lines 35-37:_
+     The histogram is printed as a two-column table, with the number of
+     intervals in the first column and the length of the interval (with
+     millisecond resolution) in the second column. (What happens if
+     `rr' starts at 0 rather than 1 in line 35?)
+
+
+File: wpg,  Node: Example 5,  Next: Example 6,  Prev: Example 4,  Up: Examples
+
+Example 5: Reading Signal Specifications
+========================================
+
+   This program reads the signal specifications of the record named as
+its argument:
+
+      1  #include <stdio.h>
+      2  #include <wfdb/wfdb.h>
+      3
+      4  main(argc, argv)
+      5  int argc;
+      6  char *argv[];
+      7  {
+      8      WFDB_Siginfo *s;
+      9      int i, nsig;
+     10
+     11      if (argc < 2) {
+     12          fprintf(stderr, "usage: %s record\n", argv[0]);
+     13          exit(1);
+     14      }
+     15      nsig = isigopen(argv[1], NULL, 0);
+     16      if (nsig < 1) exit(2);
+     17      s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+     18      if (s == NULL) {
+     19          fprintf(stderr, "insufficient memory\n");
+     20	        exit(3);
+     21      }
+     22      if (isigopen(argv[1], s, nsig) != nsig) exit(2);
+     23      printf("Record %s\n", argv[1]);
+     24      printf("Starting time: %s\n", timstr(0L));
+     25      printf("Sampling frequency: %g Hz\n", sampfreq(argv[1]));
+     26      printf("%d signals\n", nsig);
+     27      for (i = 0; i < nsig; i++) {
+     28          printf("Group %d, Signal %d:\n", s[i].group, i);
+     29          printf(" File: %s\n", s[i].fname);
+     30          printf(" Description: %s\n", s[i].desc);
+     31          printf(" Gain: ");
+     32          if (s[i].gain == 0.)
+     33              printf("uncalibrated; assume %g", WFDB_DEFGAIN);
+     34          else printf("%g", s[i].gain);
+     35          printf(" adu/%s\n", s[i].units ? s[i].units : "mV");
+     36          printf(" Initial value: %d\n", s[i].initval);
+     37          printf(" Storage format: %d\n", s[i].fmt);
+     38          printf(" I/O: ");
+     39          if (s[i].bsize == 0) printf("can be unbuffered\n");
+     40          else printf("%d-byte blocks\n", s[i].bsize);
+     41          printf(" ADC resolution: %d bits\n", s[i].adcres);
+     42          printf(" ADC zero: %d\n", s[i].adczero);
+     43          if (s[i].nsamp > 0L) {
+     44              printf(" Length: %s (%ld sample intervals)\n",
+     45                     timstr(s[i].nsamp), s[i].nsamp);
+     46              printf(" Checksum: %d\n", s[i].cksum);
+     47          }
+     48          else printf(" Length undefined\n");
+     49      }
+     50      exit(0);
+     51  }
+
+*Notes:*
+
+_Line 15:_
+     The command-line argument, `argv[1]', is the record name.  The
+     number of signals listed in the header file for the record is
+     returned by `isigopen' as `nsig'.  If `nsig' < 1, `isigopen' will
+     print an error message; in this case the program can't do anything
+     useful, so it exits.
+
+_Line 17:_
+     We allocate `nsig' signal information (`WFDB_Siginfo') objects.
+
+_Line 22:_
+     On the second invocation of `isigopen', we pass the pointer to the
+     signal information objects and the number of signals we expect to
+     open.  `isigopen' returns the number of signals it is able to
+     open;  if any of those named in the header file are unreadable,
+     the return value will not match `nsig', and the program exits.
+
+_Line 24:_
+     Invoking `timstr' with an argument of zero (here written `0L' to
+     emphasize to the compiler that the argument is a `long' integer)
+     will obtain the starting time of the record.  If no starting time
+     is defined, `timstr' will return "`0:00:00'".
+
+_Lines 31-34:_
+     Notice how a zero value for `gain' is interpreted.
+
+_Line 35:_
+     If the `units' field is NULL, the physical units are assumed to be
+     millivolts ("mV").
+
+_Lines 38-40:_
+     If `bsize' is zero, I/O can be performed in blocks of any
+     reasonable size;  otherwise it must be performed in blocks of
+     exactly the specified `bsize'.
+
+_Lines 43-48:_
+     If the length of the record is defined, it is printed in both
+     hours, minutes, and seconds, and in sample intervals.  Since the
+     argument of `timstr' in line 39 is positive, it is interpreted as
+     a time interval.  The checksum is defined only if the record
+     length is defined.
+
+
+File: wpg,  Node: Example 6,  Next: Example 7,  Prev: Example 5,  Up: Examples
+
+Example 6: A Differentiator
+===========================
+
+   The program below inverts and differentiates the signals read by
+`getvec' and writes the results with `putvec'.  The output is readable
+as record `dif'.  A wide variety of simple digital filters can be
+modelled on this example; *note Example 7::, for a more general
+approach.
+
+      1  #include <stdio.h>
+      2  #include <wfdb/wfdb.h>
+      3
+      4  main(argc, argv)
+      5  int argc;
+      6  char *argv[];
+      7  {
+      8      WFDB_Siginfo *s;
+      9      int i, nsig, nsamp=1000;
+     10      WFDB_Sample *vin, *vout;
+     11
+     12      if (argc < 2) {
+     13          fprintf(stderr, "usage: %s record\n", argv[0]); exit(1);
+     14      }
+     15      if ((nsig = isigopen(argv[1], NULL, 0)) <= 0) exit(2);
+     16      s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+     17      vin = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
+     18      vout = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
+     19      if (s == NULL || vin == NULL || vout == NULL) {
+     20          fprintf(stderr, "insufficient memory\n");
+     21          exit(3);
+     22      }
+     23      if (isigopen(argv[1], s, nsig) != nsig) exit(2);
+     24      if (osigopen("8l", s, nsig) <= 0) exit(3);
+     25      while (nsamp-- > 0 && getvec(vin) > 0) {
+     26          for (i = 0; i < nsig; i++)
+     27              vout[i] -= vin[i];
+     28          if (putvec(vout) < 0) break;
+     29          for (i = 0; i < nsig; i++)
+     30              vout[i] = vin[i];
+     31      }
+     32      (void)newheader("dif");
+     33      wfdbquit();
+     34      exit(0);
+     35  }
+
+*Notes:*
+
+_Line 24:_
+     Here we attempt to open as many output signals as there are input
+     signals; if we cannot do so, the program exits after `osigopen'
+     prints an error message.
+
+_Line 25:_
+     The main loop of the program begins here.  If 1000 samples can be
+     read from each signal, the loop will end normally; if `getvec'
+     fails before 1000 samples have been read, the loop ends
+     prematurely.
+
+_Lines 26-27:_
+     For each signal, we compute the negated first difference by
+     subtracting the new sample from the previous sample.
+
+_Line 28:_
+     One sample of each output signal is written here.
+
+_Lines 29-30:_
+     The new input samples are copied into the output sample vector in
+     preparation for the next iteration.
+
+_Line 32:_
+     This step is optional.  It creates a header file for a new record
+     to be called `dif', which we can then open with another program if
+     we want to read the signals that this program has written.  Since
+     the RECORD argument for `osigopen' was `8l', we can also read
+     these files using record `8l'; one reason for making a new `hea'
+     file here is that the `hea' file for `8l' may not necessarily
+     indicate the proper sampling frequency for these signals.
+
+_Line 33:_
+     Since the program writes output signals, it must invoke `wfdbquit'
+     to close the files properly.
+
+
 File: wpg,  Node: Example 7,  Next: Example 8,  Prev: Example 6,  Up: Examples
 
 Example 7:  A General-Purpose FIR Filter
@@ -549,9 +814,9 @@ and feature extraction", `Computers in Cardiology' 6:37-42 (1979).
      30          exit(2);
      31      }
      32      if (wfdbinit(argv[1], &a, 1, s, nsig) != nsig) exit(2);
-     33      if (sampfreq(NULL) != 250.)
-     34          fprintf(stderr,"warning: %s is designed for 250 Hz input\n",
-     35                  argv[0]);
+     33      if (sampfreq((char *)NULL) < 240. ||
+     34          sampfreq((char *)NULL) > 260.)
+     35          setifreq(250.);
      36      if (argc > 2) scmin = muvadu(0, atoi(argv[2]));
      37      if (scmin < 1) scmin = muvadu(0, 1000);
      38      slopecrit = scmax = 10 * scmin;
@@ -623,9 +888,9 @@ _Lines 33-35:_
      Most of this program is independent of sampling frequency, but the
      filter (lines 45-46) and the threshold are as specified by the
      authors of the original program for human ECGs sampled at 250 Hz
-     (e.g., the AHA DB).  The program will work for MIT DB records
-     sampled at 360 Hz, but better results can be obtained if the
-     filter is optimized for the correct sampling frequency.
+     (e.g., the AHA DB).  If the sampling frequency of the input record
+     is significantly different, we use `setifreq' to specify that we
+     want `getvec' to give us data resampled at 250 Hz.
 
 _Lines 36-38:_
      The threshold is actually a slope criterion (with units of
@@ -686,15 +951,16 @@ Answers to some of them are at the back of the book, but try to work
 through them first.
 
   1. Type in the first program from the previous chapter, compile it,
-     and run it.  Remember to set and export the environment variable
-     `WFDB' (*note WFDB path::).  It is a good idea to include this
-     step in your `.profile', `.cshrc', or `autoexec.bat'.  As input,
-     try record `100s', input annotator `atr', and output annotator
-     `normal'.  The program should finish in five seconds or less.  The
-     annotations will have been written into a file called `100s.nor'
-     in the current directory.  Now type "`rdann -r 100s -a atr'" and
-     observe the output for a few seconds, then try "`rdann -r 100s -a
-     nor'" and notice the difference.
+     and run it.  If you know that you will need to read WFDB files
+     from non-standard locations, remember to set and export the
+     environment variable `WFDB' (*note WFDB path::).  It is a good
+     idea to include this step in your `.profile', `.cshrc', or
+     `autoexec.bat'.  As input, try record `100s', input annotator
+     `atr', and output annotator `normal'.  The program should finish
+     in five seconds or less.  The annotations will have been written
+     into a file called `100s.nor' in the current directory.  Now type
+     "`rdann -r 100s -a atr'" and observe the output for a few seconds,
+     then try "`rdann -r 100s -a nor'" and notice the difference.
 
   2. Modify the program from the previous exercise so that the non-QRS
      annotations are put into a second output annotation file.

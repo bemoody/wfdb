@@ -3,7 +3,7 @@
 % Recent LaTeX distributions include html.sty (written for latex2html).
 % If yours doesn't, get a copy from CTAN (http://www.ctan.org/), from
 % the current latex2html package (also available from CTAN), or from
-% the wave/misc sudirectory of the directory where you found this
+% the wave/misc subdirectory of the directory where you found this
 % file, and put the copy into this directory (or into the directory
 % that contains the other .sty files referenced below) before attempting
 % to process this file using LaTeX.
@@ -34,7 +34,7 @@
 \title{\WAVE{} User's Guide}
 \author{Fifth Edition\\
 (revised and with corrections for \WAVE{} version 6.5)\\
-10 March 2002\\
+24 June 2002\\
 \\
 \\
 \\
@@ -221,8 +221,8 @@ Long time users of \WAVE{} will note that this edition has been greatly
 expanded over previous editions.  In part, this reflects more complete
 coverage of the original material, but \WAVE{} itself has also grown.
 \WAVE{} 6.5 is freely available from
-\hyperref{downloading from the Internet}
-{Physionet (see section~}
+\hyperref{PhysioNet}
+{PhysioNet (see section~}
 {, page~\pageref{sec:getting-wave})}
 {sec:getting-wave}.
 
@@ -253,13 +253,10 @@ This on-line version of the \WAVE{} User's Guide was prepared using
 {http://www-dsed.llnl.gov/files/programs/unix/latex2html/}
 from the same \LaTeX{} sources used for the
 printed manual.  You can print your own copy from the PostScript version
-\htmladdnormallink{here}{wug.ps}.  The most recent \LaTeX{}, HTML, and
+\htmladdnormallink{here}{wug.ps}.  The most recent \LaTeX{}, HTML, PDF, and
 PostScript versions can be obtained from
 \htmladdnormallink{PhysioNet}
-{http://www.physionet.org/}.  If you wish to obtain a printed copy of
-this guide, an
-\htmladdnormallink{order form}{http://ecg.mit.edu/order-form.html}
-is available on-line.
+{http://www.physionet.org/}.
 I would be grateful for reports of any typographic or other problems
 in the HTML version, since the translation to HTML is automated and
 may be less than perfect.  Note that the distributed HTML version uses
@@ -306,6 +303,62 @@ guide, and for your comments and suggestions about \WAVE{}.
 GBM\\
 Cambridge, Massachusetts\\
 May, 1999
+
+\vfill
+
+\section*{Notes on the fifth edition}
+
+This edition contains updated figures, additional tutorial material,
+and revisions to reflect recent changes in \WAVE{}.
+
+\index{GTKWave} Since version 1, \WAVE{} has used the XView toolkit,
+an open source implementation of the Open Look GUI.  Open Look is an
+elegant and easy-to-use GUI, but it is no longer being actively
+developed or supported, and as a result, it is unfamiliar to many
+first-time \WAVE{} users.  Newer user interface toolkits, such as the
+open source GTK+ toolkit, have converged on a common set of graphical
+elements and behaviors resembling those of the Motif GUI.  GTK+ has a
+very active developer community and has been ported from Linux to many
+other Unix variants, and to MS Windows.  A version of \WAVE{} that
+uses the GTK+ toolkit is now available from PhysioNet.  Sources and
+precompiled versions of GTKWave for Linux and for MS-Windows are
+available at
+\htmladdnormallink{http://www\-.physio\-net\-.org/physio\-tools/\-beta/\-gtkwave/}
+{http://www.physionet.org/physiotools/beta/gtkwave/}.  Although
+GTKWave is still in development, it is quite usable and contains
+nearly all of the functionality of the XView-based \WAVE{} described
+in this Guide.
+\index{Open Look}
+
+\begin{figure}[h]
+\centerline{\epsfig{file=GTKWave}}
+\caption{GTKWave (beta).}
+\index{GTKWave}
+\label{fig:GTKWave}
+\end{figure}
+
+This guide serves as the primary documentation for both \WAVE{} and
+GTKWave, but the current edition does not contain any information
+specific to GTKWave.
+
+If you find a difference between GTKWave and what is described in the
+Wave User's Guide (other than a cosmetic difference in the user
+interface elements), please check the GTKWave Beta Notes
+page on PhysioNet
+(\htmladdnormallink{http://www\-.physio\-net.org/\-physio\-tools/\-beta/\-gtkwave/\-notes\-.shtml}
+{http://www.physionet.org/physiotools/beta/gtkwave/notes.shtml}) to see
+if this difference has already been reported. If not, please send me a
+note, citing the page number in the printed Wave User's Guide, or the
+exact URL in the online version.  Indicate what is different in
+GTKWave, the name and version of the operating system you are using,
+and suggest how the text should be changed. Your reports will help us
+to prepare an accurate and up-to-date guide for GTKWave.
+
+\vspace{2em}
+\noindent
+GBM\\
+Cambridge, Massachusetts\\
+June, 2002
 
 \chapter{Introducing \WAVE{}}
 \pagenumbering{arabic}
@@ -446,6 +499,8 @@ output to your computer's display?} &
 
 \subsubsection*{Notes:}
 
+\index{olwm@{\tt olwm} (Open Look Window Manager)}
+\index{olvwm@{\tt olvwm} (Open Look Virtual Window Manager)}
 \begin{description}
 \item[1. Starting the X server.]
 On some computers, the X server and the window manager
@@ -454,10 +509,7 @@ needed.  Otherwise, you must run a command to start the X server
 before you can run \WAVE{}.  This command may be `{\tt startx}' or
 `{\tt openwin}'; for details, check your X server manual (on a UNIX
 system, type `{\tt man X}').  If you have a choice of window managers,
-use {\tt olwm} or {\tt olvwm}
-\index{olwm@{\tt olwm} (Open Look Window Manager)}
-\index{olvwm@{\tt olvwm} (Open Look Virtual Window Manager)}
-if possible
+use {\tt olwm} or {\tt olvwm} if possible
 \hyperref{(click here for details).}
 {(see Appendix~}
 {, page~\pageref{app:system-requirements}).}
@@ -478,101 +530,107 @@ terminal window.
 \index{terminal window}\index{window!terminal}
 
 \item[2. Initializing the environment.]
-The form of this command depends on what shell (command
-interpreter)
+If you are using a recent version of \WAVE{}, you probably will not
+need to do anything to initialize the environment (the WFDB path
+and the name of the WFDB calibration file).  Unless you keep input files
+in non-standard places, or if you have created your own calibration
+file in a non-standard location, you can skip this step. 
 \index{shell}\index{command interpreter}
-you use on the \WAVE{} host.  To identify your
-shell, log onto the \WAVE{} host \index{WAVE host@\WAVE{} host}
-and type `{\tt echo
-\$SHELL}'.
 \index{environment variables!SHELL}\index{SHELL environment variable}
-If the response contains the characters `{\tt csh}',
 \index{csh@{\tt csh}}\index{C-shell}
-you are using the C-shell (or a variant of it);  in this case, use 
-`{\tt source /usr/bin/cshsetwfdb}'
 \index{cshsetwfdb@{\tt cshsetwfdb} command}
-to initialize the environment.  Otherwise, use `{\tt .~setwfdb}'
 \index{setwfdb@{\tt setwfdb} command}
-to do so (don't omit the
-`{\tt .}' in this case).  Usually, the appropriate command is included in
-your `{\tt .profile}'
 \index{profile@{\tt .profile}}
 \index{login@{\tt .login}}
-or `{\tt .login}'
-script on the \WAVE{} host,
-so that it need not be entered each time you log onto the \WAVE{}
-host.  See
-\htmladdnormallink{{\tt setwfdb(1)}}{../dbag/setwfd-1.htm}
-(type `{\tt man setwfdb}' on the \WAVE{} host) for further
-information.
+
+If you do need to initialize your environment, this is typically done
+using a command at login time.  The form of this command depends on
+what shell (command interpreter) you use on the \WAVE{} host.  To
+identify your shell, log onto the \WAVE{} host \index{WAVE
+host@\WAVE{} host} and type `{\tt echo \$SHELL}'.  If the response
+contains the characters `{\tt csh}', you are using the C-shell (or a
+variant of it); in this case, use `{\tt source /usr/bin/cshsetwfdb}'
+to initialize the environment.  Otherwise, use `{\tt .~setwfdb}' to do
+so (don't omit the `{\tt .}' in this case).  Usually, the appropriate
+command is included in your `{\tt .profile}' or `{\tt .login}' script
+on the \WAVE{} host, so that it need not be entered each time you log
+onto the \WAVE{} host.  See \htmladdnormallink{{\tt
+setwfdb(1)}}{../wag/setwfd-1.htm} (type `{\tt man setwfdb}' on the
+\WAVE{} host) for further information.
 
 \item[3. Simulating a middle button click.]
-\index{mouse!middle button!simulating}
-\index{middle mouse button!simulating}
-\index{chording (mouse technique)}
 On a two-button mouse, this is often done by clicking both buttons
 simultaneously; on a one-button mouse, this is usually performed by
 pressing and holding a keyboard key such as \keycap{Shift}
 while clicking the mouse button.  Refer to your X server
 documentation.
+\index{mouse!middle button!simulating}
+\index{middle mouse button!simulating}
+\index{chording (mouse technique)}
 
 \item[4. Simulating a right button click.]
+This is usually done by pressing and holding a keyboard key while
+clicking the mouse button.  Refer to your X server documentation.
 \index{mouse!right button!simulating}
 \index{right mouse button!simulating}
 \index{chording (mouse technique)}
-This is usually done by pressing and holding a keyboard key while
-clicking the mouse button.  Refer to your X server documentation.
 
 \item[5. Your computer's name.]
+If you don't know your computer's name, you may be able to discover it
+by typing the command `{\tt hostname}' (on a UNIX system), or by
+logging in to the \WAVE{} host and typing the command `{\tt who am I}'
+(your computer's name should appear at the end of the output).  If the
+\WAVE{} host doesn't recognize your computer by name, use your
+computer's IP address (in the form {\tt a.b.c.d}, where {\tt a}, {\tt
+b}, {\tt c}, and {\tt d} are decimal numbers between 0 and 255).
 \index{hostname@{\tt hostname}}
 \index{names of computers}
-If you don't know your computer's name, you may be able to discover
-it by typing the command `{\tt hostname}' (on a UNIX system), or by
-logging in to the \WAVE{} host
 \index{WAVE host@\WAVE{} host}
-and typing the command `{\tt who am I}'
 \index{who am I command@{\tt who am I} command}
-(your computer's name should appear at the end of the output).  If the
-\WAVE{} host doesn't recognize your computer by name, use
-your computer's IP address
 \index{IP address}
 \index{address, IP (Internet Protocol)}
-(in the form {\tt a.b.c.d}, where {\tt a},
-{\tt b}, {\tt c}, and {\tt d} are decimal numbers between 0 and 255).
 
 \item[6. The \WAVE{} host's name.]
 If your computer doesn't recognize the \WAVE{} host by name, use
 the \WAVE{} host's IP address.
 
 \item[7. Permitting access to your display.]
-This command is usually needed if your computer is running UNIX.
-For example, if the name of the \WAVE{} host is {\tt atlantic}, this
-command would be `{\tt xhost +atlantic}'.
+If you use {\tt ssh} (see the next item) to login to the \WAVE{} host,
+skip this step.  Otherwise, this command is usually
+needed if your computer is running UNIX.  For example, if the name of
+the \WAVE{} host is {\tt atlantic}, this command would be `{\tt xhost
++atlantic}'.  If your computer is not running UNIX, there may not be
+any command required; if in doubt, see your X server manual.
 \index{xhost command@{\tt xhost} command}
-If your computer is not running
-UNIX, there may not be any command required;  if in doubt, see your X server
-manual.
+\index{ssh command@{\tt ssh} command}
 
 \item[8. Logging onto the \WAVE{} host.]
-This is probably a command of the form `{\tt telnet atlantic}' or (a safer
-alternative) `{\tt ssh atlantic}'.
+
+This is probably a command of the form `{\tt ssh atlantic}'.  You will
+probably be prompted to enter your password when you execute this
+command.  If you don't have {\tt ssh} on your computer, and an {\tt
+ssh} server on the \WAVE{} host, it is very strongly recommended that you
+obtain and install them (both are freely available from
+\htmladdnormallink{http://www.openssh.org/}{http://www.openssh.org/}).
+Use {\tt telnet} only as a last resort, and never on a public network.
+\index{ssh command@{\tt ssh} command}
 \index{telnet command@{\tt telnet} command}
-You will
-probably be prompted to enter your password when you execute this command.
 
 \item[9. Redirecting \WAVE{} output to your display.]
-\index{environment variables!DISPLAY}\index{SHELL environment variable}
 \label{sec:setting-display}
-Assume that the name of your computer is {\tt arctic}.
-If you use the C-shell on the \WAVE{} host (see note 2 above), the
-command would be `{\tt setenv DISPLAY arctic:0}'.
-Otherwise, it would
+If you use {\tt ssh} (see above), skip this step.  Otherwise, you will
+need to set the {\tt DISPLAY} environment variable to point to your
+computer.  Assume that the name of your computer is {\tt arctic}.  If
+you use the C-shell on the \WAVE{} host (see note 2 above), the
+command would be `{\tt setenv DISPLAY arctic:0}'.  Otherwise, it would
 be `{\tt DISPLAY=arctic:0; export DISPLAY}'.  It is possible to set up
-\index{profile@{\tt .profile}}
-\index{login@{\tt .login}}
 your {\tt .profile} or {\tt .login} script so that this command can be
 executed automatically each time you log onto the \WAVE{} host.
 Consult your system administrator for details.
+\index{environment variables!DISPLAY}
+\index{SHELL environment variable}
+\index{profile@{\tt .profile}}
+\index{login@{\tt .login}}
 
 \end{description}
 
@@ -595,7 +653,6 @@ pointer; typically, you click the left mouse button after dragging the
 window outline to the desired location on your screen in order to make
 the window appear.
 
-\index{moving windows}\index{window!moving}\index{dragging}
 Before going any further, find out how to move windows on your screen
 if you don't already know how to do so.  (You will need to do this
 occasionally while using \WAVE{}, since its windows may sometimes
@@ -607,51 +664,48 @@ the pointer (which may have been replaced by the window outline) to
 the desired location before releasing the mouse button.  (This common
 action is called \emph{dragging}, as in the expression `drag the window
 using the left button'.)  Try moving the terminal window now.
+\index{moving windows}\index{window!moving}\index{dragging}
 
-For this exercise, all commands should be typed into the same terminal window.
-Once again, however, differences in window managers may affect how you do
-this.  Some window managers use a \emph{focus-follows-mouse}
+For this exercise, all commands should be typed into the same terminal
+window.  Once again, however, differences in window managers may
+affect how you do this.  Some window managers use a
+\emph{focus-follows-mouse} policy: you can type into a window whenever
+the mouse pointer is in the window.  Others use a \emph{click-to-type}
+policy: you must click the left mouse button within a window before
+you can type into it, but the mouse pointer need not remain in the
+window while you type (this policy will be familiar to Macintosh and
+Microsoft Windows users).  If you use {\tt olwm} or {\tt olvwm} as
+your window manager, as recommended, you may choose the policy you
+prefer using the {\sf Properties} menu (click right on the background
+or root window, and select {\sf Properties} from the pop-up menu that
+appears).
 \index{focus-follows-mouse policy}
-policy:  you can
-type into a window whenever the mouse pointer is in the window.  Others use
-a \emph{click-to-type}
 \index{click-to-type policy}
-policy:  you must click the left mouse button within
-a window before you can type into it, but the mouse pointer need not remain
-in the window while you type (this policy will be familiar to Macintosh and
-Microsoft Windows users).  If you use {\tt olwm} or {\tt olvwm}
 \index{olwm@{\tt olwm} (Open Look Window Manager)}
 \index{olvwm@{\tt olvwm} (Open Look Virtual Window Manager)}
-as your
-window manager, as recommended, you may choose the policy you prefer using
-the {\sf Properties} menu (click right on the background or root window,
-and select {\sf Properties} from the pop-up menu that appears).
 
 If you have previous experience with X Window System and Open Look
 user interface applications, much of what you see will be familiar.
 This exercise does not assume that you have any such experience, but
 you may find it helpful to read through an introductory book on the
-Open Look user interface
-\index{Open Look}
-such as Sun's {\it OpenWindows User's Guide},
+Open Look user interface such as Sun's {\it OpenWindows User's Guide},
 or a more general introduction such as O'Reilly's {\it X Window System
 in a Nutshell}.  Please note that, although \WAVE{} uses many Open
 Look controls, it is not fully Open Look compliant; in particular,
-actions within its signal window (see chapter 2) do not comply with Open
-Look style guidelines.}
-
+actions within its signal window (see chapter 2) do not comply with
+Open Look style guidelines.}
+\index{Open Look}
 
 \subsection*{If you need to run \WAVE{} remotely}
 
-If your computer is also the \WAVE{} host,
-\index{WAVE host@\WAVE{} host}
-skip ahead to the next
+If your computer is also the \WAVE{} host, skip ahead to the next
 paragraph.  Otherwise, type the command(s) from items 7, 8, and 9 of
-the worksheet, in that order (entering your password if prompted
-to do so by the \WAVE{} host).  These commands are the only
-differences in the procedures for running \WAVE{} remotely (with
-different desktop and \WAVE{} host systems) and locally (with your
-own computer serving as the \WAVE{} host).
+the worksheet, in that order (entering your password if prompted to do
+so by the \WAVE{} host).  These commands are the only differences in
+the procedures for running \WAVE{} remotely (with different desktop
+and \WAVE{} host systems) and locally (with your own computer serving
+as the \WAVE{} host).
+\index{WAVE host@\WAVE{} host}
 
 \subsection*{Checking the environment and the sample record}
 
@@ -660,10 +714,11 @@ In common with all programs built using the WFDB library, \WAVE{} finds its
 input files in any of the directories specified by the {\em WFDB path}
 (the value of the {\tt WFDB} environment variable, if set, or a compiled-in
 default path as given in the WFDB library source file {\tt wfdblib.h}
-otherwise; see the discussion of the database path in the
-\htmladdnormallink{{\it WFDB Programmer's Guide}}{../dbpg/dbpg.htm}
+otherwise; see the discussion of the
+\htmladdnormallink{database path}{../wpg/database-path.htm}
+in the \htmladdnormallink{{\it WFDB Programmer's Guide}}{../wpg/wpg.htm}
 for details).  Verify that the sample record is accessible on the WFDB
-path using the command ``{\\tt wfdbwhich 100s.hea}''.  If the response
+path using the command ``{\tt wfdbwhich 100s.hea}''.  If the response
 begins with
 \begin{verbatim}
     `100s.hea': not found
@@ -696,31 +751,31 @@ If you do not obtain this output, see your system administrator.
 
 \index{starting WAVE@starting \WAVE{}}\index{wave command@{\tt wave} command}
 \index{terminal window}
+\index{WAVE host@\WAVE{} host}
+\index{environment variables!PATH}\index{PATH environment variable}
+
 \WAVE{} is usually started by typing a command in a terminal window.
 Type:
 \begin{verbatim}
     wave
 \end{verbatim}
-(Be sure to type this using lower-case letters.)
-If you see a response similar to `{\tt wave: Command not found.}', you will
-need to find the executable copy of \WAVE{} on the \WAVE{} host
-\index{WAVE host@\WAVE{} host}
-system.
-(It may be in a directory that is not part of your {\tt PATH};
-\index{environment variables!PATH}\index{PATH environment variable}
-if so, you may
-wish to add that directory to your {\tt PATH} by editing {\tt .cshrc} or {\tt
-.profile} in your home directory.  If the previous sentence makes no sense to
-you, refer to any introductory book on UNIX for guidance.)  If the response is
-`{\tt wave:~permission denied}', see your system administrator about obtaining
-permission to run \WAVE{}.
+(Be sure to type this using lower-case letters.)  If you see a
+response similar to `{\tt wave:~Command not found.}', you will need to
+find the executable copy of \WAVE{} on the \WAVE{} host system.  (It
+may be in a directory that is not part of your {\tt PATH}; if so, you
+may wish to add that directory to your {\tt PATH} by editing {\tt
+.cshrc} or {\tt .profile} in your home directory.  If the previous
+sentence makes no sense to you, refer to any introductory book on UNIX
+for guidance.)  If the response is `{\tt wave:~permission denied}',
+see your system administrator about obtaining permission to run
+\WAVE{}.
 
 If all goes as it should, \WAVE{} prints a concise summary of its command
 format, which should appear (approximately) as:
 \begin{verbatim}
 WAVE version XXX (MMM DD YYYY)
  WFDB library version XXXXXX (MMM DD YYYY).
-usage: wave -r record-name [ options ]
+usage: wave -r RECORD[+RECORD] [ options ]
 
 Options are:
  -a annotator-name  Open an annotation file
@@ -730,6 +785,8 @@ Options are:
  -H                 Use high-resolution mode
  -m                 Use black and white only
  -O                 Use overlay graphics
+ -p PATH            Search for input files in PATH
+                     (if not found in the WFDB path)
  -s SIGNAL [SIGNAL ...]  Initialize the signal list
  -S                 Use a shared colormap
  -Vx                Set initial display option x
@@ -745,15 +802,13 @@ For more information, type `more /usr/help/wave/wave.hlp',
 or open `http://www.physionet.org/physiotools/wug/' using
 your web browser.
 \end{verbatim}
-\index{environment variables!WFDB}\index{WFDB environment variable}
-\index{environment variables!DISPLAY}\index{DISPLAY environment variable}
 \noindent
 The comments about setting the {\tt DISPLAY} and {\tt WFDB} variables will not
-appear if these variables have been set (as they should have been earlier).
+appear if you have already set these variables.
+\index{environment variables!WFDB}\index{WFDB environment variable}
+\index{environment variables!DISPLAY}\index{DISPLAY environment variable}
 
 Now try using \WAVE{} to view record {\tt 100s}, together with its
-\index{atr (reference) annotations@{\tt atr} (reference) annotations}
-\index{annotation!reference}\index{reference annotations}
 {\tt atr} (reference) annotations.  Type:
 \begin{verbatim}
     wave -r 100s -a atr &
@@ -762,6 +817,8 @@ The `{\tt \&}' is optional but recommended; it allows you to type additional
 commands in the terminal emulator window without interrupting or exiting from
 \WAVE{}.  After a few seconds, \WAVE{}'s \emph{main window}
 (figure~\ref{fig:main-window}) opens.
+\index{atr (reference) annotations@{\tt atr} (reference) annotations}
+\index{annotation!reference}\index{reference annotations}
 \begin{htmlonly}
 \index{main window}
 \end{htmlonly}
@@ -1040,18 +1097,18 @@ the \emph{window menu button} (the square button containing a triangle at the
 upper left corner of the window), and then clicking left on the {\sf Quit} item
 in the window menu.
 
-\index{Netscape}\index{web browsers}
+\index{Mozilla}\index{web browsers}
 \index{on-line manual}\index{User's Guide (on-line)}
 \index{WAVE User's Guide (on-line)@\WAVE{} User's Guide (on-line)}
 The third (and most comprehensive) form of on-line help can be used if
 a suitable web browser is available on the \WAVE{} host system.
-(\WAVE{} uses Netscape 1.1 or any later version by default.  See
+(\WAVE{} uses Mozilla by default.  Set the environment variable {\tt URLV}
+to the name of your browser if you prefer a different browser.  See
 \hyperref{\WAVE{} and the Web}
 {section~}
 {, page~\pageref{sec:web},}
 {sec:web}
-for details on obtaining Netscape, or on configuring \WAVE{} to use a
-different web browser.)
+for details on configuring \WAVE{} and your browser to work together.
 Click left on the \button{WAVE User's Guide} button in the {\sf Help
 Topics} window to open this manual using your web browser.  If your
 browser is not running already, this may take a few moments while
@@ -1144,7 +1201,7 @@ appears in the {\sf Analysis Commands} window, as shown in
 figure~\ref{fig:analysis-commands}.  Below the command, its error
 output appears.  When the command has run to completion (which will take only
 a few seconds unless the \WAVE{} host is heavily loaded), an annotation file
-named `{\tt qrs.100s}' is written into the current directory.
+named `{\tt 100s.qrs}' is written into the current directory.
 
 If you wish, the {\sf Analyze} window or the {\sf Analysis Commands}
 window, or both, may be dismissed (by selecting {\sf Quit} from the
@@ -1167,7 +1224,7 @@ retained after that point.
 \end{wrapfigure}
 To load annotations
 \index{annotation file!loading}\index{loading an annotation file}
-from `{\tt qrs.100s}' into \WAVE{}, click right on
+from `{\tt 100s.qrs}' into \WAVE{}, click right on
 \menubutton{File}, and click left on the {\sf Load...} selection in the
 File menu.
 \begin{figure}
@@ -1185,7 +1242,7 @@ The {\sf Load} window (see figure~\ref{fig:load-window}) appears.  It
 contains text items that specify a
 record and and an annotator name.  Click left next to the {\sf
 Annotator} field, type `{\tt qrs}', and, as always, press \keycap{
-Enter}.  The contents of `{\tt qrs.100s}' are loaded into \WAVE{}, and
+Enter}.  The contents of `{\tt 100s.qrs}' are loaded into \WAVE{}, and
 annotations appear in the signal window.  The title bar
 changes to indicate the annotator name.
 The {\sf Load} window also contains items that specify the name of the
@@ -1527,7 +1584,7 @@ rhythm change, ST or T change, or link annotation.  In addition to
 these, there are several {\sf Search for} strings that \WAVE{}
 interprets in special ways:
 
-\begin{tabular*}{\textwidth}{l p{3.5 in}}
+\begin{tabular*}{5.5 in}{l p{4.75 in}}
 {\tt *v} & {matches any ventricular ectopic beat} \\
 {\tt *s} & {matches any supraventricular ectopic beat} \\
 {\tt *n} & {matches any other beat type} \\
@@ -1589,8 +1646,9 @@ does so automatically on any normal exit (via \button{Quit}
 \index{Quit button@{\sf Quit} button}
 on the main control panel,
 or from the window menu).  You will find two new files in the
-current directory.  The file called `{\tt qrs.100s}' is the edited version of
-the annotation file that you have just created, and `{\tt \_qrs.100s}' is the
+current directory.  The file called `{\tt 100s.qrs}' is the edited version of
+the annotation file that you have just created, and `\verb+100s.qrs~+'
+is the
 \index{backup}\index{annotation file!backup}
 previous version (in this case, containing the unedited annotations as produced
 by {\tt sqrs}).  At most one previous version is saved as a backup; if the
@@ -1697,12 +1755,12 @@ To view the external data associated with a link annotation, select it
 and then press \keycap{Return} (or \keycap{Enter}).  \WAVE{} then
 directs your web browser to display the data specified by the URL.
 (If your web browser is not running, \WAVE{} starts it.)  By default,
-\WAVE{} uses Netscape 1.1 or any later version available on the
-\WAVE{} host.  To configure \WAVE{} to use a different browser, see
+\WAVE{} uses Mozilla.  To configure \WAVE{} to use a different browser, see
 \hyperref{\WAVE{} and the Web}
 {section~}
 {, page~\pageref{sec:web}}
 {sec:web}.
+\index{Mozilla}\index{web browser}
 
 If the URL string does not contain a {\it protocol}{\tt ://} prefix
 (where {\it protocol} is typically {\tt http} or {\tt ftp}), \WAVE{}
@@ -1711,17 +1769,18 @@ path.  In this case, \WAVE{} finds the file if possible, and attaches
 the necessary path information to the beginning of the URL before
 directing your web browser to display the associated data.
 
-\WAVE{} does not include built-in facilities for editing external data.
-You may insert and edit link annotations themselves, however, using
-the normal annotation editing facilities of \WAVE{}.  To create a link
-annotation, select `{\tt @}' from the {\sf Type} menu of the {\sf
-Annotation Template}, and enter the URL in the {\sf aux} field.  If
-you wish to supply a description to be displayed by \WAVE{} in place of
-the URL, enter it after the URL, separating it from the URL with a
-space character.  The current URL (i.e., the one associated with the
-most recently selected link annotation) can be passed by \WAVE{} to an external
-program such as a web browser or an HTML editor via the {\tt \$URL}
-menu variable (see the comments in \WAVE{}'s menu file for details).
+\WAVE{} does not include built-in facilities for editing external
+data.  You may insert and edit link annotations themselves, however,
+using the normal annotation editing facilities of \WAVE{}.  To create
+a link annotation, select `{\tt @}' from the {\sf Type} menu of the
+{\sf Annotation Template}, and enter the URL in the {\sf Text} ({\tt
+aux}) field.  If you wish to supply a description to be displayed by
+\WAVE{} in place of the URL, enter it after the URL, separating it
+from the URL with a space character.  The current URL (i.e., the one
+associated with the most recently selected link annotation) can be
+passed by \WAVE{} to an external program such as a web browser or an
+HTML editor via the {\tt \$URL} menu variable (see the comments in
+\WAVE{}'s menu file for details).
 
 \section{Creating and using new annotation types}
 
@@ -1798,10 +1857,10 @@ come from, and what does it mean?
 \index{sqrs command@{\tt sqrs} command}
 If you refer to the {\tt man} page for {\tt
 sqrs},
-\htmladdnormallink{{\tt sqrs(1)}}{../dbag/sqrs-1.htm}
+\htmladdnormallink{{\tt sqrs(1)}}{../wag/sqrs-1.htm}
 (either by typing `{\tt man sqrs}' in a terminal emulator window, or by
 looking it up in the
-\htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm}),
+\htmladdnormallink{{\it WFDB Applications Guide}}{../wag/wag.htm}),
 you will see that
 the second command-line argument ({\tt 100s}) is (not surprisingly) the record
 name, `{\tt -f 0}' instructs {\tt sqrs} to start at the beginning of the
@@ -1813,17 +1872,29 @@ specifies that signal 0 is to be used for QRS detection.
 \label{sec:menu-file}
 \index{menu file}
 To understand where the command comes from, we need to inspect \WAVE{}'s
+\emph{menu file}.
+\WAVE{} allows you to edit its menu file using any editor of your
+choice.  By default, \WAVE{} uses a simple Open Look text editor
+called {\tt textedit}, which is included with the XView package used
+by \WAVE{}.  If you prefer to use another editor such as {\tt emacs},
+set and export the {\tt EDITOR} environment variable before starting
+\WAVE{} (you may wish to include this step in your {\tt .login} or
+{\tt .cshrc}).  Most other UNIX applications that invoke an external
+text editor use the {\tt EDITOR} environment variable in the same way.
+\index{EDITOR environment variable}
+\index{environment variables!EDITOR}
+\index{textedit command@{\tt textedit} command}
+
+Click left on the \button{Edit menu} button in the {\sf Analyze}
 \begin{wrapfigure}[12]{r}{7.25cm}
 \mbox{\epsfig{file=system-menu}}
 \end{wrapfigure}
-\emph{menu file}. Click left on the \button{Edit menu} button in the
-{\sf Analyze} window. Unless your
-\WAVE{} menu has already been customized, \WAVE{} pops up a
-notice as shown at right.
-Click left on \button{Copy} to continue with this exercise.  After a few
-seconds, the \WAVE{} menu file appears (in an OpenWindows {\tt textedit}
-window as in figure~\ref{fig:wave-menu}, unless you have specified a
-different editor by setting the {\tt EDITOR} environment variable).
+window. Unless your \WAVE{} menu has already been customized, \WAVE{}
+pops up a notice as shown at right.  Click left on \button{Copy} to
+continue with this exercise.  After a few seconds, the \WAVE{} menu
+file appears (in an OpenWindows {\tt textedit} window as in
+figure~\ref{fig:wave-menu}, unless you have specified a different
+editor by setting the {\tt EDITOR} environment variable).
 \index{EDITOR environment variable}
 \index{environment variables!EDITOR}
 \index{textedit command@{\tt textedit} command}
@@ -1835,10 +1906,6 @@ a {\tt textedit} window.}
 \label{fig:wave-menu}
 \end{figure}
 
-\index{Analyze window@{\sf Analyze} window}
-\index{analysis commands window@{\sf Analysis Commands} window}
-\index{menu variables}
-\index{signal!list}
 The comments at the beginning of the \WAVE{} menu file describe how it
 works.  Each of the buttons in the {\sf Analyze} window (except for
 those in the first three rows) corresponds to an entry in the menu
@@ -1863,9 +1930,9 @@ becomes {\tt 0}.  Similarly, `{\tt \$END}' is the time of the `{\tt
 been defined, the {\sf End} field is `{\sf end of record}', and `{\tt
 \$END}' is determined by the record length as encoded in the header
 file for the record (see
-\htmladdnormallink{{\tt header(5)}}{../dbag/header-5.htm},
+\htmladdnormallink{{\tt header(5)}}{../wag/header-5.htm},
 in the
-\htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm}).
+\htmladdnormallink{{\it WFDB Applications Guide}}{../wag/wag.htm}).
 Finally, `{\tt \$SIGNAL}' is taken from the
 {\sf Signal} field of the {\sf Analyze} window; it specifies which
 signal is to be analyzed.
@@ -1873,6 +1940,10 @@ signal is to be analyzed.
 the string `{\tt \$SIGNALS}' is taken from the {\sf Signal list}
 field.)  Examine the commands defined in the default \WAVE{} menu;
 they should give you an idea of what is possible.
+\index{Analyze window@{\sf Analyze} window}
+\index{analysis commands window@{\sf Analysis Commands} window}
+\index{menu variables}
+\index{signal!list}
 
 \section{Defining a region of interest}
 
@@ -1905,15 +1976,15 @@ the annotation file using the {\sf Load} window.
 \index{tach command@{\tt tach} command}
 Generating a heart rate signal is simple enough, given a beat annotation file
 and 
-\htmladdnormallink{{\tt tach}}{../dbag/tach-1.htm},
+\htmladdnormallink{{\tt tach}}{../wag/tach-1.htm},
 a program supplied as part of the WFDB Software Package.  {\tt
 tach} reads an annotation file, calculates an instantaneous heart rate for each
 cardiac cycle from the reciprocal of the interval between successive beat
 annotations, and then uniformily resamples this signal (by default, at 2 Hz).
 Referring to the 
-\htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm},
+\htmladdnormallink{{\it WFDB Applications Guide}}{../wag/wag.htm},
 we find the command we need to generate a heart rate signal from
-`{\tt qrs.100s'}:
+`{\tt 100s.qrs'}:
 \begin{verbatim}
     tach -r 100s -a qrs -f 0 -t 1:0
 \end{verbatim}
@@ -1994,12 +2065,12 @@ as a set of command-line arguments in place of the string `{\tt \$SIGNALS}'.
 Although you can type into the {\sf Signal list} field directly to change it,
 you can also do so using the mouse.  Pointing to a signal, hold down the
 \keycap{Control} key while clicking left to add it to the signal list, or hold
-down the {\sf Meta} key while clicking left to delete its first
-\index{Meta key@{\sf Meta} key}
+down the \keycap{Meta} key while clicking left to delete its first
 occurrence from the signal list.  (Most keyboards do not have a key
 labelled {\sf Meta}.  On most Sun keyboards, the {\sf Meta} keys look like
 this: \keycap{$\Diamond$};  they flank the space bar.  On most
 other keyboards, the \keycap{Alt} key is equivalent to {\sf Meta}.)
+\index{Meta key@{\sf Meta} key}
 
 \section{Using a customized menu file}
 
@@ -2197,7 +2268,7 @@ Measure ST deviation<TAB>stdev -r $RECORD -a $ANNOTATOR \
 \htmladdnormallink{Here}{stdev.c}
 is the C source for the program.  If this looks unfamiliar, read
 about how to write WFDB applications in the
-\htmladdnormallink{{\it WFDB Programmer's Guide}}{../dbpg/dbpg.htm}.
+\htmladdnormallink{{\it WFDB Programmer's Guide}}{../wpg/wpg.htm}.
 
 \begin{latexonly}
 {\small
@@ -2258,8 +2329,8 @@ obtained output beginning with:
 \index{plt command@{\tt plt} command}
 If {\tt plt} has been installed on your system, you can use it to plot this
 output (see
-\htmladdnormallink{{\tt plt(1)}}{../dbag/plt-1.htm}, in the
-\htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm},
+\htmladdnormallink{{\tt plt(1)}}{../wag/plt-1.htm}, in the
+\htmladdnormallink{{\it WFDB Applications Guide}}{../wag/wag.htm},
 for details on {\tt plt}).
 To do so, modify the entry in the menu file, so that it becomes:
 \begin{verbatim}
@@ -2326,7 +2397,7 @@ interesting research problem in itself.
 \item
 You may wish to examine using beat averaging (or median filtering) to reduce
 noise in the measurements further; the
-\htmladdnormallink{{\it WFDB Programmer's Guide}}{../dbpg/dbpg.htm}
+\htmladdnormallink{{\it WFDB Programmer's Guide}}{../wpg/wpg.htm}
 describes a beat averager that may be a useful starting point.
 
 \item
@@ -2395,13 +2466,15 @@ wave-remote} launches \WAVE{} provided that the record to be opened has been
 specified.  {\tt wave-remote} exits immediately once it has delivered its
 instructions to \WAVE{}.
 
-As an alternative to the command-line interface offered by {\tt
-wave-remote}, the {\tt wavescript} application provides the same
-services, but is controlled by a script file (named on the {\tt
-wavescript} command line).  Scripts for {\tt wavescript} should contain
-on each non-comment line a single option/argument pair as described
-above for {\tt wave-remote}.  Any line that does not begin with a
-`{\tt -}' is treated as a comment line.  For example, if the file {\tt example.xws} contains
+As an alternative to the command-line interface offered by {\tt wave-remote},
+the {\tt wavescript} application provides the same services, but is controlled
+by a script file (named on the {\tt wavescript} command line).  Scripts for
+{\tt wavescript} should contain on each non-comment line a single
+option/argument pair as described above for {\tt wave-remote}.  In addition to
+{\tt wave-remote}'s options, {\tt wavescript} also accepts a {\tt -p {\em
+path}} option; the {\tt \em path} argument is appended to the WFDB path.  Any
+line in the script that does not begin with a `{\tt -}' is treated as a comment
+line.  For example, if the file {\tt example.xws} contains
 \begin{verbatim}
     # Here is a comment
     -r 100s
@@ -2443,13 +2516,14 @@ and have your web browser open the data specified by the link.
 
 \subsection*{Controlling \WAVE{} from a web browser}
 
-Most web browsers, such as Netscape, can use so-called \emph{helper}
-or \emph{viewer} applications.  These are external applications that
-are invoked by the browser to present data in formats that (usually)
-are not supported by the browser directly.  For example, browsers
-often use {\tt ghostscript} to display PostScript data.  It is
-possible to configure Netscape and other web browsers so that \WAVE{}
-can be used indirectly as a helper application.
+Most web browsers, such as Mozilla or Netscape, can use so-called \emph{helper}
+or \emph{viewer} applications.  These are external applications that are
+invoked by the browser to present data in formats that (usually) are not
+supported by the browser directly.  For example, browsers often use {\tt
+ghostscript} to display PostScript data.  It is possible to configure Mozilla
+and other web browsers so that \WAVE{} can be used indirectly as a helper
+application.
+\index{Mozilla}\index{Netscape}\index{web browser}
 
 By using
 \hyperref{{\tt wavescript}}
@@ -2461,32 +2535,70 @@ as the helper application for viewing WFDB records, an already-running
 to move to a specified location in the record.  With this approach, it
 is not necessary to start a new \WAVE{} process each time.
 
-You can set up your browser to view files with the suffix {\tt .xws} (or
-the MIME type {\tt application/x-wavescript}) using {\tt wavescript}.  To
-do so, add the line
-\begin{verbatim}
-    type=application/x-wavescript  exts=xws
-\end{verbatim}
-\noindent
-to the file named {\tt .mime.types} in your home directory, and add the line
-\begin{verbatim}
-    application/x-wavescript; wavescript %s
-\end{verbatim}
-\noindent
-to the file named {\tt .mailcap} (also in your home directory).  If
-your browser is Netscape 4.x, you can make these additions to {\tt
-.mime.types} and {\tt .mailcap} by choosing {\sf Preferences}
-from the Edit menu, opening the {\sf Navigator} category in the
-{\sf Preferences} window, selecting {\sf Applications}, then
-clicking on the {\sf New...} button.  Fill in the dialog box as shown in
-figure~\ref{fig:netscape-new-helper}, then save your settings.  (Other
-versions of Netscape have similar dialog boxes, and similar operations
-may be possible with other browsers;  consult your browser's documentation.)
+You can set up your browser to view files with the MIME type
+{\tt appli\-cation/\-x-wavescript} using {\tt wavescript}.  Some browsers,
+including Mozilla and Netscape, also allow you to specify that any URL with the
+{\tt .xws} suffix should be handled by {\tt wavescript}.
+
+If you use Mozilla, choose {\sf Preferences} from the {\sf Edit} menu,
+then open the {\sf Navigator} category and choose {\sf Helper Applications}.
+Click on {\sf New Type...} to pop up a dialog, where you should enter
+'{\tt WAVEScript}' as the {\sf Description of type}, '{\tt xws}' as the
+{\sf File extension}, '{\tt application/x-wavescript}' as the {\sf MIME type},
+and '{\tt wavescript}' as the {\sf Application to use}' (omitting the
+quotation marks in each case).  Click {\sf OK} to close the {\sf New Type}
+dialog, and click {\sf OK} in the {\sf Preferences} dialog to save your
+changes.
+\index{Mozilla}
+
+\begin{figure}
+\centerline{\epsfig{file=mozilla-new-helper}}
+\caption{Adding {\tt wavescript} as a Mozilla helper.}
+\label{fig:mozilla-new-helper}
+\end{figure}
+
+If your browser is Netscape 4.x, do this by choosing {\sf Preferences} from the
+{\sf Edit} menu, opening the {\sf Navigator} category in the {\sf Preferences}
+window, selecting {\sf Applications}, then clicking on the {\sf New...} button.
+Fill in the dialog box as shown in figure~\ref{fig:netscape-new-helper} (enter
+'{\tt WAVEScript}' as the {\sf Description}, '{\tt application/x-wavescript}'
+as the {\sf MIMEType}, '{\tt xws}' as the {\sf Suffixes}, click on the radio
+button next to {\sf Application} and enter '{\tt wavescript \%s}' (note the
+'{\tt \%s}') as the {\sf Application}, then save your settings by clicking on
+{\sf OK} in each of the dialogs.  (Other versions of Netscape have similar
+dialog boxes.)
+\index{Netscape}
+
 \begin{figure}
 \centerline{\epsfig{file=netscape-new-helper}}
 \caption{Adding {\tt wavescript} as a Netscape helper.}
 \label{fig:netscape-new-helper}
 \end{figure}
+
+If you use Galeon, choose {\sf Preferences} from the {\sf Settings} menu, then
+select {\sf Handlers}, then {\sf MIME Types}, then click on {\sf New}.  Enter
+'{\tt application/x-wavescript}' as the MIME type and '{\tt wavescript}' as the
+Helper (note that the quotation marks are not part of either entry).  Select
+{\sf Run with helper} and {\sf Always use this helper}; do not select {\sf Run
+in terminal} or {\sf Processes URL}.  Save your changes by clicking on {\sf
+Close}.  Note that Galeon does not support using the file suffix to select
+a helper application, so Galeon will only be able to control \WAVE{} if the
+web server is properly configured to transmit the
+{\tt applica\-tion/\-x-wave\-script} MIME type for {\tt .xws} files (see
+\hyperref{Serving .xws files}
+{Serving .xws files, section~}
+{, page~\pageref{sec:serving-xws}}
+{sec:serving-xws}).
+\index{Galeon}
+
+\begin{figure}
+\centerline{\epsfig{file=galeon-new-helper}}
+\caption{Adding {\tt wavescript} as a Galeon helper.}
+\label{fig:galeon-new-helper}
+\end{figure}
+
+Similar operations may be possible with other browsers;  consult your browser's
+documentation.
 
 \begin{latexonly}
 \begin{wrapfigure}[3]{l}{1.5cm}
@@ -2520,6 +2632,7 @@ distribution.
 \end{latexonly}
 
 \subsection*{Serving {\tt .xws} files}
+\label{sec:serving-xws}
 
 If you plan to make {\tt .xws} files available from a Web server, you
 will also need to configure your Web server so that it sends the
@@ -2559,14 +2672,17 @@ with proper operation after the configuration is completed.  If this
 happens, simply delete any {\tt .xws} files from your browser's cache.
 
 \subsection*{Controlling a web browser from \WAVE{}}
+\index{Galeon}\index{Konqueror}\index{Mozilla}\index{Netscape}\index{Opera}
+\index{web browser}
 
-\WAVE{} uses a web browser to display external data associated
-with link annotations, and to display the on-line version of this
-guide.  A suitable web browser must be installed on the \WAVE{} host
-in order for this to work.  By default, \WAVE{} uses Netscape version
-1.1 (or any later version;  Netscape may be obtained freely by
-anonymous FTP from
-\htmladdnormallink{{\tt ftp.netscape.com}}{ftp://ftp.netscape.com/}).
+\WAVE{} uses a web browser to display external data associated with link
+annotations, and to display the on-line version of this guide.  A suitable web
+browser must be installed on the \WAVE{} host in order for this to work.  By
+default, \WAVE{} uses Mozilla (\htmladdnormallink{{\tt
+http://www.mozilla.org/}}{http://www.mozilla.org/}); several other browsers,
+including Galeon, Konqueror, Netscape, and Opera, can also be controlled by
+\WAVE{}.  If you prefer to use one of these rather than Mozilla, set the
+environment variable {\tt URLV} to the name of your browser.
 
 \WAVE{} controls the web browser in the same way it controls other
 external programs:  by running commands in the {\sf Analysis Commands}
@@ -2577,43 +2693,56 @@ file.  In the standard version of the menu file, this line reads:
   <Open URL>    url_view $URL
 \end{verbatim}
 % $ (this comment is here only to keep Emacs's LaTeX fontification happy)
+\noindent
+As this example illustrates, the menu variable {\tt \$URL} can be used
+to pass the selected URL from \WAVE{} to your browser.  (\WAVE{}
+expands any incomplete URLs from annotation files as needed before
+evaluating {\tt \$URL}.)
 
 The program {\tt url\_view} is a shell script (normally installed at the
 same time as \WAVE{}, and in the same directory) that handles starting
 the browser if necessary and instructing it to display the specified
-URL.  The standard version of {\tt url\_view} does so using the command:
+URL.  If {\tt URLV} is not set, or if you have set it to {\tt mozilla},
+{\tt url\_view} does so using the command:
 \begin{verbatim}
- ( netscape -remote 'openURL($URL)' || netscape $URL ) &
+ ( mozilla -remote 'openURL($URL)' || mozilla $URL ) &
 \end{verbatim}
-
-As this example illustrates, the menu variable {\tt \$URL} can be used
-to pass the selected URL from \WAVE{} to your browser.  (\WAVE{}
-expands any incomplete URLs from annotation files as needed before
-evaluating {\tt \$URL}.)  In this case, \WAVE{} first uses Netscape's
-{\tt -remote} option to instruct an already-running copy of Netscape
-to open the desired URL.  This is a very fast operation if Netscape is
-already running (since Netscape is already in RAM, it is not necessary
-to load another in order to run the {\tt netscape -remote ...}
+\noindent
+In this case, \WAVE{} (via {\tt url\_view}) first uses Mozilla's
+{\tt -remote} option to instruct an already-running copy of Mozilla
+to open the desired URL.  This is a very fast operation if Mozilla is
+already running (since Mozilla is already in RAM, it is not necessary
+to load another in order to run the {\tt mozilla -remote ...}
 process, and the remote process efficiently delivers its message and
-exits immediately).  If Netscape was not running, the {\tt
-netscape -remote} command fails, and (in this case only) \WAVE{}
-starts a new Netscape browser process.
+exits immediately).  If Mozilla was not running, the {\tt
+mozilla -remote} command fails, and (in this case only) {\tt url\_view}
+starts a new Mozilla browser process.
+/index{Mozilla}
 
-To configure \WAVE{} to use a different web browser, edit the {\tt
-url\_view} script appropriately.  (You may also do this by editing the
-action associated with {\tt <Open URL>}, but it's better to modify
-{\tt url\_view}, since \WAVE{} also uses {\tt url\_view} to display some
-of its on-line help.  If you decide to modify the action in the
-\WAVE{} menu file, be careful not to change the {\tt <Open URL>} tag
-at the beginning of the line, since \WAVE{} uses this tag to identify
-the browser interface command within the menu file.)  Consult the
-documentation for your browser to see what commands will be needed.
-(The {\tt -remote} option is unique to Netscape; other browsers will
-probably require different methods.)  Note that early versions of
-Mosaic (prior to 2.5) used a different method for remote control than
-current versions do.  Browsers that do not support any means of remote
-control are best avoided (since the only way to use them is to start a
+The {\tt url\_view} script includes analogous commands for each of the other
+supported browsers.  If {\tt url\_view} does not recognize the browser named by
+{\tt URLV}, it simply runs:
+\begin{verbatim}
+ ( $URLV $URL ) &
+\end{verbatim}
+\noindent
+but this is (in general) much slower, since launching a new instance of the
+browser for each URL will take much more time than reusing an already-open
+window, as for the supported browsers.
+
+To configure \WAVE{} to use a different web browser, edit the {\tt url\_view}
+script appropriately.  (You may also do this by editing the action associated
+with {\tt <Open URL>}, but it's better to modify {\tt url\_view}, since \WAVE{}
+also uses {\tt url\_view} to display some of its on-line help.  If you decide
+to modify the action in the \WAVE{} menu file, be careful not to change the
+{\tt <Open URL>} tag at the beginning of the line, since \WAVE{} uses this tag
+to identify the browser interface command within the menu file.)  Consult the
+documentation for your browser to see what commands will be needed.  (The {\tt
+-remote} option is used by Mozilla, Netscape, and Opera; other browsers will
+probably require different methods.)  Browsers that do not support any means of
+remote control are best avoided (since the only way to use them is to start a
 new browser for each new URL, a very inefficient solution).
+\index{Mozilla}\index{Netscape}\index{Opera}\index{web browser}
 
 \chapter{Printing from \WAVE{}}
 
@@ -2716,9 +2845,9 @@ for instructions.
 Since \WAVE{}'s printing facilities are implemented through its menu
 file, you have complete control over the format of the output, simply
 by editing the menu file as in the previous chapter.  Both
-\htmladdnormallink{{\tt pschart}}{../dbag/pschar-1.htm}
+\htmladdnormallink{{\tt pschart}}{../wag/pschar-1.htm}
 (used to produce ``chart recorder'' output) and
-\htmladdnormallink{{\tt psfd}}{../dbag/psfd-1.htm}
+\htmladdnormallink{{\tt psfd}}{../wag/psfd-1.htm}
 (used to produce ``full disclosure'' output) are highly flexible and
 can be configured to produce almost any reasonable format by inserting
 the appropriate options in the commands given in \WAVE{}'s menu file.
@@ -2733,10 +2862,10 @@ menu.  You can change this command as you wish, but don't change the
 A few of the most commonly-used options (usable with either {\tt
 pschart} or {\tt psfd}) are listed below.  For further details on
 these and other options, see
-\htmladdnormallink{{\tt pschart(1)}}{../dbag/pschar-1.htm} and
-\htmladdnormallink{{\tt psfd(1)}}{../dbag/psfd-1.htm},
+\htmladdnormallink{{\tt pschart(1)}}{../wag/pschar-1.htm} and
+\htmladdnormallink{{\tt psfd(1)}}{../wag/psfd-1.htm},
 in the
-\htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm}.
+\htmladdnormallink{{\it WFDB Applications Guide}}{../wag/wag.htm}.
 (You can also get a brief summary of the many available options by typing {\tt
 pschart~-h} and {\tt psfd~-h}.)
 
@@ -2965,9 +3094,9 @@ robust since they depend on differential rather than integrative
 measurements, but they can be used in a pinch.)
 
 For further information on signal calibration, see 
-\htmladdnormallink{{\tt calsig(1)}}{../dbag/calibr-1.htm},
+\htmladdnormallink{{\tt calsig(1)}}{../wag/calibr-1.htm},
 in the
-\htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm}.
+\htmladdnormallink{{\it WFDB Applications Guide}}{../wag/wag.htm}.
 
 \section{Display calibration}
 
@@ -3016,9 +3145,9 @@ that of an ECG, however, simply edit a copy of the WFDB calibration file, reset
 restart \WAVE{};  instead, give the copy a different name, then change the
 {\sf Calibration file} item in the {\sf Load} window to match.  Any changes are
 effective only when the signal window is redrawn.)  See 
-\htmladdnormallink{{\tt wfdbcal(5)}}{../dbag/wfdbca-5.htm},
+\htmladdnormallink{{\tt wfdbcal(5)}}{../wag/wfdbca-5.htm},
 in the 
-\htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm},
+\htmladdnormallink{{\it WFDB Applications Guide}}{../wag/wag.htm},
 for details.
 
 If the display calibration appears incorrect for all signals, the X
@@ -3221,9 +3350,9 @@ network connection).
 \index{WFDB environment variable}\index{environment variables!WFDB}
 \item[{\tt WFDB}]
 The database path (see
-\htmladdnormallink{{\tt setwfdb(1)}}{../dbag/setwfd-1.htm},
+\htmladdnormallink{{\tt setwfdb(1)}}{../wag/setwfd-1.htm},
 in the
-\htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm}.
+\htmladdnormallink{{\it WFDB Applications Guide}}{../wag/wag.htm}.
 If not set, \WAVE{} can find database files only in the locations
 specified by the compiled-in default database path, which normally
 includes the current directory and the {\tt /usr/database} directory
@@ -3240,16 +3369,18 @@ includes the current directory and the {\tt /usr/database} directory
 \index{WFDBCAL environment variable}\index{environment variables!WFDBCAL}
 \item[{\tt WFDBCAL}]
 The WFDB calibration file (see 
-\htmladdnormallink{{\tt setwfdb(1)}}{../dbag/setwfd-1.htm} and
-\htmladdnormallink{{\tt wfdbcal(5)}}{../dbag/wfdbca-5.htm},
+\htmladdnormallink{{\tt setwfdb(1)}}{../wag/setwfd-1.htm} and
+\htmladdnormallink{{\tt wfdbcal(5)}}{../wag/wfdbca-5.htm},
 in the 
-\htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm},
+\htmladdnormallink{{\it WFDB Applications Guide}}{../wag/wag.htm},
 and 
 \hyperref{Calibration}
 {chapter~}
 {, page~\pageref{ch:calibration}}
 {ch:calibration}).
-If not set, \WAVE{} may not scale signals other than ECGs correctly.
+If not set, \WAVE{} reads a default calibration file specified when
+the WFDB library was compiled.  If the calibration file cannot be
+read, \WAVE{} may not scale signals other than ECGs correctly.
 
 \index{WAVEMENU environment variable}\index{environment variables!WAVEMENU}
 \item[{\tt WAVEMENU}]
@@ -3275,6 +3406,20 @@ commands within the {\sf Analysis Commands} window.
 \item[{\tt EDITOR}]
 The name of the text editor to be used for modifying \WAVE{}'s menu
 file.  If not set, \WAVE{} uses {\tt textedit}.
+
+\index{URLV environment variable}\index{environment variables!URLV}
+\item[{\tt URLV}]
+The name of the web browser to be used for viewing LINK annotation
+attachments and some of \WAVE{}'s on-line help;  normally, {\tt URLV}
+should be one of {\tt galeon}, {\tt konqueror}, {\tt mozilla}, {\tt netscape},
+or {\tt opera}.  If not set, \WAVE{} uses Mozilla.  See
+\hyperref{\WAVE{} and the Web}
+{section~}
+{, page~\pageref{sec:web},}
+{sec:web}
+for details.
+\index{Galeon}\index{Konqueror}\index{Mozilla}\index{Netscape}\index{Opera}
+\index{web browser}
 
 \index{PRINTER environment variable}\index{environment variables!PRINTER}
 \index{PostScript}
@@ -3355,7 +3500,7 @@ all of the resources listed in the {\tt man} page for {\tt xview}
 can be used with \WAVE{} (type `{\tt man xview}' for details).
 If your system doesn't have an XView {\tt man} page, refer to the copy provided
 with the \WAVE{} distribution
-(\htmladdnormallink{{\tt xview.7}}{../dbag/xview-7.htm}).
+(\htmladdnormallink{{\tt xview.7}}{../wag/xview-7.htm}).
 In addition, the \WAVE{}-specific resources listed below may also be set.
 
 The standard way to change default values of X11 resources is to
@@ -3760,7 +3905,7 @@ which allows you to name a log file,
 and to record in that file the current record name, the time of the
 samples at the center of the signal window, and (optionally) a
 one-line comment.  Log files may be used as scripts for
-\htmladdnormallink{{\tt pschart}}{../dbag/pschar-1.htm}.
+\htmladdnormallink{{\tt pschart}}{../wag/pschar-1.htm}.
 You may write to as many log files in a single session as you choose,
 and you may accumulate entries from multiple sessions in a single log
 file.
@@ -4210,13 +4355,13 @@ Open this menu using \menubutton{Properties} in \WAVE{}'s main window.
 \item[{\sf Signals...}]
 This selection pops up a window containing information about the signals of the
 current record, obtained by running
-\htmladdnormallink{{\tt wfdbdesc}}{../dbag/wfdbde-1.htm}.
+\htmladdnormallink{{\tt wfdbdesc}}{../wag/wfdbde-1.htm}.
 
 \index{sumann command@{\tt sumann} command}
 \item[{\sf Annotations...}]
 This selection pops up a window containing a summary of the contents of the
 annotation buffer, obtained by running 
-\htmladdnormallink{{\tt sumann}}{../dbag/sumann-1.htm}
+\htmladdnormallink{{\tt sumann}}{../wag/sumann-1.htm}
 (after saving any edits).
 
 \index{WAVE version number@\WAVE{} version number}
@@ -4328,13 +4473,13 @@ Common questions about \WAVE{} (answers, too!).
 
 \item[\button{User's Guide}]
 Click on this button to begin reading this guide in a web browser
-window.  By default, \WAVE{} uses Netscape 1.1 or any later version
-available on the \WAVE{} host.  To configure \WAVE{} to use a
+window.  By default, \WAVE{} uses Mozilla.  To configure \WAVE{} to use a
 different browser, see
 \hyperref{\WAVE{} and the web}
 {section~}
 {, page~\pageref{sec:web}}
 {sec:web}.
+\index{Mozilla}\index{web browser}
 
 \item[\button{Quit from Help}]
 Press this button to dismiss the {\sf Help Topics} window.
@@ -4558,27 +4703,37 @@ running Solaris 2.x or SunOS 4.1.x are also available on PhysioNet. See
 \index{resolution!of display}
 \index{X Window System!XFree86 server}
 \item [A computer capable of acting as a \WAVE{} host]
-(one for which a binary version of \WAVE{} is available).  Virtually any PC
-with a 386 or better CPU can run Linux, and such systems are likely to be the
-least expensive choice.  Ideally, a Linux PC to be used as a \WAVE{} host
-should have at least 8 Mb of RAM, at least 200 Mb of available disk space, a
-three-button mouse (or trackball), and a graphics card and monitor (17-inch or
-larger, with a dot pitch of .26 mm or less) capable of non-interlaced display
-at 65 Hz or faster with a resolution of at least 1024x768 with 256 colors.  In
-most cases, you will also want the system to be equipped with a CD-ROM drive
-(for loading software and digitized signals) and an Ethernet adapter or a
-modem.  Check the Linux Hardware-HOWTO to be sure that your chosen hardware is
-supported.  Most graphics cards, including the popular accelerated cards, are
-fully supported by the standard XFree86 X server, but a few high-end models are
-supported only in SVGA compatibility mode.  Most PCs manufactured since 1995
-will easily meet these requirements; new PCs will exceed most of them by large
-factors.  In late 2001, it was possible to assemble a suitable Linux PC for
-about US\$500 (not including the monitor).  It is not unreasonable to budget an
-equal amount for a good monitor, since \WAVE{}'s usability depends to a
-significant extent on being able to see its output clearly.  If your budget
-permits, a flat-panel (LCD) monitor is an excellent choice, particularly if you
-plan to do much annotation editing, because these monitors typically present
-very stable images that do not tire the eye.
+(one for which a binary version of \WAVE{} is available).  Virtually
+any PC with a 386 or better CPU can run Linux, and such systems are
+likely to be the least expensive choice.  Ideally, a Linux PC to be
+used as a \WAVE{} host should have at least 8 Mb of RAM, at least 200
+Mb of available disk space, a three-button mouse (or trackball), and a
+graphics card and monitor (17-inch or larger, with a dot pitch of .26
+mm or less) capable of non-interlaced display at 65 Hz or faster with
+a resolution of at least 1024x768 with 256 colors.  In most cases, you
+will also want the system to be equipped with a CD-ROM drive (for
+loading software and digitized signals) and an Ethernet adapter or a
+modem.  Check the Linux Hardware-HOWTO to be sure that your chosen
+hardware is supported.  Most graphics cards, including the popular
+accelerated cards, are fully supported by the standard XFree86 X
+server, but a few high-end models are supported only in SVGA
+compatibility mode.  Most PCs manufactured since 1995 will easily meet
+these requirements; new PCs will exceed most of them by large factors.
+In mid-2002, it was possible to assemble a suitable Linux PC for about
+US\$300 (not including the monitor).  It is not unreasonable to budget
+an equal or greater amount for a good monitor, since \WAVE{}'s
+usability depends to a significant extent on being able to see its
+output clearly.  If your budget permits, a flat-panel (LCD) monitor is
+an excellent choice, particularly if you plan to do much annotation
+editing, because these monitors typically present very stable images
+that do not tire the eye.
+
+Inexpensive three-button mice, trackballs, and touchpads manufactured
+by Logitech and many others are widely available for PCs, and are
+highly recommended if you do much annotation editing.  Most are fully
+compatible with Microsoft two-button mice.  Some users prefer
+trackballs for precision editing since there is no tendency for the
+pointer to move when clicking the buttons, as with a mouse.
 
 For those on a tight budget, suitable used PCs are often available for next to
 nothing.  If you use an older PC and can afford to upgrade components, get a
@@ -4833,16 +4988,17 @@ The package also includes the WFDB library of interface functions for
 user-written applications that read and write signal and annotation
 files in the formats supported by \WAVE{}.
 
-\index{Netscape}\index{web browser}
 A web browser, though not a necessity for everyone who uses \WAVE{},
 should be part of your software toolbox.  If you use link annotations,
 you will need a browser in order to follow the links to the external
 data.  Even if you don't anticipate using link annotations, you can
 still use a web browser to view the on-line version of this guide.
 Netscape is an attractive choice because of its simple remote-control
-interface, among other reasons. As noted earlier, Netscape may be
-obtained freely by anonymous FTP from
-\htmladdnormallink{{\tt ftp.netscape.com}}{ftp://ftp.netscape.com/}).
+interface, among other reasons.  Mozilla may be obtained freely from
+\htmladdnormallink{{\tt http://\-www\-.mozilla\-.org}}
+{http://www.mozilla.org/}).
+\index{Galeon}\index{Konqueror}\index{Mozilla}\index{Netscape}\index{Opera}
+\index{web browser}
 
 \index{gnuplot command@{\tt gnuplot} command}
 \index{plot2d command@{\tt plot2d} command}
@@ -4856,16 +5012,16 @@ on the number of points that can be plotted.  If you expect to prepare
 plots for publication, avoid packages that only provide screen dumps;
 any decent plotting program should be able to generate plots
 at the resolution of your printer.  
-\htmladdnormallink{{\tt plot2d}}{../dbag/plot2d-1.htm}
+\htmladdnormallink{{\tt plt}}{../wag/plt-1.htm} is a highly capable
+plotting package freely available from
+\htmladdnormallink{{\tt www.physionet.org};}{http://www.physionet.org/}.
+\htmladdnormallink{{\tt plot2d}}{../wag/plot2d-1.htm}
 (included in the WFDB Software Package) is a
 bare-bones command-line front end to {\tt gnuplot}, a fairly capable
 interactive plotting program that is included in most Linux distributions,
 and is also available from
 \htmladdnormallink{{\tt www.gnuplot.vt.edu}}{http://www.gnuplot.vt.edu/} and
 numerous other sites.
-\htmladdnormallink{{\tt plt}}{../dbag/plt-1.htm} is a highly capable
-plotting package freely available from
-\htmladdnormallink{{\tt www.physionet.org};}{http://www.physionet.org/}
 {\tt plot2d} uses {\tt plt} rather than {\tt gnuplot} if {\tt plt} is
 installed.
 
@@ -5192,10 +5348,9 @@ left or right.
 Inexpensive three-button mice, trackballs, and touchpads manufactured
 by Logitech and many others are widely available for PCs, and are
 highly recommended if you do much annotation editing.  Most are fully
-compatible with Microsoft two-button mice and with X server software
-for PCs.  Some users prefer trackballs for precision editing since
-there is no tendency for the pointer to move when clicking the
-buttons, as with a mouse.
+compatible with Microsoft two-button mice.  Some users prefer
+trackballs for precision editing since there is no tendency for the
+pointer to move when clicking the buttons, as with a mouse.
 
 \subsection{How do I get spot help if I don't have a {\sf Help} key?}
 
@@ -5427,7 +5582,7 @@ effect can also occur as a result of various problems related to the
 WFDB calibration file, for example, if the {\tt WFDBCAL} environment
 \index{WFDBCAL environment variable}\index{environment variables!WFDBCAL}
 variable does not name an accessible WFDB calibration file (see 
-\htmladdnormallink{{\tt wfdbcal(5)}}{../dbag/wfdbca-5.htm}
+\htmladdnormallink{{\tt wfdbcal(5)}}{../wag/wfdbca-5.htm}
 for details), if any of the signals in the record are of
 types not listed in the WFDB calibration file, or if the WFDB calibration
 file does not contain appropriate default display scales for all of
@@ -5488,8 +5643,8 @@ A bug in network file handling can sometimes interfere with correct display of
 waveforms in the scope window when reading records via HTTP.  For now, the only
 workarounds are to restart \WAVE{}, or to copy the record to local disk files
 (this can be done easily using
-\htmladdnormallink{{\tt xform}}{../dbag/xform-1.htm},
-\htmladdnormallink{{\tt snip}}{../dbag/snip-1.htm}, or a web browser).  Check
+\htmladdnormallink{{\tt xform}}{../wag/xform-1.htm},
+\htmladdnormallink{{\tt snip}}{../wag/snip-1.htm}, or a web browser).  Check
 \htmladdnormallink{PhysioNet}{http://www.physionet.org/} for updates to \WAVE{}
 or to the WFDB library that may correct this bug.
 
@@ -5556,7 +5711,7 @@ discussion about the
 {sec:wfdb-path}).
 Instructions for adding additional signal names and scales to the calibration
 file are located within the file itself, and may also be found in the
-\htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm}.
+\htmladdnormallink{{\it WFDB Applications Guide}}{../wag/wag.htm}.
 
 \item
 \index{header file}
@@ -5567,7 +5722,7 @@ not been determined, or is incorrect, the size of the signal as drawn by
 correspond to at least two levels represented in the signal (for example,
 the top and bottom of a calibration pulse), you can use the `{\tt calsig}'
 application to determine the gain and to rewrite the header file.  See the
-\htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm}
+\htmladdnormallink{{\it WFDB Applications Guide}}{../wag/wag.htm}
 for details.  `{\tt calsig}' can be most conveniently run from
 \WAVE{}'s {\sf Analysis} window.
 
@@ -5637,10 +5792,10 @@ Record names are \emph{not} file names; they are components of file
 names only.  For example, three files belong to record 100s: {\tt
 100s.hea}, {\tt 100s.dat}, and {\tt 100s.atr}. There is no \emph{file} named
 `{\tt 100s}' belonging to \emph{record} 100s.  See
-\htmladdnormallink{{\tt annot(5)}}{../dbag/annot-5.htm},
-\htmladdnormallink{{\tt header(5)}}{../dbag/header-5.htm}, and
-\htmladdnormallink{{\tt signal(5)}}{../dbag/signal-5.htm}, in the
-\htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm},
+\htmladdnormallink{{\tt annot(5)}}{../wag/annot-5.htm},
+\htmladdnormallink{{\tt header(5)}}{../wag/header-5.htm}, and
+\htmladdnormallink{{\tt signal(5)}}{../wag/signal-5.htm}, in the
+\htmladdnormallink{{\it WFDB Applications Guide}}{../wag/wag.htm},
 for information about file types and formats.
 
 \subsection{Why does \WAVE{} tell me `Record ... is unavailable'?}
@@ -5648,8 +5803,9 @@ for information about file types and formats.
 \index{WFDB environment variable}\index{environment variables!WFDB}
 In common with other WFDB applications, \WAVE{} searches for its input
 signals and annotations in directories named by the {\tt WFDB}
-environment variable (see the discussion of the WFDB path in the 
-\htmladdnormallink{{\it WFDB Programmer's Guide}}{../dbpg/dbpg.htm}).
+environment variable (see the discussion of the 
+\htmladdnormallink{WFDB path}{../wpg/database-path.htm} in the 
+\htmladdnormallink{{\it WFDB Programmer's Guide}}{../wpg/wpg.htm}).
 If \WAVE{} is running remotely,
 remember to set {\tt WFDB} \emph{on the \WAVE{} host}
 \index{WAVE host@\WAVE{} host}
@@ -5667,7 +5823,7 @@ to your current directory on the \WAVE{} host.
 
 \index{wfdbwhich command@{\tt wfdbwhich} command}
 To get the pathname of a WFDB file, use `{\tt wfdbwhich}' (see
-\htmladdnormallink{{\tt wfdbwhich(1)}}{../dbag/wfdbwh-1.htm}
+\htmladdnormallink{{\tt wfdbwhich(1)}}{../wag/wfdbwh-1.htm}
 for details).  For example, the output of `{\tt wfdbwhich
 header 100s}' is the pathname of the header file for record 100s
 (usually `{\tt /usr/database/100s.hea}').  If `{\tt wfdbwhich}'
@@ -5816,8 +5972,8 @@ are not text files, however, you will need to convert your files from binary
 to text form to edit them, and then convert the edited text back to binary
 form in order to use them further with \WAVE{}.  You can do this using {\tt
 rdann} and {\tt wrann} (see
-\htmladdnormallink{{\tt rdann(1)}}{../dbag/rdann-1.htm} and
-\htmladdnormallink{{\tt wrann(1)}}{../dbag/wrann-1.htm},
+\htmladdnormallink{{\tt rdann(1)}}{../wag/rdann-1.htm} and
+\htmladdnormallink{{\tt wrann(1)}}{../wag/wrann-1.htm},
 in the {\it WFDB Applications Guide}, for details).
 
 \subsection{What are `link' annotations?}
@@ -5841,13 +5997,13 @@ If your web browser is not already running, this may take a few
 moments while \WAVE{} starts it.  If nothing happens after a minute or
 so, check \WAVE{}'s {\sf Analysis Commands} window for errors that may
 have occurred when \WAVE{} attempted to start your web browser.
-(\WAVE{} uses Netscape 1.1 or any later version by default.  See
+(\WAVE{} uses Mozilla by default.  See
 \hyperref{\WAVE{} and the Web}
 {section~}
 {, page~\pageref{sec:web},}
 {sec:web}
-for details on obtaining Netscape, or on configuring \WAVE{} to use a
-different web browser.)
+for details on configuring \WAVE{} to use a different web browser.)
+\index{Mozilla}\index{web browser}
 
 Link annotations may be moved, copied, attached to specific signals,
 inserted, changed, and deleted just as for any other annotation.
@@ -5873,8 +6029,8 @@ desired portions of the record are copied to create a new record.  If you
 wish to copy a set of annotations as well as data from signal files, be sure
 to load the annotation file for the original record into \WAVE{} before
 extracting the segment.  (See
-\htmladdnormallink{{\tt snip(1)}}{../dbag/snip-1.htm}, in the
-\htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm},
+\htmladdnormallink{{\tt snip(1)}}{../wag/snip-1.htm}, in the
+\htmladdnormallink{{\it WFDB Applications Guide}}{../wag/wag.htm},
 if you need to copy two or more sets of annotations.)
 
 \index{wfdbcollate command@{\tt wfdbcollate} command}
@@ -5886,10 +6042,10 @@ or header files of the original records;  it will, however, write
 new annotation files on request, since the WFDB library does not support
 multi-segment annotation sets.  The records to be joined must be
 ordinary (not multi-segment) records.  If necessary,
-\htmladdnormallink{{\tt xform}}{../dbag/xform-1.htm}
+\htmladdnormallink{{\tt xform}}{../wag/xform-1.htm}
 can be used to rewrite a multi-segment record as an ordinary record.  See
-\htmladdnormallink{{\tt wfdbcollate(1)}}{../dbag/wfdbco-1.htm}, in the 
-\htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm},
+\htmladdnormallink{{\tt wfdbcollate(1)}}{../wag/wfdbco-1.htm}, in the 
+\htmladdnormallink{{\it WFDB Applications Guide}}{../wag/wag.htm},
 for further information.
 
 \index{rdsamp command@{\tt rdsamp} command}
@@ -5897,13 +6053,13 @@ for further information.
 More complex editing of signal files, such as splicing segments or
 modifying individual samples, can be done by converting the signals to
 text form using
-\htmladdnormallink{{\tt rdsamp}}{../dbag/rdsamp-1.htm}
+\htmladdnormallink{{\tt rdsamp}}{../wag/rdsamp-1.htm}
 (accessible from \WAVE{} via the
 \button{List samples} button in the {\sf Analyze} window), editing the
 text as required, and converting the edited text to a signal file
 using {\tt wrsamp} (see
-\htmladdnormallink{{\tt wrsamp(1)}}{../dbag/wrsamp-1.htm}, in the
-\htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm},
+\htmladdnormallink{{\tt wrsamp(1)}}{../wag/wrsamp-1.htm}, in the
+\htmladdnormallink{{\it WFDB Applications Guide}}{../wag/wag.htm},
 for details).
 
 \section{What else can \WAVE{} do?}
@@ -5927,8 +6083,8 @@ Why settle for a screen dump, though?  In most cases, you will prefer to use
 {\sf Print} from \WAVE{}'s \menubutton{File} menu to print the current contents
 of the signal window;  use \button{Print chart} in the {\sf Analyze} window
 if you wish to specify start and stop times.  See
-\htmladdnormallink{{\tt pschart(1)}}{../dbag/pschar-1.htm}, in the
-\htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm}
+\htmladdnormallink{{\tt pschart(1)}}{../wag/pschar-1.htm}, in the
+\htmladdnormallink{{\it WFDB Applications Guide}}{../wag/wag.htm}
 for information about {\tt pschart}'s
 numerous formatting options.  If you don't like the defaults, change them by
 editing \WAVE{}'s menu file.  Doing so also allows you to change the
@@ -5937,7 +6093,7 @@ the comments in the menu file for details).
 
 \index{psfd command@{\tt psfd} command}
 If you are plotting a great deal of data, you may wish to use
-\htmladdnormallink{{\tt psfd}}{../dbag/psfd-1.htm}
+\htmladdnormallink{{\tt psfd}}{../wag/psfd-1.htm}
 rather than {\tt pschart};  to do so, select \button{Print full disclosure}
 rather than \button{Print chart} in \WAVE{}'s {\sf Analyze} window.  Most of
 {\tt pschart}'s options are accepted by {\tt psfd}.
@@ -5964,9 +6120,9 @@ understandable to \WAVE{}; once you have done so, any of the other WFDB
 applications can also read your signals.  Writing a header file can be
 most easily done by copying an existing header file and modifying it
 using a text editor.  See 
-\htmladdnormallink{{\tt signal(5)}}{../dbag/signal-5.htm} and
-\htmladdnormallink{{\tt header(5)}}{../dbag/header-5.htm} in the
-\htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm},
+\htmladdnormallink{{\tt signal(5)}}{../wag/signal-5.htm} and
+\htmladdnormallink{{\tt header(5)}}{../wag/header-5.htm} in the
+\htmladdnormallink{{\it WFDB Applications Guide}}{../wag/wag.htm},
 for details on supported signal formats and how to write a header file.
 
 \index{multiplexed signal file}
@@ -5996,9 +6152,9 @@ may be able to view it with \WAVE{} via this expedient:
 \item
 Write a header file describing the layout of the block-interleaved
 signal file (see
-\htmladdnormallink{{\tt header(5)}}{../dbag/header-5.htm},
+\htmladdnormallink{{\tt header(5)}}{../wag/header-5.htm},
 in the
-\htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm},
+\htmladdnormallink{{\it WFDB Applications Guide}}{../wag/wag.htm},
 for details).  The sampling frequency in the
 first line of the header should be given as the frame rate (i.e., the
 basic sampling rate divided by the number of samples per block), and
@@ -6025,9 +6181,9 @@ signal file (for example, by following the steps above to verify that
 the signal file is properly readable, then using {\tt xform} with its
 \index{xform command@{\tt xform} command}
 own {\tt -H} option; see
-\htmladdnormallink{{\tt xform(1)}}{../dbag/xform-1.htm}
+\htmladdnormallink{{\tt xform(1)}}{../wag/xform-1.htm}
 in the
-\htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm}.
+\htmladdnormallink{{\it WFDB Applications Guide}}{../wag/wag.htm}.
 
 \index{embedded header data in signal files}
 \index{preamble in signal files}
@@ -6041,15 +6197,15 @@ applications built using the WFDB library simply ignore any preamble.
 If the signal file format is documented, it is usually not difficult to
 write a program to generate a header file based on embedded header
 data.  See
-\htmladdnormallink{{\tt header(5)}}{../dbag/header-5.htm}, in the 
-\htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm},
+\htmladdnormallink{{\tt header(5)}}{../wag/header-5.htm}, in the 
+\htmladdnormallink{{\it WFDB Applications Guide}}{../wag/wag.htm},
 for details on byte offsets.
 
 \WAVE{} does not support directly reading signals stored in text files, because
 there is no general method for computing the position within such files of
 samples occuring at arbitrarily-chosen times.  It is usually simple to convert
 such text files into \WAVE{}-compatible binary files using
-\htmladdnormallink{{\tt wrsamp}}{../dbag/wrsamp-1.htm},
+\htmladdnormallink{{\tt wrsamp}}{../wag/wrsamp-1.htm},
 \index{wrsamp command@{\tt wrsamp} command}
 an application supplied with \WAVE{}.
 
@@ -6080,7 +6236,7 @@ If you have a large amount of data, this may be the only reasonable choice.
 It may not be much more difficult than writing a conversion utility,
 provided that your format permits computing file position as a function of
 time.  See the appendix titled `{\sf Extensions}' in the 
-\htmladdnormallink{{\it WFDB Programmer's Guide}}{../dbpg/dbpg.html}
+\htmladdnormallink{{\it WFDB Programmer's Guide}}{../wpg/wpg.htm}
 for hints on how to proceed.
 \end{itemize}
 
@@ -6114,7 +6270,7 @@ more than 16 bits may be difficult to support in other environments.
 \index{resolution!of multi-frequency records}
 Briefly, it is an alternative display mode for multi-frequency records
 only.  See the
-\htmladdnormallink{{\it WFDB Programmer's Guide}}{../dbpg/dbpg.htm}
+\htmladdnormallink{{\it WFDB Programmer's Guide}}{../wpg/wpg.htm}
 for details on multi-frequency records.
 
 \index{H option for WAVE@{\tt -H} option for \WAVE{}}
@@ -6221,8 +6377,8 @@ For example, if you want to compare two sets of annotations of the
 same data in order to study their differences, use {\tt bxb} with the
 `{\tt -o}' option to prepare a comparison annotation file, and then
 use \WAVE{} to open that file.  (See 
-\htmladdnormallink{{\tt bxb(1)}}{../dbag/bxb-1.htm}, in the
-\htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm},
+\htmladdnormallink{{\tt bxb(1)}}{../wag/bxb-1.htm}, in the
+\htmladdnormallink{{\it WFDB Applications Guide}}{../wag/wag.htm},
 for details.)  If your goal is to
 find discrepancies, this is by far the best way to do so; `{\tt bxb}'
 produces a statistical summary of them, and you can search for {\sf
@@ -6245,12 +6401,12 @@ If you already have multiple independent annotation files for a single record
 for disjoint segments of the record), you can use {\tt mrgann} to merge them
 into a single file, preserving information about which file each annotation
 came from if you wish (see
-\htmladdnormallink{{\tt mrgann}}{../dbag/mrgann-1.htm}, in the
-\htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm},
+\htmladdnormallink{{\tt mrgann}}{../wag/mrgann-1.htm}, in the
+\htmladdnormallink{{\it WFDB Applications Guide}}{../wag/wag.htm},
 for details).
 
 \index{wfdbcollate command@{\tt wfdbcollate} command}
-\htmladdnormallink{{\tt wfdbcollate}}{../dbag/wfdbco-1.htm}
+\htmladdnormallink{{\tt wfdbcollate}}{../wag/wfdbco-1.htm}
 can also be used for this purpose if you have separate
 annotation files for each segment of a multi-segment record.
 
@@ -6348,18 +6504,19 @@ If you have not used \WAVE{} before, start by reading the \WAVE{} ~{\it User's
 Guide} (this book) and working through the tutorial examples it contains.
 If you need to use existing WFDB applications under \WAVE{}'s control, refer to
 the 
-\htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm}.
+\htmladdnormallink{{\it WFDB Applications Guide}}{../wag/wag.htm}.
 If you need to develop your own applications for use with \WAVE{}, read the
-\htmladdnormallink{{\it WFDB Programmer's Guide}}{../dbpg/dbpg.htm}.
+\htmladdnormallink{{\it WFDB Programmer's Guide}}{../wpg/wpg.htm}.
 You may read these guides on-line on-line or print your own copies (visit
 \htmladdnormallink{PhysioNet}{http://www.physionet.org/}).
 
-\index{on-line help}\index{help}\index{Netscape}
+\index{on-line help}\index{help}\index{Mozilla}\index{web browser}
 \item
 The on-line version of the \WAVE{} ~{\it User's Guide} can be opened for
 browsing by clicking left on
 \button{User's Guide} in \WAVE{}'s {\sf Help Topics} window (this
-requires \WAVE{} 6.0 or later, and Netscape 1.1 or later on the
+requires \WAVE{} 6.0 or later, and Mozilla (or another browser, if named by
+the {\tt URLV} environment variable) on the
 \WAVE{} host).  This guide
 may also be read with any Web browser independently of \WAVE{}
 (point your browser to
@@ -6403,14 +6560,14 @@ copy of the `{\sf What's new}' topic.
 
 \item
 The {\tt man} page for \WAVE{}
-(\htmladdnormallink{{\tt wave(1)}}{../dbag/wave-1.htm})
+(\htmladdnormallink{{\tt wave(1)}}{../wag/wave-1.htm})
 contains a concise description of its
 command-line options, the environment variables and X resources it
 uses, and the \WAVE{} menu file.  (This information is also included
 in this Guide;  the {\tt man} page is intended as a compact reference.
 The {\tt man} page for \WAVE{} can
 be found in the 
-\htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm},
+\htmladdnormallink{{\it WFDB Applications Guide}}{../wag/wag.htm},
 or on-line by typing `{\tt man wave}', or by using {\tt xman} or {\tt
 tkman}, etc.)
 
@@ -6422,12 +6579,12 @@ in the default menu file distributed with \WAVE{} and usually installed as
 \item
 For information about the data formats supported by \WAVE{} and the other WFDB
 applications, see
-\htmladdnormallink{{\tt annot(5)}}{../dbag/annot-5.htm},
-\htmladdnormallink{{\tt header(5)}}{../dbag/header-5.htm}, 
-\htmladdnormallink{{\tt signal(5)}}{../dbag/signal-5.htm}, and
-\htmladdnormallink{{\tt wfdbcal(5)}}{../dbag/wfdbca-5.htm},
+\htmladdnormallink{{\tt annot(5)}}{../wag/annot-5.htm},
+\htmladdnormallink{{\tt header(5)}}{../wag/header-5.htm}, 
+\htmladdnormallink{{\tt signal(5)}}{../wag/signal-5.htm}, and
+\htmladdnormallink{{\tt wfdbcal(5)}}{../wag/wfdbca-5.htm},
 in the
-\htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm}.
+\htmladdnormallink{{\it WFDB Applications Guide}}{../wag/wag.htm}.
 \end{itemize}
 
 \chapter{Command-line Options}
@@ -6644,7 +6801,7 @@ display 0 of {\tt atlantic.bigu.edu}, window 1 on display 0 of
 display.  (For this to work, your colleagues must first allow your
 computer to open windows on their displays, typically using
 {\tt xhost}.  See
-\htmladdnormallink{{\tt xview(7)}}{../dbag/xview-7.htm} 
+\htmladdnormallink{{\tt xview(7)}}{../wag/xview-7.htm} 
 for information about the {\tt -display} option.  Notice that the
 `{\tt +}{\it n}{\tt /}' prefix must be attached to
 both the {\tt -display} option and to its argument in order to
