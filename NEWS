@@ -1,3 +1,17 @@
+10.3.13:
+	Using an indirect WFDB path (i.e., setting the WFDB environment
+	variable to a value such as '@FILE', where FILE contains the
+	desired path) was broken in WFDB library versions 10.3.9 through
+	10.3.12;  it now works again, thanks to a patch contributed by
+	Fred Geheb.  Fred also found and proposed a solution to a memory
+	leak in pschart (also in psfd), which has now been fixed.
+
+	A bug in xform caused incorrect output when processing multifrequency
+	records in high-resolution mode (using xform's -H option), and a bug
+	in mit2edf caused an attempt to access unallocated memory for some
+	inputs.  Thanks to Joe Mietus for providing sample inputs that helped
+	in identifying and resolving these problems.
+
 10.3.12:
 	A beta release of the WFDB_tools package is now available for testing.
 	This package allows Matlab R13 users to use the WFDB library to read

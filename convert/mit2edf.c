@@ -1,8 +1,8 @@
 /* file: mit2edf.c		G. Moody	2 November 2002
-				Last revised:   5 December 2002
+				Last revised:      5 May 2004
 -------------------------------------------------------------------------------
 Convert MIT format header and signal files to EDF (European Data Format) file
-Copyright (C) 2002 George B. Moody
+Copyright (C) 2002-2004 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -364,7 +364,7 @@ char **argv;
     for (n = 1; n <= nblocks; n++) {
 	blockp[0] = block;
 	for (j = 1; j < nsig; j++)
-	    blockp[j] = blockp[j-1] + 2 * frames_per_block * si[j].spf;
+	    blockp[j] = blockp[j-1] + 2 * frames_per_block * si[j-1].spf;
 	for (i = 0; i < frames_per_block; i++) {
 	    if (nsig != getframe(v)) {
 		/* end of input: pad last block with zeroes */

@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:	  5 March 2004       wfdblib 10.3.12
+                        Last revised:	30 April 2004       wfdblib 10.3.13
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -167,7 +167,7 @@ FSTRING getwfdb()
 	char *p = getenv("WFDB"), *wfdb_getiwfdb();
 
 	if (p == NULL) p = DEFWFDB;
-	if (*p == '@') p = wfdb_getiwfdb();
+	if (*p == '@') p = wfdb_getiwfdb(p);
 	setwfdb(p);
     }
     return (wfdbpath);

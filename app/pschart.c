@@ -1,9 +1,9 @@
 /* file: pschart.c	G. Moody       15 March 1988
-			Last revised:	8 July 2003
+			Last revised:	 4 May 2004
 
 -------------------------------------------------------------------------------
 pschart: Produce annotated `chart recordings' on a PostScript device
-Copyright (C) 2003 George B. Moody
+Copyright (C) 1988-2004 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -638,15 +638,15 @@ FILE *cfile;
 		    (void)fprintf(stderr, "%s: insufficient memory\n", pname);
 		    exit(2);
 		}
-		while (nimax < nisig)
+		while (nimax < nisig) {
+		    vbuf[nimax] = NULL;
 		    buflen[nimax++] = 0;
+		}
 	    }
 	    if (isigopen(record, s, nisig) != nisig)
 		continue;
-	    for (i = 0; i < nisig; i++) {
-		vbuf[i] = NULL;
+	    for (i = 0; i < nisig; i++)
 		uncal[i] = 0;
-	    }
 	    (void)setpagetitle(0L);
 	    if (!sflag) {
 		for (i = 0; i < nisig; i++)

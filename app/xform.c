@@ -1,9 +1,9 @@
 /* file: xform.c	G. Moody        8 December 1983
-			Last revised:    26 March 2003
+			Last revised:    13 April 2004
 
 -------------------------------------------------------------------------------
 xform: Sampling frequency, amplitude, and format conversion for WFDB records
-Copyright (C) 2003 George B. Moody
+Copyright (C) 1983-2004 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -259,13 +259,14 @@ char *argv[];
     }
 
     /* Determine the input sampling frequency. */
-    if (Hflag)
-	setgvmode(WFDB_HIGHRES);
-    spf = getspf();
-    ifreq = sampfreq(NULL) * spf;
+    ifreq = sampfreq(NULL);
     (void)setsampfreq(0.);
 
     if (isigopen(irec, dfin, nisig) != nisig) exit(2);
+
+    if (Hflag)
+	setgvmode(WFDB_HIGHRES);
+    ifreq *= spf = getspf();
 
     if (Mflag) {
 	for (i = iframelen = 0; i < nisig; i++)
