@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: hrlomb		G. Moody	14 June 1995
-#			Last revised:    5 May 1999
+#			Last revised: 10 December 2001
 #
 # -----------------------------------------------------------------------------
 # Derive a heart rate power spectrum (using ihr and lomb) and plot it
@@ -39,24 +39,40 @@ do
   shift
 done
 
+
 if [ x$PLOT = x ]; then
   if [ -x /usr/local/bin/plt ]; then
     PLOT=/usr/local/bin/plt
+  elif [ -x /usr/bin/plt ]; then
+    PLOT=/usr/bin/plt
   elif [ -x /usr/local/bin/plot2d ]; then
     PLOT=/usr/local/bin/plot2d
+  elif [ -x /usr/bin/plot2d ]; then
+    PLOT=/usr/bin/plot2d
   else
     echo "No plot utility found -- exiting"
     exit 1
   fi
 fi
 
+echo -n >/tmp/echo.$$
+if [ -s echo.$$ ]
+then
+   P1=""
+   P2="\\c"
+else
+   P1="-n"
+   P2=""
+fi
+rm -f /tmp/echo.$$
+
 if [ x$RECORD = x ]; then
-  echo -n "Enter the record name: "
+  echo $P1 "Enter the record name: " $P2
   read RECORD
 fi
 
 if [ x$ANNOTATOR = x ]; then
-  echo -n "Enter the annotator name: "
+  echo $P1 "Enter the annotator name: " $P2
   read ANNOTATOR
 fi
 

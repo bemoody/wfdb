@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:  25 November 2001
+#				Last revised:  3 December 2001
 # Change the settings below as appropriate for your setup.
 
 # Set COLORS to 'color' if you have a color printer and would like to print
@@ -150,7 +150,7 @@ $(MAN7):
 # `make appguide': print the man pages (the Applications Guide)
 appguide:
 	$(TROFF) cover.ag >dbag0.ps
-	tex dbag
+	latex dbag
 	dvips -o dbag1.ps dbag.dvi
 	tbl appguide.int | $(TROFF) $(TMS) >dbag2.ps
 	tbl *.1 *.3 *.5 | $(TROFF) $(TMAN) >dbag3.ps
@@ -161,7 +161,7 @@ appguide:
 	$(PSPRINT) dbag?.ps
 
 dbag.ps:
-	tex dbag
+	latex dbag
 	dvips -o dbag1.ps dbag.dvi
 	tbl appguide.int | $(TROFF) $(TMS) >dbag2.ps
 	tbl *.1 *.3 *.5 | $(TROFF) $(TMAN) >dbag3.ps
@@ -181,6 +181,7 @@ wguide:	wug.ps
 # distribution.
 wug.ps:	wug.tex
 	wave/scripts/wugfigures -$(COLORS)	# get a set of figures
+	rm -f wug.aux wug.idx wug.ind wug.toc
 	latex wug
 	makeindex wug.idx
 	latex wug
@@ -189,14 +190,28 @@ wug.ps:	wug.tex
 	dvips $(D2PARGS) -o wug.ps wug.dvi
 	wave/scripts/wugfigures -clean	# remove figures from this directory
 
+wug.pdf:	wug.tex
+	wave/scripts/wugfigures -pdf
+	rm -f wug.aux wug.idx wug.ind wug.toc
+	pdflatex wug
+	makeindex wug.idx
+	pdflatex wug
+	makeindex wug.idx
+	pdflatex wug
+	wave/scripts/wugfigures -clean
+
 # `make guide': print the Programmer's Guide
 guide:	dbpg.ps
 	$(TROFF) cover.pg >dbpg0.ps
 	$(PSPRINT) dbpg0.ps dbpg.ps
 
-dbpg.ps:
+dbpg.ps:	dbu.tex
 	texi2dvi $(T2DARGS) dbu.tex
 	dvips $(D2PARGS) -o dbpg.ps dbu.dvi
+
+dbpg.pdf:	dbu.tex
+	texi2dvi --pdf $(T2DARGS) dbu.tex
+	mv dbu.pdf dbpg.pdf
 
 # `make info': create and install emacs info files
 info:	$(INFODIR)
@@ -291,6 +306,5 @@ listing:
 
 # `make clean': remove intermediate and backup files
 clean:
-	rm -f *.aux *.dvi *.log db*.toc db*.?? db*.??s dbpg* *~ texindex \
-	 wug.ind wug.ilg wug.toc wug.idx wug.ps labels.pl internals.pl
-
+	rm -f *.aux *.dvi *.log *.pdf *.toc db*.?? db*.??s dbpg* *~ texindex \
+	 wug.ind wug.ilg wug.idx wug.out wug.ps labels.pl internals.pl

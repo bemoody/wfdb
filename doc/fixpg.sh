@@ -1,12 +1,12 @@
 #! /bin/sh
 # file: fixpg.sh	G. Moody	12 April 1997
-#			Last revised:	25 May 1999
+#			Last revised:  10 December 2001
 #
 # Post-process WFDB Programmer's Guide HTML files
 
 for i in $1/*.htm
 do
-  echo -n fixing links in $i ...
+  ../conf/prompt fixing links in $i ...
   cp $1/$i /tmp/.fix.$$
   sed -f fixpg.sed </tmp/.fix.$$ >$1/$i
   echo " done"

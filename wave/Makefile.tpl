@@ -112,7 +112,7 @@ help:
 	@echo "the WAVE User's Guide, by typing 'make guide'."
 	@echo "*************************************************************"
 	@echo
-	@echo -n "Press <Return> to view the manual on-screen: "
+	@../conf/prompt "Press <Return> to view the manual on-screen: "
 	@read x
 	@echo
 	@soelim wave.hl0 | more

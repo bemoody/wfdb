@@ -317,7 +317,7 @@ int check(char *record, char *orec)
     errors++;
   }
   else if (vflag)
-    printf("[OK]:  isigopen(%s, NULL, 0) succeeded\n");
+    printf("[OK]:  isigopen(%s, NULL, 0) succeeded\n", record);
 	
   /* Allocate WFDB_Siginfo structures before calling isigopen again. */
   si = calloc(n, sizeof(WFDB_Siginfo));

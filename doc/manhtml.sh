@@ -1,5 +1,6 @@
 #!/bin/sh
 # file: manhtml		G. Moody	18 October 1996
+#			Last revised:  10 December 2001
 #
 # This script uses `rman' to convert man pages to HTML pages, with
 # hyperlinked cross-references.
@@ -17,7 +18,7 @@ do
   t=`echo $T | cut -c1-6`
   S=`echo $FILENAME | cut -d. -f2`	# section
 
-  echo -n "$FILENAME ... "
+  ../conf/prompt "$FILENAME ... "
   rman -fHTML -l "%s(%s)" -r "%6s-%s.htm" $T.$S >$D/$t-$S.htm
   echo $t-$S.htm
 done

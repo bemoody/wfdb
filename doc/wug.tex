@@ -215,11 +215,6 @@ USA\\
 Long time users of \WAVE{} will note that this edition has been greatly
 expanded over previous editions.  In part, this reflects more complete
 coverage of the original material, but \WAVE{} itself has also grown.
-\begin{latexonly}
-If you are still using \WAVE{} 5.0, pay attention to the marginal notes here
-and there indicating features of \WAVE{} 6.0 that are not available
-in earlier versions.
-\end{latexonly}
 \WAVE{} 6.5 is freely available from
 \hyperref{downloading from the Internet}
 {Physionet (see section~}
@@ -769,7 +764,7 @@ commands in the terminal emulator window without interrupting or exiting from
 \index{main window|emph}
 \end{latexonly}
 \begin{figure}
-\centerline{\epsfig{file=main-window.ps}}
+\centerline{\epsfig{file=main-window}}
 \caption{\WAVE{}'s main window.}
 \begin{htmlonly}
 \index{main window}
@@ -847,7 +842,7 @@ Buttons such as \button{Find...}, with labels that end with `{\sf ...}', make
 \button{Find...} now.  The {\sf Find} window (figure~\ref{fig:find-window})
 will appear.
 \begin{figure}
-\centerline{\epsfig{file=find-window.ps}}
+\centerline{\epsfig{file=find-window}}
 \caption{The {\sf Find} window.}
 \begin{htmlonly}
 \index{Find window@{\sf Find} window}
@@ -906,7 +901,7 @@ annotation in record {\tt 100s} occurs at about 0:06, so \WAVE{} is unable to
 satisfy this request.  Whenever \WAVE{} cannot do what you have asked, it
 displays
 \begin{wrapfigure}[7]{r}{3cm}
-\mbox{\epsfig{file=nomatch.ps}}
+\mbox{\epsfig{file=nomatch}}
 \begin{htmlonly}
 \index{notice box}
 \end{htmlonly}
@@ -933,7 +928,7 @@ this, because \WAVE{} has already tried to do so after we changed
 the contents of the {\sf Search for} field).  Use \button{{\tt <}
 Search} button to search backwards.
 \begin{wrapfigure}{l}{2.2cm}
-\mbox{\epsfig{file=file-print.ps}}
+\mbox{\epsfig{file=file-print}}
 \end{wrapfigure}
 The signal window now shows the segment from 0:01 to 0:11, with the `{\sf A}'
 annotation at 0:06 roughly centered in the window.  If you use either
@@ -956,7 +951,7 @@ minutes to do so. It is not necessary to wait for the output to
 appear before continuing. The output will appear as in figure~\ref{fig:chart1}.
 
 \begin{figure}
-\fbox{\centerline{\epsfig{file=chart1.ps,angle=-90,width=.9\linewidth}}}
+\fbox{\centerline{\epsfig{file=chart1,angle=-90,width=.9\linewidth}}}
 % This figure was produced in ``landscape'' mode.  To print it
 % properly in portrait mode, it must be rotated by -90 degrees
 % *before* scaling it.
@@ -996,7 +991,7 @@ display.
 \index{Open Look!spot help|textbf}
 \end{latexonly}
 \label{fig:spot-help}
-\centerline{\epsfig{file=spot-help.ps}}
+\centerline{\epsfig{file=spot-help}}
 \caption{A spot help window.}
 \end{figure}
 
@@ -1006,7 +1001,7 @@ display.
 To get an overview of how to use \WAVE{}, or if you cannot use spot help,
 click left on \button{Help} in \WAVE{}'s main control panel.
 \begin{figure}
-\centerline{\epsfig{file=help-topics.ps}}
+\centerline{\epsfig{file=help-topics}}
 \caption{The {\sf Help Topics} window.}
 \begin{htmlonly}
 \index{Help Topics window@{\sf Help Topics} window}
@@ -1022,7 +1017,7 @@ available topics by clicking left on the corresponding button.  If you do so, a
 scrollable \emph{help text window} (see figure~\ref{fig:help-text})
 appears, containing information on the selected topic.
 \begin{figure}
-\centerline{\epsfig{file=help-intro.ps}}
+\centerline{\epsfig{file=help-intro}}
 \caption{A help text window.}
 \begin{htmlonly}
 \index{help text window}\index{window!help text}
@@ -1060,7 +1055,7 @@ browser is not running already, this may take a few moments while
 \index{Quit button@{\sf Quit} button}
 \index{WAVE host@\WAVE{} host}
 \begin{wrapfigure}[7]{r}{4.75cm}
-\mbox{\epsfig{file=notice-quit.ps}}
+\mbox{\epsfig{file=notice-quit}}
 \end{wrapfigure}
 To complete this exercise, exit from \WAVE{} by clicking left on
 \button{Quit} in \WAVE{}'s main control panel.  A notice box
@@ -1083,14 +1078,14 @@ omitting the `{\tt -a atr}' option this time.  Note that the title bar
 contains only the record name.
 
 \begin{wrapfigure}[9]{l}{2.2cm}
-\mbox{\epsfig{file=file-analyze.ps}}
+\mbox{\epsfig{file=file-analyze}}
 \end{wrapfigure}
 Click right on \menubutton{File}, and click left on the {\sf Analyze...}
 selection in the File menu.  After a short delay, the {\sf Analyze}
 window (see figure~\ref{fig:analyze-window}) and the
 {\sf Analysis Commands} window (see figure~\ref{fig:analysis-commands}) appear.
 \begin{figure}
-\centerline{\epsfig{file=analyze-window.ps}}
+\centerline{\epsfig{file=analyze-window}}
 \caption{The {\sf Analyze} window.}
 \begin{htmlonly}
 \index{Analyze window@{\sf Analyze} window}
@@ -1111,7 +1106,7 @@ various actions that you can apply to the signals.  The separate
 {\sf Analysis Commands} window behaves like an OpenWindows {\tt cmdtool}
 \index{cmdtool@{\tt cmdtool}}
 \begin{figure}
-\centerline{\epsfig{file=analysis-commands.ps}}
+\centerline{\epsfig{file=analysis-commands}}
 \caption{The {\sf Analysis Commands} window.}
 \begin{htmlonly}
 \index{analysis commands window@{\sf Analysis Commands} window}
@@ -1163,7 +1158,7 @@ retained after that point.
 \index{calibration file}
 \index{database path}
 \begin{wrapfigure}[8]{l}{2.2cm}
-\mbox{\epsfig{file=file-load.ps}}
+\mbox{\epsfig{file=file-load}}
 \end{wrapfigure}
 To load annotations
 \index{annotation file!loading}\index{loading an annotation file}
@@ -1171,7 +1166,7 @@ from `{\tt qrs.100s}' into \WAVE{}, click right on
 \menubutton{File}, and click left on the {\sf Load...} selection in the
 File menu.
 \begin{figure}
-\centerline{\epsfig{file=load-window.ps}}
+\centerline{\epsfig{file=load-window}}
 \caption{The {\sf Load} window.}
 \begin{htmlonly}
 \index{Load window@{\sf Load} window}
@@ -1211,7 +1206,7 @@ Move the pointer into the signal window and click left.  \WAVE{}'s
 {\sf Annotation Template} window appears (see
 figure~\ref{fig:annotation-template}).
 \begin{figure}
-\centerline{\epsfig{file=annotation-template.ps}}
+\centerline{\epsfig{file=annotation-template}}
 \caption{The {\sf Annotation Template} window.}
 \begin{htmlonly}
 \index{Annotation Template window@{\sf Annotation Template} window}
@@ -1228,7 +1223,7 @@ menu button.  The {\sf Type} menu
 \index{Type menu@{\sf Type} menu}
 appears (see figure~\ref{fig:type-menu}).
 \begin{figure}
-\centerline{\epsfig{file=type-menu.ps}}
+\centerline{\epsfig{file=type-menu}}
 \caption{The {\sf Type} menu.}
 \label{fig:type-menu}
 \begin{htmlonly}
@@ -1262,7 +1257,7 @@ immediately to reflect your choice.
 \newpage
 \end{latexonly}
 \begin{wrapfigure}[8]{r}{6.3cm}
-\mbox{\epsfig{file=noedit.ps}}
+\mbox{\epsfig{file=noedit}}
 \end{wrapfigure}
 Annotation editing is disabled by default, to avoid inadvertent modification of
 annotation files.  If you now move the pointer into the signal window and click
@@ -1274,7 +1269,7 @@ you that no action has been taken.  Click left on \button{Continue} to dismiss
 the notice box.
 
 \begin{wrapfigure}{l}{3cm}
-\mbox{\epsfig{file=allow-edit.ps}}
+\mbox{\epsfig{file=allow-edit}}
 \begin{htmlonly}
 \index{Edit menu@{\sf Edit} menu}
 \end{htmlonly}
@@ -1315,7 +1310,7 @@ a \emph{selection rectangle}
 drawn around it, and the pointer jumps to
 the center of the rectangle (see figure~\ref{fig:main-with-markers}).
 \begin{figure}
-\centerline{\epsfig{file=main-with-markers.ps}}
+\centerline{\epsfig{file=main-with-markers}}
 \caption{The main window, showing the selection rectangle and marker bars.}
 \begin{htmlonly}
 \index{selection rectangle}
@@ -1342,7 +1337,7 @@ figure~\ref{fig:view-window}), and finally click left on
 \button{Redraw} to dismiss the {\sf View} window and redraw the signal window
 with annotation marker bars (see figure~\ref{fig:main-with-markers}).
 \begin{figure}
-\centerline{\epsfig{file=view-window.ps}}
+\centerline{\epsfig{file=view-window}}
 \caption{The {\sf View} window.}
 \label{fig:view-window}
 \begin{htmlonly}
@@ -1366,7 +1361,7 @@ arrow keys, until the selection rectangle surrounds it.  Change the
 (On some keyboards, if `Num Lock' is off, you can use the \keycap{5} key on
 the numeric keypad instead of \keycap{F2} if you prefer.)  The `{\sf N}' is
 \begin{wrapfigure}[4]{r}{3cm}
-\mbox{\epsfig{file=title-with-parens.ps}}
+\mbox{\epsfig{file=title-with-parens}}
 \begin{htmlonly}
 \index{title bar!parentheses in}
 \end{htmlonly}
@@ -1540,7 +1535,7 @@ More complex search criteria can be defined by clicking on
 {\sf Search Template} window (figure~\ref{fig:search-template}).
 \index{search template window@{\sf Search Template} window}
 \begin{figure}
-\centerline{\epsfig{file=search-template.ps}}
+\centerline{\epsfig{file=search-template}}
 \caption{The {\sf Search Template} window.}
 \label{fig:search-template}
 \end{figure}
@@ -1574,7 +1569,7 @@ buttons to {\sf Match}.
 In a lengthy editing session, \WAVE{} saves your annotation file periodically.
 \index{annotation file!checkpointing}
 \begin{wrapfigure}[9]{r}{2.2cm}
-\mbox{\epsfig{file=file-save.ps}}
+\mbox{\epsfig{file=file-save}}
 \end{wrapfigure}
 You can force \WAVE{} to save your edits
 \index{saving edits}
@@ -1636,7 +1631,7 @@ annotated independently, read this section.
 Using the \amenubutton{Show annotations} menu button
 in \WAVE{}'s {\sf View} window, you
 \begin{wrapfigure}[6]{l}{6cm}
-\mbox{\epsfig{file=attach-to-signals.ps}}
+\mbox{\epsfig{file=attach-to-signals}}
 \end{wrapfigure}
 may choose to display annotations attached to signals, rather than
 in the center of the signal window as is the usual default.  In this case, the
@@ -1814,7 +1809,7 @@ specifies that signal 0 is to be used for QRS detection.
 \index{menu file}
 To understand where the command comes from, we need to inspect \WAVE{}'s
 \begin{wrapfigure}[12]{r}{7.25cm}
-\mbox{\epsfig{file=system-menu.ps}}
+\mbox{\epsfig{file=system-menu}}
 \end{wrapfigure}
 \emph{menu file}. Click left on the \button{Edit menu} button in the
 {\sf Analyze} window. Unless your
@@ -1829,7 +1824,7 @@ different editor by setting the {\tt EDITOR} environment variable).
 \index{textedit command@{\tt textedit} command}
 
 \begin{figure}
-\centerline{\epsfig{file=wave-menu.ps}}
+\centerline{\epsfig{file=wave-menu}}
 \caption[\WAVE{}'s menu file]{The beginning of \WAVE{}'s menu file, in
 a {\tt textedit} window.}
 \label{fig:wave-menu}
@@ -1969,7 +1964,7 @@ output from {\tt tach}; if you enter `{\tt hr\_100s}' in the {\sf Record}
 field of the {\sf Load} window, however, \WAVE{} displays the calculated
 heart rate signal.
 \begin{figure}
-\centerline{\epsfig{file=main-with-hr.ps}}
+\centerline{\epsfig{file=main-with-hr}}
 \caption{Heart rate signal.}
 \label{fig:main-with-hr}
 \end{figure}
@@ -2045,7 +2040,7 @@ Open the {\sf Log} window (see figure~\ref{fig:log-window}) by choosing
 \begin{latexonly}
 \index{Log window@{\sf Log} window|emph}
 \end{latexonly}
-\centerline{\epsfig{file=log-window.ps}}
+\centerline{\epsfig{file=log-window}}
 \caption{The {\sf Log} window.}
 \label{fig:log-window}
 \end{figure}
@@ -2099,7 +2094,7 @@ charts}.
 
 \index{Scope window@{\sf Scope} window}
 \begin{wrapfigure}{l}{2cm}
-\mbox{\epsfig{file=scope-window.ps}}
+\mbox{\epsfig{file=scope-window}}
 \caption[The {\sf Scope} window.]{\sf Scope}
 \end{wrapfigure}
 Some types of signals are characterized by changes in waveform shape
@@ -2275,7 +2270,7 @@ If you now reread the menu and use the new \button{Plot ST deviation}
 button, {\tt plot2d} opens a window with a plot in it, similar to
 figure~\ref{fig:stdev-plot}.
 \begin{figure}
-\centerline{\epsfig{file=stdev.ps}}
+\centerline{\epsfig{file=stdev}}
 \caption{ST deviations measured by the example program.}
 \label{fig:stdev-plot}
 \end{figure}
@@ -2483,14 +2478,14 @@ figure~\ref{fig:netscape-new-helper}, then save your settings.  (Other
 versions of Netscape have similar dialog boxes, and similar operations
 may be possible with other browsers;  consult your browser's documentation.)
 \begin{figure}
-\centerline{\epsfig{file=netscape-new-helper.ps}}
+\centerline{\epsfig{file=netscape-new-helper}}
 \caption{Adding {\tt wavescript} as a Netscape helper.}
 \label{fig:netscape-new-helper}
 \end{figure}
 
 \begin{latexonly}
 \begin{wrapfigure}[3]{l}{1.5cm}
-\mbox{\epsfig{file=wave-icon.ps}}
+\mbox{\epsfig{file=wave-icon}}
 \end{wrapfigure}
 Once {\tt wavescript} has been installed as a helper application, your
 web browser will launch {\tt wavescript} whenever you click on a link
@@ -2651,7 +2646,7 @@ Click on \button{Print chart} in the {\sf Analyze} window to produce a
 \end{htmlonly}
 \begin{figure}
 \begin{latexonly}
-\fbox{\centerline{\epsfig{file=chart2.ps,width=.9\linewidth}}}
+\fbox{\centerline{\epsfig{file=chart2,width=.9\linewidth}}}
 \end{latexonly}
 \begin{htmlonly}
 ........................................................................_
@@ -2672,7 +2667,7 @@ to produce the highly compact format shown in figure~\ref{fig:full-disclosure}.
 \end{htmlonly}
 \begin{figure}
 \begin{latexonly}
-\fbox{\centerline{\epsfig{file=fulldisc.ps,width=.9\linewidth}}}
+\fbox{\centerline{\epsfig{file=fulldisc,width=.9\linewidth}}}
 \end{latexonly}
 \begin{htmlonly}
 ........................................................................_
@@ -2886,7 +2881,7 @@ Find a calibration pulse (or a segment with known amplitudes).  Mark samples
 of the low and high amplitude phases using the `{\tt <}' and `{\tt >}' markers
 respectively.
 \begin{figure}
-\centerline{\epsfig{file=calibrate.ps}}
+\centerline{\epsfig{file=calibrate}}
 \caption[Signal calibration.]{Signal calibration using \WAVE{}.
 Signal 3 (ABP) has been selected (note that all of the other signal
 numbers have been removed from the {\sf Signal list}).  The `{\tt <}'
@@ -3550,7 +3545,7 @@ key if your keyboard does not have a \keycap{HELP} key).
 \section{\WAVE{}'s main window}
 
 \begin{figure}[h]
-\centerline{\epsfig{file=main-control-panel.ps}}
+\centerline{\epsfig{file=main-control-panel}}
 \end{figure}
 
 \begin{description}
@@ -3760,7 +3755,7 @@ file.
 \index{Load window@{\sf Load} window}
 
 \begin{figure}[h]
-\centerline{\epsfig{file=load-window.ps}}
+\centerline{\epsfig{file=load-window}}
 \end{figure}
 \label{sec:load-window}
 Open this window by selecting {\sf Load} from the \menubutton{File} menu.
@@ -3812,7 +3807,7 @@ directory.
 \index{Print setup window@{\sf Print setup} window}
 
 \begin{figure}[h]
-\centerline{\epsfig{file=print-setup-window.ps}}
+\centerline{\epsfig{file=print-setup-window}}
 \end{figure}
 \label{sec:print-setup-window}
 Open this window by selecting {\sf Print setup} from the
@@ -3856,7 +3851,7 @@ setup} window (see
 \index{Analyze window@{\sf Analyze} window}
 
 \begin{figure}[h]
-\centerline{\epsfig{file=analyze-window.ps}}
+\centerline{\epsfig{file=analyze-window}}
 \end{figure}
 \label{sec:analyze-window}
 Open this window by selecting {\sf Analyze} from the \menubutton{File} menu.
@@ -3970,7 +3965,7 @@ is {\tt wavemenu} (if it exists in the current directory) or {\tt
 \index{Log window@{\sf Log} window}
 
 \begin{figure}[h]
-\centerline{\epsfig{file=log-window.ps}}
+\centerline{\epsfig{file=log-window}}
 \end{figure}
 \label{sec:log-window}
 Open this window by selecting {\sf Log} from the \menubutton{File} menu.
@@ -4054,7 +4049,7 @@ log entry).
 \index{View window@{\sf View} window}
 
 \begin{figure}[h]
-\centerline{\epsfig{file=view-window.ps}}
+\centerline{\epsfig{file=view-window}}
 \end{figure}
 \label{sec:view-window}
 Open this window using \button{View...} in \WAVE{}'s main window.
@@ -4220,7 +4215,7 @@ copy of \WAVE{}.  This window may also contain news about recent changes in
 \index{Find window@{\sf Find} window}
 
 \begin{figure}[h]
-\centerline{\epsfig{file=find-window.ps}}
+\centerline{\epsfig{file=find-window}}
 \end{figure}
 \label{sec:find-window}
 Open this window using \button{Find...} in \WAVE{}'s main window.
@@ -4275,7 +4270,7 @@ opens the
 \index{on-line help}\index{Help Topics window@{\sf Help Topics} window}
 
 \begin{figure}[h]
-\centerline{\epsfig{file=help-topics.ps}}
+\centerline{\epsfig{file=help-topics}}
 \end{figure}
 \label{sec:help-topics-window}
 Open this window using \button{Help} in \WAVE{}'s main window.
@@ -4334,7 +4329,7 @@ Press this button to dismiss the {\sf Help Topics} window.
 \index{Annotation Template window@{\sf Annotation Template} window}
 
 \begin{figure}[h]
-\centerline{\epsfig{file=annotation-template.ps}}
+\centerline{\epsfig{file=annotation-template}}
 \end{figure}
 \label{sec:annotation-template-window}
 Open this window at any time by clicking left anywhere within the
@@ -4393,7 +4388,7 @@ recalled by clicking left while the pointer is within the signal window).
 \index{search template window@{\sf Search Template} window}
 
 \begin{figure}[h]
-\centerline{\epsfig{file=search-template.ps}}
+\centerline{\epsfig{file=search-template}}
 \end{figure}
 \label{sec:search-template-window}
 Open this window by clicking left on \button{More Options...} in the
@@ -4429,7 +4424,7 @@ Find} window).
 \index{Level window@{\sf Level} window}
 
 \begin{figure}[h]
-\centerline{\epsfig{file=level-window.ps}}
+\centerline{\epsfig{file=level-window}}
 \end{figure}
 \label{sec:level-window}
 Open the {\sf Level} window by choosing {\sf level} in the {\sf View}
@@ -4471,7 +4466,7 @@ recalled by clicking within the signal window).
 \index{Analyze window@{\sf Analyze} window}
 \index{oscilloscope display}
 \begin{wrapfigure}{l}{2cm}
-\mbox{\epsfig{file=scope-window.ps,bbllx=279,bblly=390,bburx=333,bbury=530,clip=}}
+\mbox{\epsfig{file=scope-window,bbllx=279,bblly=390,bburx=333,bbury=530,clip=}}
 \end{wrapfigure}
 \label{sec:scope-window}
 Open the {\sf Scope} window from the {\sf Analyze} window, using

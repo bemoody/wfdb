@@ -1,3 +1,13 @@
+10.2.3:
+	Portability fixes in 'configure', 'install.sh', 'wave/Makefile.tpl',
+	'psd/hr*', 'doc/*.sh', 'lib/wfdblib.h', and 'checkpkg/*check'.
+
+	Updated 'checkpkg/appcheck' to use WFDBANNSORT when testing 'sortann'.
+
+	The full package is now much smaller because the figures for the
+	WAVE User's Guide are now generated as needed from compressed ppm
+	files.
+
 10.2.2:
 	WAVE can now be used to view and edit annotations for records that
 	have no signals.

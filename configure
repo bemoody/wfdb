@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody               24 May 2000
-#                             Last revised:          29 May 2001
+#                             Last revised:        10 December 2001
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -12,9 +12,20 @@ echo "Checking the operating system type ..."
 OS=`uname`
 echo "Configuring the WFDB software package for $OS."
 
+echo "Checking the echo command ..."
+echo -n >echo.out
+if [ -s echo.out ]
+then
+ln -sf prompt-c conf/prompt
+else
+ln -sf prompt-n conf/prompt
+fi
+rm echo.out
+
 cp conf/version.def conf/site.def
-echo -n "PACKAGE=" >>conf/site.def
-basename `pwd` >>conf/site.def
+PWD=`pwd`
+PACKAGE=`basename $PWD`
+echo "PACKAGE=$PACKAGE" >>conf/site.def
 
 cp /dev/null conf/site-slib.def
 case `uname` in
@@ -44,7 +55,7 @@ then
     echo
     echo "The WFDB library may be compiled as a static library or as a"
     echo "dynamically loaded (shared) library (the default).  Type S for a"
-    echo -n "static library, or D for a dynamically loaded library: "
+    conf/prompt "static library, or D for a dynamically loaded library: "
     read LIBTYPE
     case x$LIBTYPE in
        xS*|xs*) cp /dev/null conf/site-slib.def
@@ -60,7 +71,7 @@ then
 		echo "libraries only may cause compilation to fail if your"
 		echo "system does not have a complete set of static libraries."
 		echo "Type S to link to static libraries only, or D to link to"
-		echo -n "dynamically loaded libraries where available: "
+		conf/prompt "dynamically loaded libraries where available: "
 		read SYSLIBS
 		case x$SYSLIBS in
 		   xS*|xs*) sed "s/LDFLAGS = -L/LDFLAGS = -static -L/" \
@@ -110,7 +121,7 @@ echo
 DIR=
 while [ x$DIR = x ]
 do
-  echo -n "Choose a location, or press <Enter> to install in /usr: "
+  conf/prompt "Choose a location, or press <Enter> to install in /usr: "
   read DIR
   case x$DIR in
    x/usr) ;;
@@ -141,7 +152,7 @@ do
                echo "  LD_LIBRARY_PATH=\${LD_LIBRARY_PATH}:$DIR/lib"
                echo "  export LD_LIBRARY_PATH" ;;
           esac
-          echo -n "Press <Enter> to continue: "
+          conf/prompt "Press <Enter> to continue: "
           read A
       fi ;;
    *) DIR=

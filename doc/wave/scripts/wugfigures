@@ -1,7 +1,7 @@
 #! /bin/sh
 # file: wugfigures
 #
-# Copy WAVE User's Guide PostScript figures into the doc directory.  The
+# Get or remove a set of WAVE User's Guide figures in the doc directory.  The
 # doc directory must be the current directory when this script is run.
 
 if [ $# -eq 1 ]; then OPT=$1
@@ -9,11 +9,42 @@ else OPT=-grey
 fi
 
 case $OPT in
-  -clean) (cd wave/grey;  for i in *.ps; do rm -f ../../$i; done)
-	  (cd wave/color; for i in *.ps; do rm -f ../../$i; done) ;;
-  -color) cp -f wave/grey/*.ps .
-	  cp -f wave/color/*.ps . ;;
-  -grey)  cp -f wave/grey/*.ps . ;;
+  -clean) for i in wave/ps/*.ps
+	  do
+	     rm -f `basename $i .ps`.p*
+	  done
+          for i in wave/ppm/*.ppm.gz
+	  do
+	     rm -f `basename $i .ppm.gz`.p*
+	  done ;;
+  -color) cp -f wave/ps/*.ps .
+	  for i in wave/ppm/*.ppm.gz
+	  do
+	     OUT=`basename $i .ppm.gz`.ps
+	     gzip -d <$i | pnmdepth 255 | pnmtops -noturn -scale .5 >$OUT
+	     echo $i '-->' $OUT
+	  done ;;
+   -grey) cp -f wave/ps/*.ps .
+	  for i in wave/ppm/*.ppm.gz
+	  do
+	     OUT=`basename $i .ppm.gz`.ps
+	     gzip -d <$i | pnmdepth 255 | ppmtopgm | \
+		 pnmtops -noturn -scale .5 >$OUT
+	     echo $i '-->' $OUT
+	  done ;;
+    -pdf) for i in wave/ps/*.ps
+	  do
+	     OUT=`basename $i .ps`.pdf
+	     epstopdf --filter <$i >$OUT
+	     echo $i '-->' $OUT
+	  done
+	  for i in wave/ppm/*.ppm.gz
+	  do
+	     OUT=`basename $i .ppm.gz`.pdf
+	     gzip -d <$i | pnmdepth 255 | pnmtops -noturn -scale .5 | \
+		 epstopdf --filter --outfile=$OUT
+	     echo $i '-->' $OUT
+	  done ;;
 esac
 
 

@@ -1,7 +1,7 @@
 bxb: (warning) nonstandard comparison selected
 Beat-by-beat comparison results for record 100s
 Reference annotator: atr
-     Test annotator: qrs
+     Test annotator: ann
 
                Algorithm
         n    v    f    q    o    x

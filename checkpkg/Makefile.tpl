@@ -2,6 +2,8 @@ all:
 	@rm -f lcheck
 	@make lcheck	
 	@./libcheck
+	@../conf/prompt "Press <Enter> to continue ... "
+	@read a
 	@./appcheck
 
 lcheck:	lcheck.c

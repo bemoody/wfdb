@@ -1,13 +1,13 @@
 #! /bin/sh
 # file: savewin		G. Moody	27 November 2001
-#
+#			Last revised:    3 December 2001
 
 # This program captures a window (optionally, the entire screen) to a ppm file.
 # It then opens the ppm file in the Gimp so that it can be cropped if
-# necessary.  The ppm file is then converted into a color PostScript file and
-# saved in the 'color' directory, into a greyscale PostScript file and saved in
-# the 'grey' directory, and finally the ppm file is compressed and saved in the
-# 'ppm' directory.
+# necessary.  The ppm file is then compressed and saved.
+
+# Hint: to capture WAVE's exit confirmation box, run WAVE with the -Wfsdb
+# option (see xview(7)) to disable the full-screen grab.
 
 CROP="no"
 F=''
@@ -37,25 +37,7 @@ then
   echo "Use -crop if you want to crop or otherwise edit the image in the Gimp"
   echo " before saving the output files."
   echo "Use -root if you want a screen capture after a 10-second pause."
-  echo "Output is saved as ppm/NAME.ppm.gz, color/NAME.ps, and grey/NAME.ps ."
-  exit
-fi
-
-if [ ! -d color ]
-then
-  echo "Create directory 'color', then run this program again."
-  exit
-fi
-
-if [ ! -d grey ]
-then
-  echo "Create directory 'grey', then run this program again."
-  exit
-fi
-
-if [ ! -d ppm ]
-then
-  echo "Create directory 'ppm', then run this program again."
+  echo "Output is saved as NAME.ppm.gz ."
   exit
 fi
 
@@ -83,7 +65,4 @@ then
   gimp $F.ppm
 fi
 
-pnmdepth 255 <$F.ppm | pnmtops -noturn -rle -scale .5 >color/$F.ps
-pnmdepth 255 <$F.ppm | ppmtopgm | pnmtops -noturn -rle -scale .5 >grey/$F.ps
 gzip $F.ppm
-mv $F.ppm.gz ppm

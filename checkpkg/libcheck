@@ -1,6 +1,6 @@
 #!/bin/sh
 # file: libcheck		G. Moody	8 September 2001
-#                               Last revised:  12 September 2001
+#                               Last revised:   11 December 2001
 #
 # This script checks the functionality of the WFDB library by comparing the
 # outputs of 'lcheck' with expected outputs.  See 'lcheck.c' for details of
@@ -18,13 +18,18 @@ then
   exit
 fi
 
+case $# in
+  0) VERBOSE=0 ;;
+  *) VERBOSE=1 ;;
+esac
+
 test -s Makefile || ( cd ..; ./configure )
 test -s lcheck || make lcheck
 ./lcheck -v >lcheck.log
 cp ../data/100s.atr expected/100s.chk
 cp ../data/100s.dat expected/100z.dat
 CF="lcheck.log 100s.chk 100z.dat 100z.hea"
-if grep -q "WFDB supports NETFILES" lcheck.log
+if grep "WFDB supports NETFILES" lcheck.log >/dev/null 2>&1
 then
   CF="$CF udb/100s.chk udb/100z.dat udb/100z.hea"
   cp ../data/100s.atr expected/udb/100s.chk
@@ -34,17 +39,36 @@ else
   cp expected/lcheck.log-no-NETFILES expected/lcheck.log
 fi
 
+PASS=0
+FAIL=0
+TESTS=0
+
 for i in $CF
 do
-    case $i in
-      *.hea) diff -q $i expected/$i &&
-	       ( echo " Files $i and expected/$i match: test succeeded"
-		 rm -f $i ) ;;
-      *) diff -q $i expected/$i &&
-	       ( echo " Files $i and expected/$i match: test succeeded"
-		 rm -f $i expected/$i ) ;;
-    esac
+    if ( ./checkfile $i )
+    then
+	PASS=`expr $PASS + 1`
+	case $i in
+	    *.hea) rm -f $i ;;
+	    *)     rm -f $i expected/$i ;;
+	esac
+    else
+	FAIL=`expr $FAIL + 1`
+    fi
+    TESTS=`expr $TESTS + 1`
 done
+
+if [ $PASS = $TESTS ]
+then
+    echo "`basename $0`: all $TESTS tests passed."
+else
+    if [ $FAIL = 1 ]
+    then
+	echo "`basename $0`: $PASS of $TESTS tests passed, $FAIL test failed."
+    else
+	echo "`basename $0`: $PASS of $TESTS tests passed, $FAIL tests failed."
+    fi
+fi
 
 # rmdir will fail if 'udb' is not empty.  This is a *feature*, not a bug --
 # don't fix it!

@@ -54,7 +54,7 @@ clean:
 	cd wave;     $(MAKE) clean
 	cd waverc;   $(MAKE) clean
 	cd wview;    $(MAKE) -f clean
-	rm -f *~ conf/*~ config.cache */*.exe
+	rm -f *~ conf/*~ conf/prompt config.cache */*.exe
 
 # 'make config.cache': check configuration
 config.cache:

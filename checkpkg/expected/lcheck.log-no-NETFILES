@@ -26,7 +26,7 @@
 [OK]:  getann read: {N 0 0 0} at     0:08.327 (2998)
 [OK]:  iannsettime skipping backward to     0:00
 [OK]:  75 annotations read, 75 written
-[OK]:  isigopen((null), NULL, 0) succeeded
+[OK]:  isigopen(100s, NULL, 0) succeeded
 [OK]:  (at     0:00.000) getframe returned {  995,  1011}
 [OK]:  (at     0:00.002) getframe returned {  995,  1011}
 [OK]:  (at     0:00.005) getframe returned {  995,  1011}

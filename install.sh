@@ -7,7 +7,7 @@ case $# in
 esac
 
 DIR=$1
-if [ ! -e $DIR ]
+if [ ! -d $DIR ]
 then
     mkdir -p $DIR
 fi
@@ -22,11 +22,11 @@ shift
 
 for FILE in $*
 do
-    if [ -e $FILE.exe ]
+    if [ -f $FILE.exe ]
     then
         cp -p $FILE.exe $DIR
     else
-        if [ -e $FILE ]
+        if [ -f $FILE ]
         then
 	    cp -p $FILE $DIR
         else

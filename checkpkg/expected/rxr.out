@@ -1,7 +1,7 @@
 rxr: (warning) nonstandard comparison selected
 VE run-by-run comparison results for record 100s
 Reference annotator: atr
-     Test annotator: qrs
+     Test annotator: ann
 
                Algorithm Run Length
           0    1    2    3    4    5   >5

@@ -9,7 +9,7 @@
 @sp 5
 @center @titlefont{WFDB Programmer's Guide}
 @sp 4
-@center Tenth Edition (revised and with additions for WFDB library version 10.2.1)
+@center Tenth Edition (revised and with additions for WFDB library version 10.2.2)
 @center @today
 @sp 5
 @center George B. Moody
@@ -6908,7 +6908,7 @@ The home of the WFDB library, and a source for recorded physiologic signals and
 software for use with them.  All materials on PhysioNet are freely available.
 The main PhysioNet server is @code{http://www.@-physio@-net.@-org/}, located at
 MIT in Cambridge, Massachusetts; PhysioNet mirror sites are located around the
-world (see @@code{http://www.@-physio@-net.@-org/@-mirrors/} for a list).
+world (see @code{http://www.@-physio@-net.@-org/@-mirrors/} for a list).
 
 @item Piped record
 @cindex piped record (defined)
@@ -7178,7 +7178,7 @@ assortment of other Unix utilities ported to MS-Windows.  Accept the defaults
 suggested by the installer.
 
 @emph{Important:} Although you may be able to compile the WFDB software package
-using a proprietary compiler, this is \emph{not supported}.  The
+using a proprietary compiler, this is @emph{not supported}.  The
 @code{Makefile.dos} files in several of the subdirectories of the package's
 source tree can be used with the @code{make} utilities provided with most
 commercial C compilers, although you will need to customize them for your
@@ -7249,9 +7249,10 @@ and DAP interface library on your system.  Specifically, files @file{c_lib.c},
 @file{clock.h}, and @file{ioutil.h} must be installed in your @file{include}
 directory, and the version of the file @file{cdapl.lib} that is compatible with
 your compiler must be installed in a directory in which libraries are found by
-your linker.  Read and customize @code{lib/Makefile.dos} and {\tt
-app/Makefile.dos} as appropriate for your compiler, and use your compiler's
-@code{make} utility to generate @code{wfdb.lib} and then @code{sample.exe}.
+your linker.  Read and customize @code{lib/Makefile.dos} and
+@code{app/Makefile.dos} as appropriate for your compiler, and use your
+compiler's @code{make} utility to generate @code{wfdb.lib} and then
+@code{sample.exe}.
 
 
 @node Other installation, , MS-Windows installation, Installation
