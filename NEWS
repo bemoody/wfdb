@@ -1,3 +1,15 @@
+10.2.5:
+	New output format options in 'ann2rr' and 'ihr'.
+
+	FreeBSD support in 'configure', new conf/freebsd* (thanks to
+	Giuseppe Pagnoni).
+
+	Added support for annotation maps from wfdb/ecgmap.h to the Fortran
+	wrappers (fortran/wfdbf.c) and fixed two typos there.
+
+	Removed unneeded references to wfdb/wfdb.h from waverc/wave-remote.c
+	and waverc/wavescript.c (thanks again to Giuseppe Pagnoni).
+
 10.2.4:
 	Bug fixes in 'pschart' and 'psfd' (vbuf was not properly initialized
 	before its first use).

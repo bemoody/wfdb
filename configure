@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody               24 May 2000
-#                             Last revised:        18 December 2001
+#                             Last revised:         5 March 2002
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -32,6 +32,9 @@ case `uname` in
   Linux*) OS=Linux
     cat conf/linux.def >>conf/site.def
     cat conf/version.def conf/linux-slib.def >conf/site-slib.def ;;
+  FreeBSD*) OS=FreeBSD
+    cat conf/freebsd.def >>conf/site.def
+    cat conf/version.def conf/freebsd-slib.def >conf/site-slib.def ;;
   SunOS*) OS=Solaris
     cat conf/solaris.def >>conf/site.def
     cat conf/version.def conf/solaris-slib.def >conf/site-slib.def
@@ -216,16 +219,29 @@ sed "s+DBDIR+$DIR/database+" <lib/wfdblib.h0 >lib/wfdblib.h
 
 echo
 echo "Looking for the XView libraries ..."
-if [ -d /usr/openwin -o -d /usr/local/openwin -o -d /opt/openwin ]
+if [ -d /usr/openwin ]
 then
     WAVE=1;
-else
-  if ( which textedit 2>&1 | grep "no \|not " >/dev/null )
-  then
-    WAVE=0;
-  else
+elif [ -d /usr/local/openwin ]
+then
     WAVE=1;
-  fi
+    sed "s+/usr/openwin+/usr/local/openwin+" <wave/Makefile >tmp.$$
+    mv tmp.$$ wave/Makefile
+elif [ -d /opt/openwin ]
+then
+    WAVE=1;
+    sed "s+/usr/openwin+/opt/openwin+" <wave/Makefile >tmp.$$
+    mv tmp.$$ wave/Makefile
+elif ( which textedit 2>&1 | grep "no \|not " >/dev/null )
+then
+    WAVE=0;
+else
+    WAVE=1;
+    TEXTEDIT=`which textedit`;
+    TEDIR=`dirname $TEXTEDIT`;
+    OWHOME=`dirname $TEDIR`;
+    sed "s+/usr/openwin+$OWHOME+" <wave/Makefile >tmp.$$
+    mv tmp.$$ wave/Makefile
 fi
 if [ $WAVE = 0 ]
 then

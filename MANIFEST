@@ -119,6 +119,8 @@ conf/
 conf/cygwin.def
 conf/exechmod
 conf/exestrip
+conf/freebsd.def
+conf/freebsd-slib.def
 conf/generic.def
 conf/generic-slib.def
 conf/hpux.def

@@ -1,10 +1,10 @@
 /* file: mainpan.c	G. Moody	30 April 1990
-			Last revised:  12 October 2001
+			Last revised:	10 March 2002
 Functions for the main control panel of WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -299,7 +299,7 @@ static void create_edit_menu()
 	0);
 }
 
-static char filename[20], *title;
+static char filename[40], *title;
 
 static void show_print()
 {
@@ -440,9 +440,7 @@ static void prop_annotations()
 
 static void prop_wave()
 {
-    static char fname[40];
-
-    sprintf(fname, "%s/wave/wave.pro", helpdir);
+    sprintf(filename, "%s/wave/wave.pro", helpdir);
     title = "About WAVE";
     show_file();
 }

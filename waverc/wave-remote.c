@@ -1,10 +1,10 @@
 /* file: wave-remote.c		G. Moody	10 October 1996
-				Last revised:	14 October 2001
+				Last revised:	 9 March 2002
 Remote control for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -77,7 +77,6 @@ implementation is adequate.
 #include <sys/types.h>
 #include <dirent.h>
 #include <unistd.h>
-#include <wfdb/wfdb.h>
 
 char *pname;
 

@@ -1,0 +1,109 @@
+# file: freebsd-slib.def	G. Moody	5 March 2002
+#
+# Based on 'linux-slib.def'.
+
+# This section contains settings suitable for generating an ELF-format shared
+# library under FreeBSD.
+
+# Choose a value for WFDBROOT to determine where the WFDB Software Package will
+# be installed.  One of the following is usually a reasonable choice.
+# Installing in /usr generally requires root permissions, but will be easiest
+# for future software development (no special -I or -L options will be needed
+# to compile software with the WFDB library, since the *.h files and the
+# library will be installed in the standard directories).
+WFDBROOT = /usr
+# Installing in /usr/local usually requires root permissions.  On a multi-user
+# system where it is desirable to keep the OS vendor's software separate from
+# other software, this is a good choice.  Another common choice in such cases
+# is /opt .
+# WFDBROOT = /usr/local
+# To install without root permissions, a good choice is to set WFDBROOT to the
+# name of your home directory, as in the example below (change as needed).
+# WFDBROOT = /home/frodo
+
+# If the W3C's libwww library of HTTP and FTP client code is available, and
+# you wish to compile a WFDB library with NETFILES support, set LWC
+# to 'libwww-config' (a utility supplied with libwww).  Otherwise set
+# LWC to ':' (a program that does nothing, successfully).
+LWC = libwww-config
+
+# INCDIR specifies the name of a directory in which to install the WFDB
+# library's #include <...> files.
+INCDIR = $(WFDBROOT)/include
+
+# LIBDIR specifies the name of a directory in which to install the WFDB
+# library.
+LIBDIR = $(WFDBROOT)/lib
+
+# CC is the name of your C compiler.
+CC = gcc
+
+# CCDEFS is the set of C compiler options needed to set preprocessor variables
+# while compiling the WFDB Software Package.  CCDEFS should always include
+# VDEFS.
+CCDEFS = $(VDEFS)
+
+# CFLAGS is the set of C compiler options used when compiling the shared
+# library.  CFLAGS should always include CCDEFS.
+CFLAGS = -fpic -g -O $(CCDEFS) `$(LWC) --cflags` -I$(INCDIR)
+
+# WFDBLIB_BASENAME is the name, without version numbers, of the alternate
+# library.  WFDBLIB_SONAME is the shared object name ("soname") of the
+# alternate library; normally, this includes the base name and the major
+# version number only. WFDBLIB is the complete name, including the minor
+# version number.  Symbolic links from WFDBLIB to WFDBLIB_BASENAME and
+# WFDBLIB_SONAME will be created as the final step in building the alternate
+# library.
+WFDBLIB_BASENAME = libwfdb.so
+WFDBLIB_SONAME = $(WFDBLIB_BASENAME).$(MAJOR)
+WFDBLIB = $(WFDBLIB_SONAME).$(MINOR)
+# For a shared library, the soname is significant for proper run-time binding.
+# If you change function interfaces in the library, change its soname by
+# incrementing the major version number;  when you do this, set the minor
+# version number to zero.  If you change the library without changing the
+# function interfaces, increment the minor version number; this allows existing
+# binaries to use the new version without recompilation, since the soname is
+# unchanged in this case.
+
+# BUILDLIB is the command that creates the shared WFDB library once its
+# components have been compiled separately;  the list of *.o files that
+# make up the library will be appended to BUILDLIB.
+BUILDLIB = gcc -shared -Wl,-soname,$(WFDBLIB_SONAME) `$(LWC) --libs` \
+ -o $(WFDBLIB)
+
+# LDCONFIG is the name of the program needed to refresh the system's cached
+# index of shared libraries.
+LDCONFIG = /sbin/ldconfig
+
+# PRINT is the name of the program used to produce listings (including any
+# options for the desired formatting).
+PRINT = lpr
+
+# SETPERMISSIONS is the command needed to make the installed files accessible
+# to those who will use them.  The value given below makes them readable by
+# everyone, and writeable by the owner only.  (If you perform the installation
+# as `root', `root' is the owner of the installed files.)
+SETPERMISSIONS = chmod 644
+
+# SETDPERMISSIONS is similarly used to make directories created during the
+# installation accessible.
+SETDPERMISSIONS = chmod 755
+
+# SETLPERMISSIONS is the command needed to make the WFDB library usable by
+# programs linked to it.
+SETLPERMISSIONS = chmod 755
+
+# `make' (with no target specified) will be equivalent to `make all'.
+make-all:	all
+
+# `make lib-post-install' should be run after installing the WFDB library.
+lib-post-install:
+	cd $(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_BASENAME)
+	cd $(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_SONAME)
+	@$(LDCONFIG) || echo Warning: "$(LDCONFIG)" was unsuccessful
+
+lib-post-uninstall:
+	rm -f $(LIBDIR)/$(WFDBLIB_BASENAME)
+	rm -f $(LIBDIR)/$(WFDBLIB_SONAME)
+	@$(LDCONFIG) || echo Warning: "$(LDCONFIG)" was unsuccessful
+#______________________________________________________________________________

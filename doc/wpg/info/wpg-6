@@ -1,4 +1,4 @@
-This is wpg, produced by makeinfo version 4.0 from wpg.tex.
+This is wpg, produced by makeinfo version 4.0b from wpg.tex.
 
 
 File: wpg,  Node: Glossary,  Next: Installation,  Prev: Exercises,  Up: Top
@@ -534,7 +534,7 @@ single command: `tar xfvz wfdb.tar.gz'.)
 
    This will create a directory with a name of the form `wfdb-'M.N.R,
 where M.N.R is the version number of the included WFDB library (e.g.,
-`10.2.4').  Enter this directory.
+`10.2.5').  Enter this directory.
 
    You should now be ready to configure, compile, and install the
 software, using the commands:
@@ -610,7 +610,7 @@ command instead:
 
    This will create a directory with a name of the form `wfdb-'_m.n.r_,
 where _m.n.r_ is the version number of the included WFDB library (e.g.,
-`10.2.4').  Enter this directory.
+`10.2.5').  Enter this directory.
 
    You should now be ready to configure, compile, and install the
 software, using the commands:

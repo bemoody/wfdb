@@ -1,5 +1,5 @@
 file: README		G. Moody	7 September 1989
-			Last revised:	20 December 2001
+			Last revised:	  10 March 2002
 
 This directory and its subdirectories contain documentation for the WFDB
 Software Package, including UNIX man pages in troff source format for the WFDB
@@ -29,7 +29,7 @@ WFDB Programmer's Guide
   Windows help	'make wpg.hlp' (requires makertf and hcrtf)
   HTML		'make wpg.html'(requires texi2html and perl)
   info		'make wpg.info'(requires makeinfo or GNU emacs)
-  PDF		'make wpg.pdf' (requires texi2dvi)
+  PDF		'make wpg.pdf' (requires texi2dvi) *
   PostScript	'make wpg.ps'  (requires texi2dvi and dvips)
 
 WAVE User's Guide
@@ -41,6 +41,10 @@ WAVE User's Guide
 All of these, with the exception of printed copies, can be downloaded from
 PhysioNet (look in http://www.physionet.org/physiotools/manuals.shtml).
 
+* Some recent versions of pdflatex (invoked by texi2dvi) do not handle cross-
+  references properly.  If you encounter errors while attempting to make
+  wpg.pdf, try replacing pdflatex's copy of texinfo.tex with a version dated
+  June 2001 or later.  This problem occurs under Red Hat Linux 7.2.
 
 The following files will be found in this directory:
 

@@ -11,15 +11,15 @@
 <B>Up:</B> <A HREF="../manuals.shtml">Books about PhysioToolkit</A>
 <H1 ALIGN=CENTER>WFDB Programmer's Guide</H1>
 <P ALIGN=CENTER><STRONG>Tenth Edition<BR>
-(Revised and with corrections for WFDB library version 10.2.4)<BR>
-20 December 2001<BR>
+(Revised and with corrections for WFDB library version 10.2.5)<BR>
+10 March 2002<BR>
 <BR> 
 <BR> 
 <BR> 
 George B. Moody<BR> 
 Harvard-MIT Division of Health Sciences and Technology<BR></STRONG></P><P>
 <P>
-Copyright &#169;1980-2001 George B. Moody.
+Copyright &#169;1980-2002 George B. Moody.
 <P>
 The most recent versions of the software described in this guide are freely
 downloadable from <A HREF="http://www.physionet.org/">PhysioNet</A>.  For

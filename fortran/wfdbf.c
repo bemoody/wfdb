@@ -1,9 +1,9 @@
 /* file: wfdbf.c	G. Moody	23 August 1995
-			Last revised:  19 November 1999
+			Last revised:  6 February 2002
 
 _______________________________________________________________________________
 wfdbf: Fortran wrappers for the WFDB library functions
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -43,13 +43,13 @@ annotator numbers passed to these functions must be 0-based.
 
 If you are using a UNIX Fortran compiler, or a Fortran-to-C translator, note
 that the trailing `_' in these function names should *not* appear in your
-Fortran program;  thus, for example, `annopen1_' should be invoked as
-`annopen1'.  UNIX Fortran compilers and translators append a `_' to the
+Fortran program;  thus, for example, `annopen_' should be invoked as
+`annopen'.  UNIX Fortran compilers and translators append a `_' to the
 names of all external symbols referenced in Fortran source files when
 generating object files.  Thus the linker can recognize that annopen1_
 (defined below) is the function required by a Fortran program that invokes
-`annopen1';  if the Fortran program were to invoke `annopen1_', the linker
-would search (unsuccessfully) for a function named `annopen1__'.
+`annopen';  if the Fortran program were to invoke `annopen_', the linker
+would search (unsuccessfully) for a function named `annopen__'.
 
 If you are using a Fortran compiler that does not follow this convention,
 you are on your own.
@@ -57,6 +57,7 @@ you are on your own.
 
 #include <stdio.h>
 #include <wfdb/wfdb.h>
+#include <wfdb/ecgmap.h>
 #ifndef BSD
 # include <string.h>
 #else		/* for Berkeley UNIX only */
@@ -342,16 +343,22 @@ char *aux;
     return (putann((WFDB_Annotator)(*annotator), &oann));
 }
 
-long isigsetttime_(time)
+long isigsettime_(time)
 long *time;
 {
     return (isigsettime((WFDB_Time)(*time)));
 }
 
-long isgsetttime_(group, time)
+long isgsettime_(group, time)
 long *group, *time;
 {
     return (isgsettime((WFDB_Group)(*group), (WFDB_Time)(*time)));
+}
+
+long iannsettime_(time)
+long *time;
+{
+    return (iannsettime((WFDB_Time)(*time)));
 }
 
 long ecgstr_(code, string)
@@ -732,5 +739,78 @@ long wfdbflush_(dummy)
 long *dummy;
 {
     wfdbflush();
+    return (0L);
+}
+
+/* The functions below can be used in place of the macros defined in
+   <wfdb/ecgmap.h>. */
+
+long isann_(anntyp)
+long *anntyp;
+{   
+    return ((long)(isann(*anntyp)));
+}
+
+long isqrs_(anntyp)
+long *anntyp;
+{   
+    return ((long)(isqrs(*anntyp)));
+}
+
+long setisqrs_(anntyp, value)
+long *anntyp, *value;
+{   
+    setisqrs(*anntyp, *value);
+    return (0L);
+}
+
+long map1_(anntyp)
+long *anntyp;
+{   
+    return ((long)(map1(*anntyp)));
+}
+
+long setmap1_(anntyp, value)
+long *anntyp, *value;
+{   
+    setmap1(*anntyp, *value);
+    return (0L);
+}
+
+long map2_(anntyp)
+long *anntyp;
+{   
+    return ((long)(map1(*anntyp)));
+}
+
+long setmap2_(anntyp, value)
+long *anntyp, *value;
+{   
+    setmap1(*anntyp, *value);
+    return (0L);
+}
+
+long ammap_(anntyp)
+long *anntyp;
+{   
+    return ((long)(ammap(*anntyp)));
+}
+
+long mamap_(anntyp, subtyp)
+long *anntyp, *subtyp;
+{   
+    return ((long)(mamap(*anntyp, *subtyp)));
+}
+
+long annpos_(anntyp)
+long *anntyp;
+{   
+    return ((long)(annpos(*anntyp)));
+}
+
+long setannpos_(anntyp, value)
+long *anntyp, *value;
+{   
+    setannpos(*anntyp, *value);
     return (0L);
 }

@@ -1,12 +1,12 @@
-This is wpg, produced by makeinfo version 4.0 from wpg.tex.
+This is wpg, produced by makeinfo version 4.0b from wpg.tex.
 
 
 File: wpg,  Node: Top,  Next: Overview,  Prev: (dir),  Up: (dir)
 
    This guide documents the Waveform Database interface library (the
 WFDB library).  This file contains the text of the Tenth Edition of the
-`WFDB Programmer's Guide' (December,2001), with revisions for release
-10.2.4 of the WFDB library.
+`WFDB Programmer's Guide' (March, 2002), with revisions for release
+10.2.5 of the WFDB library.
 
 * Menu:
 
@@ -385,6 +385,12 @@ and to this guide since the first printing of the tenth edition of this
 guide in June, 1999.  See `NEWS', in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
+
+Changes in version 10.2.5
+-------------------------
+
+   Additions and fixes in `wfdbf.c' (the Fortran wrappers for the WFDB
+library).
 
 Changes in version 10.2.4
 -------------------------
