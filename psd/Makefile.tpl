@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody		24 May 2000
-#				Last revised:		5 June 2000
+#				Last revised:		6 June 2000
 # This section of the Makefile should not need to be changed.
 
 # Programs to be compiled.
@@ -14,8 +14,8 @@ all:	$(XFILES)
 
 # `make' or `make install':  build and install applications, clean up
 install:	$(BINDIR) all scripts
-	cp $(XFILES) $(BINDIR)
-	cd $(BINDIR); $(SETXPERMISSIONS) $(XFILES)
+	$(SETXPERMISSIONS) $(XFILES)
+	../install.sh $(BINDIR) $(XFILES)
 	$(MAKE) clean
 
 # `make scripts': customize and install scripts
@@ -28,7 +28,7 @@ scripts:
 	$(SETXPERMISSIONS) $(SCRIPTS)
 
 uninstall:
-	../uninstall $(BINDIR) $(XFILES) $(SCRIPTS)
+	../uninstall.sh $(BINDIR) $(XFILES) $(SCRIPTS)
 
 coherence:	coherence.c
 	$(CC) -o coherence -O coherence.c -lm
@@ -37,7 +37,7 @@ fft:		fft.c
 	$(CC) -o fft -O fft.c -lm
 
 log10:		log10.c
-	$(CC) -o log10 -O log10.c -lm
+	$(CC) $(CCDEFS) -o log10 -O log10.c -lm
 
 lomb:		lomb.c
 	$(CC) -o lomb -O lomb.c -lm

@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody               24 May 2000
-#                             Last revised:          5 June 2000
+#                             Last revised:          6 June 2000
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -26,6 +26,8 @@ case `uname` in
   HP-UX*) OS=HPUX
     cat conf/hpux.def >>conf/site.def
     cat conf/version.def conf/hpux-slib.def >conf/site-slib.def ;;
+  CYGWIN*) OS=cygwin
+    cat conf/cygwin.def >>conf/site.def ;;
   *)      OS=generic
     cat conf/generic.def >>conf/site.def
     cat conf/version.def conf/generic-slib.def >conf/site-slib.def

@@ -1,5 +1,5 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised:   22 May 2000	wfdblib 10.1.4
+			Last revised:   6 June 2000	wfdblib 10.1.5
 WFDB library type, constant, structure, and function interface definitions
 
 _______________________________________________________________________________
@@ -33,12 +33,14 @@ _______________________________________________________________________________
 /* WFDB library version. */
 #define WFDB_MAJOR   10
 #define WFDB_MINOR   1
-#define WFDB_RELEASE 4
+#define WFDB_RELEASE 5
 #define WFDB_NETFILES 1	/* if 1, library includes code for HTTP, FTP clients */
 
 /* Determine what type of compiler is being used. */
 #ifdef __STDC__		/* true for ANSI C compilers only */
 #define wfdb_PROTO	/* function prototypes will be needed */
+#undef _WINDOWS		/* we don't want MS-Windows API in this case */
+#undef _WIN32		/* ... or 32-bit MS-Windows API either */
 #endif
 
 #ifdef __cplusplus	/* true for some C++ compilers */

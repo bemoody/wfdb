@@ -29,8 +29,8 @@ all:	$(XFILES)
 
 # `make' or `make install':  build and install applications, clean up
 install:	all $(BINDIR) $(PSPDIR) scripts
-	cp $(XFILES) $(BINDIR)
-	cd $(BINDIR); $(SETXPERMISSIONS) $(XFILES)
+	$(SETXPERMISSIONS) $(XFILES)
+	../install.sh $(BINDIR) $(XFILES)
 	cp $(PSFILES) $(PSPDIR)
 	cd $(PSPDIR); $(SETPERMISSIONS) $(PSFILES)
 	$(MAKE) clean
@@ -42,9 +42,9 @@ scripts:
 	$(SETPERMISSIONS) $(SCRIPTS)
 
 uninstall:
-	../uninstall $(PSPDIR) $(PSFILES)
-	../uninstall $(BINDIR) $(XFILES) $(SCRIPTS)
-	../uninstall $(LIBDIR)
+	../uninstall.sh $(PSPDIR) $(PSFILES)
+	../uninstall.sh $(BINDIR) $(XFILES) $(SCRIPTS)
+	../uninstall.sh $(LIBDIR)
 
 # Create directories for installation if necessary.
 $(BINDIR):

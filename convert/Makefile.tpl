@@ -18,12 +18,12 @@ all:	$(XFILES)
 
 # `make' or `make install':  build and install applications, clean up
 install:	$(BINDIR) all
-	cp $(XFILES) $(BINDIR)
-	cd $(BINDIR); $(SETXPERMISSIONS) $(XFILES)
+	$(SETXPERMISSIONS) $(XFILES)
+	../install.sh $(BINDIR) $(XFILES)
 	$(MAKE) clean
 
 uninstall:
-	../uninstall $(BINDIR) $(XFILES)
+	../uninstall.sh $(BINDIR) $(XFILES)
 
 # `make clean':  remove intermediate and backup files
 clean:

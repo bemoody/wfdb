@@ -1,9 +1,9 @@
 /* file: wview.c        G. Moody        20 January 1993
-                        Last revised:      7 May 1999
+                        Last revised:     11 June 2000
    
 -------------------------------------------------------------------------------
 wview: view WFDB-format signals and annotations under MS Windows
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2000 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -1208,7 +1208,7 @@ open_record()
     wfdbquit();
     
     /* Open the signal file(s) for the record to be browsed. */
-    nsig = isigopen(record, si, DB_MAXSIG);
+    nsig = isigopen(record, si, WFDB_MAXSIG);
     
     /* Recalculate the current time (necessary if the sampling frequencies
        of the new record and the old record differ). */
@@ -1237,7 +1237,7 @@ int open_annotation_file()
 {
     static WFDB_Anninfo ai;
     
-    ai.name = annotator; ai.stat = READ;
+    ai.name = annotator; ai.stat = WFDB_READ;
     return (nann = annopen(record, &ai, 1) + 1);
 }
 

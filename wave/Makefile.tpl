@@ -82,7 +82,7 @@ all:	wave
 install:	$(BINDIR) $(HELPDIR)/wave $(MENUDIR) $(RESDIR) wave wave.hlp
 	sed s/WAVEVERSION/$(WAVEVERSION)/ <wave.prf | sed "s/WHEN/`date`/" | \
 	 sed "s%HELPDIR%$(HELPDIR)%" >wave.pro
-	$(STRIP) wave; cp wave $(BINDIR); $(SETXPERMISSIONS) $(BINDIR)/wave
+	$(STRIP) wave; $(SETXPERMISSIONS) wave;	../install.sh $(BINDIR) wave
 	cp $(HELPFILES) wave.hlp wave.info wave.pro demo.txt $(HELPDIR)/wave
 	-ln -s $(HELPDIR)/wave/wave.pro $(HELPDIR)/wave/news.hlp
 	cd $(HELPDIR)/wave; $(SETPERMISSIONS) $(HELPFILES) news.hlp wave.info \
@@ -92,14 +92,14 @@ install:	$(BINDIR) $(HELPDIR)/wave $(MENUDIR) $(RESDIR) wave wave.hlp
 	-cp Wave.res $(RESDIR)/Wave && $(SETPERMISSIONS) $(RESDIR)/Wave
 
 uninstall:
-	../uninstall $(BINDIR) wave
-	../uninstall $(HELPDIR)/wave $(HELPFILES) wave.hlp wave.info wave.pro \
+	../uninstall.sh $(BINDIR) wave
+	../uninstall.sh $(HELPDIR)/wave $(HELPFILES) wave.hlp wave.info wave.pro \
 	  demo.txt news.hlp
 	rmdir $(HELPDIR) || echo "(Ignored)"
-	../uninstall $(MENUDIR) wavemenu.def
-	../uninstall $(RESDIR) Wave
-	../uninstall $(LIBDIR)/X11
-	../uninstall $(LIBDIR)
+	../uninstall.sh $(MENUDIR) wavemenu.def
+	../uninstall.sh $(RESDIR) Wave
+	../uninstall.sh $(LIBDIR)/X11
+	../uninstall.sh $(LIBDIR)
 
 wave:		$(OFILES)
 	$(CC) -o wave $(OFILES) $(WLDFLAGS)

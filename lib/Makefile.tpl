@@ -22,11 +22,11 @@ install:	$(INCLUDES) $(LIBDIR) all
 	$(MAKE) lib-post-install
 
 uninstall:
-	../uninstall $(INCDIR)/wfdb $(HFILES)
-	../uninstall $(INCDIR)
-	../uninstall $(LIBDIR) $(WFDBLIB)
+	../uninstall.sh $(INCDIR)/wfdb $(HFILES)
+	../uninstall.sh $(INCDIR)
+	../uninstall.sh $(LIBDIR) $(WFDBLIB)
 	$(MAKE) lib-post-uninstall
-	../uninstall $(LIBDIR)
+	../uninstall.sh $(LIBDIR)
 
 # `make compat':  install the includes needed for source compatibility with
 # applications written for pre-version 10.0.0 versions of this library

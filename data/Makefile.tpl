@@ -13,7 +13,7 @@ install:	$(DBDIR)
 	-cd $(DBDIR); ln -sf wfdbcal dbcal
 
 uninstall:
-	../uninstall $(DBDIR) $(DBFILES) dbcal
+	../uninstall.sh $(DBDIR) $(DBFILES) dbcal
 
 $(DBDIR):
 	mkdir $(DBDIR); $(SETDPERMISSIONS) $(DBDIR)

@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody		24 May 2000
-#				Last revised:		5 June 2000
+#				Last revised:		7 June 2000
 # Change the settings below as appropriate for your setup.
 
 # URLV is the command that starts your web browser if necessary and opens the
@@ -16,14 +16,13 @@ all:	wavescript wave-remote
 # Guide for instructions on setting up `wavescript' as a helper application for
 # your Web browser.
 install:	$(BINDIR) urlview wavescript wave-remote
-	strip wavescript
-	strip wave-remote
-	cp urlview wavescript wave-remote $(BINDIR)
-	$(SETXPERMISSIONS) $(BINDIR)/urlview $(BINDIR)/wavescript \
-	 $(BINDIR)/wave-remote
+	$(STRIP) wavescript
+	$(STRIP) wave-remote
+	$(SETXPERMISSIONS) urlview wavescript wave-remote
+	../install.sh $(BINDIR) urlview wavescript wave-remote
 
 uninstall:
-	../uninstall $(BINDIR) urlview wavescript wave-remote
+	../uninstall.sh $(BINDIR) urlview wavescript wave-remote
 
 # `urlview' opens a web browser to view a named URL.
 urlview:	Makefile

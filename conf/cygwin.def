@@ -1,15 +1,13 @@
-# file: generic.def		G. Moody	31 May 2000
-#				Last revised:	6 June 2000
-# This file contains default 'make' definitions for compiling the WFDB Software
-# Package under versions of UNIX that are not otherwise recognized by
-# 'configure'.
+# file: cygwin.def		G. Moody	6 June 2000
 #
-# If you find that changes are needed in order to compile successfully, please
-# send a copy of your modifications together with the name of your operating
-# system (as reported by the 'uname' command) to george@mit.edu, so that
-# support for your operating system can be incorporated in future versions of
-# this package.  Thanks!
-
+# This file contains default 'make' definitions for compiling the WFDB Software
+# Package under MS Windows using the free Cygwin/gcc ANSI C compiler, available
+# from http://www.cygnus.com/cygwin/.
+#
+# To use this successfully, you need to have installed Cygwin B20 or later,
+# as well as `which.exe' (which should be installed somewhere in your PATH;
+# get it from http://www.physionet.org/physiotools/utilities/which/which.exe).
+#
 # Choose a value for WFDBROOT to determine where the WFDB Software Package will
 # be installed.  One of the following is usually a reasonable choice.
 # Installing in /usr generally requires root permissions, but will be easiest
@@ -88,7 +86,7 @@ CC = gcc
 #   -DOLDC	  if you have neither `stdarg.h' nor `varargs.h' (see wfdbio.c)
 # If your C compiler fails to compile `signal.c', add -DBROKEN_CC to CCDEFS
 # and try again (see signal.c).
-CCDEFS = $(VDEFS)
+CCDEFS = $(VDEFS) -DNOVALUES_H
 
 # CFLAGS is the set of C compiler options.  CFLAGS should always include
 # CCDEFS.  Add the following options to CFLAGS as appropriate (separating them
@@ -149,8 +147,9 @@ SETLPERMISSIONS = chmod 644
 SETXPERMISSIONS = chmod 755
 
 # STRIP is the command used to compact the compiled binaries by removing their
-# symbol tables.
-STRIP = strip
+# symbol tables.  'exestrip' is a script that appends the '.exe' suffix to the
+# files in its argument list before passing their names to 'strip' itself.
+STRIP = ../conf/exestrip
 # To retain the symbol tables for debugging, comment out the previous line, and
 # uncomment the next line.
 # STRIP = :
@@ -165,4 +164,3 @@ lib-post-install:
 lib-post-uninstall:
 	echo "Nothing to be done for lib-post-uninstall"
 # _____________________________________________________________________________
-

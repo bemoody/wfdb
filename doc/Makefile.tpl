@@ -117,10 +117,10 @@ install:	$(MAN1) $(MAN3) $(MAN5)
 	$(LN) $(MAN1)/view.1 $(MAN1)/vsetup.1
 
 uninstall:
-	../uninstall $(MAN1) *.1 ad2m.1 m2a.1 md2a.1 hrlomb.1 hrmem.1 \
+	../uninstall.sh $(MAN1) *.1 ad2m.1 m2a.1 md2a.1 hrlomb.1 hrmem.1 \
 	 hrplot.1 plot3d.1 cshsetwfdb.1 vsetup.1
-	../uninstall $(MAN3) *.3
-	../uninstall $(MAN5) *.5
+	../uninstall.sh $(MAN3) *.3
+	../uninstall.sh $(MAN5) *.5
 
 # Create directories for installation if necessary.
 $(MAN1):

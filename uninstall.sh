@@ -1,5 +1,5 @@
 #!/bin/sh
-# file: uninstall		G. Moody	5 June 2000
+# file: uninstall.sh		G. Moody	5 June 2000
 
 case $# in
  0) echo "usage: $0 DIRECTORY [FILE ...]"

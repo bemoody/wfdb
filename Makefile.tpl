@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody		24 May 2000
-#
+#				Last revised:		8 June 2000
 # This section of the Makefile should not need to be changed.
 
 # ARCH specifies the type of CPU and the operating system (e.g., 'i686-Linux').
@@ -36,7 +36,7 @@ uninstall:	config.cache
 	cd psd;      $(MAKE) uninstall
 	cd convert;  $(MAKE) uninstall
 	cd data;     $(MAKE) uninstall
-	./uninstall $(WFDBROOT)
+	./uninstall.sh $(WFDBROOT)
 
 # 'make clean': remove binaries, other cruft from source directories
 clean:
@@ -52,7 +52,7 @@ clean:
 	cd wave-doc; $(MAKE) clean
 	cd waverc;   $(MAKE) clean
 	cd wview;    $(MAKE) -f clean
-	rm -f *~ config.cache
+	rm -f *~ conf/*~ config.cache */*.exe
 
 # 'make config.cache': check configuration
 config.cache:
