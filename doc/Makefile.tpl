@@ -44,10 +44,6 @@ MAKEINFO = makeinfo --force --no-warn
 # Otherwise, you can use GNU emacs to do the job by uncommenting the next line.
 # MAKEINFO = ./makeinfo.sh
 
-# MANDIR is the root of the man page directory tree.  On most systems, this is
-# something like /usr/man or /usr/local/man (type 'man man' to find out).
-MANDIR = $(WFDBROOT)/local/man
-
 # MAN1, MAN3, MAN5, and MAN7 are the directories in which local man pages for
 # section 1 (commands), section 3 (libraries), section 5 (formats), and
 # section 7 (conventions and miscellany) go.  You may wish to use

@@ -145,7 +145,7 @@ SETDPERMISSIONS = chmod 755
 SETLPERMISSIONS = chmod 644
 
 # SETXPERMISSIONS is the command needed to make the applications accessible.
-SETXPERMISSIONS = ../conf/exechmod 755
+SETXPERMISSIONS = chmod 755
 
 # STRIP is the command used to compact the compiled binaries by removing their
 # symbol tables.  'exestrip' is a script that appends the '.exe' suffix to the

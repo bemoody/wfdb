@@ -6,14 +6,19 @@ Version: VERSION
 Release: RPMRELEASE
 License: GPL
 Group: Libraries
-Source: http://www.physionet.org/physiotools/archives/wfdb-VERSION.tar.gz
+Source0: http://www.physionet.org/physiotools/archives/wfdb-VERSION.tar.gz
+Source1: http://www.physionet.org/physiotools/archives/wfdb-MAJOR.MINOR/wfdb-VERSION.tar.gz
 URL: http://www.physionet.org/physiotools/wfdb.shtml
+Vendor: PhysioNet
 Packager: George Moody <george@mit.edu>
 Requires: w3c-libwww >= 5.2
 Requires: w3c-libwww-devel >= 5.2
 BuildRoot: /var/tmp/%{name}-root
 
 %changelog
+* Wed Mar 19 2003 George B Moody <george@mit.edu>
+- added --mandir to build, fixed linking in post
+
 * Wed Dec 18 2002 George B Moody <george@mit.edu>
 - split into wfdb, wfdb-devel, wfdb-app, wfdb-wave, wfdb-doc subpackages
 
@@ -26,7 +31,7 @@ BuildRoot: /var/tmp/%{name}-root
 %setup
 
 %build
-PATH=$PATH:/usr/openwin/bin ./configure --prefix=/usr
+PATH=$PATH:/usr/openwin/bin ./configure --prefix=/usr --mandir=%{_mandir}
 make
 
 # The 'make' command above actually *installs* the WFDB library and its *.h
@@ -57,7 +62,9 @@ cd ../doc; make WFDBROOT=$RPM_BUILD_ROOT/usr install
 rm -rf $RPM_BUILD_ROOT
 make clean
 
-%post -p /sbin/ldconfig
+%post
+/sbin/ldconfig
+test -e /usr/lib/libwfdb.so.10 -a ! -e /usr/lib/libwfdb.so && ln -s /usr/lib/libwfdb.so.10 /usr/lib/libwfdb.so
 
 %postun -p /sbin/ldconfig
 
@@ -83,6 +90,7 @@ range of general-purpose signal processing applications.
 %package devel
 Summary: WFDB developer's toolkit
 Group: Development/Libraries
+URL: http://www.physionet.org/physiotools/wpg/
 Requires: wfdb = VERSION
 
 %description devel

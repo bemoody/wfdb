@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody         24 May 2000
-#                             Last revised:  18 December 2002
+#                             Last revised:   19 March 2003
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -19,6 +19,7 @@ for i in $*
 do
   case $i in
     --dynamic)     LIBTYPE=dynamic ;;
+    --mandir=*)    MANDIR=`echo $i | sed 's/[-a-zA-Z0-9]*=//'` ;;
     --prefix=*)    DIR=`echo $i | sed 's/[-a-zA-Z0-9]*=//'` ;;
     --shared)      LIBTYPE=dynamic ;;
     --static)      LIBTYPE=static ;;
@@ -30,6 +31,7 @@ Options:
     --dynamic         make a shared (dynamically linkable) WFDB library
                        if possible [default]
     --help            print this message
+    --mandir=MANDIR   install man pages in MANDIR
     --prefix=PREFIX   install files in PREFIX [default: $DIR]
     --shared          (same as --dynamic)
     --static          make a static WFDB library (do not make a shared
@@ -109,7 +111,7 @@ then
     echo
     echo "The WFDB library may be compiled as a static library or as a"
     echo "dynamically loaded (shared) library (the default).  Type S for a"
-    conf/prompt "static library, or D for a dynamically loaded library: " " "
+    conf/prompt "static library, or D for a dynamically loaded library:"
     read LIBTYPE
   fi
 else
@@ -136,7 +138,7 @@ then
 	echo "libraries only may cause compilation to fail if your"
 	echo "system does not have a complete set of static libraries."
 	echo "Type S to link to static libraries only, or D to link to"
-	conf/prompt "dynamically loaded libraries where available: " ""
+	conf/prompt "dynamically loaded libraries where available:"
 	read SYSLIBS
     fi
     case x$SYSLIBS in
@@ -153,12 +155,23 @@ else
 fi
 
 echo
-conf/prompt "Looking for the C compiler ..." ""
-if ( which gcc 2>&1 | grep "no \|not " >/dev/null )
+conf/prompt "Looking for the C compiler ..."
+WCC=`which gcc 2>&1`
+if [ "x$WCC" = "x" ]
 then
-    if (which cc 2>&1 | grep "no \|not " >/dev/null )
+    WCC="no gcc"
+fi
+if ( echo $WCC | grep "no \|not " >/dev/null )
+then
+    WCC=`which cc 2>&1`
+    if [ "x$WCC" = "x" ]
     then
-        echo
+        WCC="no cc"
+    fi
+    if ( echo $WCC | grep "no \|not " >/dev/null )
+    then
+        echo "not found"
+	echo
         echo "The WFDB software cannot be compiled, because there does not"
         echo "appear to be a C compiler installed on this system.  Please"
         echo "install one, be sure that it is in your PATH, and that it is"
@@ -192,7 +205,7 @@ then
     DIR=
     while [ x$DIR = x ]
     do
-        conf/prompt "Choose a location, or press <Enter> to install in /usr: " ""
+        conf/prompt "Choose a location, or press <Enter> to install in /usr:"
         read DIR
         case x$DIR in
             x/usr) ;;
@@ -206,8 +219,6 @@ then
     done
 fi
 
-echo  "The WFDB software will be installed in '$DIR'."
-
 case $DIR in
   /usr) ;;
     /*) sed "s+^WFDBROOT = /usr+WFDBROOT = $DIR+" <conf/site.def >conf/site.tmp
@@ -216,11 +227,57 @@ case $DIR in
          >conf/site.tmp
         mv conf/site.tmp conf/site-slib.def
 esac
- 
-echo
-echo "Looking for libwww ..."
-if ( which libwww-config 2>&1 | grep "no \|not " >/dev/null )
+
+echo  "The WFDB software will be installed in '$DIR'."
+
+MANTMP=`grep "MANDIR =" conf/site.def |sed 's+$(WFDBROOT)/++' |cut -d " " -f 3`
+MANDEF=$DIR/$MANTMP
+if [ x$MANDIR = x ]
 then
+    echo
+    echo "Where do you wish to install the manual pages?"
+    echo "They will be installed in subdirectories of MANDIR (by default,"
+    echo "MANDIR is '$MANDEF').  If you install them in a non-standard"
+    echo "directory, you will need to add that directory to your MANPATH."
+    echo "The value of MANDIR must be a full pathname (beginning with '/',"
+    echo "but without a '/' at the end).  If the subdirectories (man1, man3,"
+    echo "man5, ...) of MANDIR don't exist, they will be created as necessary."
+    echo
+    DIR=
+    while [ x$MANDIR = x ]
+    do
+       conf/prompt "Choose a location, or press <Enter> to install in $MANDEF:"
+        read MANDIR
+        case x$MANDIR in
+            x/usr) ;;
+                x) MANDIR=$MANDEF ;;
+              x*/) MANDIR=
+                   echo "Please type the path again, omitting the '/' at the end." ;;
+              x/*) ;;
+               x*) MANDIR=
+                   echo "Please enter an absolute pathname, beginning with '/'." ;;
+        esac
+    done
+fi
+
+if [ "$MANDIR" != "$MANDEF" ]
+then
+    sed "s+^MANDIR = $MANDEF+MANDIR = $MANDIR+" <conf/site.def >conf/site.tmp
+    mv conf/site.tmp conf/site.def
+fi
+
+echo  "The manual pages will be installed in '$MANDIR'."
+
+echo
+conf/prompt "Looking for libwww ..."
+WLC=`which libwww-config 2>&1`
+if [ "x$WLC" = "x" ]
+then
+    WLC="no libwww-config"
+fi
+if ( echo $WLC | grep "no \|not " >/dev/null )
+then
+    echo "not found"
     echo "The WFDB software will be compiled without NETFILES access, because"
     echo "libwww does not appear to be installed on this system."
     echo "To add NETFILES access, install libwww and run ./configure again."
@@ -232,6 +289,7 @@ then
     sed "s/WFDB_NETFILES 1/WFDB_NETFILES 0/" <lib/wfdb.h0 >lib/wfdb.h
     WITHNF=without
 else
+    echo "found"
     echo "The WFDB software will be compiled with NETFILES access."
     echo "NETFILES=1" >config.cache
     sed "s/LWC = :/LWC = libwww-config/" <conf/site.def >conf/site.tmp
@@ -272,7 +330,12 @@ echo "Adding $DIR/database to the default WFDB path ..."
 sed "s+DBDIR+$DIR/database+" <lib/wfdblib.h0 >lib/wfdblib.h
 
 echo
-echo "Looking for the XView libraries ..."
+conf/prompt "Looking for the XView libraries ..."
+TEXTEDIT=`which textedit 2>&1`
+if [ "x$TEXTEDIT" = "x" ]
+then
+    TEXTEDIT="no textedit"
+fi
 if [ -d /usr/openwin ]
 then
     WAVE=1;
@@ -286,12 +349,11 @@ then
     WAVE=1;
     sed "s+/usr/openwin+/opt/openwin+" <wave/Makefile >tmp.$$
     mv tmp.$$ wave/Makefile
-elif ( which textedit 2>&1 | grep "no \|not " >/dev/null )
+elif ( echo $TEXTEDIT | grep "no \|not " >/dev/null )
 then
     WAVE=0;
 else
     WAVE=1;
-    TEXTEDIT=`which textedit`;
     TEDIR=`dirname $TEXTEDIT`;
     OWHOME=`dirname $TEDIR`;
     sed "s+/usr/openwin+$OWHOME+" <wave/Makefile >tmp.$$
@@ -299,6 +361,7 @@ else
 fi
 if [ $WAVE = 0 ]
 then
+    echo "not found"
     echo "WAVE will not be compiled, because the XView libraries do not"
     echo "appear to be installed on this system."
     echo "To compile WAVE, install XView, add the directory containing the"
@@ -308,6 +371,7 @@ then
     echo "WAVE=0" >>config.cache
     WAVECOMP="WAVE will not be compiled."
 else
+    echo "found"
     WAVECOMP="WAVE will be compiled and installed in '$DIR/bin'."
     echo "WAVE=1" >>config.cache
 fi
@@ -352,7 +416,6 @@ then
     echo "        george@mit.edu"
 fi
 
-
 cat <<EOF
 
 Summary:
@@ -364,8 +427,7 @@ The WFDB library .h files will be installed in '$DIR/include/wfdb'.
 The WFDB applications will be linked to $SYSLIBS system libraries, and
  they will be installed in '$DIR/bin'.
 $WAVECOMP
-Manual pages will be installed in subdirectories of '/usr/local/man'
- (change MANDIR in 'doc/Makefile' if you prefer another location).
+Manual pages will be installed in subdirectories of '$MANDIR'.
 Sample data files will be installed in '$DIR/database', which
  will be included in the default WFDB path.
 

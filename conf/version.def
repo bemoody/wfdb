@@ -1,11 +1,11 @@
 # file: version.def		G. Moody	24 May 2000
-#				Last revised:  4 March 2003
+#				Last revised:  19 March 2003
 # Each release of the WFDB Software Package is identified by a three-part
 # version number, defined here:
 MAJOR = 10
 MINOR = 3
 RELEASE = 3
-VERSION = $(MAJOR).$(MINOR).$(RELEASE)pre1
+VERSION = $(MAJOR).$(MINOR).$(RELEASE)
 
 # RPMRELEASE can be incremented if changes are made between official
 # releases.  It should be reset to 1 whenever the VERSION is changed.
