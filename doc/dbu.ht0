@@ -11,19 +11,19 @@
 <B>Up:</B> <A HREF="../index.htm">Catalog of documents</A>
 <H1 ALIGN=CENTER>WFDB Programmer's Guide</H1>
 <P ALIGN=CENTER><STRONG>Tenth Edition<BR>
-(Revised and with corrections for WFDB library version 10.0)<BR>
-18 May 1999<BR> 
+(Revised and with corrections for WFDB library version 10.1.0)<BR>
+11 January 2000<BR>
 <BR> 
 <BR> 
 <BR> 
 George B. Moody<BR> 
 Harvard-MIT Division of Health Sciences and Technology<BR></STRONG></P><P>
 <P>
-Copyright &#169;1980-1999 George B. Moody.
+Copyright &#169;1980-2000 George B. Moody.
 <P>
-For information on obtaining the most recent versions of the software
-described in this guide, visit <A HREF="http://ecg.mit.edu/">our web site</A>,
-or write to:
+The most recent versions of the software described in this guide are freely
+downloadable from <A HREF="http://www.physionet.org/">PhysioNet</A>.  For
+further information, write to:
 <P>
 <BLOCKQUOTE>George B. Moody<BR> 
 MIT Room E25-505A<BR> 
@@ -33,7 +33,7 @@ USA<BR>
 <P>
 A <A HREF="dbpg.ps">PostScript version</A> of this guide is
 available.  The latest version can be downloaded from
-<A HREF="http://ecg.mit.edu">MIT</A>.  Printed
+<A HREF="http://www.physionet.org/">PhysioNet</A>.  Printed
 copies of this guide are available for $10 each
 (including shipping by surface mail) by writing to the address above.
 Please make checks payable to ``Beth Israel Hospital Biomedical
@@ -56,11 +56,19 @@ into another language, under the above conditions for modified versions.
 <BR><HR>
 <H2>Other links of interest</H2>
 <UL>
-<LI><A HREF="http://ecg.mit.edu">The MIT-BIH Database Distribution
+<LI><A HREF="http://www.physionet.org/">PhysioNet</A><BR>
+PhysioNet offers free access via the web to large collections of
+recorded physiologic signals and related open-source software.
+PhysioNet is a public service of the Research Resource for
+Complex Physiologic Signals, funded by the National Center for
+Research Resources of the National Institutes of Health.  
+The most recent version of this guide, and of the software it
+describes, may be obtained from PhysioNet.
+<LI><A HREF="http://ecg.mit.edu/">The MIT-BIH Database Distribution
 Home Page</A><BR>
-Information about CD-ROM databases of ECGs and other physiologic signals,
-and related software.  This is the source for the software described in this
-guide.
+Information about obtaining CD-ROMs containing many of the databases
+available from PhysioNet, and printed copies of this and related manuals,
+can be found here.
 <LI><I><A HREF="../dbag/dbag.htm">WFDB Applications Guide</A></I>
 <BR>
 Includes <TT>man</TT> pages for the applications included in the WFDB Software

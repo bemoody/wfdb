@@ -1,4 +1,4 @@
-.TH WFDB 3 "17 May 1999" "WFDB software 10.0" "WFDB library"
+.TH WFDB 3 "11 January 2000" "WFDB software 10.0" "WFDB library"
 .SH NAME
 wfdb \- Waveform Database library
 .SH SYNOPSIS
@@ -179,8 +179,8 @@ stubs for linking with applications that use \fBwfdb.dll\fR
 (On systems that support GNU emacs, the \fIGuide\fR may be available on-line
 using emacs \fIinfo\fR;  from within \fIemacs\fR, type control-H followed by
 \fIi\fR to find out.  An HTML version may be installed on your system (in
-\fI/usr/help/html/dbpg\fP);  the most recent version can be viewed at
-\fBhttp://ecg.mit.edu/dbpg/\fP if you have Internet access.
+\fI/usr/help/html/dbpg\fP);  the most recent version can be viewed on-line at
+\fBhttp://www.physionet.org/physiotools/dbpg/\fP.
 .PP
 The WFDB library can also be used with Fortran programs;  see the \fIGuide\fR
 for details.
@@ -189,3 +189,13 @@ All functions that return an \fBint\fR indicate errors with negative
 values.  Depending on context, zero returns may indicate success or
 failure.  Positive values indicate success.  Most errors other than
 EOF are accompanied by diagnostics on the standard error output.
+.SH AUTHORS
+George B. Moody (george@mit.edu), with contributions from many sources.
+The predecessor of the WFDB library was originally implemented in C by
+George Moody and Ted Baker, based on earlier designs by Paul Schluter and
+Larry Siegal.  Other contributors of code and ideas include Paul Albrecht,
+Mike Dakin, Phil Devlin, Scott Greenwald, David Israel, Roger Mark, Joe Mietus,
+and Warren Muldrow.  Pat Hamilton and Bob Farrell contributed ports, to MacOS
+and Win32 respectively.
+.SH SOURCES
+http://www.physionet.org/physiotools/wfdb/lib/

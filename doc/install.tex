@@ -1,7 +1,8 @@
 \documentstyle[twocolumn]{article}
 
 \title{Installing the WFDB Software Package}
-\author{}
+\author{George B. Moody\\
+Harvard-MIT Division of Health Sciences and Technology, Cambridge, MA, USA}
 \date{}
 
 \begin{document}
@@ -13,87 +14,123 @@
 \def\textheight{224 mm}
 \flushbottom
 % \pagestyle{empty}	% uncomment to suppress page numbering
-\setcounter{page}{98}
+\setcounter{page}{105}
 
 \maketitle
 
-\subsection*{Obtaining the WFDB Software Package}
+\section*{Obtaining the WFDB Software Package}
 
 Several versions of the WFDB Software Package, differing in their completeness,
-are available.  From our web site ({\tt http://ecg.mit.edu}) you may obtain
-up-to-date sources for the WFDB Software Package, as well as binary versions for
-various popular operating systems.  (Currently these include x86 Linux, Sparc
-Solaris, Sparc SunOS, and MS-DOS/MS-Windows.)  If you have been using earlier
-versions of this software included on the first, second, or third editions of
-the {\it MIT-BIH Arrhythmia Database CD-ROM}, the {\it MIT-BIH PolysomnographicDatabase CD-ROM}, the {\it European Society of Cardiology ST-T Database
-CD-ROM}, or the {\it Massachusetts General Hospital/Marquette Foundation
-Waveform Database CD-ROMs}, you should update your software by downloading the
-newer versions available from our web site (or from one of our more recent
-CD-ROMs, see below).
+are available.  From PhysioNet ({\tt http://www.physionet.org/}) you may obtain
+up-to-date sources for the WFDB Software Package, including WAVE and WVIEW, as
+well as binary versions for various popular operating systems.  (Currently
+these include x86 Linux, Sparc Solaris, Sparc SunOS, and MS-DOS/MS-Windows.)
+If you have been using earlier versions of this software included on the first,
+second, or third editions of the {\it MIT-BIH Arrhythmia Database CD-ROM}, the
+{\it MIT-BIH PolysomnographicDatabase CD-ROM}, the {\it European Society of
+Cardiology ST-T Database CD-ROM}, or the {\it Massachusetts General
+Hospital/Marquette Foundation Waveform Database CD-ROMs}, you should update
+your software by downloading the newer versions available from PhysioNet (or
+from one of our more recent CD-ROMs, see below).
+
+The most recent stable version of the package may be obtained by downloading
+either {\tt http://www.\-physio\-net.\-org/\-physio\-tools/\-wfdb.tar.gz}
+(sources and documentation) or {\tt
+http://www.\-physio\-net.\-org/\-physio\-tools/\-wfdb-no-docs.tar.gz}
+(sources only).
+There may also be a development version available at either {\tt
+http://www.\-physio\-net.\-org/\-physio\-tools/\-beta/\-wfdb.tar.gz}
+(sources and documentation) or {\tt
+http://www.\-physio\-net.\-org/\-physio\-tools/\-beta/\-wfdb-no-docs.tar.gz}
+(sources only).
+These files are gzip-compressed UNIX tar archives, which can be decompressed
+and unpacked using {\tt gzip} and {\tt tar} under any version of UNIX using
+a command such as
+\begin{verbatim}
+gzip -d <wfdb.tar.gz | tar xfv -
+\end{verbatim}
+or (with modern versions of {\tt tar})
+\begin{verbatim}
+tar xfvz wfdb.tar.gz
+\end{verbatim}
+This creates a source tree beginning with a directory named {\tt wfdb}.  {\tt
+gzip} and {\tt tar} are also freely available for MS-DOS, MS-Windows, OS/2,
+and many other operating systems.  The popular WinZip utility for MS-Windows
+can also decompress and unpack these files, but be sure to restore their
+original names if your browser has renamed them (WinZip can only recognize the
+format if the file name ends in ``{\tt .tar.gz}'', and some browsers will
+change the first ``.'' to ``\_'' in the name of the downloaded file).
+
+Alternatively, you may download individual files from the on-line WFDB source
+tree ({\tt http://www.\-physio\-net.\-org/\-physio\-tools/\-wfdb/} for
+the stable version,
+or ({\tt http://www.\-physio\-net\-.org/\-physio\-tools/\-beta/\-wfdb/} for
+the development version).
 
 The complete WFDB Software Package (both sources and binaries for
-Linux, Solaris, SunOS, and MS-DOS/MS-Windows) is included on the {\it
-MIT-BIH Arrhythmia Database CD-ROM} (fourth edition), and also on the
-{\it Software for Physiologic Databases with Samples CD-ROM},
+Linux, Solaris, SunOS, and MS-DOS/MS-Windows) is also included on
+the {\it MIT-BIH Arrhythmia Database CD-ROM} (fourth edition) and on the
+{\it Software for Physiologic Databases with Samples CD-ROM}, both
 available from MIT (see {\tt http://ecg.mit.edu/} for information
-about these CD-ROMs).  Installation instructions are included in {\tt
-software/README.TXT} on these CD-ROMs.
+about these CD-ROMs).  If you wish to compile the WFDB sources from one of
+these CD-ROMs, begin by copying the entire contents of the {\tt wfdb} source
+tree from the CD-ROM to a writable hard drive.
 
-\subsection*{Choosing an installation method}
+\section*{Choosing an installation method}
 
-From within the {\tt software} directory of your hard disk (if you have
-downloaded the WFDB Software Package from our web site or FTP server), or from
+From within the {\tt wfdb} directory of your hard disk (if you have
+downloaded the WFDB Software Package from PhysioNet), or from
 within the {\tt software} directory of your CD-ROM, follow the instructions
 appropriate for your operating system.
 
 \subsection*{If you use Linux, SunOS, or Solaris}
 
-Examine the script {\tt install.unx} in the {\tt software} directory,
-then run it (you will need root permissions to do so successfully on
-most systems).  This script will identify your operating system and
-install the appropriate binaries in {\tt /usr/local/bin} (other files
-needed by the WFDB Software Package will be installed in other
-subdirectories of {\tt /usr/local}).
-
-If you wish to customize or recompile the WFDB Software Package, follow the
-instructions in the next paragraph, for users of other Unices.
+Examine {\tt wfdb/Makefile} for information about compiling the WFDB Software
+Package on your system.  In most cases, you will need to change a few settings
+in {\tt wfdb/Makefile} to configure the software for your system, then type
+{\tt make} to compile and install the software.  You will need root permissions
+to install the software in the standard locations.
 
 \subsection*{If you use another version of Unix}
 
 The WFDB Software Package has been successfully compiled on dozens of Unix
 variants, using both ANSI/ISO and K\&R C compilers.
 
-Copy the source files (in the {\tt software/wfdb} directory) to a working
-directory on your hard disk, then examine {\tt wfdb/Makefile} for information
-about compiling the WFDB Software Package on your system.  In most cases, you
-will need to change a few settings in {\tt wfdb/Makefile} to configure the
-software for your system, then type {\tt make} to compile the software, and
-{\tt make install} to install it.  You will need root permissions to install
-the software in the standard locations.  
-
 If you would like to use {\sf WAVE} on a UNIX system other than Linux,
 Solaris, or SunOS, you will need to port XView to your system first
 (or purchase a commercial port if one is available).  Sources for
-XView are supplied on our CD-ROMs, and are also available from our
-web/FTP server ({\tt ecg.mit.edu}) as well as from {\tt
-sunsite.unc.edu}, {\tt tsx-11.mit.edu}, and their mirrors.  \emph{We
+XView are supplied on our CD-ROMs, and are also available from PhysioNet
+({\tt www.physionet.org}) as well as from {\tt
+metalab.unc.edu}, {\tt tsx-11.mit.edu}, and their mirrors.  \emph{We
 cannot offer assistance in porting XView; if you wish to try this, you
 are on your own.}  If you successfully port the {\tt cmdtool} terminal
 emulator application included in the XView sources, we will assist you
 in porting {\sf WAVE} (this is much simpler than the XView port).
 
+If you are not planning to port {\sf WAVE}, edit {\tt wfdb/Makefile} to
+remove any lines that begin with ``{\tt cd wave;}''.
+
+Make any other necessary changes in {\tt wfdb/Makefile} for your
+system, then type {\tt make} to compile and install the WFDB Software
+Package.  You will need root permissions to install the software in the
+standard locations.
+
+
 \subsection*{If you use MS-DOS or MS-Windows}
 
-Run {\tt install.exe} from the {\tt software} directory.  Follow the
-on-screen directions to choose the installation directories, to set up
-your WFDB path, and to calibrate your display.  Detailed instructions
-may be found in {\tt software/MSDOS.TXT}.
+%% This is out-of-date.  For now, look at the files named 'makefile.dos'
+%% in the subdirectories of 'wfdb'.
+% Run {\tt install.exe} from the {\tt software} directory.  Follow the
+% on-screen directions to choose the installation directories, to set up
+% your WFDB path, and to calibrate your display.  Detailed instructions
+% may be found in {\tt software/MSDOS.TXT}.
 
 The source files within the {\tt wfdb} directory are in UNIX text format
 (newlines are marked by ASCII line feed characters only).  Most MS-DOS C and
 C++ compilers and text editors can process UNIX-format text files without
 difficulty; if you wish to convert these files to MS-DOS native text file
-format, however, first install {\tt msdos/bin/u2d.exe} into a directory in your
+format, however, first install {\tt u2d} (available from
+{tt http://www\-.physio\-net.org/\-physio\-tools/\-bi\-naries/\-msdos/\-bin/u2d.exe}) into a directory in your
 {\tt PATH}, copy the UNIX-format files to a writable directory, change to that
 directory, and type `{\tt u2d *.*}'.   (You may name individual files to be
 converted if you prefer. `{\tt u2d}' does not modify binary files or files
@@ -120,11 +157,12 @@ ANSI C compiler.  The UNIX and MS-DOS {\tt make} description files
 ({\tt Makefile} and {\tt makefile.dos} in {\tt software/wfdb} and in
 each of its subdirectories) should get you started.
 
-Notes for Macintosh users can be found in {\tt software/MAC.TXT}, and
-in {\tt software/wfdb/MAC.TXT}.  These include detailed instructions
-for compiling the WFDB library using Symantec's Think C.  Since most
-of the applications are command-line oriented, they will require minor
-modifications to run under the Mac OS.
+%% This is also out-of-date.
+% Notes for Macintosh users can be found in {\tt software/MAC.TXT}, and
+% in {\tt software/wfdb/MAC.TXT}.  These include detailed instructions
+% for compiling the WFDB library using Symantec's Think C.  Since most
+% of the applications are command-line oriented, they will require minor
+% modifications to run under the Mac OS.
 
 \section*{Your comments are requested}
 

@@ -1,9 +1,9 @@
 \" file: appguide.int		G. Moody	July 1989
-\"				Last revised:	17 May 1999
+\"				Last revised: 6 January 2000
 \" Table of contents and introduction to the WFDB Applications Guide.
 \"
 \" To print this document using GNU groff, use:
-\"     tbl appguide.int | groff -ms
+\"     tbl appguide.int | groff -mgs
 \" To print this using standard UNIX troff and Adobe TranScript software, use:
 \"     tbl appguide.int | ptroff -ms
 \"
@@ -15,6 +15,7 @@
 \" See the Makefile in this directory for details.
 \"
 .af PN i
+.bp 2
 .bp 3
 .ce 999
 .ps 16
@@ -30,61 +31,64 @@ l l r.
 
 \fBSection 1: Applications\fP
 a2m, ad2m, m2a, md2a	utilities for converting between MIT and AHA DB formats	1
-bxb	ANSI/AAMI-standard beat-by-beat annotation comparator	3
-calibrate	calibrate signals of a DB record	5
-coherence	estimate coherence and cross-spectrum of two time series	7
-ecgeval	generate and run ECG analyzer evaluation script	15
-epic	ANSI/AAMI-standard episode-by-episode annotation comparator	16
-fft	fast Fourier transform	18
-fir	general-purpose FIR filter for WFDB records	20
-hrfft, hrlomb, hrmem, hrplot	calculate and plot heart rate power spectra	22
-ihr	calculate instantaneous heart rate	23
-log10	calculate common logarithms of two-column data	24
-lomb	estimate power spectrum using the Lomb periodogram method	25
-memse	estimate power spectrum using maximum entropy (all poles) method	26
-mfilt	general-purpose median filter for WFDB records	28
-mrgann	merge annotation files	29
-mxm	ANSI/AAMI-standard measurement-by-measurement comparator	31
-nst	noise stress test for ECG analysis programs	33
-plot2d, plot3d	make 2-D or 3-D plots from text files of data, using \fIgnuplot\fR	36
-plotstm	produce scatter plot of ST measurement errors on a PostScript device	38
-pschart	produce annotated `chart recordings' on a PostScript device	39
-psfd	produce annotated `full-disclosure' plots on a PostScript device	42
-rdann	read a WFDB annotation file	46
-rdsamp	read WFDB signal files	47
-rxr	ANSI/AAMI-standard run-by-run annotation comparator	48
-sample	digitize and replay analog signals (MS-DOS only)	50
-setwfdb, cshsetwfdb	set WFDB environment variables	54
-sigamp	measure signal amplitudes of a WFDB record	55
-skewedit	edit skew fields of header file(s)	56
-snip	copy an excerpt of a WFDB record	57
-sortann	rearrange annotations in canonical order	58
-sqrs	single-channel QRS detector	59
+bxb	ANSI/AAMI-standard beat-by-beat annotation comparator	4
+calibrate	calibrate signals of a DB record	6
+coherence	estimate coherence and cross-spectrum of two time series	8
+ecgeval	generate and run ECG analyzer evaluation script	9
+epic	ANSI/AAMI-standard episode-by-episode annotation comparator	10
+fft	fast Fourier transform	12
+fir	general-purpose FIR filter for WFDB records	14
+hrfft, hrlomb, hrmem, hrplot	calculate and plot heart rate power spectra	16
+ihr	calculate instantaneous heart rate	18
+log10	calculate common logarithms of two-column data	19
+lomb	estimate power spectrum using the Lomb periodogram method	20
+memse	estimate power spectrum using maximum entropy (all poles) method	21
+mfilt	general-purpose median filter for WFDB records	23
+mrgann	merge annotation files	24
+mxm	ANSI/AAMI-standard measurement-by-measurement comparator	26
+nst	noise stress test for ECG analysis programs	28
+plot2d, plot3d	make 2-D or 3-D plots from text files of data, using \fIgnuplot\fR	31
+plotstm	produce scatter plot of ST measurement errors on a PostScript device	33
+pschart	produce annotated `chart recordings' on a PostScript device	34
+psfd	produce annotated `full-disclosure' plots on a PostScript device	38
+rdann	read a WFDB annotation file	42
+rdsamp	read WFDB signal files	44
+rxr	ANSI/AAMI-standard run-by-run annotation comparator	45
+sample	digitize and replay analog signals (MS-DOS only)	47
+setwfdb, cshsetwfdb	set WFDB environment variables	51
+sigamp	measure signal amplitudes of a WFDB record	53
+skewedit	edit skew fields of header file(s)	54
+snip	copy an excerpt of a WFDB record	55
+sortann	rearrange annotations in canonical order	56
+sqrs	single-channel QRS detector	58
 sumann	summarize the contents of a WFDB annotation file	60
 sumstats	derive aggregate statistics from bxb, rxr, etc., line-format output	61
 tach	heart rate tachometer	62
 view, vsetup	WFDB browser for MS-DOS	64
 wave	waveform analyzer, viewer, and editor for the X Window System	67
-wfdbcollate	collate WFDB records into a multi-segment record	8
-wfdbdesc	read signal specifications	9
-wfdbwhich	find a WFDB file and print its pathname	14
-wrann	write a WFDB annotation file	77
-wrsamp	write WFDB signal files	78
-wview	WFDB browser for MS Windows	80
-xform	sampling frequency, amplitude, and format conversion for WFDB records	84
+wfdbcollate	collate WFDB records into a multi-segment record	77
+wfdbdesc	read signal specifications	79
+wfdbwhich	find a WFDB file and print its pathname	80
+wrann	write a WFDB annotation file	81
+wrsamp	write WFDB signal files	82
+wview	WFDB browser for MS Windows	84
+xform	sampling frequency, amplitude, and format conversion for WFDB records	88
+
 
 \fBSection 3: WFDB library\fP
-wfdb	Waveform Database library	86
+wfdb	Waveform Database library	90
+
 
 \fBSection 5: WFDB file formats\fP
-annot	WFDB annotation file formats	88
-header	WFDB header file format	91
-signal	WFDB signal file formats	97
-wfdbcal	WFDB calibration file format	89
+annot	WFDB annotation file formats	93
+header	WFDB header file format	94
+signal	WFDB signal file formats	101
+wfdbcal	WFDB calibration file format	103
+
 
 \fBAppendices\fP
-	\fIInstalling the WFDB Software Package\fP	98
-	\fIEvaluating ECG Analyzers\fP	100
+	\fIInstalling the WFDB Software Package\fP	105
+	\fIEvaluating ECG Analyzers\fP	107
 .TE
 
 .LP
@@ -169,10 +173,10 @@ to add \fB/usr/local/man\fR to your \fBMANPATH\fR environment variable, in
 order to make these pages accessible to \fIman\fR.
 .PP
 An HTML version of this guide is also available;  point your Web browser to
-\fBhttp://ecg.mit.edu/dbag/\fR to read it.  The HTML version of this guide is
-also supplied on our CD-ROMs that include the WFDB Software Package;  begin by
-pointing your browser to \fBfile:///cdrom/dbag/dbag.htm\fR (under UNIX, if
-the mount point for your CD-ROM is \fB/cdrom\fR), or to
+\fBhttp://www.physionet.org/physiotools/dbag/\fR to read it.  The HTML version
+of this guide is also supplied on our CD-ROMs that include the WFDB Software
+Package;  begin by pointing your browser to \fBfile:///cdrom/dbag/dbag.htm\fR
+(under UNIX, if the mount point for your CD-ROM is \fB/cdrom\fR), or to
 \fBfile:///d|/html/dbag.htm\fR (under MS-DOS, if your CD-ROM is the D: drive).
 .PP
 The notations that appear at the bottom of each page indicate the date when

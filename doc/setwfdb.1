@@ -1,4 +1,4 @@
-.TH SETWFDB 1 "24 May 1999" "WFDB software 10.0" "WFDB applications"
+.TH SETWFDB 1 "11 January 2000" "WFDB software 10.0" "WFDB applications"
 .SH NAME
 setwfdb, cshsetwfdb \- set WFDB environment variables
 .SH SYNOPSIS
@@ -18,7 +18,7 @@ the \fI.profile\fR file.
 \fIcshsetwfdb\fR sets \fBWFDB\fR and \fBWFDBCAL\fR similarly for the C-shell.  It
 must be executed using ``source'' as shown above.  It may be convenient to
 include this command in the \fI.cshrc\fR file.
-.SS MS-DOS users:
+.SS MS-DOS/MS-Windows users:
 \fIsetwfdb.bat\fR sets \fBWFDB\fR and \fBWFDBCAL\fR similarly for MS-DOS;  it also
 sets \fBVIEWP\fR (see \fIview\fR(1)).  It may be convenient to include this
 command in the \fIautoexec.bat\fR file (under MS-DOS 3.3 and later, include
@@ -70,3 +70,14 @@ user, the WFDB library uses a default WFDB calibration file
 (\fIwfdbcal\fR, named in \fIwfdblib.h\fR).  If the WFDB calibration
 file is not readable, programs that rely on it may not choose
 appropriate scales for some types of signals.
+.SH AUTHOR
+George B. Moody (george@mit.edu)
+.SH SOURCES
+Note that these are \fItemplates\fR and will need to be customized
+before use:
+.br
+http://www.physionet.org/physiotools/wfdb/app/setwfdb
+.br
+http://www.physionet.org/physiotools/wfdb/app/cshsetwfdb
+.br
+http://www.physionet.org/physiotools/wfdb/app/setwfdb.bat

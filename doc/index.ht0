@@ -9,9 +9,8 @@ physiologic signals</H1>
 <BR> 
 <P>
 <UL>
-<LI><A HREF="http://ecg.mit.edu">The MIT-BIH Database Distribution
-Home Page</A><BR>
-Information about CD-ROM databases of ECGs and other physiologic signals,
+<LI><A HREF="http://www.physionet.org/">PhysioNet</A><BR>
+Freely downloadable databases of ECGs and other physiologic signals,
 and related software.  This is the source for the software described in the
 guides listed below.
 <LI><I><A HREF="dbpg/dbpg.htm">WFDB Programmer's Guide</A></I>

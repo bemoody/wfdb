@@ -1,10 +1,10 @@
 # file: Makefile	G. Moody	24 June 1989
-#			Last revised: 14 November 1999
+#			Last revised:  6 January 2000
 # `make' description file for WFDB software documentation
 #
 # -----------------------------------------------------------------------------
 # WFDB applications: programs for working with annotated signals
-# Copyright (C) 1999 George B. Moody
+# Copyright (C) 2000 George B. Moody
 #
 # These programs are free software; you can redistribute them and/or modify
 # them under the terms of the GNU General Public License as published by the
@@ -22,7 +22,7 @@
 #
 # You may contact the author by e-mail (george@mit.edu) or postal mail
 # (MIT Room E25-505A, Cambridge, MA 02139 USA).  For updates to this software,
-# please visit the author's web site (http://ecg.mit.edu/).
+# please visit PhysioNet (http://www.physionet.org/).
 # _____________________________________________________________________________
 #
 # This file is used with the UNIX `make' command to install on-line
@@ -74,8 +74,8 @@
 # `rman' (to translate the man pages in the Applications Guide).  You also need
 # `texi2html' (included here, to translate the WFDB Programmer's Guide),
 # and Perl (in order to run `latex2html' and `texi2html').  Links to all of
-# these are available from http://ecg.mit.edu, along with the latest versions
-# of the files in this directory.
+# these are available from http://www.physionet.org, along with the latest
+# versions of the files in this directory.
 
 # Printed documentation
 # =====================

@@ -22,7 +22,7 @@ Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 You may contact the author by e-mail (george@mit.edu) or postal mail
 (MIT Room E25-505A, Cambridge, MA 02139 USA).  For updates to this software,
-please visit the author's web site (http://ecg.mit.edu/).
+please visit PhysioNet (http://www.physionet.org/).
 _______________________________________________________________________________
 
 The DB library has been renamed (in version 10.0.0 and later versions) as the

@@ -1,4 +1,4 @@
-.TH BXB 1 "17 May 1999" "MIT DB software 10.0" "WFDB applications"
+.TH BXB 1 "11 January 2000" "MIT DB software 10.0" "WFDB applications"
 .SH NAME
 bxb \- ANSI/AAMI-standard beat-by-beat annotation comparator
 .SH SYNOPSIS
@@ -12,21 +12,21 @@ Recommended Practice (AAMI ECAR-1987).
 Using options \fB-C\fR, \fB-L\fR, or \fB-S\fR, \fIbxb\fR implements
 the beat-by-beat comparison algorithm specified by the current
 American National Standard for ambulatory ECG analyzers (ANSI/AAMI
-EC38-1994).  \fIbxb\fR is the reference implementation of these
+EC38:1998).  \fIbxb\fR is the reference implementation of these
 algorithms, and must be used to obtain the beat-by-beat performance
 statistics cited in EC38 in order to be in compliance with the
-standard.  The EC38 comparison algorithm includes all of the ECAR
-statistics (so that both sets of requirements are satisfied by using
-the EC38 algorithm), with additional statistics on detection of
-supraventricular ectopic beats (SVEBs).  The \fB-C\fR, \fB-L\fR, and
-\fB-S\fR options also gather statistics on RR interval errors, which
-were considered for inclusion in EC38, but were eventually dropped
-from it.
+standard (see EC38, section 5.2.14).  The EC38 comparison algorithm
+includes all of the ECAR statistics (so that both sets of requirements
+are satisfied by using the EC38 algorithm), with additional statistics
+on detection of supraventricular ectopic beats (SVEBs).  The \fB-C\fR,
+\fB-L\fR, and \fB-S\fR options also gather statistics on RR interval
+errors, which were considered for inclusion in EC38, but were eventually
+dropped from it.
 .PP
 Input to this program consists of two annotation files associated with the same
 \fIrecord\fR.  One of these is designated the \fIreference\fR annotation file,
 the other the \fItest\fR annotation file (called the `algorithm' annotation
-file in EC-38 and in ECAR).
+file in EC38 and in ECAR).
 .PP
 \fIOptions\fR include:
 .TP
@@ -157,8 +157,12 @@ ecgeval(1), epic(1), mxm(1), rxr(1), setwfdb(1), sumstats(1)
 \fITesting and Reporting Performance Results of Ventricular Arrhythmia
 Detection Algorithms\fR (publication AAMI ECAR-1987)
 .br
-\fIAmerican National Standard for Ambulatory Electrocardiographs\fR
-(publication ANSI/AAMI EC38-1994)
+\fIAmerican National Standard ANSI/AAMI EC38:1998, Ambulatory
+Electrocardiographs\fR
 .br
 The last two publications are available from AAMI, 3330 Washington Blvd.,
-Suite 400, Arlington, VA 22201 USA.
+Suite 400, Arlington, VA 22201 USA (http://www.aami.org/).
+.SH AUTHOR
+George B. Moody (george@mit.edu)
+.SH SOURCE
+http://www.physionet.org/physiotools/wfdb/app/bxb.c

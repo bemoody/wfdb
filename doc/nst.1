@@ -1,5 +1,5 @@
 '\" t
-.TH NST 1 "20 May 1999" "WFDB software 10.0" "WFDB applications"
+.TH NST 1 "11 January 2000" "WFDB software 10.0" "WFDB applications"
 .SH NAME
 nst \- noise stress test for ECG analysis programs
 .SH SYNOPSIS
@@ -70,20 +70,11 @@ ECG signals, noise signals are paired with more than one clean signal as
 necessary.  For example, if there are three clean signals and two noise
 signals, they are paired and combined as follows:
 .br
-.ie n \{\
     output signal 0 = clean signal 0 + \fIa\fR[0] * noise signal 0 + \fIb\fR[0]
 .br
     output signal 1 = clean signal 1 + \fIa\fR[1] * noise signal 1 + \fIb\fR[1]
 .br
     output signal 2 = clean signal 2 + \fIa\fR[2] * noise signal 0 + \fIb\fR[2]
-.\}
-.el \{\
-    output signal 0 = clean signal 0 + \fIa\s-2\d0\u\s+2\fR * noise signal 0 + \fIb\s-2\d0\u\s+2\fR
-.br
-    output signal 1 = clean signal 1 + \fIa\s-2\d1\u\s+2\fR * noise signal 1 + \fIb\s-2\d1\u\s+2\fR
-.br
-    output signal 2 = clean signal 2 + \fIa\s-2\d2\u\s+2\fR * noise signal 0 + \fIb\s-2\d2\u\s+2\fR
-.\}
 .PP
 The initial values of the gains, \fIa\fR, and offsets, \fIb\fR,
 are zero for all signals (i.e., no noise is added).  In the protocol
@@ -91,12 +82,7 @@ annotation file, the \fItime\fR field of each NOTE annotation
 specifies when gains are to be changed, and the \fIaux\fR field
 specifies new values for the gains (in \fIscanf\fR(3) \fB%lf\fR
 format, beginning with
-.ie n \{\
 \fIa\fR[0];
-.\}
-.el \{\
-\fIa\s-2\d0\u\s+2\fR;
-.\}
 values are separated by white space within the \fIaux\fR field).  The offsets,
 \fIb\fR, are recalculated at these times to cancel out step changes in signal
 levels when gains are changed.  During the intervals between NOTE annotations
@@ -170,18 +156,14 @@ this estimate; if a noise signal is scaled by a gain, \fIa\fR, then \fIN\fR is
 scaled by the square of \fIa\fR.  To obtain the desired \fISNR\fR given \fIS\fR
 and \fIN\fR, \fInst\fR solves for \fIa\fR in the equation:
 .br
-.ie n \{\
     \fISNR\fR = 10 log (\fIS\fR/(\fIN\fR * \fIa\fR**2))
-.\}
-.el \{\
-    \fISNR\fR = 10 log (\fIS\fR/\fINa\fR\s-2\u2\d\s+2)
-.\}
 .PP
 The calculations of \fIS\fR, \fIN\fR, and \fIa\fR are performed separately for
 each pair of clean and noise signals.
 .SS Noise records
-Three noise records suitable for use with \fInst\fR are provided in the
-\fInstdb\fR directory of the MIT-BIH Arrhythmia Database CD-ROM.  These
+Three noise records suitable for use with \fInst\fR are available from
+http://www.physionet.org/physiobank/database/nstdb/ and are also provided
+in the \fInstdb\fR directory of the MIT-BIH Arrhythmia Database CD-ROM.  These
 contain noise of the types typically observed in ECG recordings.  They were
 obtained using a Holter recorder and standard electrodes for ambulatory
 ECG monitoring, on an active subject.  The electrodes were placed on the
@@ -194,7 +176,9 @@ electrodes), with significant amounts of baseline wander and muscle noise as
 well.  Record \fIma\fR contains primarily muscle noise (EMG), with a spectrum
 that overlaps that of the ECG, but which extends to higher frequencies.
 Electrode motion artifact is usually the most troublesome type of noise for
-ECG analyzers, since it can closely mimic characteristics of the ECG.
+ECG analyzers, since it can closely mimic characteristics of the ECG.  For
+this reason, the remaining records in the \fInstdb\fR directory consist of
+noise from record \fIem\fR mixed with clean ECGs by \fInst\fR.
 .PP
 Although an early version of \fInst\fR generated the records in the
 \fInstdb/old\fR directory, the signal-to-noise ratios of these records were not
@@ -211,15 +195,9 @@ c n n c n n.
 118_04	13.77	8.36	119_04	14.29	7.77
 118_06	10.25	4.84	119_06	10.76	4.25
 118_08	7.75	2.34	119_08	8.27	1.75
-118_10	5.81	0.41 (*)	119_10	6.33	-0.19
+118_10	5.81	0.41	119_10	6.33	-0.19
 118_12	4.23	-1.18	119_12	4.74	-1.77
 .TE
-.PP
-(*) On the first edition of the CD-ROM, signal 1 was omitted from record
-118_10.  To reconstruct record 118_10 as intended, compile \fImk118_10.c\fR
-(in the \fIconvert\fR directory of the WFDB software package) and run it.
-The second edition of the CD-ROM contains the corrected version of this
-record.
 .SS Choosing `clean' records
 If the goal is to assess noise robustness, `clean' records are best chosen
 from among those that can be analyzed without error (or with very low error
@@ -255,3 +233,7 @@ wrann(1), signal(5)
 Moody, G.B., Muldrow, W.K., and Mark, R.G.
 ``A noise stress test for arrhythmia detectors'',
 \fIComputers in Cardiology\fR\fB 11\fR:381\-384 (1984).
+.SH AUTHOR
+George B. Moody (george@mit.edu)
+.SH SOURCE
+http://www.physionet.org/physiotools/wfdb/app/nst.c

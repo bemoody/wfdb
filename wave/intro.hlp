@@ -1,6 +1,6 @@
 WAVE: Waveform Analyzer, Viewer, and Editor
 
-Copyright (C) 1990-1999 George B. Moody
+Copyright (C) 1990-2000 George B. Moody
 
 WAVE is an extensible interactive graphical environment for manipulating sets
 of digitized signals with optional annotations.  WAVE is built using the WFDB
@@ -48,4 +48,4 @@ george@mit.edu, or by postal mail to:
     George B. Moody
     MIT Room E25-505A
     Cambridge, MA 02139 USA
-For updates to this software, please visit http://ecg.mit.edu/.
+For updates to this software, please visit http://www.physionet.org/.

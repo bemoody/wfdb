@@ -1,10 +1,10 @@
 /* file: analyze.c	G. Moody	10 August 1990
-			Last revised:	29 April 1999
+			Last revised:	6 January 2000
 Functions for the analysis panel of WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2000 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -21,7 +21,7 @@ Place - Suite 330, Boston, MA 02111-1307, USA.
 
 You may contact the author by e-mail (george@mit.edu) or postal mail
 (MIT Room E25-505A, Cambridge, MA 02139 USA).  For updates to this software,
-please visit the author's web site (http://ecg.mit.edu/).
+please visit PhysioNet (http://www.physionet.org/).
 _______________________________________________________________________________
 
 */
@@ -960,13 +960,13 @@ char *p1;
 		ttysw_input(tty, log_file_name, strlen(log_file_name));
 		p1 = p2 += 3;
 	    }
-	    else if (strncmp(p1, "WFDBCAL", 5) == 0) {
+	    else if (strncmp(p1, "WFDBCAL", 7) == 0) {
 		ttysw_input(tty, cfname, strlen(cfname));
-		p1 = p2 += 5;
+		p1 = p2 += 7;
 	    }
-	    else if (strncmp(p1, "WFDB", 2) == 0) {
+	    else if (strncmp(p1, "WFDB", 4) == 0) {
 		ttysw_input(tty, getwfdb(), strlen(getwfdb()));
-		p1 = p2 += 2;
+		p1 = p2 += 4;
 	    }
 	    else if (strncmp(p1, "TSCALE", 6) == 0) {
 		char s[10];

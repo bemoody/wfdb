@@ -1,4 +1,4 @@
-.TH EPIC 1 "20 May 1999" "WFDB software 10.0" "WFDB applications"
+.TH EPIC 1 "11 January 2000" "WFDB software 10.0" "WFDB applications"
 .SH NAME
 epic \- ANSI/AAMI-standard episode-by-episode annotation comparator
 .SH SYNOPSIS
@@ -7,10 +7,10 @@ epic \- ANSI/AAMI-standard episode-by-episode annotation comparator
 .PP
 This program implements the VF, AF, and ST episode-by-episode
 comparison algorithms specified by the current American National
-Standard for ambulatory ECG analyzers (ANSI/AAMI EC38-1994).  \fIepic\fR
+Standard for ambulatory ECG analyzers (ANSI/AAMI EC38:1998).  \fIepic\fR
 is the reference implementation of these algorithms, and must be used
 to obtain the episode-by-episode performance statistics cited in EC38
-in order to be in compliance with the standard.
+in order to be in compliance with the standard (see EC38, section 5.2.14).
 .PP
 Input to this program consists of two annotation files associated with the same
 \fIrecord\fR.  One of these is designated the \fIreference\fR annotation file,
@@ -138,7 +138,7 @@ The shell variable \fBWFDB\fR should be set and exported (see \fIsetwfdb\fR(1)).
 .TP
 \fInon-standard comparison selected\fR
 The \fB-f\fR, \fB-i\fR, and \fB-t\fR options modify the comparison algorithms
-used by \fIepic\fR in ways not permitted by EC-38.  These options are provided
+used by \fIepic\fR in ways not permitted by EC38.  These options are provided
 for the use of developers, who may find them useful for obtaining a more
 detailed understanding of algorithm errors.
 .SH BUGS
@@ -154,6 +154,10 @@ bxb(1), ecgeval(1), mxm(1), plotstm(1), rxr(1), setwfdb(1), sumstats(1)
 .br
 \fIEvaluating ECG Analyzers\fR (in the \fIWFDB Applications Guide\fR)
 .br
-\fIAmerican National Standard for Ambulatory Electrocardiographs\fR
-(publication ANSI/AAMI EC38-1994);  available from AAMI, 3330 Washington Blvd.,
-Suite 400, Arlington, VA 22201 USA.
+\fIAmerican National Standard ANSI/AAMI EC38:1998, Ambulatory
+Electrocardiographs\fR;  available from AAMI, 3330 Washington Blvd.,
+Suite 400, Arlington, VA 22201 USA (http://www.aami.org/).
+.SH AUTHOR
+George B. Moody (george@mit.edu)
+.SH SOURCE
+http://www.physionet.org/physiotools/wfdb/app/epic.c

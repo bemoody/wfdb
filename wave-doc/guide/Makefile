@@ -1,8 +1,8 @@
-# file: makefile	G. Moody	 9 August 1992
-#			Last revised:	16 April 1997
+# file: Makefile	G. Moody	 9 August 1992
+#			Last revised:	14 January 2000
 # `make' description file for printing the WAVE User's Guide
 
-# Copyright(C) Massachusetts Institute of Technology 1997. All rights reserved.
+# Copyright(C) Massachusetts Institute of Technology 2000. All rights reserved.
 
 # Type `make guide' to print the compressed PostScript source.  You will need
 # gzip, a PostScript printer (or GhostScript and a supported printer), and
@@ -19,6 +19,15 @@
 # WAVE User's Guide by typing `make html' (see below).
 
 # All of the software mentioned above is freely available;  see ../SOURCES.
+
+# TROFF is the name of the program that prints UNIX troff files (needed to
+# format the covers of the guide).  Use `groff' if you have GNU groff (the
+# preferred formatter).
+TROFF = groff
+# Use `ptroff' if you have Adobe TranScript software.
+# TROFF = ptroff
+# Consult your system administrator if you have neither `groff' nor `ptroff'.
+# Other (untested) possibilities are `psroff', `ditroff', `nroff', and `troff'.
 
 # PRINT is the command for printing PostScript files.  If your printer is not
 # a PostScript printer, see the GhostScript documentation to see how to do
@@ -38,6 +47,7 @@ guide:		wug.psz wugcover.psz
 # (included in the TeX distribution) and gzip.
 
 wug.ps:		wug.dvi
+	cp -p ../grey/*.ps .
 	dvips -o wug.ps wug
 
 wug.psz:	wug.ps
@@ -49,6 +59,7 @@ wug.psz:	wug.ps
 # figures, and index correctly.  makeindex is included in the TeX distribution.
 
 wug.dvi:	wug.tex
+	cp -p ../grey/*.ps .
 	latex wug
 	makeindex wug.idx
 	latex wug
@@ -56,7 +67,7 @@ wug.dvi:	wug.tex
 	latex wug
 
 wugcover.psz:
-	ptroff -t cover.wug | gzip >wugcover.psz
+	$(TROFF) cover.wug | gzip >wugcover.psz
 
 # `make html':  process the LaTeX source using latex2html.  This has been
 # tested with latex2html version 96.1.  The file `.latex2html.init' in this
@@ -87,14 +98,13 @@ HTMLDIR = ../../../html
 html:	wug.ps 	# (we also need wug.aux, made with wug.dvi by 'make wug.ps')
 	-mkdir $(HTMLDIR)/wug
 	cp -f wug.ps $(HTMLDIR)/wug/wug.ps
-	cp -f icons/* stdev.c example.xws $(HTMLDIR)/wug
+	cp -f icons/*.png *.png stdev.c example.xws $(HTMLDIR)/wug
 	-mkdir $(HTMLDIR)/dbag
-	cp xview-7.ht0 $(HTMLDIR)/dbag/xview-7.htm
-	cp -f ../color/* .           # use any available color figures
+	../../doc/manhtml.sh $(HTMLDIR)/dbag xview.7
+	cp -f ../grey/*.ps .         # restore greyscale figures
+	cp -f ../color/*.ps .        # use any available color figures
 	latex2html -dir $(HTMLDIR)/wug -local_icons wug
-	cp -f ../grey/* .            # restore greyscale figures
 	./fixindex $(HTMLDIR)/wug    # optional; see above
-	./fixgif $(HTMLDIR)/wug/*.gif # make figure borders transparent
 	cp dossify-html fixlinks $(HTMLDIR)/wug
 	cd $(HTMLDIR)/wug; ./dossify-html *.html
 	cd $(HTMLDIR)/wug; rm -f dossify-html fixlinks *.html *.orig
@@ -106,7 +116,7 @@ html:	wug.ps 	# (we also need wug.aux, made with wug.dvi by 'make wug.ps')
 
 clean:
 	rm -f wug.aux wug.dvi wug.idx wug.ilg wug.ind wug.lof wug.log wug.toc
-	rm -f wug.ps *~
+	rm -f wug.lot wug.psz *.ps wugcover.psz internals.pl labels.pl stdev *~
 
 # `make stdev':  This is an example program used in chapter 3 of the WAVE
 # User's Guide.

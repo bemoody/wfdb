@@ -1,14 +1,14 @@
 This is the WAVE FAQ (frequently asked questions) list.  It was last revised on
-7 September 1999 (recent changes are marked with `*' below).
+7 January 2000 (recent changes are marked with `*' below).
 
 Hardware questions:
- . Can I use WAVE if I don't have a SparcStation?
+ * Can I use WAVE if I don't have a SparcStation?
  . How can I use WAVE from an X terminal, PC, Mac, etc.?
  . Can I run WAVE remotely using a modem?
  . How can I insert annotations using a two-button mouse?
  . How do I get spot help if I don't have a `Help' key?
 Problems starting WAVE:
- . Why won't WAVE run?
+ * Why won't WAVE run?
  * Why does WAVE take so long to display the first screen?
  . Where do I find the missing fonts?
 Display-related questions:
@@ -24,8 +24,8 @@ File-related questions:
  . I can't find the file named `RECORD'!
  * Why does WAVE tell me `Record ... is unavailable'?
  * How can I view a record stored on a web site or an FTP server?
- * Where is my annotation file?
 Questions about editing:
+ * Where are my annotations?
  . Why does WAVE tell me `You may not edit annotations ...'?
  * How do I edit a record on a CD-ROM, a web site, or an FTP server?
  * How can I undo an edit?
@@ -35,7 +35,7 @@ Questions about editing:
  . What are `link' annotations?
  . Can WAVE edit signal files?
 What else can WAVE do?
- . How can I make a screen dump?
+ * How can I make a screen dump?
  . Can WAVE read digitized signals in (fill in the blank) format?
  . What is ``high-resolution'' mode?
  . Can WAVE open more than one record at once?
@@ -46,7 +46,7 @@ What else can WAVE do?
  . Can WAVE scroll through a record without user intervention?
  . How can I use WAVE's menu variables in a script or other program?
  * Is there a Motif version of WAVE?
- . How can I find out about ...?
+ * How can I find out about ...?
 
 If your question is not on this list, and you think it should be, please
 send it to me (george@hstbme.mit.edu)!
@@ -60,24 +60,21 @@ Can I use WAVE if I don't have a SparcStation?
 
 If you have a 386, 486, or Pentium-based PC with a VGA card, mouse, at least
 8 Mb of RAM and 100 Mb of available disk space, you can run WAVE under Linux,
-a freely available UNIX clone for the PC.
+a freely available UNIX clone for the PC.  Users have reported that WAVE can
+be compiled and run successfully on DEC Alpha-based workstations under Linux,
+and (in principle) it should be possible to run WAVE on any other type of
+CPU supported by Linux (the list currently includes MIPS, PowerPC, Sparc, ARM,
+as well as x86 and Alpha CPUs).
 
 If you have any networked computer that can run X11R4 or a later version
 (this includes all current UNIX workstations, PCs, Macintoshes, and a variety
-of other systems), and access via network to either a SparcStation or a
-PC running Linux, you can run WAVE remotely (see the next question).
-
-Otherwise, you're out of luck at present.  WAVE requires X11R4 or later and
-the XView toolkit (both are freely available in source form for UNIX systems).
-Please write to me (address above) if you would like to try porting WAVE to
-another version of UNIX.
+of other systems), and access via network to another computer that can host
+WAVE (see above), you can run WAVE remotely (see the next question).
 
 Other WFDB applications (WVIEW for Microsoft Windows, VIEW for MS-DOS, MacView
-for the Macintosh, dbtool for SunView, dbplot for a variety of graphics
-terminals and plotters under UNIX, and pschart and psfd for PostScript devices)
-offer many of the display features of WAVE in other environments;  none of
-these currently support annotation editing or control of external programs,
-however.
+for the Macintosh, and pschart and psfd for PostScript devices) offer many of
+the display features of WAVE in other environments;  none of these currently
+support annotation editing or control of external programs, however.
 
 
 How can I use WAVE from an X terminal/PC/Mac/etc?
@@ -98,7 +95,7 @@ steps:
    in order to make it possible for X clients on YON to open windows on your
    screen.  If HITHER is a UNIX system, you can accomplish this by typing
    (on HITHER) `xhost +YON'.
- - Remotely log in to YON (for example, via telnet), and set the DISPLAY
+ - Remotely log in to YON (for example, via ssh or telnet), and set the DISPLAY
    environment variable on YON to point back to your display.  If you use the
    C-shell on YON, this will normally be done by `setenv DISPLAY HITHER:0.0'.
    Bourne shell, Korn shell, and `bash' users should type `DISPLAY=HITHER:0.0;
@@ -206,7 +203,7 @@ Here are a few things to check:
    on your system (for example, using a command such as
 	find / -name libxview.so.3 -print
    If any of these libraries cannot be found on your system, it may be
-   downloaded from http://ecg.mit.edu .  Add the directories in which the
+   downloaded from http://www.physionet.org/.  Add the directories in which the
    missing libraries are found to your LD_LIBRARY_PATH.  For example, if the
    missing libraries are located in /usr/openwin/lib, and you are using the
    C-shell, use the command
@@ -239,11 +236,8 @@ Here are a few things to check:
     text in the signal window!' below.
   * If you see a correct display, your problem is specific to the record you
     were previously trying to view.  Find the directory containing the header
-    file for the desired record, and append the name of that directory to the
-    value of WFDB.  If the record is on a CD-ROM, or was copied from a CD-ROM,
-    its header file is `RECORD.hea' (where RECORD is the record name);
-    otherwise, its name is probably `header.RECORD'.
-
+    file (`RECORD.hea', where RECORD is the record name) for the desired
+    record, and append the name of that directory to the value of WFDB.
 
 Why does WAVE take so long to display the first screen?
 -------------------------------------------------------
@@ -332,10 +326,11 @@ the signal names along the left edge of the window.  If there are no signal
 names visible, click on `View...', then on `signal names' and `Redraw' in the
 View panel.  If signal names still do not appear, either the header file or
 the signal file for the record you have opened may be inaccessible.  Find these
-files (see the next question), add the directory that contains them to your
-WFDB path, and try to read a few samples using `rdsamp -r RECORD -t 1'.  If
-this fails, examine the header file for the record (a text file), and be sure
-that it specifies at least one signal in an accessible signal file.
+files (see `File-related questions', below), add the directory that contains
+them to your WFDB path, and try to read a few samples using
+	rdsamp -r RECORD -t 1
+If this fails, examine the header file for the record (a text file), and be
+sure that it specifies at least one signal in an accessible signal file.
 
 
 I can't see text in the signal window!
@@ -375,16 +370,16 @@ Use `xdpyinfo' (a standard X client that is provided as part of the X core
 distribution) to check several server parameters.  (As with virtually all X
 clients, it doesn't matter which machine you find `xdpyinfo' on; it will query
 your server from wherever it is run.)  `xdpyinfo' will report the version and
-release numbers of your server; you should have version 11, release 3 or
-later.  It will also report the screen size in pixels and the resolution in
-pixels per inch.  Take a minute to verify the screen resolution by direct
-measurement of the screen with a ruler.  If the resolution reported by
-`xdpyinfo' is incorrect, WAVE will not be able to draw waveforms at properly
-calibrated scales.  The sample X11 servers from MIT all support a `-dpi'
-option, which allows you to specify the correct screen resolution at the time
-the server is started;  read the man page for X for details.  (If your server
-does not support this feature, WAVE can be given a similar `-dpi' option;  see
-Options, above.)
+release numbers of your server; you should have version 11, release 3 or later.
+It will also report the screen size in pixels and the resolution in pixels per
+inch.  Take a minute to verify the screen resolution by direct measurement of
+the screen with a ruler.  If the resolution reported by `xdpyinfo' is
+incorrect, WAVE will not be able to draw waveforms at properly calibrated
+scales.  The sample X11 servers from MIT and the X Consortium, and the XFree86
+project's X11 servers, all support a `-dpi' option, which allows you to specify
+the correct screen resolution at the time the server is started; read the man
+page for X or Xserver for details.  (If your server does not support this
+feature, WAVE can be given a similar `-dpi' option; see Options, above.)
 
 You can also double-check your display calibration using WAVE itself.  Run
 WAVE, enable the grid display, and set the display scales to their default
@@ -462,9 +457,9 @@ Everything in the Analysis Commands window appears twice!
 ---------------------------------------------------------
 
 This problem, which may occur when you are running WAVE under Linux, appears to
-result from a bug in the Linux version of the XView `termsw' package. Type the
-command `stty -echo' in the Analysis Commands window, and the problem should go
-away.
+result from a bug in an early Linux version of the XView `termsw' package.
+Type the command `stty -echo' in the Analysis Commands window, and the problem
+should go away.
 
 
 File-related questions
@@ -521,30 +516,33 @@ and finally on sand.bar.com's FTP server.  Unless you have a slow network
 connection, you may not notice any difference between viewing locally and
 remotely stored records.
 
-Where is my annotation file?
-----------------------------
+Questions about editing
+=======================
 
-When you edit an annotation file, WAVE makes a copy with your edits, gives it a
-name of the form RECORD.ANNOTATOR, and saves it in the current directory (i.e.,
-whatever directory was current when you started WAVE).  To be able to read your
-edited copy in a later WAVE session, be sure that the directory that contains
-your edited copy is listed in your WFDB path *before* any other directory that
-contains an older version of the same annotation file.  Usually, your WFDB path
-begins with `.', a synonym for the current directory.  If this is the case,
-simply return to the directory that contains your edited annotation file before
-starting WAVE each time.
+Where are my annotations?
+-------------------------
+
+When you create a new set of annotations, if you have specified the annotator
+name in the Load window, WAVE saves your annotations in a new file with a name
+of the form RECORD.ANNOTATOR, in the current directory.  When you edit an
+existing set of annotations, WAVE makes a copy of the annotation file
+containing your edits, gives it a name of the form RECORD.ANNOTATOR, and saves
+it in the current directory (i.e., whatever directory was current when you
+started WAVE).  To be able to read your annotations in a later WAVE session, be
+sure that the directory that contains your edited copy is listed in your WFDB
+path *before* any other directory that contains an older version of the same
+annotation file.  Usually, your WFDB path begins with `.', a synonym for the
+current directory.  If this is the case, simply return to the directory that
+contains your edited annotation file before starting WAVE each time.
 
 If you created an annotation file without specifying an annotator name,
 WAVE uses its own name as the annotator name, so you should look for a file
-named `RECORD.wave' in this case. 
+named `RECORD.wave' in this case.  
 
 Old versions of WAVE created annotation files with names of the form
 ANNOTATOR.RECORD;  if you have any of these, rename them in order to continue
 using them with WAVE.
 
-
-Questions about editing
-=======================
 
 Why does WAVE tell me `You may not edit annotations ...'?
 ---------------------------------------------------------
@@ -705,8 +703,11 @@ How can I make a screen dump?
 If you really want a screen dump,
 	xwd | xpr
 will produce one in PostScript form.  (Type `man xwd' and `man xpr' for details
-on options.)  If your printer is not a PostScript printer, you can still print
-the output of xpr using Ghostscript, a freely available PostScript interpreter.
+on options.)  Another way to do this, if xpr is not available, is
+	xwd | xwdtopnm | pnmdepth 255 | pnmtops
+If your printer is not a PostScript printer, you can still print
+the output of either of these commands using Ghostscript, a freely available
+PostScript interpreter.
 
 Why settle for a screen dump, though?  In most cases, you will prefer to use
 `pschart' to produce a much nicer plot, and in much less time.  Select `Print'
@@ -766,7 +767,7 @@ view it with WAVE via this expedient:
 
   *  First, check that the block size in samples is no greater than
      WFDB_MAXSPF, a symbol defined in the WFDB library header file wfdb.h
-     (which you will probably find in /usr/local/include/wfdb). If necessary,
+     (which you will probably find in /usr/include/wfdb). If necessary,
      increase the value of WFDB_MAXSPF, recompile and reinstall the shared
      WFDB library (libwfdb.so.*), and check to be sure that WAVE loads this
      version of the WFDB library (use the command ldd `which wave`).
@@ -834,10 +835,10 @@ outlined above for reading block-interleaved files can be used to read EDF
 files, a difficulty in doing so is that the block size is specified within the
 embedded header, and may vary between records.  Moreover, since typical block
 sizes are quite large, the time resolution of annotations in this case is very
-coarse. A format converter for EDF files, edf2mit, may be used to rewrite such
-files in a format that WAVE can read without these limitations. This converter
-also constructs a suitable header file from the embedded header in the EDF
-file.
+coarse. A format converter for EDF files, edf2mit (available from PhysioNet,
+http://www.physionet.org/), may be used to rewrite such files in a format that
+WAVE can read without these limitations. This converter also constructs a
+suitable header file from the embedded header in the EDF file.
 
 All currently supported signal formats use 16 bits per sample or less.  In
 principle, formats requiring up to 32 bits per sample should pose no problem
@@ -1033,11 +1034,15 @@ Motif's buggy, ugly, proprietary, bloated, kludgy procedural interface over
 XView's buggy, attractive, non-proprietary, streamlined, elegant
 object-oriented interface (end of rant). 
 
-Motif has clearly become the standard, however, and a consequence of this is
-that the Open Look user interface presented by WAVE is unfamiliar to many
-users. There is a scarcity of introductory material for Open Look in print.
-Unfortunately, the Motif API is vastly different from the XView API with
-which WAVE is written, and a port to Motif would be decidedly non-trivial. 
+Motif and its lookalikes (notably GTK+, Qt, and LessTif) have clearly become
+the standard, however, and a consequence of this is that the Open Look user
+interface presented by WAVE is unfamiliar to many users. There is a scarcity
+of introductory material for Open Look in print (but there is an excellent
+and comprehensive set of documentation available on CD-ROM from Darwin Open
+Systems, http://www.darwinsys.com/).  Unfortunately, the Motif API, and those
+of its lookalikes, are vastly different from the XView API with which WAVE is
+written, and a port to a Motif-like user interface would be decidedly
+non-trivial.
 
 
 How can I find out about ...?
@@ -1050,16 +1055,15 @@ There are several sources of information about WAVE:
    use existing WFDB applications under WAVE's control, refer to the WFDB
    Applications Guide.  If you need to develop your own applications for use
    with WAVE, read the WFDB Programmer's Guide.  Printed copies of
-   these guides may be purchased from MIT, or you may print your own copies on
-   a PostScript printer by following the instructions in the `manuals.doc' file
-   distributed with WAVE.
+   these guides may be purchased from MIT, or you may read them on-line or
+   print your own copies (visit http://www.physionet.org/).
    
  * The on-line version of the WAVE User's Guide can be opened for browsing by
    clicking left on `User's Guide' in WAVE's Help Topics window (this requires
    WAVE 6.0 or later, and Netscape 1.1 or later on the WAVE host). This guide
    may also be read with any Web browser independently of WAVE (point your
-   browser to file:/usr/local/help/html/wug/wug.htm if you have installed WAVE
-   6.0 or later, or to http://ecg.mit.edu/wug/wug.htm otherwise).
+   browser to file:///usr/help/html/wug/wug.htm if you have installed WAVE
+   6.0 or later, or to http://www.physionet.org/physiotools/wug/ otherwise).
 
  * Use XView spot help for brief descriptions of WAVE's controls and other
    graphic elements.  Point to any control and press the Help key (see `How
@@ -1089,7 +1093,7 @@ There are several sources of information about WAVE:
 
  * For additional information on the WAVE Analyze menu file, see the comments
    in the default menu file distributed with `wave' (usually installed as
-   `/usr/local/lib/wavemenu.def').
+   `/usr/lib/wavemenu.def').
 
  * For information about the data formats supported by WAVE and the other WFDB
    applications, see section 5 of the WFDB Applications Guide, or the man pages

@@ -5,5 +5,7 @@ no `Help' key, for information about that control.  Most
 controls are activated using the left mouse button;  menus
 are opened using the right mouse button.
 
-For information about obtaining the software being demonstrated,
-please visit http://ecg.mit.edu/.
+The software being demonstrated can be freely obtained in
+source form or in precompiled binaries (for Linux and
+Solaris), together with a comprehensive user's guide, from
+PhysioNet (http://www.physionet.org/).

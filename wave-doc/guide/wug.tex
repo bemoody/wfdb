@@ -25,9 +25,9 @@
 \pagenumbering{roman}
 
 \title{\WAVE{} User's Guide}
-\author{Fourth (Interim) Edition\\
+\author{Fifth Edition\\
 (revised and with corrections for \WAVE{} version 6.3)\\
-26 May 1999\\
+14 January 2000\\
 \\
 \\
 \\
@@ -50,17 +50,17 @@ Harvard-MIT Division of Health Sciences and Technology}
 \pagestyle{empty}
 \vspace*{\fill}
 \noindent
-Copyright \copyright 1992 -- 1999 George B. Moody
+Copyright \copyright 1992 -- 2000 George B. Moody
 
 \vspace{1 in}
 \noindent
 For information on obtaining the most recent version of \WAVE{},
 visit
 \begin{htmlonly}
-\htmladdnormallink{our web site}{http://ecg.mit.edu}, or write to:
+\htmladdnormallink{PhysioNet}{http://www.physionet.org/}, or write to:
 \end{htmlonly}
 \begin{latexonly}
-our web site ({\tt http://ecg.mit.edu}), or write to:
+PhysioNet ({\tt http://www.physionet.org/}), or write to:
 \end{latexonly}
 
 \begin{quote}
@@ -75,12 +75,13 @@ USA\\
 \noindent
 A \htmladdnormallink{PostScript version}{wug.ps} of this guide is available.
 The latest version can be downloaded from
-\htmladdnormallink{MIT}{http://ecg.mit.edu}.  Printed
+\htmladdnormallink{MIT}{http://www.physionet.org/}.  Printed
 \end{htmlonly}
 \begin{latexonly}
 \noindent
 An HTML version of this guide is available; point your web browser to
-{\tt http://ecg.\-mit.\-edu/\-wug/} to view it.  Additional printed
+{\tt http://www.\-physio\-net.\-org/\-physio\-tools/\-wug/} to view
+it. Additional printed
 \end{latexonly}
 copies of this guide are available for US\$10 each
 (including shipping by surface mail) by writing to the address above.
@@ -118,9 +119,9 @@ into another language, under the above conditions for modified versions.
 
 \begin{itemize}
 \item
-\htmladdnormallink{The MIT-BIH Database Distribution Home Page}
-{http://ecg.mit.edu} \\
-Information about CD-ROM databases of ECGs and other physiologic signals,
+\htmladdnormallink{PhysioNet}
+{http://www.physionet.org/} \\
+Freely available databases of ECGs and other physiologic signals,
 and related software.  This is the source for the software described in this
 guide.
 
@@ -243,7 +244,7 @@ and it may also be read with any Web browser independently of \WAVE{}
 file:\-/usr\-/local\-/help\-/wave\-/wug.htm} if you 
 have installed \WAVE{} on your system, or to\\
 {\tt
-http://ecg.mit.edu\-/software\-/wave-doc\-/guide\-/wug\-/wug.htm}\\
+http://www.physionet.org\-/physiotools\-/wug/}\\
 otherwise). 
 \end{latexonly}
 \begin{htmlonly}
@@ -253,11 +254,12 @@ This on-line version of the \WAVE{} User's Guide was prepared using
 from the same \LaTeX{} sources used for the
 printed manual.  You can print your own copy from the PostScript version
 \htmladdnormallink{here}{wug.ps}.  The most recent \LaTeX{}, HTML, and
-PostScript versions can be obtained from the
-\htmladdnormallink{MIT-BIH Database Distribution Home Page}
-{http://ecg.mit.edu/}, where you can also find an
+PostScript versions can be obtained from
+\htmladdnormallink{PhysioNet}
+{http://www.physionet.org/}.  If you wish to obtain a printed copy of
+this guide, an
 \htmladdnormallink{order form}{http://ecg.mit.edu/order-form.html}
-for obtaining printed copies of this guide and related materials.
+is available on-line.
 I would be grateful for reports of any typographic or other problems
 in the HTML version, since the translation to HTML is automated and
 may be less than perfect.  Note that the distributed HTML version uses
@@ -553,7 +555,8 @@ UNIX, there may not be any command required;  if in doubt, see your X server
 manual.
 
 \item[8. Logging onto the \WAVE{} host.]
-This is probably a command of the form `{\tt telnet atlantic}'.
+This is probably a command of the form `{\tt telnet atlantic}' or (a safer
+alternative) `{\tt ssh atlantic}'.
 \index{telnet command@{\tt telnet} command}
 You will
 probably be prompted to enter your password when you execute this command.
@@ -737,7 +740,7 @@ indicate a list of directories that contain
 input files for wave.
 
 For more information, type `more /usr/local/help/wave/wave.hlp',
-or open `http://ecg.mit.edu/wug/wug.htm' using your web browser.
+or open `http://www.physionet.org/physiotools/wug/' using your web browser.
 \end{verbatim}
 \index{environment variables!WFDB}\index{WFDB environment variable}
 \index{environment variables!DISPLAY}\index{DISPLAY environment variable}
@@ -2317,8 +2320,8 @@ obtained output beginning with:
 You can plot this output by piping it to the {\tt plot2d} command (see
 \marginpar{\emph{{\tt plot2d} will not work unless {\tt gnuplot} has
 been installed.  {\tt gnuplot} is included in most Linux distributions,
-and is also available by anonymous FTP from
-\htmladdnormallink{{\tt prep.ai.mit.edu}}{ftp://prep.ai.mit.edu} and
+and is also available from
+\htmladdnormallink{{\tt www.gnuplot.vt.edu}}{http://www.gnuplot.vt.edu/} and
 numerous other sites.  If {\tt plt} is available on your system, you may use
 it instead of {\tt plot2d} (with the same options).}}
 \htmladdnormallink{{\tt plot2d(1)}}{../dbag/plot2d-1.htm}, in the
@@ -2563,15 +2566,15 @@ section:
 \end{htmlonly}
 \begin{rawhtml}
    <a href="example.xws">
-   <img src="wave.gif" alt="click here to view waveforms"></a>
+   <img src="wave.png" alt="click here to view waveforms"></a>
 \end{rawhtml}
 To provide such a link in an HTML document, use a statement such as
 \begin{verbatim}
    <a href="example.xws">
-   <img src="wave.gif" alt="click here to view waveforms"></a>
+   <img src="wave.png" alt="click here to view waveforms"></a>
 \end{verbatim}
 \begin{latexonly}
-The {\tt wave.gif} icon (shown above) is provided in the \WAVE{}
+The {\tt wave.png} icon (shown above) is provided in the \WAVE{}
 distribution.
 \end{latexonly}
 
@@ -2619,9 +2622,9 @@ happens, simply delete any {\tt .xws} files from your browser's cache.
 with link annotations, and to display the on-line version of this
 guide.  A suitable web browser must be installed on the \WAVE{} host
 in order for this to work.  By default, \WAVE{} uses Netscape version
-1.1 (or any later version;  free copies of Netscape for academic use
-or for evaluation purposes may be obtained by anonymous FTP from
-\htmladdnormallink{{\tt ftp.netscape.com}}{http://www.netscape.com}).
+1.1 (or any later version;  Netscape may be obtained freely by
+anonymous FTP from
+\htmladdnormallink{{\tt ftp.netscape.com}}{ftp://ftp.netscape.com/}).
 
 \WAVE{} controls the web browser in the same way it controls other
 external programs:  by running commands in the {\sf Analysis Commands}
@@ -2699,8 +2702,18 @@ After this preparation, you are ready to print:
 \item
 Click on \button{Print chart} in the {\sf Analyze} window to produce a
 ``chart recording'' as shown in figure~\ref{fig:chart2}.
+\begin{htmlonly}
+\begin{rawhtml}
+<p><img width=728 height=1019 src="chart2.png" alt="[Chart recording]"
+\end{rawhtml}
+\end{htmlonly}
 \begin{figure}
+\begin{latexonly}
 \fbox{\centerline{\epsfig{file=chart2.ps,width=.9\linewidth}}}
+\end{latexonly}
+\begin{htmlonly}
+........................................................................_
+\end{htmlonly}
 \caption{``Chart recording'' made using {\sf Print chart} from the
 {\sf Analyze} window.}
 \label{fig:chart2}
@@ -2710,8 +2723,18 @@ Click on \button{Print chart} in the {\sf Analyze} window to produce a
 Click on \button{Print full disclosure} in the {\sf Analyze} window
 to produce the highly compact format shown in figure~\ref{fig:full-disclosure}.
 \end{itemize}
+\begin{htmlonly}
+\begin{rawhtml}
+<p><img width=728 height=994 src="fulldisc.png" alt="[Full disclosure]">
+\end{rawhtml}
+\end{htmlonly}
 \begin{figure}
+\begin{latexonly}
 \fbox{\centerline{\epsfig{file=fulldisc.ps,width=.9\linewidth}}}
+\end{latexonly}
+\begin{htmlonly}
+........................................................................_
+\end{htmlonly}
 \caption{Plot made using {\sf Print full disclosure} from the
 {\sf Analyze} window.}
 \label{fig:full-disclosure}
@@ -4642,8 +4665,10 @@ Laboratories (see
 {section~}
 {, page~\pageref{sec:adc-boards}}
 {sec:adc-boards}).
-Digitized reference recordings of ECGs and
-other signals are available on
+Large collections of digitized reference recordings of ECGs and
+other signals are freely available from
+\htmladdnormallink{PhysioNet}{http://www.physionet.org/},
+and may be purchased on
 \htmladdnormallink{CD-ROMs from MIT}{http://ecg.mit.edu/}
 and others; several
 CD-ROMs are currently available for use in basic research in
@@ -4815,39 +4840,33 @@ system, written by Linus Torvalds and a cast of thousands.  It is
 available in source and ready-to-run form by anonymous FTP from many
 sources, including
 \htmladdnormallink{{\tt tsx-11.mit.edu}}{ftp://tsx-11.mit.edu/pub/linux},
-\htmladdnormallink{{\tt sunsite.unc.edu}}{ftp://sunsite.unc.edu/pub/Linux}, and
+\htmladdnormallink{{\tt metalab.unc.edu}}{ftp://metalab.unc.edu/pub/Linux}, and
 \htmladdnormallink{{\tt ftp.funet.fi}}{ftp://ftp.funet.fi/pub/Linux}.
 You can also obtain Linux on CD-ROMs from many
 commercial sources, generally at very low prices (typically US\$10 to
 \$40, depending mainly on the amount of printed documentation and
 technical support offered).  Current Linux distributions include
+TCP/IP networking including NFS
+support, the complete collection of GNU software including the GNU
+C/C++ compiler, Ghostscript, \TeX, and much more.  Some also include
 \index{XView}\index{olwm@{\tt olwm} (Open Look Window Manager)}
 \index{olvwm@{\tt olvwm} (Open Look Virtual Window Manager)}
-X11R6, XView 3.2, {\tt olwm} and {\tt olvwm}, TCP/IP networking including NFS
-support, the complete collection of GNU software including the GNU
-C/C++ compiler, Ghostscript, \TeX, and much more.  For further
+X11R6, XView 3.2, {\tt olwm} and {\tt olvwm};  these are also available
+from the sites above as well as from PhysioNet.  For further
 information, visit the home page of the Linux Documentation Project
-(\htmladdnormallink{{\tt http://sunsite.unc.edu/mdw/}}
-{http://sunsite.unc.edu/mdw/}), or get the Linux INFO-SHEET by
-anonymous FTP from {\tt tsx-11.mit.edu}
-(\htmladdnormallink{{\tt pub/linux/docs/INFO-SHEET}}
-{ftp://tsx-11.mit.edu/pub/linux/docs/INFO-SHEET}) or from {\tt sunsite.unc.edu}
-(\htmladdnormallink{{\tt pub/Linux/docs/INFO-SHEET}}
-{ftp://sunsite.unc.edu/pub/Linux/docs/INFO-SHEET}).
-The other Linux HOWTO documents mentioned earlier can be obtained from
-these sources as well.
+(\htmladdnormallink{{\tt http://www.linuxdoc.org/}}
+{http://www.linuxdoc.org/}), where you may also find the Linux HOWTO
+documents mentioned earlier.
 
 \index{format!of binary executable files}
 Since mid-1995, Linux has supported ELF binaries, and current versions
 of \WAVE{} for Linux are made available in this format.  Older
 versions of Linux used the {\tt a.out} binary format.  If you have
 been running one of these older versions of Linux, updating your system
-to one with ELF support is highly recommended.  Until you do so, you
-can use the Linux {\tt a.out} \WAVE{} version 5.4 binary available from
-\htmladdnormallink{{\tt ecg.mit.edu}}{http://ecg.mit.edu/}
-\begin{latexonly}
-(see section~\ref{sec:getting-wave}, page~\pageref{sec:getting-wave})
-\end{latexonly}.
+to one with ELF support is highly recommended.  Otherwise, you can attempt
+to compile an {\tt a.out}-format WAVE from the
+\htmladdnormallink{sources}{http://www.physionet.org/physiotools/wfdb/wave/}
+available from PhysioNet.
 
 \section{Other useful software}
 \label{sec:other-software}
@@ -4855,8 +4874,8 @@ can use the Linux {\tt a.out} \WAVE{} version 5.4 binary available from
 \index{WFDB Software Package}
 \WAVE{} makes extensive use of the \emph{WFDB Software Package}, available from
 the same sources as \WAVE{} itself
-(\htmladdnormallink{{\tt http://ecg.mit.edu}}
-{http://ecg.mit.edu}).  The WFDB Software Package includes
+(\htmladdnormallink{{\tt http://www.physionet.org/}}
+{http://www.physionet.org/}).  The WFDB Software Package includes
 {\tt calibrate}, {\tt mrgann}, {\tt plot2d}, {\tt pschart}, {\tt
 psfd}, {\tt rdann}, {\tt rdsamp}, {\tt sample}, {\tt snip}, {\tt
 sqrs}, {\tt tach}, {\tt wfdbcollate}, {\tt wfdbdesc}, {\tt wfdbwhich},
@@ -4872,10 +4891,9 @@ you will need a browser in order to follow the links to the external
 data.  Even if you don't anticipate using link annotations, you can
 still use a web browser to view the on-line version of this guide.
 Netscape is an attractive choice because of its simple remote-control
-interface, among other reasons. As noted earlier, free copies of
-Netscape for academic use or for evaluation purposes may be obtained
-by anonymous FTP from
-\htmladdnormallink{{\tt ftp.netscape.com}}{http://www.netscape.com}).
+interface, among other reasons. As noted earlier, Netscape may be
+obtained freely by anonymous FTP from
+\htmladdnormallink{{\tt ftp.netscape.com}}{ftp://ftp.netscape.com/}).
 
 \index{gnuplot command@{\tt gnuplot} command}
 \index{plot2d command@{\tt plot2d} command}
@@ -4893,14 +4911,12 @@ at the resolution of your printer.
 (included in the WFDB Software Package) is a
 bare-bones command-line front end to {\tt gnuplot}, a fairly capable
 interactive plotting program that is included in most Linux distributions,
-and is also available by anonymous FTP from
-\htmladdnormallink{{\tt prep.ai.mit.edu}}{ftp://prep.ai.mit.edu/pub/gnu} and
-numerous other sites.  An interesting alternative is {\tt xvgr},
-available from
-\htmladdnormallink{{\tt ftp.teleport.com/\-pub/\-users/\-pturner/\-acegr}}
-{ftp://ftp.teleport.com/pub/users/pturner/acegr/} and in most Linux
-distributions. \WAVE{} and {\tt xvgr} use the same Open Look/XView user
-interface.
+and is also available from
+\htmladdnormallink{{\tt www.gnuplot.vt.edu}}{http://www.gnuplot.vt.edu/} and
+numerous other sites.  An interesting alternative is
+\htmladdnormallink{\tt
+robot}{http://heasarc.gsfc.nasa.gov/docs/xte/SOF/robot.html}, which
+uses the same Open Look/Xview interface as \WAVE{}.
 
 \chapter{Setting up a \WAVE{}~host}
 
@@ -4912,7 +4928,8 @@ interface.
 \index{Linux}\index{Solaris}\index{SunOS}\index{SPARCstation}\index{PC}
 \index{WWW}\index{WFDB Software Package}\index{downloading}
 \index{installing \WAVE{}}
-Current (demo) versions of \WAVE{} for SPARCstations running SunOS and
+Current sources for \WAVE{}, and precompiled \WAVE{} binaries for
+SPARCstations running SunOS and
 \marginpar{\emph{
 The second edition of the MIT-BIH Arrhythmia Database CD-ROM contains
 \WAVE{} version 5.0 binaries for SPARC SunOS 4.1.x, within the `{\tt
@@ -4922,20 +4939,12 @@ and PostScript formats.  Follow the instructions in {\tt readme.doc}
 for installing the WFDB Software Package on your system.  Doing so will
 install \WAVE{} 5.0 as well.
 }}
-Solaris, and for PCs running Linux, may be downloaded via the
-Internet.  Point your Web browser to 
-\htmladdnormallink{{\tt http://ecg.mit.edu}}
-{http://ecg.mit.edu/}
-for details, or use anonymous FTP to get
-\htmladdnormallink{{\tt pub/software/README.DOC}}
-{ftp://ecg.mit.edu/pub/software/README.DOC}
-from {\tt ecg.mit.edu} and follow the instructions there for
-downloading and installing a demo version of \WAVE{}, and the WFDB
-Software Package.  (Demo versions of \WAVE{} do not permit
-you to save the results of annotation editing operations, but they are
-otherwise fully functional.)
+Solaris, and for PCs running Linux, may be obtained from PhysioNet.
+Point your Web browser to 
+\htmladdnormallink{{\tt http://www.physionet.org/}}
+{http://www.physionet.org/} for details.
 \index{MIMIC Database}
-Fully functional \WAVE{} binaries are also included on some of our
+\WAVE{} binaries are also included on some of our
 CD-ROMs, in the {\tt software} directory.  Follow the instructions in
 {\tt software/README.DOC} to install \WAVE{} from any of these CD-ROMs.
 
@@ -4968,13 +4977,12 @@ If you are successful, write to the author
 for information on obtaining a current set of \WAVE{} sources.  Compared to
 the original sources, the Linux
 \index{Linux}
-version of XView (freely available by anonymous FTP from
-\htmladdnormallink{{\tt ecg.mit.edu}}
-{ftp://ecg.mit.edu/pub/software/},
-\htmladdnormallink{{\tt sunsite.unc.edu}}
-{ftp://sunsite.unc.edu/pub/Linux/libs/X/xview},
-\htmladdnormallink{{\tt tsx-11.mit.edu}}
-{ftp://tsx-11.mit.edu/pub/linux/distributions/slackware/source/xv},
+version of XView (freely available from
+\htmladdnormallink{PhysioNet}{http://www.physionet.org/physiotools/xview/},
+\htmladdnormallink{{\tt metalab.unc.edu}}
+{ftp://metalab.unc.edu/pub/Linux/libs/X/xview/},
+\htmladdnormallink{{\tt www.rpmfind.net}}
+{http://www.rpmfind.net/linux/RPM/},
 and their mirrors, and also available on many low-cost
 Linux CD-ROM archives) is easier to port to another operating system,
 since many Sun-specific dependencies were removed.  Nevertheless,
@@ -5006,9 +5014,10 @@ If the printer itself is incapable of rendering PostScript, you may
 still be able to use it if it is supported by Ghostscript (a freely
 available PostScript interpreter).  Ghostscript is included in
 executable and portable C source form in most if not all Linux
-distributions, and is also available by anonymous FTP from many
-sources, including
-\htmladdnormallink{{\tt prep.ai.mit.edu}}{ftp://prep.ai.mit.edu/pub/gnu}
+distributions, and is also available from many
+sources, including its own
+\htmladdnormallink{web site}{http://www.cs.wisc.edu/~ghost/} and its
+mirrors, \htmladdnormallink{CTAN}{http://ctan.tug.org},
 and other archives of GNU software.  Ghostscript supports a wide
 variety of ink jet, dot matrix,
 and laser printers including popular models made by Canon, Epson,
@@ -5125,30 +5134,23 @@ If you have a 386, 486, or Pentium-based PC with a VGA card, mouse, at
 least 8 Mb of RAM and 100 Mb of available disk space, you can run
 \WAVE{} under Linux,
 \index{Linux}
-a freely available UNIX clone for the PC.
+a freely available UNIX clone for the PC.  Users have reported that \WAVE{} can
+be compiled and run successfully on DEC Alpha-based workstations under Linux,
+and (in principle) it should be possible to run \WAVE{} on any other type of
+CPU supported by Linux (the list currently includes MIPS, PowerPC, Sparc, ARM,
+as well as x86 and Alpha CPUs).
 
 If you have any networked computer that can run X11R4 or a later version
 (this includes all current UNIX workstations, PCs, Macintoshes, and a variety
-of other systems), and access via network to either a SPARCstation or a
-PC running Linux, you can run \WAVE{} remotely (see the next question).
-
-Otherwise, you're out of luck at present.  \WAVE{} requires X11R4 or
-later and the XView
-\index{XView}
-toolkit (both are freely available
-in source form for UNIX systems).  See
-\hyperref{Setup}
-{Appendix~}
-{, page~\pageref{app:setup},}
-{app:setup} for details if you would like to try porting
-\WAVE{} to another version of UNIX.
+of other systems), and access via network to another computer that can host
+\WAVE{} (see above), you can run \WAVE{} remotely (see the next question).
 
 \index{PostScript}
 Other WFDB applications ({\sf WVIEW} for Microsoft Windows, {\sf VIEW} for
-MS-DOS, {\sf MacView} for the Macintosh, and {\tt pschart}
-and {\tt psfd} for PostScript devices) offer many of the display features of
-\WAVE{} in other environments;  none of these currently support annotation
-editing or control of external programs, however.
+MS-DOS, {\sf MacView} for the Macintosh, and {\tt pschart} and {\tt psfd} for
+PostScript devices) offer many of the display features of \WAVE{} in other
+environments;  none of these currently support annotation editing or control
+of external programs, however.
 
 \subsection{How can I use \WAVE{} from an X terminal, PC, Mac, etc.?}
 
@@ -5181,9 +5183,9 @@ accomplish this by typing (on {\tt hither}) `{\tt xhost +yon}'.  (Note:  if
 effect.  In this case, use {\tt yon}'s IP address in place of its name.)
 
 \item
-Remotely log in to {\tt yon} (for example, via {\tt telnet}), and set the
-{\tt DISPLAY} environment variable on {\tt yon} to point back to your display.
-If you use the C-shell on {\tt yon}, this will normally be done by
+Remotely log in to {\tt yon} (for example, via {\tt ssh} or {\tt telnet}), and
+set the {\tt DISPLAY} environment variable on {\tt yon} to point back to your
+display.  If you use the C-shell on {\tt yon}, this will normally be done by
 `{\tt setenv DISPLAY hither:0.0}'.  Users of {\tt sh}, {\tt ksh}, or {\tt bash}
 should type `{\tt DISPLAY=hither:0.0; export DISPLAY}'.  (Note:  if {\tt yon}
 doesn't recognize {\tt hither} by name, this command won't work.  In this case,
@@ -5326,7 +5328,7 @@ Use the command `{\tt ldd `which wave`} to identify which dynamically
 linked libraries are missing.  Locate these on your system (for
 example, using a command such as `{\tt find / -name libxview.so.3
 -print}';  if any of these libraries cannot be found on your system, it may be
-downloaded from \htmladdnormallink{MIT}{http://ecg.mit.edu}.)
+downloaded from \htmladdnormallink{PhysioNet}{http://www.physionet.org/}.)
 Add the directories in which the missing libraries are found to your
 {\tt LD\_LIBRARY\_PATH}.  For example, if the missing libraries are
 located in {\tt /usr/openwin/lib}, and you are using the C-shell, use the
@@ -5393,12 +5395,25 @@ the `{\tt -S}' option to the `wave' command.  Also see
 \item
 If you see a correct display, your problem is specific to the record you
 were previously trying to view.  Find the directory containing the header
-file for the desired record, and append the name of that directory to the
-value of {\tt WFDB}.  If the record is on a CD-ROM, or was copied from a CD-ROM,
-its header file is `\emph{record}{\tt .hea}' (where \emph{record} is the record
-name);  otherwise, its name is probably `{\tt header.}\emph{record}'.
+file (`\emph{record}{\tt .hea}', where \emph{record} is the record
+name) for the desired record, and append the name of that directory to the
+value of {\tt WFDB}.
 \end{itemize}
 \end{enumerate}
+
+\subsection{Why does \WAVE{} take so long to display the first screen?}
+
+If you are running \WAVE{} remotely, a slow network connection may be the
+reason for sluggish performance.  If possible, run \WAVE{} locally, or get
+a faster network connection.  You might also try changing the time scale
+so that fewer points need to be drawn on each screen.
+
+If you are using \WAVE{} to view a record via FTP, it is currently not possible
+to begin until the entire record has been downloaded;  for long records over
+slow network connections, this can take a long time.  Some web (HTTP) servers
+suffer from the same limitation.  If possible, use a web server that supports
+HTTP range requests, such as Apache, or download a copy of the record to your
+local disk.
 
 \subsection{Where do I find the missing fonts?}
 
@@ -5495,7 +5510,11 @@ are no signal names visible, click on \button{View...}, then on {\sf
 signal names} and \button{Redraw} in the {\sf View} window.  If signal
 names still do not appear, either the header file or the signal file
 for the record you have opened may be inaccessible.  Find these files
-(see the next question), add the directory that contains them to your
+(see 
+\hyperref{``File-related questions''}
+{``File-related questions'', section~}
+{, page~\pageref{faq:file-related-questions}}
+{faq:file-related-questions}), add the directory that contains them to your
 WFDB path, and try to read a few samples using `{\tt rdsamp -r \emph{
 record} -t 1}'.  If this fails, examine the header file for the record
 (a text file), and be sure that it specifies at least one signal in an
@@ -5531,28 +5550,37 @@ command-line option), or vice versa, since \WAVE{} uses different
 techniques for drawing in the scope window depending on the display
 mode.
 
+A bug in network file handling can sometimes interfere with correct display of
+waveforms in the scope window when reading records via HTTP.  For now, the only
+workarounds are to restart \WAVE{}, or to copy the record to local disk files
+(this can be done easily using
+\htmladdnormallink{{\tt xform}}{../dbag/xform-1.htm},
+\htmladdnormallink{{\tt snip}}{../dbag/snip-1.htm}, or a web browser).  Check
+\htmladdnormallink{PhysioNet}{http://www.physionet.org/} for updates to \WAVE{}
+or to the WFDB library that may correct this bug.
+
 \subsection{How can I get correct display scales?}
 
 \label{faq:display-scales}
 \index{xdpyinfo command@{\tt xdpyinfo} command}
 \index{resolution!of display}
-Use `{\tt xdpyinfo}' (a standard X client that is provided as part of
-the X core distribution) to check several server parameters.  (As with
-virtually all X clients, it doesn't matter which machine you find
-`{\tt xdpyinfo}' on; it will query your server from wherever it is run.)
-`{\tt xdpyinfo}' will report the version and release numbers of your server;
-you should have version 11, release 3 or later.  It will also report
-the screen size in pixels and the resolution in pixels per inch.  Take
-a minute to verify the screen resolution by direct measurement of the
-screen with a ruler.  If the resolution reported by `{\tt xdpyinfo}' is
-incorrect, \WAVE{} will not be able to draw waveforms at properly
-calibrated scales.  The sample X11 servers from MIT all support a
+Use `{\tt xdpyinfo}' (a standard X client that is provided as part of the X
+core distribution) to check several server parameters.  (As with virtually all
+X clients, it doesn't matter which machine you find `{\tt xdpyinfo}' on; it
+will query your server from wherever it is run.)  `{\tt xdpyinfo}' will report
+the version and release numbers of your server; you should have version 11,
+release 3 or later.  It will also report the screen size in pixels and the
+resolution in pixels per inch.  Take a minute to verify the screen resolution
+by direct measurement of the screen with a ruler.  If the resolution reported
+by `{\tt xdpyinfo}' is incorrect, \WAVE{} will not be able to draw waveforms at
+properly calibrated scales.  The sample X11 servers from MIT and the X
+Consortium, and the XFree86 project's X11 servers, all support a
 \index{dpi option for WAVE@{\tt -dpi} option for \WAVE{}}
 \index{command-line options!{\tt -dpi}}\index{options!{\tt -dpi}}
-`{\tt -dpi}' option, which allows you to specify the correct screen
-resolution at the time the server is started; read the man page for X
-for details.  (If your server does not support this feature, \WAVE{} can
-be given a similar `{\tt -dpi}' option.)
+`{\tt -dpi}' option, which allows you to specify the correct screen resolution
+at the time the server is started; read the man page for X or Xserver for
+details.  (If your server does not support this feature, \WAVE{} can be given
+a similar `{\tt -dpi}' option.)
 
 \index{display calibration}\index{calibration!display}
 You can also double-check your display calibration using \WAVE{} itself.
@@ -5659,11 +5687,12 @@ behavior at a slight (often unnoticeable) cost in speed.
 \index{stty command@{\tt stty command}}
 \index{analysis commands window@{\sf Analysis Commands} window}
 This problem, which may occur when you are running \WAVE{} under Linux,
-appears to result from a bug in the Linux version of the XView
+appears to result from a bug in an early Linux version of the XView
 `termsw' package.  Type the command `{\tt stty -echo}' in the {\sf
 Analysis Commands} window, and the problem should go away.
 
 \section{File-related questions}
+\label{faq:file-related-questions}
 
 \subsection{I can't find the file named `\emph{record}'!}
 
@@ -5695,9 +5724,10 @@ usually be set for C-shell users by `{\tt source
 /usr/local/bin/cshsetwfdb}', or for Bourne shell, Korn shell, and `{\tt bash}'
 users by `{\tt .~setwfdb}'; don't omit the `{\tt .}').  The directories
 named by {\tt WFDB} are those on the \WAVE{} host; thus (unless your WFDB
-files are already on the \WAVE{} host) you must either transfer them
-there, or NFS- or RFS-mount the directory in which they reside onto a
-suitable point in the file system of the \WAVE{} host.  Furthermore,
+files are already on the \WAVE{} host, or are accessible to the \WAVE{} host
+via HTTP or FTP -- see the next question) you must either transfer them
+to the remote machine, or NFS- or RFS-mount the directory in which they reside
+onto a suitable point in the file system of the \WAVE{} host.  Furthermore,
 remember that output annotation, log, and print files will be written
 to your current directory on the \WAVE{} host.
 
@@ -5715,35 +5745,48 @@ the directories in the path to the file; in such cases, you will need
 to get the file's owner or your system administrator to give you
 appropriate permissions.
 
-\subsection{Where is my annotation file?}
+\subsection{How can I view a record stored on a web site or an FTP server?}
+
+Add the directory containing the record to your WFDB path, then use \WAVE{}
+just as you would to view a record stored on your local disk.  For example,
+suppose the WFDB path is:
+\begin{verbatim}
+   . /usr/local/database http://www.signals.r.us/data ftp://sand.bar.com/pub
+\end{verbatim}
+In this case, \WAVE{} would look for input files first in the current directory
+({\tt .}) of the local disk, then in {\tt /usr/local/database} (which might be
+local or might be part of a networked file system), then on the
+{\tt signals.r.us} web site, and finally on {\tt sand.bar.com}'s FTP server.
+Unless you have a slow network connection, you may not notice any difference
+between viewing locally and remotely stored records.
+
+\section{Questions about editing}
+
+\subsection{Where are my annotations?}
 
 \index{annotation file}
-When you edit an annotation file, \WAVE{} makes a copy with your edits,
-gives it a name of the form {\it annotator.record}, and saves it in
-the current directory (i.e., whatever directory was current when you
-started \WAVE{}).  To be able to read your edited copy in a later \WAVE{}
-session, be sure that the directory that contains your edited copy is
-listed in your WFDB path \emph{before} any other directory that contains
-an older version of the same annotation file.  Usually, your WFDB path
-begins with `{\tt .}', a synonym for the current directory.  If this
-is the case, simply return to the directory that contains your edited
-annotation file before starting \WAVE{} each time.
+
+When you create a new set of annotations, if you have specified the annotator
+name in the {\sf Load} window, \WAVE{} saves your annotations in a new file
+with a name of the form {\it record.annotator}, in the current directory.  When
+you edit an existing set of annotations, \WAVE{} makes a copy of the annotation
+file containing your edits, gives it a name of the form {\it record.annotator},
+and saves it in the current directory (i.e., whatever directory was current
+when you started \WAVE{}).  To be able to read your edited copy in a later
+\WAVE{} session, be sure that the directory that contains your edited copy is
+listed in your WFDB path \emph{before} any other directory that contains an
+older version of the same annotation file.  Usually, your WFDB path begins with
+`{\tt .}', a synonym for the current directory.  If this is the case, simply
+return to the directory that contains your edited annotation file before
+starting \WAVE{} each time.
 
 If you created an annotation file without specifying an annotator
 name, \WAVE{} uses its own name as the annotator name, so you should
-look for a file named {\tt wave.}{\it record} in this case.
+look for a file named {\it record}{\tt .wave} in this case.
 
-If the annotation file was originally created under MS-DOS, or if it is
-intended for use under MS-DOS, the filename is constructed in the
-opposite order (i.e., as {\it record.annotator}, where {\it annotator}
-is truncated to at most three characters).  This is necessary in order
-to accommodate MS-DOS's restrictions on file names while still
-permitting flexibility in the choice of record names.  Since the
-standard CD-ROM databases are intended to be usable under MS-DOS as
-well as in other environments, file names on these CD-ROMs follow this
-``record name first'' convention as well.
-
-\section{Questions about editing}
+Old versions of \WAVE{} created annotation files with names of the form
+{\it annotator.record};  if you have any of these, rename them in order to
+continue using them with \WAVE{}.
 
 \subsection{Why does \WAVE{} tell me `You may not edit annotations ...'?}
 
@@ -5757,18 +5800,19 @@ action is disabled.
 If you did intend to edit the annotations, select {\sf Allow editing} from the
 \menubutton{Edit} menu, then repeat the edit.
 
-\subsection{How do I edit a record on a CD-ROM?}
+\subsection{How do I edit a record on a CD-ROM, a web site, or an FTP server?}
 
 \index{CD-ROM}
 Be sure that your current directory is writable, that both your current
-directory and the CD-ROM directory containing the record you wish to edit are
-in your WFDB path, and that your current directory comes \emph{before} the CD-ROM
-directory in your WFDB path.  When \WAVE{} writes your edits, they always go into
-the current directory (so the current directory cannot be on the CD-ROM, since
-the CD-ROM is not writable).  At a later time, when \WAVE{} (or any other WFDB
-application) opens the record, it finds your edited version first, and doesn't
-look for the original version on the CD-ROM, provided only that, in your WFDB
-path, the CD-ROM directory follows the one in which your edits are stored.
+directory and the source (CD-ROM, web, or FTP) directory containing the record
+you wish to edit are in your WFDB path, and that your current directory comes
+\emph{before} the source directory in your WFDB path.  When \WAVE{} writes your
+edits, they always go into the current directory (so the current directory
+cannot be on the CD-ROM, since the CD-ROM is not writable).  At a later time,
+when \WAVE{} (or any other WFDB application) opens the record, it finds your
+edited version first, and doesn't look for the original version, provided only
+that, in your WFDB path, the source directory follows the one in which your
+edits are stored.
 
 \subsection{How can I undo an edit?}
 
@@ -5789,19 +5833,19 @@ that was current at the time \WAVE{} loaded the record.  \WAVE{}
 always saves edited annotation files to the current directory (even if
 the original annotation file was loaded from another directory).
 \WAVE{}'s saved annotation files are given names of the form `{\it
-annotator.record}'.  If, by saving its output, \WAVE{} would overwrite
+record.annotator}'.  If, by saving its output, \WAVE{} would overwrite
 an existing file with the same name, \WAVE{} first renames the
-existing file by prefixing an underscore (`{\tt \_}') to its name.
+existing file by appending a tilde (`{\tt ~}') to its name.
 Thus it is always possible to recover the state of the annotation file
 as it was before you began the most recent editing pass.  To do so,
 exit \WAVE{}, and:
 \begin{itemize}
 \item
-If there is a file with a name of the form `{\tt \_}{\it annotator.record}' in
-the current directory, rename it as `{\it annotator.record}'.
+If there is a file with a name of the form `{\it record.annotator}{\tt ~}' in
+the current directory, rename it as `{\it record.annotator}'.
 
 \item
-Otherwise, delete or rename `{\it annotator.record}' so that the previous
+Otherwise, delete or rename `{\it record.annotator}' so that the previous
 version (which must be in another directory in the WFDB path) becomes visible
 once again to \WAVE{}.
 \end{itemize}
@@ -5940,8 +5984,8 @@ If you really want a screen dump, `{\tt xwd | xpr}' will produce one in
 PostScript form.  (Type `{\tt man xwd}' and `{\tt man xpr}' for details
 on options.)  Another way to do this, if {\tt xpr} is not available, is
 `{\tt xwd | xwdtopnm | pnmdepth 255 | pnmtops}'.  If your printer is not a
-PostScript printer, you can still print the output of {\tt xpr} using
-Ghostscript, a freely available PostScript interpreter.
+PostScript printer, you can still print the output of either of these
+commands using Ghostscript, a freely available PostScript interpreter.
 
 \index{pschart command@{\tt pschart} command}
 Why settle for a screen dump, though?  In most cases, you will prefer to use
@@ -6128,7 +6172,7 @@ size is specified within the embedded header, and may vary between
 records.  Moreover, since typical block sizes are quite large, the
 time resolution of annotations in this case is very coarse.  A format
 converter for EDF files,
-\htmladdnormallink{{\tt edf2mit}}{http://ecg.mit.edu}, may be
+\htmladdnormallink{{\tt edf2mit}}{http://www.physionet.org/}, may be
 used to rewrite such files in a format that \WAVE{} can read without
 these limitations.  This converter also constructs a
 suitable header file from the embedded header in the EDF file.
@@ -6355,12 +6399,16 @@ procedural interface over XView's buggy, attractive, non-proprietary,
 streamlined, elegant object-oriented interface (end of rant).
 
 \index{Open Look}
-Motif has clearly become the standard, however, and a consequence of
-this is that the Open Look user interface presented by \WAVE{} is
-unfamiliar to many users.  There is a scarcity of introductory
-material for Open Look in print.  Unfortunately, the Motif API is
-vastly different from the XView API with which \WAVE{} is written, and
-a port to Motif would be decidedly non-trivial.
+Motif and its lookalikes (notably GTK+, Qt, and LessTif) have clearly become
+the standard, however, and a consequence of this is that the Open Look user
+interface presented by \WAVE{} is unfamiliar to many users.  There is a
+scarcity of introductory material for Open Look in print (but there is an
+excellent and comprehensive set of documentation, including an Open Look User's
+Guide, available from Darwin Open Systems, \htmladdnormallink{{\tt
+http://www.darwinsys.com/}}{http://www.darwinsys.com/}).  Unfortunately, the
+Motif API, and those of its lookalikes, are vastly different from the XView API
+with which \WAVE{} is written, and a port to Motif would be decidedly
+non-trivial.
 
 \subsection{How can I find out about ...?}
 
@@ -6377,9 +6425,9 @@ the
 \htmladdnormallink{{\it WFDB Applications Guide}}{../dbag/dbag.htm}.
 If you need to develop your own applications for use with \WAVE{}, read the
 \htmladdnormallink{{\it WFDB Programmer's Guide}}{../dbpg/dbpg.htm}.
-Printed copies of these guides may be purchased from MIT, or you may
-print your own copies on a PostScript printer by following the instructions in
-the `{\tt manuals.doc}' file distributed with \WAVE{}.
+Printed copies of these guides may be purchased from MIT, or you may read them
+on-line or print your own copies (visit
+\htmladdnormallink{PhysioNet}{http://www.physionet.org/}).
 
 \index{on-line help}\index{help}\index{Netscape}
 \item
@@ -6390,13 +6438,13 @@ requires \WAVE{} 6.0 or later, and Netscape 1.1 or later on the
 \WAVE{} host).  This guide
 may also be read with any Web browser independently of \WAVE{}
 (point your browser to
-\htmladdnormallink{{\tt file:/usr/local/help/html/wug/wug.htm}}
-{file:/usr/local/help/html/wug/wug.htm}
+\htmladdnormallink{{\tt file:///usr/help/html/wug/wug.htm}}
+{file:///usr/help/html/wug/wug.htm}
 if you have installed \WAVE{} 6.0
 or later on your system, or to
 \htmladdnormallink
-{{\tt http://ecg.mit.edu\-/wug\-/wug.htm}}
-{http://ecg.mit.edu/wug/wug.htm}
+{{\tt http://www.physionet.org\-/physiotools\-/wug/}}
+{http://www.physionet.org/physiotools/wug/}
 otherwise).
 
 \item
@@ -6444,7 +6492,7 @@ tkman}, etc.)
 \item
 For additional information on the \WAVE{} menu file, see the comments
 in the default menu file distributed with \WAVE{} and usually installed as
-`{\tt /usr/local/lib/wavemenu.def}'.
+`{\tt /usr/lib/wavemenu.def}'.
 
 \item
 For information about the data formats supported by \WAVE{} and the other WFDB

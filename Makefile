@@ -1,10 +1,10 @@
 # file: Makefile	G. Moody	5 September 1990
-#			Last revised:  15 September 1999	Version 10.1.0
+#			Last revised:    11 January 2000	Version 10.1.1
 # UNIX 'make' description file for the WFDB software package
 #
 # -----------------------------------------------------------------------------
 # WFDB software for creating & using annotated waveform (time series) databases
-# Copyright (C) 1999 George B. Moody
+# Copyright (C) 2000 George B. Moody
 #
 # These programs are free software; you can redistribute them and/or modify
 # them under the terms of the GNU General Public License as published by the
@@ -28,7 +28,7 @@
 #
 # You may contact the author by e-mail (george@mit.edu) or postal mail
 # (MIT Room E25-505A, Cambridge, MA 02139 USA).  For updates to this software,
-# please visit the author's web site (http://ecg.mit.edu/).
+# please visit PhysioNet (http://www.physionet.org/).
 # _____________________________________________________________________________
 #
 # This file is used with the UNIX `make' command to compile, install, and
@@ -98,14 +98,18 @@ all:		install-slib
 
 # 'make clean': remove binaries, other cruft from source directories
 clean:
-	cd lib;      $(MAKE) $(WFDBDIRS) clean
-	cd wave;     $(MAKE) $(WFDBDIRS) clean
-	cd waverc;   $(MAKE) $(WFDBDIRS) clean
-	cd app;      $(MAKE) $(WFDBDIRS) clean
-	cd psd;      $(MAKE) $(WFDBDIRS) clean
-	cd examples; $(MAKE) $(WFDBDIRS) clean
-	cd convert;  $(MAKE) $(WFDBDIRS) clean
-	cd data;     $(MAKE) $(WFDBDIRS) clean
+	cd app;      $(MAKE) clean
+	cd convert;  $(MAKE) clean
+	cd data;     $(MAKE) clean
+	cd doc;      $(MAKE) clean
+	cd examples; $(MAKE) clean
+	cd fortran;  $(MAKE) clean
+	cd lib;      $(MAKE) clean
+	cd psd;      $(MAKE) clean
+	cd wave;     $(MAKE) clean
+	cd wave-doc; $(MAKE) clean
+	cd waverc;   $(MAKE) clean
+	cd wview;    $(MAKE) -f clean
 	rm -f *~
 
 # 'make test-lib': compile the dynamically-linked WFDB library without
@@ -137,9 +141,10 @@ test-install:
 # tar source archives of the WFDB software package (with and without the
 # documentation), and generate PGP signature blocks for the archives
 tarballs:	clean
-	cd ..; tar cfvz wfdb.tar.gz wfdb
+	cd ..; tar --create --file wfdb.tar.gz --verbose --gzip \
+                '--exclude=wfdb/*CVS' wfdb
 	cd ..; tar --create --file wfdb-no-docs.tar.gz --verbose --gzip \
-                '--exclude=wfdb/*doc' wfdb
+                '--exclude=wfdb/*CVS' '--exclude=wfdb/*doc' wfdb
 	cd ..; pgps -b wfdb.tar.gz wfdb-no-docs.tar.gz
 
 # 'make bin-tarball': make a gzipped tar archive of the WFDB software package

@@ -27,7 +27,7 @@ href="../wug/wug.htm"> <strong>WAVE</strong></a> provide to Linux, Solaris, and
 SunOS users.  Specifically, <tt>wvscript</tt> can be installed as a
 <i>viewer</i> for your Web browser and for Windows 95 Explorer by following the
 steps outlined below.  Once you have done so, you can follow links such as this
-one: <br> <a href="example.xws"> <img src="wave.gif" alt="click here to view
+one: <br> <a href="example.xws"> <img src="wave.png" alt="click here to view
 waveforms"></a>
 
 <p>
@@ -52,7 +52,7 @@ Double-click on the <strong>My computer</strong> icon, and open the
 <strong>Add New File Type</strong> dialog appears.
 
 <br>
-<img src="addnft1.gif">
+<img src="addnft1.png">
 <br>
 Fill in the text fields of this dialog box exactly as shown above.  (Note that
 the MIME type is <tt>application/x-wavescript</tt>, not
@@ -60,7 +60,7 @@ the MIME type is <tt>application/x-wavescript</tt>, not
 clicking on <i>New...</i>.  The <strong>New Action</strong> dialog appears.
 
 <p>
-<img src="addnft2.gif">
+<img src="addnft2.png">
 <br>
 Again, fill in the text fields as shown.  If you did not install the WFDB
 applications in <tt>c:\bin</tt>, provide the correct path to <tt>wvscript</tt>.
@@ -72,13 +72,13 @@ When you have done so, click on <i>OK</i>.
 warning message will appear when you do so:
 
 <br>
-<img src="addnft3.gif">
+<img src="addnft3.png">
 <br>
 Dismiss the message box by clicking on <i>OK</i>. The <strong>Change
 Icon</strong> dialog appears.
 
 <br>
-<img src="addnft4.gif">
+<img src="addnft4.png">
 <br>
 Enter the path to the <strong>WVIEW</strong> executable file (normally as
 shown above), then click on <i>OK</i>.
@@ -102,7 +102,7 @@ Start Netscape. Open the <strong>Preferences</strong> dialog from the
 <i>Options</i> menu, and click on the <i>Helpers</i> tab.
 
 <p>
-<img src="addnft5.gif">
+<img src="addnft5.png">
 <br>
 Click on <i>Create New Type...</i> to open the <strong>New Type</strong>
 dialog.
@@ -117,14 +117,14 @@ In the <strong>Preferences</strong> dialog, select <i>Launch the
 Application</i> as the action, and enter the correct path for the
 <tt>wscript</tt> executable, as shown below.
 <p>
-<img src="addnft6.gif">
+<img src="addnft6.png">
 
 <p>
 When you have finished, click on <i>OK</i> to register your changes.  You
 may now test your setup by clicking on the icon below:
 <br>
 <a href="example.xws">
-<img src="wave.gif" alt="click here to view waveforms"></a>
+<img src="wave.png" alt="click here to view waveforms"></a>
 
 <p>
 The first time you do this, Netscape may open a message box to warn you that
@@ -167,7 +167,7 @@ To embed a link such as those shown above in your own web pages, simply insert
 HTML code such as:
 <pre>
     &lt;a href=&quot;example.xws&quot;&gt;
-    &lt;img src=&quot;wave.gif&quot; alt=&quot;click here to view waveforms&quot;&gt;&lt;/a&gt;
+    &lt;img src=&quot;wave.png&quot; alt=&quot;click here to view waveforms&quot;&gt;&lt;/a&gt;
 </pre>
 
 The file <tt>example.xws</tt>, to which this link refers, is a text file that

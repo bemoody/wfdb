@@ -1,5 +1,5 @@
 '\" t
-.TH WAVE 1 "24 May 1999" "WAVE 6.3" "WFDB applications"
+.TH WAVE 1 "11 January 2000" "WAVE 6.3" "WFDB applications"
 .SH NAME
 wave \- waveform analyzer, viewer, and editor for the X Window System
 .SH SYNOPSIS
@@ -11,11 +11,10 @@ records on any display controlled by an X11 server.  It includes
 facilities for interactive annotation editing.  The keyboard and mouse
 are used to control the display interactively.  First-time users
 should read the \fIWAVE User's Guide\fR.  (One way to do this is by
-pointing your Web browser to
-\fBfile:///usr/local/help/html/wug/wug.htm\fR, or to
-\fBhttp://ecg.mit.edu\fR for the latest version.)  If the \fIGuide\fR
-is unavailable, print a copy of the on-line manual; run \fIwave\fR
-without any command-line arguments to get instructions for doing so.
+pointing your Web browser to \fBfile:///usr/local/help/html/wug/wug.htm\fR,
+or to \fBhttp://www.physionet.org/physiotools/wug/\fR for the latest version.)
+If the \fIGuide\fR is unavailable, print a copy of the on-line manual; run
+\fIwave\fR without any command-line arguments to get instructions for doing so.
 Note that this operation does not require an X display.
 .PP
 If you specify more than one \fIrecord\fR, a separate \fIwave\fR process is
@@ -677,12 +676,13 @@ some systems, this man page is known as \fIxview\fR(1))
 \fIwave\fR currently runs under Linux, Solaris, and SunOS.  It should be
 easily portable to any POSIX-compliant OS that can support X11 and XView.
 If you would like to use \fIwave\fR on a system other than those listed above,
- you will need to port XView to your system first (or purchase a
+you will need to port XView to your system first (or purchase a
 commercial port if one is available).  Sources for XView are supplied
 on our CD-ROMs that include \fIwave\fR, and are also available from
-\fBsunsite.unc.edu\fR, \fBtsx-11.mit.edu\fR, and their mirrors.  \fIWe
-cannot offer assistance in porting XView; if you wish to try this, you
-are on your own.\fR If you successfully port the \fBcmdtool\fR
+PhysioNet (\fBwww.physionet.org\fR, where the sources for \fIwave\fR itself
+are also available), \fBmetalab.unc.edu\fR, \fBtsx-11.mit.edu\fR, and their
+mirrors.  \fIWe cannot offer assistance in porting XView; if you wish to try
+this, you are on your own.\fR If you successfully port the \fBcmdtool\fR
 terminal emulator application included in the XView sources, we will
 assist you in porting \fIwave\fR (this is much simpler than the XView
 port).
@@ -691,3 +691,7 @@ The second edition of the \fIMIT-BIH Arrhythmia Database CD-ROM\fR
 contained an earlier version of \fIwave\fR (for Sparc SunOS only) that
 lacked many of the features described here.  Refer to the
 documentation included on that CD-ROM for details.
+.SH AUTHOR
+George B. Moody (george@mit.edu)
+.SH SOURCES
+http://www.physionet.org/physiotools/wfdb/wave/

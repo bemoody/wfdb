@@ -89,14 +89,27 @@ $WORDS_IN_NAVIGATION_PANEL_TITLES = 7;
 # or "minipage".
 # Effective values are those greater than 0.
 # Sensible values are between 0.1 - 4.
-$MATH_SCALE_FACTOR = 1.6;
+$MATH_SCALE_FACTOR = 2;
 
 # This number will determine the size of 
 # image generating environments such as "figure", "table" or "minipage".
 # Effective values are those greater than 0.
 # Sensible values are between 0.1 - 4.
-$FIGURE_SCALE_FACTOR = 1.6;
+$FIGURE_SCALE_FACTOR = 2;
 
+### material not in original dot.latex2html-init
+$LATEX_COLOR = "\\pagecolor[gray]{1.0}";
+
+# If this is set to 0 then any inlined images generated from "figure" 
+# environments will NOT be transparent.
+$TRANSPARENT_FIGURES = 0;
+
+# ANTI-ALIASING within generated images
+#
+# -anti_alias
+# 1 =  use anti-aliasing in the generation of images of figures .
+$ANTI_ALIAS = 1;
+### end of new material
 
 #  If this is set then intermediate files are left for later inspection.
 #  This includes $$_images.tex and $$_images.log created during image
@@ -115,12 +128,15 @@ $EXTERNAL_UP_TITLE = "WFDB Applications Guide";
 # with Netscape.
 $NETSCAPE_HTML = 1;
 
-# Valid paper sizes are "letter", "legal", "a4","a3","a2" and "a0"
-# Paper sizes has no effect other than in the time it takes to create inlined
-# images and in whether large images can be created at all ie
+# Valid paper sizes are "letter", "legal", "note" and ...
+#   "a0", ... "a10", "b0", ... "b5";  
+# Recommended:  "a5"
+# Paper sizes has no effect other than with images that
+# need special alignment; 
+# e.g for equation-numbering with HTML, version 2.0
 #  - larger paper sizes *MAY* help with large image problems 
-#  - smaller paper sizes are quicker to handle
-$PAPERSIZE = "a4";
+#  - smaller paper sizes *MAY* be quicker to handle on some systems
+$PAPERSIZE = "a3";
 
 # Replace "english" with another language in order to tell LaTeX2HTML that you 
 # want some generated section titles (eg "Table of Contents" or "References")
@@ -202,25 +218,25 @@ sub bot_navigation_panel {
 
 %icons = 
 (
- 'cross_ref_visible_mark' ,'cross_ref.gif',
+ 'cross_ref_visible_mark' ,'cross_ref.png',
  'anchor_mark' ,'&#160;',	
  'anchor_invisible_mark' ,'&#160;', 
- 'up_visible_mark' ,'up.gif', 
- 'next_visible_mark' ,'next_group_motif.gif', 
- 'previous_visible_mark' ,'previous_group_motif.gif',
- 'next_page_visible_mark' ,'next.gif',
- 'previous_page_visible_mark' ,'previous.gif',
- 'contents_visible_mark' ,'contents.gif',
- 'index_visible_mark' ,'index.gif',
- 'footnote_mark' ,'foot.gif',
- 'up_inactive_visible_mark' ,'up_gr.gif', 
- 'next_inactive_visible_mark' ,'next_group_motif_gr.gif', 
- 'previous_inactive_visible_mark' ,'previous_group_motif_gr.gif',
- 'next_page_inactive_visible_mark' ,'next_gr.gif',
- 'previous_page_inactive_visible_mark' ,'prev_gr.gif',
- 'change_begin_visible_mark','change_begin.gif',
- 'change_end_visible_mark','change_end.gif',
- 'change_delete_visible_mark','change_delete.gif'
- );
+ 'up_visible_mark' ,'up.png', 
+ 'next_visible_mark' ,'next_group_motif.png', 
+ 'previous_visible_mark' ,'previous_group_motif.png',
+ 'next_page_visible_mark' ,'next.png',
+ 'previous_page_visible_mark' ,'previous.png',
+ 'contents_visible_mark' ,'contents.png',
+ 'index_visible_mark' ,'index.png',
+ 'footnote_mark' ,'foot.png',
+ 'up_inactive_visible_mark' ,'up_gr.png', 
+ 'next_inactive_visible_mark' ,'next_group_motif_gr.png', 
+ 'previous_inactive_visible_mark' ,'previous_group_motif_gr.png',
+ 'next_page_inactive_visible_mark' ,'next_gr.png',
+ 'previous_page_inactive_visible_mark' ,'prev_gr.png',
+ 'change_begin_visible_mark','change_begin.png',
+ 'change_end_visible_mark','change_end.png',
+ 'change_delete_visible_mark','change_delete.png'
+);
 
 1;      # This must be the last line

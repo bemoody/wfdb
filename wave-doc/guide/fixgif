@@ -1,9 +1,0 @@
-for i in $*
-do
-  if ( giftrans -l $i 2>&1 | grep -q 7fc9dd ); then
-     echo -n "Making background of $i transparent ... "
-     giftrans -t#7fc9dd $i >$i-trans
-     mv $i-trans $i
-     echo done
-  fi
-done

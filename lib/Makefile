@@ -1,10 +1,10 @@
 # file: Makefile	G. Moody	 6 July 1983
-#			Last revised: 14 September 1999		Version 10.1.0
+#			Last revised:  6 January 2000		Version 10.1.0
 # UNIX 'make' description file for compiling the WFDB library with NETFILES
 #
 # _____________________________________________________________________________
 # wfdb: a library for reading and writing annotated waveforms(time series data)
-# Copyright (C) 1999 George B. Moody
+# Copyright (C) 2000 George B. Moody
 #
 # This library is free software; you can redistribute it and/or modify it under
 # the terms of the GNU Library General Public License as published by the Free
@@ -22,7 +22,7 @@
 #
 # You may contact the author by e-mail (george@mit.edu) or postal mail
 # (MIT Room E25-505A, Cambridge, MA 02139 USA).  For updates to this software,
-# please visit the author's web site (http://ecg.mit.edu/).
+# please visit PhysioNet (http://www.physionet.org/).
 # _____________________________________________________________________________
 #
 # This file is used with the UNIX `make' command to install the WFDB library.
@@ -309,25 +309,25 @@ lib:		$(OFILES)
 
 # `make slib-test':  build the alternate WFDB library in the current directory
 slib-test:
-	$(MAKE) clean
+	$(MAKE) tidy
 	$(SMAKE) lib
-	$(MAKE) clean
+	$(MAKE) tidy
 
 # `make slib':  build and install the alternate WFDB library
 slib:
-	$(MAKE) clean
+	$(MAKE) tidy
 	$(SMAKE)
-	$(MAKE) clean
+	$(MAKE) tidy
 	cd $(SLIBDIR); ln -sf $(SWFDBLIB) $(SWFDBLIB_BASENAME)
 	cd $(SLIBDIR); ln -sf $(SWFDBLIB) $(SWFDBLIB_SONAME)
 	@$(LDCONFIG) || echo Warning: "$(LDCONFIG)" was unsuccessful
 
-# `make clean':  remove intermediate and backup files
-clean:
+# `make tidy':  remove intermediate and backup files
+tidy:
 	rm -f $(OFILES) *~
 
-# `make really-clean':  also remove previously compiled versions of the library
-really-clean:
+# `make clean':  also remove previously compiled versions of the library
+clean:
 	rm -f $(WFDBLIB) $(SWFDBLIB) $(OFILES) *~
 
 # `make TAGS':  make an `emacs' TAGS file

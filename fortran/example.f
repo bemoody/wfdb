@@ -21,7 +21,7 @@ C Place - Suite 330, Boston, MA 02111-1307, USA.
 C
 C You may contact the author by e-mail (george@mit.edu) or postal mail
 C (MIT Room E25-505A, Cambridge, MA 02139 USA).  For updates to this software,
-C please visit the author's web site (http://ecg.mit.edu/).
+C please visit PhysioNet (http://www.physionet.org/).
 C _____________________________________________________________________________
 C
 C This program is a slightly elaborated version of the C example shown in

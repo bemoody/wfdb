@@ -22,7 +22,7 @@
 #
 # You may contact the author by e-mail (george@mit.edu) or postal mail
 # (MIT Room E25-505A, Cambridge, MA 02139 USA).  For updates to this software,
-# please visit the author's web site (http://ecg.mit.edu/).
+# please visit PhysioNet (http://www.physionet.org/).
 # _____________________________________________________________________________
 #
 # CC is the name of your C compiler.  These applications can be compiled with

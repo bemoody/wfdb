@@ -1,10 +1,10 @@
-/* file: helppan.c	G. Moody	   1 May 1990
-			Last revised:   10 October 1999
+/* file: helppan.c	G. Moody         1 May 1990
+			Last revised:  7 January 2000
 Help panel functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2000 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -21,7 +21,7 @@ Place - Suite 330, Boston, MA 02111-1307, USA.
 
 You may contact the author by e-mail (george@mit.edu) or postal mail
 (MIT Room E25-505A, Cambridge, MA 02139 USA).  For updates to this software,
-please visit the author's web site (http://ecg.mit.edu/).
+please visit PhysioNet (http://www.physionet.org/).
 _______________________________________________________________________________
 
 */
@@ -49,7 +49,7 @@ void find_user_guide()
 	sprintf(url, "%s/wug.htm", getcwd(NULL, 256));
     }
     else
-	strcpy(url, "http://ecg.mit.edu/wug/wug.htm");
+	strcpy(url, "http://www.physionet.org/physiotools/wug/");
 }
 
 void help()
