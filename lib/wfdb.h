@@ -33,7 +33,7 @@ _______________________________________________________________________________
 /* WFDB library version. */
 #define WFDB_MAJOR   10
 #define WFDB_MINOR   1
-#define WFDB_RELEASE 2
+#define WFDB_RELEASE 3
 
 /* Determine what type of compiler is being used. */
 #ifdef __STDC__		/* true for ANSI C compilers only */

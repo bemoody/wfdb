@@ -1,5 +1,5 @@
-# file: netmake			G. Moody		30 January 2000
-#
+# file: netmake		G. Moody       30 January 2000
+#			Last revised:	 9 April 2000		WFDB 10.1.3
 # Redefine make variables to compile a NETFILES-enabled WFDB library
 #
 # _____________________________________________________________________________
@@ -32,16 +32,16 @@
 # Wide Web Consortium's libwww library, which may be downloaded freely from
 # http://www.w3.org/Library/,
 #
-# The standard 'make' description file provided in this directory, 'Makefile',
+# The standard 'make' description file provided in this directory, 'makelib',
 # does not include NETFILES support.  Rather than duplicate all of the common
-# definitions in 'Makefile', this file simply redefines those that must differ
+# definitions in 'makelib', this file simply redefines those that must differ
 # when compiling with NETFILES support, and then invokes another instance of
-# 'make' on the standard 'Makefile', but with the new definitions overriding
-# the old ones.  If this file is renamed 'makefile', 'make' will read it
-# first (before 'Makefile') and all of this will happen automagically.  The
-# script 'configure' (in the directory above this one) renames this file
-# if libwww has been installed, so that a simple 'make' in that directory is
-# all that is required.
+# 'make' on the standard 'makelib', but with the new definitions overriding
+# the old ones.  If this file is renamed 'Makefile', 'make' will read it
+# by default, and all of this will happen automagically.  The script
+# 'configure' (in the directory above this one) renames this file if libwww
+# has been installed, so that a simple 'make' in that directory is all that is
+# required.
 #
 # NETFILES support is known to work well under Linux (with both 2.0 and 2.2
 # series kernels and glibc 2.0 and 2.1) provided that the library is compiled
@@ -52,11 +52,11 @@
 # For further information about NETFILES, see README.NETFILES in the top-level
 # directory of the WFDB software package.
 
-# These should exactly match the values in Makefile.  They are needed here because
-# other variables are constructed using these.
+# These should exactly match the values in makelib.  They are needed here
+# because other variables are constructed using these.
 MAJOR = 10
 MINOR = 1
-RELEASE = 1
+RELEASE = 3
 CCDEFS = -DWFDB_MAJOR=$(MAJOR) -DWFDB_MINOR=$(MINOR) -DWFDB_RELEASE=$(RELEASE)
 SWFDBLIB_BASENAME = libwfdb.so
 SWFDBLIB_SONAME = $(SWFDBLIB_BASENAME).$(MAJOR)
@@ -73,10 +73,10 @@ SBUILDLIB = gcc -shared -Wl,-soname,$(SWFDBLIB_SONAME) \
   `libwww-config --libs` -o $(SWFDBLIB) $(SLIBOBJS)
 
 # This command causes the 'make' processes spawned from this one to use the
-# standard Makefile after incorporating the definitions above.
-MAKE = make -f Makefile
+# standard `make' description file after incorporating the definitions above.
+MAKE = make -f makelib
 
-# 'make' targets:  Each target in 'Makefile' should have an identically named
+# 'make' targets:  Each target in 'makelib' should have an identically named
 # target here.
 
 install:

@@ -2242,13 +2242,13 @@ insert the special annotations manually around the first beat.)
 
 Let us begin by deciding how the program should be invoked from \WAVE{}.
 At a minimum, we should be able to specify which signal should be
-measured, and the region of interest.  The program also needs to know
+measured, and the region of interest.
 \index{record!name}
 \index{annotator name}
-the record and annotator names (the latter so that it can read the
-annotations it needs to get started).  Following the conventions
-used by many other WFDB applications, we add the following entry to
-\WAVE{}'s menu file:
+The program also needs to know the record and annotator names (the
+latter so that it can read the annotations it needs to get started).
+Following the conventions used by many other WFDB applications, we
+add the following entry to \WAVE{}'s menu file:
 
 \begin{verbatim}
 Measure ST deviation<TAB>stdev -r $RECORD -a $ANNOTATOR \

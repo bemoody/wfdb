@@ -39,7 +39,9 @@ _______________________________________________________________________________
 #include <xview/cursor.h>
 #include <xview/defaults.h>
 #include <xview/win_input.h>
+#include <xview/xview.h>	/* new */
 #include <xview/frame.h>
+#include <xview/panel.h>	/* new */
 #include <xview/notice.h>
 #include <xview/window.h>
 
@@ -238,7 +240,7 @@ void save_defaults()
 	defaults_set_integer("Wave.View.CoarseTimeScale", tsa_index);
     defaults_set_integer("Wave.View.AmplitudeScale", vsa_index);
     defaults_set_integer("Wave.View.AnnotationMode", ann_mode);
-    defaults_set_integer("Wave.View.AnnotationOverlap", overlap);
+    //    defaults_set_integer("Wave.View.AnnotationOverlap", overlap);
     defaults_set_integer("Wave.View.SignalMode", sig_mode);
     defaults_set_integer("Wave.View.TimeMode", time_mode);
     if (tsa_index > MAX_COARSE_TSA_INDEX)
@@ -258,7 +260,8 @@ Destroy_status status;
 {
     if (status == DESTROY_CHECKING) {
 	int result;
-#ifdef NOTICE
+	// #ifdef NOTICE
+#if 0
 	Xv_notice notice = xv_create((Frame)client, NOTICE,
 				     XV_SHOW, TRUE,
 				     NOTICE_STATUS, &result,
@@ -269,7 +272,8 @@ Destroy_status status;
 				   NOTICE_BUTTON_YES, "Confirm",
 				   NOTICE_BUTTON_NO, "Cancel",
 				   NULL);
-#ifdef NOTICE
+#if 0
+				     //#ifdef NOTICE
 	xv_destroy_safe(notice);
 #endif
 	if (result != NOTICE_YES)
@@ -628,10 +632,10 @@ int mode;
 	ann_mode     = defaults_get_integer("wave.view.annotationmode",
 					    "Wave.View.AnnotationMode",
 					    0);
-    if (overlap < 0)
-	overlap      = defaults_get_integer("wave.view.annotationoverlap",
-					    "Wave.View.AnnotationOverlap",
-					    0);
+    //    if (overlap < 0)
+    //	overlap      = defaults_get_integer("wave.view.annotationoverlap",
+    //					    "Wave.View.AnnotationOverlap",
+    //				    0);
     if (sig_mode < 0)
 	sig_mode     = defaults_get_integer("wave.view.signalmode",
 					    "Wave.View.SignalMode",

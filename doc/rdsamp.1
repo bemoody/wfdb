@@ -1,4 +1,4 @@
-.TH RDSAMP 1 "11 January 2000" "WFDB software 10.0" "WFDB applications"
+.TH RDSAMP 1 "10 April 2000" "WFDB software 10.1.3" "WFDB applications"
 .SH NAME
 rdsamp \- read WFDB signal files
 .SH SYNOPSIS
@@ -25,6 +25,11 @@ These modes are identical for ordinary records.  For multifrequency records,
 the standard decimation of oversampled signals to the frame rate is suppressed
 in high-resolution mode (rather, all other signals are resampled at the highest
 sampling frequency).
+.TP
+\fB-l\fR \fIinterval\fR
+Limit the amount of output to the specified time \fIinterval\fR (in standard
+time format;  default: no limit).  If both \fB-l\fR and \fB-t\fR are used,
+\fIrdsamp\fR stops at the earlier of the two limits.
 .TP
 \fB-p\fR
 Print times in seconds and milliseconds, and values in physical units.  By

@@ -1,5 +1,5 @@
 # file: Makefile	G. Moody	5 September 1990
-#			Last revised:    11 March 2000     Version 10.1.2
+#			Last revised:     9 April 2000     Version 10.1.3
 # UNIX 'make' description file for the WFDB software package
 #
 # -----------------------------------------------------------------------------
@@ -49,7 +49,7 @@ ARCH=`uname -m`-`uname -s`
 # the parent of this directory) for details.
 MAJOR = 10
 MINOR = 1
-RELEASE = 2
+RELEASE = 3
 VERSION = $(MAJOR).$(MINOR).$(RELEASE)
 VERDEFS= 
 
@@ -114,13 +114,13 @@ clean:
 	cd doc;      $(MAKE) clean
 	cd examples; $(MAKE) clean
 	cd fortran;  $(MAKE) clean
-	cd lib;      $(MAKE) clean
+	cd lib;      $(MAKE) -f makelib clean
 	cd psd;      $(MAKE) clean
-	cd wave;     $(MAKE) clean
+	cd wave;     $(MAKE) -f makewave clean
 	cd wave-doc; $(MAKE) clean
 	cd waverc;   $(MAKE) clean
 	cd wview;    $(MAKE) -f clean
-	rm -f *~ lib/makefile wave/makefile config.cache
+	rm -f *~ lib/Makefile wave/Makefile config.cache
 
 # 'make config.cache': check configuration
 config.cache:

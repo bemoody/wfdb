@@ -1,6 +1,26 @@
 /* file: stdev.c        G. Moody        19 August 1996
 
-Sample application for use with WAVE
+-------------------------------------------------------------------------------
+stdev: sample application for use with WAVE
+Copyright (C) 1996 George B. Moody
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place - Suite 330, Boston, MA 02111-1307, USA.
+
+You may contact the author by e-mail (george@mit.edu) or postal mail
+(MIT Room E25-505A, Cambridge, MA 02139 USA).  For updates to this software,
+please visit PhysioNet (http://www.physionet.org/).
+_______________________________________________________________________________
 
 This program measures ST deviations given QRS annotations and a pair of
 `(' and `)' annotations around the first QRS annotation.  Its output

@@ -40,8 +40,9 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-    char *wfdbp, *hp, *p, *tp, *start_string = NULL, *getenv();
+    char *wfdbp, *hp, *p, *start_string = NULL, *tp, *getenv();
     int do_demo = 0, i, mode = 0;
+    static char *helppath;
     static int wave_procno;
     void set_frame_footer();
 
@@ -66,6 +67,16 @@ char *argv[];
     /* Provide (non-window based) usage information if needed. */
     if (i == argc-1 || argc == 1 || getenv("DISPLAY") == NULL)
 	help();	/* print info and quit */
+
+    /* Set the path for XView spot help. */
+    if ((hp = getenv("HELPPATH")) == NULL)
+	hp = "/usr/lib/help";
+    helppath = (char *)malloc(strlen(hp) + strlen(helpdir) + 16);
+    	/* (strlen("HELPPATH=") + strlen(":") + strlen("/wave") + 1 = 16) */
+    if (helppath) {
+	sprintf(helppath, "HELPPATH=%s:%s/wave", hp, helpdir);
+	putenv(helppath);
+    }
 
     /* Check for requests to open more than one record. */
     strcpy(record, argv[++i]);
@@ -309,16 +320,6 @@ char *argv[];
 
     /* Provide help if no record was specified. */
     if (record[0] == '\0') help();
-
-    /* Set the path for XView spot help. */
-    if ((hp = getenv("HELPPATH")) == NULL)
-	hp = "/usr/lib/help";
-    tp = (char *)malloc(strlen(hp) + strlen(helpdir) + 16);
-    	/* (strlen("HELPPATH=") + strlen(":") + strlen("/wave") + 1 = 16) */
-    if (tp) {
-	sprintf(tp, "HELPPATH=%s:%s/wave", hp, helpdir);
-	putenv(tp);
-    }
 
     /* Set up base frame, quit if unsuccessful. */
     if (initialize_graphics(mode)) exit(1);

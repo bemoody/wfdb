@@ -1,5 +1,5 @@
 /* file: xform.c	G. Moody       8 December 1983
-			Last revised:  2 October 1999
+			Last revised:   10 April 2000
 
 -------------------------------------------------------------------------------
 xform: Sampling frequency, amplitude, and format conversion for WFDB records
@@ -53,15 +53,15 @@ int argc;
 char *argv[];
 {
     char *irec = NULL, *orec = NULL, *nrec = NULL, *startp = "0:0";
-    int i;
-    int fflag = 0, gflag = 0, Hflag = 0, ifreq, j, m, msiglist[WFDB_MAXSIG],
-	Mflag = 0, mn, n, nann = 0, nisig, nminutes = 0, nosig = -1, ofreq = 0,
-        reopen = 0, siglist[WFDB_MAXSIG], spf = 1, use_irec_desc = 1;
+    int clip = 0, fflag = 0, gflag = 0, Hflag = 0, ifreq, i, j, m, Mflag = 0,
+	mn, n, nann = 0, nisig, nminutes = 0, nosig = -1, ofreq = 0,
+        reopen = 0, spf = 1, use_irec_desc = 1;
     static char btstring[30];
     static double gain[WFDB_MAXSIG];
-    static int deltav[WFDB_MAXSIG], v[WFDB_MAXSIG], vin[WFDB_MAXSIG*WFDB_MAXSPF],
-        vmax[WFDB_MAXSIG], vmin[WFDB_MAXSIG], vv[WFDB_MAXSIG],
-	vout[WFDB_MAXSIG*WFDB_MAXSPF];
+    static int deltav[WFDB_MAXSIG], msiglist[WFDB_MAXSIG],
+	siglist[WFDB_MAXSIG], v[WFDB_MAXSIG], vin[WFDB_MAXSIG*WFDB_MAXSPF],
+        vmax[WFDB_MAXSIG], vmin[WFDB_MAXSIG], vout[WFDB_MAXSIG*WFDB_MAXSPF],
+	vv[WFDB_MAXSIG];
     static long it, ot, from, to, nsamp = -1L, spm, nsm = 0L;
     static WFDB_Siginfo dfin[WFDB_MAXSIG], dfout[WFDB_MAXSIG];
     static WFDB_Anninfo ai[WFDB_MAXANN];
@@ -91,6 +91,9 @@ char *argv[];
 		ai[nann].name = argv[i++]; ai[nann++].stat = WFDB_READ;
 	    } while (i < argc && *argv[i] != '-');
 	    i--;
+	    break;
+	  case 'c':	/* clip (limit) output (default: discard high bits) */
+	    clip = 1;
 	    break;
 	  case 'f':	/* starting time */
 	    if (++i >= argc) {
@@ -667,12 +670,14 @@ char *argv[];
 		if (vout[i] > vmax[i]) {
 		    (void)fprintf(stderr, "v[%d] = %d (out of range)\n",
 				  i, vout[i]);
-		    vmax[i] = vout[i];
+		    if (clip) vout[i] = vmax[i];
+		    else vmax[i] = vout[i];
 		}
 		else if (vout[i] < vmin[i]) {
 		    (void)fprintf(stderr, "v[%d] = %d (out of range)\n",
 				  i, vout[i]);
-		    vmin[i] = vout[i];
+		    if (clip) vout[i] = vmin[i];
+		    else vmin[i] = vout[i];
 		}
 	    }
 	    if (putvec(vout) < 0) break;
@@ -697,12 +702,14 @@ char *argv[];
 		if (vout[j] > vmax[i]) {
 		    (void)fprintf(stderr, "v[%d] = %d (out of range)\n",
 				  i, vout[j]);
-		    vmax[i] = vout[j];
+		    if (clip) vout[j] = vmax[i];
+		    else vmax[i] = vout[j];
 		}
 		else if (vout[j] < vmin[i]) {
 		    (void)fprintf(stderr, "v[%d] = %d (out of range)\n",
 				  i, vout[j]);
-		    vmin[i] = vout[j];
+		    if (clip) vout[j] = vmin[i];
+		    else vmin[i] = vout[j];
 		}
 	      }
 	    }
@@ -727,12 +734,14 @@ char *argv[];
 		if (vout[i] > vmax[i]) {
 		    (void)fprintf(stderr, "v[%d] = %d (out of range)\n",
 				  i, vout[i]);
-		    vmax[i] = vout[i];
+		    if (clip) vout[i] = vmax[i];
+		    else vmax[i] = vout[i];
 		}
 		else if (vout[i] < vmin[i]) {
 		    (void)fprintf(stderr, "v[%d] = %d (out of range)\n",
 				  i, vout[i]);
-		    vmin[i] = vout[i];
+		    if (clip) vout[i] = vmin[i];
+		    else vmin[i] = vout[i];
 		}
 	    }
 	    if (putvec(vout) < 0) break;
@@ -757,12 +766,14 @@ char *argv[];
 		if (vout[j] > vmax[i]) {
 		    (void)fprintf(stderr, "v[%d] = %d (out of range)\n",
 				  i, vout[j]);
-		    vmax[i] = vout[j];
+		    if (clip) vout[j] = vmax[i];
+		    else vmax[i] = vout[j];
 		}
 		else if (vout[j] < vmin[i]) {
 		    (void)fprintf(stderr, "v[%d] = %d (out of range)\n",
 				  i, vout[j]);
-		    vmin[i] = vout[j];
+		    if (clip) vout[j] = vmin[i];
+		    else vmin[i] = vout[j];
 		}
 	      }
 	    }
@@ -790,12 +801,14 @@ char *argv[];
 		    if (vout[i] > vmax[i]) {
 			(void)fprintf(stderr, "v[%d] = %d (out of range)\n",
 				      i, vout[i]);
-			vmax[i] = vout[i];
+			if (clip) vout[i] = vmax[i];
+			else vmax[i] = vout[i];
 		    }
 		    else if (vout[i] < vmin[i]) {
 			(void)fprintf(stderr, "v[%d] = %d (out of range)\n",
 				      i, vout[i]);
-			vmin[i] = vout[i];
+			if (clip) vout[i] = vmin[i];
+			else vmin[i] = vout[i];
 		    }
 		}
 		if (putvec(vout) < 0) { nsamp = 0L; break; }
@@ -827,12 +840,14 @@ char *argv[];
 		    if (vout[i] > vmax[i]) {
 			(void)fprintf(stderr, "v[%d] = %d (out of range)\n",
 				      i, vout[i]);
-			vmax[i] = vout[i];
+			if (clip) vout[i] = vmax[i];
+			else vmax[i] = vout[i];
 		    }
 		    else if (vout[i] < vmin[i]) {
 			(void)fprintf(stderr, "v[%d] = %d (out of range)\n",
 				      i, vout[i]);
-			vmin[i] = vout[i];
+			if (clip) vout[i] = vmin[i];
+			else vmin[i] = vout[i];
 		    }
 		}
 		if (putvec(vout) < 0) { nsamp = 0L; break; }
@@ -919,6 +934,7 @@ static char *help_strings[] = {
  " include any of:",
  " -a ANNOTATOR [ANNOTATOR ...]  copy annotations for the specified ANNOTATOR",
  "              from IREC;  two or more ANNOTATORs may follow -a",
+ " -c          clip output (default: wrap around if out-of-range)",
  " -f TIME     begin at specified time",
  " -h          print this usage summary",
  " -H          open the input record in `high resolution' mode",

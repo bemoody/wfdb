@@ -1,5 +1,5 @@
-# file: Makefile	G. Moody	 6 July 1983
-#			Last revised:   11 March 2000		Version 10.1.2
+# file: makelib		G. Moody	 6 July 1983
+#			Last revised:   9 April 2000		Version 10.1.3
 # UNIX 'make' description file for compiling the WFDB library
 #
 # _____________________________________________________________________________
@@ -28,17 +28,18 @@
 # This file is used with the UNIX `make' command to install the WFDB library.
 # Before using it for the first time, check that the site-specific variables
 # below are appropriate for your system.  To build and install the standard
-# WFDB library, just type `make' (from within this directory).  To build and
-# install the alternate WFDB library (not available on all systems), type
-# `make slib'.
+# WFDB library, copy this file to `Makefile', then just type `make' (from
+# within this directory).  To build and install the alternate WFDB library (not
+# available on all systems), type `make slib'.
 
-# If used as is, this Makefile compiles the WFDB library without NETFILES
-# support.  The simplest way to compile with NETFILES support (which requires
-# that you have previously installed libwww, see http://www.w3.org/Library/),
-# is to copy 'netmake' to 'makefile' before running 'make' in this directory.
-# (If you do this, the definitions in the renamed file take precedence over
-# those below.)  As is, this Makefile is preconfigured for Linux and requires
-# minor changes for other supported operating systems.
+# If this file is copied to `Makefile', make compiles the WFDB library without
+# NETFILES support.  The simplest way to compile with NETFILES support (which
+# requires that you have previously installed libwww, see
+# http://www.w3.org/Library/), is to copy 'netmake' (rather than this file) to
+# 'Makefile' before running 'make' in this directory.  (If you do this, the
+# definitions in the renamed file take precedence over those below.)  As is,
+# this file is preconfigured for Linux and requires minor changes for other
+# supported operating systems.
 
 # NETFILES support is known to work well under Linux (with both 2.0 and 2.2
 # series kernels and glibc 2.0 and 2.1) provided that the library is compiled
@@ -65,7 +66,7 @@
 # Makefile (in the parent of this directory) for details.
 MAJOR = 10
 MINOR = 1
-RELEASE = 2
+RELEASE = 3
 VERSION = $(MAJOR).$(MINOR).$(RELEASE)
 
 # Historical note:  Versions earlier than 10.0.0, released between 1981 and

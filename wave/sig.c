@@ -1,10 +1,10 @@
 /* file: sig.c		G. Moody	27 April 1990
-			Last revised:	29 April 1999
+			Last revised:	14 March 2000
 Signal display functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2000 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -239,7 +239,7 @@ static struct display_list *get_display_list()
 	   and they need not be reset. */
 	if (nsamp > canvas_width) {
 	    x = maxx = canvas_width - 1;
-	    if (lp->xmax != x) {
+	    if (lp->vlist[i][x].x != x) {
 		int xx;
 
 		lp->vlist[i][0].x = 0;	/* absolute first abscissa */
@@ -254,7 +254,7 @@ static struct display_list *get_display_list()
 	   be correct, and no computation is needed. */
 	else {
 	    x = maxx = nsamp - 1;
-	    if (lp->xmax != x*tscale) {
+	    if (lp->vlist[i][vlist_size-1].x != (int)(x*tscale)) {
 		int xp, xpp;
 
 		lp->vlist[i][0].x = xp = 0;    /* absolute first abscissa */
@@ -414,7 +414,7 @@ void clear_cache()
 
     if (canvas_width > vlist_size) {
 	for (lp = first_list; lp; lp = lp->next) {
-	    for (i = 0; i < NSIG && lp->vlist[i] != NULL; i++) {
+	    for (i = 0; i < WFDB_MAXSIG && lp->vlist[i] != NULL; i++) {
 		free(lp->vlist[i]);
 		lp->vlist[i] = NULL;
 	    }

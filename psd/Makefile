@@ -87,7 +87,7 @@ all:	$(XFILES)
 # `make scripts': customize and install scripts
 scripts:
 	sed s+/usr/local/bin+$(BINDIR)+g <hrfft >$(BINDIR)/hrfft
-	sed s+/usr/local/bin+$(BINDIR)+g <hrlomb >$(BINDIR)/htlomb
+	sed s+/usr/local/bin+$(BINDIR)+g <hrlomb >$(BINDIR)/hrlomb
 	sed s+/usr/local/bin+$(BINDIR)+g <hrmem >$(BINDIR)/hrmem
 	sed s+/usr/local/bin+$(BINDIR)+g <hrplot >$(BINDIR)/hrplot
 	cp plot2d plot3d $(BINDIR)

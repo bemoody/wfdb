@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/usr/bin/perl
 'di ';
 'ig 00 ';
 #+##############################################################################
@@ -11,7 +11,7 @@
 
 # From @(#)texi2html	1.52 01/05/98	
 # Written (mainly) by Lionel Cons, Lionel.Cons@cern.ch
-# $Id: texi2html,v 1.5 1999/07/19 18:19:49 george Exp $
+# $Id: texi2html,v 1.6 2000/04/26 05:44:30 george Exp $
 # This version of texi2html is currently maintained at
 # http://www.mathematik.uni-kl.de/~obachman/Texi2html by
 # Olaf Bachmann (obachman@mathematik.uni-kl.de)

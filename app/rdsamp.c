@@ -1,9 +1,9 @@
 /* file: rdsamp.c	G. Moody	23 June 1983
-			Last revised:    3 May 1999
+			Last revised:   9 April 2000
 
 -------------------------------------------------------------------------------
 rdsamp: Print an arbitrary number of samples from each signal
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2000 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -68,7 +68,7 @@ char *argv[];
     int i, isiglist, nsig, nosig = 0, pflag = 0, s, *sig = NULL, v[WFDB_MAXSIG],
 	vflag = 0;
     int highres = 0;
-    long from = 0L, to = 0L;
+    long from = 0L, maxl = 0L, to = 0L;
     static WFDB_Siginfo si[WFDB_MAXSIG];
     void help();
 
@@ -118,6 +118,14 @@ char *argv[];
 	    break;
 	  case 'H':	/* select high-resolution mode */
 	    highres = 1;
+	    break;
+	  case 'l':	/* maximum length of output follows */
+	    if (++i >= argc) {
+		(void)fprintf(stderr, "%s: max output length must follow -l\n",
+			      pname);
+		exit(1);
+	    }
+	    maxl = i;
 	    break;
 	  case 'r':	/* record name */
 	    if (++i >= argc) {
@@ -179,6 +187,10 @@ char *argv[];
 	exit(2);
     if (to > 0L && (to = strtim(argv[to])) < 0L)
 	to = -to;
+    if (maxl > 0L && (maxl = strtim(argv[maxl])) < 0L)
+	maxl = -maxl;
+    if (maxl && (to == 0L || to > from + maxl))
+	to = from + maxl;
     if (nosig) {		/* print samples only from specified signals */
 #ifndef lint
 	if ((sig = (int *)malloc((unsigned)nosig*sizeof(int))) == NULL) {
@@ -293,6 +305,7 @@ static char *help_strings[] = {
  " -f TIME     begin at specified time",
  " -h          print this usage summary",
  " -H          read multifrequency signals in high resolution mode",
+ " -l INTERVAL truncate output after the specified time interval (hh:mm:ss)",
  " -p          print times and samples in physical units (default: raw units)",
  " -s SIGNAL [SIGNAL ...]  print only the specified signal(s)",
  " -t TIME     stop at specified time",

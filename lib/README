@@ -1,5 +1,5 @@
 file: README		G. Moody	 1 July 1989
-			Last revised:	  5 May 1999	      wfdblib 10.0.0
+			Last revised:	 30 March 2000	      wfdblib 10.1.2
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
@@ -38,7 +38,10 @@ the same level as this one).
 The following files will be found in this directory:
 
 COPYING.LIB	the GNU Library General Public License
-Makefile	UNIX `make' description file for compiling the WFDB library
+makelib		UNIX `make' description file for compiling the WFDB library
+		 without NETFILES support (copy to `Makefile' before use)
+netmake		UNIX `make' description file for compiling the WFDB library
+		 with NETFILES support (copy to `Makefile' before use)
 Makefile-dos-gcc UNIX `make' description file for compiling the WFDB library
 		 for MS-DOS using a gcc cross-compiler under UNIX
 Makefile.dos	MS-DOS `make' description file for compiling the WFDB library
