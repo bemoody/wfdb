@@ -1,4 +1,4 @@
-This is wpg, produced by makeinfo version 4.0 from wpg.tex.
+This is wpg, produced by makeinfo version 4.0b from wpg.tex.
 
 INFO-DIR-SECTION Libraries
 START-INFO-DIR-ENTRY
@@ -164,7 +164,7 @@ Sources
 
    This section is a compendium of sources for databases and related
 materials that may be useful to readers of this guide.  Please send any
-corrections to the author (`george@mit.edu').
+corrections to the author (<george@mit.edu>).
 
 _WFDB Programmer's Guide (this guide)_
 _WFDB Applications Guide_
@@ -175,6 +175,8 @@ _MIT-BIH Polysomnographic Database_
 _MIMIC Database_
 _Other reference databases of physiologic signals_
 _WFDB Software Package_
+_W3C libwww sources_
+_XView toolkit (needed for WAVE)_
 
           WWW: `http://www.physionet.org/'
 
@@ -196,7 +198,7 @@ _Software for Physiologic Databases with Samples CD-ROM_
           77 Massachusetts Ave.
           Cambridge, MA 02139 USA
           
-          e-mail: `george@mit.edu'
+          email: <george@mit.edu>
           WWW: http://ecg.mit.edu/
           telephone: +1 617 253 7424
 
@@ -209,7 +211,7 @@ _VALE Database Directory_
           via Trieste, 41
           56126 PISA, Italy
           
-          e-mail:	`taddei@ifc.pi.cnr.it'
+          email:	<taddei@ifc.pi.cnr.it>
           telephone: +39 050 501145
           telefax: +39 050 503596
 
@@ -219,7 +221,7 @@ _AHA Database for Evaluation of Ventricular Arrhythmia Detectors_
           5200 Butler Pike
           Plymouth Meeting, PA 19462 USA
           
-          e-mail: `hshupack@shrsys.hslc.org'
+          email: <hshupack@shrsys.hslc.org>
           WWW: `http://www.healthcare.ecri.org/'
           telephone: +1 610 825 6000
 
@@ -230,7 +232,7 @@ _MGH/Marquette Foundation Waveform Database CD-ROMs_
           Fruit St.
           Boston, MA 02114 USA
           
-          e-mail: `cooper@etherdome.mgh.harvard.edu'
+          email: <cooper@etherdome.mgh.harvard.edu>
           telephone: +1 617 726 8824
 
      This is a large database of multi-channel recordings (3 ECG leads,
@@ -272,7 +274,7 @@ _Proceedings of Computers in Cardiology (ISSN 0276-6574)_
           P.O. Box 1331
           Piscataway, NJ 08855-1331 USA
           
-          e-mail: `customer.service@ieee.org'
+          email: <customer.service@ieee.org>
           WWW: `http://www.ieee.org/ieeestore/'
           telephone: 1 800 678 IEEE (USA and Canada) or +1 732 981 0060
           telefax: +1 732 981 9667
@@ -290,7 +292,7 @@ _GNU info and makeinfo (standalone hypertext browser and formatter)_
           59 Temple Place - Suite 330
           Boston, MA 02111-1307 USA
           
-          e-mail: `gnu@gnu.org'
+          email: <gnu@gnu.org>
           WWW: `http://www.gnu.org/'
           telephone: +1 617 542 5942
      GNU software is included in all Linux distributions (in fact,
@@ -310,7 +312,7 @@ _TeX for Unix systems_
      `ftp.tex.ac.uk', `ftp.dante.de', and `ctan.tug.org'.  Many of the
      sources of GNU software (above) also make TeX, etc. available.
      CTAN is indexed on the World Wide Web (one such index is
-     `http://ctan.tug.org/ctan/').
+     `http://www.ctan.org/').
 
      The Unix TeX distribution is also distributed on CD-ROM and in
      other tape formats by the Free Software Foundation (address above)
@@ -328,28 +330,29 @@ _General information on TeX_
           Portland, OR 97208-2311 USA
           
           WWW: `http://www.tug.org/'
-          e-mail: `office@tug.org'
+          email: <office@tug.org>
           telephone: +1 503 223 3960
           telefax: +1 503 223 9994
 
-_X11R6 (the X Window System, Version 11, Release 6)_
-_XView_
+_W3C libwww libraries_
 
-          The Open Group
-          29B Montvale Ave.
-          Woburn, MA 01801 USA
-          
-          e-mail: `xorg_info@x.org'
+
+          WWW: `http://www.w3.org/Library/'
+
+     The `libwww' libraries, created and maintained by the World Wide
+     Web Consortium, provide the low-level functions needed to support
+     the WFDB library's (optional) NETFILES capability.  The `libwww'
+     libraries are also available from PhysioNet.
+
+_X11R6 (the X Window System, Version 11, Release 6)_
+
+
+          email: `xorg_info@x.org'
           WWW: `http://www.x.org/'
           telephone: +1 781 376 8200
           telefax: +1 781 376 9358
 
-     These packages are freely available by anonymous FTP from
-     ftp.x.org and other archive sites.  X11R6 sources are also
-     available on CD-ROM from the Free Software Foundation (address
-     above).
-
-     Sources for XView are also available from PhysioNet.
+     Sources for XView are available from PhysioNet.
 
 _GNU/Linux_
      GNU/Linux is a POSIX-compliant reimplementation of the Unix
@@ -357,7 +360,7 @@ _GNU/Linux_
      thousands.  It runs on Intel 386, 486, and Pentium PCs, among
      others.  For information about GNU/Linux, visit the web site of
      the Linux Documentation Project:
-          `WWW: http://www.linuxdoc.org/'
+          WWW: `http://www.linuxdoc.org/'
 
      GNU/Linux is freely available by anonymous FTP in source and
      binary form from many sites, including:
@@ -369,26 +372,32 @@ _GNU/Linux_
      GNU/Linux on CD-ROMs are widely available.  Among the more popular
      are:
 
-          Caldera Systems, Inc.
-          240 West Center Street
-          Orem, UT 84057 USA
-          
-          e-mail: `info@caldera.com'
-          WWW: `http://www.caldera.com/'
-          telephone: +1 801 765 4999
-          telefax: +1 801 765 1313
-          
-          
-          Debian
+          Debian (non-commercial)
           
           WWW: `http://www.debian.org/'
+          
+          
+          Gentoo (non-commercial)
+          
+          WWW: `http://www.gentoo.org/'
+          
+          
+          MandrakeSoft S.A.
+          43, rue d'Aboukir
+          75002 Paris
+          France
+          
+          email: <webmaster@linux-mandrake.com>
+          WWW: `http://www.linux-mandrake.com/'
+          telephone: +1 626 296 6290 (USA), +33(0) 1 40 41 00 41 (France)
+          telefax: +1 801 765 1313
           
           
           Red Hat
           2600 Meridian Parkway
           Durham, NC 27713
           
-          e-mail: `orders@redhat.com'
+          email: <orders@redhat.com>
           WWW: `http://www.redhat.com/'
           telephone: 1 888 733 4281 (USA and Canada) or +1 919 547 0012
           telefax: +1 919 547 0024
@@ -396,6 +405,7 @@ _GNU/Linux_
           
           Slackware
           
+          email: <info@slackware.com>
           WWW: `http://www.slackware.com/'
           
           
@@ -404,7 +414,7 @@ _GNU/Linux_
           D-90443 Nurnberg
           Germany
           
-          e-mail: `suse@suse.de'
+          email: <suse@suse.de>
           WWW: `http://www.suse.de/' (Germany), `http://www.suse.com/' (USA)
           telephone: +49 911 74053 31
           telefax: +49 911 7417755
@@ -459,7 +469,7 @@ _Microstar DAP analog interface boards for PCs_
           2265 116th Avenue N.E.
           Bellevue, WA 98004 USA
           
-          e-mail: `info@mstarlabs.com/'
+          email: <info@mstarlabs.com/>
           WWW: `http://www.mstarlabs.com/'
           telephone: +1 425 453 2345
           telefax: +1 425 453 3199

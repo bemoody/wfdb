@@ -1,4 +1,4 @@
-This is wpg, produced by makeinfo version 4.0 from wpg.tex.
+This is wpg, produced by makeinfo version 4.0b from wpg.tex.
 
 INFO-DIR-SECTION Libraries
 START-INFO-DIR-ENTRY
@@ -269,6 +269,14 @@ Concept Index
 * legal annotation code:                 Mapping macros.
 * length of signal file:                 WFDB_Siginfo structures.
 * library functions:                     Functions.
+* libwww <1>:                            Sources.
+* libwww <2>:                            MS-Windows installation.
+* libwww <3>:                            Unix installation.
+* libwww <4>:                            Glossary.
+* libwww <5>:                            NETFILES.
+* libwww <6>:                            WFDB path syntax.
+* libwww <7>:                            compiling.
+* libwww:                                Recent changes.
 * Linux:                                 Sources.
 * loader options:                        compiling.
 * local record:                          Piped and Local Records.
@@ -480,6 +488,14 @@ Concept Index
 * variable name restrictions:            name restrictions.
 * virtual array of annotations:          Annotation Order.
 * voltage (conversion to and from adus): aduphys and physadu.
+* W3C libwww <1>:                        Sources.
+* W3C libwww <2>:                        MS-Windows installation.
+* W3C libwww <3>:                        Unix installation.
+* W3C libwww <4>:                        Glossary.
+* W3C libwww <5>:                        NETFILES.
+* W3C libwww <6>:                        WFDB path syntax.
+* W3C libwww <7>:                        compiling.
+* W3C libwww:                            Recent changes.
 * waveform editor <1>:                   Sources.
 * waveform editor <2>:                   Graphics.
 * waveform editor:                       Applications.
@@ -530,6 +546,8 @@ Concept Index
 * writing signals:                       putvec.
 * X Window System:                       Sources.
 * X11:                                   Sources.
+* XView toolkit <1>:                     Sources.
+* XView toolkit:                         Unix installation.
 
 
 File: wpg,  Node: Function and Macro Index,  Next: Copying,  Prev: Concept Index,  Up: Top
@@ -633,7 +651,7 @@ File: wpg,  Node: Copying,  Prev: Function and Macro Index,  Up: Top
    WFDB Programmer's Guide
 
    Tenth Edition (revised and with additions for WFDB library version
-10.2.7)
+10.2.9) 26 October 2002
 
    George B. Moody
 

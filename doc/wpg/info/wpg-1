@@ -1,4 +1,4 @@
-This is wpg, produced by makeinfo version 4.0 from wpg.tex.
+This is wpg, produced by makeinfo version 4.0b from wpg.tex.
 
 INFO-DIR-SECTION Libraries
 START-INFO-DIR-ENTRY
@@ -10,8 +10,8 @@ File: wpg,  Node: Top,  Next: Overview,  Prev: (dir),  Up: (dir)
 
    This guide documents the Waveform Database interface library (the
 WFDB library).  This file contains the text of the Tenth Edition of the
-`WFDB Programmer's Guide' (8 August 2002), with revisions for release
-10.2.7 of the WFDB library.
+`WFDB Programmer's Guide' (26 October 2002), with revisions for release
+10.2.9 of the WFDB library.
 
 * Menu:
 
@@ -257,11 +257,11 @@ the WFDB library functions, are unfamiliar to you, see pp. 217-218 in
 the second edition of `The C Programming Language' by Kernighan and
 Ritchie, Prentice Hall, 1988.  (This is the famous `K&R'; all `K&R'
 references in this guide include page numbers for the second edition.
-Newcomers to C should have a copy for ready reference while reading
-this guide.)  It may also be helpful to have a copy of a database
-directory, such as the `MIT-BIH Arrhythmia Database Directory'
-(`http://www.physionet.org/physiobank/database/mitdb/mitdbdir/').  The
-`WFDB Applications Guide' (`http://www.physionet.org/physiotools/wag/')
+Newcomers to C should have a copy for ready reference while reading this
+guide.)  It may also be helpful to have a copy of a database directory,
+such as the `MIT-BIH Arrhythmia Database Directory'
+(http://www.physionet.org/physiobank/database/html/mitdbdir/).  The
+`WFDB Applications Guide' (http://www.physionet.org/physiotools/wag/)
 will be useful as a reference for existing WFDB library-based
 applications (available from PhysioNet, `http://www.physionet.org/').
 
@@ -361,12 +361,10 @@ analysis projects.  The guide, and the WFDB library itself, have been
 extensively revised since they first appeared in 1981.  Your comments
 and suggestions are welcome.  Please send them to:
 
-     George B. Moody
-     MIT Room E25-505
+     George B. Moody  <<george@mit.edu>>
+     MIT Room E25-505A
      Cambridge, MA 02139
      USA
-     
-     (e-mail: `george@mit.edu')
 
    An HTML version of this guide, suitable for viewing using any web
 browser, is included with the WFDB Software Package.  The latest
@@ -574,14 +572,15 @@ only local files, but also remote files made available by web (HTTP) or
 FTP servers.  To make use of this feature, link your application with
 both the WFDB library and the `libwww' library (freely available for
 all versions of Unix, and for most recent versions of MS Windows, from
-`http://www.w3.org/Library').  (In some cases, notably under GNU/Linux,
-`libwww' is linked together with the dynamically-loaded version of the
-WFDB library, so that you do not need to link `libwww' explicitly.)
-All access to remote files is read-only.  If you do not wish to allow
-access to remote files, or if `libwww' is not available for your OS,
-simply do not define the symbol NETFILES when compiling the WFDB
-library.  For further details, see `wfdbio.c' in the WFDB library
-sources.
+`http://www.w3.org/Library', or from
+`http://www.physionet.org/physiotools/libwww/').  (In some cases,
+notably under GNU/Linux, `libwww' is linked together with the
+dynamically-loaded version of the WFDB library, so that you do not need
+to link `libwww' explicitly.)  All access to remote files is read-only.
+If you do not wish to allow access to remote files, or if `libwww' is
+not available for your OS, simply do not define the symbol NETFILES
+when compiling the WFDB library.  For further details, see `wfdbio.c'
+in the WFDB library sources.
 
    The WFDB environment variable may now contain whitespace (space,
 tab, or newline characters) as path component separators under any OS.
@@ -682,6 +681,9 @@ creating a source file called `psamples.c' that contains:
          exit(0);
      }
 
+(See `http://www.physionet.org/physiotools/wfdb/examples/psamples.c'
+for a copy of this program.)
+
    All programs that use the WFDB library _must_ include the statement
 
      #include <wfdb/wfdb.h>
@@ -735,7 +737,7 @@ a compatible compiler, the `wfdb-config' utility is available to help
 construct commands for compiling programs that use the WFDB library
 (and the `libwww' libraries, if available).  Use it like this:
 
-     gcc `wfdb-config --cflags` -o psamples `wfdb-config --libs`
+     gcc `wfdb-config --cflags` -o psamples psamples.c `wfdb-config --libs`
 
 Note that this command contains backticks (`), not apostrophes (').
 `wfdb-config' is particularly useful if the WFDB library or its `*.h'
@@ -809,11 +811,13 @@ libraries.  See your compiler manual for further information.
 
    A set of wrapper functions is also available for those who wish to
 use the WFDB library together with applications written in Fortran.
-These functions, defined in `wfdbf.c', provide a thin `wrapper' around
-the WFDB library functions, by accepting Fortran-compatible arguments
-(there are no structures, and all arguments are passed by reference
-rather than by value).  For example, here is the Fortran equivalent of
-the example program in the previous section:
+These functions, defined in `wfdbf.c'
+(http://www.physionet.org/physiotools/wfdb/fortran/wfdbf.c), provide a
+thin `wrapper' around the WFDB library functions, by accepting
+Fortran-compatible arguments (there are no structures, and all
+arguments are passed by reference rather than by value).  For example,
+here is the Fortran equivalent of the example program in the previous
+section:
 
              integer i, v(2), g
      
@@ -825,16 +829,22 @@ the example program in the previous section:
              end do
              end
 
+(See `http://www.physionet.org/physiotools/wfdb/fortran/fsamples.f' for
+a copy of this program;  an extensively commented version of this
+program is also available, at
+`http://www.physionet.org/physiotools/wfdb/fortran/example.f'.)
+
 To compile this program using `g77' (the GNU Fortran compiler), save it
-as `fsamples.f', copy `wfdbf.c' from the `fortran' directory of the
-WFDB Software Package sources or from
-`http://www.physionet.org/physiotools/wfdb/fortran/wfdbf.c', then type:
+as `fsamples.f' in the current directory, copy `wfdbf.c'
+(http://www.physionet.org/physiotools/wfdb/fortran/wfdbf.c) to the
+current directory, then type:
 
      g77 -o fsamples -fwritable-strings fsamples.f wfdbf.c -lwfdb
 
 The Fortran wrapper functions are not discussed in this guide; for
-further information, refer to `fortran/README' in the WFDB Software
-Package.
+further information, refer to fortran/README
+(http://www.physionet.org/physiotools/wfdb/fortran/README) in the WFDB
+Software Package.
 
    It should be possible to write a similar set of wrapper functions
 for use with Matlab, Octave (a freely available open-source language

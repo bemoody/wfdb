@@ -1,6 +1,6 @@
 # file: Makefile		G. Moody	 6 July 1983
-#				Last revised:    22 May 2000	Version 10.1.4
-# UNIX 'make' description file for compiling the WFDB library
+#				Last revised:  26 October 2002	Version 10.2.9
+# 'make' description file for compiling the WFDB library
 #
 # _____________________________________________________________________________
 # wfdb: a library for reading and writing annotated waveforms(time series data)

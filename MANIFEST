@@ -165,7 +165,6 @@ data/culist
 data/dblist
 data/esclist
 data/Makefile
-data/Makefile.dos
 data/Makefile.top
 data/Makefile.tpl
 data/mitlist
@@ -335,6 +334,8 @@ doc/wpg-src/Makefile
 doc/wpg-src/Makefile.top
 doc/wpg-src/Makefile.tpl
 doc/wpg-src/makeinfo.sh
+doc/wpg-src/pdftex.cfg-a4
+doc/wpg-src/pdftex.cfg-letter
 doc/wpg-src/README
 doc/wpg-src/wpg0.tex
 doc/wpg-src/wpg.cover
@@ -413,7 +414,6 @@ doc/wug-src/wave/scripts/wugfigures
 doc/wug-src/wug0.tex
 doc/wug-src/wug.cover
 examples/
-examples/dblibver.c
 examples/example10.c
 examples/example1.c
 examples/example2.c
@@ -425,17 +425,20 @@ examples/example7.c
 examples/example8.c
 examples/example9.c
 examples/exannstr.c
+examples/exgetann.c
 examples/exgetvec.c
 examples/exputvec.c
 examples/Makefile
 examples/Makefile.dos
 examples/Makefile.top
 examples/Makefile.tpl
+examples/pgain.c
 examples/psamples.c
 examples/psamplex.c
 examples/README
 examples/refhr.c
 examples/stdev.c
+examples/wfdbversion.c
 fortran/
 fortran/example.f
 fortran/fsamples.f
@@ -458,7 +461,6 @@ lib/Makefile.tpl
 lib/makelib
 lib/README
 lib/signal.c
-lib/twfdbdll.def
 lib/wfdbdll.def
 lib/wfdb.h
 lib/wfdbinit.c

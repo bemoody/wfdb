@@ -1,4 +1,4 @@
-This is wpg, produced by makeinfo version 4.0 from wpg.tex.
+This is wpg, produced by makeinfo version 4.0b from wpg.tex.
 
 INFO-DIR-SECTION Libraries
 START-INFO-DIR-ENTRY
@@ -699,11 +699,10 @@ WFDB path if the WFDB environment variable is undefined) is `.
 /usr/database http://www.physionet.org/physiobank/database'.  (The
 second component, after the `.' that specifies the current directory,
 may vary, depending on your platform and the choices made during
-installation.)  The URL prefix (the third component) points to
+installation.)  The third component is a URL prefix pointing to
 PhysioBank, an on-line archive for a wide variety of standard databases
-of physiologic signals.  The databases are kept in subdirectories of
-`http://www.physionet.org/physiobank/database'.  For example, the
-MIT-BIH Polysomnographic Database is kept in
+of physiologic signals.  For example, the MIT-BIH Polysomnographic
+Database is kept in
 `http://www.physionet.org/physiobank/database/slpdb', so it is possible
 to read record `slp37' of that database directly from PhysioBank by
 passing `slpdb/slp37' as the RECORD argument to `wfdbinit' (or
@@ -859,6 +858,9 @@ annotations to `NORMAL' and deleting all non-QRS annotations.
      25      wfdbquit();
      26  }
 
+(See `http://www.physionet.org/physiotools/wfdb/examples/example1.c'
+for a copy of this program.)
+
 *Notes:*
 
 _Line 2:_
@@ -960,6 +962,9 @@ name `aha'.
      21      exit(0);
      22  }
 
+(See `http://www.physionet.org/physiotools/wfdb/examples/example2.c'
+for a copy of this program.)
+
 *Notes:*
 
 _Lines 4-6:_
@@ -1029,6 +1034,9 @@ argument is an annotator name, and its second argument is a record name.
      25                  annot.aux+1 : "");
      26      exit(0);
      27  }
+
+(See `http://www.physionet.org/physiotools/wfdb/examples/example3.c'
+for a copy of this program.)
 
 *Notes:*
 _Line 16:_

@@ -24,7 +24,7 @@
 Copyright @copyright{} 1989 -- 2002 George B. Moody
 @sp 2
 The most recent versions of the software described in this guide may be
-downloaded from @code{http://www.physionet.org/}.  For further
+downloaded from @uref{http://www.physionet.org/}.  For further
 information, write to:
 
 @display
@@ -35,8 +35,10 @@ Cambridge, MA 02139
 USA
 @end display
 
-An HTML version of this guide is available at
-@code{http://@-www.@-physio@-net.@-org/@-physio@-tools/@-wpg/}.
+@ifnothtml
+See @uref{http://www.physio@-net.org/physio@-tools/@-wpg/}
+for an HTML version of this guide.
+@end ifnothtml
 
 @sp 2
 Permission is granted to make and distribute verbatim copies of this
@@ -331,20 +333,21 @@ eliminate the need for @emph{ad hoc} user-written database I/O.
 @node     Guide, , Applications, Overview
 @unnumberedsec About this Guide
 
-You should have a good grasp of the C language in order to make the best use of
-this guide.  If ANSI C prototypes, used here to document the WFDB library
-functions, are unfamiliar to you, see pp. 217--218 in the second edition of
-@cite{The C Programming Language} by Kernighan and Ritchie, Prentice Hall,
-1988.  (This is the famous @cite{K&R}; all @cite{K&R} references in this guide
-include page numbers for the second edition.  Newcomers to C should have a copy
-for ready reference while reading this guide.)  It may also be helpful to have
-a copy of a database directory, such as the @cite{MIT-BIH Arrhythmia Database
-Directory}
-(@code{http://@-www.@-physionet.@-org/@-physio@-bank/@-data@-base/@-mitdb/@-mitdbdir/}).
-The @cite{WFDB Applications Guide}
-(@code{http://@-www.@-physionet.@-org/@-physio@-tools/@-wag/}) will be useful
-as a reference for existing WFDB library-based applications (available from
-PhysioNet, @code{http://@-www.@-physio@-net.@-org/}).
+You should have a good grasp of the C language in order to make the best
+use of this guide.  If ANSI C prototypes, used here to document the WFDB
+library functions, are unfamiliar to you, see pp. 217--218 in the second
+edition of @cite{The C Programming Language} by Kernighan and Ritchie,
+Prentice Hall, 1988.  (This is the famous @cite{K&R}; all @cite{K&R}
+references in this guide include page numbers for the second edition.
+Newcomers to C should have a copy for ready reference while reading this
+guide.)  It may also be helpful to have a copy of a database directory,
+such as the
+@uref{http://@-www.@-physionet.@-org/@-physio@-bank/@-data@-base/@-html/@-mitdbdir/,
+@cite{MIT-BIH Arrhythmia Database Directory}}.  The 
+@uref{http://@-www.@-physionet.@-org/@-physio@-tools/@-wag/,
+@cite{WFDB Applications Guide}} will be
+useful as a reference for existing WFDB library-based applications
+(available from PhysioNet, @uref{http://@-www.@-physio@-net.@-org/}).
 
 You should have access to a computer that has the WFDB library and at
 least one or two database records on-line, or access to the World Wide Web,
@@ -443,12 +446,11 @@ extensively revised since they first appeared in 1981.  Your comments
 and suggestions are welcome.  Please send them to:
 
 @display
-George B. Moody
-MIT Room E25-505
+George B. Moody  <@email{george@@mit.edu}>
+MIT Room E25-505A
 Cambridge, MA 02139
 USA
 
-(e-mail: @code{george@@mit.edu})
 @end display
 
 @iftex
@@ -466,14 +468,14 @@ information about obtaining GNU @code{emacs}).
 
 An HTML version of this guide, suitable for viewing using any web browser,
 is included with the WFDB Software Package.  The latest version may always be
-viewed at @code{http://@-www.@-physio@-net.@-org/@-physio@-tools/@-wpg/} using your web
+viewed at @uref{http://@-www.@-physio@-net.@-org/@-physio@-tools/@-wpg/} using your web
 browser.
 
 @ifinfo
 You can format and print copies of this guide using TeX if you have it (see
 @file{makefile} in the @file{doc} directory of the library distribution for
 instructions on doing so).  You may obtain a preformatted version suitable for
-output on any PostScript device from @code{http://www.physionet.org/}.
+output on any PostScript device from @uref{http://www.physionet.org/}.
 @end ifinfo
 
 @node     Recent changes, Usage, Overview, Top
@@ -590,7 +592,7 @@ sqrs -r mitdb/100
 
 @noindent
 will read its input from
-@file{http://@-www.@-physio@-net.@-org/@-physio@-bank/@-data@-base/@-mitdb/},
+@uref{http://@-www.@-physio@-net.@-org/@-physio@-bank/@-data@-base/@-mitdb/},
 will create a directory named @file{mitdb} within the current directory, and
 will write its output annotation file (@file{100.qrs}) into this newly-created
 directory.  If we then use the command:
@@ -645,8 +647,8 @@ path.  For example, if the WFDB path is
 @file{. http://@-www.@-physio@-net.@-org/@-physio@-bank/@-data@-base}, and the
 record name @file{mitdb/100} is supplied to @code{wfdbinit}, the WFDB library
 will find the header file at
-@code{http://@-www.@-physio@-net.@-org/@-physio@-bank/@-data@-base/@-mitdb/@-100.hea},
-and will then add @code{http://@-www.@-physio@-net.@-org/@-physio@-bank/data@-base/@-mitdb/} to
+@uref{http://@-www.@-physio@-net.@-org/@-physio@-bank/@-data@-base/@-mitdb/@-100.hea},
+and will then add @uref{http://@-www.@-physio@-net.@-org/@-physio@-bank/data@-base/@-mitdb/} to
 the end of the WFDB path so that the signal file (specified as @file{100.dat}
 in the header file) can be found.
 
@@ -658,20 +660,21 @@ numerous minor changes in the NETFILES support code introduced in 10.0.1.
 
 @unnumberedsubsec Changes in version 10.0.1
 @cindex NETFILES
+@cindex libwww
+@cindex W3C libwww
 
-Beginning with version 10.0.1, the WFDB library supports reading not
-only local files, but also remote files made available by web (HTTP) or
-FTP servers.  To make use of this feature, link your application with
-both the WFDB library and the @file{libwww} library (freely available
-for all versions of Unix, and for most recent versions of MS Windows,
-from @file{http://www.w3.org/Library}).  (In some cases, notably under
-GNU/Linux, @code{libwww} is linked together with the dynamically-loaded
-version of the WFDB library, so that you do not need to link
-@code{libwww} explicitly.)  All access to remote files is read-only.  If
-you do not wish to allow access to remote files, or if @code{libwww} is
-not available for your OS, simply do not define the symbol NETFILES when
-compiling the WFDB library.  For further details, see @file{wfdbio.c} in
-the WFDB library sources.
+Beginning with version 10.0.1, the WFDB library supports reading not only local
+files, but also remote files made available by web (HTTP) or FTP servers.  To
+make use of this feature, link your application with both the WFDB library and
+the @code{libwww} library (freely available for all versions of Unix, and for
+most recent versions of MS Windows, from @uref{http://www.w3.org/Library}, or
+from @uref{http://@-www.physio@-net.org/physio@-tools/libwww/}).  (In some
+cases, notably under GNU/Linux, @code{libwww} is linked together with the
+dynamically-loaded version of the WFDB library, so that you do not need to link
+@code{libwww} explicitly.)  All access to remote files is read-only.  If you do
+not wish to allow access to remote files, or if @code{libwww} is not available
+for your OS, simply do not define the symbol NETFILES when compiling the WFDB
+library.  For further details, see @file{wfdbio.c} in the WFDB library sources.
 
 @cindex WFDB path
 The WFDB environment variable may now contain whitespace (space, tab, or
@@ -769,6 +772,10 @@ main()
 @}
 @end example
 
+@noindent
+(See @uref{http://www.physionet.org/physiotools/wfdb/examples/psamples.c}
+for a copy of this program.)
+
 All programs that use the WFDB library @emph{must} include the
 statement
 
@@ -815,9 +822,12 @@ this case, @code{isigopen} and @code{getvec}).  Some programs will need
 additional libraries, and the corresponding @samp{-l} options can
 usually be given before or after the @samp{-lwfdb} option.
 
+@cindex libwww
+@cindex W3C libwww
+
 If the WFDB library was installed with NETFILES support, it will make
-use of functions contained in the @file{libwww} libraries.  If you have
-dynamically linkable versions of the @file{libwww} libraries, as under
+use of functions contained in the @code{libwww} libraries.  If you have
+dynamically linkable versions of the @code{libwww} libraries, as under
 GNU/Linux, these will be loaded automatically when you run
 @code{psamples}.  If you have only static versions of these libraries,
 as under Solaris or MS-Windows, however, it is necessary to provide
@@ -830,11 +840,11 @@ source tree.
 If you are using WFDB version 10.2.6 or a later version and @file{gcc}
 or a compatible compiler, the @file{wfdb-config} utility is available
 to help construct commands for compiling programs that use the WFDB
-library (and the @file{libwww} libraries, if available).  Use it like
+library (and the @code{libwww} libraries, if available).  Use it like
 this:
 
 @example
-gcc `wfdb-config --cflags` -o psamples `wfdb-config --libs`
+gcc `wfdb-config --cflags` -o psamples psamples.c `wfdb-config --libs`
 @end example
 
 @noindent
@@ -845,11 +855,11 @@ you have only static @code{libwww} libraries.
 
 Under MS-Windows, it will be easiest to use @file{gcc}, the GNU C/C++
 compiler, which is included in the freely available Cygwin software
-development system (@code{http://@-www@-.cygwin@-.com/}),
+development system (@uref{http://@-www@-.cygwin@-.com/}),
 and also in the freely available MinGW package
-(@code{http://@-www@-.mingw@-.org/}).  An MS-DOS version of @file{gcc}
+(@uref{http://@-www@-.mingw@-.org/}).  An MS-DOS version of @file{gcc}
 is available in the free djgpp package
-(@code{http://@-www@-.delorie@-.com/@-djgpp/}). These are used within a
+(@uref{http://@-www@-.delorie@-.com/@-djgpp/}). These are used within a
 Cygwin terminal emulator window or an MS-DOS box in exactly the same way
 as described above for Unix C compilers.  
 
@@ -915,15 +925,14 @@ further information.
 
 @cindex Fortran bindings
 @cindex wrappers for Fortran
-A set of wrapper functions is also available for those who wish to use
-the WFDB library together with applications written in Fortran.  These
-functions, defined in @file{wfdbf.c}, provide a thin `wrapper' around the WFDB library functions, by
+A set of wrapper functions is also available for those who wish to use the WFDB
+library together with applications written in Fortran.  These functions,
+defined in @uref{http://www.physionet.org/physiotools/wfdb/fortran/wfdbf.c,
+@file{wfdbf.c}}, provide a thin `wrapper' around the WFDB library functions, by
 accepting Fortran-compatible arguments (there are no structures, and all
-arguments are passed by reference rather than by value).  For example,
-here is the Fortran equivalent of the example program in the previous
-section:
+arguments are passed by reference rather than by value).  For example, here is
+the Fortran equivalent of the example program in the previous section:
 
-@page
 @example
         integer i, v(2), g
 
@@ -937,11 +946,16 @@ section:
 @end example
 
 @noindent
+(See @uref{http://www.physionet.org/physiotools/wfdb/fortran/fsamples.f}
+for a copy of this program;  an extensively commented version of this program
+is also available, at
+@uref{http://www.physionet.org/physiotools/wfdb/fortran/example.f}.)
+
+@noindent
 To compile this program using @code{g77} (the GNU Fortran compiler), save it as
-@file{fsamples.f}, copy @file{wfdbf.c} from the @file{fortran} directory of the
-WFDB Software Package sources or from
-@code{http://@-www.@-physio@-net.@-org/@-physio@-tools/@-wfdb/@-fortran/@-wfdbf.c},
-then type:
+@file{fsamples.f} in the current directory, copy
+@uref{http://www.physionet.org/physiotools/wfdb/fortran/wfdbf.c,@file{wfdbf.c}}
+to the current directory, then type:
 
 @example
 g77 -o fsamples -fwritable-strings fsamples.f wfdbf.c -lwfdb
@@ -949,7 +963,9 @@ g77 -o fsamples -fwritable-strings fsamples.f wfdbf.c -lwfdb
 
 @noindent
 The Fortran wrapper functions are not discussed in this guide; for further
-information, refer to @file{fortran/README} in the WFDB Software Package.
+information, refer to
+@uref{http://www.physionet.org/physiotools/wfdb/fortran/README,fortran/README}
+in the WFDB Software Package.
 
 @cindex Matlab bindings
 @cindex Octave bindings
@@ -957,16 +973,16 @@ information, refer to @file{fortran/README} in the WFDB Software Package.
 @cindex wrappers for Matlab, Octave, or Scilab
 It should be possible to write a similar set of wrapper functions for use with
 Matlab, Octave (a freely available open-source language that is compatible with
-Matlab, available from @code{http://www.che.wisc.edu/octave/}), or Scilab (an
+Matlab, available from @uref{http://www.che.wisc.edu/octave/}), or Scilab (an
 open-source scientific software package for numerical computations, with a
 language similar to that of Matlab, available from
-@code{http://www-rocq.@-inria.@-fr/@-scilab/}).  At this time, such wrappers
+@uref{http://www-rocq.@-inria.@-fr/@-scilab/}).  At this time, such wrappers
 are not available, but a reimplementation of a useful subset of the WFDB
 library in native m-code (contributed by Jose Garcia Moros and Salvador Olmos)
 is available from
-@code{http://www.@-physio@-net.@-org/@-physio@-tools/@-matlab/}.  Jesus Olivan
+@uref{http://www.@-physio@-net.@-org/@-physio@-tools/@-matlab/}.  Jesus Olivan
 Palacios has written a tutorial (available at
-@code{http://www.@-neurotraces.@-com/@-scilab/@-sciteam/}) on using the WFDB
+@uref{http://www.@-neurotraces.@-com/@-scilab/@-sciteam/}) on using the WFDB
 Software Package with Scilab.
 
 @node     WFDB path, running example, other languages, Usage
@@ -1107,7 +1123,7 @@ with a three-component default WFDB path; the first component is empty
 (i.e., it refers to the current directory), the second component names
 the @dfn{system-wide database directory} (which contains the sample WFDB
 files supplied with the WFDB software package), and the third component
-is @code{http://www.physionet.org/physiobank/data@-base} (referring to the
+is @uref{http://www.physionet.org/physiobank/data@-base} (referring to the
 PhysioBank data archives).  Note that this default may be changed at the
 time the WFDB library is compiled.  Normally, however, this means that
 any record available from PhysioBank is readable by any WFDB application
@@ -1151,7 +1167,10 @@ file, any later actions that would read this file will read your
 modified version rather than the original.
 
 @cindex NETFILES
-The WFDB path may contain @code{http://} and @code{ftp://} URL prefixes
+@cindex libwww
+@cindex W3C libwww
+
+The WFDB path may contain @uref{http://} and @code{ftp://} URL prefixes
 (other schema, such as @code{file://} and @code{https://}, may also be
 supported if they are supported by your version of @code{libwww}).  If
 NETFILES support is not compiled into the WFDB library, any WFDB
@@ -1538,6 +1557,10 @@ main()
 @c @end group
 
 @noindent
+(See @uref{http://www.physionet.org/physiotools/wfdb/examples/pgain.c}
+for a copy of this program.)
+
+@noindent
 This program, unlike the example in the previous chapter, does not
 assume that the number of signals is known.  The first invocation of
 @code{isigopen} determines this number (and the program quits if there
@@ -1847,11 +1870,10 @@ main(int argc, char **argv)
 @end example
 
 @noindent
-(The source for this program, @file{psamplex.c}, can be found in the
-@file{examples} directory of the WFDB source tree.  Compile it as shown
-in the previous chapter, then run it using a command such as
-@samp{psamplex 100}.)  The QRS detector in chapter 6 also illustrates
-the use of @code{setifreq} (@pxref{Example 10}).
+(See @uref{http://www.physionet.org/physiotools/wfdb/examples/psamplex.c} for a
+copy of this program.  Compile it as shown in the previous chapter, then run it
+using a command such as @samp{psamplex 100}.)  The QRS detector in chapter 6
+also illustrates the use of @code{setifreq} (@pxref{Example 10}).
 
 @c @group
 @node     getifreq, setgvmode, setifreq, special input modes
@@ -2019,6 +2041,10 @@ main()
 @}
 @end example
 
+@noindent
+(See @uref{http://www.physionet.org/physiotools/wfdb/examples/exgetvec.c}
+for a copy of this program.)
+
 Notice how the value returned by the first invocation of @code{isigopen}
 is used to determine how many input signals there are.  Several of the
 example programs in chapter 6 illustrate the use of @code{getvec}; for
@@ -2154,6 +2180,10 @@ main()
 @}
 @end example
 
+@noindent
+(See @uref{http://www.physionet.org/physiotools/wfdb/examples/exputvec.c}
+for a copy of this program.)
+
 All programs that write signals or annotations @emph{must} invoke
 @code{wfdbquit} to close the output files properly
 @iftex
@@ -2219,10 +2249,14 @@ main()
     if (annopen("100s", &a, 1) < 0)
         exit(1);
     while (getann(0, &annot) == 0)
-        printf("%s %s\n", mstimstr(annot.time), annstr(annot.anntyp);
+        printf("%s %s\n", mstimstr(annot.time), annstr(annot.anntyp));
     exit(0);
 @}
 @end example
+
+@noindent
+(See @uref{http://www.physionet.org/physiotools/wfdb/examples/exgetann.c}
+for a copy of this program.)
 
 @iftex
 @xref{WFDB_Anninfo structures, , Annotator Information Structures},
@@ -2524,6 +2558,10 @@ main()
     @}
 @}
 @end example
+
+@noindent
+(See @uref{http://www.physionet.org/physiotools/wfdb/examples/exannstr.c}
+for a copy of this program.)
 
 @code{ACMAX} is defined in @file{<wfdb/ecgcodes.h>}.  The range from 1
 through @code{ACMAX} includes all legal annotation codes; if you run
@@ -4845,7 +4883,7 @@ Recall that a WFDB record is not a file; rather, it is an extensible
 example, record 100 of the MIT-BIH Arrhythmia Database consists of the files
 named @file{100.hea}, @file{100.dat}, and @file{100.atr} in the @file{mitdb}
 directory of the MIT-BIH Arrhythmia Database CD-ROM (or in PhysioBank, within
-@code{http://@-www.@-physio@-net.@-org/@-physio@-bank/@-data@-base/@-mitdb/}),
+@uref{http://@-www.@-physio@-net.@-org/@-physio@-bank/@-data@-base/@-mitdb/}),
 together with any additional files in other directories that you may have
 associated with record 100 (such as your own annotation file).  All files
 associated with a given record include the record name as the first part of the
@@ -5262,6 +5300,8 @@ as will be used; if, for example, only one signal is needed, only
 @cindex http
 @cindex ftp
 @cindex WFDB path
+@cindex libwww
+@cindex W3C libwww
 
 If the symbol @code{WFDB_NETFILES} is defined at the time the WFDB library is
 compiled, then input files located on remote web (HTTP) and FTP servers can be
@@ -5280,17 +5320,16 @@ WFDB library source file @code{wfdblib.h}, and used as the WFDB path if the
 WFDB environment variable is undefined) is @samp{. /usr/database
 http://www.physio@-net.org/physio@-bank/data@-base}.  (The second component,
 after the @samp{.} that specifies the current directory, may vary, depending on
-your platform and the choices made during installation.)  The URL prefix (the
-third component) points to PhysioBank, an on-line archive for a wide variety of
-standard databases of physiologic signals.  The databases are kept in
-subdirectories of @code{http://www.physio@-net.org/physio@-bank/data@-base}.
+your platform and the choices made during installation.)  The third component
+is a URL prefix pointing to PhysioBank, an on-line archive for a wide variety
+of standard databases of physiologic signals.
 For example, the MIT-BIH Polysomnographic Database is kept in
-@code{http://www.physio@-net.org/physio@-bank/data@-base/slpdb}, so it is
+@uref{http://www.physio@-net.org/physio@-bank/data@-base/slpdb}, so it is
 possible to read record @code{slp37} of that database directly from PhysioBank
 by passing @code{slpdb/slp37} as the @var{record} argument to @code{wfdbinit}
 (or @code{isigopen}, @code{annopen}, etc.).
 
-Current implementations of @code{libwww} permit input from @code{http://} URLs
+Current implementations of @code{libwww} permit input from @uref{http://} URLs
 in much the same way that local files are read, provided that the remote web
 server supports HTTP 1.1 range requests (most, including PhysioNet's, do).
 This means that it is not necessary to download an entire file in order to
@@ -5449,7 +5488,10 @@ to @code{NORMAL} and deleting all non-QRS annotations.
 @i{26}  @}
 @end example
 
-@page
+@noindent
+(See @uref{http://www.physionet.org/physiotools/wfdb/examples/example1.c}
+for a copy of this program.)
+
 @c @group
 @noindent
 @strong{Notes:}
@@ -5556,6 +5598,10 @@ annotator name @file{aha}.
 @end example
 
 @noindent
+(See @uref{http://www.physionet.org/physiotools/wfdb/examples/example2.c}
+for a copy of this program.)
+
+@noindent
 @strong{Notes:}
 
 @table @emph
@@ -5628,6 +5674,10 @@ an annotator name, and its second argument is a record name.
 @end example
 
 @noindent
+(See @uref{http://www.physionet.org/physiotools/wfdb/examples/example3.c}
+for a copy of this program.)
+
+@noindent
 @strong{Notes:}
 @table @emph
 @item Line 16:
@@ -5695,6 +5745,10 @@ histogram of them.
 @i{38}      exit(0);
 @i{39}  @}
 @end example
+
+@noindent
+(See @uref{http://www.physionet.org/physiotools/wfdb/examples/example4.c}
+for a copy of this program.)
 
 @c @group
 @noindent
@@ -5786,6 +5840,10 @@ argument:
 @i{50}      exit(0);
 @i{51}  @}
 @end example
+
+@noindent
+(See @uref{http://www.physionet.org/physiotools/wfdb/examples/example5.c}
+for a copy of this program.)
 
 @noindent
 @strong{Notes:}
@@ -5882,6 +5940,10 @@ approach.
 @i{34}      exit(0);
 @i{35}  @}
 @end example
+
+@noindent
+(See @uref{http://www.physionet.org/physiotools/wfdb/examples/example6.c}
+for a copy of this program.)
 
 @noindent
 @strong{Notes:}
@@ -6027,6 +6089,10 @@ header file is created in the current directory.
 @i{79}      exit(0);
 @i{80}  @}
 @end example
+
+@noindent
+(See @uref{http://www.physionet.org/physiotools/wfdb/examples/example7.c}
+for a copy of this program.)
 
 @noindent
 @strong{Notes:}
@@ -6225,6 +6291,10 @@ data acquisition are hardware-dependent and are not shown here.
 @end example
 
 @noindent
+(See @uref{http://www.physionet.org/physiotools/wfdb/examples/example8.c}
+for a copy of this program.)
+
+@noindent
 @strong{Notes:}
 @table @emph
 @item Lines 14--17:
@@ -6334,13 +6404,13 @@ average normal QRS complex).
 @i{30}          fprintf(stderr, "%s: insufficient memory\n", argv[0]);
 @i{31}          exit(2);
 @i{32}      @}
-@i{33}      for (i = 0; i < nsig; i++)
-@i{34}          if ((sum[i]=(long *)calloc(window,sizeof(long))) == NULL) @{
-@i{35}              fprintf(stderr, "%s: insufficient memory\n", argv[0]);
-@i{36}              exit(2);
-@i{37}          @}
-@i{38}      if (wfdbinit(argv[2], &a, 1, s, nsig) != nsig) exit(3);
-@i{39}      hwindow = strtim(".05"); window = 2*hwindow + 1;
+@i{33}      if (wfdbinit(argv[2], &a, 1, s, nsig) != nsig) exit(3);
+@i{34}      hwindow = strtim(".05"); window = 2*hwindow + 1;
+@i{35}      for (i = 0; i < nsig; i++)
+@i{36}          if ((sum[i]=(long *)calloc(window,sizeof(long))) == NULL) @{
+@i{37}              fprintf(stderr, "%s: insufficient memory\n", argv[0]);
+@i{38}              exit(2);
+@i{39}          @}
 @i{40}      btype = (argc > 3) ? strann(argv[3]) : NORMAL;
 @i{41}      if (argc > 4) iannsettime(strtim(argv[4]));
 @i{42}      if (argc > 5) @{
@@ -6378,19 +6448,23 @@ average normal QRS complex).
 @end example
 
 @noindent
+(See @uref{http://www.physionet.org/physiotools/wfdb/examples/example9.c}
+for a copy of this program.)
+
+@noindent
 @strong{Notes:}
 
 @table @emph
-@item Lines 33--37:
-Here we allocate memory for the @code{sum} vectors that will be used to
-store the running totals.  See @cite{K&R}, page 167, for a description
-of @code{calloc}.
-
-@item Line 39:
+@item Line 34:
 The ``half-window'' is 50 milliseconds wide, and the ``window'' (the
 duration of a segment to be entered into the average) is one sample more
 than twice that amount (i.e., 50 milliseconds to either side of the
 fiducial point defined by the annotation).
+
+@item Lines 35--39:
+Here we allocate memory for the @code{sum} vectors that will be used to
+store the running totals.  See @cite{K&R}, page 167, for a description
+of @code{calloc}.
 
 @item Line 40:
 If a third argument is present on the command line, it is taken as an
@@ -6546,6 +6620,10 @@ is based on a Pascal program written by W.A.H. Engelse and C. Zeelenberg,
 @i{91}      exit(0);
 @i{92}  @}
 @end example
+
+@noindent
+(See @uref{http://www.physionet.org/physiotools/wfdb/examples/example10.c}
+for a copy of this program.)
 
 @noindent
 @strong{Notes:}
@@ -6788,7 +6866,7 @@ factor of 3 of the average values.  Run your detector on MIT-BIH Arrhythmia
 Database record @file{200}.  (This record is available on PhysioNet.  If you
 have a NETFILES-enabled WFDB library, use the default WFDB path, and open
 record @file{mitdb/200}; otherwise, download the record from
-@code{http://www.physio@-net.org/physio@-bank/data@-base/mitdb/}.)  Read the
+@uref{http://www.physio@-net.org/physio@-bank/data@-base/mitdb/}.)  Read the
 documentation on the annotation comparator, @file{bxb}, and figure out how to
 use it to compare the annotation file produced by your program against the
 reference annotator @file{atr}.  How does your detector compare to Example
@@ -7121,13 +7199,15 @@ samples, thus representing an equal number of signals.
 
 @item NETFILES
 @cindex NETFILES (defined)
+@cindex libwww
+@cindex W3C libwww
 WFDB files made available by an FTP or HTTP (web) server;  readable
 by applications linked with a NETFILES-enabled WFDB library.  A
 NETFILES-enabled WFDB library can be created by compiling the WFDB
 library sources with the symbol @code{WFDB_NETFILES} defined (to anything;
 its value is not important, only that it is defined) and then linking
 them with the @code{libwww} library available from the World Wide Web
-Consortium (@code{http://www.w3.org/Library/}).
+Consortium (@uref{http://www.w3.org/Library/}).
 
 @item 9-track tape
 @cindex nine-track tape (defined)
@@ -7163,9 +7243,9 @@ signal with units of mmHg is 0 mmHg.
 @cindex PhysioNet
 The home of the WFDB library, and a source for recorded physiologic signals and
 software for use with them.  All materials on PhysioNet are freely available.
-The main PhysioNet server is @code{http://www.@-physio@-net.@-org/}, located at
+The main PhysioNet server is @uref{http://www.@-physio@-net.@-org/}, located at
 MIT in Cambridge, Massachusetts; PhysioNet mirror sites are located around the
-world (see @code{http://www.@-physio@-net.@-org/@-mirrors/} for a list).
+world (see @uref{http://www.@-physio@-net.@-org/@-mirrors/} for a list).
 
 @item Piped record
 @cindex piped record (defined)
@@ -7365,33 +7445,37 @@ pages for the package, and a one-minute sample record (@samp{100s}).
 @unnumberedsec How to obtain the WFDB Software Package
 
 The latest version of the WFDB Software Package can always be downloaded in
-source form from PhysioNet and its mirrors (see
-@code{http://www.physio@-net.org/physio@-tools/wfdb.shtml}); binaries for
-popular operating systems and development snapshots, as well as quick-start
-guides including installation notes for popular operating systems, are also
-usually available there.
+source form from PhysioNet
+(@uref{http://www.physio@-net.org/physio@-tools/wfdb.shtml}) and its mirrors;
+binaries for popular operating systems and development snapshots, as well as
+quick-start guides including installation notes for popular operating systems,
+are also usually available there.
 
 @node Unix installation, MS-Windows installation, Distribution, Installation
 @unnumberedsec Unix, GNU/Linux, and similar operating systems
 
+@cindex libwww
+@cindex W3C libwww
+
 Before beginning the installation of the WFDB Software Package, obtain and
-install the @code{libwww} package from @code{http://www.w3.org/Library/} or
-from @code{http://@-www.physio@-net.org/physio@-tools/libwww/}.  This package
+install the @code{libwww} package from @uref{http://www.w3.org/Library/} or
+from @uref{http://@-www.physio@-net.org/physio@-tools/libwww/}.  This package
 is provided with most current versions of GNU/Linux.  (If you have a program
 called @code{libwww-config}, then @code{libwww} is installed already.)  You may
 omit this step if you do not wish to have NETFILES support.
 
-Also download and install the @code{XView} software from
-@code{http://www.physio@-net.org/physio@-tools/xview/} if you wish to use
-@emph{WAVE}.  Sources are available, as are binaries for several versions of
-GNU/Linux.  If you are using SunOS or Solaris, XView binaries are available in
-the Open Look Software Development package and may be installed already.  (If
-you have a program called @code{textedit}, then @code{XView} is installed
-already.) If you are able to use an existing set of binaries, these are
-recommended, since the sources may take a @emph{long} time to compile.  Be sure
-that the directory containing @code{textedit}, usually @code{/usr/openwin/bin},
-is in your @code{PATH}.  You may omit this step if you do not wish to use
-@emph{WAVE}.
+@cindex XView toolkit
+
+If you wish to use @emph{WAVE}, also download and install the @code{XView}
+software from @uref{http://www.physio@-net.org/physio@-tools/xview/}.  Sources
+are available, as are binaries for several versions of GNU/Linux.  If you are
+using SunOS or Solaris, XView binaries are available in the Open Look Software
+Development package and may be installed already.  (If you have a program
+called @code{textedit}, then @code{XView} is installed already.) If you are
+able to use an existing set of binaries, these are recommended, since the
+sources may take a @emph{long} time to compile.  Be sure that the directory
+containing @code{textedit}, usually @code{/usr/openwin/bin}, is in your
+@code{PATH}.  You may omit this step if you do not wish to use @emph{WAVE}.
 
 If you have downloaded the software from PhysioNet or another source, you
 will have a @code{gzip}-compressed @code{tar} archive.  Unpack it using
@@ -7430,7 +7514,7 @@ generally require between 1 and 10 minutes.
 @unnumberedsec MS-Windows
 
 If you have not already done so, install the Cygwin development environment
-(freely available from @code{http://www.cygwin.com}).  This
+(freely available from @uref{http://www.cygwin.com}).  This
 includes @code{gcc} (the GNU C/C++ compiler) as well as a comprehensive
 assortment of other Unix utilities ported to MS-Windows.  Accept the defaults
 suggested by the installer.
@@ -7442,9 +7526,12 @@ source tree can be used with the @code{make} utilities provided with most
 commercial C compilers, although you will need to customize them for your
 compiler. Your feedback is appreciated.
 
+@cindex libwww
+@cindex W3C libwww
+
 Before beginning the installation of the WFDB Software Package, obtain and
-install the @code{libwww} package from @code{http://www.w3.org/Library/} or
-from @code{http://@-www.physio@-net.org/physio@-tools/libwww/}.  You may
+install the @code{libwww} package from @uref{http://www.w3.org/Library/} or
+from @uref{http://@-www.physio@-net.org/physio@-tools/libwww/}.  You may
 omit this step if you do not wish to have NETFILES support.
 
 Open a Cygwin terminal window (the Cygwin installer will have added this to
@@ -7510,7 +7597,7 @@ compiler's @code{make} utility to generate @code{wfdb.lib} and then
 @node Other installation, , MS-Windows installation, Installation
 @unnumberedsec Other systems
 
-Copy the contents of @code{http://www.@-physio.@-net/physio@-tools/wfdb/} to
+Copy the contents of @uref{http://www.@-physio@-net/physio@-tools/wfdb/} to
 your hard disk.  Note that the text files are in Unix format (i.e., lines are
 terminated by ASCII line-feed characters only).  If your system expects text
 files in MS-DOS format (with both a carriage return and a line-feed at the end
@@ -8024,11 +8111,14 @@ have such limitations, however.
 
 This section is a compendium of sources for databases and related
 materials that may be useful to readers of this guide.  Please send any
-corrections to the author (@code{george@@mit.edu}).
+corrections to the author (@email{george@@mit.edu}).
 
 @table @emph
 @cindex MIT DB
 @cindex waveform editor
+@cindex libwww
+@cindex W3C libwww
+@cindex XView toolkit
 @item WFDB Programmer's Guide (this guide)
 @itemx WFDB Applications Guide
 @itemx WAVE User's Guide
@@ -8038,9 +8128,11 @@ corrections to the author (@code{george@@mit.edu}).
 @itemx MIMIC Database
 @itemx Other reference databases of physiologic signals
 @itemx WFDB Software Package
+@itemx W3C libwww sources
+@itemx XView toolkit (needed for WAVE)
 @sp 1
 @display
-WWW: @code{http://www.physionet.org/}
+WWW: @uref{http://www.physionet.org/}
 @end display
 
 PhysioNet offers free access via the web to large collections of
@@ -8050,7 +8142,7 @@ Complex Physiologic Signals, funded by the National Center for
 Research Resources of the National Institutes of Health.  The
 master PhysioNet web server is located at MIT in Cambridge, Massachusetts;
 about ten public mirrors are located elsewhere in the US and around
-the world (see @code{http://@-www.@-physio@-net.@-org/@-mirrors/} for a list).
+the world (see @uref{http://@-www.@-physio@-net.@-org/@-mirrors/} for a list).
 
 @cindex CD-ROM
 @cindex MIT DB
@@ -8065,7 +8157,7 @@ MIT Room E25-505A
 77 Massachusetts Ave.
 Cambridge, MA 02139 USA
 
-e-mail: @code{george@@mit.edu}
+email: @email{george@@mit.edu}
 WWW: http://ecg.mit.edu/
 telephone: +1 617 253 7424
 @end display
@@ -8082,7 +8174,7 @@ Dept. of Bioengineering and Medical Informatics
 via Trieste, 41
 56126 PISA, Italy
 
-e-mail:	@code{taddei@@ifc.pi.cnr.it}
+email:	@email{taddei@@ifc.pi.cnr.it}
 telephone: +39 050 501145
 telefax: +39 050 503596
 @end display
@@ -8095,8 +8187,8 @@ ECRI
 5200 Butler Pike
 Plymouth Meeting, PA 19462 USA
 
-e-mail: @code{hshupack@@shrsys.hslc.org}
-WWW: @code{http://www.healthcare.ecri.org/}
+email: @email{hshupack@@shrsys.hslc.org}
+WWW: @uref{http://www.healthcare.ecri.org/}
 telephone: +1 610 825 6000
 @end display
 
@@ -8110,7 +8202,7 @@ Massachusetts General Hospital
 Fruit St.
 Boston, MA 02114 USA
 
-e-mail: @code{cooper@@etherdome.mgh.harvard.edu}
+email: @email{cooper@@etherdome.mgh.harvard.edu}
 telephone: +1 617 726 8824
 @end display
 
@@ -8127,7 +8219,7 @@ Association for the Advancement of Medical Instrumentation
 1110 N Glebe Road, Suite 220
 Arlington, VA 22201 USA
 
-WWW: @code{http://www.aami.org/}
+WWW: @uref{http://www.aami.org/}
 telephone: +1 703 525 4890
 telefax: +1 703 276 0793
 @end display
@@ -8135,7 +8227,7 @@ telefax: +1 703 276 0793
 @item Computers in Cardiology
 @sp 1
 @display
-WWW: @code{http://www.cinc.org/}
+WWW: @uref{http://www.cinc.org/}
 @end display
 
 CinC is the major scientific meeting at which current research in ECG signal
@@ -8157,8 +8249,8 @@ IEEE Customer Service
 P.O. Box 1331
 Piscataway, NJ 08855-1331 USA
 
-e-mail: @code{customer.service@@ieee.org}
-WWW: @code{http://www.ieee.org/ieeestore/}
+email: @email{customer.service@@ieee.org}
+WWW: @uref{http://www.ieee.org/ieeestore/}
 telephone: 1 800 678 IEEE (USA and Canada) or +1 732 981 0060
 telefax: +1 732 981 9667
 @end display
@@ -8179,8 +8271,8 @@ Free Software Foundation
 59 Temple Place - Suite 330
 Boston, MA 02111-1307 USA
 
-e-mail: @code{gnu@@gnu.org}
-WWW: @code{http://www.gnu.org/}
+email: @email{gnu@@gnu.org}
+WWW: @uref{http://www.gnu.org/}
 telephone: +1 617 542 5942
 @end display
 GNU software is included in all Linux distributions (in fact, since Linux
@@ -8199,7 +8291,7 @@ This software is available by anonymous FTP from CTAN (Comprehensive TeX
 Archive Network) mirrors, including @code{ftp.tex.ac.uk}, @code{ftp.dante.de},
 and @code{ctan.tug.org}.  Many of the sources of GNU software (above) also make
 @TeX{}, etc. available.  CTAN is indexed on the World Wide Web (one such index
-is @file{http://ctan.tug.org/ctan/}).
+is @uref{http://www.ctan.org/}).
 
 The Unix @TeX{} distribution is also distributed on CD-ROM and in other tape
 formats by the Free Software Foundation (address above) and others.  It is
@@ -8216,33 +8308,39 @@ TeX Users Group
 PO Box 2311
 Portland, OR 97208-2311 USA
 
-WWW: @code{http://www.tug.org/}
-e-mail: @code{office@@tug.org}
+WWW: @uref{http://www.tug.org/}
+email: @email{office@@tug.org}
 telephone: +1 503 223 3960
 telefax: +1 503 223 9994
 @end display
 
+@cindex libwww
+@cindex W3C libwww
+@item W3C libwww libraries
+@sp 1
+@display
+
+WWW: @uref{http://www.w3.org/Library/}
+@end display
+
+The @code{libwww} libraries, created and maintained by the World Wide
+Web Consortium, provide the low-level functions needed to support
+the WFDB library's (optional) NETFILES capability.  The @code{libwww}
+libraries are also available from PhysioNet.
+
 @cindex X11
 @cindex X Window System
 @item X11R6 (the X Window System, Version 11, Release 6)
-@itemx XView
 @sp 1
 @display
-The Open Group
-29B Montvale Ave.
-Woburn, MA 01801 USA
 
-e-mail: @code{xorg_info@@x.org}
-WWW: @code{http://www.x.org/}
+email: @code{xorg_info@@x.org}
+WWW: @uref{http://www.x.org/}
 telephone: +1 781 376 8200
 telefax: +1 781 376 9358
 @end display
 
-These packages are freely available by anonymous FTP from
-ftp.x.org and other archive sites.  X11R6 sources are also available
-on CD-ROM from the Free Software Foundation (address above).
-
-Sources for XView are also available from PhysioNet.
+Sources for XView are available from PhysioNet.
 
 @cindex GNU/Linux
 @cindex Linux
@@ -8253,7 +8351,7 @@ written by Linus Torvalds and a cast of thousands.  It runs on Intel 386,
 486, and Pentium PCs, among others.  For information about GNU/Linux, visit
 the web site of the Linux Documentation Project:
 @display
-@code{WWW: http://www.linuxdoc.org/}
+WWW: @uref{http://www.linuxdoc.org/}
 @end display
 
 GNU/Linux is freely available by anonymous FTP in source and binary form from
@@ -8268,34 +8366,41 @@ Many low-cost (typically US$10 to US$30) distributions of GNU/Linux on CD-ROMs
 are widely available.  Among the more popular are:
 
 @display
-Caldera Systems, Inc.
-240 West Center Street
-Orem, UT 84057 USA
+Debian (non-commercial)
 
-e-mail: @code{info@@caldera.com}
-WWW: @code{http://www.caldera.com/}
-telephone: +1 801 765 4999
+WWW: @uref{http://www.debian.org/}
+
+
+Gentoo (non-commercial)
+
+WWW: @uref{http://www.gentoo.org/}
+
+
+MandrakeSoft S.A.
+43, rue d'Aboukir
+75002 Paris
+France
+
+email: @email{webmaster@@linux-mandrake.com}
+WWW: @uref{http://www.linux-mandrake.com/}
+telephone: +1 626 296 6290 (USA), +33(0) 1 40 41 00 41 (France)
 telefax: +1 801 765 1313
-
-
-Debian
-
-WWW: @code{http://www.debian.org/}
 
 
 Red Hat
 2600 Meridian Parkway
 Durham, NC 27713
 
-e-mail: @code{orders@@redhat.com}
-WWW: @code{http://www.redhat.com/}
+email: @email{orders@@redhat.com}
+WWW: @uref{http://www.redhat.com/}
 telephone: 1 888 733 4281 (USA and Canada) or +1 919 547 0012
 telefax: +1 919 547 0024
 
 
 Slackware
 
-WWW: @code{http://www.slackware.com/}
+email: @email{info@@slackware.com}
+WWW: @uref{http://www.slackware.com/}
 
 
 S.u.S.E. GmbH
@@ -8303,8 +8408,8 @@ Schanzaeckerstr. 10
 D-90443 Nurnberg
 Germany
 
-e-mail: @code{suse@@suse.de}
-WWW: @code{http://www.suse.de/} (Germany), @code{http://www.suse.com/} (USA)
+email: @email{suse@@suse.de}
+WWW: @uref{http://www.suse.de/} (Germany), @uref{http://www.suse.com/} (USA)
 telephone: +49 911 74053 31
 telefax: +49 911 7417755
 @end display
@@ -8330,7 +8435,7 @@ will encounter if using a commercial compiler.
 @cindex Cygwin
 @item Cygwin
 
-WWW: @code{http://www.cygwin.com/}
+WWW: @uref{http://www.cygwin.com/}
 
 This is a freely available software development platform for MS-Windows
 9x/NT/2000/ME/XP, based on GNU @code{gcc} and a large set of Unix
@@ -8344,7 +8449,7 @@ are created using Cygwin.
 @cindex MinGW
 @item MinGW
 
-WWW: @code{http://www.mingw.org/}
+WWW: @uref{http://www.mingw.org/}
 
 This is another freely available software development platform for
 MS-Windows, also based on @code{gcc} and many of the same utilities as
@@ -8353,7 +8458,7 @@ Cygwin.
 @cindex djgpp
 @item djgpp
 
-WWW: @code{http://www.delorie.com/djgpp/}
+WWW: @uref{http://www.delorie.com/djgpp/}
 
 A freely available software development platform for MS-DOS, including
 @code{gcc}, a free 32-bit DOS extender, and many of the same utilties
@@ -8366,8 +8471,8 @@ Microstar Laboratories
 2265 116th Avenue N.E.
 Bellevue, WA 98004 USA
 
-e-mail: @code{info@@mstarlabs.com/}
-WWW: @code{http://www.mstarlabs.com/}
+email: @email{info@@mstarlabs.com/}
+WWW: @uref{http://www.mstarlabs.com/}
 telephone: +1 425 453 2345
 telefax: +1 425 453 3199
 @end display
@@ -8381,15 +8486,15 @@ The most popular Web browsers may be downloaded by anonymous FTP.
 @display
 Netscape
 FTP: @code{ftp.netscape.com}
-WWW: @code{http://www.netscape.com/}
+WWW: @uref{http://www.netscape.com/}
 
 Mozilla
 FTP: @code{ftp.mozilla.org}
-WWW: @code{http://www.mozilla.org/}
+WWW: @uref{http://www.mozilla.org/}
 
 MS Internet Explorer
 FTP: @code{ftp.microsoft.com}
-WWW: @code{http://www.microsoft.com/}
+WWW: @uref{http://www.microsoft.com/}
 @end display
 @end table
 
@@ -8508,6 +8613,7 @@ numbered versions of the WFDB library.
 WFDB Programmer's Guide
 
 Tenth Edition (revised and with additions for WFDB library version VERSION)
+LONGDATE
 
 George B. Moody
 

@@ -1,5 +1,5 @@
 file: README		G. Moody	28 July 1989
-			Last revised:	12 July 2002
+			Last revised:  26 October 2002
 
 This directory contains sources for WFDB applications which convert database
 files in various unsupported formats to and from MIT format, including to and
@@ -63,6 +63,12 @@ as this one.
 
 The following files will be found in this directory:
 
+Makefile	`make' description file for compiling these applications using
+		 ANSI/ISO standard C compilers on supported platforms
+Makefile.dos	`make' description file for compiling these applications using
+		 unsupported compilers from Borland, Microsoft, etc.
+Makefile.top	Used by ../configure to construct Makefile (comments only)
+Makefile.tpl	Used by ../configure to construct Makefile (portable section)
 README		this file
 
 a2m.c		Converts an AHA format annotation file to MIT format
@@ -76,7 +82,3 @@ makeid.c	Makes an AHA-format ID block for a database record
 edf2mit.c	Converts an EDF file to MIT format
 
 revise.c	Converts an obsolete MIT header to a new-format MIT header
-
-Makefile	UNIX `make' description file for compiling these applications
-makefile.dos	MS-DOS `make' description file for compiling these applications
-		 using Microsoft `make' or `nmake', Borland `make', etc.

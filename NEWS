@@ -1,3 +1,15 @@
+10.2.9:
+	Fixed a bug in example 9 in the WFDB Programmer's Guide (introduced
+	in version 10.2.0).
+
+	Updated lib/wfdbdll.def and the 'Makefile.dos' files in several
+	directories.  These have not been tested in recent years and may
+	need further revisions;  feedback is welcome.
+
+	Corrected persistent problems with generating PDF versions of the
+	manuals for the desired page size, and added hyperlinks to the
+	PDF version of the WFDB Programmer's Guide.
+
 10.2.8:
 	Fixed a bug in WAVE that occasionally caused a crash when starting
 	up;  also repaired a broken link in WAVE's on-line help.

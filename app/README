@@ -1,9 +1,9 @@
 file: README		G. Moody	 1 June 1989
-			Last revised:    8 October 2001
+			Last revised:  26 October 2002
 
 -------------------------------------------------------------------------------
 WFDB applications: programs for working with annotated signals
-Copyright (C) 2001 George B. Moody
+Copyright (C) 2002 George B. Moody
 
 These programs are free software; you can redistribute them and/or modify
 them under the terms of the GNU General Public License as published by the
@@ -49,9 +49,10 @@ one, will get you started if no others are available.
 
 The following files will be found in this directory:
 
-Makefile	UNIX `make' description file for compiling these applications
-Makefile.dos	MS-DOS `make' description file for compiling these applications
-		 using Microsoft `make' or `nmake', Borland `make', etc.
+Makefile	`make' description file for compiling these applications using
+		 ANSI/ISO standard C compilers on supported platforms
+Makefile.dos	`make' description file for compiling these applications using
+		 unsupported compilers from Borland, Microsoft, etc.
 Makefile.top	Used by ../configure to construct Makefile (comments only)
 Makefile.tpl	Used by ../configure to construct Makefile (portable section)
 README		this file

@@ -1,4 +1,4 @@
-This is wpg, produced by makeinfo version 4.0 from wpg.tex.
+This is wpg, produced by makeinfo version 4.0b from wpg.tex.
 
 INFO-DIR-SECTION Libraries
 START-INFO-DIR-ENTRY
@@ -390,6 +390,9 @@ signal in record `100s' like this:
          exit(0);
      }
 
+(See `http://www.physionet.org/physiotools/wfdb/examples/pgain.c' for a
+copy of this program.)
+
 This program, unlike the example in the previous chapter, does not
 assume that the number of signals is known.  The first invocation of
 `isigopen' determines this number (and the program quits if there are
@@ -639,11 +642,11 @@ beginning of the record:
          exit(0);
      }
 
-(The source for this program, `psamplex.c', can be found in the
-`examples' directory of the WFDB source tree.  Compile it as shown in
-the previous chapter, then run it using a command such as `psamplex
-100'.)  The QRS detector in chapter 6 also illustrates the use of
-`setifreq' (*note Example 10::).
+(See `http://www.physionet.org/physiotools/wfdb/examples/psamplex.c'
+for a copy of this program.  Compile it as shown in the previous
+chapter, then run it using a command such as `psamplex 100'.)  The QRS
+detector in chapter 6 also illustrates the use of `setifreq' (*note
+Example 10::).
 
 
 File: wpg,  Node: getifreq,  Next: setgvmode,  Prev: setifreq,  Up: special input modes
@@ -784,6 +787,9 @@ reads and prints the first ten samples of each available input signal:
          exit(0);
      }
 
+(See `http://www.physionet.org/physiotools/wfdb/examples/exgetvec.c'
+for a copy of this program.)
+
    Notice how the value returned by the first invocation of `isigopen'
 is used to determine how many input signals there are.  Several of the
 example programs in chapter 6 illustrate the use of `getvec'; for
@@ -891,6 +897,9 @@ copies the first ten samples of each available input signal:
          exit(0);
      }
 
+(See `http://www.physionet.org/physiotools/wfdb/examples/exputvec.c'
+for a copy of this program.)
+
    All programs that write signals or annotations _must_ invoke
 `wfdbquit' to close the output files properly (*note wfdbquit::).  This
 example uses record `8l' (*note Piped and Local Records::) for the
@@ -941,6 +950,9 @@ reference (`atr') annotation file for record `100s':
              printf("%s %s\n", mstimstr(annot.time), annstr(annot.anntyp);
          exit(0);
      }
+
+(See `http://www.physionet.org/physiotools/wfdb/examples/exgetann.c'
+for a copy of this program.)
 
    *Note WFDB_Anninfo structures::, for information on the contents of
 the `WFDB_Anninfo' structure, and *note timstr and strtim::, and *note
@@ -1167,6 +1179,9 @@ strings, and descriptions:
              printf("\n");
          }
      }
+
+(See `http://www.physionet.org/physiotools/wfdb/examples/exannstr.c'
+for a copy of this program.)
 
    `ACMAX' is defined in `<wfdb/ecgcodes.h>'.  The range from 1 through
 `ACMAX' includes all legal annotation codes; if you run this program,

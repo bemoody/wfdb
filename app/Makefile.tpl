@@ -1,5 +1,5 @@
-# file: Makefile.tpl		G. Moody		23 May 2000
-#				Last revised:		27 April 2002
+# file: Makefile.tpl		G. Moody	  23 May 2000
+#				Last revised:	26 October 2002
 # This section of the Makefile should not need to be changed.
 
 CFILES = ann2rr.c bxb.c calsig.c ecgeval.c epic.c fir.c ihr.c mfilt.c \
@@ -16,7 +16,7 @@ XFILES = ann2rr bxb calsig ecgeval epic fir ihr mfilt \
 SCRIPTS = cshsetwfdb setwfdb
 PSFILES = pschart.pro psfd.pro 12lead.pro
 OTHERFILES = cshsetwfdb setwfdb setwfdb.bat sample8.hea
-MFILES = Makefile Makefile-dos-gcc makefile.dos
+MFILES = Makefile Makefile.dos
 
 # General rule for compiling C sources into executable files.  This is
 # redundant for most versions of `make', but at least one System V version

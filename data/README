@@ -14,6 +14,9 @@ Most of the *.hea files in this directory duplicate those in the `udb'
 directory of the MIT-BIH Arrhythmia Database CD-ROM.  The other files in this
 directory are:
 
+Makefile	`make' description file for installing these files
+Makefile.top	Used by ../configure to construct Makefile (comments only)
+Makefile.tpl	Used by ../configure to construct Makefile (portable section)
 README		this file
 
 100s.hea	header file for record `100s'
@@ -33,9 +36,6 @@ esclist		list of records in the European ST-T DB
 mitlist		list of records in the MIT-BIH Arrhythmia DB
 mitxlist	as above, excluding paced records
 nstlist		list of records in the NST DB
-
-Makefile	UNIX `make' description file for installing these files
-makefile.dos	MS-DOS `make' description file for installing these files
 
 Note that there are no signal or annotation files associated with `multi.hea'
 and `null.hea';  see the comments in these files for details.

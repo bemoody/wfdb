@@ -1,11 +1,11 @@
-# file: Makefile.tpl		G. Moody		24 May 2000
-#				Last revised:		20 July 2002
+# file: Makefile.tpl		G. Moody	  24 May 2000
+#				Last revised:	26 October 2002
 # This section of the Makefile should not need to be changed.
 
 CFILES = a2m.c ad2m.c m2a.c md2a.c readid.c makeid.c edf2mit.c revise.c
 XFILES = a2m ad2m m2a md2a readid makeid edf2mit revise
 SCRIPTS = ahaconvert
-MFILES = Makefile makefile.dos
+MFILES = Makefile Makefile.dos
 
 # General rule for compiling C sources into executable files.  This is
 # redundant for most versions of `make', but at least one System V version

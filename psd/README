@@ -43,9 +43,12 @@ man pages on your system.
 
 The following files will be found in this directory:
 
-Makefile	UNIX `make' description file for compiling these applications
-Makefile-dos-gcc UNIX `make' description file for compiling these appliccations
-		 for MS-DOS using a gcc cross-compiler under UNIX
+Makefile	`make' description file for compiling these applications using
+		 ANSI/ISO standard C compilers on supported platforms
+Makefile.dos	`make' description file for compiling these applications using
+		 unsupported compilers from Borland, Microsoft, etc.
+Makefile.top	Used by ../configure to construct Makefile (comments only)
+Makefile.tpl	Used by ../configure to construct Makefile (portable section)
 README		this file
 coherence.c	Calculate coherence and cross-spectrum of two time series
 fft.c		Calculate fast Fourier transform (FFT), inverse FFT, etc.

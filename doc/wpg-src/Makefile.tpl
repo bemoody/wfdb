@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:	5 August 2002
+#				Last revised:  26 October 2002
 # Change the settings below as appropriate for your setup.
 
 # D2PARGS is a list of options for dvips.  Uncomment one of these to set the
@@ -8,10 +8,14 @@
 D2PARGS = -t letter
 
 # T2DARGS is a list of options for texi2dvi.  Uncomment one of these to set the
-# page size (the size of the printed area on the paper;  normally this should
-# match the paper size specified in D2PARGS):
-# T2DARGS = -t @afourpaper
-T2DARGS = -t @letterpaper
+# page size (the size of the printed area on the paper):
+# T2DARGS = --t @afourpaper
+T2DARGS = --t @letterpaper
+
+# PDFTEXCFG is the name of a file containing parameter settings for pdftex
+# (used by texi2dvi).  Choose the file corresponding to your paper size:
+# PDFTEXCFG = pdftex.cfg-a4
+PDFTEXCFG = pdftex.cfg-letter
 
 # LN is a command that makes the file named by its first argument accessible
 # via the name given in its second argument.  If your system supports symbolic
@@ -119,8 +123,12 @@ wpg.info.tar.gz:	wpg.tex
 
 # 'make wpg.pdf': format the WFDB Programmer's Guide as PDF
 wpg.pdf:	wpg.tex
+	sed 's/@-//g' <wpg.tex >wpg1.tex
+	mv wpg1.tex wpg.tex
 	rm -f wpg.aux wpg.idx wpg.ind wpg.toc
+	cp $(PDFTEXCFG) pdftex.cfg
 	texi2dvi --pdf $(T2DARGS) wpg.tex
+	rm pdftex.cfg wpg.tex
 
 # 'make pg.ps': format the WFDB Programmer's Guide as PostScript
 wpg.ps:		wpg.tex
@@ -135,5 +143,5 @@ wpg.tex:	wpg0.tex
 # 'make clean': remove intermediate and backup files
 clean:
 	rm -f info.tar.gz wpg wpg-* wpg.aux wpg.cp wpg.cps wpg.dvi wpg.fn \
-	 wpg.fns wpg.ky wpg.log wpg.pdf wpg.ps wpg.pg wpg.tex wpg.toc wpg.tp \
-	 wpg.vr wpgcover wpgcover.ps *~ ../wpg/info/dir
+	 wpg.fns wpg.ilg wpg.ky wpg.log wpg.pdf wpg.ps wpg.pg wpg.tex wpg.toc \
+	 wpg.tp wpg.vr wpgcover wpgcover.ps *~ ../wpg/info/dir

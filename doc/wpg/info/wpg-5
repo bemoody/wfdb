@@ -1,4 +1,4 @@
-This is wpg, produced by makeinfo version 4.0 from wpg.tex.
+This is wpg, produced by makeinfo version 4.0b from wpg.tex.
 
 INFO-DIR-SECTION Libraries
 START-INFO-DIR-ENTRY
@@ -54,6 +54,9 @@ accumulates a histogram of them.
      37      printf("%4d %s (or longer)\n", rrhist[rr], mstimstr((long)rr));
      38      exit(0);
      39  }
+
+(See `http://www.physionet.org/physiotools/wfdb/examples/example4.c'
+for a copy of this program.)
 
 *Notes:*
 _Lines 21-25:_
@@ -140,6 +143,9 @@ its argument:
      49      }
      50      exit(0);
      51  }
+
+(See `http://www.physionet.org/physiotools/wfdb/examples/example5.c'
+for a copy of this program.)
 
 *Notes:*
 
@@ -232,6 +238,9 @@ approach.
      33      wfdbquit();
      34      exit(0);
      35  }
+
+(See `http://www.physionet.org/physiotools/wfdb/examples/example6.c'
+for a copy of this program.)
 
 *Notes:*
 
@@ -371,6 +380,9 @@ which a header file is created in the current directory.
      78      wfdbquit();
      79      exit(0);
      80  }
+
+(See `http://www.physionet.org/physiotools/wfdb/examples/example7.c'
+for a copy of this program.)
 
 *Notes:*
 
@@ -563,6 +575,9 @@ acquisition are hardware-dependent and are not shown here.
      113      exit(0);
      114  }
 
+(See `http://www.physionet.org/physiotools/wfdb/examples/example8.c'
+for a copy of this program.)
+
 *Notes:*
 _Lines 14-17:_
      This code uses `newheader' to determine if a legal record name was
@@ -672,13 +687,13 @@ average waveform (by default, the average normal QRS complex).
      30          fprintf(stderr, "%s: insufficient memory\n", argv[0]);
      31          exit(2);
      32      }
-     33      for (i = 0; i < nsig; i++)
-     34          if ((sum[i]=(long *)calloc(window,sizeof(long))) == NULL) {
-     35              fprintf(stderr, "%s: insufficient memory\n", argv[0]);
-     36              exit(2);
-     37          }
-     38      if (wfdbinit(argv[2], &a, 1, s, nsig) != nsig) exit(3);
-     39      hwindow = strtim(".05"); window = 2*hwindow + 1;
+     33      if (wfdbinit(argv[2], &a, 1, s, nsig) != nsig) exit(3);
+     34      hwindow = strtim(".05"); window = 2*hwindow + 1;
+     35      for (i = 0; i < nsig; i++)
+     36          if ((sum[i]=(long *)calloc(window,sizeof(long))) == NULL) {
+     37              fprintf(stderr, "%s: insufficient memory\n", argv[0]);
+     38              exit(2);
+     39          }
      40      btype = (argc > 3) ? strann(argv[3]) : NORMAL;
      41      if (argc > 4) iannsettime(strtim(argv[4]));
      42      if (argc > 5) {
@@ -714,18 +729,21 @@ average waveform (by default, the average normal QRS complex).
      72      exit(0);
      73  }
 
+(See `http://www.physionet.org/physiotools/wfdb/examples/example9.c'
+for a copy of this program.)
+
 *Notes:*
 
-_Lines 33-37:_
-     Here we allocate memory for the `sum' vectors that will be used to
-     store the running totals.  See `K&R', page 167, for a description
-     of `calloc'.
-
-_Line 39:_
+_Line 34:_
      The "half-window" is 50 milliseconds wide, and the "window" (the
      duration of a segment to be entered into the average) is one
      sample more than twice that amount (i.e., 50 milliseconds to
      either side of the fiducial point defined by the annotation).
+
+_Lines 35-39:_
+     Here we allocate memory for the `sum' vectors that will be used to
+     store the running totals.  See `K&R', page 167, for a description
+     of `calloc'.
 
 _Line 40:_
      If a third argument is present on the command line, it is taken as
@@ -879,6 +897,9 @@ and feature extraction", `Computers in Cardiology' 6:37-42 (1979).
      90      wfdbquit();
      91      exit(0);
      92  }
+
+(See `http://www.physionet.org/physiotools/wfdb/examples/example10.c'
+for a copy of this program.)
 
 *Notes:*
 

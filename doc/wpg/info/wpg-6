@@ -1,4 +1,4 @@
-This is wpg, produced by makeinfo version 4.0 from wpg.tex.
+This is wpg, produced by makeinfo version 4.0b from wpg.tex.
 
 INFO-DIR-SECTION Libraries
 START-INFO-DIR-ENTRY
@@ -492,11 +492,11 @@ How to obtain the WFDB Software Package
 =======================================
 
    The latest version of the WFDB Software Package can always be
-downloaded in source form from PhysioNet and its mirrors (see
-`http://www.physionet.org/physiotools/wfdb.shtml'); binaries for
-popular operating systems and development snapshots, as well as
-quick-start guides including installation notes for popular operating
-systems, are also usually available there.
+downloaded in source form from PhysioNet
+(`http://www.physionet.org/physiotools/wfdb.shtml') and its mirrors;
+binaries for popular operating systems and development snapshots, as
+well as quick-start guides including installation notes for popular
+operating systems, are also usually available there.
 
 
 File: wpg,  Node: Unix installation,  Next: MS-Windows installation,  Prev: Distribution,  Up: Installation
@@ -512,17 +512,17 @@ provided with most current versions of GNU/Linux.  (If you have a
 program called `libwww-config', then `libwww' is installed already.)
 You may omit this step if you do not wish to have NETFILES support.
 
-   Also download and install the `XView' software from
-`http://www.physionet.org/physiotools/xview/' if you wish to use
-_WAVE_.  Sources are available, as are binaries for several versions of
-GNU/Linux.  If you are using SunOS or Solaris, XView binaries are
-available in the Open Look Software Development package and may be
-installed already.  (If you have a program called `textedit', then
-`XView' is installed already.) If you are able to use an existing set
-of binaries, these are recommended, since the sources may take a _long_
-time to compile.  Be sure that the directory containing `textedit',
-usually `/usr/openwin/bin', is in your `PATH'.  You may omit this step
-if you do not wish to use _WAVE_.
+   If you wish to use _WAVE_, also download and install the `XView'
+software from `http://www.physionet.org/physiotools/xview/'.  Sources
+are available, as are binaries for several versions of GNU/Linux.  If
+you are using SunOS or Solaris, XView binaries are available in the
+Open Look Software Development package and may be installed already.
+(If you have a program called `textedit', then `XView' is installed
+already.) If you are able to use an existing set of binaries, these are
+recommended, since the sources may take a _long_ time to compile.  Be
+sure that the directory containing `textedit', usually
+`/usr/openwin/bin', is in your `PATH'.  You may omit this step if you
+do not wish to use _WAVE_.
 
    If you have downloaded the software from PhysioNet or another
 source, you will have a `gzip'-compressed `tar' archive.  Unpack it
@@ -633,7 +633,7 @@ File: wpg,  Node: Other installation,  Prev: MS-Windows installation,  Up: Insta
 Other systems
 =============
 
-   Copy the contents of `http://www.physio.net/physiotools/wfdb/' to
+   Copy the contents of `http://www.physionet/physiotools/wfdb/' to
 your hard disk.  Note that the text files are in Unix format (i.e.,
 lines are terminated by ASCII line-feed characters only).  If your
 system expects text files in MS-DOS format (with both a carriage return

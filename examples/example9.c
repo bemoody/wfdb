@@ -30,13 +30,13 @@ char *argv[];
 	fprintf(stderr, "%s: insufficient memory\n", argv[0]);
 	exit(2);
     }
+    if (wfdbinit(argv[2], &a, 1, s, nsig) != nsig) exit(3);
+    hwindow = strtim(".05"); window = 2*hwindow + 1;
     for (i = 0; i < nsig; i++)
         if ((sum[i]=(long *)calloc(window,sizeof(long))) == NULL) {
             fprintf(stderr, "%s: insufficient memory\n", argv[0]);
             exit(2);
         }
-    if (wfdbinit(argv[2], &a, 1, s, nsig) != nsig) exit(3);
-    hwindow = strtim(".05"); window = 2*hwindow + 1;
     btype = (argc > 3) ? strann(argv[3]) : NORMAL;
     if (argc > 4) iannsettime(strtim(argv[4]));
     if (argc > 5) {

@@ -1,5 +1,5 @@
-# file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:	18 July 2000
+# file: Makefile.tpl		G. Moody	  24 May 2000
+#				Last revised:	26 October 2002
 # This section of the Makefile should not need to be changed.
 
 INCLUDES = $(INCDIR)/wfdb/wfdb.h $(INCDIR)/wfdb/ecgcodes.h \
@@ -9,7 +9,7 @@ COMPAT_INCLUDES = $(INCDIR)/ecg/db.h $(INCDIR)/ecg/ecgcodes.h \
 HFILES = wfdb.h ecgcodes.h ecgmap.h wfdblib.h
 CFILES = wfdbinit.c annot.c signal.c calib.c wfdbio.c
 OFILES = wfdbinit.o annot.o signal.o calib.o wfdbio.o
-MFILES = Makefile makefile.dos
+MFILES = Makefile Makefile.dos
 
 # `make' or `make all':  build the WFDB library
 all:	$(OFILES)
