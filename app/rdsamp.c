@@ -1,9 +1,9 @@
 /* file: rdsamp.c	G. Moody	23 June 1983
-			Last revised:   9 April 2000
+			Last revised:   5 October 2001
 
 -------------------------------------------------------------------------------
 rdsamp: Print an arbitrary number of samples from each signal
-Copyright (C) 2000 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -65,11 +65,11 @@ int argc;
 char *argv[];
 {
     char *record = NULL, *prog_name();
-    int i, isiglist, nsig, nosig = 0, pflag = 0, s, *sig = NULL, v[WFDB_MAXSIG],
+    int highres = 0, i, isiglist, nsig, nosig = 0, pflag = 0, s, *sig = NULL,
 	vflag = 0;
-    int highres = 0;
     long from = 0L, maxl = 0L, to = 0L;
-    static WFDB_Siginfo si[WFDB_MAXSIG];
+    WFDB_Sample *v;
+    WFDB_Siginfo *si;
     void help();
 
 #ifdef WFDBP
@@ -175,7 +175,13 @@ char *argv[];
 	help();
 	exit(1);
     }
-    if ((nsig = isigopen(record, si, WFDB_MAXSIG)) <= 0)
+    if ((nsig = isigopen(record, NULL, 0)) <= 0) exit(2);
+    if ((v = malloc(nsig * sizeof(WFDB_Sample))) == NULL ||
+	(si = malloc(nsig * sizeof(WFDB_Siginfo))) == NULL) {
+	(void)fprintf(stderr, "%s: insufficient memory\n", pname);
+	exit(2);
+    }
+    if ((nsig = isigopen(record, si, nsig)) <= 0)
 	exit(2);
     for (i = 0; i < nsig; i++)
 	if (si[i].gain == 0.0) si[i].gain = WFDB_DEFGAIN;
@@ -220,11 +226,15 @@ char *argv[];
 
     /* Print column headers if '-v' option selected. */
     if (vflag) {
-	char *p, t[40];
+	char *p, *t;
 	int l;
 
 	if (pflag == 0) (void)printf("samp #");
 	else (void)printf("time");
+	if ((t = malloc((strlen(record)+30) * sizeof(char))) == NULL) {
+	    fprintf(stderr, "%s: insufficient memory\n", pname);
+	    exit(2);
+	}
 	for (i = 0; i < nsig; i++) {
 	    (void)sprintf(t, "record %s, signal %d", record, sig[i]);
 	    p = si[sig[i]].desc;

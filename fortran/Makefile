@@ -1,9 +1,9 @@
 # file: Makefile		G. Moody	23 August 1995
-#				Last revised:	  7 May 1999
+#				Last revised:	8 October 2001
 #
 # -----------------------------------------------------------------------------
 # UNIX 'make' description file for compiling the Fortran example program
-# Copyright (C) 1999 George B. Moody
+# Copyright (C) 2001 George B. Moody
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -32,7 +32,7 @@
 # `make clean' to remove it.
 
 example:	example.f wfdbf.c
-	f77 -o example example.f wfdbf.c -lwfdb
+	f77 -o example -fwritable-strings example.f wfdbf.c -lwfdb
 
 # If you have `f2c', but not `f77', use `make example-alt' instead of `make'.
 example-alt:	example.f wfdbf.c

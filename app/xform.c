@@ -1,5 +1,5 @@
 /* file: xform.c	G. Moody       8 December 1983
-			Last revised:   15 August 2001
+			Last revised:  8 October 2001
 
 -------------------------------------------------------------------------------
 xform: Sampling frequency, amplitude, and format conversion for WFDB records
@@ -52,21 +52,17 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-    char *irec = NULL, *orec = NULL, *nrec = NULL, *script = NULL,
-        *startp = "0:0";
-    int clip = 0, fflag = 0, gflag = 0, Hflag = 0, ifreq, i, j, m, Mflag = 0,
-	mn, n, nann = 0, nisig, nminutes = 0, nosig = -1, ofreq = 0,
-        reopen = 0, spf = 1, use_irec_desc = 1;
-    static char btstring[30];
-    static double gain[WFDB_MAXSIG];
-    static int deltav[WFDB_MAXSIG], msiglist[WFDB_MAXSIG],
-	siglist[WFDB_MAXSIG], v[WFDB_MAXSIG], vin[WFDB_MAXSIG*WFDB_MAXSPF],
-        vmax[WFDB_MAXSIG], vmin[WFDB_MAXSIG], vout[WFDB_MAXSIG*WFDB_MAXSPF],
-	vv[WFDB_MAXSIG];
-    static long it, ot, from, to, nsamp = -1L, spm, nsm = 0L;
-    static WFDB_Siginfo dfin[WFDB_MAXSIG], dfout[WFDB_MAXSIG];
-    static WFDB_Anninfo ai[WFDB_MAXANN];
-    static WFDB_Annotation annot;
+    char btstring[30], **description, **filename, *irec = NULL, *orec = NULL,
+	*nrec = NULL, *script = NULL, *startp = "0:0", **units;
+    double *gain;
+    int clip = 0, *deltav, fflag = 0, gflag = 0, Hflag = 0, ifreq, i, j, m,
+	Mflag = 0, mn, *msiglist, n, nann = 0, nisig, nminutes = 0, nosig = 0,
+	ofreq = 0, reopen = 0, sflag = 0, *siglist = NULL, spf, uflag = 0,
+	use_irec_desc = 1, *v, *vin, *vmax, *vmin, *vout, *vv;
+    long from = 0L, it = 0L, nsamp = -1L, nsm = 0L, ot = 0L, spm, to = 0L;
+    WFDB_Anninfo *ai = NULL;
+    WFDB_Annotation annot;
+    WFDB_Siginfo *dfin, *dfout;
 
     pname = prog_name(argv[0]);
 
@@ -74,23 +70,27 @@ char *argv[];
     for (i = 1; i < argc; i++) {
 	if (*argv[i] == '-') switch (*(argv[i]+1)) {
 	  case 'a':	/* annotator(s) */
-	    if (++i >= argc) {
+	    /* Count the number of annotators.  Accept the next argument
+	     unconditionally as an annotator name; accept additional arguments
+	     until we find one beginning with `-', or the end of the argument
+	     list. */
+	    for (j = 0; ++i < argc && (j == 0 || *argv[i] != '-'); j++)
+		;
+	    if (j == 0) {
 		(void)fprintf(stderr, "%s: annotator(s) must follow -a\n",
 			      pname);
 		exit(1);
 	    }
-	    /* Accept the next argument unconditionally as an annotator name;
-	       accept additional arguments until we find one beginning with
-	       `-', or the end of the argument list. */
-	    do {
-		if (nann >= WFDB_MAXANN) {
-		    (void)fprintf(stderr,
-	           "%s: no more than %d annotators may be processed at once\n",
-				  pname, WFDB_MAXANN);
-		    exit(1);
-		}
-		ai[nann].name = argv[i++]; ai[nann++].stat = WFDB_READ;
-	    } while (i < argc && *argv[i] != '-');
+	    /* allocate storage */
+	    if ((ai = realloc(ai, (nann+j) * sizeof(WFDB_Anninfo))) == NULL) {
+		(void)fprintf(stderr, "%s: insufficient memory\n", pname);
+		exit(2);
+	    }
+	    /* fill the annotator information structures */
+	    for (i -= j, j=0; i<argc && (j == 0 || *argv[i] != '-'); j++) {
+		ai[nann].name = argv[i++];
+		ai[nann++].stat = WFDB_READ;
+	    }
 	    i--;
 	    break;
 	  case 'c':	/* clip (limit) output (default: discard high bits) */
@@ -148,20 +148,23 @@ char *argv[];
 	    orec = argv[i];
 	    break;
 	  case 's':	/* signal list follows */
-	    if (++i >= argc) {
+	    sflag = 1;
+	    /* count the number of output signals */
+	    for (j = 0; ++i < argc && *argv[i] != '-'; j++)
+		;
+	    if (j == 0) {
 		(void)fprintf(stderr, "%s: signal list must follow -s\n",
 			pname);
 		exit(1);
 	    }
-	    nosig = 0;
-	    while (i < argc && *argv[i] != '-') {
-		if (nosig == WFDB_MAXSIG) {
-		    (void)fprintf(stderr, "%s: too many output signals\n",
-				  pname);
-		    exit(1);
-		}
-		siglist[nosig++] = atoi(argv[i++]);
+	    /* allocate storage for the signal list */
+	    if ((siglist=realloc(siglist, (nosig+j) * sizeof(int))) == NULL) {
+		(void)fprintf(stderr, "%s: insufficient memory\n", pname);
+		exit(2);
 	    }
+	    /* fill the signal list */
+	    for (i -= j; i < argc && *argv[i] != '-'; )
+		siglist[nosig++] = atoi(argv[i++]);
 	    i--;
 	    break;
 	  case 'S':	/* script name follows */
@@ -178,6 +181,9 @@ char *argv[];
 		exit(1);
 	    }
 	    to = i;
+	    break;
+	  case 'u':	/* make annotation times unique */
+	    uflag = 1;
 	    break;
 	  default:
 	    (void)fprintf(stderr, "%s: unrecognized option %s\n", pname,
@@ -197,57 +203,136 @@ char *argv[];
 	exit(1);
     }
 
-    /* Get input signal information and sampling frequency to use as defaults
-       for output. */
-    nisig = isigopen(irec, dfin, WFDB_MAXSIG);
-    if (Hflag) {
-	setgvmode(WFDB_HIGHRES);
-	spf = getspf();
+    /* Determine the number of input signals.  If isigopen returns a negative
+       value, quit (isigopen will have emitted an error message). */
+    if ((nisig = isigopen(irec, NULL, 0)) < 0) exit(2);
+
+    /* If the input record contains no signals, we won't write any -- but
+       we might still read and write annotations. */
+    if (nisig == 0) nosig = 0;
+
+    /* Otherwise, prepare to read and write signals. */
+    else {
+	/* Allocate storage for variables related to the input signals. */
+	if ((dfin = malloc(nisig * sizeof(WFDB_Siginfo))) == NULL ||
+	    (vin = malloc(nisig * sizeof(int))) == NULL) {
+	    (void)fprintf(stderr, "%s: insufficient memory\n", pname);
+	    exit(2);
+	}
+
+	/* If a signal list was specified using -s, check that the specified
+	   signal numbers are legal. */
+	if (sflag) {
+	    for (i = 0; i < nosig && nosig > 0; i++)
+		if (siglist[i] < 0 || siglist[i] >= nisig) {
+		    (void)fprintf(stderr,
+		       "%s: warning: signal %d can't be read from record %s\n",
+				  pname, siglist[i], irec);
+		    /* Delete illegal signal numbers from the list. */
+		    for (j = i; j+1 < nosig; j++)
+			siglist[j] = siglist[j+1];
+		    nosig--;
+		    i--;
+		}
+	    /* If the signal list contained no valid signal numbers, treat
+	       this situation as if no signal list was specified. */
+	    if (nosig == 0)
+		sflag = 0;
+	}
+
+	/* If the signal list was not specified using -s, initialize it now. */
+	if (sflag == 0) {
+	    nosig = nisig;
+	    if ((siglist = malloc(nosig * sizeof(int))) != NULL)
+		for (i = 0; i < nosig; i++)
+		    siglist[i] = i;
+	}
+
+	/* Allocate storage for variables related to the output signals. */
+	if ((siglist == NULL) ||
+	    (dfout = malloc(nosig * sizeof(WFDB_Siginfo))) == NULL ||
+	    (gain = malloc(nosig * sizeof(double))) == NULL ||
+	    (deltav = malloc(nosig * sizeof(int))) == NULL ||
+	    (msiglist = malloc(nosig * sizeof(int))) == NULL ||
+	    (v = malloc(nosig * sizeof(int))) == NULL ||
+	    (vmax = malloc(nosig * sizeof(int))) == NULL ||
+	    (vmin = malloc(nosig * sizeof(int))) == NULL ||
+	    (vout = malloc(nosig * sizeof(int))) == NULL ||
+	    (vv = malloc(nosig * sizeof(int))) == NULL ||
+	    (filename = malloc(nosig * sizeof(char *))) == NULL ||
+	    (description = malloc(nosig * sizeof(char *))) == NULL ||
+	    (units = malloc(nosig * sizeof(char *))) == NULL) {
+	    (void)fprintf(stderr, "%s: insufficient memory\n", pname);
+	    exit(2);
+	}
     }
+
+    /* Determine the input sampling frequency. */
+    if (Hflag)
+	setgvmode(WFDB_HIGHRES);
+    spf = getspf();
     ifreq = strtim("1") * spf;
     (void)setsampfreq(0.);
 
-    /* If no output record was specified, get the specifications
-       interactively. */
-    if (orec == NULL) {
-	char answer[32], directory[32];
-	static char filename[WFDB_MAXSIG][32], description[WFDB_MAXSIG][32],
-	    record[8], units[WFDB_MAXSIG][22];
+    if (isigopen(irec, dfin, nisig) != nisig) exit(2);
+
+    if (orec != NULL) {	/* an output record was specified */
+	/* If a new record name was specified, check that it can be created. */
+	if (nrec && newheader(nrec) < 0) exit(2);
+
+	/* Determine the output sampling frequency. */
+	if (orec) ofreq = sampfreq(orec);
+	(void)setsampfreq(ifreq/spf);
+
+	if (ifreq != ofreq) {
+	    if (Mflag != 0) {
+		(void)fprintf(stderr,
+      "%s: -M option may not be used if sampling frequency is to be changed\n",
+			      pname);
+		wfdbquit();
+		exit(1);
+	    }
+	}
+    }
+
+    /* If no output record was specified, get signal specs interactively. */
+    else {
+	static char answer[32], directory[32], record[WFDB_MAXRNL+2];
 	static int formats[WFDB_NFMTS] = WFDB_FMT_LIST;	/* see <wfdb/wfdb.h> */
-	FILE *ttyin = NULL;
+	int format;
+	FILE *ttyin;
 #ifndef MSDOS
 	ttyin = fopen(script ? script : "/dev/tty", "r");
-#endif
-#ifdef MSDOS
+#else
 	ttyin = fopen(script ? script : "CON", "rt");
 #endif
 	if (ttyin == NULL) ttyin = stdin;
 	if (nrec == NULL) {
 	    do {
 		(void)fprintf(stderr,
-		 "Choose a name for the output record (up to 6 characters): ");
-		(void)fgets(record, 8, ttyin); record[strlen(record)-1] = '\0';
+		 "Choose a name for the output record (up to %d characters): ",
+			      WFDB_MAXRNL);
+		(void)fgets(record, WFDB_MAXRNL+2, ttyin);
+		record[strlen(record)-1] = '\0';
 	    } while (record[0] == '\0' || newheader(record) < 0);
 	    nrec = record;
 	}
-	if (nosig == -1) {
+	if (sflag == 0) {
 	    do {
 		nosig = nisig;
 		(void)fprintf(stderr,
 			      "Number of signals to be written (1-%d) [%d]: ",
-		       WFDB_MAXSIG, nosig);
-		(void)fgets(answer, 32, ttyin);
+		       nisig, nosig);
+		(void)fgets(answer, sizeof(answer), ttyin);
 		(void)sscanf(answer, "%d", &nosig);
 		if (nosig == 0) {
 		    (void)fprintf(stderr,
 			"No signals will be written.  Are you sure? [n]: ");
-		    (void)fgets(answer, 32, ttyin);
+		    (void)fgets(answer, sizeof(answer), ttyin);
 		    if (*answer != 'y' && *answer != 'Y')
 			nosig = -1;
 		}
-	    } while (nosig < 0 || nosig > WFDB_MAXSIG);
-	    for (i = 0; i < nosig; i++)
-		siglist[i] = i;
+	    } while (nosig < 0 || nosig > nisig);
 	}
 	if (Mflag) {
 	    ofreq = ifreq;
@@ -260,7 +345,8 @@ char *argv[];
 	    (void)fprintf(stderr,
 		  "Output sampling frequency (Hz per signal, > 0) [%d]: ",
 			  ofreq);
-	    (void)fgets(answer, 32, ttyin); (void)sscanf(answer, "%d", &ofreq);
+	    (void)fgets(answer, sizeof(answer), ttyin);
+	    (void)sscanf(answer, "%d", &ofreq);
 	} while (ofreq < 0);
 	if (ofreq == 0) ofreq = WFDB_DEFFREQ;
 	if (nosig > 0) {
@@ -269,7 +355,7 @@ char *argv[];
 	    (void)fprintf(stderr,
 		" signals should be written, or press <return> to write\n");
 	    (void)fprintf(stderr, " them in the current directory: ");
-	    (void)fgets(directory, 31, ttyin);
+	    (void)fgets(directory, sizeof(directory)-1, ttyin);
 	    if (*directory == '\n') *directory = '\0';
 	    else directory[strlen(directory)-1] = '/';
 	    (void)fprintf(stderr,"Any of these output formats may be used:\n");
@@ -287,20 +373,28 @@ char *argv[];
 	    (void)fprintf(stderr,
 	  "  311   3 10-bit amplitudes bit-packed in 30 LS bits of 4 bytes\n");
 	    do {
-		dfout[0].fmt = dfin[0].fmt;
+		format = dfin[0].fmt;
 		(void)fprintf(stderr,
 		 "Choose an output format (8/16/61/80/160/212/310/311) [%d]: ",
-			      dfout[0].fmt);
-		(void)fgets(answer, 32, ttyin);
-		(void)sscanf(answer, "%d", &dfout[0].fmt);
+			      format);
+		(void)fgets(answer, sizeof(answer), ttyin);
+		(void)sscanf(answer, "%d", &format);
 		for (i = 0; i < WFDB_NFMTS; i++)
-		    if (dfout[0].fmt == formats[i]) break;
+		    if (format == formats[i]) break;
 	    } while (i >= WFDB_NFMTS);
 	    if (nosig > 1) {
 		(void)fprintf(stderr, "Save all signals in one file? [y]: ");
-		(void)fgets(answer, 32, ttyin);
+		(void)fgets(answer, sizeof(answer), ttyin);
 	    }
+	    /* Use the input signal specifications as defaults for output. */
+	    for (i = 0; i < nosig; i++)
+		dfout[i] = dfin[siglist[i]];
 	    if (nosig <= 1 || (answer[0] != 'n' && answer[0] != 'N')) {
+		filename[0] = malloc(strlen(directory)+strlen(nrec)+10);
+		if (filename[0] == NULL) {
+		    (void)fprintf(stderr, "%s: insufficient memory\n", pname);
+		    exit(2);
+		}
 		(void)sprintf(filename[0], "%s%s.dat", directory, nrec);
 		for (i = 0; i < nosig; i++) {
 		    dfout[i].fname = filename[0];
@@ -309,6 +403,12 @@ char *argv[];
 	    }
 	    else {
 		for (i = 0; i < nosig; i++) {
+		    filename[i] = malloc(strlen(directory)+strlen(nrec)+10);
+		    if (filename[i] == NULL) {
+			(void)fprintf(stderr, "%s: insufficient memory\n",
+				      pname);
+			exit(2);
+		    }
 		    (void)sprintf(filename[i], "%s%s.d%d", directory, nrec, i);
 		    dfout[i].fname = filename[i];
 		    dfout[i].group = i;
@@ -316,23 +416,28 @@ char *argv[];
 	    }
 	}
 	for (i = 0; i < nosig; i++) {
-            dfout[i].fmt = dfout[0].fmt; dfout[i].bsize = 0;
-	    dfout[i].gain = dfin[siglist[i]].gain;
-	    dfout[i].adcres = dfin[siglist[i]].adcres;
-	    dfout[i].adczero = dfin[siglist[i]].adczero;
-	    dfout[i].units = dfin[siglist[i]].units;
-	    if (Mflag) dfout[i].spf = dfin[siglist[i]].spf;
+	    /* Make sure output signals are written in the chosen format. */
+	    dfout[i].fmt = format;
+	    if (Mflag == 0) dfout[i].spf = 1;
+	    dfout[i].bsize = 0;	    /* no block size is defined */
 	    if (!use_irec_desc) {
 		char *p;
 
+		if ((description[i] = malloc(WFDB_MAXDSL+2)) == NULL ||
+		    (units[i] = malloc(WFDB_MAXUSL+2)) == NULL) {
+		    (void)fprintf(stderr, "%s: insufficient memory\n", pname);
+		    exit(2);
+		}
 		(void)fprintf(stderr,
-			"Signal %d description (up to 30 characters): ", i);
-		(void)fgets(description[i], 32, ttyin);
+			      "Signal %d description (up to %d characters): ",
+			      i, WFDB_MAXDSL);
+		(void)fgets(description[i], WFDB_MAXDSL+2, ttyin);
 		description[i][strlen(description[i])-1] = '\0';
 		dfout[i].desc = description[i];
 		(void)fprintf(stderr,
-			      "Signal %d units (up to 20 characters): ", i);
-		(void)fgets(units[i], 22, ttyin);
+			      "Signal %d units (up to %d characters): ",
+			      i, WFDB_MAXUSL);
+		(void)fgets(units[i], WFDB_MAXUSL+2, ttyin);
 		for (p = units[i]; *p; p++) {
 		    if (*p == ' ' || *p == '\t') *p = '_';
 		    else if (*p == '\n') { *p = '\0'; break; }
@@ -343,7 +448,7 @@ char *argv[];
 		(void)fprintf(stderr, " Signal %d gain (adu/%s) [%g]: ",
 			      i, dfout[i].units ? dfout[i].units : "mV",
 			      dfout[i].gain);
-		(void)fgets(answer, 32, ttyin);
+		(void)fgets(answer, sizeof(answer), ttyin);
 		(void)sscanf(answer, "%lf", &dfout[i].gain);
 	    } while (dfout[i].gain < 0.);
 	    do {
@@ -368,40 +473,21 @@ char *argv[];
 		(void)fprintf(stderr,
 			" Signal %d ADC resolution in bits (8-16) [%d]: ", i,
 			      dfout[i].adcres);
-		(void)fgets(answer, 32, ttyin);
+		(void)fgets(answer, sizeof(answer), ttyin);
 		(void)sscanf(answer, "%d", &dfout[i].adcres);
 	    } while (dfout[i].adcres < 8 || dfout[i].adcres > 16);
 	    (void)fprintf(stderr, " Signal %d ADC zero level (adu) [%d]: ",
 			  i, dfout[i].adczero);
-	    (void)fgets(answer, 32, ttyin);
+	    (void)fgets(answer, sizeof(answer), ttyin);
 	    (void)sscanf(answer, "%d", &dfout[i].adczero);
 	}
     }
 
-    /* Check that the output record can be created. */
-    if (nrec && newheader(nrec) < 0) exit(2);
-
-    /* Determine the output sampling frequency. */
-    if (orec) ofreq = sampfreq(orec);
-    (void)setsampfreq(ifreq/spf);
-
-    if (ifreq != ofreq) {
-	if (Mflag != 0) {
-	    fprintf(stderr,
-      "%s: -M option may not be used if sampling frequency is to be changed\n",
-		    pname);
-	    wfdbquit();
-	    exit(1);
-	}
-    }
-
     /* Check the starting and ending times. */
-    if (from) {
-	startp = argv[(int)from];
-	from = strtim(startp);
-	if (from < 0L) from = -from;
-	strcpy(btstring, timstr(-from));
-    }
+    if (from) startp = argv[(int)from];
+    from = strtim(startp);
+    if (from < 0L) from = -from;
+    strcpy(btstring, timstr(-from));
     if (to) {
 	to = strtim(argv[(int)to]);
 	if (to < 0L) to = -to;
@@ -412,7 +498,6 @@ char *argv[];
 	    exit(1);
 	}
     }
-
     spm = strtim("1:0");
 
     /* Process the annotation file(s), if any. */
@@ -449,12 +534,14 @@ char *argv[];
 	    while (getann((unsigned)i, &annot) == 0 &&
 		   (to == 0L || annot.time <= to)) {
 		annot.time = (annot.time - from) * ((double)ofreq*spf) / ifreq;
-		/* Make sure that the corrected annotation time is positive
-		   and that it is later than the previous annotation time
-		   (exception: if it matches the previous annotation time,
-		   but the chan field is greater than that of the previous
-		   annotation, no time adjustment is performed). */
-		if (annot.time < tt || (annot.time == tt && annot.chan <= cc))
+		/* If the -u option was specified, make sure that the corrected
+		   annotation time is positive and that it is later than the
+		   previous annotation time (exception: if it matches the
+		   previous annotation time, but the chan field is greater than
+		   that of the previous annotation, no time adjustment is
+		   performed). */
+		if (uflag && (annot.time < tt ||
+			      (annot.time == tt && annot.chan <= cc)))
 		    annot.time = ++tt;
 		else tt = annot.time;
 		cc = annot.chan;
@@ -473,81 +560,24 @@ char *argv[];
     if (nosig == 0) exit(0);
 
     /* Check that the input signals are readable. */
-    fprintf(stderr, "Checking input signals ...");
+    (void)fprintf(stderr, "Checking input signals ...");
     if (isigsettime(from) < 0)
 	exit(2);
-    fprintf(stderr, " done\n");
-
-    /* If no signal list was specified, generate one. */
-    if (nosig == -1)
-	for (nosig = 0; nosig < nisig; nosig++)
-	    siglist[nosig] = nosig;
-
-    /* Otherwise, check that the signal numbers are legal. */
-    else {
-	for (i = 0; i < nosig && nosig > 0; i++)
-	    if (siglist[i] < 0 || siglist[i] >= nisig) {
-		(void)fprintf(stderr,
-		    "%s: warning: signal %d can't be read from record %s\n",
-			pname, siglist[i], irec);
-		/* Delete illegal signal numbers from the list. */
-		for (j = i; j+1 < nosig; j++)
-		    siglist[j] = siglist[j+1];
-		nosig--;
-		i--;
-	    }
-	if (nosig == 0) {
-	    (void)fprintf(stderr, "%s: no output signals written\n", pname);
-	    exit(2);
-	}
-    }
+    (void)fprintf(stderr, " done\n");
 
     /* If an output record was specified using `-o', check that the output
-       signals are writable. */
-    if (orec) {
-	/* Temporarily suppress WFDB library error messages. */
-	wfdbquiet();
-
-	n = nosig;
-	while ((i = osigopen(orec, dfout, (unsigned)n)) != n) {
-	    if (i == -1) {
-		(void)fprintf(stderr,
-			      "%s: can't read header file for record %s\n",
-			pname, orec);
-		exit(2);
-	    }
-	    else if (i == -2) {
-		(void)fprintf(stderr,
-			"%s: incorrect header file format for record %s\n",
-			pname, orec);
-		exit(2);
-	    }
-	    else if (--n <= 0) {
-		(void)fprintf(stderr,
-			"%s: can't open any output signals for record %s\n",
-			pname, orec);
-		exit(2);
-	    }
-	}
-
-	/* If some but not all outputs can be written, print a warning and
-	   reduce the number of outputs as necessary. */
-	if (n < nosig) {
-	    (void)fprintf(stderr,
-		    "%s: warning: writing only the first %d of %d signals\n",
-		    pname, n, nosig);
-	    nosig = n;
-	    for (nisig = i = 0; i < nosig; i++)
-		if (nisig <= siglist[i]) nisig = siglist[i]+1;
-	}
-
-	/* Re-enable WFDB library error messages. */
-	wfdbverbose();
+       signals are writable.  Suppress warning messages about possible
+       sampling frequency differences. */
+    wfdbquiet();
+    if (orec && (osigopen(orec, dfout, (unsigned)nosig) != nosig)) {
+	(void)fprintf(stderr, "%s: can't write output signals\n", pname);
+	exit(2);
     }
+    wfdbverbose();
 
     /* If the `-n' option was specified, copy the signal descriptions from the
-       input record header file into the siginfo structures for the output
-       record (for eventual storage in the new output header file.)  To make
+       input record header file into the WFDB_Siginfo structures for the output
+       record (for eventual storage in the new output header file).  To make
        the changes effective, the output signals must be (re)opened using
        osigfopen. */
     if (nrec && use_irec_desc) {
@@ -564,10 +594,10 @@ char *argv[];
 	/* A signal may be rescaled by xform depending on the gains and ADC
 	   resolutions specified.  The rules for doing so are as follows:
 	   1.  If the output gain has not been specified, the signal is scaled
-	       only if the input and output ADC resolutions have been specified
-	       and differ.  In this case, the scale factor (gain[]) is
-	       determined so that the appropriate number of bits will be
-	       dropped from or added to each signal.
+	       only if the input and output ADC resolutions differ.  In this
+	       case, the scale factor (gain[]) is determined so that the
+	       appropriate number of bits will be dropped from or added to each
+	       signal.
 	   2.  If the output gain has been specified, the signal is scaled by
 	       the ratio of the output and input gains.  If the input gain is
 	       not specified explicitly, the value WFDB_DEFGAIN is assumed.
@@ -890,7 +920,7 @@ char *argv[];
 
     /* Generate a new header file, if so requested. */
     if (nrec) {
-	char *info, xinfo[80];
+	char *info, *xinfo;
 
 	(void)setsampfreq((double)ofreq);
 	if (btstring[0] == '[') {
@@ -908,19 +938,28 @@ char *argv[];
 	    } while (info = getinfo((char *)NULL));
 
 	/* Append additional info summarizing what xform has done. */
-	(void)sprintf(xinfo, "Produced by %s from record %s, beginning at %s",
-		pname, irec, startp);
-	(void)putinfo(xinfo);
-	for (i = 0; i < nosig; i++)
-	    if (siglist[i] != i) {
-		(void)sprintf(xinfo,
+	if (xinfo = malloc(strlen(pname)+strlen(irec)+strlen(startp)+80)) {
+	    (void)sprintf(xinfo,
+			  "Produced by %s from record %s, beginning at %s",
+			  pname, irec, startp);
+	    (void)putinfo(xinfo);
+	    for (i = 0; i < nosig; i++)
+		if (siglist[i] != i) {
+		    (void)sprintf(xinfo,
 			      "record %s, signal %d <- record %s, signal %d",
-			nrec, i, irec, siglist[i]);
-		(void)putinfo(xinfo);
-	    }
+				  nrec, i, irec, siglist[i]);
+		    if (gain[i] != 1.)
+			(void)sprintf(xinfo+strlen(xinfo),
+				      " * %g", gain[i]);
+		    if (deltav[i] != 0)
+			(void)sprintf(xinfo+strlen(xinfo),
+				      " %c %d", deltav[i] > 0 ? '+' : '-',
+				      deltav[i] > 0 ? deltav[i] : -deltav[i]);
+		    (void)putinfo(xinfo);
+		}
+	}
 	wfdbverbose();
     }
-
     wfdbquit();
     exit(0);	/*NOTREACHED*/
 }
@@ -974,11 +1013,12 @@ static char *help_strings[] = {
  " -s SIGNAL [SIGNAL ...]  write only the specified signal(s)",
  " -S SCRIPT   take answers to prompts from SCRIPT (a text file)",
  " -t TIME     stop at specified time",
+ " -u          adjust annotation times if needed to make them unique",
  "Unless you use `-o' to specify an *existing* header that describes the",
  "desired signal files, you will be asked for output specifications.  Use",
  "`-n' to name the record to be created.  Use `-s' to select a subset of the",
  "input signals, or to re-order them in the output file;  arguments that",
- "follow `-s' are *input* signal numbers (0-31).",    /* WFDB_MAXSIG-1 = 31 */
+ "follow `-s' are *input* signal numbers (0,1,2,...).",
 NULL
 };
 

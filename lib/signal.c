@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  11 September 2001	wfdblib 10.2.0
+			Last revised:  8 October 2001	wfdblib 10.2.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -1452,6 +1452,7 @@ int nsig;
 	if (siarray != NULL)
 	    for (s = 0; s < nsig; s++)
 		siarray[s] = hsd[s]->info;
+	in_msrec = 0;	/* necessary to avoid errors when reopening */
 	return (navail);
     }
 

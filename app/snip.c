@@ -1,5 +1,5 @@
 /* file: snip.c		G. Moody	30 July 1989
-			Last revised:	10 September 2001
+			Last revised:	4 October 2001
 -------------------------------------------------------------------------------
 snip: Copy an excerpt of a database record
 Copyright (C) 2001 George B. Moody
@@ -28,6 +28,11 @@ _______________________________________________________________________________
 #ifndef __STDC__
 extern void exit();
 #endif
+#ifndef NOMALLOC_H
+#include <malloc.h>
+#else
+extern char *malloc();
+#endif
 #include <wfdb/wfdb.h>
 
 char *pname;
@@ -36,14 +41,14 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-    char *irec = NULL, *nrec = NULL, *prog_name();
-    int i, j, nsig, v[WFDB_MAXSIG];
+    char *info, *irec = NULL, *nrec = NULL, *ofname, *orec, *startp = "0:0",
+         *xinfo, *prog_name();
+    int a, i, nann = 0, nsig;
     long from = 0L, to = 0L, nsamp;
-    unsigned int nann = 0;
-    static char desc[WFDB_MAXSIG][40], ofname[32], orec[32];
-    static WFDB_Siginfo si[WFDB_MAXSIG];
-    static WFDB_Anninfo ai[WFDB_MAXANN];
-    static WFDB_Annotation annot[WFDB_MAXANN];
+    WFDB_Anninfo *ai;
+    WFDB_Annotation annot;
+    WFDB_Sample *v;
+    WFDB_Siginfo *si;
     void help();
 
     pname = prog_name(argv[0]);
@@ -59,15 +64,10 @@ char *argv[];
 	    /* Accept the next argument unconditionally as an annotator name;
 	       accept additional arguments until we find one beginning with
 	       `-', or the end of the argument list. */
+	    a = i;
 	    do {
-		if (nann >= WFDB_MAXANN) {
-		    (void)fprintf(stderr,
-	           "%s: no more than %d annotators may be processed at once\n",
-				  pname, WFDB_MAXANN);
-		    exit(1);
-		}
-		ai[nann].name = argv[i++]; ai[nann++].stat = WFDB_READ;
-	    } while (i < argc && *argv[i] != '-');
+	        nann++;
+	    } while (i < argc && *argv[++i] != '-');
 	    i--;
 	    break;
 	  case 'f':	/* starting time */
@@ -75,7 +75,7 @@ char *argv[];
 		(void)fprintf(stderr, "%s: time must follow -f\n", pname);
 		exit(1);
 	    }
-	    from = i;
+	    startp = argv[i];
 	    break;
 	  case 'h':	/* help requested */
 	    help();
@@ -120,56 +120,108 @@ char *argv[];
 	exit(1);
     }
 
-    if ((nsig = isigopen(irec, si, WFDB_MAXSIG)) < 0) exit(2);
-    if (nann != 0 && annopen(irec, ai, nann) < 0) exit(2);
+    /* Verify that the output record can be written. */
     if (newheader(nrec) < 0) exit(2);
-    (void)sprintf(ofname, "%s.dat", nrec);
-    for (i = 0; i < nsig; i++) {
-	si[i].fname = ofname;
-	si[i].group = 0;
-	if (i > 0) si[i].fmt = si[0].fmt;
-	(void)sprintf(desc[i], "record %s, signal %d", irec, i);
-	if (si[i].desc == NULL || strcmp(si[i].desc, desc[i]) == 0) {
-	    (void)sprintf(desc[i], "record %s, signal %d", nrec, i);
-	    si[i].desc = desc[i];
-	}
-    }
-    if (osigfopen(si, (unsigned)nsig) < nsig) exit(2);
-    (void)sprintf(orec, "+%s", nrec);
-    if (from > 0L) {
-	if ((from = strtim(argv[from])) < 0L)
+
+    /* Determine the number of signals. */
+    if ((nsig = isigopen(irec, NULL, 0)) < 0) exit(2);
+
+    /* Evaluate the time limits. */
+    if ((from = strtim(startp)) < 0L)
 	from = -from;
-	if (isigsettime(from) < 0)
-	    exit(2);
-    }
     if (to > 0L) {
 	if ((to = strtim(argv[to])) < 0L)
 	    to = -to;
     }
-    nsamp = (to == 0L) ? -1L : to - from;
-    for (j = 0; j < nann; j++)
-	ai[j].stat = WFDB_WRITE;
-    if (nann != 0 && annopen(orec, ai, nann) < 0) exit(2);
 
-    /* Copy selected segment of signals. */
-    while ((nsamp == -1L || nsamp-- > 0L) &&
-	   getvec(v) == nsig && putvec(v) == nsig)
-	;
-
-    /* Copy selected segment of annotations. */
-    for (i = 0; i < nann; i++) {
-	if (getann((unsigned)i, &annot[i]) == 0) {
-	    do {
-		annot[i].time -= from;
-		if (annot[i].time >= 0L && putann((unsigned)i, &annot[i]) < 0)
-		    break;
-	    } while (getann((unsigned)i, &annot[i]) == 0 &&
-		     (to == 0L || annot[i].time < to));
+    /* Copy the signals, if any. */
+    if (nsig > 0) {
+	/* Allocate data structures for nsig signals. */
+        if ((v = malloc(nsig * sizeof(WFDB_Sample))) == NULL ||
+	    (si = malloc(nsig * sizeof(WFDB_Siginfo))) == NULL ||
+	    (ofname = malloc((strlen(nrec)+5) * sizeof(char))) == NULL) {
+	    (void)fprintf(stderr, "%s: insufficient memory\n", pname);
+	    exit(2);
 	}
+
+	/* Open the input signals. */
+	if (isigopen(irec, si, (unsigned)nsig) != nsig) exit(2);
+
+	/* Open the output signals. */
+	(void)sprintf(ofname, "%s.dat", nrec);
+	for (i = 0; i < nsig; i++) {
+	    si[i].fname = ofname;
+	    si[i].group = 0;
+	    if (i > 0) si[i].fmt = si[0].fmt;
+	}
+	if (osigfopen(si, (unsigned)nsig) != nsig) exit(2);
+
+	/* Copy the selected segment. */
+	if (isigsettime(from) < 0) exit(2);
+	nsamp = (to == 0L) ? -1L : to - from;
+	while ((nsamp == -1L || nsamp-- > 0L) &&
+	    getvec(v) == nsig && putvec(v) == nsig)
+	    ;
+	free(ofname);
+	free(si);
+	free(v);
+    }
+
+    /* Copy the annotations, if any. */
+    if (nann > 0) {
+        /* Allocate data structures for nann annotators. */
+	if ((ai = malloc(nann * sizeof(ai))) == NULL ||
+	    (orec = malloc((strlen(nrec)+2) * sizeof(char))) == NULL) {
+	    (void)fprintf(stderr, "%s: insufficient memory\n", pname);
+	    exit(2);
+	}
+	for (i = 0; i < nann; i++) {
+	    ai[i].name = argv[a++];
+	    ai[i].stat = WFDB_READ;
+	}
+
+	/* Open the input annotators. */
+	if (annopen(irec, ai, nann) < 0) exit(2);
+
+	/* Open the output annotators. */
+	(void)sprintf(orec, "+%s", nrec);
+	for (i = 0; i < nann; i++)
+	    ai[i].stat = WFDB_WRITE;
+	if (annopen(orec, ai, nann) < 0) exit(2);
+
+        /* Copy the selected segment. */
+        for (i = 0; i < nann; i++) {
+	    while (getann((unsigned)i, &annot) == 0) {
+	        if (annot.time >= from && (to == 0L || annot.time < to)) {
+		    annot.time -= from;
+		    if (putann((unsigned)i, &annot) < 0) break;
+		}
+	    }
+	}
+	free(orec);
+	free(ai);
     }
 
     /* Clean up. */
     (void)newheader(nrec);
+
+    /* Copy info strings from the input header file into the new one.
+       Suppress error messages from the WFDB library. */
+    wfdbquiet();
+    if (info = getinfo(irec))
+        do {
+	    (void)putinfo(info);
+	} while (info = getinfo((char *)NULL));
+
+    /* Append additional info summarizing what snip has done. */
+    if (xinfo =
+	malloc((strlen(pname)+strlen(irec)+strlen(startp)+50)* sizeof(char))) {
+        (void)sprintf(xinfo, "Produced by %s from record %s, beginning at %s",
+		      pname, irec, startp);
+	(void)putinfo(xinfo);
+	free(xinfo);
+    }
+    wfdbverbose();
     wfdbquit();
     exit(0);	/*NOTREACHED*/
 }

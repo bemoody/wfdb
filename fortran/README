@@ -1,8 +1,8 @@
 file: README		G. Moody	28 July 1995
-			Last revised: 19 November 1999
+			Last revised: 8 October 2001
 _______________________________________________________________________________
 Fortran wrappers for the WFDB library
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 These wrappers are free software; you can redistribute them and/or modify them
 under the terms of the GNU Library General Public License as published by the
@@ -87,17 +87,13 @@ indexing.  Thus, if you have read a vector of samples via
 	getvec(v)
 the first element of v, namely v(1), contains a sample of the first signal
 (signal 0).  An attempt to reference v(0) in your Fortran program is illegal.
-If this discussion is not clear, refer to the ECG Database Programmer's Guide,
+If this discussion is not clear, refer to the WFDB Programmer's Guide,
 especially to the Glossary entries for Annotator number and Signal number.
 
 Certain parameters are defined in `wfdb.h' (in the `lib' directory at the same
 level as this one;  a copy of this file is referenced by the C statement
 	#include <wfdb/wfdb.h>
-near the top of most of the *.c files in the `app' directory).  Among these
-parameters are the maximum number of signals that can be open at once
-(WFDB_MAXSIG, currently 32) and the maximum number of input (or output)
-annotators open at once (WFDB_MAXANN, currently 2).  If you need to increase
-these parameters, modify wfdb.h and recompile the WFDB library.
+near the top of most of the *.c files in the `app' directory).
 
 If you are using a UNIX Fortran compiler, or a Fortran-to-C translator, note
 that the trailing `_' in the names of the functions defined in wfdbf.c should
@@ -151,40 +147,17 @@ using the C version as a model; this is left as an exercise for the reader.
 Note to users of g77 (the GNU Fortran compiler)
 -----------------------------------------------
 
-There appear to be two incompatibilities between these wrappers and g77, at
-least under Linux.  The first is easily avoided (g77 chokes on wfdbf.c); to
-work around this, just compile wfdbf.c using gcc:
-	gcc -c wfdbf.c
-then compile your Fortran code with g77 linking with wfdbf.o and the WFDB
-library:
-	g77 -o myprogram myprogram.f wfdbf.o -lwfdb
-The more serious problem is that the values returned by the wrapper functions
-don't appear to be in the formats expected by the Fortran code.  The example
-program in this directory, e.g., produces this output when compiled as above:
+When compiling the wrappers, use the option -fwritable-strings, as in:
+	g77 -c -DFIXSTRINGS -fwritable-strings wfdbf.c
 
-	init: can't open header for record 100s 
-	Number of signals in record 100s = -1
-	init: can't open header for record 100s 
-	Sampling frequency =  -1.00
-	v(1) = ****    v(2) = ****
-	v(1) = ****    v(2) = ****
-	v(1) = ****    v(2) = ****
-	v(1) = ****    v(2) = ****
-	v(1) = ****    v(2) = ****
-	v(1) = ****    v(2) = ****
-	v(1) = ****    v(2) = ****
-	v(1) = ****    v(2) = ****
-	v(1) = ****    v(2) = ****
-	v(1) = ****    v(2) = ****
+You should also be sure to use -fwritable-strings when compiling your
+Fortran code.  For example:
+	g77 -o myprogram -fwritable-strings myprogram.f wfdbf.o -lwfdb
 
-If you understand what's happening, please send me a note and suggest a fix.
-Otherwise, I recommend that you use the Fortran-to-C translator (f2c, supplied
-with Red Hat Linux and most other Linux distributions) to compile your Fortran
-programs with these wrappers.  For example, produce an executable from
-example.f as follows:
-	f2c example.f
-	cc -o example example.c wfdbf.c -lf2c -lm -lwfdb
-The executable generated this way yields the correct output:
+If you use the older 'f2c' (Fortran-to-C translator), it is not necessary to
+use -fwritable-strings.
+
+If you compile and run the example program, its output should be:
 
 	Number of signals in record 100s =  2
 	Sampling frequency = 360.00

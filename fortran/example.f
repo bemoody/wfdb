@@ -1,9 +1,9 @@
 C file: example.f		G. Moody	23 August 1995
-C                               Last revised:     7 May 1999
+C                               Last revised:   8 October 2001 (comments only)
 C
 C -----------------------------------------------------------------------------
 C Sample program illustrating use of Fortran wrappers for the WFDB library
-C Copyright (C) 1999 George B. Moody
+C Copyright (C) 2001 George B. Moody
 C
 C This program is free software; you can redistribute it and/or modify it under
 C the terms of the GNU General Public License as published by the Free Software
@@ -26,7 +26,7 @@ C _____________________________________________________________________________
 C
 C This program is a slightly elaborated version of the C example shown in
 C section 1.1 of the WFDB Programmer's Guide.  It uses the WFDB library to open
-C record 100s (a sample record, provided in the `microdb' directory at the same
+C record 100s (a sample record, provided in the `data' directory at the same
 C level as this one).  The program prints the number of signals, the sampling
 C frequency, and the first ten samples from each signal.
 C
@@ -48,8 +48,7 @@ C The next two lines specify the data types returned by the wrappers.
 	real f
 
 C Open up to 32 signals from record 100s.  (There are only 2 signals in this
-C record, however.)  To open more than 32 signals in any record, you will need
-C to modify WFDB_MAXSIG in <wfdb/wfdb.h>, and recompile the DB library.
+C record, however.)
 	i = isigopen("100s", 32)
 	write (6,1) i
  1	format("Number of signals in record 100s = ", i2)

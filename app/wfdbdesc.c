@@ -1,9 +1,9 @@
 /* file: wfdbdesc.c		G. Moody	 June 1989
-				Last revised:   5 May 1999
+				Last revised:   5 October 2001
 
 -------------------------------------------------------------------------------
 wfdbdesc: Describe signal specifications
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -29,8 +29,15 @@ Guide.
 */
 
 #include <stdio.h>
-#ifndef __STDC__
+#ifdef __STDC__
+# include <stdlib.h>
+#else
 extern void exit();
+# ifndef NOMALLOC_H
+# include <malloc.h>
+# else
+extern char *malloc();
+# endif
 #endif
 #include <wfdb/wfdb.h>
 
@@ -39,9 +46,9 @@ int argc;
 char *argv[];
 {
     char *info, *p, *pname, *prog_name();
-    static WFDB_Siginfo s[WFDB_MAXSIG];
     int i, msrec = 0, nsig;
     FILE *ifile;
+    WFDB_Siginfo *s;
     WFDB_Time t;
 
     pname = prog_name(argv[0]);
@@ -49,13 +56,22 @@ char *argv[];
         (void)fprintf(stderr, "usage: %s RECORD [-readable]\n", pname);
         exit(1);
     }
+    /* Discover the number of signals defined in the header. */
+    if ((nsig = isigopen(argv[1], NULL, 0)) < 1) exit(2);
+
+    /* Allocate storage for nsig signal information structures. */
+    if ((s = malloc(nsig * sizeof(WFDB_Siginfo))) == NULL) {
+	fprintf(stderr, "%s: insufficient memory\n", pname);
+	exit(2);
+    }
+
     /* If the `-readable' option is given, report only on signals which can
        be opened.  Otherwise, report on all signals named in the header file,
        without attempting to open them. */
     if (argc > 2 && strncmp(argv[2], "-readable", strlen(argv[2])) == 0)
-	nsig = isigopen(argv[1], s, WFDB_MAXSIG);
+	nsig = isigopen(argv[1], s, nsig);
     else
-	nsig = isigopen(argv[1], s, -(WFDB_MAXSIG));
+	nsig = isigopen(argv[1], s, -nsig);
     if (nsig < 1) exit(2);
     (void)printf("Record %s", argv[1]);
     t = strtim("e");

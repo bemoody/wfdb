@@ -1,9 +1,9 @@
 /* file: skewedit.c	G. Moody	10 August 1994
-			Last revised:	  4 May 1999
+			Last revised:	8 October 2001
 
 -------------------------------------------------------------------------------
 skewedit: Edit skew fields of header file(s)
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -26,9 +26,17 @@ _______________________________________________________________________________
 */
 
 #include <stdio.h>
+#ifndef __STDC__
+extern void exit();
+#endif
+#ifndef NOMALLOC_H
+#include <malloc.h>
+#else
+extern char *malloc();
+#endif
 #include <wfdb/wfdb.h>
 
-static int skew[WFDB_MAXSIG];
+static int nskews, *skew;
 
 main(argc, argv)
 int argc;
@@ -51,6 +59,11 @@ char *argv[];
 	exit(1);
     }
 
+    nskews = argc-2;
+    if ((skew = malloc(nskews * sizeof(int))) == NULL) {
+	fprintf(stderr, "%s: insufficient memory\n", argv[0]);
+	exit(2);
+    }
     for (i = 2; i < argc; i++) {
 	if ((skew[i-2] = atoi(argv[i])) < 0) {
 	    fprintf(stderr, "%s: skew cannot be less than zero\n", argv[0]);
@@ -135,7 +148,7 @@ FILE *hfile;
 	}
 	else
 	    *p++ = '\0';
-	if (i < WFDB_MAXSIG && skew[i])
+	if (i < nskews && skew[i])
 	    fprintf(tfile, "%s:%d %s", buf, skew[i], p);
 	else
 	    fprintf(tfile, "%s %s", buf, p);

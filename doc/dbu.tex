@@ -9,7 +9,7 @@
 @sp 5
 @center @titlefont{WFDB Programmer's Guide}
 @sp 4
-@center Tenth Edition (revised and with additions for WFDB library version 10.1.4)
+@center Tenth Edition (revised and with additions for WFDB library version 10.2.0)
 @center @today
 @sp 5
 @center George B. Moody
@@ -17,7 +17,7 @@
 @center Harvard-MIT Division of Health Sciences and Technology
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1989 -- 2000 George B. Moody
+Copyright @copyright{} 1989 -- 2001 George B. Moody
 @sp 2
 The most recent versions of the software described in this guide may be
 downloaded from @code{http://www.physionet.org/}.  For further
@@ -65,7 +65,7 @@ translated versions of this guide for reference purposes.
 This guide documents the Waveform Database interface library (the WFDB
 library).  This file contains the text of the Tenth Edition of
 the @cite{WFDB Programmer's Guide} (January, 2000), with
-additional material for release 10.1.1 of the WFDB library.
+additional material for release 10.2.0 of the WFDB library.
 @end ifinfo
 
 @menu
@@ -484,9 +484,84 @@ Division'').
 
 This section contains a brief summary of changes to the WFDB library and to
 this guide since the first printing of the ninth edition of this guide in July,
-1995.  See @file{NEWS.TXT} and @file{NEWNEWS.TXT}, in the top-level directory
-of the WFDB Software Package distribution, for details on these changes, and
-for information on any more recent changes that may not be described here.
+1995.  See @file{NEWS.TXT}, in the top-level directory of the WFDB Software
+Package distribution, for details on these changes, and for information on any
+more recent changes that may not be described here.
+
+@unnumberedsubsec Changes in version 10.2.0
+
+There are no longer any fixed limits on the numbers of signals or annotation
+files that can be opened simultaneously, or on the number of samples per signal
+per frame.  In previous versions of the WFDB library, the symbols
+@code{WFDB_MAXSIG}, @code{WFDB_MAXANN}, and @code{WFDB_MAXSPF} (all defined in
+@file{<wfdb/wfdb.h>}) specified limits on these parameters that could be
+modified only by recompiling the WFDB library.  These symbols are still defined
+for compatibility with older applications that use them (typically to determine
+the size of statically allocated arrays).
+
+Since version 10.1.1, record names may include path information (see the notes
+for version 10.1.1 below), but if such names are used to generate names of WFDB
+output files, the user has been required to ensure that the target directory
+exists.  This requirement is eliminated in version 10.2.0.  If an output file
+is specified to be located in a non-existent directory, the WFDB library will
+attempt to create the directory (including, if necessary, any non-existent
+parent directories).  This feature simplifies the use of record names that
+include directory information, as is common when reading data from a CD-ROM or
+a web server such as PhysioNet.  For example, using the default WFDB path
+(@file{. http://@-www.@-physio@-net.@-org/@-physio@-bank/@-data@-base}), if the
+current directory, @file{.}, does not contain a subdirectory named
+@file{mitdb}, the command:
+
+@example
+sqrs -r mitdb/100
+@end example
+
+@noindent
+will read its input from
+@file{http://@-www.@-physio@-net.@-org/@-physio@-bank/@-data@-base/@-mitdb/},
+will create a directory named @file{mitdb} within the current directory, and
+will write its output annotation file (@file{100.qrs}) into this newly-created
+directory.  If we then use the command:
+
+@example
+rdann -r mitdb/100 -a qrs
+@end example
+
+@noindent
+the header file is still read from the remote directory, but the annotation
+file is read from @file{./mitdb}.  (The programs @file{sqrs} and @file{rdann}
+are standard applications that use the WFDB library;  see the @cite{WFDB
+Applications Guide} for details.)
+
+Also new is the WFDB test suite (located in the @file{checkpkg} directory of
+the WFDB source tree, at the same level as the @file{lib} directory containing
+the WFDB library sources).  This set of programs can be used to help verify
+that a newly-installed version of the WFDB library behaves properly.
+
+@unnumberedsubsec Changes in version 10.1.6
+
+The WFDB library requires that the record name specified in the first line
+of a header file must match the name of the record with which the header file
+is associated (this is done in order to detect corrupted or erroneously
+renamed header files).  Version 10.1.6 requires that only the final portion of
+the record name (stripped of any path information) must match.
+
+@unnumberedsubsec Changes in version 10.1.5
+
+More changes in the @file{make} description files, for Cygwin compatibility.
+
+@unnumberedsubsec Changes in version 10.1.4
+
+The symbol @code{WFDB_NETFILES} replaces the old @code{NETFILES}.
+
+@unnumberedsubsec Changes in version 10.1.3
+
+More changes in the @file{make} description files, to support a configuration
+script.
+
+@unnumberedsubsec Changes in version 10.1.2
+
+Changes in the @file{make} description files.
 
 @unnumberedsubsec Changes in version 10.1.1
 

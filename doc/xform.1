@@ -1,4 +1,4 @@
-.TH XFORM 1 "10 April 2000" "WFDB software 10.1.3" "WFDB applications"
+.TH XFORM 1 "8 October 2001" "WFDB software 10.2.0" "WFDB applications"
 .SH NAME
 xform \- sampling frequency, amplitude, and format conversion for WFDB records
 .SH SYNOPSIS
@@ -71,6 +71,12 @@ used to re-order or duplicate signals.
 \fB-t\fI time\fR
 Process until the specified \fItime\fR in the input record (default: continue
 to the end of the record).
+.TP
+\fB-u\fR
+Adjust annotation times as needed so that they are unique.  If the output
+sampling frequency is less than that of the input, the times of closely-spaced
+annotations may coincide in the output, which may cause problems for some
+older WFDB applications.  The \fB-u\fR option avoids this.
 .PP
 If a \fInew-record\fR is specified, a new header file is created
 after the signal file transformation is complete.  The new header file,

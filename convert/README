@@ -1,16 +1,16 @@
 file: README		G. Moody	28 July 1989
-			Last revised:	 7 May 1999
+			Last revised:	4 October 2001
 
-This directory contains sources for DB applications which convert database
+This directory contains sources for WFDB applications which convert database
 files in various unsupported formats to and from MIT format, including to and
 from AHA DB formats.
 
-Note that many commonly used formats are supported by the DB library.  The
+Note that many commonly used formats are supported by the WFDB library.  The
 program `xform' (in the `app' directory) is a flexible application for
 converting between any pair of supported formats, in addition to offering
 other capabilities such as resampling (to change the sampling frequency),
-deletion or rearrangement of signals, and removal of unwanted material at
-the beginning or end of a record.
+deletion or rearrangement of signals, rescaling (to change signal amplitudes),
+and removal of unwanted material at the beginning or end of a record.
 
 Programs `rdsamp' and `wrsamp' in the `app' directory convert signals between
 supported (binary) formats and text;  programs `rdann' and `wrann', also in
@@ -21,10 +21,10 @@ If you need to convert digital data to analog form, or vice versa, see program
 
 AHA DB tape distribution format was used for both the AHA DB and the MIT-BIH
 DB between 1980 and 1990.  AHA DB tape distribution format requires more space
-than the other formats supported by the DB library and applications, however,
+than the other formats supported by the WFDB library and applications, however,
 so it is not recommended for on-line storage.  Programs `a2m' and `ad2m' can
-also convert AHA DB diskette distribution format files into standard DB files;
-the reverse conversion is not supported, however.
+also convert AHA DB diskette distribution format files into standard WFDB
+files;  the reverse conversion is not supported, however.
 
 European Data Format (EDF) has been used for storage of multiparameter,
 multifrequency data (such as polysomnograms) since 1990.  Program `edf2mit'
@@ -48,7 +48,7 @@ these applications, look in the respective source files.  You can also obtain a
 brief usage summary for each application by running it without command-line
 arguments.
 
-Note that you must set the DB environment variable (the database path) before
+Note that you must set the WFDB environment variable (the database path) before
 using these applications.  Select and customize the appropriate script for
 doing so from among the templates in the `app' directory on the same level
 as this one.

@@ -1,9 +1,9 @@
 file: README		G. Moody	 1 June 1989
-			Last revised:    24 May 2000
+			Last revised:    8 October 2001
 
 -------------------------------------------------------------------------------
 WFDB applications: programs for working with annotated signals
-Copyright (C) 2000 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 These programs are free software; you can redistribute them and/or modify
 them under the terms of the GNU General Public License as published by the
@@ -44,17 +44,18 @@ the same level as this one.  You can also obtain a brief usage summary for each
 application by running it without any command-line arguments.
 
 Before using any of the applications, you will need to have database files
-for input.  The contents of the `microdb' directory, on the same level as this
+for input.  The contents of the `data' directory, on the same level as this
 one, will get you started if no others are available.
 
 The following files will be found in this directory:
 
 Makefile	UNIX `make' description file for compiling these applications
-Makefile-dos-gcc UNIX `make' description file for compiling these appliccations
-		 for MS-DOS using a gcc cross-compiler under UNIX
 Makefile.dos	MS-DOS `make' description file for compiling these applications
 		 using Microsoft `make' or `nmake', Borland `make', etc.
+Makefile.top	Used by ../configure to construct Makefile (comments only)
+Makefile.tpl	Used by ../configure to construct Makefile (portable section)
 README		this file
+ann2rr.c	Converts an annotation file to an RR interval series
 bxb.c		AAMI-standard beat-by-beat annotation comparator
 calsig.c	Calibrates signals of a database record
 cshsetwfdb	Template for C-shell WFDB path initialization script
@@ -68,12 +69,15 @@ mrgann.c	Merges a pair of annotation files, generating a third one
 mxm.c		AAMI-standard measurement-by-measurement annotation comparator
 nst.c		Mixes noise with ECGs for noise stress tests
 plotstm.c	Produces a PostScript scatter plot of ST measurement errors
+pscgen.c	Generate a 'pschart' script from an annotation file
 pschart.c	Makes annotated `chart recordings' on PostScript devices
 pschart.pro	PostScript prolog file for use with `pschart'
+12lead.pro	Alternate prolog for printing 12-lead ECGs using `pschart'
 psfd.c		Makes annotated `full-disclosure' plots on PostScript devices
-pschart.pro	PostScript prolog file for use with `psfd'
+psfd.pro	PostScript prolog file for use with `psfd'
 rdann.c		Reads annotations and prints them
 rdsamp.c	Reads signals and prints them
+rr2ann.c	Converts an RR interval series into an annotation file
 rxr.c		AAMI-standard run-by-run annotation comparator
 sampfreq.c	Prints the sampling frequency of a record
 sample.c	Digitizes and replays analog signals (MS-DOS only)
@@ -92,6 +96,7 @@ tach.c		Generates a uniformly sampled heart rate signal from an
 		 annotation file
 view.c		ECG database browser for MS-DOS (using Microsoft C graphics)
 vsetup.c	CRT calibration program for use with `view' (MS-DOS only)
+wfdbcat.c	Copies a WFDB file to standard output
 wfdbcollate.c	Collates multiple WFDB records into a multi-segment record
 wfdbdesc.c	Describes signals based on header file contents
 wfdbwhich.c	Finds a WFDB file and prints its pathname

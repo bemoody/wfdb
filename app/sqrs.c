@@ -1,9 +1,9 @@
 /* file: sqrs.c		G. Moody	27 October 1990
-			Last revised:      4 May 1999
+			Last revised:    8 October 2001
 
 -------------------------------------------------------------------------------
 sqrs: Single-channel QRS detector
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -74,7 +74,11 @@ and then compare its output with the reference annotations by:
 #ifndef __STDC__
 extern void exit();
 #endif
-
+#ifndef NOMALLOC_H
+#include <malloc.h>
+#else
+extern char *malloc();
+#endif
 #include <wfdb/wfdb.h>
 #include <wfdb/ecgcodes.h>
 
@@ -90,11 +94,11 @@ char *argv[];
     int filter, i, minutes = 0, nsig, time = 0,
         slopecrit, sign, maxslope = 0, nslope = 0,
         qtime, maxtime, t0, t1, t2, t3, t4, t5, t6, t7, t8, t9,
-        ms160, ms200, s2, scmax, scmin = 500, signal = 0, v[WFDB_MAXSIG];
+        ms160, ms200, s2, scmax, scmin = 500, signal = 0, *v;
     long from = 0L, next_minute, now, spm, to = 0L;
     WFDB_Anninfo a;
     WFDB_Annotation annot;
-    static WFDB_Siginfo s[WFDB_MAXSIG];
+    static WFDB_Siginfo *s;
     void help();
 
     pname = prog_name(argv[0]);
@@ -158,8 +162,14 @@ char *argv[];
 	exit(1);
     }
 
+    if ((nsig = isigopen(record, NULL, 0)) < 1) exit(2);
+    if ((s = malloc(nsig * sizeof(WFDB_Siginfo))) == NULL ||
+	(v = malloc(nsig * sizeof(WFDB_Sample))) == NULL) {
+	(void)fprintf(stderr, "%s: insufficient memory\n", pname);
+	exit(2);
+    }
     a.name = "qrs"; a.stat = WFDB_WRITE;
-    if ((nsig = wfdbinit(record, &a, 1, s, WFDB_MAXSIG)) < 1) exit(2);
+    if ((nsig = wfdbinit(record, &a, 1, s, nsig)) < 1) exit(2);
     if (sampfreq((char *)NULL) < 200. || sampfreq((char *)NULL) > 300.) {
         (void)fprintf(stderr, "warning: %s is designed for 250 Hz input\n",
                 argv[0]);

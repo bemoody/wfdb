@@ -1,9 +1,9 @@
 /* file: sampfreq.c	G. Moody	7 June 1998
-			Last revised:	3 May 1999
+			Last revised:	5 October 2001
 
 -------------------------------------------------------------------------------
 sampfreq: Print the sampling frequency of a record
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -33,10 +33,8 @@ int argc;
 char **argv;
 {
     if (argc == 3 && strcmp(argv[1], "-H") == 0) {
-	static WFDB_Siginfo s[WFDB_MAXSIG];
-
 	setgvmode(WFDB_HIGHRES);
-	isigopen(argv[2], s, WFDB_MAXSIG);
+	(void)isigopen(argv[2], NULL, 0);
 	printf("%g\n", sampfreq(NULL));
 	exit(0);
     }

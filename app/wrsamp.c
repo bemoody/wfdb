@@ -1,8 +1,8 @@
 /* file: wrsamp.c	G. Moody	10 August 1993
-			Last revised:     5 May 1999
+			Last revised:   5 October 2001
 -------------------------------------------------------------------------------
 wrsamp: Select fields or columns from a file and generate a WFDB record
-Copyright (C) 1999 George B. Moody
+Copyright (C) 2001 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -46,20 +46,20 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-    char **ap, *cp, **fp = NULL, fsep = '\0', *ifname, *l = NULL, ofname[40],
-         *p, *record = NULL, rsep = '\n', *prog_name();
-    static char desc[WFDB_MAXSIG][80];
+    char **ap, *cp, **desc, **fp = NULL, fsep = '\0', *ifname = "(stdin)",
+	*l = NULL, ofname[40], *p, *record = NULL, rsep = '\n', *prog_name();
     double freq = WFDB_DEFFREQ, gain = WFDB_DEFGAIN, scale = 1.0, v;
 #ifndef atof
     double atof();
 #endif
-    int c, cf = 0, *fv = NULL, i, lmax = 1024, mf, vout[WFDB_MAXSIG];
+    int c, cf = 0, *fv = NULL, i, lmax = 1024, mf;
     FILE *ifile = stdin;
     long t = 0L, t0 = 0L, t1 = 0L;
 #ifndef atol
     long atol();
 #endif
-    static WFDB_Siginfo si[WFDB_MAXSIG];
+    WFDB_Sample *vout;
+    WFDB_Siginfo *si;
     unsigned int nf = 0;
     void help();
 
@@ -184,15 +184,16 @@ char *argv[];
 	nf++;
     }
 
-    if (nf > WFDB_MAXSIG) {
-	(void)fprintf(stderr, "%s: no more than %d columns may be selected\n",
-		      WFDB_MAXSIG);
-	exit(1);
-    }
-
     if (nf < 1) {
 	help();
 	exit(1);
+    }
+
+    if ((vout = malloc(nf * sizeof(WFDB_Sample))) == NULL ||
+	(si = malloc(nf * sizeof(WFDB_Siginfo))) == NULL ||
+	(desc = malloc(nf * sizeof(char *))) == NULL) {
+	(void)fprintf(stderr, "%s: insufficient memory\n", pname);
+	exit(2);
     }
 
     /* open output file */
@@ -202,6 +203,10 @@ char *argv[];
 	(void)sprintf(ofname, "%s.dat", record);
     for (i = 0; i < nf; i++) {
 	si[i].fname = ofname;
+	if ((desc[i] = malloc((strlen(ifname)+20) * sizeof(char))) == NULL) {
+	    (void)fprintf(stderr, "%s: insufficient memory\n", pname);
+	    exit(2);
+	}
 	if (ifile == stdin)
 	    (void)sprintf(desc[i], "column %d", fv[i]);
 	else

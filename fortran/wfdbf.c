@@ -208,8 +208,6 @@ long osigopen_(record, nsig)
 char *record;
 long *nsig;
 {
-    int i;
-
     fcstring(record);
     return (osigopen(record, sinfo, (unsigned int)(*nsig)));
 }
@@ -400,7 +398,7 @@ long setannstr_(code, string)
 long *code;
 char *string;
 {
-    fcstring(string)
+    fcstring(string);
     return (setannstr((int)(*code), string));
 }
 
