@@ -1,5 +1,5 @@
 # file: linux.def		G. Moody	31 May 2000
-#				Last revised: 23 February 2003
+#				Last revised:  4 March 2003
 # 'make' definitions for compiling the WFDB Software Package under Linux
 
 # Choose a value for WFDBROOT to determine where the WFDB Software Package will
@@ -51,6 +51,10 @@ INFODIR = $(WFDBROOT)/share/info
 # LIBDIR specifies the name of a directory in which to install the WFDB
 # library.
 LIBDIR = $(WFDBROOT)/lib
+
+# MANDIR is the root of the man page directory tree.  On most systems, this is
+# something like /usr/man or /usr/local/man (type 'man man' to find out).
+MANDIR = $(WFDBROOT)/share/man
 
 # PSPDIR specifies the name of a directory in which to install the PostScript
 # prolog (*.pro) files from the 'app' directory.

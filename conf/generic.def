@@ -1,5 +1,5 @@
 # file: generic.def		G. Moody	31 May 2000
-#				Last revised: 18 December 2002
+#				Last revised:  4 March 2003
 # This file contains default 'make' definitions for compiling the WFDB Software
 # Package under versions of UNIX that are not otherwise recognized by
 # 'configure'.
@@ -67,6 +67,10 @@ INFODIR = /usr/info
 # LIBDIR specifies the name of a directory in which to install the WFDB
 # library.
 LIBDIR = $(WFDBROOT)/lib
+
+# MANDIR is the root of the man page directory tree.  On most systems, this is
+# something like /usr/man or /usr/local/man (type 'man man' to find out).
+MANDIR = $(WFDBROOT)/man
 
 # PSPDIR specifies the name of a directory in which to install the PostScript
 # prolog (*.pro) files from the 'app' directory.

@@ -1,5 +1,5 @@
 # file: solaris.def		G. Moody	31 May 2000
-#				Last revised: 18 December 2002
+#				Last revised:  4 March 2003
 # 'make' definitions for compiling the WFDB Software Package under Solaris
 
 # Choose a value for WFDBROOT to determine where the WFDB Software Package will
@@ -51,11 +51,15 @@ INCDIR = $(WFDBROOT)/include
 # applications).
 
 # INFODIR is the GNU info directory (optional, needed to `make info').
-INFODIR = /usr/local/info
+INFODIR = $(WFDBROOT)/info
 
 # LIBDIR specifies the name of a directory in which to install the WFDB
 # library.
 LIBDIR = $(WFDBROOT)/lib
+
+# MANDIR is the root of the man page directory tree.  On most systems, this is
+# something like /usr/man or /usr/local/man (type 'man man' to find out).
+MANDIR = $(WFDBROOT)/man
 
 # PSPDIR specifies the name of a directory in which to install the PostScript
 # prolog (*.pro) files from the 'app' directory.

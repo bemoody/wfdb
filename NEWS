@@ -1,3 +1,7 @@
+10.3.3:
+	Fixed man page installation bug;  thanks to Joe Mietus for the bug
+	report.
+
 10.3.2:
 	New applications wav2mit and mit2wav create WFDB-format records from
 	files in the widely-used .wav audio format and vice versa.
