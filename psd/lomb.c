@@ -1,9 +1,9 @@
 /* file: lomb.c		G. Moody	12 February 1992
-			Last revised:	  16 June 2003
+			Last revised:	  10 June 2005
 
 -------------------------------------------------------------------------------
 lomb: Lomb periodogram of real data
-Copyright (C) 2003 George B. Moody
+Copyright (C) 1992-2005 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -37,12 +37,24 @@ been rewritten using the versions of this algorithm presented in Numerical
 Recipes in C (Press, Teukolsky, Vetterling, and Flannery;  Cambridge U. Press,
 1992).
 
-This version agrees with `fft' output (amplitude spectrum up to the Nyquist
+This version agrees with 'fft' output (amplitude spectrum up to the Nyquist
 frequency with total power equal to the variance);  thanks to Joe Mietus.
 */
 
 #include <stdio.h>
 #include <math.h>
+#ifdef __STDC__
+#include <stdlib.h>
+#else
+extern void exit();
+#endif
+
+#ifndef BSD
+# include <string.h>
+#else           /* for Berkeley UNIX only */
+# include <strings.h>
+# define strchr index
+#endif
 
 static long lmaxarg1, lmaxarg2;
 #define LMAX(a,b) (lmaxarg1 = (a),lmaxarg2 = (b), (lmaxarg1 > lmaxarg2 ? \

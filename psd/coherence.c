@@ -76,7 +76,7 @@ where FILENAME is the name of the input file, and OPTIONS may include:
 #if defined(__STDC__) || defined(_WINDOWS)
 # include <stdlib.h>
 #else
-# ifndef NOMALLOC_H
+# ifdef HAVE_MALLOC_H
 # include <malloc.h>
 # else
 extern char *calloc();

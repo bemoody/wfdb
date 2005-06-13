@@ -1,13 +1,13 @@
 # file: Makefile.tpl		G. Moody	  23 May 2000
-#				Last revised:	28 November 2004
+#				Last revised:	  8 June 2005
 # This section of the Makefile should not need to be changed.
 
 CFILES = ann2rr.c bxb.c calsig.c ecgeval.c epicmp.c fir.c ihr.c mfilt.c \
  mrgann.c mxm.c nguess.c nst.c plotstm.c pscgen.c pschart.c psfd.c rdann.c \
  rdsamp.c rr2ann.c rxr.c sampfreq.c sample.c sigamp.c sigavg.c skewedit.c \
  snip.c sortann.c sqrs.c sqrs125.c sumann.c sumstats.c tach.c time2sec.c \
- view.c vsetup.c wabp.c wfdbcat.c wfdbcollate.c wfdbdesc.c \
- wfdbwhich.c wqrs.c wrann.c wrsamp.c wvscript.c xform.c
+ wabp.c wfdbcat.c wfdbcollate.c wfdbdesc.c \
+ wfdbwhich.c wqrs.c wrann.c wrsamp.c xform.c
 XFILES = ann2rr bxb calsig ecgeval epicmp fir ihr mfilt \
  mrgann mxm nguess nst plotstm pscgen pschart psfd rdann \
  rdsamp rr2ann rxr sampfreq sigamp sigavg skewedit \
@@ -16,8 +16,7 @@ XFILES = ann2rr bxb calsig ecgeval epicmp fir ihr mfilt \
  wrann wrsamp xform
 SCRIPTS = cshsetwfdb setwfdb
 PSFILES = pschart.pro psfd.pro 12lead.pro
-OTHERFILES = cshsetwfdb setwfdb setwfdb.bat sample8.hea
-MFILES = Makefile Makefile.dos
+MFILES = Makefile
 
 # General rule for compiling C sources into executable files.  This is
 # redundant for most versions of `make', but at least one System V version
@@ -60,7 +59,7 @@ clean:
 
 # `make listing':  print a listing of WFDB applications sources
 listing:
-	$(PRINT) README $(MFILES) $(CFILES) $(PSFILES) $(OTHERFILES)
+	$(PRINT) README $(MFILES) $(CFILES) $(PSFILES)
 
 # Rules for compiling applications that require non-standard options
 

@@ -1,11 +1,11 @@
+#include <stdio.h>
 #include <wfdb/wfdb.h>
 
 main(int argc, char **argv)
 {
-    int i;
+    WFDB_Frequency f = (WFDB_Frequency)0;
     WFDB_Sample v[2];
     WFDB_Siginfo s[2];
-    WFDB_Frequency f;
     WFDB_Time t, t0, t1;
 
     if (argc > 1) sscanf(argv[1], "%lf", &f);

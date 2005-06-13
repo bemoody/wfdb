@@ -1,3 +1,0 @@
-# `make clean':  also remove previously compiled versions of the library
-clean:
-	rm -f libwfdb.* *.o *~

@@ -1,10 +1,10 @@
 /* file: annot.c	G. Moody	  1 May 1990
-			Last revised:    5 March 2004
+			Last revised:    10 June 2005
 Annotation list handling and display functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1990-2004 George B. Moody
+Copyright (C) 1990-2005 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -388,7 +388,7 @@ int dt;
 	    int yy = y + annp->this.num*vscalea;
 
 	    if (xs >= 0)
-		XDrawLine(display, xid, draw_ann, xs, ys, x, yy);
+		XDrawLine(display, osb, draw_ann, xs, ys, x, yy);
 	    xs = x;
 	    ys = yy;
 	}
@@ -420,31 +420,31 @@ int dt;
 	        while (n > 3 && XTextWidth(font, p, n) > maxwidth)
 		    n--;
 	    }
-	    XDrawString(display, xid,
+	    XDrawString(display, osb,
 			annp->this.anntyp == LINK ? draw_sig : draw_ann,
 			x, y, p, n);
 
 	    if (annp->this.anntyp == LINK) {
 		int xx = x + XTextWidth(font, p, n), yy = y + linesp/4;
 
-		XDrawLine(display, xid, draw_sig, x, yy, xx, yy);
+		XDrawLine(display, osb, draw_sig, x, yy, xx, yy);
 	    }
 	
 	    if (show_subtype) {
 		sprintf(buf, "%d", annp->this.subtyp); p = buf; y += linesp;
-		XDrawString(display, xid, draw_ann, x, y, p, strlen(p));
+		XDrawString(display, osb, draw_ann, x, y, p, strlen(p));
 	    }
 	    if (show_chan) {
 		sprintf(buf, "%d", annp->this.chan); p = buf; y += linesp;
-		XDrawString(display, xid, draw_ann, x, y, p, strlen(p));
+		XDrawString(display, osb, draw_ann, x, y, p, strlen(p));
 	    }
 	    if (show_num) {
 		sprintf(buf, "%d", annp->this.num); p = buf; y += linesp;
-		XDrawString(display, xid, draw_ann, x, y, p, strlen(p));
+		XDrawString(display, osb, draw_ann, x, y, p, strlen(p));
 	    }
 	    if (show_aux && annp->this.aux != NULL) {
 		p = annp->this.aux + 1; y += linesp;
-		XDrawString(display, xid, draw_ann, x, y, p, strlen(p));
+		XDrawString(display, osb, draw_ann, x, y, p, strlen(p));
 	    }
 	}
 	if (show_marker && annp->this.anntyp != NOTQRS) {
@@ -484,23 +484,24 @@ int dt;
 	    }
 	    marker[0].y2 = ytop - linesp;
 	    marker[1].y1 = y + mmy(2);
-	    XDrawSegments(display, xid, draw_ann, marker, 2);
+	    XDrawSegments(display, osb, draw_ann, marker, 2);
 	}
 	if (annp->next == NULL) break;
 	annp = annp->next;
+    
     }
 }
 
 void clear_annotation_display()
 {
     if (ann_mode == 1 || (use_overlays && show_marker)) {
-	XFillRectangle(display, xid, clear_ann,
+	XFillRectangle(display, osb, clear_ann,
 		       0, 0, canvas_width+mmx(10), canvas_height);
 	if (!use_overlays)
 	    do_disp();
     }
     else
-	XFillRectangle(display, xid, clear_ann,
+	XFillRectangle(display, osb, clear_ann,
 		       0, abase-mmy(8), canvas_width+mmx(10), mmy(13));
 }
 

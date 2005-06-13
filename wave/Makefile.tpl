@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	31 May 2000
-#				Last revised: 23 February 2003
+#				Last revised:	31 May 2005
 # Change the settings below as appropriate for your setup.
 
 # Choose directories in which to install WAVE and its ancillary files by
@@ -63,7 +63,7 @@ uninstall:
 	../uninstall.sh $(LIBDIR)
 
 wave:		$(OFILES)
-	$(CC) -o wave $(OFILES) $(WLDFLAGS)
+	$(CC) $(WCFLAGS) -o wave $(OFILES) $(WLDFLAGS)
 
 # `make help':  show help text
 help:
@@ -85,10 +85,10 @@ help:
 	@echo "*************************************************************"
 
 wave-static:	$(OFILES)
-	$(CC) -o wave-static $(OFILES) -static $(LDFLAGS)
+	$(CC) $(WCFLAGS) -o wave-static $(OFILES) -static $(LDFLAGS)
 
 soelim:		soelim.c
-	$(CC) -o soelim -O soelim.c
+	$(CC) $(CFLAGS) -o soelim -O soelim.c
 
 wave.hlp:	soelim wave.hl0 $(HELPFILES)
 	./soelim wave.hl0 >wave.hlp

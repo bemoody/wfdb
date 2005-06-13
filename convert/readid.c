@@ -1,9 +1,9 @@
 /* file: readid.c	G. Moody	8 August 1983
-			Last revised:	  5 June 2003
+			Last revised:	 9 June 2005
 
 -------------------------------------------------------------------------------
 readid: Read AHA-format ID block, write record name, file lengths on stdout
-Copyright (C) 2003 George B. Moody
+Copyright (C) 1983-2005 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -26,7 +26,9 @@ _______________________________________________________________________________
 */
 
 #include <stdio.h>
-#ifndef __STDC__
+#ifdef __STDC__
+#include <stdlib.h>
+#else
 extern void exit();
 #endif
 

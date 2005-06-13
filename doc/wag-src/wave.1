@@ -1,17 +1,14 @@
 '\" t
-.TH WAVE 1 "6 August 2002" "WFDB 10.2.7" "WFDB Applications Guide"
+.TH WAVE 1 "13 June 2005" "WFDB 10.3.16" "WFDB Applications Guide"
 .SH NAME
-wave, gtkwave \- waveform analyzer, viewer, and editor
+wave \- waveform analyzer, viewer, and editor
 .SH SYNOPSIS
 \fBwave -r\fR \fIrecord\fR[\fB+\fIrecord\fR ...] [ \fIoptions\fR ... ]
-.br
-\fBgtkwave -r\fR \fIrecord\fR[\fB+\fIrecord\fR ...] [ \fIoptions\fR ... ]
 .SH DESCRIPTION
 .PP
 \fBwave\fR can be used to view the specified WFDB \fIrecord\fR or
-records on any display controlled by an X11 server.  \fBgtkwave\fR provides
-most of the same facilities with a newer GUI under either Unix or MS-Windows.
-Both applications include facilities for interactive annotation editing.
+records on any display controlled by an X11 server.  It includes
+facilities for interactive annotation editing.
 The keyboard and mouse are used to control the display interactively.
 First-time users should read the \fIWAVE User's Guide\fR.  (One way to do this
 is by pointing your Web browser to \fBfile:///usr/help/html/wug/wug.htm\fR,
@@ -658,7 +655,9 @@ the background under SunOS.  The Solaris 2.x and Linux versions of the
 XView library do not have this bug.
 .PP
 If \fBwave\fR opens with an empty signal window, this may mean that
-the X server's backing store is disabled.  If possible, enable backing
+the X server's backing store is disabled.  \fBwave\fR versions 6.8 and later
+incorporate a workaround that avoids this problem.  If you must use an earlier
+version of \fBwave\fR, enable backing
 store and restart the X server.  (Using XFree86 4.x, backing store can
 be enabled by inserting the line `Option "backingstore"' in the
 `Device' section(s) of the \fBXF86Config-4\fR file.  If the X server is
@@ -696,12 +695,12 @@ XView application has run at least once since the X server was started.
 \fIWAVE User's Guide\fR
 .SH AVAILABILITY
 .PP
-\fBwave\fR currently runs under Linux, Solaris, and SunOS.  It should be
+\fBwave\fR currently runs under FreeBSD, GNU/Linux, Mac OS X, MS-Windows with
+Cygwin/X, Solaris, and SunOS.  It should be
 easily portable to any POSIX-compliant OS that can support X11 and XView.
 If you would like to use \fBwave\fR on a system other than those listed above,
 you will need to port XView to your system first (or purchase a
-commercial port if one is available).  Sources for XView are supplied
-on our CD-ROMs that include \fBwave\fR, and are also available from
+commercial port if one is available).  Sources for XView are available from
 PhysioNet (\fBwww.physionet.org\fR, where the sources for \fBwave\fR itself
 are also available), \fBmetalab.unc.edu\fR, \fBtsx-11.mit.edu\fR, and their
 mirrors.  \fIWe cannot offer assistance in porting XView; if you wish to try
@@ -709,18 +708,7 @@ this, you are on your own.\fR If you successfully port the \fBcmdtool\fR
 terminal emulator application included in the XView sources, we will
 assist you in porting \fBwave\fR (this is much simpler than the XView
 port).
-.PP
-The second edition of the \fIMIT-BIH Arrhythmia Database CD-ROM\fR
-contained an earlier version of \fBwave\fR (for Sparc SunOS only) that
-lacked many of the features described here.  Refer to the
-documentation included on that CD-ROM for details.
-.PP
-Beta (test) versions of \fBgtkwave\fR are available for Linux and MS-Windows.
-It should be straightforward to recompile \fBgtkwave\fR sources for any other
-environment in which the GTK+ toolkit and the WFDB library are available.
 .SH AUTHOR
 George B. Moody (george@mit.edu)
 .SH SOURCES
 http://www.physionet.org/physiotools/wfdb/wave/
-.br
-http://www.physionet.org/physiotools/beta/gtkwave/

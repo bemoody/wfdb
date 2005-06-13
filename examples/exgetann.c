@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <wfdb/wfdb.h>
 
 main()

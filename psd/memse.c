@@ -1,9 +1,9 @@
 /* file: memse.c	G. Moody	6 February 1992
-			Last revised:    16 June 2003
+			Last revised:     10 June 2005
 
 -------------------------------------------------------------------------------
 memse: Estimate power spectrum using maximum entropy (all poles) method
-Copyright (C) 2003 George B. Moody
+Copyright (C) 1992-2005 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -23,11 +23,11 @@ You may contact the author by e-mail (george@mit.edu) or postal mail
 please visit PhysioNet (http://www.physionet.org/).
 _______________________________________________________________________________
 
-This program has been written to behave as much like `fft' as possible.  The
+This program has been written to behave as much like 'fft' as possible.  The
 input and output formats and many of the options are the same.  See the man
 page (memse.1) for details.
 
-This version agrees with `fft' output (amplitude spectrum with total power
+This version agrees with 'fft' output (amplitude spectrum with total power
 equal to the variance);  thanks to Joe Mietus.
 */
 
@@ -37,6 +37,13 @@ equal to the variance);  thanks to Joe Mietus.
 extern double atof();
 #else
 #include <stdlib.h>
+#endif
+
+#ifndef BSD
+# include <string.h>
+#else           /* for Berkeley UNIX only */
+# include <strings.h>
+# define strchr index
 #endif
 
 #define PI	 M_PI	/* pi to machine precision, defined in math.h */

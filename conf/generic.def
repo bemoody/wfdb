@@ -1,5 +1,5 @@
 # file: generic.def		G. Moody	31 May 2000
-#				Last revised:  4 March 2003
+#				Last revised:   10 June 2005
 # This file contains default 'make' definitions for compiling the WFDB Software
 # Package under versions of UNIX that are not otherwise recognized by
 # 'configure'.
@@ -32,6 +32,10 @@ WFDBROOT = /usr
 # (a program that does nothing, successfully).
 LWC = libwww-config
 
+# 'curl-config'.  Otherwise set LCC to ':'.  Only one of libwww or
+# libcurl should be enabled.
+LCC = curl-config
+
 # LDLIBWWW, which is appended to LDFLAGS below, is the set of options needed
 # to link with libwww.  If libwww is not installed, or if libwfdb is a shared
 # library, LDLIBWWW can be empty (if there is a '#' immediately after the '='
@@ -40,6 +44,9 @@ LWC = libwww-config
 # three passes through the option list are necessary to satisfy all
 # dependencies when linking to the static libwww libraries.
 LDLIBWWW = # `$(LWC) --libs` `$(LWC) --libs` `$(LWC) --libs`
+
+# LDLIBCURL is the set of options needed to link with libcurl.
+LDLIBCURL = # `$(LCC) --libs` `$(LCC) --libs` `$(LCC) --libs`
 
 # BINDIR specifies the directory in which the applications will be installed;
 # it should be a directory in the PATH of those who will use the applications.
@@ -91,7 +98,7 @@ CC = gcc
 #		   int (see wfdblib.h)
 #   -DNETFILES	  if you have libwww and want to be able to access WFDB files
 #		   remotely via http or ftp (as well as local files)
-#   -DNOMALLOC_H  if you have neither `stdlib.h' nor `malloc.h' (see wfdblib.h)
+#   -DHAVE_MALLOC_H  if you have `malloc.h' but not `stdlib.h' (see wfdblib.h)
 #   -DNOSTRTOK	  if your standard C library does not include function `strtok'
 #		   (see wfdbio.c)
 #   -DNOTIME	  if you do not have `time.h' (see signal.c)
@@ -108,13 +115,13 @@ CCDEFS = $(VDEFS)
 #   -O		  if you trust your C compiler's optimizer
 # With the exception of `gcc', most C compilers do not allow you to use -g and
 # -O simultaneously.
-CFLAGS = -g $(CCDEFS) `$(LWC) --cflags` -I$(INCDIR)
+CFLAGS = -g $(CCDEFS) `$(LWC) --cflags` `$(LCC) --cflags` -I$(INCDIR)
 # `gcc' users may comment out the previous line, and uncomment the next one.
-# CFLAGS = -g -O $(CCDEFS) `$(LWC) --cflags` -I$(INCDIR)
+# CFLAGS = -g -O $(CCDEFS) `$(LWC) --cflags` `$(LCC) --cflags` -I$(INCDIR)
 
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.
-LDFLAGS = -L$(LIBDIR) -lwfdb $(LDLIBWWW)
+LDFLAGS = -L$(LIBDIR) -lwfdb $(LDLIBWWW) $(LDLIBCURL)
 
 # WFDBLIB is the name of the standard WFDB library.  In order to access it via
 # `-lwfdb', WFDBLIB should be `libwfdb.a'.

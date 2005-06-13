@@ -1,9 +1,9 @@
 file: README		G. Moody	2 July 1991
-			Last revised: 26 November 2001
+			Last revised:   8 June 2005
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 2001 George B. Moody
+Copyright (C) 1991-2005 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -32,6 +32,12 @@ information include on-line text help (type `make help' in this directory) and
 the WAVE 'man' page (type 'man wave' once this package has been installed,
 or see `wave.1' in '../doc'.  Read `Makefile' in this directory for information
 about compiling and installing `wave'.
+
+WAVE was originally developed under SunOS;  since 1994, its development has
+been continued under GNU/Linux.  WAVE currently runs on FreeBSD, Mac OS X,
+MS-Windows (with Cygwin), and Solaris, in addition to GNU/Linux.  It has
+proven very easy to port (typically just a recompile is required) to any
+platform for which the XView toolkit is available.
 
 The following files will be found in this directory:
 

@@ -1,5 +1,5 @@
 # file: generic-slib.def	G. Moody	31 May 2000
-#				Last revised: 28 November 2004
+#				Last revised:   10 June 2005
 # This section contains settings suitable for compiling a shared version of the
 # WFDB library under versions of UNIX that are not otherwise recognized by
 # 'configure'.  Not all versions of UNIX support shared libraries, so you may
@@ -33,6 +33,11 @@ WFDBROOT = /usr
 # LWC to ':' (a program that does nothing, successfully).
 LWC = libwww-config
 
+# Similarly, to use the libcurl library instead of libwww, set LCC to
+# 'curl-config'.  Otherwise set LCC to ':'.  Only one of libwww or
+# libcurl should be enabled.
+LCC = curl-config
+
 # BINDIR specifies the directory in which the applications will be installed;
 # it should be a directory in the PATH of those who will use the applications.
 BINDIR = $(WFDBROOT)/bin
@@ -54,9 +59,12 @@ LIBDIR = $(WFDBROOT)/lib
 # dependencies when linking to the static libwww libraries.
 LDLIBWWW = # `$(LWC) --libs` `$(LWC) --libs` `$(LWC) --libs`
 
+# LDLIBCURL is the set of options needed to link with libcurl.
+LDLIBCURL = # `$(LCC) --libs` `$(LCC) --libs` `$(LCC) --libs`
+
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.
-LDFLAGS = -L$(LIBDIR) -lwfdb $(LDLIBWWW)
+LDFLAGS = -L$(LIBDIR) -lwfdb $(LDLIBWWW) $(LDLIBCURL)
 
 # CC is the name of your C compiler.
 CC = gcc
@@ -69,7 +77,7 @@ CC = gcc
 #		   int (see wfdblib.h)
 #   -DNETFILES	  if you have libwww and want to be able to access WFDB files
 #		   remotely via http or ftp (as well as local files)
-#   -DNOMALLOC_H  if you have neither `stdlib.h' nor `malloc.h' (see wfdblib.h)
+#   -DHAVE_MALLOC_H  if you have `malloc.h' but not `stdlib.h' (see wfdblib.h)
 #   -DNOSTRTOK	  if your standard C library does not include function `strtok'
 #		   (see wfdbio.c)
 #   -DNOTIME	  if you do not have `time.h' (see signal.c)
@@ -81,7 +89,7 @@ CCDEFS = $(VDEFS)
 
 # CFLAGS is the set of C compiler options used when compiling the shared
 # library.  CFLAGS should always include CCDEFS.
-CFLAGS = -fpic -g -O $(CCDEFS) `$(LWC) --cflags` -I$(INCDIR)
+CFLAGS = -fpic -g -O $(CCDEFS) `$(LWC) --cflags` `$(LCC) --cflags` -I$(INCDIR)
 
 # WFDBLIB_BASENAME is the name, without version numbers, of the alternate
 # library.  WFDBLIB_SONAME is the shared object name ("soname") of the
@@ -107,7 +115,7 @@ WFDBLIB = $(WFDBLIB_SONAME).$(MINOR)
 # considerably depending on the operating system;  the setting here works
 # if gcc and the GNU binutils are installed.
 BUILDLIB = gcc -shared -Wl,-soname,$(SWFDBLIB_SONAME) \
- `$(LWC) --libs` -o $(SWFDBLIB)
+ `$(LWC) --libs` `$(LCC) --libs` -o $(SWFDBLIB)
 
 # BUILDLIB_LDFLAGS is a list of arguments appended to BUILDLIB following
 # the list of *.o files (for most platforms, BUILDLIB_LDFLAGS is empty).

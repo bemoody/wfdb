@@ -1,9 +1,9 @@
 file: README		G. Moody	 1 June 1989
-			Last revised:  26 October 2002
+			Last revised:    8 June 2005
 
 -------------------------------------------------------------------------------
 WFDB applications: programs for working with annotated signals
-Copyright (C) 2002 George B. Moody
+Copyright (C) 1989-2005 George B. Moody
 
 These programs are free software; you can redistribute them and/or modify
 them under the terms of the GNU General Public License as published by the
@@ -25,17 +25,16 @@ please visit PhysioNet (http://www.physionet.org/).
 _______________________________________________________________________________
 
 This directory contains sources for the standard applications which come
-with the ECG WFDB software package.  Before attempting to compile these
+with the WFDB software package.  Before attempting to compile these
 programs, build and install the WFDB library (look in the `lib' directory
 on the same level as this one).
 
-If a `make' utility is available, follow the instructions in the appropriate
-`make' description file (see the list below) to compile and install these
-applications on your system.  If you do not have a `make' utility, you will
-have to perform the installation manually;  the comments in the `make' files
-may be helpful in determining how to proceed.
+If a `make' utility is available, follow the instructions in 'Makefile' to
+compile and install these applications on your system.  If you do not have a
+`make' utility, you will have to perform the installation manually; the
+comments in 'Makefile' may be helpful in determining how to proceed.
 
-Note that you must set the WFDB environment variable (the database path) before
+You may wish to set the WFDB environment variable (the database path) before
 using these applications.  Select and customize the appropriate script for
 doing so from among the templates listed below.
 
@@ -51,8 +50,6 @@ The following files will be found in this directory:
 
 Makefile	`make' description file for compiling these applications using
 		 ANSI/ISO standard C compilers on supported platforms
-Makefile.dos	`make' description file for compiling these applications using
-		 unsupported compilers from Borland, Microsoft, etc.
 Makefile.top	Used by ../configure to construct Makefile (comments only)
 Makefile.tpl	Used by ../configure to construct Makefile (portable section)
 README		this file
@@ -81,10 +78,7 @@ rdsamp.c	Reads signals and prints them
 rr2ann.c	Converts an RR interval series into an annotation file
 rxr.c		AAMI-standard run-by-run annotation comparator
 sampfreq.c	Prints the sampling frequency of a record
-sample.c	Digitizes and replays analog signals (MS-DOS only)
-sample8.hea	Example header file with DAP program for use with `sample'
 setwfdb		Template for Bourne/bash shell WFDB path initialization script
-setwfdb.bat	Template for MS-DOS WFDB path initialization
 sigamp.c	Measures signal amplitudes
 skewedit.c	Rewrites header files to correct for measured inter-signal skew
 snip.c		Copies an excerpt of a database record
@@ -95,15 +89,12 @@ sumann.c	Summarizes the contents of an annotation file
 sumstats.c	Derives aggregate statistics from `bxb', `rxr', etc. output
 tach.c		Generates a uniformly sampled heart rate signal from an
 		 annotation file
-view.c		ECG database browser for MS-DOS (using Microsoft C graphics)
-vsetup.c	CRT calibration program for use with `view' (MS-DOS only)
 wfdbcat.c	Copies a WFDB file to standard output
 wfdbcollate.c	Collates multiple WFDB records into a multi-segment record
 wfdbdesc.c	Describes signals based on header file contents
 wfdbwhich.c	Finds a WFDB file and prints its pathname
 wrann.c		Creates an annotation file from `rdann' output
 wrsamp.c	Creates signal and header files by converting text input
-wvscript.c	Starts wview using specifications in a .xws file (Windows only)
 xform.c		Sampling frequency, amplitude, and format converter
 
 What next?
@@ -121,8 +112,8 @@ to look for format-conversion programs in the `convert' directory on the same
 level as this one.
 
 Finally, you may also wish to compile the example programs from chapter 6 of
-the ECG Database Programmer's Guide, which can be found in the `examples'
-directory on the same level as this one.
+the WFDB Programmer's Guide, which can be found in the `examples' directory on
+the same level as this one.
 
 See the `README' files in the `psd', `convert', and `examples' directories for
 further information.

@@ -1,11 +1,6 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:	 30 May 2004
+#				Last revised:	 13 June 2005
 # This section of the Makefile should not need to be changed.
-
-# ARCH specifies the type of CPU and the operating system (e.g., 'i686-Linux').
-# This symbol is used only to generate a name for the binary archive;  it
-# does not affect how the software is compiled.
-ARCH=`uname -m`-`uname -s`
 
 # 'make' or 'make all': compile the WFDB applications without installing them
 # (requires installation of the WFDB library and includes)
@@ -52,7 +47,6 @@ clean:
 	cd psd;      $(MAKE) clean
 	cd wave;     $(MAKE) clean
 	cd waverc;   $(MAKE) clean
-	cd wview;    $(MAKE) -f clean
 	test -d doc && ( cd doc; $(MAKE) clean )
 	rm -f *~ conf/*~ conf/prompt config.cache */*.exe $(PACKAGE)-*.spec
 
@@ -125,8 +119,11 @@ tarballs:	clean
 # 'make bin-tarball': make a gzipped tar archive of the WFDB software package
 # binaries and other installed files
 bin-tarball:	test-install
-	cd $(HOME); mv wfdb-test $(PACKAGE)-$(ARCH)
-	cd $(HOME); tar cfvz $(PACKAGE)-$(ARCH).tar.gz $(PACKAGE)-$(ARCH)
+	cp conf/archname /tmp; chmod +x /tmp/archname
+	cd $(HOME); mv wfdb-test $(PACKAGE)-`/tmp/archname`
+	cd $(HOME); tar cfvz $(PACKAGE)-`/tmp/archname`.tar.gz \
+	 $(PACKAGE)-`/tmp/archname`
+	rm -f /tmp/archname
 
 # 'make doc-tarball': make a gzipped tar archive of formatted documents
 # (requires many freely-available utilities that are not part of this

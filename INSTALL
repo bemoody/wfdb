@@ -1,192 +1,115 @@
 file: INSTALL			G. Moody	30 January 2000
-				Last revised:	 19 March 2003
+				Last revised:	  8 June 2005
 WFDB Software Package installation notes
 
 These notes are infrequently updated, but are included here for those who may
 not have ready access to the World Wide Web.  For those who do, please visit
 PhysioNet, where up-to-date quick-start guides including installation notes
-for popular operating systems are available (find a guide for your platform in
-http://www.physionet.org/physiotools/wfdb.shtml).
+for popular operating systems are available (find a guide for your platform at
+http://physionet.org/physiotools/wfdb.shtml).
 
-This file contains separate sets of notes for UNIX and GNU/Linux, Mac OS/X,
-and MS-Windows, followed by brief notes on other ports.
+Although ready-to-run binaries are available for several popular platforms,
+we strongly recommend building the WFDB Software Package from sources.  Doing
+so is the best way to ensure that the components of the package will work
+together properly on your system, and that your software is up-to-date.  The
+process of building the package is simple and quick.  
+
+The GNU C compiler (gcc) is available freely for all platforms, and it is
+strongly recommended.  We will help you to solve any problems you may encounter
+in building the WFDB Software Package using gcc on your platform; our
+experience has been that such builds are trouble-free if you follow the
+instructions in our quick-start guides (see above).
+
+Some users have reported success in compiling the WFDB Software Package, except
+for WAVE, using various commercial compilers.  We don't use or recommend these
+compilers, and we offer no instructions or support for doing so whatsoever.  If
+you choose to use one of these unsupported compilers, you are on your own!
+
+PREPARATION
+
+There are three prerequisites for a complete build.  All are free, open-source
+software available for all popular platforms:
+
+ * Software development tools (make, gcc, X11 libraries and *.h files, etc.)
+
+     + GNU/Linux, Unix, etc.:  usually included
+
+     + Mac OS X: install Mac OS X Developer Tools, X11 for Mac OS X, X11 SDK
+       (all included in current Mac OS X CD sets)
+
+     + MS-Windows: Install Cygwin, including (at least) the following optional
+       packages: bc, curl-devel, gcc, gcc-mingw, gv, ImageMagick, make,
+       sunrpc, and xorg-x11-devel.  (Other required packages will be installed
+       automatically if those listed are selected.)  Detailed instructions
+       are available at
+	    http://physionet.org/physiotools/cygwin/
+
+ * An HTTP client library, either libcurl (preferred) or libwww
+
+     + GNU/Linux, Unix, etc.:  usually included, or from http://curl.haxx.se/
+       (libcurl) or http://www.w3.org/Library/ (libwww)
+
+     + Mac OS X: install libcurl or libwww (both base and development packages)
+       from Fink (http://fink.sourceforge.net)
+
+     + MS-Windows: install curl-devel from Cygwin (see above)
+
+     One or both of these libraries may already be installed on your system;
+     to check, try running the commands
+	curl-config --version
+	libwww-config --version
+
+ * The XView libraries and *.h files
+
+     All platforms: free from http://physionet.org/physiotools/xview/
+
+Detailed instructions for obtaining and installing these prerequisites, all
+of which are free, open-source software, are included in the WFDB quick-start
+guides for the popular platforms (see above).  Brief notes about other
+platforms are at the end of this file.
+
+
+BUILDING AND INSTALLING
+
+Once you have installed the necessary prerequisites, the WFDB installation
+process is the same on all platforms:
+
+1. Open a terminal emulator window and navigate to the top-level directory
+   of the WFDB sources (the directory that contains this file).
+
+2. In this directory, build and install the WFDB Software Package by typing:
+	./configure
+	make install
+   Except under MS-Windows, you will normally need root permissions to run
+   'make install'.  If you don't have root permissions, set WFDBROOT to the
+   name of a directory in which you have permission to write (you will be
+   given a chance to do this when running 'configure').
+
+3. In this directory, test the installation by typing:
+	make check
+   If there are any errors, look in the checkpkg directory for details.
+
+
+FURTHER READING
 
 Once you have successfully compiled and installed the WFDB Software Package,
 you will find a great deal of information about using it on PhysioNet;  begin
-by looking in http://www.physionet.org/physiotools/manuals.shtml.
-_______________________________________________________________________________
+by looking in http://physionet.org/physiotools/manuals.shtml.
 
-Under UNIX or GNU/Linux:
+Many frequently asked questions about this software are answered in the
+PhysioNet FAQ (http://physionet.org/faq.shtml).
 
-1. Install the World Wide Web Consortium's libwww library (you will need both
-   the library itself and the developer's package;  download them from
-   http://www.physionet.org/physiotools/libwww/, or from the W3C's web site
-   at http://www.w3.org/Library).  You may skip this step if you don't want
-   support for reading input files from remote web and FTP servers.  See
-   README.NETFILES for further information about this option.
 
-2. WAVE is an optional part of the WFDB Software Package.  If the XView
-   toolkit is available for your system, installing WAVE is highly recommended.
-   Otherwise, go on to step 3;  after completing the WFDB Software Package
-   installation, you may wish to try GTKWave (an experimental version of WAVE
-   that uses the GTK+ GUI, which is available for many versions of Unix;  see
-   http://www.physionet.org/physiotools/beta/gtkwave/ for more information.)
+UNINSTALLING
 
-   Install the XView library (see http://www.physionet.org/physiotools/xview/)
-   if you want to use WAVE, and be sure that the directory that contains the
-   XView application 'textedit' (usually /usr/openwin/bin) is in your PATH.
-   For information about WAVE, see the WAVE User's Guide,
-   http://www.physionet.org/physiotools/wug/.
-
-   Copy the contents of http://www.physionet.org/physiotools/wug/ into
-   /usr/local/help/html/wug if you wish to read the help from local files;
-   otherwise, edit wave/wave.info and change all occurrences of
-   '/usr/local/help/html/' into 'http://www.physionet.org/physiotools/wug/'.
-   (The utility 'wget' -- which you can find on PhysioNet -- can be helpful
-   if you wish to copy an entire directory of a web site, as suggested
-   here.)
-
-3. In this directory, type:
-	./configure
-	make install
-   You will need root permissions to run 'make install', unless you change
-   WFDBROOT so that the files are installed in a directory that you own (you
-   will be given a chance to do this when running 'configure').
-
-4. [Optional but recommended] In this directory, test the installation by
-   typing:
-	make check
-   If there are any errors, look in the checkpkg directory for details.
-
-   If libwww and XView are installed, you can also test WAVE with the command:
-	wave -r mitdb/200 -a atr
-   If WAVE opens with a blank (solid white) signal window, you may need to
-   enable backing store in your X server.  If you use XFree86 as your X server,
-   you can insert the line
-	Option "backingstore"
-   in the Device section of your XF86Config (or XF86Config-4), or run the
-   server with the option "+bs" to obtain the same result.
-
-5. If for any reason you wish to uninstall the WFDB Software Package, type:
+If for any reason you wish to uninstall the WFDB Software Package, type:
 	make uninstall
-   from this directory.  You will need root permissions to uninstall unless
-   you changed WFDBROOT before installing the package.
+from this directory.  You will need root permissions to uninstall unless
+you changed WFDBROOT before installing the package.
+ 
+This file contains separate sets of notes for GNU/Linux, Mac OS/X,
+and MS-Windows, followed by brief notes on other ports.
 
-_______________________________________________________________________________
-
-Under Mac OS/X (Darwin):
-
-The WFDB Software Package has been successfully compiled under Mac OS/X 10.2
-(Darwin 6.0.1).  It should also work under 10.1, but this has not been tested.
-
-1. Install Mac OS/X Developer Tools (requires root permissions).  This
-   software can be downloaded from http://developer.apple.com/macosx/). This
-   software is also available on a CD-ROM included with Mac OS/X. 
-
-2. [Optional but recommended, requires root permissions] Install XDarwin.
-   This port of the X Window System (server, clients, and libraries) is needed
-   if you wish to use plt together with the WFDB Software Package, or if you
-   wish to compile WAVE or GTKWave (but see the next item below). XDarwin
-   binaries are available from Fink, http://fink.sourceforge.net/; sources are
-   available from http://www.xdarwin.org/. 
-
-3. [Optional, requires root permissions]  Install XView.  At this time, an
-   incomplete port of XView to Darwin is available from the GNU-Darwin project
-   (http://gnu-darwin.sourceforge.net/). You may wish to see if a  complete
-   XView port is available; if so, it should be possible to compile WAVE under
-   Mac OS/X as part of the installation of the WFDB Software Package.
-     * You will not be able to compile or use WAVE unless you have installed
-       XView, but none of the other applications require XView. 
-     * Add /usr/X11R6/bin (or the directory containing textedit, if you have a
-       non-standard installation of XView) to your PATH before attempting to
-       compile WAVE.
-
-Once you have completed these steps, follow the instructions above for
-installing the WFDB Software Package under UNIX or GNU/Linux.
-
-_______________________________________________________________________________
-
-Under MS-Windows:
-
-1. If you have not already done so, install the Cygwin development environment
-   (freely available from http://sources.redhat.com/cygwin/).  This includes
-   gcc (the GNU C/C++ compiler) as well as a comprehensive assortment of other
-   Unix utilities ported to MS-Windows.  Accept the defaults suggested by the
-   installer.
-
-   See the notes near the end of this section for information contributed by
-   users about using proprietary compilers.
-
-2. Open a Cygwin terminal window (the Cygwin installer will have added this to
-   your MS-Windows start menu).  Check that 'which' and 'gcc' are accessible by
-   typing the command:
-	which gcc
-   The output of this command should be:
-	/usr/bin/gcc
-   If you don't see this output, rerun the Cygwin installer and manually select
-   the necessary packages to correct the problem before continuing.
-
-3. Install the World Wide Web Consortium's libwww library (you will need both
-   the library itself and the developer's package;  download them from
-   http://www.physionet.org/physiotools/libwww/, or from the W3C's web site
-   at http://www.w3.org/Library).  You may skip this step if you don't want
-   support for reading input files from remote web and FTP servers.  See
-   README.NETFILES for further information about this option.
-
-4. In this directory (the top-level directory of the WFDB software package,
-   containing the file you are now reading), type:
-	./configure
-	make install
-
-5. [Optional but recommended] In this directory, test the installation by
-   typing:
-	make check
-   If there are any errors, look in the checkpkg directory for details.
-
-6. After completing these steps, you may wish to install GTKWave (an
-   experimental version of WAVE that uses the GTK+ GUI, which is available for
-   MS-Windows;  see http://www.physionet.org/physiotools/beta/gtkwave/ for
-   more information.)
-
-7. If for any reason you wish to uninstall the WFDB Software Package, type:
-	make uninstall
-   from this directory.
-
-...............................................................................
-
-Using proprietary compilers under MS-DOS/MS-Windows
-
-   IMPORTANT:  Although you may be able to compile the WFDB software package
-   using a proprietary compiler, this is NOT SUPPORTED.  Cygwin 'gcc' is free,
-   robust, and supported -- please give it a try!
-
-   If, despite the above, you feel that you must use a proprietary compiler,
-   this section contains notes contributed by other users who have done so.
-   The developers of the WFDB Software Package do not use any of these
-   compilers, so you are on your own if you choose to use one of them.
-
-   Between 1985 and 1995, previous versions of this software were compiled
-   using Borland C/C++, Microsoft C/C++, and Turbo C/C++.  These compilers
-   came bundled with 'make'-like utilties (Microsoft's was called 'nmake').
-   If you are using one of these compilers, you may be able to use the
-   'Makefile.dos' files in several of the subdirectories of this one to
-   perform an automated compilation of the WFDB software package, although you
-   will need to customize these 'Makefile.dos' files for your compiler. Your
-   feedback is appreciated.
-
-Borland C++ Builder
-
-   Thanks to Ion Gaztañaga for these notes.
-
-1. Edit lib/wfdb.h to define WFDB_NETFILES as 0 (do not compile with libwww
-   support).  It's possible that libwww support will work, but this has not
-   been tested.
-
-2. Build a static library (wfdb.lib) from the sources in the 'lib' directory,
-   selecting:
-	C calling convention
-	Borland Language compliance
-	Others:  Borland C++ Builder default settings
 
 _______________________________________________________________________________
 
@@ -207,7 +130,7 @@ sources as ordinary source files together with the programs that use the WFDB
 library functions.  This approach won't yield the benefits of reduced
 compilation time and reduced executable size available on platforms that
 support shared libraries, but it should allow you to compile and run the WFDB
-software with a minimum of difficulty.
+software (except for WAVE) with a minimum of difficulty.
 
 If you find that changes are necessary in order to compile this software
 successfully on your platform, please send details to the author

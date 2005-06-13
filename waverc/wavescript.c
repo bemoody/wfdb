@@ -1,10 +1,10 @@
 /* file: wavescript.c		G. Moody	10 October 1996
-				Last revised:	 19 June 2002
+				Last revised:	 10 June 2005
 Remote control for WAVE via script
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 2002 George B. Moody
+Copyright (C) 1996-2005 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -86,6 +86,24 @@ WAVE unconditionally (though it's unclear why this would be useful).
 #include <signal.h>
 #include <sys/types.h>
 #include <dirent.h>
+
+#ifdef __STDC__
+#include <stdlib.h>
+#else
+extern void exit();
+# ifdef HAVE_MALLOC_H
+# include <malloc.h>
+# else
+extern char *malloc(), *calloc(), *realloc();
+# endif
+#endif
+
+#ifndef BSD
+# include <string.h>
+#else           /* for Berkeley UNIX only */
+# include <strings.h>
+# define strchr index
+#endif
 
 char *pname;
 

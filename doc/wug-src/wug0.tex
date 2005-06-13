@@ -57,7 +57,7 @@ Harvard-MIT Division of Health Sciences and Technology}
 \pagestyle{empty}
 \vspace*{\fill}
 \noindent
-Copyright \copyright 1992 -- 2004 George B. Moody
+Copyright \copyright 1992 -- 2005 George B. Moody
 
 \vspace{1 in}
 \noindent
@@ -305,59 +305,45 @@ May, 1999
 
 \vfill
 
-\section*{Notes on the fifth edition}
+\section*{Notes on the fifth edition (revised)}
 
 This edition contains updated figures, additional tutorial material,
 and revisions to reflect recent changes in \WAVE{}.
 
-\index{GTKWave} Since version 1, \WAVE{} has used the XView toolkit,
-an open source implementation of the Open Look GUI.  Open Look is an
-elegant and easy-to-use GUI, but it is no longer being actively
-developed or supported, and as a result, it is unfamiliar to many
-first-time \WAVE{} users.  Newer user interface toolkits, such as the
-open source GTK+ toolkit, have converged on a common set of graphical
-elements and behaviors resembling those of the Motif GUI.  GTK+ has a
-very active developer community and has been ported from Linux to many
-other Unix variants, and to MS Windows.  A version of \WAVE{} that
-uses the GTK+ toolkit is now available from PhysioNet.  Sources and
-precompiled versions of GTKWave for Linux and for MS-Windows are
-available at
-\htmladdnormallink{http://www\-.physio\-net\-.org/physio\-tools/\-beta/\-gtkwave/}
-{http://www.physionet.org/physiotools/beta/gtkwave/}.  Although
-GTKWave is still in development, it is quite usable and contains
-nearly all of the functionality of the XView-based \WAVE{} described
-in this Guide.
+The previous release of the \WAVE{} User's Guide announced the GTKWave
+project, intended to replace the XView-based \WAVE{} with a new
+implementation based on the GTK+ toolkit.  We have redirected our
+efforts to the original XView-based \WAVE{} since it is now
+available for all of the popular platforms, while the GTK 1.x project
+for MS-Windows that inspired development of GTKWave has been
+abandoned.
+
 \index{Open Look}
+A recent flurry of activity has given new life to the venerable
+XView toolkit, an open source implementation of the Open Look GUI
+that \WAVE{} has used since version 1.  Notably, XView has been ported
+to Mac OS X (by Logan Donaldson of York University in Toronto) and to
+MS-Windows (by Isaac Henry of PhysioNet).  As a result, \WAVE{} is now
+available on these platforms in addition to GNU/Linux, FreeBSD,
+and Solaris.  Meanwhile, an outstanding source of XView documentation
+has been made available by O'Reilly's Open Books Project
+(\htmladdnormallink{http://www\-.oreilly\-.com/open\-book/open\-look/}
+{http://www.oreilly.com/openbook/openlook/}), which provides free
+on-line copies of the previously unpublished Open Look User's Guide (originally
+planned as Volume 3 of O'Reilly's X Window System Series), the XView
+Programming Manual (the out-of-print Volume 7A of the same series),
+and the XView Reference Manual (Volume 7B, also long out of print).
 
-\begin{figure}[h]
-\centerline{\epsfig{file=GTKWave}}
-\caption{GTKWave (beta).}
-\index{GTKWave}
-\label{fig:GTKWave}
-\end{figure}
-
-This guide serves as the primary documentation for both \WAVE{} and
-GTKWave, but the current edition does not contain any information
-specific to GTKWave.
-
-If you find a difference between GTKWave and what is described in the
-Wave User's Guide (other than a cosmetic difference in the user
-interface elements), please check the GTKWave Beta Notes
-page on PhysioNet
-(\htmladdnormallink{http://www\-.physio\-net.org/\-physio\-tools/\-beta/\-gtkwave/\-notes\-.shtml}
-{http://www.physionet.org/physiotools/beta/gtkwave/notes.shtml}) to see
-if this difference has already been reported. If not, please send me a
-note, citing the page number in the printed Wave User's Guide, or the
-exact URL in the online version.  Indicate what is different in
-GTKWave, the name and version of the operating system you are using,
-and suggest how the text should be changed. Your reports will help us
-to prepare an accurate and up-to-date guide for GTKWave.
+Isaac Henry has also provided hooks for using a mouse's scroll wheel
+within XView, and future versions of \WAVE{} will take advantage of
+this feature where available.
 
 \vspace{2em}
 \noindent
 GBM\\
 Cambridge, Massachusetts\\
-June, 2002
+June, 2002\\
+revised June, 2005
 
 \chapter{Introducing \WAVE{}}
 \pagenumbering{arabic}
@@ -376,8 +362,9 @@ before continuing.
 \index{X Window System!client}\index{window manager}\index{Macintosh}
 \index{Microsoft Windows}\index{SPARCstation}\index{PC}
 
-\WAVE{} is an X Window System client application that runs on Sun
-SPARCstations (under Solaris or SunOS), and on PCs running Linux.  X
+\WAVE{} is an X Window System client application that runs on PCs
+running GNU/Linux, FreeBSD, or MS-Windows;  on Macintoshes running OS
+X;  and on SPARCstations running Solaris or SunOS.  X
 clients communicate with an X server and a window manager, programs
 that handle display output, and keyboard and mouse input, on behalf
 of the X clients, in much the same way that the Macintosh and
@@ -387,8 +374,8 @@ clients need not necessarily run on the same computer as the X server.
 If your computer can run an X server, and it is connected to a
 network, you can use it to interact with X clients running on any
 other computers (``hosts'') connected to the same network.  Thus you
-do not need to have your own SPARCstation or Linux PC in order to use
-\WAVE{}, since X server software is available for almost all
+do not even need to have \WAVE{} running on your own computer in order
+to use it, since X server software is available for almost all
 currently manufactured computers (including Macintoshes and Windows
 PCs) and many older computers as well.
 
@@ -397,9 +384,8 @@ You may use X server software running on your own computer to interact
 with a copy of \WAVE{} running on another networked computer (the
 \WAVE{} host).  (Since the window manager is also an X client, it can run on
 any computer in the network, although it is usually run on the same computer
-as the X server.)   If your own computer is a SPARCstation or a PC
-running Linux, it can act as the \WAVE{} host, and no network connection
-is required.
+as the X server.)   If your own computer is a Macintosh, PC, or Sparcstation,
+it can act as the \WAVE{} host, and no network connection is required.
 
 If you don't yet have a \WAVE{} host, see
 \hyperref{System Requirements}
@@ -4684,6 +4670,7 @@ the record, an index mark (`{\tt :}'), or the `{\tt >}' marker.
 
 \label{app:system-requirements}
 \index{Linux}\index{Solaris}\index{SunOS}\index{SPARCstation}\index{PC}
+\index{Macintosh}\index{Microsoft Windows}
 This section includes a shopping list of hardware and software that you will
 need in order to run \WAVE{}, or that you may find useful in order to use
 \WAVE{} most effectively.
@@ -4694,12 +4681,14 @@ At a minimum, you will require:
 \begin{description}
 \item [\WAVE{} software]
 This is freely available from PhysioNet in source form, and in binary form
-for PCs running Linux.  (Older binaries for SPARC-based systems
-running Solaris 2.x or SunOS 4.1.x are also available on PhysioNet. See
+for PCs running GNU/Linux or MS-Windows, or Macintoshes running OS X.
+(Older binaries for SPARC-based systems running Solaris 2.x or SunOS
+4.1.x are also available on PhysioNet. See
 \hyperref{how to obtain the current version of \WAVE{}}
 {section~}
 {, page~\pageref{sec:getting-wave} for details}
-{sec:getting-wave}.)
+{sec:getting-wave}.)  If the XView toolkit can be installed on your
+platform, it should be easy to build and use \WAVE{} on it.
 
 \index{WAVE host@\WAVE{} host}
 \index{resolution!of display}
@@ -4714,12 +4703,9 @@ graphics card and monitor (17-inch or larger, with a dot pitch of .26
 mm or less) capable of non-interlaced display at 65 Hz or faster with
 a resolution of at least 1024x768 with 256 colors.  In most cases, you
 will also want the system to be equipped with a CD-ROM drive (for
-loading software and digitized signals) and an Ethernet adapter or a
-modem.  Check the Linux Hardware-HOWTO to be sure that your chosen
-hardware is supported.  Most graphics cards, including the popular
-accelerated cards, are fully supported by the standard XFree86 X
-server, but a few high-end models are supported only in SVGA
-compatibility mode.  Most PCs manufactured since 1995 will easily meet
+loading software and digitized signals) and an Internet connection
+(for obtaining data from PhysioNet and compatible sources).
+Most PCs manufactured since 1995 will easily meet
 these requirements; new PCs will exceed most of them by large factors.
 In mid-2002, it was possible to assemble a suitable Linux PC for about
 US\$300 (not including the monitor).  It is not unreasonable to budget
@@ -4735,7 +4721,11 @@ by Logitech and many others are widely available for PCs, and are
 highly recommended if you do much annotation editing.  Most are fully
 compatible with Microsoft two-button mice.  Some users prefer
 trackballs for precision editing since there is no tendency for the
-pointer to move when clicking the buttons, as with a mouse.
+pointer to move when clicking the buttons, as with a mouse.  Future
+versions of \WAVE{} will make use of scroll wheels on mice when
+available;  if you choose a mouse equipped with a scroll wheel, try to
+select one that allows you to use the middle button without generating
+scroll wheel events.
 
 For those on a tight budget, suitable used PCs are often available for next to
 nothing.  If you use an older PC and can afford to upgrade components, get a
@@ -4750,8 +4740,14 @@ faster CPU.  Fully configured and supported Linux PCs are available from many
 vendors if you prefer not to assemble your own; see the Linux Commercial-HOWTO
 for further information.
 
-SPARC-based systems tend to be considerably more expensive than comparable
-or faster Linux PCs.  Used SPARCstations may be worth considering.
+Although \WAVE{} now runs on MS-Windows, we still recommend using
+GNU/Linux as the platform of choice because of its greater speed, capability,
+configurability, security, and stability, and because of the wider
+range of related software available for GNU/Linux.
+
+Macintoshes and SPARC-based systems may also be worth considering, although
+they tend to be substantiallyly more expensive than comparable or
+faster Linux PCs.
 
 \item [A source of digitized signals]
 \index{SPARCstation}\index{PC}\index{WFDB Software Package}\index{MS-DOS}
@@ -4816,17 +4812,19 @@ in current use, including those running any version of UNIX, as well
 as for MS-DOS and MS-Windows PCs, Macintoshes, Amigas, and DEC VAXen
 running VMS.
 
-\index{Linux}\index{X Window System!XFree86 server} For many users seeking to
-add an additional point of access to \WAVE{}, a networked PC may be attractive.
-With current CPUs and graphics adapters, rendering speed is much faster than
-was available on far more expensive workstations only a few years ago.  X
-server software for MS-Windows is available from many vendors, and may be a
-good choice if you are heavily invested in Windows-based software.  (For less
-than the cost of a Windows X server, however, you can buy a 30 Gb disk drive
-and install Linux, XFree86, and \WAVE{} on it with 29 Gb to spare.  Consider
-this before choosing a commercial X server for Windows.)  If costs of
-maintenance and system administration are a concern, an X terminal is probably
-a better choice than a networked PC.
+\index{Linux}\index{X Window System!XFree86 server} For many users
+seeking to add an additional point of access to \WAVE{}, a networked
+PC may be attractive.  With current CPUs and graphics adapters,
+rendering speed is much faster than was available on far more
+expensive workstations only a few years ago.  X server software for
+MS-Windows is freely available as part of Cygwin, and may be a good
+choice if you are heavily invested in Windows-based software.  (For
+less than the cost of a commercial Windows X server, however, you can
+buy a 300 Gb disk drive and install Linux, X.org, and \WAVE{} on it
+with 298 Gb to spare.  Consider this before choosing a commercial X
+server for Windows.)  If costs of maintenance and system administration are a
+concern, an X terminal is probably a better choice than a networked
+PC.
 
 \section{X11 window managers}
 \index{window manager}\index{ICCCM}
@@ -4850,7 +4848,10 @@ popups).  If you
 \index{X terminal}
 are using an MS-DOS PC or an X terminal to access \WAVE{}, the window
 manager must usually be run remotely, often on the same computer that runs
-\WAVE{}.
+\WAVE{}. (Note:  these recommendations are several years old.  Many
+newer X11 window managers have appeared since then;  \WAVE{} works
+with any of them, although {\tt olwm} and {\tt olvwm} still have a
+slight advantage over the others.
 
 \section{Data acquisition and digitization}
 \label{sec:adc-boards}
@@ -4889,20 +4890,11 @@ digitization (by writing to a network drive) or afterwards.  Since
 signal files are usually very large, Ethernet
 \index{Ethernet}
 transmission is
-recommended.  To set up a minimal Ethernet including a Sun workstation
-or Linux PC and an MS-DOS PC, you will need an Ethernet card for each
-PC (usually around US\$100; Sun workstations have built-in Ethernet
-adapters but may require external transceivers, usually around \$50),
-TCP/IP software for the PC (such as Sun's PC-NFS, about \$300), and
-miscellaneous cabling and terminators (\$20 or less).  For a truly
-minimal network of only two systems, see the Linux Ethernet-HOWTO for
-details on how to connect two UTP interfaces without using a hub.  You
-will need a hub (US\$150 or more) to connect more than two systems,
-unless you are able to use the older `thin' (10 Base 2) Ethernet.  If
+recommended.  If
 \index{sample command@{\tt sample} command (for digitization under MS-DOS)}
 you use {\tt sample} for digitization, signal files can be written
 directly on the host system's drive at rates up to 80,000 samples per
-second using PC-NFS (or up to 100,000 samples per second on local
+second using NFS (or up to 100,000 samples per second on local
 disks).  This configuration allows you to examine the signal files
 using \WAVE{} as the data are being acquired; although \WAVE{} does
 not currently support real-time, continuously updated display of
@@ -4984,8 +4976,9 @@ available from PhysioNet.
 \label{sec:other-software}
 
 \index{WFDB Software Package}
-\WAVE{} makes extensive use of the \emph{WFDB Software Package}, available from
-the same sources as \WAVE{} itself
+\WAVE{} makes extensive use of other components of the \emph{WFDB
+Software Package} of which it is a part.  The most recent version of
+this package is always freely available from PhysioNet
 (\htmladdnormallink{{\tt http://www.physionet.org/}}
 {http://www.physionet.org/}).  The WFDB Software Package includes
 {\tt calsig}, {\tt mrgann}, {\tt plot2d}, {\tt pschart}, {\tt
@@ -5001,7 +4994,7 @@ should be part of your software toolbox.  If you use link annotations,
 you will need a browser in order to follow the links to the external
 data.  Even if you don't anticipate using link annotations, you can
 still use a web browser to view the on-line version of this guide.
-Netscape is an attractive choice because of its simple remote-control
+Mozilla is an attractive choice because of its simple remote-control
 interface, among other reasons.  Mozilla may be obtained freely from
 \htmladdnormallink{{\tt http://\-www\-.mozilla\-.org}}
 {http://www.mozilla.org/}).
@@ -5053,9 +5046,11 @@ Note that \WAVE{} cannot be run at all until the WFDB library (contained within
 the WFDB Software Package) and the XView libraries ({\tt libxview.so.3} and
 {\tt libolgx.so.3}) have been installed.  It is strongly recommended that you
 install the complete WFDB Software Package, since \WAVE{} uses many of the
-applications included in this package.  The W3C's {\tt libwww} libraries
-are optional but recommended;  they are necessary if you wish to use \WAVE{}
-to read data directly from web and FTP servers.
+applications included in this package.  The W3C's {\tt libwww}
+libraries, or the newer and more capable {\tt libcurl} library,
+are optional but recommended;  either {\tt libwww} or {\tt libcurl} is
+necessary if you wish to use \WAVE{} to read data directly from web
+and FTP servers.
 
 \index{XView}
 \index{Linux}
@@ -5063,14 +5058,13 @@ If you would like to try porting \WAVE{} to another operating system for which
 X11 client support (Xlib) is available, please obtain the XView source
 distribution and attempt to port `{\tt cmdtool}' (a simple terminal emulator
 included in the XView distribution) first.  Compared to the original sources,
-the Linux version of XView (freely available from
+the Linux/Mac OS X/MS-Windows version of XView (freely available from
 \htmladdnormallink{PhysioNet}{http://www.physionet.org/physiotools/xview/},
 \htmladdnormallink{{\tt metalab.unc.edu}}
 {ftp://metalab.unc.edu/pub/Linux/libs/X/xview/}, \htmladdnormallink{{\tt
 www.rpmfind.net}} {http://www.rpmfind.net/linux/RPM/}, and their mirrors, and
 also available on many low-cost Linux CD-ROM archives) is easier to port to
 another operating system, since many Sun-specific dependencies were removed.
-Nevertheless, porting XView is likely to require significant effort.
 
 \section{Setting up a printer for \WAVE{}}
 
@@ -5214,7 +5208,8 @@ send it to me
 
 \subsection{Can I use \WAVE{} if I don't run Linux or another Unix?}
 
-Why would you not want to run Linux or Unix?  Any version of Linux or Unix is a
+Why would you not want to run Linux or Unix?  Any version of Linux or Unix,
+including Mac OS X, is a
 much better choice for research than any version of MS-Windows. See
 \htmladdnormallink{{\tt http://\-srom.zgp.org/}}{http://srom.zgp.org/}
 for an independent perspective on this issue.  Linux can coexist on the same PC
@@ -5224,24 +5219,13 @@ The major obstacle to porting \WAVE{} to other platforms is that the XView
 toolkit is needed for the user interface components of \WAVE{}.  XView is free
 software and can be ported to other platforms, but this task is not trivial.
 
-Another possibility is to reimplement \WAVE{}'s user interface with a different
-toolkit.  The {\sf GTKWave} project is doing just that, using the Gimp toolkit
-(GTK+), which runs not only under Linux and Unix, but also under MS-Windows.
-Beta-quality versions of {\sf GTKWave} for Linux and for MS-Windows are
-currently available from PhysioNet (search for {\sf GTKWave} for further
-information).
+Since late 2004 it has been possible to run \WAVE{} on MS-Windows directly,
+using the free Cygwin POSIX emulation library and X11 server.
 
 If you have any networked computer that can run X11R4 or a later version
 (this includes all current UNIX workstations, PCs, Macintoshes, and a variety
 of other systems), and access via network to another computer that can host
 \WAVE{} (see above), you can run \WAVE{} remotely (see the next question).
-
-\index{PostScript}
-Other WFDB applications ({\sf WVIEW} for MS-Windows, {\sf VIEW} for
-MS-DOS, {\sf MacView} for the Macintosh, and {\tt pschart} and {\tt psfd} for
-PostScript devices) offer many of the display features of \WAVE{} in other
-environments;  none of these currently support annotation editing or control
-of external programs, however.
 
 \subsection{How can I use \WAVE{} from an X terminal, PC, Mac, etc.?}
 
@@ -5468,7 +5452,8 @@ directory (probably {\tt /usr/database}) containing a file named
 \item
 \index{signal!window}
 If \WAVE{}'s signal window appears, but is solid white or light grey,
-your X server does not have backing store enabled.
+and you are using a version of \WAVE{} older than 6.8, your X server
+does not have backing store enabled.
 Click on any of the navigation controls (e.g., \button{\tt <<},
 \button{\tt <}, \button{\tt >}, or \button{\tt >>}), or resize the window,
 to make the signals appear.  To avoid this problem entirely (until
@@ -5576,8 +5561,8 @@ exits and will need to be repeated afterwards.
 
 \label{faq:cannot-see-signals}
 \index{signal!window}
-If the signal window is solid white or light grey, your X server does not have
-backing store enabled.
+If the signal window is solid white or light grey, and your version of
+\WAVE{} is older than 6.8, your X server does not have backing store enabled.
 Click on any of the navigation controls (e.g., \button{\tt <<},
 \button{\tt <}, \button{\tt >}, or \button{\tt >>}), or resize the window, to
 make the signals appear.  If this works, the problem is almost certainly that
@@ -6540,20 +6525,16 @@ streamlined, elegant object-oriented interface (end of rant).
 \index{Open Look}
 Motif and its lookalikes (notably GTK+, Qt, and LessTif) have clearly become
 the standard, however, and a consequence of this is that the Open Look user
-interface presented by \WAVE{} is unfamiliar to many users.  There is a
-scarcity of introductory material for Open Look in print (but there is an
-excellent and comprehensive set of documentation, including an Open Look User's
-Guide, available from Darwin Open Systems, \htmladdnormallink{{\tt
-http://www.darwinsys.com/}}{http://www.darwinsys.com/}).  Unfortunately, the
+interface presented by \WAVE{} is unfamiliar to many users.  Until recently,
+there has been a scarcity of introductory material for Open Look in
+print (but O'Reilly's Open Books Project
+(\htmladdnormallink{http://www\-.oreilly\-.com/open\-book/open\-look/}
+{http://www.oreilly.com/openbook/openlook/}) now provides free
+on-line copies of three relevant books (a user's guide and two
+programmer's guides).  Unfortunately, the
 Motif API, and those of its lookalikes, are vastly different from the XView API
 with which \WAVE{} is written, and a port to Motif would be decidedly
 non-trivial.
-
-The {\sf GTKWave} project is reimplementing the user interface of WAVE using
-the Gimp toolkit (GTK+).  A beta-quality release of {\sf GTKWave} is now
-available from PhysioNet.  This offers a stable, object-oriented, and
-non-proprietary Motif-like interface under any version of Linux or Unix, and
-also under MS-Windows.
 
 \subsection{How can I find out about ...?}
 

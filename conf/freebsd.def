@@ -26,6 +26,11 @@ WFDBROOT = /usr
 # (a program that does nothing, successfully).
 LWC = libwww-config
 
+# Similarly, to use the libcurl library instead of libwww, set LCC to
+# 'curl-config'.  Otherwise set LCC to ':'.  Only one of libwww or
+# libcurl should be enabled.
+LCC = curl-config
+
 # LDLIBWWW, which is appended to LDFLAGS below, is the set of options needed
 # to link with libwww.  If libwww is not installed, or if libwfdb is a shared
 # library, LDLIBWWW can be empty (if there is a '#' immediately after the '='
@@ -34,6 +39,9 @@ LWC = libwww-config
 # three passes through the option list are necessary to satisfy all
 # dependencies when linking to the static libwww libraries.
 LDLIBWWW = # `$(LWC) --libs` `$(LWC) --libs` `$(LWC) --libs`
+
+# LDLIBCURL is the set of options needed to link with libcurl.
+LDLIBCURL = # `$(LCC) --libs` `$(LCC) --libs` `$(LCC) --libs`
 
 # BINDIR specifies the directory in which the applications will be installed;
 # it should be a directory in the PATH of those who will use the applications.
@@ -72,11 +80,11 @@ CCDEFS = $(VDEFS)
 
 # CFLAGS is the set of C compiler options.  CFLAGS should always include
 # CCDEFS.
-CFLAGS = -g -O $(CCDEFS) `$(LWC) --cflags` -I$(INCDIR)
+CFLAGS = -g -O $(CCDEFS) `$(LWC) --cflags` `$(LCC) --cflags` -I$(INCDIR)
 
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.
-LDFLAGS = -L$(LIBDIR) -lwfdb $(LDLIBWWW)
+LDFLAGS = -L$(LIBDIR) -lwfdb $(LDLIBWWW) $(LDLIBCURL)
 
 # WFDBLIB is the name of the standard WFDB library.  In order to access it via
 # `-lwfdb', WFDBLIB should be `libwfdb.a'.

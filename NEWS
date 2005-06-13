@@ -1,3 +1,40 @@
+10.3.16:
+	Benjamin Moody has added an interface between the WFDB library and
+	libcurl as an alternative to the existing libwww interface, and has
+	updated 'configure' and conf/*.def to search for and use libcurl if
+        it is available.  The primary advantages of libcurl over libwww are
+	that libcurl is smaller and faster, it supports access to
+	password-protected files, and it is actively maintained.  Both
+	libraries are freely available on all popular platforms.
+
+	Isaac Henry has provided changes to WAVE that improve the behavior of
+	the signal window if the X server does not provide backing store.
+
+	Isaac has also updated 'configure' to support building a native
+	MS-Windows version of the WFDB library using either Cygwin gcc or MinGW
+	gcc.
+
+	In wabp and wqrs, the variable 'signal' has been renamed (to 'sig')
+	to avoid redefining a symbol appearing in signal.h under Mac OS X 10.4
+	(thanks to Richard Piper for reporting this problem).
+
+	A number of minor changes, mostly involving conditional use of
+	malloc.h, stdlib.h, and string.h, were made to eliminate warnings
+	from gcc 4.x.
+
+	A small number of files that are no longer supported, including several
+	MS-DOS utilities and makefiles, have been removed from this version of
+	the WFDB Software Package.
+
+10.3.15:
+	Rules for generating the binary tarball for MS-Windows have been
+	fixed so that the Cygwin DLLs are now included with correct
+        permissions.
+
+	Installation of shared libraries under GNU/Linux requires an extra
+	step if SELinux is enabled (as under Fedora Core 2 and later);  this
+	has been incorporated into conf/linux-slib.def.
+
 10.3.14:
 	Use rdann's new -v option to add column headings to its standard
 	output.

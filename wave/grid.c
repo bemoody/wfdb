@@ -1,10 +1,10 @@
 /* file: grid.c		G. Moody	 1 May 1990
-			Last revised:	29 April 1999
+			Last revised:	10 June 2005
 Grid drawing functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1999 George B. Moody
+Copyright (C) 1990-2005 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -76,20 +76,20 @@ void show_grid()
        map. */
     if (!grid_plotted || ghflag != oghf || gvflag != ogvf ||
 	(ghflag && dy != ody) || (gvflag && dx != odx) || !use_overlays) {
-	XFillRectangle(display, xid, clear_grd,
+	XFillRectangle(display, osb, clear_grd,
 		       0, 0, canvas_width,canvas_height);
 	
 	/* If horizontal grid lines are enabled, draw them. */
 	if (ghflag)
 	    for (i = y = 0; y < canvas_height + dy; i++, y = i*dy) {
 		if (0 < y && y < canvas_height)
-		    XDrawLine(display, xid,
+		    XDrawLine(display, osb,
 			      (ghflag > 1) ? draw_cgrd : draw_grd,
 			      0, y, canvas_width, y);
 		if (ghflag > 1)		/* Draw fine horizontal grid lines. */
 		    for (ii = 1; ii < 5; ii++) {
 			yy = y + ii*dyfine;
-			XDrawLine(display, xid, draw_grd,
+			XDrawLine(display, osb, draw_grd,
 				  0, yy, canvas_width, yy);
 		    }
 	    }
@@ -98,13 +98,13 @@ void show_grid()
 	if (gvflag)
 	    for (i = x = 0; x < canvas_width + dx; i++, x = i*dx) {
 		if (0 < x && x < canvas_width)
-		    XDrawLine(display, xid,
+		    XDrawLine(display, osb,
 			      (gvflag > 1) ? draw_cgrd : draw_grd,
 			      x, 0, x, canvas_height);
 		if (gvflag > 1)		/* Draw fine vertical grid lines. */
 		    for (ii = 1; ii < 5; ii++) {
 			xx = x + ii*dxfine;
-			XDrawLine(display, xid, draw_grd,
+			XDrawLine(display, osb, draw_grd,
 				  xx, 0, xx, canvas_height);
 		    }
 	    }

@@ -10,7 +10,6 @@ app/epicmp.c
 app/fir.c
 app/ihr.c
 app/Makefile
-app/Makefile.dos
 app/Makefile.top
 app/Makefile.tpl
 app/mfilt.c
@@ -30,10 +29,7 @@ app/README
 app/rr2ann.c
 app/rxr.c
 app/sampfreq.c
-app/sample8.hea
-app/sample.c
 app/setwfdb
-app/setwfdb.bat
 app/sigamp.c
 app/sigavg.c
 app/skewedit.c
@@ -45,8 +41,6 @@ app/sumann.c
 app/sumstats.c
 app/tach.c
 app/time2sec.c
-app/view.c
-app/vsetup.c
 app/wabp.c
 app/wfdbcat.c
 app/wfdbcollate.c
@@ -55,7 +49,6 @@ app/wfdbwhich.c
 app/wqrs.c
 app/wrann.c
 app/wrsamp.c
-app/wvscript.c
 app/xform.c
 check-manifest
 checkpkg/
@@ -128,6 +121,7 @@ checkpkg/Makefile.top
 checkpkg/Makefile.tpl
 checkpkg/mitdb/
 conf/
+conf/archname
 conf/cygwin.def
 conf/cygwin-slib.def
 conf/darwin.def
@@ -143,6 +137,8 @@ conf/hpux-slib.def
 configure
 conf/linux.def
 conf/linux-slib.def
+conf/mingw.def
+conf/mingw-slib.def
 conf/prompt-c
 conf/prompt-n
 conf/solaris.def
@@ -155,7 +151,6 @@ convert/ahaconvert
 convert/edf2mit.c
 convert/m2a.c
 convert/Makefile
-convert/Makefile.dos
 convert/Makefile.top
 convert/Makefile.tpl
 convert/makeid.c
@@ -311,7 +306,6 @@ doc/wag-src/rdsamp.1
 doc/wag-src/README
 doc/wag-src/rxr.1
 doc/wag-src/sampfreq.1
-doc/wag-src/sample.1
 doc/wag-src/setwfdb.1
 doc/wag-src/sigamp.1
 doc/wag-src/sigavg.1
@@ -325,7 +319,6 @@ doc/wag-src/sumstats.1
 doc/wag-src/tach.1
 doc/wag-src/time2sec.1
 doc/wag-src/tmac.dif
-doc/wag-src/view.1
 doc/wag-src/wabp.1
 doc/wag-src/wag.cover
 doc/wag-src/wag.ht0
@@ -344,7 +337,6 @@ doc/wag-src/wfdbwhich.1
 doc/wag-src/wqrs.1
 doc/wag-src/wrann.1
 doc/wag-src/wrsamp.1
-doc/wag-src/wview.1
 doc/wag-src/xform.1
 doc/wag-src/xview.7
 doc/wpg/
@@ -463,7 +455,6 @@ examples/exgetann.c
 examples/exgetvec.c
 examples/exputvec.c
 examples/Makefile
-examples/Makefile.dos
 examples/Makefile.top
 examples/Makefile.tpl
 examples/pgain.c
@@ -487,18 +478,14 @@ lib/
 lib/annot.c
 lib/calib.c
 lib/COPYING.LIB
-lib/db.h
 lib/ecgcodes.h
 lib/ecgmap.h
 lib/Makefile
-lib/Makefile.dos
 lib/Makefile.top
 lib/Makefile.tpl
-lib/makelib
 lib/README
 lib/signal.c
 lib/wfdb-config.c
-lib/wfdbdll.def
 lib/wfdb.h0
 lib/wfdbinit.c
 lib/wfdbio.c
@@ -518,7 +505,6 @@ psd/hrplot
 psd/log10.c
 psd/lomb.c
 psd/Makefile
-psd/Makefile.dos
 psd/Makefile.top
 psd/Makefile.tpl
 psd/memse.c
@@ -527,6 +513,7 @@ psd/plot3d
 psd/README
 README
 README.NETFILES
+README.WINDOWS
 uninstall.sh
 wave/
 wave/analysis.hlp
@@ -581,25 +568,3 @@ wave/xview-patches
 wave/xvwave.c
 wave/xvwave.h
 wfdb.spec
-wview/
-wview/clean
-wview/ecg.ico
-wview/html/
-wview/html/addnft1.png
-wview/html/addnft2.png
-wview/html/addnft3.png
-wview/html/addnft4.png
-wview/html/addnft5.png
-wview/html/addnft6.png
-wview/html/example.xws
-wview/html/wave.png
-wview/html/wvsetup.ht0
-wview/makefile
-wview/wview.c
-wview/wview.def
-wview/wview.h
-wview/wview.hlp
-wview/wview.hpj
-wview/wview.rc
-wview/wview.rtf
-wview/wvscript.c

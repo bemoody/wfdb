@@ -1,10 +1,10 @@
 # file: version.def		G. Moody	24 May 2000
-#				Last revised:	1 January 2005
+#				Last revised:	11 June 2005
 # Each release of the WFDB Software Package is identified by a three-part
 # version number, defined here:
 MAJOR = 10
 MINOR = 3
-RELEASE = 15
+RELEASE = 16
 VERSION = $(MAJOR).$(MINOR).$(RELEASE)
 
 # RPMRELEASE can be incremented if changes are made between official
@@ -16,6 +16,6 @@ RPMRELEASE = 1
 VDEFS = -DWFDB_MAJOR=$(MAJOR) -DWFDB_MINOR=$(MINOR) -DWFDB_RELEASE=$(RELEASE)
 
 # WAVEVERSION is the WAVE version number.
-WAVEVERSION = 6.7
+WAVEVERSION = 6.8
 # _____________________________________________________________________________
 

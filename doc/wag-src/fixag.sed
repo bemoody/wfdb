@@ -2,7 +2,6 @@ s+coherence-1.htm+cohere-1.htm+g
 s+ecgeval-1.htm+ecgeva-1.htm+g
 s+ecgpuwave-1.htm+ecgpuw-1.htm+g
 s+edf2mit-1.htm+edf2mi-1.htm+g
-s+gtkwave-1.htm+gtkwav-1.htm+g
 s+imageplt-1.htm+imagep-1.htm+g
 s+pschart-1.htm+pschar-1.htm+g
 s+plotstm-1.htm+plotst-1.htm+g

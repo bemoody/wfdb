@@ -1,10 +1,10 @@
 /* file: edit.c		G. Moody	 1 May 1990
-			Last revised:  24 July 2003
+			Last revised:	10 June 2005
 Annotation-editing functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 2003 George B. Moody
+Copyright (C) 1990-2005 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -232,17 +232,17 @@ int x, y, do_bar;
 
     /* Erase any other bar and levels. */
     if (bar_on) {
-	XDrawSegments(display, xid, clear_crs, bar, 2);
+	XDrawSegments(display, osb, clear_crs, bar, 2);
 	bar_on = 0;
     }
     if (level_on) {
-	XDrawSegments(display, xid, clear_crs, level, level_on);
+	XDrawSegments(display, osb, clear_crs, level, level_on);
 	level_on = 0;
     }
     if (do_bar && 0 <= x && x < canvas_width) {
 	bar[0].x1 =    bar[0].x2 =     bar[1].x1 =     bar[1].x2 = bar_x = x;
 	bar[0].y1 = 0; bar[0].y2 = ya; bar[1].y1 = yb; bar[1].y2=canvas_height;
-	XDrawSegments(display, xid, draw_crs, bar, 2);
+	XDrawSegments(display, osb, draw_crs, bar, 2);
 	bar_on = 1;
 	bar_y = y;
 	if (show_level) {
@@ -256,7 +256,7 @@ int x, y, do_bar;
 		level_on++;
 	    }
 	    if (level_on) {
-		XDrawSegments(display, xid, draw_crs, level, level_on);
+		XDrawSegments(display, osb, draw_crs, level, level_on);
 		level_time = display_start_time + x/tscale;
 		show_level_popup(TRUE);
 	    }
@@ -273,7 +273,7 @@ int x, do_box;
 
     /* Clear any other box. */
     if (box_on) {
-	XDrawLines(display, xid, clear_crs, box, 5, CoordModeOrigin);
+	XDrawLines(display, osb, clear_crs, box, 5, CoordModeOrigin);
 	box_on = 0;
     }
     if (do_box && 0 <= x && x < canvas_width) {
@@ -282,7 +282,7 @@ int x, do_box;
 	box[2].x = box[3].x = box_right = x + mmx(2.5);
 	box[0].y = box[3].y = box[4].y = box_bottom = y - mmy(7.5);
 	box[1].y = box[2].y = box_top = y + mmy(4.5);
-	XDrawLines(display, xid, draw_crs, box, 5, CoordModeOrigin);
+	XDrawLines(display, osb, draw_crs, box, 5, CoordModeOrigin);
 	box_on = 1;
     }
 }
@@ -956,7 +956,7 @@ Notify_arg arg;
 	    if (annp->this.time < display_start_time) {
 		struct ap *a = annp;
 
-		XFillRectangle(display, xid, clear_all,
+		XFillRectangle(display, osb, clear_all,
 			       0, 0, canvas_width+mmx(10), canvas_height);
 		if ((tt = annp->this.time - (long)((nsamp-freq)/2)) < 0L)
 		    display_start_time = 0L;
@@ -1189,7 +1189,7 @@ Notify_arg arg;
 	    if (annp->this.time >= display_start_time + nsamp) {
 		struct ap *a = annp;
 
-		XFillRectangle(display, xid, clear_all,
+		XFillRectangle(display, osb, clear_all,
 			       0, 0, canvas_width+mmx(10), canvas_height);
 		tt = annp->this.time - (long)((nsamp-freq)/2);
 		display_start_time = strtim(timstr(tt));
@@ -1333,4 +1333,5 @@ Notify_arg arg;
 #endif
 	break;
     }
+    XClearWindow(display, xid);
 }

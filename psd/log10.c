@@ -1,9 +1,9 @@
 /* file: log10.c	G. Moody	19 July 1995
-		   Last revised:	 7 June 2000
+		   Last revised:	 9 June 2005
 
 -------------------------------------------------------------------------------
 log10: common log transform of 2-column data
-Copyright (C) 2000 George B. Moody
+Copyright (C) 1995-2005 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -25,6 +25,7 @@ _______________________________________________________________________________
 
 */
 
+#include <stdio.h>
 #include <math.h>
 
 #ifndef NOVALUES_H

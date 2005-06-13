@@ -1,9 +1,9 @@
 /* file: plotstm.c		G. Moody	24 March 1992
-				Last revised:	 3 May 1999
+				Last revised:	10 June 2005
 
 -------------------------------------------------------------------------------
 plotstm: Make a PostScript scatter plot of ST measurements from `epic' output
-Copyright (C) 1999 George B. Moody
+Copyright (C) 1992-2005 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -27,8 +27,18 @@ _______________________________________________________________________________
 
 #include <stdio.h>
 #include <math.h>
-#ifndef __STDC__
+
+#ifdef __STDC__
+#include <stdlib.h>
+#else
 extern void exit();
+#endif
+
+#ifndef BSD
+# include <string.h>
+#else           /* for Berkeley UNIX only */
+# include <strings.h>
+# define strchr index
 #endif
 
 /* The PostScript code below is the prolog for the scatter plot.  Portions of

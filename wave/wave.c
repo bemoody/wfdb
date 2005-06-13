@@ -1,10 +1,10 @@
-/* file: wave.c		G. Moody	 27 April 1990
-			Last revised:  14 November 2002
+/* file: wave.c		G. Moody	27 April 1990
+			Last revised:	10 June 2005
 main() function for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 2002 George B. Moody
+Copyright (C) 1990-2005 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -385,6 +385,10 @@ char *argv[];
     /* If requested, start demonstration. */
     if (do_demo)
       start_demo();
+
+    /* Do initial display */
+    XFillRectangle(display, osb, clear_all, 0, 0, canvas_width+mmx(10), canvas_height);
+    do_disp();
 
     /* Enter the main loop. */
     display_and_process_events();

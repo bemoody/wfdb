@@ -1,4 +1,4 @@
-.TH SETWFDB 1 "6 August 2002" "WFDB 10.2.7" "WFDB Applications Guide"
+.TH SETWFDB 1 "12 June 2005" "WFDB 10.3.16" "WFDB Applications Guide"
 .SH NAME
 setwfdb, cshsetwfdb \- set WFDB environment variables
 .SH SYNOPSIS
@@ -40,17 +40,6 @@ your \fB.profile\fR file.
 \fBcshsetwfdb\fR sets \fBWFDB\fR and \fBWFDBCAL\fR similarly for the C-shell.
 It must be executed using ``source'' as shown above.  It may be convenient to
 include this command in your \fB.cshrc\fR file.
-.SS MS-DOS/MS-Windows users:
-If possible, use a Unix-compatible shell such as \fBbash\fR (included in the
-freely available Cygwin package for MS-Windows), and use \fBsetwfdb\fR or
-\fBcshsetwfdb\fR as appropriate for your shell.  If you must use command.com,
-\fBsetwfdb.bat\fR sets \fBWFDB\fR and \fBWFDBCAL\fR similarly for
-MS-DOS or MS-Windows; it also sets \fBVIEWP\fR (see \fBview\fR(1)). It
-may be convenient to include this command in the \fBautoexec.bat\fR
-file (under MS-DOS 3.3 and later, include the command ``call setwfdb''
-within \fBautoexec.bat\fR; under earlier versions of MS-DOS, use
-``command /c setwfdb'', or append the contents of \fBsetwfdb.bat\fR to
-\fBautoexec.bat\fR).
 .PP
 .SH ENVIRONMENT
 .TP
@@ -103,5 +92,3 @@ before use:
 http://www.physionet.org/physiotools/wfdb/app/setwfdb
 .br
 http://www.physionet.org/physiotools/wfdb/app/cshsetwfdb
-.br
-http://www.physionet.org/physiotools/wfdb/app/setwfdb.bat

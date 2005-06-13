@@ -14,10 +14,6 @@ Complex Physiologic Signals, funded by the National Center for
 Research Resources of the National Institutes of Health.  
 The most recent version of this guide, and of the software it
 describes, may be obtained from PhysioNet.
-<LI><A HREF="http://ecg.mit.edu/">The MIT-BIH Database Distribution
-Home Page</A><BR>
-Information about obtaining CD-ROMs containing many of the databases
-available from PhysioNet can be found here.
 <LI><I><A HREF="../wpg/wpg.htm">WFDB Programmer's Guide</A></I>
 <BR>
 Includes tutorial and reference material relating to the WFDB library,
@@ -29,8 +25,9 @@ interface.
 A comprehensive tutorial, with extensive reference material, for
 <STRONG>WAVE</STRONG>, an interactive waveform browser with facilities for
 annotation editing and control of external analysis programs.
-<STRONG>WAVE</STRONG> runs on PCs under the free Linux operating system, and
-on SPARC-based systems under SunOS or Solaris.
+<STRONG>WAVE</STRONG> runs on PCs under the free GNU/Linux and FreeBSD
+operating systems, and under MS-Windows with Cygwin/X, as well as on Mac OS X
+and on SPARC-based systems under SunOS or Solaris.
 </UL>
 <BR>
 

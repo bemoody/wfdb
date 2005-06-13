@@ -1,10 +1,10 @@
 /* file: wfdblib.h	G. Moody	13 April 1989
-                        Last revised:	 5 March 2004       wfdblib 10.3.12
+                        Last revised:	 31 May 2005       wfdblib 10.3.15
 External definitions for WFDB library private functions
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1989-2004 George B. Moody
+Copyright (C) 1989-2005 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -221,16 +221,19 @@ typedef struct WFDB_FILE WFDB_FILE;
    WFDB library, define WFDB_NETFILES=1 and link with libwww (see 'Makefile').
    Otherwise, the WFDB library uses only the ANSI/ISO standard I/O library. */
 #if WFDB_NETFILES
-#include <WWWLib.h>
-#include <WWWInit.h>
-#include <errno.h>
-
-#ifndef EROFS	 /* errno value: attempt to write to a read-only file system */
-#ifdef EINVAL
-#define EROFS EINVAL
+#if WFDB_NETFILES_LIBCURL
+# include <curl/curl.h>
 #else
-#define EROFS 1
+# include <WWWLib.h>
+# include <WWWInit.h>
 #endif
+#include <errno.h>
+#ifndef EROFS	 /* errno value: attempt to write to a read-only file system */
+# ifdef EINVAL
+#  define EROFS EINVAL
+# else
+#  define EROFS 1
+# endif
 #endif
 
 /* Constants */

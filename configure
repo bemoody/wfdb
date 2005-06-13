@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody         24 May 2000
-#                             Last revised:  14 November 2004
+#                             Last revised:    8 June 2005
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -18,13 +18,14 @@ fi
 for i in $*
 do
   case $i in
-    --dynamic)     LIBTYPE=dynamic ;;
-    --mandir=*)    MANDIR=`echo $i | sed 's/[-a-zA-Z0-9]*=//'` ;;
-    --prefix=*)    DIR=`echo $i | sed 's/[-a-zA-Z0-9]*=//'` ;;
-    --shared)      LIBTYPE=dynamic ;;
-    --static)      LIBTYPE=static ;;
-    --static_only) LIBTYPE=static
-		   SYSLIBS=static ;;
+    --dynamic)        LIBTYPE=dynamic ;;
+    --mandir=*)       MANDIR=`echo $i | sed 's/[-a-zA-Z0-9]*=//'` ;;
+    --prefix=*)       DIR=`echo $i | sed 's/[-a-zA-Z0-9]*=//'` ;;
+    --shared)         LIBTYPE=dynamic ;;
+    --static)         LIBTYPE=static ;;
+    --static_only)    LIBTYPE=static
+		      SYSLIBS=static ;;
+    --no-cygwin)      NOCYGWIN=yes ;;
     *)             cat <<EOF
 usage: $0 [options]
 Options:
@@ -40,6 +41,8 @@ Options:
                        (assumes --static;  compilation may fail if any
 	               necessary libraries are available as shared libraries
 		       only)
+    --no-cygwin       on Cygwin, compile binaries that do not link to the
+                       Cygwin DLL. WAVE will not be built.
 EOF
                    exit ;;
   esac
@@ -89,9 +92,20 @@ case `uname` in
   HP-UX*) OS=HPUX
     cat site.def hpux-slib.def >site-slib.def
     cat hpux.def >>site.def ;;
-  CYGWIN*) OS=cygwin
-    cat site.def cygwin-slib.def >site-slib.def
-    cat cygwin.def >>site.def ;;
+  CYGWIN*)
+    if [ "x$NOCYGWIN" = "xyes" ]
+    then
+	OS=mingw
+	sed 's/NOCYGWIN/-mno-cygwin/' site.def mingw-slib.def >site-slib.def
+	sed 's/NOCYGWIN/-mno-cygwin/' mingw.def >>site.def
+    else
+	OS=cygwin  
+	cat site.def cygwin-slib.def >site-slib.def
+	cat cygwin.def >>site.def
+    fi ;;
+  MINGW*) OS=mingw
+    sed 's/NOCYGWIN//' site.def mingw-slib.def >site-slib.def
+    sed 's/NOCYGWIN//' mingw.def >>site.def ;;
   Darwin*) OS=Darwin
     LIBTYPE=dynamic
     cat site.def darwin-slib.def >site-slib.def
@@ -271,39 +285,82 @@ fi
 echo  "The manual pages will be installed in '$MANDIR'."
 
 echo
-./prompt "Looking for libwww ..."
-WLC=`which libwww-config 2>&1`
-if [ "x$WLC" = "x" ]
+./prompt "Looking for libcurl ..."
+WLCC=`which curl-config 2>&1`
+if [ "x$WLCC" = "x" ]
 then
-    WLC="no libwww-config"
+    WLCC="no curl-config"
 fi
-if ( echo $WLC | grep "no \|not " >/dev/null )
+if ( echo $WLCC | grep "no \|not " >/dev/null )
 then
     echo "not found"
-    echo "The WFDB software will be compiled without NETFILES access, because"
-    echo "libwww does not appear to be installed on this system."
-    echo "To add NETFILES access, install libwww and run ./configure again."
-    echo "NETFILES=0" >../config.cache
-    sed "s/LWC = libwww-config/LWC = :/" <site.def >site.tmp
-    mv site.tmp site.def
-    sed "s/LWC = libwww-config/LWC = :/" <site-slib.def >site.tmp
-    mv site.tmp site-slib.def
-    sed "s/WFDB_NETFILES 1/WFDB_NETFILES 0/" <../lib/wfdb.h0 >../lib/wfdb.h
-    WITHNF=without
+    ./prompt "Looking for libwww ..."
+    WLC=`which libwww-config 2>&1`
+    if [ "x$WLC" = "x" ]
+    then
+	WLC="no libwww-config"
+    fi
+    if ( echo $WLC | grep "no \|not " >/dev/null )
+    then
+	echo "not found"
+
+	echo "not found"
+	echo "The WFDB software will be compiled without NETFILES"
+	echo "access, because neither libcurl nor libwww appears to be"
+	echo "installed on this system.  To add NETFILES access,"
+	echo "install libcurl or libwww and run ./configure again."
+
+	echo "NETFILES=0" >../config.cache
+	echo "NETFILES_LIBCURL=0" >../config.cache
+	sed "s/LWC = libwww-config/LWC = :/" <site.def >site.tmp
+	sed "s/LCC = curl-config/LCC = :/" <site.tmp >site.def
+	sed "s/LWC = libwww-config/LWC = :/" <site-slib.def >site.tmp
+	sed "s/LCC = curl-config/LCC = :/" <site.tmp >site-slib.def
+	rm site.tmp
+	sed "s/WFDB_NETFILES 1/WFDB_NETFILES 0/" <../lib/wfdb.h0 | \
+	sed "s/WFDB_NETFILES_LIBCURL 1/WFDB_NETFILES_LIBCURL 0/" >../lib/wfdb.h
+	VIANF=""
+	WITHNF=without
+    else
+	echo "found"
+	echo "The WFDB software will be compiled with NETFILES access"
+	echo "using libwww."
+	echo "NETFILES=1" >../config.cache
+	echo "NETFILES_LIBCURL=0" >../config.cache
+	sed "s/LWC = :/LWC = libwww-config/" <site.def >site.tmp
+	sed "s/LCC = curl-config/LCC = :/" <site.tmp >site.def
+	if [ $LIBTYPE = "static" ]
+	then
+	    sed "s/LDLIBWWW = #/LDLIBWWW =/" <site.def >site.tmp
+	    mv site.tmp site.def
+	fi
+	sed "s/LWC = :/LWC = libwww-config/" <site-slib.def >site.tmp
+	sed "s/LCC = curl-config/LCC = :/" <site.tmp >site-slib.def
+	rm site.tmp
+	sed "s/WFDB_NETFILES 0/WFDB_NETFILES 1/" <../lib/wfdb.h0 | \
+	sed "s/WFDB_NETFILES_LIBCURL 1/WFDB_NETFILES_LIBCURL 0/" >../lib/wfdb.h
+	VIANF=" via libwww"
+	WITHNF=with
+    fi
 else
     echo "found"
-    echo "The WFDB software will be compiled with NETFILES access."
+    echo "The WFDB software will be compiled with NETFILES access"
+    echo "using libcurl."
     echo "NETFILES=1" >../config.cache
-    sed "s/LWC = :/LWC = libwww-config/" <site.def >site.tmp
-    mv site.tmp site.def
+    echo "NETFILES_LIBCURL=1" >../config.cache
+    sed "s/LWC = libwww-config/LWC = :/" <site.def >site.tmp
+    sed "s/LCC = :/LCC = curl-config/" <site.tmp >site.def
     if [ $LIBTYPE = "static" ]
     then
-        sed "s/LDLIBWWW = #/LDLIBWWW =/" <site.def >site.tmp
+	sed "s/LDLIBCURL = #/LDLIBCURL =/" <site.def >site.tmp
 	mv site.tmp site.def
     fi
-    sed "s/LWC = :/LWC = libwww-config/" <site-slib.def >site.tmp
-    mv site.tmp site-slib.def
-    sed "s/WFDB_NETFILES 0/WFDB_NETFILES 1/" <../lib/wfdb.h0 >../lib/wfdb.h
+    sed "s/LWC = libwww-config/LWC = :/" <site-slib.def >site.tmp
+    sed "s/LCC = :/LCC = curl-config/" <site.tmp >site-slib.def
+    rm site.tmp
+    sed "s/WFDB_NETFILES 0/WFDB_NETFILES 1/" <../lib/wfdb.h0 | \
+	sed "s/WFDB_NETFILES_LIBCURL 0/WFDB_NETFILES_LIBCURL 1/" >../lib/wfdb.h
+    VIANF=" via libcurl"
     WITHNF=with
 fi
 
@@ -332,6 +389,14 @@ echo
 echo "Adding $DIR/database to the default WFDB path ..."
 sed "s+DBDIR+$DIR/database+" <lib/wfdblib.h0 >lib/wfdblib.h
 
+
+if [ "$OS" = "mingw" ]
+then
+    cp -p wave/nomake wave/Makefile
+    cp -p wave/nomake waverc/Makefile
+    echo "WAVE=0" >>config.cache
+    WAVECOMP="WAVE will not be compiled."
+else
 echo
 conf/prompt "Looking for the XView libraries ..."
 TEXTEDIT=`which textedit 2>&1`
@@ -377,6 +442,8 @@ else
     echo "found"
     WAVECOMP="WAVE will be compiled and installed in '$DIR/bin'."
     echo "WAVE=1" >>config.cache
+fi
+
 fi
 
 # Clean up old *.o files in lib, to avoid possibly using binaries intended
@@ -425,7 +492,7 @@ Summary:
 
 $PACKAGE-$OS is now ready to be compiled using '$CC'.
 The WFDB library will be compiled as a $LIBTYPE library $WITHNF NETFILES
- access, and it will be installed in '$DIR/lib'.
+ access${VIANF}, and it will be installed in '$DIR/lib'.
 The WFDB library .h files will be installed in '$DIR/include/wfdb'.
 The WFDB applications will be linked to $SYSLIBS system libraries, and
  they will be installed in '$DIR/bin'.

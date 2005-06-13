@@ -1,6 +1,0 @@
-# file: clean
-# Use this file to clean up this directory with UNIX make and rm
-# (see the top-level Makefile in the directory above this one)
-
-cleanup:		
-	rm -f *.obj *.res *.sym *.map *~

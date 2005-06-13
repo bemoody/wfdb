@@ -1,10 +1,10 @@
 /* file: xvwave.h    	G. Moody	27 April 1990
-			Last revised:  13 October 2001
+			Last revised:   10 June 2005
 XView constants, macros, function prototypes, and global variables for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 2001 George B. Moody
+Copyright (C) 1990-2005 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -77,6 +77,7 @@ _______________________________________________________________________________
 COMMON Frame frame;	/* base frame object */
 COMMON Display *display;/* X server connection */
 COMMON Server_image icon_image;	/* Icon bitmap for base and other frames */
+COMMON Pixmap osb;      /* the offscreen buffer for the canvas */
 COMMON XID xid;		/* Xlib "drawable" id for signal window */
 COMMON XFontStruct *font;	/* Font used for text in signal window */
 

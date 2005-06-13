@@ -11,11 +11,14 @@ Source1: http://www.physionet.org/physiotools/archives/wfdb-MAJOR.MINOR/wfdb-VER
 URL: http://www.physionet.org/physiotools/wfdb.shtml
 Vendor: PhysioNet
 Packager: George Moody <george@mit.edu>
-Requires: w3c-libwww >= 5.2
-Requires: w3c-libwww-devel >= 5.2
+Requires: curl >= 7.10
+Requires: curl-devel >= 7.10
 BuildRoot: /var/tmp/%{name}-root
 
 %changelog
+* Wed Jun 8 2005 George B Moody <george@mit.edu>
+- replaced libwww dependencies with libcurl
+
 * Mon Mar 8 2004 George B Moody <george@mit.edu>
 - added time2sec
 
@@ -215,8 +218,7 @@ views on the same or different displays to support collaborative analysis and
 annotation projects.  WAVE has been used to develop annotations for most of
 the PhysioBank databases (http://www.physionet.org/physiobank/).
 
-WAVE uses the XView graphical user interface.  A (beta) version of WAVE that
-uses GTK+ is available at http://www.physionet.org/physiotools/beta/gtkwave/.
+WAVE uses the XView graphical user interface.
 
 %files wave
 %defattr(-,root,root)

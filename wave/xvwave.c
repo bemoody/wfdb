@@ -1,10 +1,10 @@
-/* file: xvwave.c	G. Moody	 27 April 1990
-			Last revised:  4 December 2002
+/* file: xvwave.c	G. Moody	27 April 1990
+			Last revised:	10 June 2005
 XView support functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 2002 George B. Moody
+Copyright (C) 1990-2005 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -67,7 +67,7 @@ Rectlist *repaint_area;
     if (!in_xv_main_loop) return;
     if (restore_all) {
 	restore_all = 0;
-	XFillRectangle(display, xid, bg_fill,
+	XFillRectangle(display, osb, bg_fill,
 		       0, 0, canvas_width, canvas_height);
     }
     restore_grid();
@@ -81,7 +81,7 @@ int width;
 int height;
 {
     int canvas_width_mm, u;
-
+    Pixmap old_osb;
     /* The manipulations below are intended to select a canvas width that
        will allow a (reasonably) standard time interval to be displayed.
        If the canvas is at least 125 mm wide, its width is truncated to
@@ -98,17 +98,21 @@ int height;
 	canvas_width_sec = u * 0.2;
     }
     canvas_width = mmx(canvas_width_mm);
-    if (width != canvas_width) {
-	if (clear_all) XFillRectangle(display, xid, clear_all, canvas_width, 0,
-				      width - canvas_width, height);
-	xv_set(canvas, CANVAS_WIDTH, canvas_width, NULL);
-    }
 
     /* Similar code might be used to readjust the canvas height, but doing so
        seems unnecessary. */
     canvas_height = height;
     canvas_height_mv = canvas_height / dmmy(10);
-
+    
+    /* get a new off screen buffer  */
+    old_osb = osb;
+    osb = XCreatePixmap(display, xid, width, canvas_height,
+			DefaultDepth(display, DefaultScreen(display)));
+    XFillRectangle(display, osb, bg_fill,
+		   0, 0, width, canvas_height);
+    XSetWindowBackgroundPixmap(display, xid, osb);
+    if (old_osb) XFreePixmap(display, old_osb);
+    
     /* Recalibrate based on selected scales, clear the display list cache. */
     if (*record) {
 	set_baselines();
@@ -129,7 +133,11 @@ Canvas canvas;
 int width;
 int height;
 {
-    if (in_xv_main_loop) do_resize(canvas, width, height);
+    XEvent next_event;
+    if (in_xv_main_loop) {
+	XPeekEvent((Display *)xv_get(canvas, XV_DISPLAY), &next_event);
+	if (next_event.type != ConfigureNotify ) do_resize(canvas, width, height);
+    }
 }
 
 /* This function handles interpretation of XView options and initialization of
@@ -489,7 +497,7 @@ int mode;
     int use_color = 0;			/* if non-zero, there are >=4 colors */
     int grey = 0;			/* if non-zero, use grey shades only */
     int ncolors;
-    static long mask[4];
+    static unsigned long mask[4];
     Canvas canvas;
     Icon icon;
     Panel main_panel;

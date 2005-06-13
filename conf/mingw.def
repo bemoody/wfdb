@@ -1,10 +1,11 @@
-# file: cygwin.def		G. Moody	6 June 2000
-#				Last revised:  10 June 2005
+# file: mingw.def		I. Henry and G. Moody       11 February 2005 
+#				Last revised:		      10 June 2005
 #
 # This file contains default 'make' definitions for compiling the WFDB Software
-# Package under MS Windows using the free Cygwin/gcc ANSI C compiler, available
-# from http://www.cygwin.com/.  To use this successfully, you need to have
-# installed Cygwin 1.x or later.
+# Package under MS Windows using the free Mininmalist GNU for Windows (MinGW) 
+# gcc ANSI C compiler, availble from http://www.mingw.org/ and from 
+# http://www.cygwin.com/.  To use this successfully, you need to have installed
+# MinGW
 #
 # Choose a value for WFDBROOT to determine where the WFDB Software Package will
 # be installed.  One of the following is usually a reasonable choice.
@@ -70,12 +71,12 @@ MANDIR = $(WFDBROOT)/man
 
 # PSPDIR specifies the name of a directory in which to install the PostScript
 # prolog (*.pro) files from the 'app' directory.
-PSPDIR = /usr/lib/ps
+PSPDIR = $(WFDBROOT)/lib/ps
 
 # CC is the name of your C compiler.  The WFDB library can be compiled with K&R
 # C compilers (`cc' on most if not all UNIX systems) as well as with ANSI C
 # compilers such as GNU C (`gcc').
-CC = gcc
+CC = gcc NOCYGWIN
 # On systems where `gcc' is the standard C compiler, `gcc' may also be known as
 # `cc'; in such cases, it doesn't matter if CC is cc or gcc.
 
@@ -94,7 +95,7 @@ CC = gcc
 #   -DOLDC	  if you have neither `stdarg.h' nor `varargs.h' (see wfdbio.c)
 # If your C compiler fails to compile `signal.c', add -DBROKEN_CC to CCDEFS
 # and try again (see signal.c).
-CCDEFS = $(VDEFS) -DNOVALUES_H
+CCDEFS = $(VDEFS) -DNOVALUES_H -DNOMKSTEMP
 
 # CFLAGS is the set of C compiler options.  CFLAGS should always include
 # CCDEFS.  Add the following options to CFLAGS as appropriate (separating them
@@ -161,6 +162,10 @@ STRIP = $(SRCDIR)/conf/exestrip
 # To retain the symbol tables for debugging, comment out the previous line, and
 # uncomment the next line.
 # STRIP = :
+
+# RM is the command used to delete binaries. 'exerm' is a script that appends
+# the '.exe' suffix to the files in its argument list before deleting.
+RM = $(SRCDIR)/conf/exerm
 
 # ...........................................................................
 # This section of definitions is used only when compiling WAVE, which is

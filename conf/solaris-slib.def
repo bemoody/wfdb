@@ -25,6 +25,11 @@ WFDBROOT = /usr
 # LWC to ':' (a program that does nothing, successfully).
 LWC = libwww-config
 
+# Similarly, to use the libcurl library instead of libwww, set LCC to
+# 'curl-config'.  Otherwise set LCC to ':'.  Only one of libwww or
+# libcurl should be enabled.
+LCC = curl-config
+
 # BINDIR specifies the directory in which the applications will be installed;
 # it should be a directory in the PATH of those who will use the applications.
 BINDIR = $(WFDBROOT)/bin
@@ -46,9 +51,12 @@ LIBDIR = $(WFDBROOT)/lib
 # dependencies when linking to the static libwww libraries.
 LDLIBWWW = # `$(LWC) --libs` `$(LWC) --libs` `$(LWC) --libs`
 
+# LDLIBCURL is the set of options needed to link with libcurl.
+LDLIBCURL = # `$(LCC) --libs` `$(LCC) --libs` `$(LCC) --libs`
+
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.
-LDFLAGS = -L$(LIBDIR) -lwfdb $(LDLIBWWW)
+LDFLAGS = -L$(LIBDIR) -lwfdb $(LDLIBWWW) $(LDLIBCURL)
 
 # CC is the name of your C compiler.
 CC = gcc
@@ -61,11 +69,11 @@ CCDEFS = $(VDEFS)
 # CFLAGS is the set of C compiler options used when compiling the shared
 # library.  CFLAGS should always include CCDEFS.  These settings are for use
 # with gcc:
-CFLAGS = -fpic -g -O $(CCDEFS) `$(LWC) --cflags` -I$(INCDIR)
+CFLAGS = -fpic -g -O $(CCDEFS) `$(LWC) --cflags` `$(LCC) --cflags` -I$(INCDIR)
 # For SunOS `cc', uncomment the next line.
-# CFLAGS = -pic -O $(CCDEFS) `$(LWC) --cflags` -I$(INCDIR)
+# CFLAGS = -pic -O $(CCDEFS) `$(LWC) --cflags` `$(LCC) --cflags` -I$(INCDIR)
 # For Solaris or SVR4 `cc', uncomment the next line.
-# CFLAGS = -K PIC -O $(CCDEFS) `$(LWC) --cflags` -I$(INCDIR)
+# CFLAGS = -K PIC -O $(CCDEFS) `$(LWC) --cflags` `$(LCC) --cflags` -I$(INCDIR)
 
 # WFDBLIB_BASENAME is the name, without version numbers, of the alternate
 # library.  WFDBLIB_SONAME is the shared object name ("soname") of the
@@ -88,7 +96,7 @@ WFDBLIB = $(WFDBLIB_SONAME).$(MINOR)
 # BUILDLIB is the command that creates the shared WFDB library once its
 # components have been compiled separately;  the list of *.o files that
 # make up the library will be appended to BUILDLIB.
-BUILDLIB = ld -o $(WFDBLIB) -G -z text `$(LWC) --libs`
+BUILDLIB = ld -o $(WFDBLIB) -G -z text `$(LWC) --libs` `$(LCC) --libs`
 
 # BUILDLIB_LDFLAGS is a list of arguments appended to BUILDLIB following
 # the list of *.o files (for most platforms, BUILDLIB_LDFLAGS is empty).

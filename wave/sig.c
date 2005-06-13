@@ -1,10 +1,10 @@
 /* file: sig.c		G. Moody	27 April 1990
-			Last revised:  13 February 2003
+			Last revised:	10 June 2005
 Signal display functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 2003 George B. Moody
+Copyright (C) 1990-2005 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -57,7 +57,7 @@ struct display_list *lp;
 	for (i = 0; i < nsig; i++) {
 	    if (lp->vlist[i]) {
 		lp->vlist[i][0].y += base[i];
-		XDrawLines(display, xid, draw_sig, lp->vlist[i], lp->ndpts,
+		XDrawLines(display, osb, draw_sig, lp->vlist[i], lp->ndpts,
 		       CoordModePrevious);
 		lp->vlist[i][0].y -= base[i];
 	    }
@@ -66,7 +66,7 @@ struct display_list *lp;
 	for (i = 0; i < siglistlen; i++) {
 	    if (0 <= siglist[i] && siglist[i] < nsig && lp->vlist[siglist[i]]){
 		lp->vlist[siglist[i]][0].y += base[i];
-		XDrawLines(display, xid, draw_sig, lp->vlist[siglist[i]],
+		XDrawLines(display, osb, draw_sig, lp->vlist[siglist[i]],
 			   lp->ndpts, CoordModePrevious);
 		lp->vlist[siglist[i]][0].y -= base[i];
 	    }
@@ -81,10 +81,10 @@ int i;
     if (0 <= highlighted && highlighted < lp_current->nsig) {
 	if (sig_mode == 0) {
 	    lp_current->vlist[highlighted][0].y += base[highlighted];
-	    XDrawLines(display, xid, unhighlight_sig,
+	    XDrawLines(display, osb, unhighlight_sig,
 		       lp_current->vlist[highlighted],
 		       lp_current->ndpts, CoordModePrevious);
-	    XDrawLines(display, xid, draw_sig,
+	    XDrawLines(display, osb, draw_sig,
 		       lp_current->vlist[highlighted],
 		       lp_current->ndpts, CoordModePrevious);
 	    lp_current->vlist[highlighted][0].y -= base[highlighted];
@@ -94,10 +94,10 @@ int i;
 	    for (j = 0; j < siglistlen; j++) {
 		if (siglist[j] == highlighted) {
 		    lp_current->vlist[highlighted][0].y += base[j];
-		    XDrawLines(display, xid, unhighlight_sig,
+		    XDrawLines(display, osb, unhighlight_sig,
 			       lp_current->vlist[highlighted],
 			       lp_current->ndpts, CoordModePrevious);
-		    XDrawLines(display, xid, draw_sig,
+		    XDrawLines(display, osb, draw_sig,
 			       lp_current->vlist[highlighted],
 			       lp_current->ndpts, CoordModePrevious);
 		    lp_current->vlist[highlighted][0].y -= base[j];
@@ -109,10 +109,10 @@ int i;
     if (0 <= highlighted && highlighted < lp_current->nsig) {
 	if (sig_mode == 0) {
 	    lp_current->vlist[highlighted][0].y += base[highlighted];
-	    XDrawLines(display, xid, clear_sig,
+	    XDrawLines(display, osb, clear_sig,
 		       lp_current->vlist[highlighted],
 		       lp_current->ndpts, CoordModePrevious);
-	    XDrawLines(display, xid, highlight_sig,
+	    XDrawLines(display, osb, highlight_sig,
 		       lp_current->vlist[highlighted],
 		       lp_current->ndpts, CoordModePrevious);
 	    lp_current->vlist[highlighted][0].y -= base[highlighted];
@@ -122,10 +122,10 @@ int i;
 	    for (j = 0; j < siglistlen; j++) {
 		if (siglist[j] == highlighted) {
 		    lp_current->vlist[highlighted][0].y += base[j];
-		    XDrawLines(display, xid, clear_sig,
+		    XDrawLines(display, osb, clear_sig,
 			       lp_current->vlist[highlighted],
 			       lp_current->ndpts, CoordModePrevious);
-		    XDrawLines(display, xid, highlight_sig,
+		    XDrawLines(display, osb, highlight_sig,
 			       lp_current->vlist[highlighted],
 			       lp_current->ndpts, CoordModePrevious);
 		    lp_current->vlist[highlighted][0].y -= base[j];
@@ -159,13 +159,13 @@ void do_disp()
     while (*tp == ' ') tp++;
     y0 = canvas_height - mmy(2);
     x0 = mmx(2);
-    XDrawString(display, xid, time_mode == 1 ? draw_ann : draw_sig,
+    XDrawString(display, osb, time_mode == 1 ? draw_ann : draw_sig,
 		x0, y0, tp, strlen(tp));
     tp = wtimstr(display_start_time + nsamp);
     set_end_time(tp);
     while (*tp == ' ') tp++;
     x1 = canvas_width - XTextWidth(font, tp, strlen(tp)) - mmx(2);
-    XDrawString(display, xid, time_mode == 1 ? draw_ann : draw_sig,
+    XDrawString(display, osb, time_mode == 1 ? draw_ann : draw_sig,
 		x1, y0, tp, strlen(tp));
 
     /* Show the annotations, if available. */
@@ -182,6 +182,7 @@ void do_disp()
     if (show_baseline) show_signal_baselines(lp);
 
     xv_set(frame, FRAME_BUSY, FALSE, NULL);
+    XClearWindow(display, xid);
 }
 
 static int nlists;
@@ -441,12 +442,12 @@ static void show_signal_names()
     yoff = (nsig > 1) ? (base[1] - base[0])/3 : canvas_height/3;
     if (sig_mode == 0) 
 	for (i = 0; i < nsig; i++)
-	    XDrawString(display, xid, draw_sig, xoff, base[i] - yoff,
+	    XDrawString(display, osb, draw_sig, xoff, base[i] - yoff,
 			signame[i], strlen(signame[i]));
     else
 	for (i = 0; i < siglistlen; i++)
 	    if (0 <= siglist[i] && siglist[i] < nsig)
-		XDrawString(display, xid, draw_sig, xoff, base[i] - yoff,
+		XDrawString(display, osb, draw_sig, xoff, base[i] - yoff,
 			    signame[siglist[i]], strlen(signame[siglist[i]]));
 }
 
@@ -458,12 +459,12 @@ struct display_list *lp;
     yoff = mmy(2);
     for (i = 0; i < nsig; i++) {
 	if (dc_coupled[i] && 0 <= lp->sb[i] && lp->sb[i] < canvas_height) {
-	    XDrawLine(display, xid, draw_ann,
+	    XDrawLine(display, osb, draw_ann,
 		      0, lp->sb[i]+base[i], canvas_width, lp->sb[i]+base[i]);
 	    if (blabel[i]) {
 		l = strlen(blabel[i]);
 		xoff = canvas_width - XTextWidth(font, blabel[i], l) - mmx(2);
-		XDrawString(display, xid, draw_sig,
+		XDrawString(display, osb, draw_sig,
 			    xoff, lp->sb[i]+base[i] - yoff, blabel[i], l);
 	    }
 	}

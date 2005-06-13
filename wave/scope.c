@@ -1,10 +1,10 @@
 /* file: scope.c	G. Moody	31 July 1991
-			Last revised:  14 October 2001
+			Last revised:	10 June 2005
 Scope window functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 2001 George B. Moody
+Copyright (C) 1991-2005 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -40,13 +40,14 @@ _______________________________________________________________________________
 #define SQRTMAXSPEED	(30)
 #define MAXSPEED  (SQRTMAXSPEED*SQRTMAXSPEED)
 
-static int use_overlays, use_color, grey;
+static int scope_use_overlays, use_color, grey;
 static void scan(), create_scope_panel(), set_dt();
+static void scope_proc(Panel_item item, Event *event);
 
 void save_scope_params(a, b, c)
 int a, b, c;
 {
-    use_overlays = a;
+    scope_use_overlays = a;
     use_color = b;
     grey = c;
 }
@@ -132,7 +133,7 @@ int w, h;
     }
 
     if (scope_xid) {
-      if (use_overlays) {
+      if (scope_use_overlays) {
         static XPoint tbuf[2];
 
 	tbuf[0].y = 0; tbuf[1].y = scope_height-1;
@@ -156,7 +157,6 @@ Notify_arg arg;
 {
     int e, x, y;
     static int handling_event;
-    static void scope_proc();
 
     e = (int)event_id(event);
     x = (int)event_x(event);
@@ -210,12 +210,12 @@ static Panel scope_panel;
 extern Server_image cursor_image;
 #endif
 
-void create_scope_popup(use_overlays, use_color, grey)
-int use_overlays, use_color, grey;
+void create_scope_popup(overlay_flag, use_color, grey)
+int overlay_flag, use_color, grey;
 {
     char *bgcname, *fgcname;
     int i, ncolors;
-    static long mask[4];
+    static unsigned long mask[4];
     static XGCValues gcvalues;
     Icon icon;
     Xv_Cursor scope_c;
@@ -244,7 +244,7 @@ int use_overlays, use_color, grey;
 			     CANVAS_AUTO_CLEAR, TRUE,
 			     WIN_X, 0,
 			     WIN_BELOW, scope_panel,
-			     WIN_DYNAMIC_VISUAL, use_overlays,
+			     WIN_DYNAMIC_VISUAL, overlay_flag,
 			     0);
 
     scope_resize(canvas, (int)xv_get(canvas, CANVAS_WIDTH),
@@ -317,11 +317,11 @@ int use_overlays, use_color, grey;
        require 16 GCs, however, which might pose a problem for the server.
     */
 
-    if (use_overlays) {
+    if (overlay_flag) {
 	/* Try to get read/write color cells if possible. */
 	if (!XAllocColorCells(scope_display, colormap, 0, mask, 4,
 			     pixel_table, 1))
-	    use_overlays = 0;	/* impossible -- use plan B */
+	    overlay_flag = 0;	/* impossible -- use plan B */
 
 	else {			/* execute plan A */
 	    /* Color 0: background */
@@ -386,7 +386,7 @@ int use_overlays, use_color, grey;
 	}
     }
 
-    if (!use_overlays) {	/* execute plan B */
+    if (!overlay_flag) {	/* execute plan B */
 	int j;
 	unsigned int stipple_height, stipple_width;
 	GC set_stipple, clear_stipple;
@@ -483,7 +483,7 @@ static int show_this_frame()
     int i, i0, tt, tt0 = 0, v0;
     long t;
 
-    if (first_frame && use_overlays) {
+    if (first_frame && scope_use_overlays) {
       first_frame = 0;
       scope_resize(canvas, (int)xv_get(canvas, CANVAS_WIDTH),
 		   (int)xv_get(canvas, CANVAS_HEIGHT));
@@ -675,9 +675,7 @@ int speed;
     }
 }
 
-static void scope_proc(item, event)
-Panel_item item;
-Event *event;
+static void scope_proc(Panel_item item, Event *event)
 {
     int client_data;
     long t0;
@@ -877,7 +875,7 @@ static int scope_popup_active = -1;
 void show_scope_window()
 {
     if (scope_popup_active < 0)
-	create_scope_popup(use_overlays, use_color, grey);
+	create_scope_popup(scope_use_overlays, use_color, grey);
     wmgr_top(scope_frame);
     xv_set(scope_frame, WIN_MAP, TRUE, 0);
     scope_popup_active = 1;

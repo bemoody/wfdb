@@ -1,8 +1,9 @@
 file: README		G. Moody	14 June 1995
+			Last revised:	 8 June 2005
 
 -------------------------------------------------------------------------------
 Power spectral density estimation and related applications
-Copyright (C) 1999 George B. Moody
+Copyright (C) 1995-2005 George B. Moody
 
 These programs are free software; you can redistribute them and/or modify
 them under the terms of the GNU General Public License as published by the
@@ -45,8 +46,6 @@ The following files will be found in this directory:
 
 Makefile	`make' description file for compiling these applications using
 		 ANSI/ISO standard C compilers on supported platforms
-Makefile.dos	`make' description file for compiling these applications using
-		 unsupported compilers from Borland, Microsoft, etc.
 Makefile.top	Used by ../configure to construct Makefile (comments only)
 Makefile.tpl	Used by ../configure to construct Makefile (portable section)
 README		this file

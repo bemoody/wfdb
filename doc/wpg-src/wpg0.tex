@@ -21,7 +21,7 @@
 @center Harvard-MIT Division of Health Sciences and Technology
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1989 -- 2004 George B. Moody
+Copyright @copyright{} 1989 -- 2005 George B. Moody
 @sp 2
 The most recent versions of the software described in this guide may be
 downloaded from @uref{http://www.physionet.org/}.  For further
@@ -489,9 +489,37 @@ guide in June, 1999.  See @file{NEWS}, in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
+@unnumberedsubsec Changes in version 10.3.16
+
+Benjamin Moody has added an interface between the WFDB library and
+@code{libcurl} as an alternative to the existing @code{libwww} interface, and
+has updated @file{configure} and @file{conf/*.def} to search for and use
+@code{libcurl} if it is available.  The primary advantages of @code{libcurl}
+over @code{libwww} are that @code{libcurl} is smaller and faster, it supports
+access to password-protected files, and it is actively maintained.  Both
+libraries are freely available on all popular platforms.
+
+Isaac Henry has updated @code{configure} to support building a native
+MS-Windows version of the WFDB library using either Cygwin gcc or MinGW
+gcc.
+
+A number of minor changes, mostly involving conditional use of
+@file{malloc.h}, @file{stdlib.h}, and @file{string.h}, were made to
+eliminate warnings from gcc 4.x.
+
+@unnumberedsubsec Changes in version 10.3.15
+
+Rules for generating the binary tarball for MS-Windows have been
+fixed so that the Cygwin DLLs are now included with correct
+permissions.
+
+Installation of shared libraries under GNU/Linux requires an extra
+step if SELinux is enabled (as under Fedora Core 2 and later);  this
+has been incorporated into @file{conf/linux-slib.def}.
+
 @unnumberedsubsec Changes in version 10.3.14
 
-Guido Muesch reported that the WFDB library function getspf() did not always
+Guido Muesch reported that @code{getspf()} did not always
 return correct results if the frame frequency does not have an exact
 representation as a double precision floating point number.  This problem has
 now been corrected.
@@ -904,6 +932,7 @@ source distributions of the WFDB Software Package.)  We might begin by
 creating a source file called @file{psamples.c} that contains:
 
 @example
+#include <stdio.h>
 #include <wfdb/wfdb.h>
 
 main()
@@ -990,26 +1019,28 @@ this case, @code{isigopen} and @code{getvec}).  Some programs will need
 additional libraries, and the corresponding @samp{-l} options can
 usually be given before or after the @samp{-lwfdb} option.
 
+@cindex NETFILES
+@cindex curl
+@cindex libcurl
 @cindex libwww
 @cindex W3C libwww
 
-If the WFDB library was installed with NETFILES support, it will make
-use of functions contained in the @code{libwww} libraries.  If you have
-dynamically linkable versions of the @code{libwww} libraries, as under
-GNU/Linux, these will be loaded automatically when you run
-@code{psamples}.  If you have only static versions of these libraries,
-as under Solaris or MS-Windows, however, it is necessary to provide
-additional arguments in the @code{cc} command line in order to compile
-successfully.  One way to do this is to follow the model used to compile
-the standard WFDB applications supplied with the WFDB library; see
-@file{Makefile} in the @file{app} directory of the WFDB software package
-source tree.
+If the WFDB library was installed with NETFILES support, it will make use of
+functions contained in the @code{libcurl} or @code{libwww} libraries.  If you
+have dynamically linkable versions of the @code{libcurl} or @code{libwww}
+libraries, as under GNU/Linux, these will be loaded automatically when you run
+@code{psamples}.  If you have only static versions of these libraries, as under
+Solaris or MS-Windows, however, it is necessary to provide additional arguments
+in the @code{cc} command line in order to compile successfully.  One way to do
+this is to follow the model used to compile the standard WFDB applications
+supplied with the WFDB library; see @file{Makefile} in the @file{app} directory
+of the WFDB software package source tree.
 
 If you are using WFDB version 10.2.6 or a later version and @file{gcc}
 or a compatible compiler, the @file{wfdb-config} utility is available
 to help construct commands for compiling programs that use the WFDB
-library (and the @code{libwww} libraries, if available).  Use it like
-this:
+library (and the @code{libcurl} or @code{libwww} libraries, if available).
+Use it like this:
 
 @example
 gcc `wfdb-config --cflags` -o psamples psamples.c `wfdb-config --libs`
@@ -1019,7 +1050,7 @@ gcc `wfdb-config --cflags` -o psamples psamples.c `wfdb-config --libs`
 Note that this command contains backticks (`), not apostrophes (').
 @file{wfdb-config} is particularly useful if the WFDB library or
 its @file{*.h} files are installed in non-standard locations, or if
-you have only static @code{libwww} libraries.
+you have only static @code{libcurl} or @code{libwww} libraries.
 
 Under MS-Windows, it will be easiest to use @file{gcc}, the GNU C/C++
 compiler, which is included in the freely available Cygwin software
@@ -1345,15 +1376,17 @@ file, any later actions that would read this file will read your
 modified version rather than the original.
 
 @cindex NETFILES
+@cindex curl
+@cindex libcurl
 @cindex libwww
 @cindex W3C libwww
 
-The WFDB path may contain @uref{http://} and @code{ftp://} URL prefixes
-(other schema, such as @code{file://} and @code{https://}, may also be
-supported if they are supported by your version of @code{libwww}).  If
-NETFILES support is not compiled into the WFDB library, any WFDB
-path components containing @file{://} are ignored.  (These features were
-first introduced in WFDB library version 10.1.0.)
+The WFDB path may contain @uref{http://} and @code{ftp://} URL prefixes (other
+schema, such as @code{file://} and @code{https://}, may also be supported if
+they are supported by your version of @code{libcurl} or @code{libwww}).  If
+NETFILES support is not compiled into the WFDB library, any WFDB path
+components containing @file{://} are ignored.  (These features were first
+introduced in WFDB library version 10.1.0.)
 
 @cindex indirect WFDB path
 @cindex file containing WFDB path
@@ -2019,6 +2052,7 @@ beginning 1 second (@code{t0}) and ending 2 seconds (@code{t1}) from the
 beginning of the record:
 
 @example
+#include <stdio.h>
 #include <wfdb/wfdb.h>
 
 main(int argc, char **argv)
@@ -2415,6 +2449,7 @@ short program uses @code{getann} to read the contents of the reference
 (@file{atr}) annotation file for record @file{100s}:
 
 @example
+#include <stdio.h>
 #include <wfdb/wfdb.h>
 
 main()
@@ -5537,16 +5572,22 @@ as will be used; if, for example, only one signal is needed, only
 @cindex http
 @cindex ftp
 @cindex WFDB path
+@cindex curl
+@cindex libcurl
 @cindex libwww
 @cindex W3C libwww
 
 If the symbol @code{WFDB_NETFILES} is defined at the time the WFDB library is
 compiled, then input files located on remote web (HTTP) and FTP servers can be
-read directly.  This capability is implemented using the World Wide Web
-Consortium's @code{libwww} library (which is available on many of the platforms
-supported by the WFDB library).  NETFILES support, if available, is transparent
-to WFDB applications.  To make use of this feature, simply link to the
-NETFILES-enabled WFDB library (the necessary @code{libwww} functions will be
+read directly.  This capability was originally implemented using the World Wide
+Web Consortium's @code{libwww} library (which is available on many of the
+platforms supported by the WFDB library).  In WFDB library version 10.3.16 and
+later, this capability can alternatively be provided by the @code{libcurl}
+library, which is smaller, faster, and more robust than @code{libwww}, and is
+actively supported and its creators on all of the popular platforms and many
+others as well.  NETFILES support, if available, is transparent to WFDB
+applications.  To make use of this feature, simply link to the NETFILES-enabled
+WFDB library (the necessary @code{libcurl} or @code{libwww} functions will be
 loaded automatically), and incorporate one or more URL prefixes in the WFDB
 path.
 
@@ -5566,16 +5607,17 @@ possible to read record @code{slp37} of that database directly from PhysioBank
 by passing @code{slpdb/slp37} as the @var{record} argument to @code{wfdbinit}
 (or @code{isigopen}, @code{annopen}, etc.).
 
-Current implementations of @code{libwww} permit input from @uref{http://} URLs
-in much the same way that local files are read, provided that the remote web
-server supports HTTP 1.1 range requests (most, including PhysioNet's, do).
-This means that it is not necessary to download an entire file in order to
-examine part of it, and you may notice little or no speed difference between
-local file and network file input for many applications.  If the remote server
-does not support range requests, however, or if input is from an @code{ftp://}
-URL, the current implementation downloads the entire file to memory, so you may
-notice a significant startup delay if the file is long and your network
-connection is slow, or if the file does not fit into physical memory.
+Current implementations of @code{libcurl} and @code{libwww} permit input from
+@uref{http://} URLs in much the same way that local files are read, provided
+that the remote web server supports HTTP 1.1 range requests (most, including
+PhysioNet's, do).  This means that it is not necessary to download an entire
+file in order to examine part of it, and you may notice little or no speed
+difference between local file and network file input for many applications.  If
+the remote server does not support range requests, however, or if input is from
+an @code{ftp://} URL, the current implementations download the entire file to
+memory, so you may notice a significant startup delay if the file is long and
+your network connection is slow, or if the file does not fit into physical
+memory.
 
 Currently, NETFILES support is limited to input files; as always, any output
 files created by the WFDB library are written into the current directory,
@@ -7404,6 +7446,8 @@ samples, thus representing an equal number of signals.
 
 @item NETFILES
 @cindex NETFILES (defined)
+@cindex curl
+@cindex libcurl
 @cindex libwww
 @cindex W3C libwww
 WFDB files made available by an FTP or HTTP (web) server;  readable
@@ -7412,7 +7456,8 @@ NETFILES-enabled WFDB library can be created by compiling the WFDB
 library sources with the symbol @code{WFDB_NETFILES} defined (to anything;
 its value is not important, only that it is defined) and then linking
 them with the @code{libwww} library available from the World Wide Web
-Consortium (@uref{http://www.w3.org/Library/}).
+Consortium (@uref{http://www.w3.org/Library/}) or the @code{libcurl}
+library available from @uref{http://curl.haxx.se/}.
 
 @item 9-track tape
 @cindex nine-track tape (defined)
@@ -7661,15 +7706,20 @@ are also usually available there.
 @node Unix installation, Mac OS X installation, Distribution, Installation
 @unnumberedsec Unix, GNU/Linux, and similar operating systems
 
+@cindex curl
+@cindex libcurl
 @cindex libwww
 @cindex W3C libwww
 
 Before beginning the installation of the WFDB Software Package, obtain and
-install the @code{libwww} package from @uref{http://www.w3.org/Library/} or
-from @uref{http://@-www.physio@-net.org/physio@-tools/libwww/}.  This package
-is provided with most current versions of GNU/Linux.  (If you have a program
-called @code{libwww-config}, then @code{libwww} is installed already.)  You may
-omit this step if you do not wish to have NETFILES support.
+install the @code{libcurl} package from @uref{http://curl.haxx.se/}, or else
+the @code{libwww} package from @uref{http://www.w3.org/Library/} or from
+@uref{http://@-www.physio@-net.org/physio@-tools/libwww/}.  One or both of
+these packages is provided with most current versions of GNU/Linux.  (If you
+have a program called @code{curl-config}, then @code{libcurl} is installed
+already; if you have one named @code{libwww-config}, then @code{libwww} is
+installed already.)  You may omit this step if you do not wish to have NETFILES
+support.
 
 @cindex XView toolkit
 
@@ -7730,7 +7780,7 @@ Before compiling the WFDB Software Package, download and install:
 @item
 Mac OS X Developer Tools (from @uref{http://developer.apple.com/tools/xcode/})
 @item
-libwww (from Fink, @uref{http://fink.sourceforge.net/})
+libcurl or libwww (from Fink, @uref{http://fink.sourceforge.net/})
 @item
 an X11 package (from Fink, @uref{http://fink.sourceforge.net/}; XDarwin,
 @uref{http://www.xdarwin.org/}; or Apple,
@@ -7753,8 +7803,9 @@ If you have not already done so, install the Cygwin development environment
 (freely available from @uref{http://www.cygwin.com}).  This
 includes @code{gcc} (the GNU C/C++ compiler) as well as a comprehensive
 assortment of other Unix utilities ported to MS-Windows.  Accept the defaults
-suggested by the installer, but be sure to select and install the @code{gcc},
-@code{binutils}, and @code{make} packages from the @code{Devel} category
+suggested by the installer, but be sure to select and install the @code{bc},
+@code{curl-devel}, @code{gcc}, @code{gcc-mingw}, @code{gv}, @code{ImageMagick},
+@code{make}, @code{sunrpc}, and @code{xorg-x11-devel} packages
 (these are not installed by default in a minimal Cygwin installation).
 
 @emph{Important:} Although you may be able to compile the WFDB software package
@@ -7763,14 +7814,6 @@ using a proprietary compiler, this is @emph{not supported}.  The
 source tree can be used with the @code{make} utilities provided with most
 commercial C compilers, although you will need to customize them for your
 compiler. Your feedback is appreciated.
-
-@cindex libwww
-@cindex W3C libwww
-
-Before beginning the installation of the WFDB Software Package, obtain and
-install the @code{libwww} package from @uref{http://www.w3.org/Library/} or
-from @uref{http://@-www.physio@-net.org/physio@-tools/libwww/}.  You may
-omit this step if you do not wish to have NETFILES support.
 
 Open a Cygwin terminal window (the Cygwin installer will have added this to
 your MS-Windows start menu).  Perform the remaining steps by typing the
@@ -7816,20 +7859,6 @@ the commands:
 ./configure
 make install
 @end example
-
-If you have Microsoft or Turbo C or C++, and a Microstar Laboratories DAP 1200-
-or 2400-series analog interface board, you can compile @file{sample} (a program
-for creating database records from analog signals, and for replaying them in
-analog form).  To do so successfully, you must first have installed the
-Microstar @file{#include} files and DAP interface library on your system.
-Specifically, files @file{c_lib.c}, @file{clock.h}, and @file{ioutil.h} must be
-installed in your @file{include} directory, and the version of the file
-@file{cdapl.lib} that is compatible with your compiler must be installed in a
-directory in which libraries are found by your linker.  Read and customize
-@code{lib/Makefile.dos} and @code{app/Makefile.dos} as appropriate for your
-compiler, and use your compiler's @code{make} utility to generate
-@code{wfdb.lib} and then @code{sample.exe}.
-
 
 @node Other installation, , MS-Windows installation, Installation
 @unnumberedsec Other systems
@@ -8359,10 +8388,11 @@ corrections to the author (@email{george@@mit.edu}).
 @item WFDB Programmer's Guide (this guide)
 @itemx WFDB Applications Guide
 @itemx WAVE User's Guide
-@itemx MIT-BIH Arrhythmia Database (selected records)
+@itemx MIT-BIH Arrhythmia Database
 @itemx MIT-BIH Arrhythmia Database Directory
 @itemx MIT-BIH Polysomnographic Database
 @itemx MIMIC Database
+@itemx MGH/Marquette Foundation Waveform Database CD-ROMs
 @itemx Other reference databases of physiologic signals
 @itemx WFDB Software Package
 @itemx W3C libwww sources
@@ -8380,24 +8410,6 @@ Research Resources of the National Institutes of Health.  The
 master PhysioNet web server is located at MIT in Cambridge, Massachusetts;
 about ten public mirrors are located elsewhere in the US and around
 the world (see @uref{http://@-www.@-physio@-net.@-org/@-mirrors/} for a list).
-
-@cindex CD-ROM
-@cindex MIT DB
-@cindex waveform editor
-@itemx MIT-BIH Arrhythmia Database CD-ROM
-@itemx MIT-BIH Polysomnographic Database CD-ROM
-@itemx Software for Physiologic Databases with Samples CD-ROM
-@sp 1
-@display
-MIT-BIH Database Distribution
-MIT Room E25-505A
-77 Massachusetts Ave.
-Cambridge, MA 02139 USA
-
-email: @email{george@@mit.edu}
-WWW: http://ecg.mit.edu/
-telephone: +1 617 253 7424
-@end display
 
 @cindex CD-ROM
 @cindex ESC DB
@@ -8445,29 +8457,10 @@ ECRI
 5200 Butler Pike
 Plymouth Meeting, PA 19462 USA
 
-email: @email{hshupack@@shrsys.hslc.org}
-WWW: @uref{http://www.healthcare.ecri.org/}
+email: @email{bduffin@@ecri.org}
+WWW: @uref{http://www.ecri.org/}
 telephone: +1 610 825 6000
 @end display
-
-@cindex CD-ROM
-@cindex MGH DB
-@item MGH/Marquette Foundation Waveform Database CD-ROMs
-@sp 1
-@display
-Anaesthesia/Bioengineering Unit
-Massachusetts General Hospital
-Fruit St.
-Boston, MA 02114 USA
-
-email: @email{cooper@@etherdome.mgh.harvard.edu}
-telephone: +1 617 726 8824
-@end display
-
-This is a large database of multi-channel recordings (3 ECG leads, radial
-arterial, pulmonary arterial, and central venous pressure, respiration,
-and CO2), which has been issued on 10 CD-ROMs.  In 2003, this database was
-contributed to PhysioNet (see above), from which it can be downloaded freely.
 
 @item American National Standard ANSI/AAMI EC38:1998, Ambulatory Electrocardiographs
 @itemx American National Standard ANSI/AAMI EC57:1998 Testing and Reporting Performance
@@ -8490,17 +8483,24 @@ WWW: @uref{http://www.cinc.org/}
 @end display
 
 CinC is the major scientific meeting at which current research in ECG signal
-processing and modelling is discussed;  the proceedings of the conference are
+processing and modelling is discussed; the proceedings of the conference are
 probably the single best source of information in print about these topics.
-CinC conferences have taken place annually since 1974, usually in September;
-in even-numbered years, they are convened in North America, and in Europe in
-odd-numbered years.  The deadline for submission of abstracts is 1 May each
-year.  Proceedings of the conferences are published by the IEEE, and
-usually appear about 3 months after the date of the conference.  CinC
-will be in Chicago in 2004 and in Lyon in 2005.
+CinC conferences have taken place annually since 1974, usually in September; in
+even-numbered years, they are usually convened in North America, and in Europe
+in odd-numbered years.  The deadline for submission of abstracts is 1 May each
+year.  Proceedings of the conferences are published by the IEEE, and usually
+appear about 3 months after the date of the conference.  CinC will be in Lyon
+in 2005 and (in a departure from the usual tradition) in Valencia in 2006.
 
 @item Proceedings of Computers in Cardiology (ISSN 0276-6574)
 @sp 1
+
+The Web of Science (@uref{http://isi1.isiknowledge.com/portal.cgi?DestApp=WOS})
+includes abstracts published in the Proceedings of CinC since 1996.  IEEE
+members can also find complete CinC proceedings from 1988 to the
+present using IEEEXplore (@uref{http://ieeexplore.ieee.org/}). Many
+universities provide access to these services for their students, faculty, and
+staff.  Printed volumes of CinC proceedings are available from:
 
 @display
 IEEE Customer Service
@@ -8572,6 +8572,19 @@ email: @email{office@@tug.org}
 telephone: +1 503 223 3960
 telefax: +1 503 223 9994
 @end display
+
+@cindex curl
+@cindex libcurl
+@item libcurl
+@sp 1
+@display
+
+WWW: @uref{http://curl.haxx.se/}
+@end display
+
+The @code{libcurl} library is a modern and enhanced replacement for the
+@code{libwww} libraries (see below).  Only one of @code{libcurl} and
+@code{libwww} is needed for NETFILES support.
 
 @cindex libwww
 @cindex W3C libwww

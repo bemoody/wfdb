@@ -1,7 +1,7 @@
 file: README		G. Moody	28 July 1989
-			Last revised:  7 November 2002
+			Last revised:    8 June 2005
 
-This directory contains sources for WFDB applications which convert database
+This directory contains sources for WFDB applications that convert database
 files in various unsupported formats to and from MIT format (also known as
 WFDB or PhysioBank format), including to and from EDF and AHA DB formats.
 
@@ -48,26 +48,25 @@ the output generated from the input to george@mit.edu.  (Don't omit the
 output;  I need to see that I can compile your converter and generate the same
 output that you do.)
 
-If a `make' utility is available, follow the instructions in the appropriate
-`make' description file (see the list below) to compile and install these
-applications on your system.  If you do not have a `make' utility, you will
-have to perform the installation manually;  the comments in the `make' files
-may be helpful in determining how to proceed.  For information about using
-these applications, look in the respective source files.  You can also obtain a
-brief usage summary for each application by running it without command-line
-arguments.
+If a `make' utility is available, follow the instructions in 'Makefile' to
+compile and install these applications on your system.  If you do not have a
+`make' utility, you will have to perform the installation manually; the
+comments in 'Makefile' may be helpful in determining how to proceed.
 
-Note that you may need to set the WFDB environment variable (the database path)
-before using these applications.  Select and customize the appropriate script
-for doing so from among the templates in the `app' directory on the same level
-as this one.
+For information about using these applications, see the WFDB Applications
+Guide (in the 'doc' directory at the same level as this one), or look in the
+respective source files.  You can also obtain a brief usage summary for each
+application by running it without command-line arguments.
+
+You may wish to set the WFDB environment variable (the database path) before
+using these applications.  Select and customize the appropriate script for
+doing so from among the templates in the `app' directory on the same level as
+this one.
 
 The following files will be found in this directory:
 
 Makefile	`make' description file for compiling these applications using
 		 ANSI/ISO standard C compilers on supported platforms
-Makefile.dos	`make' description file for compiling these applications using
-		 unsupported compilers from Borland, Microsoft, etc.
 Makefile.top	Used by ../configure to construct Makefile (comments only)
 Makefile.tpl	Used by ../configure to construct Makefile (portable section)
 README		this file

@@ -1,9 +1,9 @@
 /* file: fft.c		G. Moody	24 February 1988
-		   Last revised:	16 September 1999
+		   Last revised:	  10 June 2005
 
 -------------------------------------------------------------------------------
 fft: Fast Fourier transform of real data
-Copyright (C) 1999 George B. Moody
+Copyright (C) 1988-2005 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -35,6 +35,19 @@ Numerical Recipes in C: the Art of Scientific Computing (Cambridge Univ. Press,
 
 #include <stdio.h>
 #include <math.h>
+#ifdef __STDC__
+#include <stdlib.h>
+#else
+extern void exit();
+#endif
+
+#ifndef BSD
+# include <string.h>
+#else           /* for Berkeley UNIX only */
+# include <strings.h>
+# define strchr index
+#endif
+
 #define	LEN	16384		/* maximum points in FFT */
 #ifdef i386
 #define strcasecmp strcmp

@@ -1,8 +1,8 @@
 /* file: wqrs.c		Wei Zong      23 October 1998
-			Last revised:  8 December 2004 (by W.Zong and G. Moody)
+			Last revised:   11 May 2005 (by G. Moody)
 -----------------------------------------------------------------------------
 wqrs: Single-lead QRS detector based on length transform
-Copyright (C) 1998-2004 Wei Zong
+Copyright (C) 1998-2005 Wei Zong
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -86,7 +86,7 @@ int nsig;		/* number of input signals */
 int LPn, LP2n;          /* filter parameters (dependent on sampling rate) */
 int LTwindow;           /* LT window size */
 int PWFreq = PWFreqDEF;	/* power line (mains) frequency, in Hz */
-int signal = 0;	        /* signal number of signal to be analyzed */
+int sig = 0;	        /* signal number of signal to be analyzed */
 int Tm = TmDEF;		/* minimum threshold value */
 WFDB_Sample *lbuf = NULL;
 
@@ -127,8 +127,8 @@ WFDB_Sample ltsamp(WFDB_Time t)
 
 	Yn2 = Yn1;
 	Yn1 = Yn;
-	Yn = 2*Yn1 - Yn2 + sample(signal, tt) -
-	     2*sample(signal, tt-LPn) + sample(signal, tt-LP2n);
+	Yn = 2*Yn1 - Yn2 + sample(sig, tt) -
+	     2*sample(sig, tt-LPn) + sample(sig, tt-LP2n);
 	dy = (Yn - Yn1) / LP2n;		/* lowpass derivative of input */
 	et = ebuf[(++tt)&(BUFLN-1)] = sqrt(lfsc +dy*dy); /* length transform */
 	lbuf[(tt)&(BUFLN-1)] = aet += et - ebuf[(tt-LTwindow)&(BUFLN-1)];
@@ -217,7 +217,7 @@ main(int argc, char **argv)
 			      pname);
 		exit(1);
 	    }
-	    signal = atoi(argv[i]);
+	    sig = atoi(argv[i]);
 	    break;
 	  case 't':	/* end time */
 	    if (++i >= argc) {
@@ -252,8 +252,8 @@ main(int argc, char **argv)
     }
     a.name = "wqrs"; a.stat = WFDB_WRITE;
     if ((nsig = wfdbinit(record, &a, 1, s, nsig)) < 1) exit(2);
-    if (signal < 0 || signal >= nsig) signal = 0;
-    if ((gain = s[signal].gain) == 0.0) gain = WFDB_DEFGAIN;
+    if (sig < 0 || sig >= nsig) sig = 0;
+    if ((gain = s[sig].gain) == 0.0) gain = WFDB_DEFGAIN;
     sps = sampfreq((char *)NULL);
     if (Rflag) {
     	if (PWFreq == 60.0) setifreq(sps = 120.);
@@ -269,9 +269,9 @@ main(int argc, char **argv)
     }
 
     annot.subtyp = annot.num = 0;
-    annot.chan = signal;
+    annot.chan = sig;
     annot.aux = NULL;
-    Tm = muvadu((unsigned)signal, Tm);
+    Tm = muvadu((unsigned)sig, Tm);
     samplingInterval = 1000.0/sps;
     lfsc = 1.25*gain*gain/sps;	/* length function scale constant */
     spm = 60 * sps;
@@ -284,10 +284,10 @@ main(int argc, char **argv)
     ExpectPeriod = sps * NDP;	   /* maximum expected RR interval */
     LTwindow = sps * MaxQRSw;     /* length transform window size */
 
-    (void)sample(signal, 0L);
+    (void)sample(sig, 0L);
     if (dflag) {
 	for (t = from; (to == 0L || t < to) && sample_valid(); t++)
-	    printf("%6d\t%6d\n", sample(signal, t), ltsamp(t));
+	    printf("%6d\t%6d\n", sample(sig, t), ltsamp(t));
 	exit(0);
     }
 
@@ -300,11 +300,11 @@ main(int argc, char **argv)
 	printf("%d)\n", nsig - 1);
 	printf("Sampling Frequency:      %.1f Hz\n", sps);
 	printf("Sampling Interval:       %.3f ms\n", samplingInterval);
-	printf("Signal channel used for detection:    %d\n", signal);
+	printf("Signal channel used for detection:    %d\n", sig);
 	printf("Eye-closing period:      %d samples (%.0f ms)\n",
 	       EyeClosing, EyeClosing*samplingInterval);
 	printf("Minimum threshold:       %d A/D units (%d microvolts)\n",
-	       Tm, adumuv(signal, Tm));
+	       Tm, adumuv(sig, Tm));
 	printf("Power line frequency:    %d Hz\n", PWFreq);
 	printf("\n------------------------------------------------------\n\n");
 	printf("Processing:\n");
@@ -356,7 +356,7 @@ main(int argc, char **argv)
 
 		if (!learning) {
 		    /* Check that we haven't reached the end of the record. */
-		    (void)sample(signal, tpq);
+		    (void)sample(sig, tpq);
 		    if (sample_valid() == 0) break;
 		    /* Record an annotation at the QRS onset */
 		    annot.time = tpq;
@@ -373,7 +373,7 @@ main(int argc, char **argv)
 				break;
 			    }
 			}
-			(void)sample(signal, tj);
+			(void)sample(sig, tj);
 			if (sample_valid() == 0) break;
 			/* Record an annotation at the J-point */
 			annot.time = tj;

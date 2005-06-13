@@ -9,8 +9,8 @@ D2PARGS = -t letter
 
 # T2DARGS is a list of options for texi2dvi.  Uncomment one of these to set the
 # page size (the size of the printed area on the paper):
-# T2DARGS = --t @afourpaper
-T2DARGS = --t @letterpaper
+# T2DARGS = -t @afourpaper
+T2DARGS = -t @letterpaper
 
 # PDFTEXCFG is the name of a file containing parameter settings for pdftex
 # (used by texi2dvi).  Choose the file corresponding to your paper size:

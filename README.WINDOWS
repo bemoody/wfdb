@@ -1,0 +1,92 @@
+file: README.WINDOWS		G. Moody		8 June 2005
+
+This file contains additional notes about how to build the WFDB Software
+Package under MS-Windows in various non-standard and unsupported ways.
+We strongly recommend that all users follow the procedure described in
+'INSTALL' in order to build a complete and compatible set of WFDB Software,
+including WAVE, which is possible to build under MS-Windows only in this
+way.
+
+There are two specific cases in which you might need another version of the
+WFDB library binary under MS-Windows:
+
+ * if you need to use the WFDB_tools wrappers with Matlab R14 (but not R13)
+
+ * if you wish to link the WFDB library to other code that must also be linked
+   with Windows native libraries.
+
+In these cases, either of the two methods outlined below will allow you to
+create a Windows native version of the WFDB library that does not depend on
+Cygwin's POSIX emulation library.  These methods also create a mostly complete
+set of WFDB applications (except for WAVE) that are used to test the WFDB
+library;  use them at your own risk, since they may not behave in exactly the
+same way as the standard versions of the same applications.
+
+Please note that these methods, and any others that do not use an ANSI/ISO
+C compiler such as gcc, are UNSUPPORTED.  Your feedback is welcome, but we
+do not use any commercial compilers and cannot help you learn how to use them.
+
+...............................................................................
+
+Creating MinGW (Windows native) binaries
+
+The "Minimalist GNU for Windows" project (MinGW, http://www.mingw.org/) is "a
+collection of freely available and freely distributable Windows specific header
+files and import libraries combined with GNU toolsets that allow one to produce
+native Windows programs that do not rely on any 3rd-party C runtime DLLs."  You
+can build the WFDB software with the MinGW gcc provided by Cygwin, or with the
+minimal MSYS environment.
+
+Method A: (easy)
+
+  1. First perform a standard WFDB installation from sources using Cygwin,
+     following the instructions in 'INSTALL'.
+  
+  2. Select a location to install the MingGW WFDB binaries.  We recommend
+     keeping them separate from the standard Cygwin paths to avoid confusion.
+     A good choice is '/opt/wfdb'.
+
+  3. Install libcurl and its associated SDK within the directory you chose in
+     step 2 (e.g. /opt/wfdb).   Set your PATH variable to include the 'bin'
+     directory in your install path by typing (in a Cygwin terminal window):
+	  export PATH="/opt/wfdb/bin:$PATH"
+     replacing '/opt/wfdb' with your install path, if different.  See
+     README.NETFILES for further information.
+  
+  4. In this directory (the top-level directory of the WFDB Software Package,
+     containing the file you are now reading), type:
+	  ./configure --no-cygwin --prefix=/opt/wfdb
+	  make install
+     replacing '/opt/wfdb' with your install path, if different ('make install'
+     will create this directory if it does not exist).
+
+  5. In this directory, test the installation by typing:
+	  make check
+     If there are any errors, look in the checkpkg directory for details.
+
+
+Method B: (experts only)
+
+  1. If you have not already done so, install the MinGW compiler and the MSYS
+     shell environment (freely available from http://www.mingw.org/).  These
+     include MinGW/gcc and an assortment of other GNU utilities ported
+     to MS-Windows. Accept the defaults suggested by the installer.
+
+  2. Open a MSYS terminal window (the MSYS installer will have added this to
+     your MS-Windows start menu).  Check that 'which' and 'gcc' are accessible
+     by typing the command:
+          which gcc
+     The output of this command should be:
+          /mingw/bin/gcc
+     If you don't see this output, rerun the MinGW and MSYS installers.
+
+  3. Install libcurl and its associated SDK (see above).
+  
+  4. In this directory (the top-level directory of the WFDB software package,
+     containing the file you are now reading), type:
+          ./configure
+          make install
+
+  5. In this directory, test the installation by typing:
+	  make check
+     If there are any errors, look in the checkpkg directory for details.

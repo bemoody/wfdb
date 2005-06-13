@@ -1,5 +1,5 @@
 # file: cygwin-slib.def	I. Henry and G. Moody	19 November 2002
-#				Last revised:	26 January 2005
+#				Last revised:	  18 May 2005
 
 # This section contains settings suitable for generating a DLL (shared library)
 # under MS Windows using the free Cygwin/gcc ANSI C compiler, available from
@@ -22,12 +22,6 @@ WFDBROOT = /usr
 # name of your home directory, as in the example below (change as needed).
 # WFDBROOT = /home/frodo
 
-# If the W3C's libwww library of HTTP and FTP client code is available, and
-# you wish to compile a WFDB library with NETFILES support, set LWC
-# to 'libwww-config' (a utility supplied with libwww).  Otherwise set
-# LWC to ':' (a program that does nothing, successfully).
-LWC = libwww-config
-
 # BINDIR specifies the name of a directory in which to install the WFDB
 # DLL and the WFDB applications.
 BINDIR = $(WFDBROOT)/bin
@@ -40,6 +34,17 @@ INCDIR = $(WFDBROOT)/include
 # library.
 LIBDIR = $(WFDBROOT)/lib
 
+# If the W3C's libwww library of HTTP and FTP client code is available, and
+# you wish to compile a WFDB library with NETFILES support, set LWC
+# to 'libwww-config' (a utility supplied with libwww).  Otherwise set
+# LWC to ':' (a program that does nothing, successfully).
+LWC = libwww-config
+
+# Similarly, to use the libcurl library instead of libwww, set LCC to
+# 'curl-config'.  Otherwise set LCC to ':'.  Only one of libwww or
+# libcurl should be enabled.
+LCC = curl-config
+
 # LDLIBWWW, which is appended to LDFLAGS below, is the set of options needed
 # to link with libwww.  If libwww is not installed, or if libwfdb is a shared
 # library, LDLIBWWW can be empty (if there is a '#' immediately after the '='
@@ -49,9 +54,12 @@ LIBDIR = $(WFDBROOT)/lib
 # dependencies when linking to the static libwww libraries.
 LDLIBWWW = # `$(LWC) --libs` `$(LWC) --libs` `$(LWC) --libs`
 
+# LDLIBCURL is the set of options needed to link with libcurl.
+LDLIBCURL = # `$(LCC) --libs` `$(LCC) --libs` `$(LCC) --libs`
+
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.
-LDFLAGS = -L$(LIBDIR) -lwfdb $(LDLIBWWW)
+LDFLAGS = -L$(LIBDIR) -lwfdb $(LDLIBWWW) $(LDLIBCURL)
 
 # CC is the name of your C compiler.
 CC = gcc
@@ -63,7 +71,7 @@ CCDEFS = $(VDEFS) -DNOVALUES_H
 
 # CFLAGS is the set of C compiler options used when compiling the shared
 # library.  CFLAGS should always include CCDEFS.
-CFLAGS = -g -O $(CCDEFS) `$(LWC) --cflags` -I$(INCDIR)
+CFLAGS = -g -O $(CCDEFS) `$(LWC) --cflags` `$(LCC) --cflags` -I$(INCDIR)
 
 # WFDBLIB_BASENAME is the name, without version numbers, of the alternate
 # library.  WFDBLIB_SONAME is the shared object name ("soname") of the
@@ -72,7 +80,7 @@ CFLAGS = -g -O $(CCDEFS) `$(LWC) --cflags` -I$(INCDIR)
 # version number.  Symbolic links from WFDBLIB to WFDBLIB_BASENAME and
 # WFDBLIB_SONAME will be created as the final step in building the alternate
 # library.
-WFDBLIB_DLLNAME  = wfdb-cyg-$(MAJOR)-$(MINOR).dll
+WFDBLIB_DLLNAME  = cygwfdb-$(MAJOR)-$(MINOR).dll
 WFDBLIB_BASENAME = libwfdb.dll.a
 WFDBLIB_SONAME = $(WFDBLIB_BASENAME).$(MAJOR)
 WFDBLIB = $(WFDBLIB_SONAME).$(MINOR)
@@ -94,7 +102,8 @@ BUILDLIB = gcc -shared -o $(WFDBLIB_DLLNAME) \
 
 # BUILDLIB_LDFLAGS is a list of arguments appended to BUILDLIB following
 # the list of *.o files.
-BUILDLIB_LDFLAGS = `$(LWC) --libs` `$(LWC) --libs` `$(LWC) --libs`
+BUILDLIB_LDFLAGS = `$(LWC) --libs` `$(LWC) --libs` `$(LWC) --libs` \
+ `$(LCC) --libs` `$(LCC) --libs` `$(LCC) --libs`
  
 # LDCONFIG is the name of the program needed to refresh the system's cached
 # index of shared libraries.
@@ -131,7 +140,6 @@ lib-post-install:
  	 ( cp -p /usr/bin/cygwin1.dll $(BINDIR); \
 	   cp -p /usr/bin/cygz.dll $(BINDIR) )
 	cp $(WFDBLIB_DLLNAME) $(BINDIR)
-	cd $(BINDIR); $(SETLPERMISSIONS) *.dll
 
 lib-post-uninstall:
 	rm -f $(LIBDIR)/$(WFDBLIB_BASENAME)

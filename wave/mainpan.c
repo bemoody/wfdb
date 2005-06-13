@@ -1,10 +1,10 @@
 /* file: mainpan.c	G. Moody	30 April 1990
-			Last revised: 18 December 2002
+			Last revised:	10 June 2005
 Functions for the main control panel of WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 2002 George B. Moody
+Copyright (C) 1990-2005 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -868,7 +868,7 @@ Event *event;
        area, and we want to be sure to erase it if this has happened. */
     bar(0,0,0);
     box(0,0,0);
-    XFillRectangle(display, xid, clear_all,
+    XFillRectangle(display, osb, clear_all,
 		   0, 0, canvas_width+mmx(10), canvas_height);
 
     /* Reset the pointer for the scope display unless the scope is running or

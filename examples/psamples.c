@@ -1,8 +1,10 @@
+#include <stdio.h>
 #include <wfdb/wfdb.h>
 
 main()
 {
-    int i, v[2];
+    int i;
+    WFDB_Sample v[2];
     WFDB_Siginfo s[2];
 
     if (isigopen("100s", s, 2) < 1)

@@ -1,8 +1,8 @@
 /* file wabp.c          Wei Zong      23 October 1998
-                     Last revised: 5 December 2002 (by W. Zong and G. Moody)
+   			Last revised:   11 May 2005 (by G. Moody)
 -----------------------------------------------------------------------------
 wabp: beat detector for arterial blood presure (ABP) signal
-Copyright (C) 2002 Wei Zong
+Copyright (C) 2002-2005 Wei Zong
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -68,7 +68,7 @@ char *pname;		/* the name by which this program was invoked */
 int *ebuf;
 int nsig;		/* number of input signals */
 int SLPwindow;          /* Slope window size */
-int signal = -1;        /* signal number of signal to be analyzed (initial
+int sig = -1;        /* signal number of signal to be analyzed (initial
 			   value forces search for ABP, ART, or BP signal) */
 int Tm = TmDEF;		/* minimum threshold value */
 WFDB_Sample *lbuf = NULL;
@@ -99,7 +99,7 @@ WFDB_Sample slpsamp(WFDB_Time t)
     }
     while (t > tt) {
 	static int aet = 0, et;
-	dy = sample(signal, tt) - sample(signal, tt-1); 
+	dy = sample(sig, tt) - sample(sig, tt-1); 
 	if (dy < 0) dy = 0;
 	et = ebuf[(++tt)&(BUFLN-1)] = dy; 
 	lbuf[(tt)&(BUFLN-1)] = aet += et - ebuf[(tt-SLPwindow)&(BUFLN-1)];
@@ -172,7 +172,7 @@ main(int argc, char **argv)
 			      pname);
 		exit(1);
 	    }
-	    signal = atoi(argv[i]);
+	    sig = atoi(argv[i]);
 	    break;
 	  case 't':	/* end time */
 	    if (++i >= argc) {
@@ -207,7 +207,7 @@ main(int argc, char **argv)
     }
     a.name = "wabp"; a.stat = WFDB_WRITE;
     if ((nsig = wfdbinit(record, &a, 1, s, nsig)) < 1) exit(2);
-    if (signal < 0 || signal >= nsig) {
+    if (sig < 0 || sig >= nsig) {
 	/* Identify the lowest-numbered ABP, ART, or BP signal */
 	for (i = 0; i < nsig; i++)
 	    if (strcmp(s[i].desc, "ABP") == 0 ||
@@ -220,11 +220,11 @@ main(int argc, char **argv)
 	    help();
 	    exit(3);
 	}
-	signal = i;
+	sig = i;
     }
     if (vflag)
 	fprintf(stderr, "%s: analyzing signal %d (%s)\n",
-		pname, signal, s[signal].desc);
+		pname, sig, s[sig].desc);
     sps = sampfreq((char *)NULL);
     if (Rflag)
     	setifreq(sps = 125.); 
@@ -238,9 +238,9 @@ main(int argc, char **argv)
     }
 
     annot.subtyp = annot.num = 0;
-    annot.chan = signal;
+    annot.chan = sig;
     annot.aux = NULL;
-    Tm = physadu((unsigned)signal, Tm);
+    Tm = physadu((unsigned)sig, Tm);
     samplingInterval = 1000.0/sps;
     spm = 60 * sps;
     next_minute = from + spm;
@@ -258,7 +258,7 @@ main(int argc, char **argv)
 	printf("%d)\n", nsig - 1);
 	printf("Sampling Frequency:      %.1f Hz\n", sps);
 	printf("Sampling Interval:       %.3f ms\n", samplingInterval);
-	printf("Signal channel used for detection:    %d\n", signal);
+	printf("Signal channel used for detection:    %d\n", sig);
 	printf("Eye-closing period:      %d samples (%.0f ms)\n",
 	       EyeClosing, EyeClosing*samplingInterval);
 	printf("Minimum threshold:       %d\n", Tm);
@@ -266,10 +266,10 @@ main(int argc, char **argv)
 	printf("Processing:\n");
     }
 
-    (void)sample(signal, 0L);
+    (void)sample(sig, 0L);
     if (dflag) {
 	for (t = from; (to == 0L || t < to) && sample_valid(); t++)
-	    printf("%6d\t%6d\n", sample(signal, t), slpsamp(t));
+	    printf("%6d\t%6d\n", sample(sig, t), slpsamp(t));
 	exit(0);
     }
 
@@ -314,7 +314,7 @@ main(int argc, char **argv)
 
 		if (!learning) {
 		    /* Check that we haven't reached the end of the record. */
-		    (void)sample(signal, tpq);
+		    (void)sample(sig, tpq);
 		    if (sample_valid() == 0) break;
 		    /* Record an annotation at the ABP pulse onset */
 		    annot.time = tpq;
