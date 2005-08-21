@@ -16,6 +16,9 @@ Requires: curl-devel >= 7.10
 BuildRoot: /var/tmp/%{name}-root
 
 %changelog
+* Wed Aug 3 2005 George B Moody <george@mit.edu>
+- added --dynamic to 'configure' argument list
+
 * Wed Jun 8 2005 George B Moody <george@mit.edu>
 - replaced libwww dependencies with libcurl
 
@@ -37,7 +40,7 @@ BuildRoot: /var/tmp/%{name}-root
 %setup
 
 %build
-PATH=$PATH:/usr/openwin/bin ./configure --prefix=/usr --mandir=%{_mandir}
+PATH=$PATH:/usr/openwin/bin ./configure --prefix=/usr --dynamic --mandir=%{_mandir}
 make
 
 # The 'make' command above actually *installs* the WFDB library and its *.h

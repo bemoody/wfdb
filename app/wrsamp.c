@@ -1,5 +1,5 @@
 /* file: wrsamp.c	G. Moody	10 August 1993
-			Last revised:  21 November 2002
+			Last revised:   11 August 2005
 -------------------------------------------------------------------------------
 wrsamp: Select fields or columns from a file and generate a WFDB record
 Copyright (C) 2002 George B. Moody
@@ -264,13 +264,14 @@ char *argv[];
 			(void)fprintf(stderr,
 				      "%s: line %ld, column %d missing\n",
 				      pname, t, fv[i]);
-			vout[i] = 0;
+			vout[i] = WFDB_INVALID_SAMPLE;
 		    }
 		    else if (sscanf(p, "%lf", &v) != 1) {
-			(void)fprintf(stderr,
+			if (strcmp(p, "-") != 0)
+			    (void)fprintf(stderr,
 			      "%s: line %ld, column %d improperly formatted\n",
 				      pname, t, fv[i]);
-			vout[i] = 0;
+			vout[i] = WFDB_INVALID_SAMPLE;
 		    }
 		    else {
 			v *= scalef[i];

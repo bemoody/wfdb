@@ -1,10 +1,8 @@
 all:
 	@rm -f lcheck
 	@make lcheck	
-	@./libcheck $(DBDIR)
-	@../conf/prompt "Press <Enter> to continue ... "
-	@read a
-	@./appcheck $(INCDIR)
+	@./libcheck $(DBDIR) $(LIBDIR)
+	@./appcheck $(INCDIR) $(BINDIR) $(LIBDIR)
 
 lcheck:	lcheck.c
 	@echo Compiling WFDB library test application ...

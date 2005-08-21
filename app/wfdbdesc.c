@@ -1,5 +1,5 @@
 /* file: wfdbdesc.c		G. Moody	  June 1989
-				Last revised:	9 July 2003
+				Last revised:  11 August 2005
 
 -------------------------------------------------------------------------------
 wfdbdesc: Describe signal specifications
@@ -67,10 +67,13 @@ char *argv[];
     t = strtim("e");
     if (nsig > 0 && s[0].nsamp != t) {
 	msrec = 1;
-	(void)printf(" (a multi-segment record)\n");
-	(void)printf("----------------------------------------------\n");
-	(void)printf("The following data apply to the entire record:\n");
-	(void)printf("----------------------------------------------");
+	(void)printf(" (a %s-layout multi-segment record)\n",
+		     s[0].nsamp == 0L ? "variable" : "fixed");
+	if (s[0].nsamp != 0L) {
+	    (void)printf("----------------------------------------------\n");
+	    (void)printf("The following data apply to the entire record:\n");
+	    (void)printf("----------------------------------------------");
+	}
     }
     else if (info = getinfo((char *)NULL)) {
        (void)printf("\nNotes\n=====\n");
@@ -117,7 +120,7 @@ char *argv[];
     (void)printf("Sampling frequency: %g Hz\n", sampfreq(NULL));
     (void)printf("%d signal%s\n", nsig, nsig == 1 ? "" : "s");
     if (nsig < 1) exit(2);
-    if (msrec) {
+    if (msrec && s[0].nsamp != 0L) {
 	(void)printf("----------------------------------------------\n");
 	(void)printf("The following data apply to the first segment:\n");
 	(void)printf("----------------------------------------------\n");
@@ -134,10 +137,12 @@ char *argv[];
         else (void)printf("%g", s[i].gain);
 	(void)printf(" adu/%s\n", s[i].units ? s[i].units : "mV");
         (void)printf(" Initial value: %d\n", s[i].initval);
-        (void)printf(" Storage format: %d", s[i].fmt);
+	if (s[i].fmt != 0)
+	    (void)printf(" Storage format: %d", s[i].fmt);
 	if (s[i].spf > 1)
 	    (void)printf(" (%d samples per frame)", s[i].spf);
-	(void)printf("\n");
+	if (s[i].fmt != 0 || s[i].spf > 1)
+	    (void)printf("\n");
         (void)printf(" I/O: ");
         if (s[i].bsize == 0) (void)printf("can be unbuffered\n");
         else (void)printf("%d-byte blocks\n", s[i].bsize);

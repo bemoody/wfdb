@@ -1,37 +1,30 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:	 13 June 2005
+#				Last revised:	4 August 2005
 # This section of the Makefile should not need to be changed.
 
 # 'make' or 'make all': compile the WFDB applications without installing them
-# (requires installation of the WFDB library and includes)
 all:		config.cache
-	cd lib;	     $(MAKE) install
-	cd wave;     $(MAKE) all
-	cd waverc;   $(MAKE) all
-	cd app;      $(MAKE) all
-	cd psd;      $(MAKE) all
-	cd examples; $(MAKE) all
-	cd convert;  $(MAKE) all
+	$(MAKE) WFDBROOT=`pwd`/build install check
 
 # 'make install': compile and install the WFDB software package
 install:	config.cache
 	cd lib;	     $(MAKE) install
-	cd wave;     $(MAKE) install
-	cd waverc;   $(MAKE) install
 	cd app;      $(MAKE) install
-	cd psd;      $(MAKE) install
 	cd convert;  $(MAKE) install
 	cd data;     $(MAKE) install
+	cd psd;      $(MAKE) install
+	-( cd wave;  $(MAKE) install )
+	cd waverc;   $(MAKE) install
 	test -d doc && ( cd doc; $(MAKE) install )
 
 uninstall:	config.cache
 	cd lib;	     $(MAKE) uninstall
+	cd app;      $(MAKE) uninstall
+	cd convert;  $(MAKE) uninstall
+	cd psd;      $(MAKE) uninstall
+	cd data;     $(MAKE) uninstall
 	cd wave;     $(MAKE) uninstall
 	cd waverc;   $(MAKE) uninstall
-	cd app;      $(MAKE) uninstall
-	cd psd;      $(MAKE) uninstall
-	cd convert;  $(MAKE) uninstall
-	cd data;     $(MAKE) uninstall
 	test -d doc && ( cd doc; $(MAKE) uninstall )
 	./uninstall.sh $(WFDBROOT)
 
@@ -48,7 +41,9 @@ clean:
 	cd wave;     $(MAKE) clean
 	cd waverc;   $(MAKE) clean
 	test -d doc && ( cd doc; $(MAKE) clean )
-	rm -f *~ conf/*~ conf/prompt config.cache */*.exe $(PACKAGE)-*.spec
+	cd conf; rm -f *~ prompt site.def site-slib.def
+	rm -f *~ config.cache */*.exe $(PACKAGE)-*.spec
+	rm -rf build
 
 # 'make config.cache': check configuration
 config.cache:

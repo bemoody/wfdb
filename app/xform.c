@@ -43,7 +43,7 @@ char *argv[];
 	j, m, Mflag = 0, mn, *msiglist, n, nann = 0, nisig,
 	nminutes = 0, nosig = 0, oframelen, reopen = 0, sflag = 0,
 	*siglist = NULL, spf, uflag = 0, use_irec_desc = 1, *v, *vin, *vmax,
-	*vmin, *vout, *vv;
+	*vmin, *vout, vt, *vv;
     long from = 0L, it = 0L, nsamp = -1L, nsm = 0L, ot = 0L, spm, to = 0L;
     WFDB_Anninfo *ai = NULL;
     WFDB_Annotation annot;
@@ -732,18 +732,22 @@ char *argv[];
 		}
 	    }
 	    for (i = 0; i < nosig; i++) {
-		vout[i] = vin[siglist[i]] + deltav[i];
-		if (vout[i] > vmax[i]) {
-		    (void)fprintf(stderr, "v[%d] = %d (out of range)\n",
-				  i, vout[i]);
-		    if (clip) vout[i] = vmax[i];
-		    else vmax[i] = vout[i];
-		}
-		else if (vout[i] < vmin[i]) {
-		    (void)fprintf(stderr, "v[%d] = %d (out of range)\n",
-				  i, vout[i]);
-		    if (clip) vout[i] = vmin[i];
-		    else vmin[i] = vout[i];
+		if ((vt = vin[siglist[i]]) == WFDB_INVALID_SAMPLE)
+		    vout[i] = vt;
+		else {
+		    vout[i] = vt + deltav[i];
+		    if (vout[i] > vmax[i]) {
+			(void)fprintf(stderr, "v[%d] = %d (out of range)\n",
+				      i, vout[i]);
+			if (clip) vout[i] = vmax[i];
+			else vmax[i] = vout[i];
+		    }
+		    else if (vout[i] < vmin[i]) {
+			(void)fprintf(stderr, "v[%d] = %d (out of range)\n",
+				      i, vout[i]);
+			if (clip) vout[i] = vmin[i];
+			else vmin[i] = vout[i];
+		    }
 		}
 	    }
 	    if (putvec(vout) < 0) break;
@@ -764,18 +768,22 @@ char *argv[];
 	    }
 	    for (i = j = 0; i < nosig; i++) {
 	      for (k = 0; k < dfout[i].spf; j++, k++) {
-		vout[j] = vin[msiglist[i] + k] + deltav[i];
-		if (vout[j] > vmax[i]) {
-		    (void)fprintf(stderr, "v[%d] = %d (out of range)\n",
-				  i, vout[j]);
-		    if (clip) vout[j] = vmax[i];
-		    else vmax[i] = vout[j];
-		}
-		else if (vout[j] < vmin[i]) {
-		    (void)fprintf(stderr, "v[%d] = %d (out of range)\n",
-				  i, vout[j]);
-		    if (clip) vout[j] = vmin[i];
-		    else vmin[i] = vout[j];
+		if ((vt = vin[msiglist[i] + k]) == WFDB_INVALID_SAMPLE)
+		    vout[j] = vt;
+		else {
+		    vout[j] = vt + deltav[i];
+		    if (vout[j] > vmax[i]) {
+			(void)fprintf(stderr, "v[%d] = %d (out of range)\n",
+				      i, vout[j]);
+			if (clip) vout[j] = vmax[i];
+			else vmax[i] = vout[j];
+		    }
+		    else if (vout[j] < vmin[i]) {
+			(void)fprintf(stderr, "v[%d] = %d (out of range)\n",
+				      i, vout[j]);
+			if (clip) vout[j] = vmin[i];
+			else vmin[i] = vout[j];
+		    }
 		}
 	      }
 	    }
@@ -796,18 +804,22 @@ char *argv[];
 		}
 	    }
 	    for (i = 0; i < nosig; i++) {
-		vout[i] = vin[siglist[i]]*gain[i] + deltav[i];
-		if (vout[i] > vmax[i]) {
-		    (void)fprintf(stderr, "v[%d] = %d (out of range)\n",
-				  i, vout[i]);
-		    if (clip) vout[i] = vmax[i];
-		    else vmax[i] = vout[i];
-		}
-		else if (vout[i] < vmin[i]) {
-		    (void)fprintf(stderr, "v[%d] = %d (out of range)\n",
-				  i, vout[i]);
-		    if (clip) vout[i] = vmin[i];
-		    else vmin[i] = vout[i];
+		if ((vt = vin[siglist[i]]) == WFDB_INVALID_SAMPLE)
+		    vout[i] = vt;
+		else {
+		    vout[i] = vt*gain[i] + deltav[i];
+		    if (vout[i] > vmax[i]) {
+			(void)fprintf(stderr, "v[%d] = %d (out of range)\n",
+				      i, vout[i]);
+			if (clip) vout[i] = vmax[i];
+			else vmax[i] = vout[i];
+		    }
+		    else if (vout[i] < vmin[i]) {
+			(void)fprintf(stderr, "v[%d] = %d (out of range)\n",
+				      i, vout[i]);
+			if (clip) vout[i] = vmin[i];
+			else vmin[i] = vout[i];
+		    }
 		}
 	    }
 	    if (putvec(vout) < 0) break;
@@ -828,18 +840,22 @@ char *argv[];
 	    }
 	    for (i = j = 0; i < nosig; i++) {
 	      for (k = 0; k < dfout[i].spf; j++, k++) {
-		vout[j] = vin[msiglist[i] + k]*gain[i] + deltav[i];
-		if (vout[j] > vmax[i]) {
-		    (void)fprintf(stderr, "v[%d] = %d (out of range)\n",
-				  i, vout[j]);
-		    if (clip) vout[j] = vmax[i];
-		    else vmax[i] = vout[j];
-		}
-		else if (vout[j] < vmin[i]) {
-		    (void)fprintf(stderr, "v[%d] = %d (out of range)\n",
-				  i, vout[j]);
-		    if (clip) vout[j] = vmin[i];
-		    else vmin[i] = vout[j];
+		if ((vt = vin[msiglist[i] + k]) == WFDB_INVALID_SAMPLE)
+		    vout[j] = vt;
+		else {
+		    vout[j] = vt*gain[i] + deltav[i];
+		    if (vout[j] > vmax[i]) {
+			(void)fprintf(stderr, "v[%d] = %d (out of range)\n",
+				      i, vout[j]);
+			if (clip) vout[j] = vmax[i];
+			else vmax[i] = vout[j];
+		    }
+		    else if (vout[j] < vmin[i]) {
+			(void)fprintf(stderr, "v[%d] = %d (out of range)\n",
+				      i, vout[j]);
+			if (clip) vout[j] = vmin[i];
+			else vmin[i] = vout[j];
+		    }
 		}
 	      }
 	    }
@@ -858,23 +874,32 @@ char *argv[];
 		    (void)fprintf(stderr, "\n");
 		}
 	    }
-	    for (i = 0; i < nosig; i++)
-		v[i] = vin[siglist[i]] + deltav[i];
+	    for (i = 0; i < nosig; i++) {
+		if ((vt = vin[siglist[i]]) == WFDB_INVALID_SAMPLE)
+		    v[i] = vt;
+		else
+		    v[i] = vt + deltav[i];
+	    }
 	    while (ot <= it) {
 		double x = (ot%n == 0) ? 1.0 : (double)(ot % n)/(double)n;
 		for (i = 0; i < nosig; i++) {
-		    vout[i] = vv[i] + x*(v[i]-vv[i]);
-		    if (vout[i] > vmax[i]) {
-			(void)fprintf(stderr, "v[%d] = %d (out of range)\n",
-				      i, vout[i]);
-			if (clip) vout[i] = vmax[i];
-			else vmax[i] = vout[i];
-		    }
-		    else if (vout[i] < vmin[i]) {
-			(void)fprintf(stderr, "v[%d] = %d (out of range)\n",
-				      i, vout[i]);
-			if (clip) vout[i] = vmin[i];
-			else vmin[i] = vout[i];
+		    if (v[i] == WFDB_INVALID_SAMPLE ||
+			vv[i] == WFDB_INVALID_SAMPLE)
+			vout[i] = WFDB_INVALID_SAMPLE;
+		    else {
+			vout[i] = vv[i] + x*(v[i]-vv[i]);
+			if (vout[i] > vmax[i]) {
+			    (void)fprintf(stderr,"v[%d] = %d (out of range)\n",
+					  i, vout[i]);
+			    if (clip) vout[i] = vmax[i];
+			    else vmax[i] = vout[i];
+			}
+			else if (vout[i] < vmin[i]) {
+			    (void)fprintf(stderr,"v[%d] = %d (out of range)\n",
+					  i, vout[i]);
+			    if (clip) vout[i] = vmin[i];
+			    else vmin[i] = vout[i];
+			}
 		    }
 		}
 		if (putvec(vout) < 0) { nsamp = 0L; break; }
@@ -897,23 +922,32 @@ char *argv[];
 		    (void)fprintf(stderr, "\n");
 		}
 	    }
-	    for (i = 0; i < nosig; i++)
-		v[i] = vin[siglist[i]]*gain[i] + deltav[i];
+	    for (i = 0; i < nosig; i++) {
+		if ((vt = vin[siglist[i]]) == WFDB_INVALID_SAMPLE)
+		    v[i] = vt;
+		else
+		    v[i] = vt * gain[i] + deltav[i];
+	    }
 	    while (ot <= it) {
 		double x = (ot%n == 0) ? 1.0 : (double)(ot % n)/(double)n;
 		for (i = 0; i < nosig; i++) {
-		    vout[i] = vv[i] + x*(v[i]-vv[i]);
-		    if (vout[i] > vmax[i]) {
-			(void)fprintf(stderr, "v[%d] = %d (out of range)\n",
-				      i, vout[i]);
-			if (clip) vout[i] = vmax[i];
-			else vmax[i] = vout[i];
-		    }
-		    else if (vout[i] < vmin[i]) {
-			(void)fprintf(stderr, "v[%d] = %d (out of range)\n",
-				      i, vout[i]);
-			if (clip) vout[i] = vmin[i];
-			else vmin[i] = vout[i];
+		    if (v[i] == WFDB_INVALID_SAMPLE ||
+			vv[i] == WFDB_INVALID_SAMPLE)
+			vout[i] = WFDB_INVALID_SAMPLE;
+		    else {
+			vout[i] = vv[i] + x*(v[i]-vv[i]);
+			if (vout[i] > vmax[i]) {
+			    (void)fprintf(stderr,"v[%d] = %d (out of range)\n",
+					  i, vout[i]);
+			    if (clip) vout[i] = vmax[i];
+			    else vmax[i] = vout[i];
+			}
+			else if (vout[i] < vmin[i]) {
+			    (void)fprintf(stderr,"v[%d] = %d (out of range)\n",
+					  i, vout[i]);
+			    if (clip) vout[i] = vmin[i];
+			    else vmin[i] = vout[i];
+			}
 		    }
 		}
 		if (putvec(vout) < 0) { nsamp = 0L; break; }

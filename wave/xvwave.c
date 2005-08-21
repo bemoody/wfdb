@@ -1,5 +1,5 @@
 /* file: xvwave.c	G. Moody	27 April 1990
-			Last revised:	10 June 2005
+			Last revised:	5 August 2005
 XView support functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -59,7 +59,7 @@ static int restore_all = 1;
 static GC bg_fill;
 
 /* Handle exposures in the signal window. */
-static void repaint(canvas, paint_window, repaint_area)
+void repaint(canvas, paint_window, repaint_area)
 Canvas canvas;
 Xv_Window paint_window;
 Rectlist *repaint_area;
@@ -133,10 +133,10 @@ Canvas canvas;
 int width;
 int height;
 {
-    XEvent next_event;
+    XEvent nextev;
     if (in_xv_main_loop) {
-	XPeekEvent((Display *)xv_get(canvas, XV_DISPLAY), &next_event);
-	if (next_event.type != ConfigureNotify ) do_resize(canvas, width, height);
+	XPeekEvent((Display *)xv_get(canvas, XV_DISPLAY), &nextev);
+	if (nextev.type == ConfigureNotify) do_resize(canvas, width, height);
     }
 }
 

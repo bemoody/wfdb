@@ -1,5 +1,5 @@
 % file: pschart.pro	G. Moody	  27 May 1988
-%			Last revised:	  7 October 2000
+%			Last revised:	 11 August 2005
 
 % -----------------------------------------------------------------------------
 % prolog for pschart output
@@ -38,20 +38,20 @@ save 100 dict begin /pschart exch def
 % printer resolution (dots per inch; reset by newpage, see below)
 /dpi 300 def
 
-% basic line width (may be reset by newpage)
-/lw 0 def
+% x mm: convert x (in mm) to PostScript points (assuming default scales)
+/mm {72 mul 25.4 div}def
 
 % line width in mm for signals, grid lines, marker bars
-/lwmm 0 def
+/lwmm 0.2 def
+
+% line width in PostScript points (reset by newpage)
+/lw lwmm mm def
 
 % TM for text
 /tm matrix currentmatrix def
 
 % TM for graphics
 /gm matrix currentmatrix def
-
-% x mm: convert x (in mm) to Postscript points (assuming default scales)
-/mm {72 mul 25.4 div}def
 
 % n I: use italic font, n points
 /I {/Times-Italic findfont exch scalefont setfont}def

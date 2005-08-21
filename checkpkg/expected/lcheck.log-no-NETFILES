@@ -3,7 +3,7 @@
 [OK]:  WFDB_MAXANN = 2
 [OK]:  WFDB_MAXSIG = 32
 [OK]:  WFDB_MAXSPF = 4
-[OK]:  WFDB_MAXRNL = 11
+[OK]:  WFDB_MAXRNL = 20
 [OK]:  WFDB_MAXUSL = 20
 [OK]:  WFDB_MAXDSL = 60
 [OK]:  Signal formats = {0, 8, 16, 61, 80, 160, 212, 310, 311}

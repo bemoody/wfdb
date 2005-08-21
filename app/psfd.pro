@@ -1,9 +1,9 @@
 % file: psfd.pro	G. Moody	10 August 1988
-%			Last revised:	  3 May 1999
+%			Last revised:	11 August 2005
 
 % -----------------------------------------------------------------------------
 % prolog for psfd output
-% Copyright (C) 1999 George B. Moody
+% Copyright (C) 1988-2005 George B. Moody
 
 % This program is free software; you can redistribute it and/or modify it under
 % the terms of the GNU General Public License as published by the Free Software
@@ -38,17 +38,20 @@ save 100 dict begin /psfd exch def
 % printer resolution (dots per inch; reset by newpage, see below)
 /dpi 300 def
 
-% line width (may be reset by newpage)
-/lw 0 def
+% x mm: convert x (in mm) to PostScript points (assuming default scales)
+/mm {72 mul 25.4 div}def
+
+% line width in mm for signals, grid lines, marker bars
+/lwmm 0.2 def
+
+% line width in PostScript points (reset by newpage)
+/lw lwmm mm def
 
 % TM for text
 /tm matrix currentmatrix def
 
 % TM for graphics
 /gm matrix currentmatrix def
-
-% x mm: convert x (in mm) to Postscript points (assuming default scales)
-/mm {72 mul 25.4 div}def
 
 % n I: use italic font, n points
 /I {/Times-Italic findfont exch scalefont setfont}def
@@ -93,7 +96,7 @@ save 100 dict begin /psfd exch def
 
 % dpi newpage: start page, resolution dpi dots per inch
 /newpage {/dpi exch def tm setmatrix newpath [] 0 setdash 0 setgray
- 1 setlinecap dpi 600 idiv /lw exch def mark } def
+ 1 setlinecap /lw lwmm mm def mark } def
 
 % ss: set scales for plotting
 /ss {72 dpi div dup scale /gm matrix currentmatrix def lw setlinewidth} def
@@ -139,7 +142,7 @@ save 100 dict begin /psfd exch def
 
 % x mb: draw marker bars at x
 /mb { dup ya newpath moveto dup yb lineto dup yc moveto yd lineto
-[lw ye] 0 setdash stroke [] 0 setdash}bind def
+ [lw ye] 0 setdash stroke [] 0 setdash}bind def
 
 % str x a: plot str at (x, ay), with marker bars if defined
 /a {ya yb ne {dup mb}if ay m t}bind def

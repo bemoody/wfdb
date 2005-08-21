@@ -1,5 +1,5 @@
 /* file: rdsamp.c	G. Moody	 23 June 1983
-			Last revised:    8 March 2004
+			Last revised:    29 June 2005
 
 -------------------------------------------------------------------------------
 rdsamp: Print an arbitrary number of samples from each signal
@@ -271,9 +271,13 @@ char *argv[];
 
 	while ((to == 0L || from < to) && getvec(v) >= 0) {
 	    (void)printf("%7.3lf", (double)(from++)/freq);
-	    for (i = 0; i < nsig; i++)
-		(void)printf(fmt,
+	    for (i = 0; i < nsig; i++) {
+		if (v[sig[i]] != WFDB_INVALID_SAMPLE)
+		    (void)printf(fmt,
 		    (double)(v[sig[i]] - si[sig[i]].baseline)/si[sig[i]].gain);
+		else
+		    (void)printf(pflag > 1 ? "\t%15s" : "\t%7s", "-");
+	    }
 	    (void)printf("\n");
 	}
     }

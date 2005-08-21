@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody         24 May 2000
-#                             Last revised:    8 June 2005
+#                             Last revised:   8 August 2005
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -8,43 +8,54 @@
 # please send them to me (george@mit.edu) for inclusion in a future
 # version of this package.
 
-if [ $# -gt 0 ]
-then
-    DIR=/usr
-    LIBTYPE=dynamic
-    SYSLIBS=dynamic
-fi
- 
+# Note that any -m options (although parsed below) are currently ignored,
+# except on x86_64 Linux, where they are prefixed to CFLAGS.  The help
+# text below documents only -m32;  see the gcc manual for other -m options.
+
+NETLIB=unknown
 for i in $*
 do
   case $i in
-    --dynamic)        LIBTYPE=dynamic ;;
-    --mandir=*)       MANDIR=`echo $i | sed 's/[-a-zA-Z0-9]*=//'` ;;
-    --prefix=*)       DIR=`echo $i | sed 's/[-a-zA-Z0-9]*=//'` ;;
-    --shared)         LIBTYPE=dynamic ;;
-    --static)         LIBTYPE=static ;;
-    --static_only)    LIBTYPE=static
-		      SYSLIBS=static ;;
-    --no-cygwin)      NOCYGWIN=yes ;;
-    *)             cat <<EOF
+    --dynamic)          LIBTYPE=dynamic ;;
+    -m*)                if [ "x$MFLAGS" = x ]
+                        then
+		            MFLAGS=$i
+		        else
+		            MFLAGS="$MFLAGS $i"
+		        fi ;;
+    --mandir=*)         MANDIR=`echo $i | sed 's/[-a-zA-Z0-9]*=//'` ;;
+    --prefix=*)         DIR=`echo $i | sed 's/[-a-zA-Z0-9]*=//'` ;;
+    --shared)           LIBTYPE=dynamic ;;
+    --static)           LIBTYPE=static ;;
+    --static_only)      LIBTYPE=static
+		        SYSLIBS=static ;;
+    --without-cygwin)   NOCYGWIN=yes ;;
+    --without-netfiles) NETLIB=none ;;
+    --with-libcurl)     NETLIB=libcurl ;;
+    --with-libwww)      NETLIB=libwww ;;
+    *)                  cat <<EOF
 usage: $0 [options]
 Options:
-    --dynamic         make a shared (dynamically linkable) WFDB library
-                       if possible [default]
-    --help            print this message
-    --mandir=MANDIR   install man pages in MANDIR
-    --prefix=PREFIX   install files in PREFIX [default: $DIR]
-    --shared          (same as --dynamic)
-    --static          make a static WFDB library (do not make a shared
-                       library even if possible)
-    --static_only     link WFDB applications to static libraries only
-                       (assumes --static;  compilation may fail if any
-	               necessary libraries are available as shared libraries
-		       only)
-    --no-cygwin       on Cygwin, compile binaries that do not link to the
-                       Cygwin DLL. WAVE will not be built.
+    --dynamic           make a shared (dynamically linkable) WFDB library
+                         if possible [default]
+    --help              print this message
+    -m32                on 64-bit Linux, force compilation in 32-bit mode
+    --mandir=MANDIR     install man pages in MANDIR
+    --prefix=PREFIX     install files in PREFIX [default: $DIR]
+    --shared            (same as --dynamic)
+    --static            make a static WFDB library (do not make a shared
+                         library even if possible)
+    --static_only       link WFDB applications to static libraries only
+                         (assumes --static;  compilation may fail if any
+	                 necessary libraries are available as shared libraries
+		         only)
+    --without-cygwin    on Cygwin, compile binaries that do not link to the
+                         Cygwin DLL. WAVE will not be built.
+    --without-netfiles  disable NETFILES even if libcurl or libwww is available
+    --with-libcurl      enable NETFILES via libcurl [default]
+    --with-libwww       enable NETFILES via libwww
 EOF
-                   exit ;;
+                        exit ;;
   esac
 done
 
@@ -53,6 +64,7 @@ OS=`uname`
 echo "Configuring the WFDB software package for $OS."
 
 SRCDIR="`pwd`"
+LIB=lib
 cd conf
 
 echo "Checking the echo command ..."
@@ -76,11 +88,26 @@ echo SHORTDATE = `date '+%B %Y' | tr a-z A-Z` >>site.def
 echo "# _____________________________________________________________________________" >>site.def
 echo >>site.def
 
-cp /dev/null site-slib.def
+rm -f site-slib.def
+touch site-slib.def
 case `uname` in
   Linux*) OS=Linux
-    cat site.def linux-slib.def >site-slib.def
-    cat linux.def >>site.def ;;
+    case `arch` in
+      x86_64)
+	if [ "x$MFLAGS" = x ]
+	then
+	    LIB=lib64
+	    cat site.def linux-slib.def | sed s+/lib\$+/lib64+g >site-slib.def
+	    cat linux.def | sed s+/lib\$+/lib64+g >>site.def
+	else
+	    cat site.def linux-slib.def | \
+		sed "s+MFLAGS =+MFLAGS = $MFLAGS+" >site-slib.def
+	    cat linux.def | \
+		sed "s+MFLAGS =+MFLAGS = $MFLAGS+" >>site.def
+	fi ;;
+      *) cat site.def linux-slib.def >site-slib.def
+	 cat linux.def >>site.def ;;
+    esac ;;
   FreeBSD*) OS=FreeBSD
     cat site.def freebsd-slib.def >site-slib.def
     cat freebsd.def >>site.def ;;
@@ -135,7 +162,8 @@ else
 fi
 
 case x$LIBTYPE in
-  xS*|xs*) cp /dev/null site-slib.def
+  xS*|xs*) rm -f site-slib.def
+           touch site-slib.def
            LIBTYPE=static ;;
         *) LIBTYPE=dynamic ;;
 esac
@@ -176,14 +204,14 @@ if [ "x$WCC" = "x" ]
 then
     WCC="no gcc"
 fi
-if ( echo $WCC | grep "no \|not " >/dev/null )
+if ( echo $WCC | grep "no \|not " >wcc.t1 )
 then
     WCC=`which cc 2>&1`
     if [ "x$WCC" = "x" ]
     then
         WCC="no cc"
     fi
-    if ( echo $WCC | grep "no \|not " >/dev/null )
+    if ( echo $WCC | grep "no \|not " >wcc.t2 )
     then
         echo "not found"
 	echo
@@ -203,8 +231,8 @@ then
 else
     CC=gcc
 fi
-
 echo "$CC"
+rm -f wcc.t1 wcc.t2
 
 if [ x$DIR = x ]
 then
@@ -212,7 +240,7 @@ then
     echo "Where do you wish to install the WFDB Software Package?"
     echo "It will be installed in subdirectories of WFDBROOT (by default,"
     echo "WFDBROOT is /usr, so that files are installed in /usr/bin,"
-    echo "/usr/include, /usr/lib, etc.).  Other reasonable choices for"
+    echo "/usr/include, /usr/$LIB, etc.).  Other reasonable choices for"
     echo "WFDBROOT are /usr/local, /opt, or your home directory ($HOME)."
     echo "The value of WFDBROOT must be a full pathname (beginning with '/',"
     echo "but without a '/' at the end).  If the subdirectories (bin, include,"
@@ -283,167 +311,163 @@ then
 fi
 
 echo  "The manual pages will be installed in '$MANDIR'."
-
 echo
-./prompt "Looking for libcurl ..."
-WLCC=`which curl-config 2>&1`
-if [ "x$WLCC" = "x" ]
-then
-    WLCC="no curl-config"
-fi
-if ( echo $WLCC | grep "no \|not " >/dev/null )
-then
-    echo "not found"
-    ./prompt "Looking for libwww ..."
-    WLC=`which libwww-config 2>&1`
-    if [ "x$WLC" = "x" ]
+
+# Search for NETLIB if not specified on the command line
+if [ x$NETLIB = xunknown ]
     then
-	WLC="no libwww-config"
+    ./prompt "Looking for libcurl ..."
+    WHICH=`which curl-config 2>&1`
+    if [ "x$WHICH" = "x" ]
+	then
+	WHICH="no curl-config"
     fi
-    if ( echo $WLC | grep "no \|not " >/dev/null )
-    then
+    if ( echo $WHICH | grep "no \|not " >which.t1 )
+	then
 	echo "not found"
-
-	echo "not found"
-	echo "The WFDB software will be compiled without NETFILES"
-	echo "access, because neither libcurl nor libwww appears to be"
-	echo "installed on this system.  To add NETFILES access,"
-	echo "install libcurl or libwww and run ./configure again."
-
-	echo "NETFILES=0" >../config.cache
-	echo "NETFILES_LIBCURL=0" >../config.cache
-	sed "s/LWC = libwww-config/LWC = :/" <site.def >site.tmp
-	sed "s/LCC = curl-config/LCC = :/" <site.tmp >site.def
-	sed "s/LWC = libwww-config/LWC = :/" <site-slib.def >site.tmp
-	sed "s/LCC = curl-config/LCC = :/" <site.tmp >site-slib.def
-	rm site.tmp
-	sed "s/WFDB_NETFILES 1/WFDB_NETFILES 0/" <../lib/wfdb.h0 | \
-	sed "s/WFDB_NETFILES_LIBCURL 1/WFDB_NETFILES_LIBCURL 0/" >../lib/wfdb.h
-	VIANF=""
-	WITHNF=without
+	./prompt "Looking for libwww ..."
+	WHICH=`which libwww-config 2>&1`
+	if [ "x$WHICH" = "x" ]
+	    then
+	    WHICH="no libwww-config"
+	fi
+	if ( echo $WHICH | grep "no \|not " >which.t2 )
+	    then
+	    echo "not found"
+	    echo "The WFDB software will be compiled without NETFILES"
+	    echo "access, because neither libcurl nor libwww appears to"
+	    echo "be installed on this system.  To add NETFILES access,"
+	    echo "install libcurl or libwww and run ./configure again."
+	    NETLIB=none
+	else
+	    echo "found"
+	    echo "The WFDB software will be compiled with NETFILES access"
+	    echo "using libwww."
+	    NETLIB=libwww
+	fi
     else
 	echo "found"
 	echo "The WFDB software will be compiled with NETFILES access"
-	echo "using libwww."
-	echo "NETFILES=1" >../config.cache
-	echo "NETFILES_LIBCURL=0" >../config.cache
-	sed "s/LWC = :/LWC = libwww-config/" <site.def >site.tmp
-	sed "s/LCC = curl-config/LCC = :/" <site.tmp >site.def
-	if [ $LIBTYPE = "static" ]
-	then
-	    sed "s/LDLIBWWW = #/LDLIBWWW =/" <site.def >site.tmp
-	    mv site.tmp site.def
-	fi
-	sed "s/LWC = :/LWC = libwww-config/" <site-slib.def >site.tmp
-	sed "s/LCC = curl-config/LCC = :/" <site.tmp >site-slib.def
-	rm site.tmp
-	sed "s/WFDB_NETFILES 0/WFDB_NETFILES 1/" <../lib/wfdb.h0 | \
-	sed "s/WFDB_NETFILES_LIBCURL 1/WFDB_NETFILES_LIBCURL 0/" >../lib/wfdb.h
-	VIANF=" via libwww"
-	WITHNF=with
+	echo "using libcurl."
+	NETLIB=libcurl
     fi
-else
-    echo "found"
-    echo "The WFDB software will be compiled with NETFILES access"
-    echo "using libcurl."
-    echo "NETFILES=1" >../config.cache
-    echo "NETFILES_LIBCURL=1" >../config.cache
-    sed "s/LWC = libwww-config/LWC = :/" <site.def >site.tmp
-    sed "s/LCC = :/LCC = curl-config/" <site.tmp >site.def
-    if [ $LIBTYPE = "static" ]
-    then
-	sed "s/LDLIBCURL = #/LDLIBCURL =/" <site.def >site.tmp
-	mv site.tmp site.def
-    fi
-    sed "s/LWC = libwww-config/LWC = :/" <site-slib.def >site.tmp
-    sed "s/LCC = :/LCC = curl-config/" <site.tmp >site-slib.def
-    rm site.tmp
-    sed "s/WFDB_NETFILES 0/WFDB_NETFILES 1/" <../lib/wfdb.h0 | \
-	sed "s/WFDB_NETFILES_LIBCURL 0/WFDB_NETFILES_LIBCURL 1/" >../lib/wfdb.h
-    VIANF=" via libcurl"
-    WITHNF=with
+    rm -f which.t1 which.t2
 fi
+
+case $NETLIB in
+  libcurl) LC="\`curl-config --cflags\`"
+	   LL="\`curl-config --libs\`"
+	   NETFILES=1
+	   NETFILES_LIBCURL=1
+	   VIANF=" via libcurl"
+	   WITHNF=with
+	   ;;
+  libwww)  LC="\`libwww-config --cflags\`"
+	   LL="\`libwww-config --libs\`"
+	   NETFILES=1
+	   NETFILES_LIBCURL=0
+	   VIANF=" via libwww"
+	   WITHNF=with
+	   ;;
+  none)    LC=""
+	   LL=""
+	   NETFILES=0
+	   NETFILES_LIBCURL=0
+	   VIANF=""
+	   WITHNF=without
+	   ;;
+esac
+
+echo "NETFILES=$NETFILES" >../config.cache
+echo "NETFILES_LIBCURL=$NETFILES_LIBCURL" >>../config.cache
+sed "s/WFDB_NETFILES 1/WFDB_NETFILES $NETFILES/" < ../lib/wfdb.h0 | \
+    sed "s/WFDB_NETFILES_LIBCURL 1/WFDB_NETFILES_LIBCURL $NETFILES_LIBCURL/" \
+      >../lib/wfdb.h
+if [ $LIBTYPE = "static" -a $NETLIB != "none" ]
+    then
+    LL = "$LL $LL $LL"
+fi
+sed "s/LC =/LC = $LC/" <site-slib.def | sed "s/LL =/LL = $LL/" >site.tmp
+mv site.tmp site-slib.def
+sed "s/LC =/LC = $LC/" <site.def | sed "s/LL =/LL = $LL/" >site.tmp
+mv site.tmp site.def
+
 
 cd ..
 echo
 echo "Creating Makefile in lib ..."
 if [ -s conf/site-slib.def ]
-then
+    then
     cat lib/Makefile.top conf/site-slib.def lib/Makefile.tpl >lib/Makefile
 else
     cat lib/Makefile.top conf/site.def lib/Makefile.tpl >lib/Makefile
 fi
 for D in app checkpkg convert data doc doc/wag-src doc/wpg-src doc/wug-src \
          examples fortran psd wave waverc .
-do
-   if [ -s $D/Makefile.top ]
-   then
-       echo "Creating Makefile in $D ..."
-       cat $D/Makefile.top conf/site.def $D/Makefile.tpl >$D/Makefile
-   fi
+  do
+  if [ -s $D/Makefile.top ]
+      then
+      echo "Creating Makefile in $D ..."
+      cat $D/Makefile.top conf/site.def $D/Makefile.tpl >$D/Makefile
+  fi
 done
 
-rm conf/site.def conf/site-slib.def
-
-echo
-echo "Adding $DIR/database to the default WFDB path ..."
-sed "s+DBDIR+$DIR/database+" <lib/wfdblib.h0 >lib/wfdblib.h
-
+echo rm conf/site.def conf/site-slib.def
 
 if [ "$OS" = "mingw" ]
-then
+    then
     cp -p wave/nomake wave/Makefile
     cp -p wave/nomake waverc/Makefile
     echo "WAVE=0" >>config.cache
     WAVECOMP="WAVE will not be compiled."
 else
-echo
-conf/prompt "Looking for the XView libraries ..."
-TEXTEDIT=`which textedit 2>&1`
-if [ "x$TEXTEDIT" = "x" ]
-then
-    TEXTEDIT="no textedit"
-fi
-if [ -d /usr/openwin ]
-then
-    WAVE=1;
-elif [ -d /usr/local/openwin ]
-then
-    WAVE=1;
-    sed "s+/usr/openwin+/usr/local/openwin+" <wave/Makefile >tmp.$$
-    mv tmp.$$ wave/Makefile
-elif [ -d /opt/openwin ]
-then
-    WAVE=1;
-    sed "s+/usr/openwin+/opt/openwin+" <wave/Makefile >tmp.$$
-    mv tmp.$$ wave/Makefile
-elif ( echo $TEXTEDIT | grep "no \|not " >/dev/null )
-then
-    WAVE=0;
-else
-    WAVE=1;
-    TEDIR=`dirname $TEXTEDIT`;
-    OWHOME=`dirname $TEDIR`;
-    sed "s+/usr/openwin+$OWHOME+" <wave/Makefile >tmp.$$
-    mv tmp.$$ wave/Makefile
-fi
-if [ $WAVE = 0 ]
-then
-    echo "not found"
-    echo "WAVE will not be compiled, because the XView libraries do not"
-    echo "appear to be installed on this system."
-    echo "To compile WAVE, install XView, add the directory containing the"
-    echo "XView textedit application to your PATH, and run ./configure again."
-    cp -p wave/nomake wave/Makefile
-    cp -p wave/nomake waverc/Makefile
-    echo "WAVE=0" >>config.cache
-    WAVECOMP="WAVE will not be compiled."
-else
-    echo "found"
-    WAVECOMP="WAVE will be compiled and installed in '$DIR/bin'."
-    echo "WAVE=1" >>config.cache
-fi
-
+    echo
+    conf/prompt "Looking for the XView libraries ..."
+    TEXTEDIT=`which textedit 2>&1`
+    if [ "x$TEXTEDIT" = "x" ]
+	then
+	TEXTEDIT="no textedit"
+    fi
+    if [ -d /usr/openwin ]
+	then
+	WAVE=1;
+    elif [ -d /usr/local/openwin ]
+	then
+	WAVE=1;
+	sed "s+/usr/openwin+/usr/local/openwin+" <wave/Makefile >tmp.$$
+	mv tmp.$$ wave/Makefile
+    elif [ -d /opt/openwin ]
+	then
+	WAVE=1;
+	sed "s+/usr/openwin+/opt/openwin+" <wave/Makefile >tmp.$$
+	mv tmp.$$ wave/Makefile
+    elif ( echo $TEXTEDIT | grep "no \|not " >textedit.t1 )
+	then
+	WAVE=0;
+    else
+	WAVE=1;
+	TEDIR=`dirname $TEXTEDIT`;
+	OWHOME=`dirname $TEDIR`;
+	sed "s+/usr/openwin+$OWHOME+" <wave/Makefile >tmp.$$
+	mv tmp.$$ wave/Makefile
+    fi
+    rm -f textedit.t1
+    if [ $WAVE = 0 ]
+	then
+	echo "not found"
+	echo "WAVE will not be compiled, because the XView libraries do not"
+	echo "appear to be installed on this system."
+	echo "To compile WAVE, install XView, add the directory containing the"
+	echo "XView textedit application to your PATH, and run ./configure again."
+	cp -p wave/nomake wave/Makefile
+	cp -p wave/nomake waverc/Makefile
+	echo "WAVE=0" >>config.cache
+	WAVECOMP="WAVE will not be compiled."
+    else
+	echo "found"
+	WAVECOMP="WAVE will be compiled and installed in '$DIR/bin'."
+	echo "WAVE=1" >>config.cache
+    fi
 fi
 
 # Clean up old *.o files in lib, to avoid possibly using binaries intended
@@ -451,39 +475,51 @@ fi
 rm -f lib/*.o
 
 if [ $DIR != "/usr" -a  $LIBTYPE = dynamic ]
-then
-    echo
-    echo "IMPORTANT:  You have chosen to build a dynamic (shared) WFDB"
-    echo "library in a directory, $DIR/lib, that is not normally"
-    echo "searched for such libraries.  In order to use the applications"
-    echo "that will be compiled with this library, it may be necessary to"
-    echo "add this directory to your LD_LIBRARY_PATH.  If your shell is csh"
-    echo "or a variant, do this by typing:"
-    case "x$LD_LIBRARY_PATH" in
-      x) echo "  setenv LD_LIBRARY_PATH $DIR/lib"
-         echo "Otherwise, do this by typing:"
-         echo "  LD_LIBRARY_PATH=$DIR/lib"
-         echo "  export LD_LIBRARY_PATH" ;;
-      *) echo "  setenv LD_LIBRARY_PATH \${LD_LIBRARY_PATH}:$DIR/lib"
-         echo "Otherwise, do this by typing:"
-         echo "  LD_LIBRARY_PATH=\${LD_LIBRARY_PATH}:$DIR/lib"
-         echo "  export LD_LIBRARY_PATH" ;;
-    esac
+    then
+    cat <<EOF
+
+IMPORTANT: You have chosen to build a dynamic (shared) WFDB library in
+a directory, $DIR/$LIB, that is not normally searched for such
+libraries.  In order to use the applications that will be compiled
+with this library, it may be necessary to add this directory to your
+LD_LIBRARY_PATH.  If your shell is csh or a variant, do this by
+typing:
+EOF
+    if [ "x$LD_LIBRARY_PATH" = x ]
+	then
+	echo "  setenv LD_LIBRARY_PATH $DIR/$LIB"
+	echo "Otherwise, do this by typing:"
+	echo "  LD_LIBRARY_PATH=$DIR/$LIB"
+	echo "  export LD_LIBRARY_PATH"
+    else
+	echo "  setenv LD_LIBRARY_PATH \${LD_LIBRARY_PATH}:$DIR/$LIB"
+	echo "Otherwise, do this by typing:"
+	echo "  LD_LIBRARY_PATH=\${LD_LIBRARY_PATH}:$DIR/$LIB"
+	echo "  export LD_LIBRARY_PATH"
+    fi
 fi
 
 if [ $OS = generic ]
-then
-    echo
-    echo "No specific configuration information is available for your"
-    echo "operating system.  Please try compiling using the generic Makefiles"
-    echo "that have been generated by this configuration utility.  If there"
-    echo "are problems, it may be possible to solve them by customizing"
-    echo "conf/generic.def (and conf/generic-slib.def if you are attempting"
-    echo "to compile a shared WFDB library).  Run ./configure again after"
-    echo "making any necessary changes to these files.  Please send reports"
-    echo "of success or failure, together with the output of the command"
-    echo "'uname -a', and copies of any files you have changed, to:"
-    echo "        george@mit.edu"
+    then
+    cat <<EOF
+
+No specific configuration information is available for your operating
+system.  Please try compiling using the generic Makefiles that have
+been generated by this configuration utility.  If there are problems,
+it may be possible to solve them by customizing conf/generic.def (and
+conf/generic-slib.def if you are attempting to compile a shared WFDB
+library).  Run ./configure again after making any necessary changes to
+these files.  Please send reports of success or failure, together with
+the output of the command 'uname -a', and copies of any files you have
+changed, to:
+             george@mit.edu
+EOF
+
+fi
+
+if [ "x$MFLAGS" != x ]
+    then
+    CC="$CC $MFLAGS"
 fi
 
 cat <<EOF
@@ -492,7 +528,7 @@ Summary:
 
 $PACKAGE-$OS is now ready to be compiled using '$CC'.
 The WFDB library will be compiled as a $LIBTYPE library $WITHNF NETFILES
- access${VIANF}, and it will be installed in '$DIR/lib'.
+ access${VIANF}, and it will be installed in '$DIR/$LIB'.
 The WFDB library .h files will be installed in '$DIR/include/wfdb'.
 The WFDB applications will be linked to $SYSLIBS system libraries, and
  they will be installed in '$DIR/bin'.
@@ -502,6 +538,8 @@ Sample data files will be installed in '$DIR/database', which
  will be included in the default WFDB path.
 
 WFDB software configuration is complete.
-Now run 'make', followed by 'make install'.
+Now run 'make' to compile and test, followed by 'make install' to recompile
+and install the software, man pages, and example data.  Finally, run
+'make check' to verify that the installation is complete and successful.
 
 EOF

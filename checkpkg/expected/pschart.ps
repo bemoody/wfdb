@@ -15,11 +15,11 @@ pathbbox newpath pop pop translate
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 save 100 dict begin /pschart exch def
 /dpi 300 def
-/lw 0 def
-/lwmm 0 def
+/mm {72 mul 25.4 div}def
+/lwmm 0.2 def
+/lw lwmm mm def
 /tm matrix currentmatrix def
 /gm matrix currentmatrix def
-/mm {72 mul 25.4 div}def
 /I {/Times-Italic findfont exch scalefont setfont}def
 /R {/Times-Roman findfont exch scalefont setfont}def
 /C {/Courier findfont exch scalefont setfont}def
@@ -83,9 +83,9 @@ ss
 862 2440 1601 2912 0.5 0.5 grid
 12 R
 862 2924 m
-851 2660 m
+851 2651 m
 (0:10)b
-1612 2660 m
+1612 2651 m
 (0:15)t
 10 I
 851 2782 m

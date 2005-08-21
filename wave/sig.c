@@ -46,30 +46,54 @@ int i;
     return (0);
 }
 
+static void drawtrace(b, n, ybase, gc, mode)
+XPoint *b;
+int mode, n, ybase;
+GC gc;
+{
+    int j, xn, xp;
+    XPoint *p, *q;
+
+    for (j = 0, p = q = b; j <= n; j++) {
+	if (j == n || q->y == WFDB_INVALID_SAMPLE) {
+	    if (p < q) {
+		while (p < q && p->y == WFDB_INVALID_SAMPLE)
+		    p++;
+		xp = p->x;
+		xn = p - b;
+		if (nsamp <= canvas_width) xn *= tscale;
+		p->x = xn;
+		p->y += ybase;
+		XDrawLines(display, osb, gc, p, q-p, CoordModePrevious);
+		if (mode)
+		    XDrawLines(display, xid, gc, p, q-p, CoordModePrevious);
+		p->x = xp;
+		p->y -= ybase;
+	    }
+	    p = ++q;
+	}
+	else
+	    ++q;
+    }
+}
+
 static void show_display_list(lp)
 struct display_list *lp;
 {
-    int i, in_siglist();
+    int i, j, k, xn, xp, in_siglist();
+    XPoint *p, *q;
 
     lp_current = lp;
     if (!lp) return;
     if (sig_mode == 0)
 	for (i = 0; i < nsig; i++) {
-	    if (lp->vlist[i]) {
-		lp->vlist[i][0].y += base[i];
-		XDrawLines(display, osb, draw_sig, lp->vlist[i], lp->ndpts,
-		       CoordModePrevious);
-		lp->vlist[i][0].y -= base[i];
-	    }
+	    if (lp->vlist[i])
+		drawtrace(lp->vlist[i], lp->ndpts, base[i], draw_sig, 0);
 	}
     else
 	for (i = 0; i < siglistlen; i++) {
-	    if (0 <= siglist[i] && siglist[i] < nsig && lp->vlist[siglist[i]]){
-		lp->vlist[siglist[i]][0].y += base[i];
-		XDrawLines(display, osb, draw_sig, lp->vlist[siglist[i]],
-			   lp->ndpts, CoordModePrevious);
-		lp->vlist[siglist[i]][0].y -= base[i];
-	    }
+	    if (0 <= siglist[i] && siglist[i] < nsig && lp->vlist[siglist[i]])
+		drawtrace(lp->vlist[siglist[i]], lp->ndpts,base[i],draw_sig,0);
 	}
     highlighted = -1;
 }
@@ -77,30 +101,24 @@ struct display_list *lp;
 void sig_highlight(i)
 int i;
 {
+    extern void repaint();
+
     if (!lp_current) return;
     if (0 <= highlighted && highlighted < lp_current->nsig) {
 	if (sig_mode == 0) {
-	    lp_current->vlist[highlighted][0].y += base[highlighted];
-	    XDrawLines(display, osb, unhighlight_sig,
-		       lp_current->vlist[highlighted],
-		       lp_current->ndpts, CoordModePrevious);
-	    XDrawLines(display, osb, draw_sig,
-		       lp_current->vlist[highlighted],
-		       lp_current->ndpts, CoordModePrevious);
-	    lp_current->vlist[highlighted][0].y -= base[highlighted];
+	    drawtrace(lp_current->vlist[highlighted], lp_current->ndpts,
+		      base[highlighted], unhighlight_sig, 1);
+	    drawtrace(lp_current->vlist[highlighted], lp_current->ndpts,
+		      base[highlighted], draw_sig, 1);
 	}
 	else {
 	    int j;
 	    for (j = 0; j < siglistlen; j++) {
 		if (siglist[j] == highlighted) {
-		    lp_current->vlist[highlighted][0].y += base[j];
-		    XDrawLines(display, osb, unhighlight_sig,
-			       lp_current->vlist[highlighted],
-			       lp_current->ndpts, CoordModePrevious);
-		    XDrawLines(display, osb, draw_sig,
-			       lp_current->vlist[highlighted],
-			       lp_current->ndpts, CoordModePrevious);
-		    lp_current->vlist[highlighted][0].y -= base[j];
+		    drawtrace(lp_current->vlist[highlighted],
+			      lp_current->ndpts, base[j], unhighlight_sig, 1);
+		    drawtrace(lp_current->vlist[highlighted],
+			      lp_current->ndpts, base[j], draw_sig, 1);
 		}
 	    }
 	}
@@ -108,27 +126,19 @@ int i;
     highlighted = i;
     if (0 <= highlighted && highlighted < lp_current->nsig) {
 	if (sig_mode == 0) {
-	    lp_current->vlist[highlighted][0].y += base[highlighted];
-	    XDrawLines(display, osb, clear_sig,
-		       lp_current->vlist[highlighted],
-		       lp_current->ndpts, CoordModePrevious);
-	    XDrawLines(display, osb, highlight_sig,
-		       lp_current->vlist[highlighted],
-		       lp_current->ndpts, CoordModePrevious);
-	    lp_current->vlist[highlighted][0].y -= base[highlighted];
+	    drawtrace(lp_current->vlist[highlighted], lp_current->ndpts,
+		      base[highlighted], clear_sig, 1);
+	    drawtrace(lp_current->vlist[highlighted], lp_current->ndpts,
+		      base[highlighted], highlight_sig, 1);
 	}
 	else {
 	    int j;
 	    for (j = 0; j < siglistlen; j++) {
 		if (siglist[j] == highlighted) {
-		    lp_current->vlist[highlighted][0].y += base[j];
-		    XDrawLines(display, osb, clear_sig,
-			       lp_current->vlist[highlighted],
-			       lp_current->ndpts, CoordModePrevious);
-		    XDrawLines(display, osb, highlight_sig,
-			       lp_current->vlist[highlighted],
-			       lp_current->ndpts, CoordModePrevious);
-		    lp_current->vlist[highlighted][0].y -= base[j];
+		    drawtrace(lp_current->vlist[highlighted],
+			      lp_current->ndpts, base[j], clear_sig, 1);
+		    drawtrace(lp_current->vlist[highlighted],
+			      lp_current->ndpts, base[j], highlight_sig, 1);
 		}
 	    }
 	}
@@ -310,8 +320,9 @@ long fdl_time;
     /* Set the starting point for each signal. */
     for (c = 0; c < nsig; c++) {
 	vmin[c] = vmax[c] = v0[c];
-	if (v0[c] == -32768)
-	    lp->vlist[c][0].y = -32768;
+	vvalid[c] = 0;
+	if (v0[c] == WFDB_INVALID_SAMPLE)
+	    lp->vlist[c][0].y = WFDB_INVALID_SAMPLE;
 	else
 	    lp->vlist[c][0].y = v0[c]*vscale[c];
     }
@@ -320,25 +331,26 @@ long fdl_time;
        data. */
     if (nsamp > canvas_width) {
 	for (i = 1, x0 = 0; i < nsamp && getvec(v) > 0; i++) {
+	    for (c = 0; c < nsig; c++) {
+		if (v[c] != WFDB_INVALID_SAMPLE) {
+		    if (v[c] > vmax[c]) vmax[c] = v[c];
+		    if (v[c] < vmin[c]) vmin[c] = v[c];
+		    vvalid[c] = 1;
+		}
+	    }
 	    if ((x = i*tscale) > x0) {
 		x0 = x;
 		for (c = 0; c < nsig; c++) {
-		    if (v[c] > vmax[c]) vmax[c] = v[c];
-		    else if (v[c] < vmin[c]) vmin[c] = v[c];
-		    if (vmax[c] - v0[c] > v0[c] - vmin[c])
-			v0[c] = vmin[c] = vmax[c];
-		    else
-			v0[c] = vmax[c] = vmin[c];
-		    if (v0[c] == -32768)
-			lp->vlist[c][x0].y = -32768;
-		    else
+		    if (vvalid[c]) {
+			if (vmax[c] - v0[c] > v0[c] - vmin[c])
+			    v0[c] = vmin[c] = vmax[c];
+			else
+			    v0[c] = vmax[c] = vmin[c];
 			lp->vlist[c][x0].y = v0[c]*vscale[c];
-		}
-	    }
-	    else {
-		for (c = 0; c < nsig; c++) {
-		    if (v[c] > vmax[c]) vmax[c] = v[c];
-		    else if (v[c] < vmin[c]) vmin[c] = v[c];
+		    }
+		    else
+			lp->vlist[c][x0].y = WFDB_INVALID_SAMPLE;
+		    vvalid[c] = 0;
 		}
 	    }
 	}
@@ -349,8 +361,8 @@ long fdl_time;
     else
 	for (i = 1; i < nsamp && getvec(v) > 0; i++)
 	    for (c = 0; c < nsig; c++) {
-		if (v[c] == -32768)
-		    lp->vlist[c][i].y = -32768;
+		if (v[c] == WFDB_INVALID_SAMPLE)
+		    lp->vlist[c][i].y = WFDB_INVALID_SAMPLE;
 		else
 		    lp->vlist[c][i].y = v[c]*vscale[c];
 	    }
@@ -371,15 +383,17 @@ long fdl_time;
 	double w;	/* weight assigned to ymean in y-offset calculation */
 
 	tp = lp->vlist[c];
-	ymean = ymax = ymin = tp[0].y;
-	for (j = i-1, n = 1; j >= 0; j--) {
-	    y = tp[j].y;
-	    if (y > ymax) ymax = y;
-	    else if (y < ymin && y != -32768) ymin = y;
-	    if (y != -32768) { ymean += y; n++; }
+	ymean = 0;  ymax = -32768; ymin = 32767;
+	for (j = n = 0, n = 1; j < i; j++) {
+	    if ((y = tp[j].y) != WFDB_INVALID_SAMPLE) {
+		if (y > ymax) ymax = y;
+		else if (y < ymin) ymin = y;
+		ymean += y;
+		n++;
+	    }
 	}
 	ymid = (ymax + ymin)/2;
-	ymean /= n;
+	if (n > 0) ymean /= n;
 	/* Since ymin <= ymid <= ymax, the next lines imply 0 <= w <= 1 */
 	if (ymid > ymean) /* in this case, ymax must be > ymean */
 	    w = (ymid - ymean)/(ymax - ymean);
@@ -388,6 +402,7 @@ long fdl_time;
 	else w = 1.0;
 	dy = -(ymid + ((double)ymean-ymid)*w);
 	for (j = i-1; j >= 0; j--) {
+	    if (tp[j].y == WFDB_INVALID_SAMPLE) continue;
 	    /* The bounds-checking below shouldn't be necessary (the X server
 	       should clip at the canvas boundaries), but Sun's X11/NeWS
 	       server will crash (and may bring the system down with it) if
@@ -401,8 +416,10 @@ long fdl_time;
 	       This bug has not been observed with other X servers. */
 	    if ((tp[j].y += dy) < -canvas_height) tp[j].y = -canvas_height;
 	    else if  (tp[j].y > canvas_height) tp[j].y = canvas_height;
-	    /* Convert all except the first ordinate to relative ordinates. */
-	    if (j < i-1) tp[j+1].y -= tp[j].y;
+	    /* Convert all except the first ordinate in each set of contiguous
+	       valid samples to relative ordinates. */
+	    if (j < i-1 && tp[j+1].y != WFDB_INVALID_SAMPLE)
+		tp[j+1].y -= tp[j].y;
 	}
 	if (dc_coupled[c]) lp->sb[c] = sigbase[c]*vscale[c] + dy;
     }	    

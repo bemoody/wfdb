@@ -1,4 +1,4 @@
-.TH PSFD 1 "6 August 2002" "WFDB 10.2.7" "WFDB Applications Guide"
+.TH PSFD 1 "26 July 2005" "WFDB 10.3.5" "WFDB Applications Guide"
 .SH NAME
 psfd \- produce annotated `full-disclosure' plots on a PostScript device
 .SH SYNOPSIS
@@ -43,7 +43,24 @@ printed if no \fB-c\fR option is specified.  To suppress printing the copyright
 notice, use `\fB-c ""\fR'.
 .TP
 \fB-C\fR
-Print counter values after time stamps in the left margin.
+Produce charts in color (default: black and white).
+.TP
+\fB-Ca\fR \fIr g b\fR
+Draw annotations (if enabled) in the specified color. The color is
+specified using three numerical arguments (with values between 0 and 1
+inclusive) that indicate the amounts of red, green, and blue respectively.
+Examples: \fB-Ca 0.5 0.5 1.0\fR produces light blue (the default obtained
+using \fB-C\fR only); \fB-Ca 0 0.5 0\fR produces a deep green color.
+.TP
+\fB-Cg\fR \fIr g b\fR
+Draw the grid (if enabled) in the specified color. Default: red (1 0 0).
+.TP
+\fB-Cl\fR \fIr g b\fR
+Draw labels and other non-annotation text in the specified color.  Default:
+black (0 0 0).
+.TP
+\fB-Cs\fR \fIr g b\fR
+Draw signals in the specified color.  Default: deep blue (0 0 0.5).
 .TP
 \fB-d\fR \fIn\fR
 Set up for using a printer with a resolution of \fIn\fR dots per inch (default:
@@ -104,6 +121,9 @@ across attached signal, annotations above bars).  Default: \fIbarstyle\fR = 0.
 \fB-n\fR \fIn\fR
 Use \fIn\fR as the number of the first page (default: 1).  Use `\fB-n 0\fR'
 (or any negative value for \fIn\fR) to suppress page numbering.
+.TP
+\fB-N\fR
+Print counter values after time stamps in the left margin.
 .TP
 \fB-P\fR \fIpagesize\fR
 Specify the size of the output pages to be printed.  Legal values for
@@ -167,6 +187,11 @@ standard scale for chart recorders.
 \fB-V\fR
 Verbose mode (echo each command as it is read from the script file).
 .TP
+\fB-w \fIn\fR
+Set the line width for signals, grid lines, and marker bars to \fIn\fR mm.
+Default: 0 (the narrowest possible width;  note that some devices may not
+render zero-width lines correctly).
+.TP
 \fB-x\fR
 Extend the last strip of each record up to 10% if necessary to avoid
 printing a short strip at the end.  (This option may be used to obtain
@@ -200,7 +225,7 @@ stop time, and that strip titles are not printed by \fBpsfd\fR.
 .SH ENVIRONMENT
 .PP
 .PP
-The environment variable \fBPSCHARTPRO\fR can be used to name an
+The environment variable \fBPSFDPRO\fR can be used to name an
 alternate prolog file (see below) for custom formats.  The environment
 variable \fBTRANSCRIPTBUG\fR may be set (to any value) to generate
 `unstructured' PostScript by default (see the \fB-u\fR option above).

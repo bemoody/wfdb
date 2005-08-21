@@ -1,5 +1,5 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised: 	11 June 2005	wfdblib 10.3.16
+			Last revised: 	 1 July 2005	wfdblib 10.3.17
 WFDB library type, constant, structure, and function interface definitions
 
 _______________________________________________________________________________
@@ -33,7 +33,7 @@ _______________________________________________________________________________
 /* WFDB library version. */
 #define WFDB_MAJOR   10
 #define WFDB_MINOR   3
-#define WFDB_RELEASE 16
+#define WFDB_RELEASE 17
 #define WFDB_NETFILES 1	/* if 1, library includes code for HTTP, FTP clients */
 #define WFDB_NETFILES_LIBCURL 1
 
@@ -79,6 +79,9 @@ typedef unsigned int WFDB_Group;    /* signal group number */
 typedef unsigned int WFDB_Signal;   /* signal number */
 typedef unsigned int WFDB_Annotator;/* annotator number */
 
+#define WFDB_INVALID_SAMPLE (-32768) /* samples from getvec or getframe with
+				        this value are not valid */
+
 /* Array sizes
    Many older applications use the values of WFDB_MAXANN, WFDB_MAXSIG, and
    WFDB_MAXSPF to determine array sizes, but (since WFDB library version 10.2)
@@ -87,7 +90,7 @@ typedef unsigned int WFDB_Annotator;/* annotator number */
 #define WFDB_MAXANN    2   /* maximum number of input or output annotators */
 #define	WFDB_MAXSIG   32   /* maximum number of input or output signals */
 #define WFDB_MAXSPF    4   /* maximum number of samples per signal per frame */
-#define WFDB_MAXRNL   11   /* maximum length of record name */
+#define WFDB_MAXRNL   20   /* maximum length of record name */
 #define WFDB_MAXUSL   20   /* maximum length of WFDB_siginfo `.units' string */
 #define WFDB_MAXDSL   60   /* maximum length of WFDB_siginfo `.desc' string */
 

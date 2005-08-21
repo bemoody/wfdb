@@ -4,7 +4,7 @@
 # version number, defined here:
 MAJOR = 10
 MINOR = 3
-RELEASE = 16
+RELEASE = 17
 VERSION = $(MAJOR).$(MINOR).$(RELEASE)
 
 # RPMRELEASE can be incremented if changes are made between official

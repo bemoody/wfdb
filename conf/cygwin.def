@@ -1,5 +1,5 @@
 # file: cygwin.def		G. Moody	6 June 2000
-#				Last revised:  10 June 2005
+#				Last revised:  8 August 2005
 #
 # This file contains default 'make' definitions for compiling the WFDB Software
 # Package under MS Windows using the free Cygwin/gcc ANSI C compiler, available
@@ -22,28 +22,18 @@ WFDBROOT = /usr
 # name of your home directory, as in the example below (change as needed).
 # WFDBROOT = /home/frodo
 
-# If the W3C's libwww library of HTTP and FTP client code is available, and
-# you wish to compile a WFDB library with NETFILES support, set LWC to
-# 'libwww-config' (a utility supplied with libwww).  Otherwise set LWC to ':'
-# (a program that does nothing, successfully).
-LWC = libwww-config
-
-# Similarly, to use the libcurl library instead of libwww, set LCC to
-# 'curl-config'.  Otherwise set LCC to ':'.  Only one of libwww or
-# libcurl should be enabled.
-LCC = curl-config
-
-# LDLIBWWW, which is appended to LDFLAGS below, is the set of options needed
-# to link with libwww.  If libwww is not installed, or if libwfdb is a shared
-# library, LDLIBWWW can be empty (if there is a '#' immediately after the '='
-# below, the remainder of the line is ignored, so LDLIBWWW is empty in this
-# case).  Otherwise, it is generated from the output of LWC.  Note that up to
-# three passes through the option list are necessary to satisfy all
-# dependencies when linking to the static libwww libraries.
-LDLIBWWW = # `$(LWC) --libs` `$(LWC) --libs` `$(LWC) --libs`
-
-# LDLIBCURL is the set of options needed to link with libcurl.
-LDLIBCURL = # `$(LCC) --libs` `$(LCC) --libs` `$(LCC) --libs`
+# LC and LL are used to determine C compiler and linker options needed to
+# enable NETFILES (code that allows applications linked to the WFDB library to
+# read input from HTTP and FTP servers, in addition to the standard filesystem
+# support available without NETFILES).  The WFDB library can use either
+# libcurl (recommended) or libwww to provide NETFILES support.  To use libcurl,
+# set LC to `curl-config --cflags` (note the backquotes) and LN to
+# `curl-config --libs`.  Otherwise, to use libwww, set LC to
+# `libwww-config --cflags` and LL to `libwww-config --libs`.  If neither
+# libcurl nor libwww is available, LC and LL should be empty (and NETFILES
+# will be disabled).
+LC =
+LL =
 
 # BINDIR specifies the directory in which the applications will be installed;
 # it should be a directory in the PATH of those who will use the applications.
@@ -70,7 +60,7 @@ MANDIR = $(WFDBROOT)/man
 
 # PSPDIR specifies the name of a directory in which to install the PostScript
 # prolog (*.pro) files from the 'app' directory.
-PSPDIR = /usr/lib/ps
+PSPDIR = $(WFDBROOT)/lib/ps
 
 # CC is the name of your C compiler.  The WFDB library can be compiled with K&R
 # C compilers (`cc' on most if not all UNIX systems) as well as with ANSI C
@@ -96,6 +86,10 @@ CC = gcc
 # and try again (see signal.c).
 CCDEFS = $(VDEFS) -DNOVALUES_H
 
+# MFLAGS is the set of architecture-dependent (-m*) compiler options, which
+# is usually empty.  See the gcc manual for information about gcc's -m options.
+MFLAGS =
+
 # CFLAGS is the set of C compiler options.  CFLAGS should always include
 # CCDEFS.  Add the following options to CFLAGS as appropriate (separating them
 # by spaces if you use more than one):
@@ -103,13 +97,11 @@ CCDEFS = $(VDEFS) -DNOVALUES_H
 #   -O		  if you trust your C compiler's optimizer
 # With the exception of `gcc', most C compilers do not allow you to use -g and
 # -O simultaneously.
-CFLAGS = -g $(CCDEFS) `$(LWC) --cflags` `$(LCC) --cflags` -I$(INCDIR)
-# `gcc' users may comment out the previous line, and uncomment the next one.
-# CFLAGS = -g -O $(CCDEFS) `$(LWC) --cflags` `$(LCC) --cflags` -I$(INCDIR)
+CFLAGS = $(MFLAGS) -g -O $(CCDEFS) $(LC) -I$(INCDIR)
 
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.
-LDFLAGS = -L$(LIBDIR) -lwfdb $(LDLIBWWW) $(LDLIBCURL)
+LDFLAGS = -L$(LIBDIR) -lwfdb $(LL)
 
 # WFDBLIB is the name of the standard WFDB library.  In order to access it via
 # `-lwfdb', WFDBLIB should be `libwfdb.a'.
@@ -178,8 +170,20 @@ OWINCDIR = $(OPENWINHOME)/include
 # OWLIBDIR is the directory in which the XView library is found.
 OWLIBDIR = $(OPENWINHOME)/lib
 
+# XHOME specifies the root directory of the X11 hierarchy.
+# This is usually /usr/X11R6 (or /usr/X11).
+XHOME = /usr/X11R6
+
+# XINCDIR is the directory in which the 'X11' directory containing X11 *.h
+# files is found.  This is usually /usr/X11R6/include, although there is often
+# a link connecting /usr/include/X11 to this directory.
+XINCDIR = $(XHOME)/include
+
+# XLIBDIR is the directory in which the X11 libraries are found.
+XLIBDIR = $(XHOME)/lib
+
 # WCFLAGS is the set of C compiler options to use when compiling WAVE.
-WCFLAGS = $(CFLAGS) -I$(OWINCDIR)
+WCFLAGS = $(CFLAGS) -I$(OWINCDIR) -I$(XINCDIR)
 
 # HELPOBJ can be set to "help.o" if you wish to recompile the XView spot help
 # functions in "wave/help.c" (recommended under Linux).
@@ -189,7 +193,7 @@ HELPOBJ =
 
 # WLDFLAGS is the set of loader options appended to the C compiler command line
 # to specify loading the WFDB, XView, and Xlib libraries.
-WLDFLAGS = $(LDFLAGS) -L$(OWLIBDIR) -L/usr/X11R6/lib -lxview -lolgx -lX11
+WLDFLAGS = $(LDFLAGS) -L$(OWLIBDIR) -L$(XLIBDIR) -lxview -lolgx -lX11
 # ...........................................................................
 
 # `make' (with no target specified) will be equivalent to `make all'.

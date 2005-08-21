@@ -4,7 +4,7 @@
 # Verify tarball contents
 
 PACKAGE=$1
-sort <../${PACKAGE}-MANIFEST >../sort.$$
+sort -f <../${PACKAGE}-MANIFEST >../sort.$$
 mv ../sort.$$ ../${PACKAGE}-MANIFEST
 if diff MANIFEST ../${PACKAGE}-MANIFEST
 then

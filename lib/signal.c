@@ -1,10 +1,10 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   14 November 2004	wfdblib 10.3.14
+			Last revised:   11 August 2005	wfdblib 10.3.17
 WFDB library functions for signals
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1989-2004 George B. Moody
+Copyright (C) 1989-2005 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -33,6 +33,10 @@ visible outside of this file:
  allocogroup	(sets max number of simultaneously open output signal groups)
  isfmt		(checks if argument is a legal signal format type)
  copysi		(deep-copies a WFDB_Siginfo structure)
+ sigmap_cleanup (deallocates memory used by sigmap)
+ make_vsd	(makes a virtual signal object)
+ sigmap_init	(manages the signal maps)
+ sigmap		(creates a virtual signal vector from a raw sample vector)
  readheader	(reads a header file)
  hsdfree	(deallocates memory used by readheader)
  isigclose	(closes input signals)
@@ -95,7 +99,7 @@ have been included in all published versions of the WFDB library.)
 
 These functions, also defined here, are intended only for the use of WFDB
 library functions defined elsewhere:
- wfdb_sampquit  (frees memory allocated by sample())
+ wfdb_sampquit  (frees memory allocated by sample() and sigmap_init())
  wfdb_sigclose 	(closes signals and resets variables)
  wfdb_osflush	(flushes output signals)
 
@@ -464,6 +468,215 @@ WFDB_Siginfo *to, *from;
     return (1);
 }
 
+/* Code for handling variable-layout multi-segment records
+
+    The following code (together with minor changes elsewhere in this file)
+   was written to permit reading a record consisting of multiple segments
+   on-the-fly, even if the segments do not contain the same signals or the
+   same number of signals.  If the gain or baseline of any signal changes
+   from segment to segment, the code in this section adjusts for the changes
+   transparently, so that a WFDB application can assume that all signals
+   are always present in the same order, with constant gains and baselines
+   as specified in the .hea file for the first segment.  This .hea file
+   is in the same format as an ordinary .hea file, but if its length is
+   specified as zero samples, it is recognized as a "layout header".  In
+   this case, the signal file name is conventionally given as "~" (although
+   any name is acceptable), and the format is given as 0 (required).
+
+   The "layout header" contains a signal description line for each signal
+   of interest that appears anywhere in the record.  The gain and baseline
+   specified in the layout header are those that will apply to samples
+   throughout the record (sigmap, below, scales and shifts the raw samples
+   as needed).
+
+   If a gap occurs between the end of one segment and the beginning of the
+   next, a special "null" segment can be listed in the master .hea file,
+   like this:
+       ~ 4590
+   The segment name, "~", does not correspond to a real .hea file, but the
+   number that follows indicates the length of the gap in sample intervals.
+ */
+
+static int need_sigmap, maxvsig, nvsig, tspf;
+static struct isdata **vsd;
+static WFDB_Sample *ovec;
+
+static struct sigmapinfo {
+    char *desc;
+    double gain, scale, offset;
+    WFDB_Sample baseline;
+    int index;
+    int spf;
+} *smi;
+
+static void sigmap_cleanup()
+{
+    int i;
+
+    maxvsig = need_sigmap = nvsig = tspf = 0;
+    if (ovec) { free(ovec); ovec = NULL; }
+    if (smi) {
+	for (i = 0; i < tspf; i += smi[i].spf)
+	    if (smi[i].desc) free(smi[i].desc);
+	free(smi);
+	smi = NULL;
+    }
+
+    if (vsd) {
+	struct isdata *is;
+
+	while (nvsig)
+	    if (is = vsd[--nisig]) {
+		if (is->info.fname) (void)free(is->info.fname);
+		if (is->info.units) (void)free(is->info.units);
+		if (is->info.desc)  (void)free(is->info.desc);
+		(void)free(is);
+	    }
+    	(void)free(vsd);
+	vsd = NULL;
+    }
+}
+
+static int make_vsd()
+{
+    int i;
+
+    if (nvsig != nisig) {
+	wfdb_error("make_vsd: oops! nvsig = %d, nisig = %d\n", nvsig, nisig);
+	return (-1);
+    }
+
+    if (maxvsig < nvsig) {
+	unsigned m = maxvsig;
+	struct isdata **vsdnew = realloc(vsd, nvsig*sizeof(struct isdata *));
+
+	if (vsdnew == NULL) {
+	    wfdb_error("init: too many (%d) input signals\n", nvsig);
+	    return (-1);
+	}
+	vsd = vsdnew;
+	while (m < nvsig) {
+	    if ((vsd[m] = calloc(1, sizeof(struct isdata))) == NULL) {
+		wfdb_error("init: too many (%d) input signals\n", nvsig);
+		while (--m > maxvsig)
+		    free(isd[m]);
+		return (-1);
+	    }
+	    m++;
+	}
+	maxvsig = nvsig;
+    }
+
+    for (i = 0; i < nvsig; i++)
+	copysi(&vsd[i]->info, &isd[i]->info);
+
+    return (nvsig);
+}
+
+static int sigmap_init()
+{
+    int i, j, k, kmax, s;
+    struct sigmapinfo *ps;
+
+    /* is this the layout segment?  if so, set up output side of map */
+    if (in_msrec && ovec == NULL && isd[0]->info.nsamp == 0L) {
+	need_sigmap = 1;
+
+	/* The number of virtual signals is the number of signals defined
+	   in the layout segment. */
+	nvsig = nisig;
+	for (s = tspf = 0; s < nisig; s++)
+	    tspf += isd[s]->info.spf;
+	if ((smi = malloc(tspf * sizeof(struct sigmapinfo))) == NULL) {
+	    wfdb_error("sigmap_init: out of memory\n");
+	    return (-1);
+	}
+
+	for (i = s = 0; i < nisig; i++) {
+	    if (smi[s].desc = malloc(strlen(isd[i]->info.desc)+1))
+		strcpy(smi[s].desc, isd[i]->info.desc);
+	    else {
+		wfdb_error("sigmap_init: out of memory\n");
+		return (-1);
+	    }
+	    smi[s].gain = isd[i]->info.gain;
+	    smi[s].baseline = isd[i]->info.baseline;
+	    k = smi[s].spf = isd[i]->info.spf;
+	    for (j = 1; j < k; j++)
+		smi[s + j] = smi[s];
+	    s += k;	    
+	}
+
+	if ((ovec = malloc(tspf * sizeof(WFDB_Sample))) == NULL) {
+	    wfdb_error("sigmap_init: out of memory\n");
+	    return (-1);
+	}
+	return (make_vsd());
+    }
+
+    else if (need_sigmap) {	/* set up the input side of the map */
+	for (s = 0; s < tspf; s++) {
+	    smi[s].index = 0;
+	    smi[s].scale = 0.;
+	    smi[s].offset = WFDB_INVALID_SAMPLE;
+	}
+
+	if (isd[0]->info.fmt == 0 && nisig == 1)
+	    return (0);    /* the current segment is a null record */
+
+	for (i = j = 0; i < nisig; j += isd[i++]->info.spf)
+	    for (s = 0; s < tspf; s += smi[s].spf)
+		if (strcmp(smi[s].desc, isd[i]->info.desc) == 0) {
+		    if ((kmax = smi[s].spf) != isd[i]->info.spf) {
+			wfdb_error(
+		   "sigmap_init: unexpected spf for signal %d in segment %s\n",
+		                   i, segp->recname);
+			if (kmax > isd[i]->info.spf)
+			    kmax = isd[i]->info.spf;
+		    }
+		    for (k = 0; k < kmax; k++) {
+			ps = &smi[s + k];
+			ps->index = j + k;
+			ps->scale = ps->gain / isd[i]->info.gain;
+			if (ps->scale < 1.0)
+			    wfdb_error(
+	       "sigmap_init: loss of precision in signal %d in segment %s\n",
+				       i, segp->recname);
+			ps->offset = ps->baseline -
+			             ps->scale * isd[i]->info.baseline;
+		    }
+		    break;
+		}
+    }
+
+    else {	/* normal record, or multisegment record without a dummy
+		   header */
+	nvsig = nisig;
+	return (make_vsd());
+    }
+
+    return (0);
+}
+
+static void sigmap(WFDB_Sample *vector)
+{
+    int i;
+    double v;
+
+    for (i = 0; i < tspf; i++)
+	ovec[i] = vector[i];
+
+    for (i = 0; i < tspf; i++) {
+	vector[i] = v = ovec[smi[i].index] * smi[i].scale + smi[i].offset;
+#if defined(WFDB_OVERFLOW_CHECK)
+	if (((v > 0.0 && v - ovec[i]) > 1.0) || ((v - ovec[i]) < -1.0))
+	    wfdb_error("sigmap: overflow detected\n");
+#endif
+    }
+}
+
+/* end of code for handling variable-layout records */
+
 static int readheader(record)
 char *record;
 {
@@ -477,21 +690,58 @@ char *record;
     /* If another input header file was opened, close it. */
     if (hheader) (void)wfdb_fclose(hheader);
 
+    if (strcmp(record, "~") == 0) {
+	if (in_msrec && vsd) {
+	    char *p;
+
+	    hsd = calloc(1, sizeof(struct hsdata *));
+	    hsd[0] = calloc(1, sizeof(struct hsdata));
+	    p = calloc(2, sizeof(char)); *p = '~';
+	    hsd[0]->info.desc = p;
+	    hsd[0]->info.spf = 1;
+	    hsd[0]->info.fmt = 0;
+	    hsd[0]->info.nsamp = nsamples = segp->nsamp;
+	    return (1);	       
+	}
+	return (0);
+    }
+
     /* Try to open the header file. */
     if ((hheader = wfdb_open("hea", record, WFDB_READ)) == NULL) {
 	wfdb_error("init: can't open header for record %s\n", record);
 	return (-1);
     }
 
+    /* Read the first line and check for a magic string. */
+    if (wfdb_fgets(linebuf, 256, hheader) == NULL) {
+        wfdb_error("init: record %s header is empty\n", record);
+	    return (-2);
+    }
+    if (strncmp("#wfdb", linebuf, 5) == 0) { /* found the magic string */
+	int i, major, minor = 0, release = 0;
+
+	i = sscanf(linebuf+5, "%d.%d.%d", &major, &minor, &release);
+	if ((i > 0 && major > WFDB_MAJOR) ||
+	    (i > 1 && minor > WFDB_MINOR) ||
+	    (i > 2 && release > WFDB_RELEASE)) {
+	    wfdb_error("init: reading record %s requires WFDB library "
+		       "version %d.%d.%d or later\n"
+"  (the most recent version is always available from http://physionet.org)\n",
+		       record, major, minor, release);
+	    return (-1);
+	}
+    }
+
     /* Get the first token (the record name) from the first non-empty,
        non-comment line. */
-    do {
+    while ((p = strtok(linebuf, sep)) == NULL || *p == '#') {
 	if (wfdb_fgets(linebuf, 256, hheader) == NULL) {
 	    wfdb_error("init: can't find record name in record %s header\n",
 		     record);
 	    return (-2);
 	}
-    } while ((p = strtok(linebuf, sep)) == NULL || *p == '#');
+    }
+
     for (q = p+1; *q && *q != '/'; q++)
 	;
     if (*q == '/') {
@@ -647,7 +897,7 @@ char *record;
 	    }
 	    (void)strcpy(segp->recname, p);
 	    if ((p = strtok((char *)NULL, sep)) == NULL ||
-		(segp->nsamp = (WFDB_Time)atol(p)) <= 0L) {
+		(segp->nsamp = (WFDB_Time)atol(p)) < 0L) {
 		wfdb_error(
 		"init: length must be specified for segment %s in record %s\n",
 		           segp->recname, record);
@@ -1201,7 +1451,7 @@ WFDB_Time t;
 	    tseg++;
 	if (segp != tseg) {
 	    segp = tseg;
-	    if (isigopen(segp->recname, NULL, (int)nisig) != nisig) {
+	    if (isigopen(segp->recname, NULL, (int)nvsig) < 0) {
 	        wfdb_error("isigsettime: can't open segment %s\n",
 			   segp->recname);
 		return (-1);
@@ -1359,6 +1609,7 @@ WFDB_Sample *vector;
     struct isdata *is;
     struct igdata *ig;
     WFDB_Group g;
+    WFDB_Sample v;
     WFDB_Signal s;
 
     if ((stat = (int)nisig) == 0) return (0);
@@ -1378,27 +1629,37 @@ WFDB_Sample *vector;
 	ig = igd[is->info.group];
 	for (c = 0; c < is->info.spf; c++, vector++) {
 	    switch (is->info.fmt) {
-	      case 0:	/* null signal: return adczero */
-		*vector = is->info.adczero;
+	      case 0:	/* null signal: return sample tagged as invalid */
+		*vector = v = WFDB_INVALID_SAMPLE;
 		if (is->info.nsamp == 0) ig->stat = -1;
 		break;
 	      case 8:	/* 8-bit first differences */
 	      default:
-		*vector = is->samp += r8(ig); break;
+		*vector = v = is->samp += r8(ig); break;
 	      case 16:	/* 16-bit amplitudes */
-		*vector = r16(ig); break;
+		*vector = v = r16(ig); break;
 	      case 61:	/* 16-bit amplitudes, bytes swapped */
-		*vector = r61(ig); break;
+		*vector = v = r61(ig); break;
 	      case 80:	/* 8-bit offset binary amplitudes */
-		*vector = r80(ig); break;
+		*vector = v = r80(ig);
+		if (v == 0) *vector = WFDB_INVALID_SAMPLE;
+		break;
 	      case 160:	/* 16-bit offset binary amplitudes */
-		*vector = r160(ig); break;
+		*vector = v = r160(ig);
+		if (v == 0) *vector = WFDB_INVALID_SAMPLE;
+		break;
 	      case 212:	/* 2 12-bit amplitudes bit-packed in 3 bytes */
-		*vector = r212(ig); break;
+		*vector = v = r212(ig);
+		if (v == -2048) *vector = WFDB_INVALID_SAMPLE;
+		break;
 	      case 310:	/* 3 10-bit amplitudes bit-packed in 4 bytes */
-		*vector = r310(ig); break;
+		*vector = v = r310(ig);
+		if (v == -512) *vector = WFDB_INVALID_SAMPLE;
+		break;
 	      case 311:	/* 3 10-bit amplitudes bit-packed in 4 bytes */
-		*vector = r311(ig); break;
+		*vector = v = r311(ig);
+		if (v == -512) *vector = WFDB_INVALID_SAMPLE;
+		break;
 	    }
 	    if (ig->stat <= 0) {
 		/* End of file -- reset input counter. */
@@ -1409,7 +1670,7 @@ WFDB_Sample *vector;
 		}
 		else if (in_msrec && segp < segend) {
 		    segp++;
-		    if (isigopen(segp->recname, NULL, (int)nisig) < nisig) {
+		    if (isigopen(segp->recname, NULL, (int)nvsig) < 0) {
 			wfdb_error("getvec: error opening segment %s\n",
 				   segp->recname);
 			stat = -3;
@@ -1429,7 +1690,7 @@ WFDB_Sample *vector;
 		    stat = -1;
 	    }
 	    else
-		is->info.cksum -= *vector;
+		is->info.cksum -= v;
 	}
 	if (--is->info.nsamp == (WFDB_Time)0L &&
 	    (is->info.cksum & 0xffff) &&
@@ -1457,8 +1718,8 @@ WFDB_Sample *vector;
 	long v;
 
 	stat = getframe(tvector);
-	for (s = 0, tp = tvector; s < nisig; s++) {
-	    int sf = isd[s]->info.spf;
+	for (s = 0, tp = tvector; s < nvsig; s++) {
+	    int sf = vsd[s]->info.spf;
 
 	    for (c = v = 0; c < sf; c++)
 		v += *tp++;
@@ -1471,8 +1732,8 @@ WFDB_Sample *vector;
 	    stat = getframe(tvector);
 	    gvc = 0;
 	}
-	for (s = 0, tp = tvector; s < nisig; s++) {
-	    int sf = isd[s]->info.spf;
+	for (s = 0, tp = tvector; s < nvsig; s++) {
+	    int sf = vsd[s]->info.spf;
 
 	    *vector++ = tp[(sf*gvc)/ispfmax];
 	    tp += sf;
@@ -1636,6 +1897,9 @@ int nsig;
     gvc = ispfmax;	/* Initialize getvec's sample-within-frame counter. */
     nisig += s;		/* Update the count of open input signals. */
     nigroups += g;	/* Update the count of open input signal groups. */
+
+    if (sigmap_init() < 0)
+	return (-1);
 
     /* Determine the total number of samples per frame. */
     for (si = framelen = 0; si < nisig; si++)
@@ -2048,6 +2312,8 @@ WFDB_Sample *vector;
     }
     else		/* no deskewing necessary */
 	stat = getskewedframe(vector);
+    if (need_sigmap && stat > 0)
+	sigmap(vector);
     istime++;
     return (stat);
 }
@@ -2068,6 +2334,23 @@ WFDB_Sample *vector;
 	if (os->info.nsamp++ == (WFDB_Time)0L)
 	    os->info.initval = os->samp = *vector;
 	for (c = 0; c < os->info.spf; c++, vector++) {
+	    if (*vector == WFDB_INVALID_SAMPLE)	/* use lowest possible value */
+		switch (os->info.fmt) {
+		  case 0:
+		  case 8:
+		  case 16:
+		  case 61:
+		  default:
+		    break;
+		  case 80:
+		  case 160:
+		    *vector = 0; break;
+		  case 212:
+		    *vector = -2048; break;
+		  case 310:
+		  case 311:
+		    *vector = -512; break;
+		}
 	    switch (os->info.fmt) {
 	      case 0:	/* null signal (do not write) */
 		os->samp = *vector; break;
@@ -2427,7 +2710,7 @@ FINT wfdbgetskew(s)
 WFDB_Signal s;
 {
     if (s < nisig)
-	return (isd[s]->skew);
+	return (vsd[s]->skew);
     else
 	return (0);
 }
@@ -2439,7 +2722,7 @@ WFDB_Signal s;
 int skew;
 {
     if (s < nisig)
-        isd[s]->skew = skew;
+        vsd[s]->skew = skew;
 }
 
 /* Note: wfdbsetskew affects *only* the skew to be written by setheader.
@@ -2457,7 +2740,7 @@ FLONGINT wfdbgetstart(s)
 WFDB_Signal s;
 {
     if (s < nisig)
-        return (igd[isd[s]->info.group]->start);
+        return (igd[vsd[s]->info.group]->start);
     else
 	return (0L);
 }
@@ -2637,7 +2920,7 @@ WFDB_Time t;
     }
     else {			/* time of day */
 	/* Convert to sample intervals since midnight. */
-	t = (WFDB_Time)(btime*sfreq/1000.0) - t;
+	t = (WFDB_Time)(btime*sfreq/1000.0 + 0.5) - t;
 	/* Convert from sample intervals to seconds. */
 	s = t / f;
 	msec = (t - s*f)*1000/f;
@@ -2783,7 +3066,7 @@ WFDB_Signal s;
 WFDB_Sample a;
 {
     double x;
-    WFDB_Gain g = (s < nisig) ? isd[s]->info.gain : WFDB_DEFGAIN;
+    WFDB_Gain g = (s < nvsig) ? vsd[s]->info.gain : WFDB_DEFGAIN;
 
     if (g == 0.) g = WFDB_DEFGAIN;
     x = a*1000./g;
@@ -2798,7 +3081,7 @@ WFDB_Signal s;
 int v;
 {
     double x;
-    WFDB_Gain g = (s < nisig) ? isd[s]->info.gain : WFDB_DEFGAIN;
+    WFDB_Gain g = (s < nvsig) ? vsd[s]->info.gain : WFDB_DEFGAIN;
 
     if (g == 0.) g = WFDB_DEFGAIN;
     x = g*v*0.001;
@@ -2815,9 +3098,9 @@ WFDB_Sample a;
     int b;
     WFDB_Gain g;
 
-    if (s < nisig) {
-	b = isd[s]->info.baseline;
-	g = isd[s]->info.gain;
+    if (s < nvsig) {
+	b = vsd[s]->info.baseline;
+	g = vsd[s]->info.gain;
 	if (g == 0.) g = WFDB_DEFGAIN;
     }
     else {
@@ -2834,9 +3117,9 @@ double v;
     int b;
     WFDB_Gain g;
 
-    if (s < nisig) {
-	b = isd[s]->info.baseline;
-	g = isd[s]->info.gain;
+    if (s < nvsig) {
+	b = vsd[s]->info.baseline;
+	g = vsd[s]->info.gain;
 	if (g == 0.) g = WFDB_DEFGAIN;
     }
     else {
@@ -2950,6 +3233,8 @@ void wfdb_sigclose()
     if (gv0) (void)free(gv0);
     if (gv1) (void)free(gv1);
     gv0 = gv1 = NULL;
+
+    sigmap_cleanup();
 }
 
 void wfdb_osflush()

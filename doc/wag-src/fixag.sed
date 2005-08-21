@@ -43,17 +43,50 @@ s+<A HREF="xlsfonts-1.htm">xlsfonts</B>(1)</A>+xlsfonts</B>(1)+g
 s+<A HREF="xmodmap-1.htm">xmodmap</B>(1)</A>+xmodmap</B>(1)+g
 s+<A HREF=" xnews-1.htm">xnews</B>(1)</A>+xnews</B>(1)+g
 s+<A HREF=" xview-1.htm">xview</B>(1)</A>+xview</B>(1)+g
-s+<I>strtim+<I><A HREF="../wpg/strtim.htm">strtim</A>+
+s+<a href='    bc-1.htm'><b>bc</b>(1)</a>+<b>bc</b>(1)+g
+s+<a href='    cc-1.htm'><b>cc</b>(1)</a>+<b>cc</b>(1)+g
+s+<a href='     F-n.htm'><b>F(n)</a>+<b>F(n)+g
+s+<a href='     F-n.htm'><b>F(n)</b></a>+<b>F(n)</b>+g
+s+<a href='     F-n.htm'><b>F(n)</I></a>+<b>F(n)</I>+g
+s+<a href=' fseek-3.htm'><b>fseek</b>(3)</a>+<b>fseek</b>(3)+g
+s+<a href='   gcc-1.htm'><b>gcc</b>(1)</a>+<b>gcc</b>(1)+g
+s+<a href='gnuplot-1.htm'><b>gnuplot</b>(1)</a>+<b>gnuplot</b>(1)+g
+s+<a href='iconedit-1.htm'><b>iconedit</b>(1)</a>+<b>iconedit</b>(1)+g
+s+<a href='    ld-1.htm'><b>ld</b>(1)</a>+<b>ld</b>(1)+g
+s+<a href='osigfopen-n.htm'><b>osigfopen(nsig)</a>+<b>osigfopen(nsig)+g
+s+<a href='     N-1.htm'><b>N (1)</a>+<b>N (1)+g
+s+<a href='     N-2.htm'><b>N (2)</a>+<b>N (2)+g
+s+<a href='     N-3.htm'><b>N (3)</a>+<b>N (3)+g
+s+<a href='     N-4.htm'><b>N (4)</a>+<b>N (4)+g
+s+<a href='     N-8.htm'><b>N (8)</a>+<b>N (8)+g
+s+<a href='osigfopen-nsig.htm'><b>osigfopen(nsig)</a>+<b>osigfopen(nsig)+g
+s+<a href='openwin-1.htm'><b>openwin</b>(1)</a>+<b>openwin</b>(1)+g
+s+<a href='  plot-1.htm'><b>plot</b>(1)</a>+<b>plot</b>(1)+g
+s+<a href='  plot-3.htm'><b>plot</b>(3)</a>+<b>plot</b>(3)+g
+s+<a href='printf-3.htm'><b>printf(3)</b></a>+<b>printf(3)</b>+g
+s+<a href=' scanf-3.htm'><b>scanf</b>(3)</a>+<b>scanf</b>(3)+g
+s+<a href='    sh-1.htm'><b>sh</b>(1)</a>+<b>sh</b>(1)+g
+s+<a href='     X-1.htm'><b>X</b>(1)</a>+<b>X</b>(1)+g
+s+<a href='xdpyinfo-1.htm'><b>xdpyinfo</b>(1)</a>+<b>xdpyinfo</b>(1)+g
+s+<a href=' xhost-1.htm'><b>xhost</b>(1)</a>+<b>xhost</b>(1)+g
+s+<a href='xlsfonts-1.htm'><b>xlsfonts</b>(1)</a>+<b>xlsfonts</b>(1)+g
+s+<a href='xmodmap-1.htm'><b>xmodmap</b>(1)</a>+<b>xmodmap</b>(1)+g
+s+<a href=' xnews-1.htm'><b>xnews</b>(1)</a>+<b>xnews</b>(1)+g
+s+<a href=' xview-1.htm'><b>xview</b>(1)</a>+<b>xview</b>(1)+g
+s+>strtim+><A HREF="../wpg/strtim.htm">strtim</A>+
 s+BGCOLOR="[^"]*"+BGCOLOR="#FFFFFF"+
+s+bgcolor='[^']*'+bgcolor='#ffffff'+
 s+(http://www.physionet.org/physiobank/database)+<A HREF="http://www.physionet.org/physiobank/database">(http://www.physionet.org/physiobank/database)</A>+
 s+(http://www.aami.org/)+<A HREF="http://www.aami.org/" target="other">(http://www.aami.org/)</A>+
 s+"http://www.gnuplot.info/"+"http://www.gnuplot.info/" target="other"+
 s+http://www.mstarlabs.com/+<A HREF="http://www.mstarlabs.com/" target="other">http://www.mstarlabs.com/</A>+
-s+<A HREF="http://www.hsr.nl/edf/"+<a href="http://www.hsr.nl/edf/" target="other"+
-s+<I>Evaluating ECG Analyzers</I>+<a href="eval.htm"><I>Evaluating ECG Analyzers</I></a>+
-s+<I>WFDB Programmer's Guide</I>+<a href="../wpg/wpg.htm"><I>WFDB Programmer's Guide</I></a>+
-s+<I>WFDB Applications Guide</I>+<a href="wag.htm"><I>WFDB Applications Guide</I></a>+
-s+<I>WAVE User's Guide</I>+<a href="../wug/wug.htm"><I>WAVE User's Guide</I></a>+
-s+<I>plt Tutorial and Cookbook</I>+<a href="../plt/html/"><I>plt Tutorial and Cookbook</I></a>+
+s+"http://www.hsr.nl/edf/"+"http://www.hsr.nl/edf/" target="other"+
+s+>Evaluating ECG Analyzers<+><a href="eval.htm">Evaluating ECG Analyzers</a><+
+s+>WFDB Programmer's Guide<+><a href="../wpg/wpg.htm">WFDB Programmer's Guide</a><+
+s+>WFDB Applications Guide<+><a href="wag.htm">WFDB Applications Guide</a><+
+s+>WAVE User's Guide<+><a href="../wug/wug.htm">WAVE User's Guide</a><+
+s+>plt Tutorial and Cookbook<+><a href="../plt/html/">plt Tutorial and Cookbook</a><+
 s+<A HREF="#toc">Table of Contents</A>+<table width=100%><tr><td align=left><b>Next:</b> NEXTPAGE <b>Up:</b> <a href="wag.htm">WFDB Applications Guide</a> <b>Previous:</b> PREVPAGE</td><td align=right><a href="#toc">On This Page</a></td></tr></table>+
+s+<a href='#toc'>Table of Contents</a>+<table width=100%><tr><td align=left><b>Next:</b> NEXTPAGE <b>Up:</b> <a href="wag.htm">WFDB Applications Guide</a> <b>Previous:</b> PREVPAGE</td><td align=right><a href="#toc">On This Page</a></td></tr></table>+
 s+</BODY>+<p><b>Up:</b> <a href="wag.htm">WFDB Applications Guide</a><hr><font size=-1><p>Please e-mail your comments and suggestions to <a href="mailto:webmaster@physionet.org?subject=PAGENAME"><tt>webmaster@physionet.org</tt></a>, or post them to:<p><address>PhysioNet<br>MIT Room E25-505A<br>77 Massachusetts Avenue<br>Cambridge, MA 02139 USA<br></address></i><p>Updated LONGDATE</font></BODY>+
+s+</body>+<p><b>Up:</b> <a href="wag.htm">WFDB Applications Guide</a><hr><font size=-1><p>Please e-mail your comments and suggestions to <a href="mailto:webmaster@physionet.org?subject=PAGENAME"><tt>webmaster@physionet.org</tt></a>, or post them to:<p><address>PhysioNet<br>MIT Room E25-505A<br>77 Massachusetts Avenue<br>Cambridge, MA 02139 USA<br></address></i><p>Updated LONGDATE</font></body>+

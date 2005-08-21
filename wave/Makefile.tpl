@@ -88,7 +88,7 @@ wave-static:	$(OFILES)
 	$(CC) $(WCFLAGS) -o wave-static $(OFILES) -static $(LDFLAGS)
 
 soelim:		soelim.c
-	$(CC) $(CFLAGS) -o soelim -O soelim.c
+	$(CC) -o soelim -O soelim.c
 
 wave.hlp:	soelim wave.hl0 $(HELPFILES)
 	./soelim wave.hl0 >wave.hlp

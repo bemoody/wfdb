@@ -1,10 +1,10 @@
 /* file: wave.h		G. Moody	26 April 1990
-			Last revised:    5 March 2004
+			Last revised:   5 August 2005
 Constants, macros, global variables, and function prototypes for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1990-2004 George B. Moody
+Copyright (C) 1990-2005 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -137,6 +137,7 @@ COMMON WFDB_Sample *v;			/* see sig.c */
 COMMON WFDB_Sample *v0;
 COMMON WFDB_Sample *vmax;
 COMMON WFDB_Sample *vmin;
+COMMON int *vvalid;
 
 COMMON double *vscale;			/* amplitude scales for each signal
 					   (pixels/adu) */

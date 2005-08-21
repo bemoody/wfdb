@@ -1,3 +1,64 @@
+10.3.17:
+	The WFDB library now supports reading variable-layout records
+	(multi-segment records in which the number, arrangement, gains,
+	and baselines of the signals may vary from one segment to the next;
+	see 'Multi-Segment Records' in the WFDB Programmer's Guide).
+
+	Rounding errors in the WFDB library's mstimstr function have been
+	reduced.  Previous versions did not always round appropriately when
+	the sampling frequency was much less than 1 Hz.
+
+	The maximum length for a record name (WFDB_MAXRNL, defined in wfdb.h)
+	has been increased from 11 to 20.
+
+	A new constant, WFDB_INVALID_SAMPLE, is now defined in wfdb.h.  It
+	is used to identify padding inserted to fill in for missing data.
+	When writing in any format that uses fewer than 16 bits per sample,
+	putvec maps WFDB_INVALID_SAMPLE to the lowest (most negative) value
+	expressible in that format;  when reading a signal file in such a
+	format, getframe performs the inverse mapping, so that missing data
+	can be identified regardless of the data format.
+
+	A side effect of this change is that (for example) any samples that
+	had the most negative value (for example, -2048 in a format 212 signal
+	file) are now flagged as invalid.  To treat such samples as invalid
+	is reasonable, however, since these occur only when the input level
+	falls below the working range of the analog-to-digital converter.
+
+	'pschart', 'psfd', and 'wave' recognize this value, skip over missing
+	data, and determine the position of each trace using the valid data
+	only.  'rdsamp' also recognizes this value when using its '-p' option,
+	indicating missing values as '-', and 'wrsamp' interprets a '-' token
+	in its input as a missing value indicator to be written in its output
+	as a sample with the value WFDB_INVALID_SAMPLE.  'xform' also
+	recognizes and preserves this value in its output.
+
+	'pschart' and 'psfd' process signal lists more cleanly (each '-s'
+	option resets the signal list);  grid lines and other narrow lines
+	are now 0.2 mm wide by default (earlier versions drew "zero width"
+	lines that can be nearly invisible on modern high-resolution printers).
+
+	An error in the psfd man page (doc/wag-src/psfd.1) has been corrected.
+
+	'sumstats' now accepts certain valid inputs that previous versions
+	rejected.
+
+	A bug affecting signal highlighting in 'wave' was introduced in
+	10.3.16, and has now been corrected.
+
+	wave/soelim.c now works on the x86_64 architecture.
+
+	The 'configure' script and the .def files in 'conf' have been
+	revised, with several new options added to 'configure' (-m32,
+	--without-netfiles, --withlibcurl, and --with-libwww.  'make all'
+	(or simply 'make') builds and checks a complete test installation
+	of the WFDB Software Package without affecting any previously installed
+	version of the package (until now, 'make' has installed the WFDB
+	library and its associated *.h files). The 'configure' script now
+	automatically detects the x86_64 (AMD64) architecture under GNU/Linux,
+	and sets up the Makefiles appropriately (unless the '-m32' option
+	is used to force 32-bit mode).
+
 10.3.16:
 	Benjamin Moody has added an interface between the WFDB library and
 	libcurl as an alternative to the existing libwww interface, and has

@@ -1,9 +1,9 @@
 /* file: pschart.c	G. Moody       15 March 1988
-			Last revised:	 4 May 2004
+			Last revised:  11 August 2005
 
 -------------------------------------------------------------------------------
 pschart: Produce annotated `chart recordings' on a PostScript device
-Copyright (C) 1988-2004 George B. Moody
+Copyright (C) 1988-2005 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -83,6 +83,7 @@ char *s1, *s2;
 
 /* Configuration parameters (changeable only by recompiling) */
 #define DPI	 300.0		/* default printer resolution (dots/inch) */
+#define LWMM	   0.2		/* default line width (mm) */
 #define TSCALE	  12.5		/* default time scale (mm/second) */
 #define VSCALE	   5.0		/* default voltage scale (mm/millivolt) */
 #define TPS	  25.0		/* grid ticks per second */
@@ -135,7 +136,7 @@ int gflag = 0;			/* if non-zero, plot grid */
 int Gflag = 0;			/* if non-zero, plot alternate grid */
 int lflag = 0;			/* if non-zero, label signals */
 int Lflag = 0;			/* if non-zero, use landscape orientation */
-double lwmm = 0.;		/* line width (mm); 0 is narrowest possible */
+double lwmm = LWMM;		/* line width (mm); 0 is narrowest possible */
 int mflag = 0;			/* if non-zero, margins specified using -m */
 int Mflag = 0;			/* annotation/marker bar mode (0: do not print
 				   bars, print mnemonics at center; 1: print
@@ -146,6 +147,7 @@ int Mflag = 0;			/* annotation/marker bar mode (0: do not print
 				   bars */
 int numberpages = 1;		/* if zero, suppress page numbering */
 int nosig = 0;			/* number of signals to be printed */
+int nomax = 0;			/* largest value for nosig seen so far */
 int page = 1;			/* logical page number */
 int pages_written = 0;		/* number of pages written already */
 int prolog_written = 0;		/* if non-zero, prolog has been written */
@@ -235,6 +237,7 @@ char *argv[];
     
     /* Set other defaults (see descriptions above). */
     if ((p = getenv("DPI")) && (dpi = atof(p)) <= 0.0) dpi = DPI;
+    if ((p = getenv("LWMM")) && (lwmm = atof(p)) < 0.0) lwmm = LWMM;
     if ((p = getenv("TSCALE")) && (tscale = atof(p)) <= 0.0) tscale = TSCALE;
     if ((p = getenv("VSCALE")) && (vscale = atof(p)) <= 0.0) vscale = VSCALE;
     if ((p = getenv("TPS")) && (tps = atof(p)) <= 0.0) tps = TPS;
@@ -436,23 +439,27 @@ char *argv[];
 	    break;
 	  case 's':	/* specify signals to be printed */
 	    sflag = 1;
-	    /* count the number of output signals */
-	    for (j = 0; ++i < argc && *argv[i] != '-'; j++)
+	    /* count the number of output signals (arguments beginning with
+	       a digit) */
+	    for (j = i+1; j<argc-1 && '0' <= *argv[j] && *argv[j] <= '9'; j++)
 		;
-	    if (j == 0) {
+	    if (j == i+1) {
 		(void)fprintf(stderr, "%s: signal list must follow -s\n",
 			pname);
 		exit(1);
 	    }
 	    /* allocate storage for the signal list and for sqstr */
-	    if ((siglist=realloc(siglist, (nosig+j) * sizeof(int))) == NULL ||
-		(sqstr = realloc(sqstr, (nosig+j+1) * sizeof(char))) == NULL) {
-		(void)fprintf(stderr, "%s: insufficient memory\n", pname);
-		exit(2);
+	    if (j - i > nomax) {
+		if ((siglist = realloc(siglist, (j-i)*sizeof(int))) == NULL ||
+		    (sqstr = realloc(sqstr, (j-i+1)*sizeof(char))) == NULL) {
+		    (void)fprintf(stderr, "%s: insufficient memory\n", pname);
+		    exit(2);
+		}
 	    }
 	    /* fill the signal list */
-	    for (i -= j; i < argc && *argv[i] != '-'; )
-		siglist[nosig++] = atoi(argv[i++]);
+	    nosig = 0;
+	    while (++i < j)
+		siglist[nosig++] = atoi(argv[i]);
 	    i--;
 	    break;
 	  case 'S':	/* set modes for scale and time stamp printing */
@@ -501,7 +508,7 @@ char *argv[];
 	    vflag = 1;
 	    break;
 	  case 'w':	/* specify line width in mm */
-	    if (++i >= argc || ((lwmm = atof(argv[i])) <= 0)) {
+	    if (++i >= argc || ((lwmm = atof(argv[i])) < 0.0)) {
 		(void)fprintf(stderr,
 			      "%s: line width (mm) must follow -w\n",
 			pname);
@@ -539,17 +546,16 @@ char *argv[];
 /* Parameters set from the WFDB header file */
 int nisig;		/* number of signals in current record */
 int nimax;		/* largest value for nisig seen so far */
-int nsig;		/* number of signals to be printed */
 double sps;		/* sampling frequency (samples/second/signal) */
 WFDB_Siginfo *s;	/* signal parameters, including gain */
 int *uncal;		/* if non-zero, signal is uncalibrated */
 
 /* Arrays indexed by signal # (allocated by process(), used by printstrip()) */
-int *buflen, *v, *vbase, **vbuf, *vmax, *vmin;
+int *accept, *buflen, *v, *vbase, **vbuf, *vmax, *vmin;
 long *vsum;
 
 /* Derived parameters */
-double dpmm = DPI/25.4;	/* pixels per millimeter */
+double dpmm;		/* pixels per millimeter */
 double dppt;		/* pixels per PostScript "printer's point" (PostScript
 			   "printer's points" are 1/72 inch;  true printer's
 			   points are 1/72.27 inch) */
@@ -619,39 +625,22 @@ FILE *cfile;
 	    title = strtok((char *)NULL, "\n");
 	    if (tokptr == NULL || tstring == NULL ||
 		(nisig = isigopen(record, NULL, 0)) < 0) continue;
-	    if (nisig > nimax) {
-		if ((s = realloc(s, nisig * sizeof(WFDB_Siginfo))) == NULL ||
-		    (buflen = realloc(buflen, nisig * sizeof(int))) == NULL ||
-		    (uncal = realloc(uncal, nisig * sizeof(int))) == NULL ||
-		    (v = realloc(v, nisig * sizeof(int))) == NULL ||
-		    (vbase = realloc(vbase, nisig * sizeof(int))) == NULL ||
-		    (vmax = realloc(vmax, nisig * sizeof(int))) == NULL ||
-		    (vmin = realloc(vmin, nisig * sizeof(int))) == NULL ||
-		    (vsum = realloc(vsum, nisig * sizeof(long))) == NULL ||
-		    (vbuf = realloc(vbuf, nisig * sizeof(int *))) == NULL) {
-		    (void)fprintf(stderr, "%s: insufficient memory\n", pname);
-		    exit(2);
-		}
-		if (!sflag &&
-		    ((siglist = realloc(siglist,nisig*sizeof(int))) == NULL ||
-		     (sqstr =realloc(sqstr,(nisig+1)*sizeof(char))) == NULL)) {
-		    (void)fprintf(stderr, "%s: insufficient memory\n", pname);
-		    exit(2);
-		}
-		while (nimax < nisig) {
-		    vbuf[nimax] = NULL;
-		    buflen[nimax++] = 0;
-		}
+	    if (nisig > nimax &&
+		(s = realloc(s, nisig * sizeof(WFDB_Siginfo))) == NULL) {
+		(void)fprintf(stderr, "%s: insufficient memory\n", pname);
+		exit(2);
 	    }
 	    if (isigopen(record, s, nisig) != nisig)
 		continue;
-	    for (i = 0; i < nisig; i++)
-		uncal[i] = 0;
-	    (void)setpagetitle(0L);
 	    if (!sflag) {
+		if ((siglist == NULL || nisig > nosig) &&
+		    ((siglist=realloc(siglist,nisig*sizeof(int))) == NULL)) {
+		    (void)fprintf(stderr, "%s: insufficient memory\n", pname);
+		    exit(2);
+		}
 		for (i = 0; i < nisig; i++)
 		    siglist[i] = i;
-		nsig = nosig = nisig;
+		nosig = nisig;
 	    }
 	    else {
 		for (i = 0; i < nosig; i++)
@@ -662,8 +651,40 @@ FILE *cfile;
 			wfdbquit();
 			return;
 		    }
-		nsig = nosig;
 	    }
+	    if (nisig > nimax) {
+		if ((uncal = realloc(uncal, nisig * sizeof(int))) == NULL ||
+		    (v = realloc(v, nisig * sizeof(int))) == NULL) {
+		    (void)fprintf(stderr, "%s: insufficient memory\n", pname);
+		    exit(2);
+		}
+		nimax = nisig;
+	    }
+	    for (i = 0; i < nisig; i++)
+		uncal[i] = 0;
+	    if (nosig > nomax) {
+		if ((accept = realloc(accept, nosig * sizeof(int))) == NULL ||
+		    (buflen = realloc(buflen, nosig * sizeof(int))) == NULL ||
+		    (vbase = realloc(vbase, nosig * sizeof(int))) == NULL ||
+		    (vmax = realloc(vmax, nosig * sizeof(int))) == NULL ||
+		    (vmin = realloc(vmin, nosig * sizeof(int))) == NULL ||
+		    (vsum = realloc(vsum, nosig * sizeof(long))) == NULL ||
+		    (vbuf = realloc(vbuf, nosig * sizeof(int *))) == NULL) {
+		    (void)fprintf(stderr, "%s: insufficient memory\n", pname);
+		    exit(2);
+		}
+		if (!sflag &&
+		    ((siglist = realloc(siglist,nosig*sizeof(int))) == NULL ||
+		     (sqstr =realloc(sqstr,(nosig+1)*sizeof(char))) == NULL)) {
+		    (void)fprintf(stderr, "%s: insufficient memory\n", pname);
+		    exit(2);
+		}
+		while (nomax < nosig) {
+		    vbuf[nomax] = NULL;
+		    buflen[nomax++] = 0;
+		}
+	    }
+	    (void)setpagetitle(0L);
 	    if ((sps = sampfreq((char *)NULL)) <= 0.) sps = WFDB_DEFFREQ;
 	    dpsi = dpmm * tscale / sps;
 	    nsamp = (int)(sps*sdur);
@@ -721,286 +742,302 @@ char *record, *title;
 
     /* Allocate buffers for the samples to be plotted, and initialize the
        range variables. */
-    for (i = 0; i < nsig; i++) {
-        int sig = siglist[i];
-
-	vmax[sig] = -32768; vmin[sig] = 32767; vsum[sig] = 0L;
-	if (nsamp > buflen[sig]) {
-	    if (vbuf[sig]) {
-		free((char *)vbuf[sig]);
-		vbuf[sig] = NULL;
-		buflen[sig] = 0;
-	    }
-	    if ((vbuf[sig]=(int *)calloc((unsigned)nsamp,sizeof(int)))==NULL) {
+    for (i = 0; i < nosig; i++) {
+	accept[i] = 0;
+	vmax[i] = -32768; vmin[i] = 32767; vsum[i] = 0L;
+	if (nsamp > buflen[i]) {
+	    if ((vbuf[i] = realloc(vbuf[i], nsamp * sizeof(int))) == NULL) {
+		buflen[i] = 0;
 		(void)fprintf(stderr, "insufficient memory\n");
 		return (0);
 	    }
-	    buflen[sig] = nsamp;
+	    buflen[i] = nsamp;
 	}
     }
 
     if ((jmax = (int)(t1 - t0)) > nsamp) jmax = nsamp;
-    if (nsig > 0) {
-      /* Fill the buffers. */
-      if (isigsettime(t0) < 0) return (0);
-      for (j = 0; j < jmax && getvec(v) == nisig; j++) {
-	for (i = 0; i < nsig; i++) {
-	    int sig = siglist[i], vtmp;
+    if (nosig > 0) {
+	/* Fill the buffers. */
+	if (isigsettime(t0) < 0) return (0);
+	for (j = 0; j < jmax && getvec(v) == nisig; j++) {
+	    for (i = 0; i < nosig; i++) {
+		int vtmp = v[siglist[i]];
 
-	    vbuf[sig][j] = vtmp = v[sig];
-	    if (vtmp > vmax[sig]) vmax[sig] = vtmp;
-	    else if (vtmp < vmin[sig]) vmin[sig] = vtmp;
-	    vsum[sig] += vtmp;
+		vbuf[i][j] = vtmp;
+		if (vtmp != WFDB_INVALID_SAMPLE) {
+		    if (vtmp > vmax[i]) vmax[i] = vtmp;
+		    else if (vtmp < vmin[i]) vmin[i] = vtmp;
+		    vsum[i] += vtmp;
+		    accept[i]++;
+		}
+	    }
 	}
-      }
-      if (j == 0) return (0);
-      jmax = j;
+	if (j == 0) return (0);
+	jmax = j;
 
-      /* Calculate the midranges. */
-      for (i = 0; i < nsig; i++) {
-	int sig = siglist[i], vb, vm, vs;
-	double w;
+	/* Calculate the midranges. */
+	for (i = 0; i < nosig; i++) {
+	    int vb, vm, vs;
+	    double w;
 
-	vs = vsum[sig]/jmax;
-	vb = (vmax[sig] + vmin[sig])/2;
-	if (vb > vs) w = (vb - vs)/(vmax[sig] - vs);
-	else if (vb < vs) w = (vs - vb)/(vs - vmin[sig]);
-	else w = 0.0;
-	vbase[sig] = vs + ((double)vb-vs)*w;
-      }
-    }
-    t1 = t0 + jmax;
+	    if (accept[i]) {
+		vs = vsum[i]/accept[i];
+		vb = (vmax[i] + vmin[i])/2;
+		if (vb > vs) w = (vb - vs)/(vmax[i] - vs);
+		else if (vb < vs) w = (vs - vb)/(vs - vmin[i]);
+		else w = 0.0;
+		vbase[i] = vs + ((double)vb-vs)*w;
+	    }
+	    else	/* no valid samples in this trace */
+		vbase[i] = 0;
+	}
+	t1 = t0 + jmax;
     
-    /* Determine the width and height of the strip.  Allow the greater of 4 mV
-       or 20 mm per trace if possible.  If n strips won't fit on the page
-       (even if the allowance per trace is decreased moderately), the allowance
-       is adjusted so that n-1 strips fill the page (for n = 2, 3, and 4). */
-    s_width = jmax*tscale/sps;
-    if (vscale >= 5.) s_height = 4. * vscale * nsig;
-    else s_height = 20. * nsig;
-    if (1.5 * (s_height+v_sep) > p_height - (tmargin+bmargin))
-	s_height = p_height - (tmargin+bmargin+v_sep);
-    else if (2.5 * (s_height+v_sep) > p_height - (tmargin+bmargin))
-	s_height = (p_height - (tmargin+bmargin+2*v_sep))/2; 
-    else if (3.5 * (s_height+v_sep) > p_height - (tmargin+bmargin))
-	s_height = (p_height - (tmargin+bmargin+3*v_sep))/3;
-    if (nsig == 0) t_height = s_height;
-    else t_height = s_height / nsig;
+	/* Determine the width and height of the strip.  Allow the greater of 4
+           mV or 20 mm per trace if possible.  If n strips won't fit on the
+           page (even if the allowance per trace is decreased moderately), the
+           allowance is adjusted so that n-1 strips fill the page (for n = 2,
+           3, and 4). */
+	s_width = jmax * tscale / sps;
+	if (vscale >= 5.) s_height = 4. * vscale * nosig;
+	else s_height = 20. * nosig;
+	if (1.5 * (s_height+v_sep) > p_height - (tmargin+bmargin))
+	    s_height = p_height - (tmargin+bmargin+v_sep);
+	else if (2.5 * (s_height+v_sep) > p_height - (tmargin+bmargin))
+	    s_height = (p_height - (tmargin+bmargin+2*v_sep))/2; 
+	else if (3.5 * (s_height+v_sep) > p_height - (tmargin+bmargin))
+	    s_height = (p_height - (tmargin+bmargin+3*v_sep))/3;
+	if (nosig == 0) t_height = s_height;
+	else t_height = s_height / nosig;
 
-    /* Decide where to put the strip.  Usually, this is directly below the
-       previous strip, and s_top will have been set correctly after the
-       previous strip was printed.  If the strip won't fit in the available
-       space, though, go to the top of the next page. */
-    s_bot = s_top - s_height;
-    if (s_bot < bmargin) {
-	setpagetitle(t0);
-	ejectpage();
-	newpage();
-	s_top = p_height - (tmargin + v_sep);
+	/* Decide where to put the strip.  Usually, this is directly below the
+           previous strip, and s_top will have been set correctly after the
+           previous strip was printed.  If the strip won't fit in the available
+           space, though, go to the top of the next page. */
 	s_bot = s_top - s_height;
-	if (pflag) s_left = lmargin;
-    }
-    /* If side-by-side printing is enabled, s_left will have been set
-       correctly after the previous strip was printed. */
-    if (!pflag) s_left = lmargin + (s_defwidth - s_width)/2;
-    s_right = s_left + s_width;
+	if (s_bot < bmargin) {
+	    setpagetitle(t0);
+	    ejectpage();
+	    newpage();
+	    s_top = p_height - (tmargin + v_sep);
+	    s_bot = s_top - s_height;
+	    if (pflag) s_left = lmargin;
+	}
+	/* If side-by-side printing is enabled, s_left will have been set
+	   correctly after the previous strip was printed. */
+	if (!pflag) s_left = lmargin + (s_defwidth - s_width)/2;
+	s_right = s_left + s_width;
 
-    /* Draw the grid and print the title and time markers. */
-    if (gflag) {
-	setrgbcolor(&gc);
-	if (Gflag)
-	   grid(mm(s_left-10.0),mm(s_bot),mm(s_right),mm(s_top),t_tick,v_tick);
-	else
-	   grid(mm(s_left), mm(s_bot), mm(s_right), mm(s_top), t_tick, v_tick);
-    }
-    if (Gflag) {
-	setrgbcolor(&Gc);
-	Grid(mm(s_left), mm(s_bot), mm(s_right), mm(s_top), t_tick, v_tick);
-    }
-    setrgbcolor(&lc);
-    setroman(fs_title);
-    move(mm(s_left), mm(s_top + t_sep));
-    if (rflag) { label("Record "); label(record); label("    "); }
-    if (title) label(title);
-    /* If side-by-side strip printing is enabled, print the time markers within
-       the strip at the upper corners;  in this case, if the strip is less than
-       30 mm wide, only the starting time marker is printed.  Otherwise, if
-       signal labels are to be printed, and nsig is odd, print the time markers
-       at the bottom of the strip, so they won't interfere with the labels.
-       Otherwise, print time markers midway between top and bottom. */
-    if (pflag) tm_y = mm(s_top) - pt(10.);
-    else if (lflag && (nsig & 1)) tm_y = mm(s_bot);
-    else tm_y = mm(s_top + s_bot)/2 - pt(4.);
-    if (tsmode == 1) {	/* print elapsed times only */
-	if (t0) {
-	    ts = mstimstr(t0);
+	/* Draw the grid and print the title and time markers. */
+	if (gflag) {
+	    setrgbcolor(&gc);
+	    if (Gflag)
+		grid(mm(s_left-10.0), mm(s_bot), mm(s_right), mm(s_top),
+		     t_tick, v_tick);
+	    else
+		grid(mm(s_left), mm(s_bot), mm(s_right), mm(s_top),
+		     t_tick, v_tick);
+	}
+	if (Gflag) {
+	    setrgbcolor(&Gc);
+	    Grid(mm(s_left), mm(s_bot), mm(s_right), mm(s_top), t_tick,v_tick);
+	}
+	setrgbcolor(&lc);
+	setroman(fs_title);
+	move(mm(s_left), mm(s_top + t_sep));
+	if (rflag) { label("Record "); label(record); label("    "); }
+	if (title) label(title);
+	/* If side-by-side strip printing is enabled, print the time markers
+	   within the strip at the upper corners; in this case, if the strip is
+	   less than 30 mm wide, only the starting time marker is printed.
+	   Otherwise, if signal labels are to be printed, and nosig is odd,
+	   print the time markers at the bottom of the strip, so they won't
+	   interfere with the labels.  Otherwise, print time markers midway
+	   between top and bottom. */
+	if (pflag) tm_y = mm(s_top) - pt(fs_title);
+	else if (lflag && (nosig & 1)) tm_y = mm(s_bot);
+	else tm_y = mm(s_top + s_bot)/2 - pt(fs_title/2.);
+	if (tsmode == 1) {	/* print elapsed times only */
+	    if (t0) {
+		ts = mstimstr(t0);
+		while (*ts == ' ') ts++;
+		/* Print milliseconds only if t0 is not an exact multiple of 1
+		   second. */
+		if (strcmp(ts + strlen(ts)-4, ".000") == 0)
+		    *(ts + strlen(ts)-4) = '\0';
+	    }
+	    else
+		ts = "0:00";
+	    if (!pflag) {
+		move(mm(s_left - l_sep), tm_y);
+		rlabel(ts);
+	    }
+	    else {
+		move(mm(s_left + l_sep), tm_y);
+		label(ts);
+	    }
+	    if (vflag)
+		(void)fprintf(stderr, "%s %s-", record, ts);
+	    ts = mstimstr(t1);
 	    while (*ts == ' ') ts++;
-	    /* Print milliseconds only if t0 is not an exact multiple of 1
-	       second. */
 	    if (strcmp(ts + strlen(ts)-4, ".000") == 0)
 		*(ts + strlen(ts)-4) = '\0';
-	}
-	else
-	    ts = "0:00";
-	if (!pflag) {
-	    move(mm(s_left - l_sep), tm_y);
-	    rlabel(ts);
-	}
-	else {
-	    move(mm(s_left + l_sep), tm_y);
-	    label(ts);
-	}
-	if (vflag)
-	    (void)fprintf(stderr, "%s %s-", record, ts);
-	ts = mstimstr(t1);
-	while (*ts == ' ') ts++;
-	if (strcmp(ts + strlen(ts)-4, ".000") == 0)
-	    *(ts + strlen(ts)-4) = '\0';
-	if (!pflag) {
-	    move(mm(s_right + l_sep), tm_y);
-	    label(ts);
-	}
-	else if (s_width >= 30.) {
-	    move(mm(s_right - l_sep), tm_y);
-	    rlabel(ts);
-	}
-	if (vflag)
-	    (void)fprintf(stderr, "%s %s\n", ts, (title != NULL) ? title : "");
-    }
-    else if (tsmode == 2) { /* print absolute times (but not date) if defined,
-			       elapsed times otherwise */
-	char *p;
-
-	ts = mstimstr(-t0);
-	while (*ts == ' ') ts++;
-	for (p = ts; *p != '.'; p++)
-	    ;
-	if (strncmp(p, ".000", 4))
-	    p += 4;
-	if (*ts == '[')
-	    *p++ = ']';
-	*p = '\0';
-	if (!pflag) {
-	    move(mm(s_left - l_sep), tm_y);
-	    rlabel(ts);
-	}
-	else {
-	    move(mm(s_left + l_sep), tm_y);
-	    label(ts);
-	}
-	if (vflag)
-	    (void)fprintf(stderr, "%s %s-", record, ts);
-	ts = mstimstr(-t1);
-	while (*ts == ' ') ts++;
-	for (p = ts; *p != '.'; p++)
-	    ;
-	if (strncmp(p, ".000", 4))
-	    p += 4;
-	if (*ts == '[')
-	    *p++ = ']';
-	*p = '\0';
-	if (!pflag) {
-	    move(mm(s_right + l_sep), tm_y);
-	    label(ts);
-	}
-	else if (s_width >= 30.) {
-	    move(mm(s_right - l_sep), tm_y);
-	    rlabel(ts);
-	}
-	if (vflag)
-	    (void)fprintf(stderr, "%s %s\n", ts, (title != NULL) ? title : "");
-    }
-
-    /* Draw the signals. */
-    x0 = mm(s_left);
-    if (lflag) {
-	setitalic(fs_label);
-	/* If side-by-side printing and signal label printing are both enabled,
-	   print the signal labels in the left margin only. */
-	if (pflag && s_left == lmargin)
-	    for (i = 0; i < nsig; i++) {
-		int sig = siglist[i];
-		char *d, *t;
-
-		d = s[sig].desc;
-		y0 = mm(s_top - (i + 0.5)*t_height);
-		move(mm(s_left - l_sep), y0 - pt(4.));
-		if (strncmp(d,"record ",7) == 0 && (t = strchr(d,',')) != NULL)
-		    d = t+1;
-		rlabel(d);
-		if (s[sig].gain == 0.) rlabel("* ");
+	    if (!pflag) {
+		move(mm(s_right + l_sep), tm_y);
+		label(ts);
 	    }
-    }
-    for (i = 0; i < nsig; i++) {
-	int sig = siglist[i];
-	static WFDB_Calinfo ci;
-
-	setrgbcolor(&lc);
-	y0 = mm(s_top - (i + 0.5)*t_height);
-	if (s[sig].gain == 0.) {
-	    s[sig].gain = WFDB_DEFGAIN;
-	    usflag = uncal[sig] = 1;
+	    else if (s_width >= 30.) {
+		move(mm(s_right - l_sep), tm_y);
+		rlabel(ts);
+	    }
+	    if (vflag)
+		(void)fprintf(stderr, "%s %s\n",
+			      ts, (title != NULL) ? title : "");
 	}
-	if (lflag && !pflag) {
-	    char *d = s[sig].desc, *t;
+	else if (tsmode == 2) { /* print absolute times (but not date) if
+				   defined, elapsed times otherwise */
+	    char *p;
 
-	    if (strncmp(d, "record ", 7) == 0 && (t = strchr(d, ',')) != NULL)
-		d = t+1;
-	    move(mm(s_left - l_sep), y0 - pt(3.));
-	    rlabel(d);
-	    if (uncal[sig]) rlabel("* ");
-	    move(mm(s_right + l_sep), y0 - pt(3.));
-	    label(d);
-	    if (uncal[sig]) label(" *");
+	    ts = mstimstr(-t0);
+	    while (*ts == ' ') ts++;
+	    for (p = ts; *p != '.'; p++)
+		;
+	    if (strncmp(p, ".000", 4))
+		p += 4;
+	    if (*ts == '[')
+		*p++ = ']';
+	    *p = '\0';
+	    if (!pflag) {
+		move(mm(s_left - l_sep), tm_y);
+		rlabel(ts);
+	    }
+	    else {
+		move(mm(s_left + l_sep), tm_y);
+		label(ts);
+	    }
+	    if (vflag)
+		(void)fprintf(stderr, "%s %s-", record, ts);
+	    ts = mstimstr(-t1);
+	    while (*ts == ' ') ts++;
+	    for (p = ts; *p != '.'; p++)
+		;
+	    if (strncmp(p, ".000", 4))
+		p += 4;
+	    if (*ts == '[')
+		*p++ = ']';
+	    *p = '\0';
+	    if (!pflag) {
+		move(mm(s_right + l_sep), tm_y);
+		label(ts);
+	    }
+	    else if (s_width >= 30.) {
+		move(mm(s_right - l_sep), tm_y);
+		rlabel(ts);
+	    }
+	    if (vflag)
+		(void)fprintf(stderr, "%s %s\n",
+			      ts, (title != NULL) ? title : "");
 	}
-	dpadu = dpmm * vscale / s[sig].gain;
-	if (getcal(s[sig].desc, s[sig].units, &ci) == 0 &&
-	    ci.scale != 0.0) {
-	    dpadu /= ci.scale;
-	    append_scale(ci.sigtype, ci.units, ci.scale);
-	}
-	/* Handle the common case of mV-dimensioned signals which are not in
-	   the WFDB calibration database. */
-	else if (s[sig].units == NULL)
-	    append_scale("record", "mV", 1.0);
-	/* Adjust vbase for calibrated DC-coupled signals. */
-	if (ci.scale != 0.0 && (ci.caltype & 1) && !uncal[sig]) {
-	    int n, yzero = physadu((unsigned int)sig, 0.0), ytick;
-	    double ptick = 5.0*ci.scale/tpmv;
 
-	    ytick = physadu((unsigned int)sig, ptick) - yzero;
-	    if (ytick == 0) ytick = 1;
-	    if (vbase[sig] >= yzero)
-		n = (int)((vbase[sig] - yzero)/ytick);
-	    else
-		n = -(int)((yzero - vbase[sig])/ytick);
-	    vbase[sig] = yzero + ytick * n;
+	/* Draw the signals. */
+	x0 = mm(s_left);
+	if (lflag) {
+	    setitalic(fs_label);
+	    /* If side-by-side printing and signal label printing are both
+	       enabled, print the signal labels in the left margin only. */
+	    if (pflag && s_left == lmargin)
+		for (i = 0; i < nosig; i++) {
+		    int sig = siglist[i];
+		    char *d, *t;
+
+		    d = s[sig].desc;
+		    y0 = mm(s_top - (i + 0.5)*t_height);
+		    move(mm(s_left - l_sep), y0 - pt(fs_label/2.));
+		    if (strncmp(d,"record ",7) == 0 &&
+			(t = strchr(d,',')) != NULL)
+			d = t+1;
+		    rlabel(d);
+		    if (s[sig].gain == 0.) rlabel("* ");
+		}
+	}
+	for (i = 0; i < nosig; i++) {
+	    int last_sample_valid,  sig = siglist[i];
+	    static WFDB_Calinfo ci;
+
+	    setrgbcolor(&lc);
+	    y0 = mm(s_top - (i + 0.5)*t_height);
+	    if (s[sig].gain == 0.) {
+		s[sig].gain = WFDB_DEFGAIN;
+		usflag = uncal[sig] = 1;
+	    }
 	    if (lflag && !pflag) {
-		char lbuf[20];
-		int yt, yi = pt(3.);
+		char *d = s[sig].desc, *t;
 
-		setroman(fs_label*0.75);
-		(void)sprintf(lbuf, "%g", ptick * (n-1));
-		yt = y0 - adu(ytick);
-		move(mm(s_left - 1.5*l_sep), yt - yi); rlabel(lbuf);
-		move(mm(s_left - l_sep), yt); cont(mm(s_left), yt);
-		move(mm(s_right + 1.5*l_sep), yt - yi); label(lbuf);
-		move(mm(s_right + l_sep), yt); cont(mm(s_right), yt);
-		(void)sprintf(lbuf, "%g", ptick * (n+1));
-		yt = y0 + adu(ytick);
-		move(mm(s_left - 1.5*l_sep), yt - yi); rlabel(lbuf);
-		move(mm(s_left - l_sep), yt); cont(mm(s_left), yt);
-		move(mm(s_right + 1.5*l_sep), yt - yi); label(lbuf);
-		move(mm(s_right + l_sep), yt); cont(mm(s_right), yt);
-		setitalic(fs_label);
+		if (strncmp(d, "record ", 7) == 0 &&
+		    (t = strchr(d, ',')) != NULL)
+		    d = t+1;
+		move(mm(s_left - l_sep), y0 - pt(fs_label * 0.3));
+		rlabel(d);
+		if (uncal[sig]) rlabel("* ");
+		move(mm(s_right + l_sep), y0 - pt(fs_label * 0.3));
+		label(d);
+		if (uncal[sig]) label(" *");
+	    }
+	    dpadu = dpmm * vscale / s[sig].gain;
+	    if (getcal(s[sig].desc, s[sig].units, &ci) == 0 &&
+		ci.scale != 0.0) {
+		dpadu /= ci.scale;
+		append_scale(ci.sigtype, ci.units, ci.scale);
+	    }
+	    /* Handle the common case of mV-dimensioned signals that are not
+	       in the WFDB calibration database. */
+	    else if (s[sig].units == NULL)
+		append_scale("record", "mV", 1.0);
+	    /* Adjust vbase for calibrated DC-coupled signals. */
+	    if (ci.scale != 0.0 && (ci.caltype & 1) && !uncal[sig]) {
+		int n, yzero = physadu((unsigned int)sig, 0.0), ytick;
+		double ptick = 5.0*ci.scale/tpmv;
+
+		ytick = physadu((unsigned int)sig, ptick) - yzero;
+		if (ytick == 0) ytick = 1;
+		if (vbase[i] >= yzero)
+		    n = (int)((vbase[i] - yzero)/ytick);
+		else
+		    n = -(int)((yzero - vbase[i])/ytick);
+		vbase[i] = yzero + ytick * n;
+		if (lflag && !pflag) {
+		    char lbuf[20];
+		    int yt, yi = pt(fs_label * 0.3);
+
+		    setroman(fs_label * 0.75);
+		    (void)sprintf(lbuf, "%g", ptick * (n-1));
+		    yt = y0 - adu(ytick);
+		    move(mm(s_left - 1.5*l_sep), yt - yi); rlabel(lbuf);
+		    move(mm(s_left - l_sep), yt); cont(mm(s_left), yt);
+		    move(mm(s_right + 1.5*l_sep), yt - yi); label(lbuf);
+		    move(mm(s_right + l_sep), yt); cont(mm(s_right), yt);
+		    (void)sprintf(lbuf, "%g", ptick * (n+1));
+		    yt = y0 + adu(ytick);
+		    move(mm(s_left - 1.5*l_sep), yt - yi); rlabel(lbuf);
+		    move(mm(s_left - l_sep), yt); cont(mm(s_left), yt);
+		    move(mm(s_right + 1.5*l_sep), yt - yi); label(lbuf);
+		    move(mm(s_right + l_sep), yt); cont(mm(s_right), yt);
+		    setitalic(fs_label);
+		}
+	    }
+	    y0 -= adu(vbase[i]);
+	    setrgbcolor(&sc);
+	    for (j = last_sample_valid = 0, vp = vbuf[i]; j < jmax; j++, vp++){
+		if (*vp == WFDB_INVALID_SAMPLE)
+		    last_sample_valid = 0;
+		else if (last_sample_valid)
+			cont(x0 + si(j), y0 + adu(*vp));
+		else {
+		    move(x0 + si(j), y0 + adu(*vp));
+		    last_sample_valid = 1;
+		}
 	    }
 	}
-	y0 -= adu(vbase[sig]);
-	vp = vbuf[sig];
-	setrgbcolor(&sc);
-	move(x0 + si(0), y0 + adu(*vp++));
-	for (j = 1; j < jmax; j++)
-	    cont(x0 + si(j), y0 + adu(*vp++));
     }
     if (lflag) setroman(fs_label);
     else flush_cont();
@@ -1022,9 +1059,9 @@ char *record, *title;
 
        The scheme on the left is used for records with only one signal, and
        that on the right is used in other cases. */
-    if (nsig < 2) ya[0] = mm(s_top - 5.0) - pt(fs_ann/2.);
+    if (nosig < 2) ya[0] = mm(s_top - 5.0) - pt(fs_ann/2.);
     else ya[0] = mm(s_top - t_height) - pt(fs_ann/2.);
-    if (nsig < 3) ya[1] = mm(s_bot + 5.0) - pt(fs_ann/2.);
+    if (nosig < 3) ya[1] = mm(s_bot + 5.0) - pt(fs_ann/2.);
     else ya[1] = mm(s_top - 2*t_height) - pt(fs_ann/2.);
     if (Mflag) setbar1(mm(s_top), mm(s_bot));
 
@@ -1039,11 +1076,11 @@ char *record, *title;
 	    if (lflag) {
 		setrgbcolor(&lc);
 		setitalic(fs_label);
-		for (i = 0; i < nsig; i++) {
+		for (i = 0; i < nosig; i++) {
 		    char *d = s[siglist[i]].desc, *t;
 
 		    y0 = mm(s_top - (i + 0.5)*t_height);
-		    move(mm(s_right + l_sep), y0 - pt(4.));
+		    move(mm(s_right + l_sep), y0 - pt(fs_label * 0.4));
 		    if (strncmp(d,"record ",7)==0 && (t=strchr(d,',')) != NULL)
 			d = t+1;
 		    label(d);
@@ -1073,18 +1110,23 @@ char *record, *title;
 		c = -1;
 	    while (getann(ia, &annot) >= 0 && annot.time < t1) {
 		if (Mflag >= 2 && annot.chan != c) {
-		    int i;
+		    int i, j;
 		    i = c = annot.chan;
-		    if (i < 0 || i >= nsig) i = 0;
-		    y = mm(curr_s_top - (i + 0.5)*t_height + 10.);
-		    if (Mflag > 2)
-			(void)printf("%d Ay\n", y);
+		    if (i < 0 || i >= nisig) i = 0;
+		    for (j = 0; j < nosig; j++) {
+			if (siglist[j] == i) {
+			    y = mm(curr_s_top - (j + 0.5)*t_height + 10.);
+			    if (Mflag > 2)
+				(void)printf("%d Ay\n", y);
+			    break;
+			}
+		    }
 		}
 		if (Mflag) setbar2(y);   
 		x = (int)(annot.time - t0);
                 switch (annot.anntyp) {
 		  case NOISE:
-		    move(x0 + si(x), ya[ia] + pt(fs_ann+1.0));
+		    move(x0 + si(x), ya[ia] + pt(fs_ann * 1.1));
 		    if (annot.subtyp == -1) { label("U"); break; }
 		    /* The existing scheme is good for up to 4 signals;  it can
 		       be easily extended to 8 or 12 signals using the chan and
@@ -1115,7 +1157,7 @@ char *record, *title;
 			(void)printf("(%s) %d a\n",
 				     annstr(annot.anntyp), x0+si(x));
 		    else {
-			move(x0 + si(x), y + pt(9.));
+			move(x0 + si(x), y + pt(fs_ann * 1.1));
 			if (aux_shorten && *annot.aux > 1)
 			    *(annot.aux+2) = '\0'; /* print first char only */
 			label(annot.aux+1);
@@ -1126,7 +1168,7 @@ char *record, *title;
 			(void)printf("(%s) %d a\n",
 				     annstr(annot.anntyp), x0+si(x));
 		    else {
-			move(x0 + si(x), ya[ia] - pt(9.));
+			move(x0 + si(x), ya[ia] - pt(fs_ann * 1.1));
 			label(annot.aux+1);
 		    }
 		    break;
@@ -1376,7 +1418,7 @@ void newpage()
 	(void)printf("/tm matrix currentmatrix def\n");
 	(void)printf("/gm matrix currentmatrix def\n");
     }
-    if (lwmm > 0.)
+    if (lwmm != LWMM)
 	(void)printf("/lwmm %f def\n", lwmm);
     (void)printf("%g newpage\n", dpi);
     setrgbcolor(&lc);
@@ -1420,9 +1462,9 @@ void ejectpage()
 	    double yt = mm(title_y) + mm(30.0);
 
 	    if (Rflag) yt -= mm(10.0);
-	    setcourier(10.0);
+	    setcourier(fs_label);
 	    while (fgets(tstr, sizeof(tstr), infofile)) {
-		move(mm(lmargin), (int)(yt -= pt(10)));
+		move(mm(lmargin), (int)(yt -= pt(fs_label * 1.1)));
 		label(tstr);
 	    }
 	    (void)fclose(infofile);
@@ -1446,7 +1488,7 @@ void ejectpage()
 	}
 	if (lflag && usflag) {
 	    setroman(fs_label*0.75);
-	    move(mm(p_width - rmargin), mm(bmargin) - pt(7.5));
+	    move(mm(p_width - rmargin), mm(bmargin) - pt(fs_label*0.75));
 	    rlabel("* uncalibrated signal");
 	}
 	if (smode == 1 || smode == 2) {
@@ -1459,7 +1501,8 @@ void ejectpage()
 		    p_width - rmargin - lmargin)
 		    move(mm(p_width - rmargin), mm(footer_y));
 		else
-		    move(mm(p_width - rmargin), mm(footer_y) + pt(7.5));
+		    move(mm(p_width - rmargin),
+			 mm(footer_y) + pt(fs_label*0.75));
 		rlabel(scales);
 		if (footer) {
 		    move(mm(lmargin), mm(footer_y));
@@ -1686,6 +1729,9 @@ int x, y;
     char c;
     int dx, dy;
 
+#if DEBUG
+    printf("cont(%4d,%4d)\n", x, y);
+#else
     dx = x - xc; dy = y - yc;
     xc = x; yc = y;
     if (0 <= dx && dx <= 94 && -47 <= dy && dy <= 47) {
@@ -1704,15 +1750,20 @@ int x, y;
 	flush_cont();
 	(void)printf("%d %d N\n", dx, dy);
     }
+#endif
 }
 
 void flush_cont()
 {
+#if DEBUG
+    printf("flush_cont()\n");
+#else
     if (contp > contbuf) {
 	*contp = '\0';
 	(void)printf("(%s) z\n", contbuf);
 	contp = contbuf;
     }
+#endif
 }
 
 char *prog_name(s)
@@ -1778,7 +1829,7 @@ static char *help_strings[] = {
  " -u        generate `unstructured' PostScript",
  " -v N      set voltage scale to N mm/mV (default: 5)",     /* ** VSCALE ** */
  " -V        verbose mode",
- " -w N      set line width to N mm (default: 0 (narrowest possible))",
+ " -w N      set line width to N mm (default: 0.2; 0 is narrowest possible)",
  " -1        print only first character of comment annotation strings",
  " -         read script from standard input",
  "Script line format:",
@@ -1816,11 +1867,11 @@ static char *dprolog[] = {
 " %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%",
 "save 100 dict begin /pschart exch def",
 "/dpi 300 def",
-"/lw 0 def",
-"/lwmm 0 def",
+"/mm {72 mul 25.4 div}def",
+"/lwmm 0.2 def",
+"/lw lwmm mm def",
 "/tm matrix currentmatrix def",
 "/gm matrix currentmatrix def",
-"/mm {72 mul 25.4 div}def",
 "/I {/Times-Italic findfont exch scalefont setfont}def",
 "/R {/Times-Roman findfont exch scalefont setfont}def",
 "/C {/Courier findfont exch scalefont setfont}def",

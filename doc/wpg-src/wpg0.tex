@@ -489,6 +489,34 @@ guide in June, 1999.  See @file{NEWS}, in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
+@unnumberedsubsec Changes in version 10.3.17
+
+This version is the first to support reading variable-layout records
+(multi-segment records in which the number, arrangement, gains, and baselines
+of the signals may vary from one segment to the next; @pxref{Multi-Segment
+Records}).
+
+Rounding errors in the WFDB library's @code{mstimstr} function have been
+reduced.  Previous versions did not always round appropriately when the
+sampling frequency was much less than 1 Hz.
+
+The maximum length for a record name (@code{WFDB_MAXRNL}, defined in
+@file{wfdb.h}) has been increased from 11 to 20.
+
+A new constant, @code{WFDB_INVALID_SAMPLE}, is now defined in @file{wfdb.h}.
+It is used to identify padding inserted to fill in for missing data.  When
+writing in any format that uses fewer than 16 bits per sample, @code{putvec}
+maps @code{WFDB_INVALID_SAMPLE} to the lowest (most negative) value expressible
+in that format; when reading a signal file in such a format, @code{getframe}
+performs the inverse mapping, so that missing data can be identified regardless
+of the data format.
+
+A side effect of this change is that (for example) any samples that had the
+most negative value (for example, -2048 in a format 212 signal file) are now
+flagged as invalid.  To treat such samples as invalid is reasonable, however,
+since these occur only when the input level falls below the working range of
+the analog-to-digital converter.
+
 @unnumberedsubsec Changes in version 10.3.16
 
 Benjamin Moody has added an interface between the WFDB library and
@@ -5402,34 +5430,72 @@ selects high-resolution mode.
 @cindex multi-segment records
 @cindex concatenating records
 @cindex nested records
+@cindex layout segment
+@cindex fixed layout
+@cindex variable layout
 
 A multi-segment record consists of two or more concatenated segments.
 Each segment is an ordinary WFDB record, with its own header file and
-signal file(s).  In any given multi-segment record, all signals must
-appear in the same order within each segment (signals may not be
-omitted), and the sampling frequency of any given signal must be the
-same in each segment.  Segments of multi-segment records must be
-ordinary records (it is not permitted to nest one multi-segment record
-within another, for example), and the length of each segment must be
-specified (the WFDB library does not impose this requirement on ordinary
-records that are not part of a multi-segment record).  There are no
-other restrictions on segments; specifically, it is permitted to mix
-segments with different storage formats, and for any segment to appear
-more than once.  A special header file (created either manually or by
-using @code{setmsheader}) specifies the record name for each segment in
-a multi-segment record.  Once this special header exists, the
-multi-segment record can be read by any WFDB application.  Note that only
-the signal files of the segments are ``linked'' by the multi-segment
-record's header; annotation files associated with the individual
-segments are @emph{not} readable as part of the multi-segment record
-(although an annotation file associated directly with the multi-segment
-record can be created and read just as for an ordinary record).  From
-the point of view of a WFDB application, reading a multi-segment record is
+signal file(s).  There are two types of multi-segment records:
+@dfn{fixed-layout} records, in which all signals must appear in the
+same order within each segment (signals may not be omitted, added, or
+swapped), and the gain and baseline of any given signal may not change
+from segment to segment; and @dfn{variable-layout} records, which are
+not bound by these constraints.  If the first segment of a
+multi-segment record has a length of zero samples, that segment is a
+@dfn{layout segment}, and the record is a variable-layout record.
+Version 9.1 of the WFDB library is the first to support reading and
+writing fixed-layout multi-segment records, and version 10.3.17 is the
+first to support reading variable-layout multi-segment records.
+
+In both types of multi-segment records, the sampling frequency of any
+given signal must be the same in each segment.  Segments of
+multi-segment records must be ordinary records (it is not permitted to
+nest one multi-segment record within another, for example), and the
+length of each segment must be specified (the WFDB library does not
+impose this requirement on ordinary records that are not part of a
+multi-segment record).  There are no other restrictions on segments;
+specifically, it is permitted to mix segments with different storage
+formats, and for any segment to appear more than once.  A special
+header file (created either manually or by using @code{setmsheader})
+specifies the record name for each segment in a multi-segment record.
+Once this special header exists, the multi-segment record can be read
+by any WFDB application.  Note that only the signal files of the
+segments are ``linked'' by the multi-segment record's header;
+annotation files associated with the individual segments are
+@emph{not} readable as part of the multi-segment record (although an
+annotation file associated directly with the multi-segment record can
+be created and read just as for an ordinary record).  From the point
+of view of a WFDB application, reading a multi-segment record is
 exactly like reading an ordinary record; specifically,
 @code{isigsettime} works as expected, permitting jumps forward and
-backward between as well as within segments.  Version 9.1 of the WFDB
-library is the first to support reading and writing multi-segment
-records.
+backward between as well as within segments.
+
+Unlike ordinary segments, no signal file is associated with a layout segment;
+only the header file is needed.  In the header file of a layout segment, all of
+the signals present in any of the other segments of the record are listed, in
+the desired order and with the desired gains and baselines.  When the WFDB
+library reads the record, @code{getframe} assembles the frame, scaling and
+shifting each component as needed.  If any signals are missing during a
+segment, the resulting gaps are filled with the sample value
+@code{WFDB_INVALID_SAMPLE}.  In this way, WFDB applications do not need to be
+aware of signal changes; rather, they may read variable-layout records as if
+they were ordinary (fixed-layout) records.
+
+WFDB applications generally assume fixed-layout records, i.e., that
+the number and types of available signals (and their sampling
+frequencies, gains, and baselines) are constant throughout the record.
+These conditions do not always apply in clinical settings, in which
+signals may be added, removed, or recalibrated to meet clinical needs,
+resulting in variable-layout recordings.  A variable-layout recording
+may be divided into segments such that each segment is a fixed-layout
+WFDB record.  The segments can then be reassembled into a
+multi-segment WFDB record.  Version 10.3.17, and later versions, of
+the WFDB library contain code in @code{signal.c} to create a virtual
+fixed-layout record on the fly when reading a variable-layout record.
+This feature can also be used to transform ordinary records on the fly, if
+it is desirable to rearrange, delete, duplicate, scale, or shift
+signals.
 
 @node     Multiple Record Access, Special Files, Multi-Segment Records, Database Files
 @section Simultaneous Access to Multiple Records

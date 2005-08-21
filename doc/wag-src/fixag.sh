@@ -40,19 +40,23 @@ NEXTU=
 for i in *-1.htm *-3.htm *-5.htm *-7.htm
 do
   NEXTT=`grep "<TITLE>" $i | sed "s+<TITLE>++" | sed "s+</TITLE>++"`
+  if [ "x$NEXTT" = "x" ]
+  then
+    NEXTT=`grep "<title>" $i | sed "s+<title>++" | sed "s+</title>++"`
+  fi
   NEXTU=$i
   if [ "$THISU" = "faq.htm" ]
   then
     sed "s+NEXTPAGE+<a href=$NEXTU>$NEXTT</a>+" <$THISU >tmp.$$
   else
     sed "s+NEXTPAGE+<a href=$NEXTU>$NEXTT</a>+" <$THISU |
-     sed "s+<I>record+<i><a href=\"intro.htm#record\">record</a>+g" |
-     sed "s+<I>annotator+<i><a href=\"intro.htm#annotator\">annotator</a>+g" |
+     sed "s+>record+><a href=\"intro.htm#record\">record</a>+g" |
+     sed "s+>annotator+><a href=\"intro.htm#annotator\">annotator</a>+g" |
      sed "s+[a-zA-Z]*-annotator+<a href=\"intro.htm#annotator\">&</a>+g" |
-     sed "s+<I>\\(ann[1-3]\\)\\([ <]\\)+<I><a href=\"intro.htm#annotator\">\\1</a>\\2+g" |
-     sed "s+<I>time+<i><a href=\"intro.htm#time\">time</a>+g" |
-     sed "s+<I>signal-list+<i><a href=\"intro.htm#signal-list\">signal-list</a>+g" |
-     sed "s+<I>signal+<i><a href=\"intro.htm#signal\">signal</a>+g" |
+     sed "s+>\\(ann[1-3]\\)\\([ <]\\)+><a href=\"intro.htm#annotator\">\\1</a>\\2+g" |
+     sed "s+>time+><a href=\"intro.htm#time\">time</a>+g" |
+     sed "s+>signal-list+><a href=\"intro.htm#signal-list\">signal-list</a>+g" |
+     sed "s+>signal+><a href=\"intro.htm#signal\">signal</a>+g" |
      sed "s+PREVPAGE+<a href=$PREVU>$PREVT</a>+" >tmp.$$
   fi
   mv tmp.$$ $THISU

@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:   28 November 2004
+#				Last revised:    8 August 2005
 # This section of the Makefile should not need to be changed.
 
 INCLUDES = $(INCDIR)/wfdb/wfdb.h $(INCDIR)/wfdb/ecgcodes.h \
@@ -12,7 +12,7 @@ OFILES = wfdbinit.o annot.o signal.o calib.o wfdbio.o
 MFILES = Makefile Makefile.dos
 
 # `make' or `make all':  build the WFDB library and wfdb-config
-all:	$(OFILES) wfdb-config
+all:	setup $(OFILES) wfdb-config
 	$(BUILDLIB) $(OFILES) $(BUILDLIB_LDFLAGS)
 
 # `make install':  install the WFDB library and headers
@@ -31,8 +31,11 @@ uninstall:
 	$(MAKE) lib-post-uninstall
 	../uninstall.sh $(LIBDIR)
 
+setup:
+	sed "s+DBDIR+$(DBDIR)+" <wfdblib.h0 >wfdblib.h
+
 wfdb-config:	wfdb-config.c Makefile
-	$(CC) -DVERSION='"$(VERSION)"' -DCFLAGS='"-I$(INCDIR)"' \
+	$(CC) $(CFLAGS) -DVERSION='"$(VERSION)"' -DCFLAGS='"$(CFLAGS)"' \
 	  -DLDFLAGS='"$(LDFLAGS)"' -I$(INCDIR) -o $@ wfdb-config.c
 
 # `make compat':  install the includes needed for source compatibility with

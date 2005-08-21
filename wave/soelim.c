@@ -1,8 +1,8 @@
 /* file: soelim.c	G. Moody	25 January 1995
-
+			Last revised:	 29 June 2005
 -------------------------------------------------------------------------------
 soelim: expands .so requests in [nt]roff source files
-Copyright (C) 1995 George B. Moody
+Copyright (C) 1995-2005 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -34,6 +34,16 @@ files are named, or if the token `-' appears in the argument list.
 */
 
 #include <stdio.h>
+#if defined(__STDC__) || defined(_WINDOWS)
+#include <stdlib.h>
+#else
+extern void exit();
+#endif
+#ifndef BSD
+# include <string.h>
+#else		/* for Berkeley UNIX only */
+# include <strings.h>
+#endif
 
 #define MAXLEVEL 100
 

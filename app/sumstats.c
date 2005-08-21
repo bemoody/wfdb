@@ -1,8 +1,8 @@
 /* file: sumstats.c	G. Moody	17 August 1989
-   			Last revised:  14 November 2002
+   			Last revised:	19 August 2005
 -------------------------------------------------------------------------------
 sumstats: Derive aggregate statistics from bxb, rxr, or epic line-format output
-Copyright (C) 2002 George B. Moody
+Copyright (C) 1989-2005 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -34,7 +34,7 @@ graphs" (ANSI/AAMI EC38:1998).  These standards are available from AAMI,
 #include <stdio.h>
 #include <wfdb/wfdb.h>
 
-static int nrec, NQS, NQP, NVS, NVP, NVF, NSVS, NSVP;
+static int nrec, NQS, NQP, NVS, NVP, NVF, NSVS, NSVP, NRRE;
 static long Nn, Ns, Nv, No, Nx,
 	    Sn, Ss, Sv, So, Sx,
 	    Vn, Vs, Vv, Vo, Vx,
@@ -233,7 +233,7 @@ char *argv[];
 	pstat(" %6.2f", CVP, (double)NVP);
 	pstat(" %6.2f", CSVS, (double)NSVS);
 	pstat(" %6.2f", CSVP, (double)NSVP);
-	pstat(" %6.2f", CRRE/100.0, (double)nrec);
+	pstat(" %6.2f", CRRE/100.0, (double)NRRE);
 	(void)printf(
 	     "\nTotal QRS complexes: %ld  Total VEBs: %ld  Total SVEBs: %ld\n",
 		  QTP+QFN, Vn+Vs+Vv+Vo, Sn+Ss+Sv+So);
@@ -283,7 +283,7 @@ int type;
 char *s;
 {
     static char rec[10], mb[8], mn[8], ms[8], mv[8], mf[8], mds[8], mdp[8];
-    static char qse[8], qpp[8], vse[8], vpp[8], sse[8], spp[8];
+    static char qse[8], qpp[8], vse[8], vpp[8], sse[8], spp[8], srre[8];
     static char rts[20], tts[20];
     static double rre, ds, dp, err, mref;
     static int cts, cfn, ctp, cfp, sts, sfn, stp, sfp, lts, lfn, ltp, lfp;
@@ -369,17 +369,17 @@ char *s;
 	nrec++;
 	return (1);
       case 4:	/* bxb -L beat-by-beat report */
-	rre = -1.0;
+	fo = -1L;
 	(void)sscanf(s,
- "%s%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%s%s%s%s%s%s%lf",
+ "%s%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%s%s%s%s%s%s%s",
 	       rec, &nn, &sn, &vn, &fn, &on, &ns, &ss, &vs, &fs, &os,
 			  &nv, &sv, &vv, &fv, &ov, &no, &so, &vo, &fo,
-				  qse, qpp, vse, vpp, sse, spp, &rre);
-	if (rre < 0.0) return (0);
+				  qse, qpp, vse, vpp, sse, spp, srre);
+	if (fo < 0L) return (0);
 	Nn += nn; Sn += sn; Vn += vn; Fn += fn; On += on;
 	Ns += ns; Ss += ss; Vs += vs; Fs += fs; Os += os;
 	Nv += nv; Sv += sv; Vv += vv; Fv += fv; Ov += ov;
-	No += no; So += so; Vo += vo; Fo += fo; CRRE += rre;
+	No += no; So += so; Vo += vo; Fo += fo;
 	if (nn+ns+nv+no + sn+ss+sv+so + vn+vs+vv+vo + fn+fs+fv+fo) {
 	    CQS += (nn+ns+nv+sn+ss+sv+vn+vs+vv+fn+fs+fv) /
 		    (double)(nn+ns+nv+no+sn+ss+sv+so+vn+vs+vv+vo+fn+fs+fv+fo);
@@ -405,6 +405,12 @@ char *s;
 	if (ns+ss+vs+os) {
 	    CSVP += ss/(double)(ns+ss+vs+os);
 	    NSVP++;
+	}
+	rre = -1.0;
+	(void)sscanf(srre, "%lf", &rre);
+	if (rre >= 0.0) {
+	    CRRE += rre;
+	    NRRE++;
 	}
 	nrec++;
 	return (1);

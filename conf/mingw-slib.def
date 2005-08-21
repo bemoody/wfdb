@@ -20,16 +20,26 @@ WFDBROOT = /usr
 # name of your home directory, as in the example below (change as needed).
 # WFDBROOT = /home/frodo
 
-# If the W3C's libwww library of HTTP and FTP client code is available, and
-# you wish to compile a WFDB library with NETFILES support, set LWC
-# to 'libwww-config' (a utility supplied with libwww).  Otherwise set
-# LWC to ':' (a program that does nothing, successfully).
-LWC = libwww-config
+# LC and LL are used to determine C compiler and linker options needed to
+# enable NETFILES (code that allows applications linked to the WFDB library to
+# read input from HTTP and FTP servers, in addition to the standard filesystem
+# support available without NETFILES).  The WFDB library can use either
+# libcurl (recommended) or libwww to provide NETFILES support.  To use libcurl,
+# set LC to `curl-config --cflags` (note the backquotes) and LN to
+# `curl-config --libs`.  Otherwise, to use libwww, set LC to
+# `libwww-config --cflags` and LL to `libwww-config --libs`.  If neither
+# libcurl nor libwww is available, LC and LL should be empty (and NETFILES
+# will be disabled).
+LC =
+LL =
 
-# Similarly, to use the libcurl library instead of libwww, set LCC to
-# 'curl-config'.  Otherwise set LCC to ':'.  Only one of libwww or
-# libcurl should be enabled.
-LCC = curl-config
+# BINDIR specifies the name of a directory in which to install the WFDB
+# DLL.
+BINDIR = $(WFDBROOT)/bin
+
+# DBDIR specifies the name of a directory in which to install the contents
+# of the `data' directory.
+DBDIR = $(WFDBROOT)/database
 
 # INCDIR specifies the name of a directory in which to install the WFDB
 # library's #include <...> files.
@@ -39,11 +49,7 @@ INCDIR = $(WFDBROOT)/include
 # library.
 LIBDIR = $(WFDBROOT)/lib
 
-# BINDIR specifies the name of a directory in which to install the WFDB
-# DLL.
-BINDIR = $(WFDBROOT)/bin
-
-# CC is the name of your C compiler.
+# CC is the name of your C compiler ('configure' will modify this).
 CC = gcc NOCYGWIN
 
 # CCDEFS is the set of C compiler options needed to set preprocessor variables
@@ -51,9 +57,13 @@ CC = gcc NOCYGWIN
 # VDEFS.
 CCDEFS = $(VDEFS) -DNOVALUES_H -DNOMKSTEMP
 
+# MFLAGS is the set of architecture-dependent (-m*) compiler options, which
+# is usually empty.  See the gcc manual for information about gcc's -m options.
+MFLAGS =
+
 # CFLAGS is the set of C compiler options used when compiling the shared
 # library.  CFLAGS should always include CCDEFS.
-CFLAGS = -g -O $(CCDEFS) `$(LWC) --cflags` `$(LCC) --cflags` -I$(INCDIR)
+CFLAGS =$(MFLAGS) -g -O $(CCDEFS) $(LC) -I$(INCDIR)
 
 # WFDBLIB_BASENAME is the name, without version numbers, of the alternate
 # library.  WFDBLIB_SONAME is the shared object name ("soname") of the
@@ -84,8 +94,7 @@ BUILDLIB = gcc NOCYGWIN -shared -o $(WFDBLIB_DLLNAME) \
 
 # BUILDLIB_LDFLAGS is a list of arguments appended to BUILDLIB following
 # the list of *.o files.
-BUILDLIB_LDFLAGS = `$(LWC) --libs` `$(LWC) --libs` `$(LWC) --libs` \
- `$(LCC) --libs` `$(LCC) --libs` `$(LCC) --libs`
+BUILDLIB_LDFLAGS = $(LL)
  
 # LDCONFIG is the name of the program needed to refresh the system's cached
 # index of shared libraries.
@@ -108,20 +117,6 @@ SETDPERMISSIONS = chmod 755
 # SETLPERMISSIONS is the command needed to make the WFDB library usable by
 # programs linked to it.
 SETLPERMISSIONS = chmod 755
-
-# STRIP is the command used to compact the compiled binaries by removing their
-# symbol tables.  'exestrip' is a script that appends the '.exe' suffix to the
-# files in its argument list before passing their names to 'strip' itself.
-STRIP = $(SRCDIR)/conf/exestrip
-# To retain the symbol tables for debugging, comment out the previous line, and
-# uncomment the next line.
-# STRIP = :
-
-# RM is the command used to delete binaries. 'exerm' is a script that appends
-# the '.exe' suffix to the files in its argument list before deleting.
-RM = $(SRCDIR)/conf/exerm
-
-OTHER_CLEAN_FILES = $(WFDBLIB_DLLNAME)
 
 # `make' (with no target specified) will be equivalent to `make all'.
 make-all:	all
