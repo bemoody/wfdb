@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	31 May 2000
-#				Last revised:	31 May 2005
+#				Last revised: 2 December 2005
 # Change the settings below as appropriate for your setup.
 
 # Choose directories in which to install WAVE and its ancillary files by
@@ -51,6 +51,7 @@ install:  $(BINDIR) $(HELPDIR)/wave $(MENUDIR) $(RESDIR) wave wave.hlp news.hlp
 	-cp wavemenu.def $(MENUDIR) && \
 	 $(SETPERMISSIONS) $(MENUDIR)/wavemenu.def
 	-cp Wave.res $(RESDIR)/Wave && $(SETPERMISSIONS) $(RESDIR)/Wave
+	$(MAKE) clean
 
 uninstall:
 	../uninstall.sh $(BINDIR) wave

@@ -1,9 +1,8 @@
 /* file: nst.c		G. Moody	8 December 1983
-			Last revised:  14 November 2002
-
+			Last revised:  25 February 2006
 -------------------------------------------------------------------------------
 nst: Noise stress test
-Copyright (C) 2002 George B. Moody
+Copyright (C) 1983-2006 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -494,14 +493,23 @@ double snr;
 		    errct++;
 		/* Adjust offsets to avoid discontinuities. */
 		for (i = 0; i < nisig; i++)
-		    z[i] = vin[i] + gn[i]*vin[nse[i]] - vout[i];
+		    if (vin[i] != WFDB_INVALID_SAMPLE &&
+			vin[nse[i]] != WFDB_INVALID_SAMPLE &&
+			vout[i] != WFDB_INVALID_SAMPLE)
+			z[i] = vin[i] + gn[i]*vin[nse[i]] - vout[i];
 	    }
 	    else
 		if (getvec(vin) < 0)
 		    errct++;
 	    for (i = 0; i < nisig; i++) {
-		vin[i] -= zz[i];	/* remove any offset first */
-		vout[i] = vin[i] + gn[i]*vin[nse[i]] - z[i];
+		if (vin[i] != WFDB_INVALID_SAMPLE &&
+		    vin[nse[i]] != WFDB_INVALID_SAMPLE &&
+		    vout[i] != WFDB_INVALID_SAMPLE) {
+		    vin[i] -= zz[i];	/* remove any offset first */
+		    vout[i] = vin[i] + gn[i]*vin[nse[i]] - z[i];
+		}
+		else
+		    vout[i] = WFDB_INVALID_SAMPLE;
 	    }
 	    if (putvec(vout) < 0)
 		errct++;

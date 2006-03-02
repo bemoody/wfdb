@@ -1,8 +1,9 @@
 /* file: wfdb-config.c	G. Moody	27 April 2002
+			Last revised:	23 February 2006	wfdblib 10.4.0
 
 -------------------------------------------------------------------------------
 wfdb-config: Print WFDB library version and linking information
-Copyright (C) 2002 George B. Moody
+Copyright (C) 2002-2006 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -45,13 +46,11 @@ extern void exit();
 
 char *pname;
 
-main(argc, argv)
-int argc;
-char *argv[];
+main(int argc, char **argv)
 {
-    char *filename, *prog_name();
+    char *filename, *prog_name(char *s);
     int i;
-    void help();
+    void help(void);
 
     pname = prog_name(argv[0]);
     if (argc == 1) {
@@ -72,8 +71,7 @@ char *argv[];
     exit(0);
 }
 
-char *prog_name(s)
-char *s;
+char *prog_name(char *s)
 {
     char *p = s + strlen(s);
 
@@ -97,7 +95,7 @@ static char *help_strings[] = {
     NULL
 };
 
-void help()
+void help(void)
 {
     int i;
 

@@ -1,9 +1,9 @@
 /* file: sqrs.c		G. Moody	27 October 1990
-			Last revised:  14 November 2002
+			Last revised:  25 February 2006
 
 -------------------------------------------------------------------------------
 sqrs: Single-channel QRS detector
-Copyright (C) 2002 George B. Moody
+Copyright (C) 1990-2006 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -41,7 +41,7 @@ frequency and the time constants indicated below.
 This program is provided as an example only, and is not intended for any
 clinical application.  At the time the algorithm was originally published,
 its performance was typical of state-of-the-art QRS detectors.  Recent designs,
-particularly those which can analyze two or more input signals, may exhibit
+particularly those that can analyze two or more input signals, may exhibit
 significantly better performance.
 
 Usage:
@@ -81,7 +81,7 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-    char *record = NULL, *prog_name();
+    char *p, *record = NULL, *prog_name();
     int filter, i, minutes = 0, nsig, time = 0,
         slopecrit, sign, maxslope = 0, nslope = 0,
         qtime, maxtime, t0, t1, t2, t3, t4, t5, t6, t7, t8, t9,
@@ -89,6 +89,7 @@ char *argv[];
     long from = 0L, next_minute, now, spm, to = 0L;
     WFDB_Anninfo a;
     WFDB_Annotation annot;
+    static int gvmode = 0;
     static WFDB_Siginfo *s;
     void help();
 
@@ -106,6 +107,9 @@ char *argv[];
 	  case 'h':	/* help requested */
 	    help();
 	    exit(0);
+	    break;
+	  case 'H':	/* operate in WFDB_HIGHRES mode */
+	    gvmode = WFDB_HIGHRES;
 	    break;
 	  case 'm':	/* threshold */
 	    if (++i >= argc) {
@@ -152,6 +156,10 @@ char *argv[];
 	help();
 	exit(1);
     }
+
+    if (gvmode == 0 && (p = getenv("WFDBGVMODE")))
+	gvmode = atoi(p);
+    setgvmode(gvmode|WFDB_GVPAD);
 
     if ((nsig = isigopen(record, NULL, 0)) < 1) exit(2);
     if ((s = malloc(nsig * sizeof(WFDB_Siginfo))) == NULL ||
@@ -274,6 +282,7 @@ static char *help_strings[] = {
  "include any of:",
  " -f TIME     begin at specified time",
  " -h          print this usage summary",
+ " -H          read multifrequency signals in high resolution mode",
  " -m THRESH   set detector threshold to THRESH (default: 500)",
  " -s SIGNAL   analyze specified signal (default: 0)",
  " -t TIME     stop at specified time",

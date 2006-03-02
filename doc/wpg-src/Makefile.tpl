@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:  26 October 2002
+#				Last revised:    2 March 2006
 # Change the settings below as appropriate for your setup.
 
 # D2PARGS is a list of options for dvips.  Uncomment one of these to set the
@@ -93,6 +93,7 @@ wpg.hlp:	wpg.tex
 wpg.html:	wpg.tex
 	cp -p wpg.tex ../wpg
 	cd ../wpg; texi2html -short_ext -menu -split_node wpg.tex
+	cd ../wpg; if [ -d wpg ]; then mv wpg/* .; rmdir wpg; fi
 	mv ../wpg/wpg.htm ../wpg/wpg_btoc.htm	# use top page as brief TOC
 	rm -f ../wpg/wpg.tex
 	./fixpg.sh ../wpg

@@ -1,10 +1,10 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:	 11 June 2005       wfdblib 10.3.16
+                        Last revised:	23 February 2006       wfdblib 10.4.0
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1988-2005 George B. Moody
+Copyright (C) 1988-2006 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -67,8 +67,8 @@ Dakin.  Thanks, Mike!
 These functions, defined here if WFDB_NETFILES is non-zero, are intended only
 for the use of the functions in the next group below (except for wfdb_wwwquit,
 their definitions are not visible outside of this file):
- wfdb_wwwquit *		(shut down libwww cleanly)
- www_init		(initialize libwww)
+ wfdb_wwwquit *		(shut down libcurl or libwww cleanly)
+ www_init		(initialize libcurl or libwww)
  www_get_cont_len	(find length of data for a given url)
  www_get_url_range_chunk (get a block of data from a given url)
  www_get_url_chunk	(get all data from a given url)
@@ -93,22 +93,22 @@ their definitions are not visible outside of this file):
 
 * wfdb_wwwquit is available outside of this file;  it is invoked by wfdbquit
 (defined in wfdbinit.c) to permit an application to release resources used
-by libwww before exiting.  wfdb_wwwquit is also registered (by www_init) as a
-function to be invoked on exit from an application, so it is not necessary
-for applications to invoke wfdb_wwwquit (or wfdbquit) explicitly.
+by libcurl or libwww before exiting.  wfdb_wwwquit is also registered (by
+www_init) as a function to be invoked on exit from an application, so it is not
+necessary for applications to invoke wfdb_wwwquit (or wfdbquit) explicitly.
 
 In the current version of the WFDB library, output to remote files is not
 implemented;  for this reason, several of the functions listed above are
 stubs (placeholders) only, as noted.
 
 These functions, also defined here, are compiled only if WFDB_NETFILES is non-
-zero; they permit access to remote files via http or ftp (using libwww) as well
-as to local files (using the standard C I/O functions).  The functions in this
-group are intended primarily for use by other WFDB library functions, but may
-also be called directly by WFDB applications that need to read remote files.
-Unlike other private functions in the WFDB library, the interfaces to these
-are not likely to change, since they are designed to emulate the
-similarly-named ANSI/ISO C standard I/O functions:
+zero; they permit access to remote files via http or ftp (using libcurl or
+libwww) as well as to local files (using the standard C I/O functions).  The
+functions in this group are intended primarily for use by other WFDB library
+functions, but may also be called directly by WFDB applications that need to
+read remote files. Unlike other private functions in the WFDB library, the
+interfaces to these are not likely to change, since they are designed to
+emulate the similarly-named ANSI/ISO C standard I/O functions:
  wfdb_clearerr		(emulates clearerr)
  wfdb_feof		(emulates feof)
  wfdb_ferror		(emulates ferror)
@@ -161,10 +161,10 @@ specified (local) FILE (using wfdb_getiwfdb); such files may be nested up to
 
 static char *wfdbpath;
 
-FSTRING getwfdb()
+FSTRING getwfdb(void)
 {
     if (wfdbpath == NULL) {
-	char *p = getenv("WFDB"), *wfdb_getiwfdb();
+	char *p = getenv("WFDB"), *wfdb_getiwfdb(char *p);
 
 	if (p == NULL) p = DEFWFDB;
 	if (*p == '@') p = wfdb_getiwfdb(p);
@@ -175,10 +175,9 @@ FSTRING getwfdb()
 
 /* setwfdb can be called within an application to change the WFDB path. */
 
-FVOID setwfdb(p)
-char *p;
+FVOID setwfdb(char *p)
 {
-    void wfdb_export_config();
+    void wfdb_export_config(void);
 
     if (p == NULL && (p = getenv("WFDB")) == NULL) p = DEFWFDB;
     wfdb_parse_path(p);
@@ -191,14 +190,14 @@ char *p;
 
 static int error_print = 1;
 
-FVOID wfdbquiet()
+FVOID wfdbquiet(void)
 {
     error_print = 0;
 }
 
 /* wfdbverbose enables error messages from the WFDB library. */
 
-FVOID wfdbverbose()
+FVOID wfdbverbose(void)
 {
     error_print = 1;
 }
@@ -208,8 +207,7 @@ static char wfdb_filename[MFNLEN];
 
 /* wfdbfile returns the pathname or URL of a WFDB file. */
 
-FSTRING wfdbfile(s, record)
-char *s, *record;
+FSTRING wfdbfile(char *s, char *record)
 {
     WFDB_FILE *ifile;
 
@@ -237,8 +235,8 @@ compilers, and for almost all older C compilers as well.  If a "short" is not
 16 bits, it may be necessary to rewrite wfdb_g16() to obtain proper sign
 extension. */
 
-int wfdb_g16(fp)		/* read a 16-bit integer in PDP-11 format */
-WFDB_FILE *fp;
+/* read a 16-bit integer in PDP-11 format */
+int wfdb_g16(WFDB_FILE *fp)
 {
     int x;
 
@@ -246,8 +244,8 @@ WFDB_FILE *fp;
     return ((int)((short)((wfdb_getc(fp) << 8) | (x & 0xff))));
 }
 
-long wfdb_g32(fp)		/* read a 32-bit integer in PDP-11 format */
-WFDB_FILE *fp;
+/* read a 32-bit integer in PDP-11 format */
+long wfdb_g32(WFDB_FILE *fp)
 {
     long x, y;
 
@@ -256,17 +254,15 @@ WFDB_FILE *fp;
     return ((x << 16) | (y & 0xffff));
 }
 
-void wfdb_p16(x, fp)		/* write a 16-bit integer in PDP-11 format */
-unsigned int x;
-WFDB_FILE *fp;
+/* write a 16-bit integer in PDP-11 format */
+void wfdb_p16(unsigned int x, WFDB_FILE *fp)
 {
     (void)wfdb_putc((char)x, fp);
     (void)wfdb_putc((char)(x >> 8), fp);
 }
 
-void wfdb_p32(x, fp)		/* write a 32-bit integer in PDP-11 format */
-long x;
-WFDB_FILE *fp;
+/* write a 32-bit integer in PDP-11 format */
+void wfdb_p32(long x, WFDB_FILE *fp)
 {
     wfdb_p16((unsigned int)(x >> 16), fp);
     wfdb_p16((unsigned int)x, fp);
@@ -280,9 +276,8 @@ struct wfdb_path_component {
 static struct wfdb_path_component *wfdb_path_list;
 
 /* wfdb_free_path_list clears out the path list, freeing all memory allocated
-to it. */
-
-void wfdb_free_path_list()
+   to it. */
+void wfdb_free_path_list(void)
 {
    struct wfdb_path_component *c0 = NULL, *c1 = wfdb_path_list;
 
@@ -298,13 +293,25 @@ void wfdb_free_path_list()
 /* Operating system and compiler dependent code
 
 All of the operating system and compiler dependencies in the WFDB library are
-contained within the following section of this file.  (In the following
-comments, 'MS-DOS' includes all versions of MS-Windows.)
+contained within the following section of this file.  There are three
+significant types of platforms addressed here:
+
+   UNIX and variants
+     This includes GNU/Linux, FreeBSD, Solaris, HP-UX, IRIX, AIX, and other
+     versions of UNIX, as well as Mac OS/X and Cygwin/MS-Windows.
+   MS-DOS and variants
+     This group includes MS-DOS, DR-DOS, OS/2, and all versions of MS-Windows
+     when using the native MS-Windows libraries (as when compiling with MinGW
+     gcc).
+   MacOS 9 and earlier
+     "Classic" MacOS.
+
+Differences among these platforms:
 
 1. Directory separators vary:
-     UNIX and variants use `/'.
+     UNIX and variants (including Mac OS/X and Cygwin) use `/'.
      MS-DOS and OS/2 use `\'.
-     MacOS uses `:'.
+     MacOS 9 and earlier uses `:'.
 
 2. Path component separators also vary:
      UNIX and variants use `:' (as in the PATH environment variable)
@@ -355,7 +362,7 @@ OS- and compiler-dependent definitions:
 #define RB	"rb"
 #define WB	"wb"
 
-/* For all other C compilers, including most UNIX C compilers. */
+/* For all other C compilers, including traditional UNIX C compilers. */
 # else
 #define DSEP	'/'
 #define PSEP	':'
@@ -367,8 +374,7 @@ OS- and compiler-dependent definitions:
 /* wfdb_parse_path constructs a linked list of path components by splitting
 its string input (usually the value of WFDB). */
 
-int wfdb_parse_path(p)
-char *p;
+int wfdb_parse_path(char *p)
 {
     char *q;
     int current_type, found_end;
@@ -449,8 +455,7 @@ contents of the WFDB path) seems an unnecessary security risk. */
 #define SEEK_END 2
 #endif
 
-char *wfdb_getiwfdb(p)
-char *p;
+char *wfdb_getiwfdb(char *p)
 {
     FILE *wfdbpfile;
     int i = 0;
@@ -485,7 +490,7 @@ char *p;
 #ifndef HAS_PUTENV
 #define wfdb_export_config()
 #else
-void wfdb_export_config()
+void wfdb_export_config(void)
 {
     char *p;
 
@@ -525,8 +530,7 @@ accessible even if those directories are not listed explicitly in the WFDB
 path.  This feature may be particularly useful to MS-DOS users because of that
 system's limit on the length of environment variables. */
 
-void wfdb_addtopath(s)
-char *s;
+void wfdb_addtopath(char *s)
 {
     char *d, *p, *t;
     int i, j, l;
@@ -586,9 +590,9 @@ There are three major versions of each of wfdb_error and wfdb_fprintf below.
 The first version is compiled by ANSI C compilers.  (A variant of this version
 of wfdb_error can be used with Microsoft Windows; it puts the error message
 into a message box, rather than using the standard error output.)  The second
-version is compiled by modern UNIX C compilers (System V, Berkeley 4.x) that
-are not ANSI-conforming.  The third version can be compiled by many older C
-compilers, if the symbol OLDC is defined; do so only if you are using a C
+version is compiled by traditional UNIX C compilers (System V, Berkeley 4.x)
+that are not ANSI-conforming.  The third version can be compiled by many older
+C compilers, if the symbol OLDC is defined; do so only if you are using a C
 library which does not include a vsprintf function and a "stdarg.h" or
 "varargs.h" header file.  This third version uses an undocumented function
 (_doprnt) which works for most if not all older UNIX C compilers, and several
@@ -604,7 +608,7 @@ standard error output may be inappropriate).  */
 static char error_message[256];
 #endif
 
-FSTRING wfdberror()
+FSTRING wfdberror(void)
 {
     if (*error_message == '\0')
 	sprintf(error_message,
@@ -666,7 +670,7 @@ int wfdb_fprintf(WFDB_FILE *wp, const char *format, ...)
 }
 
 #else
-#ifndef OLDC		/* Second version: for modern UNIX K&R C compilers */
+#ifndef OLDC	     /* Second version: for traditional UNIX K&R C compilers */
 #include <varargs.h>
 void wfdb_error(va_alist)
 va_dcl
@@ -792,9 +796,7 @@ Pre-10.0.1 versions of this library that were compiled for environments other
 than MS-DOS used file names in the format TYPE.RECORD.  This file name format
 is no longer supported. */
 
-WFDB_FILE *wfdb_open(s, record, mode)
-char *s, *record;
-int mode;
+WFDB_FILE *wfdb_open(char *s, char *record, int mode)
 {
     char *wfdb, *p;
     struct wfdb_path_component *c0;
@@ -915,8 +917,7 @@ int mode;
    and they must contain only letters, digits, tildes, underscores, and
    directory separators. */
 
-int wfdb_checkname(p, s)
-char *p, *s;
+int wfdb_checkname(char *p, char *s)
 {
     do {
 	if (('0' <= *p && *p <= '9') || *p == '_' || *p == '~' || *p == DSEP ||
@@ -939,8 +940,7 @@ wfdb_setirec is invoked by isigopen (except when isigopen is invoked
 recursively to open a segment within a multi-segment record) and by annopen
 (when it is about to open a file for input). */
 
-void wfdb_setirec(p)
-char *p;
+void wfdb_setirec(char *p)
 {
     char *r;
 
@@ -955,16 +955,15 @@ char *p;
 
 /* WFDB file I/O functions
 
-The WFDB library normally reads and writes local files.  If libwww
-(see http://www.w3.org/Library for details) is available, and if you compile
-the WFDB library using an ANSI/ISO C compiler (not an older K&R C compiler),
+The WFDB library normally reads and writes local files.  If libcurl
+(http://curl.haxx.se/) or libwww (http://www.w3.org/Library) is available,
 the WFDB library can also read files from any accessible World Wide Web (HTTP)
 or FTP server.  (Writing files to a remote WWW or FTP server may be
 supported in the future.)
 
-If you do not wish to allow access to remote files, or if libwww is not
-available, simply define the symbol WFDB_NETFILES as 0 when compiling the
-WFDB library.  If the symbol WFDB_NETFILES is zero, wfdblib.h defines
+If you do not wish to allow access to remote files, or if neither libcurl nor
+libwww is available, simply define the symbol WFDB_NETFILES as 0 when compiling
+the WFDB library.  If the symbol WFDB_NETFILES is zero, wfdblib.h defines
 wfdb_fread as fread, wfdb_fwrite as fwrite, etc.;  thus in this case, the
 I/O is performed using the standard C I/O functions, and the function
 definitions in the next section are not compiled.  This behavior exactly
@@ -979,7 +978,7 @@ handles, depending on the value of the 'type' member of the WFDB_FILE object.
 All access to local files is handled by passing the 'fp' member of the
 WFDB_FILE object to the appropriate standard C I/O function.  Access to remote
 files via http or ftp is handled by passing the 'netfp' member of the WFDB_FILE
-object to the appropriate libwww function(s).
+object to the appropriate libcurl or libwww function(s).
 
 In order to read remote files, the WFDB environment variable should include
 one or more components that specify http:// or ftp:// URL prefixes.  These
@@ -1000,13 +999,14 @@ to set the search order in any way you wish, as in this example.
 static int nf_open_files = 0;		/* number of open netfiles */
 static long page_size = NF_PAGE_SIZE;	/* bytes per range request (0: disable
 					   range requests) */
-static int www_done_init = FALSE;	/* TRUE once libwww is initialized */
+static int www_done_init = FALSE;	/* TRUE once libcurl or libwww is
+					   initialized */
 
 #if WFDB_NETFILES_LIBCURL
 static CURL *curl_ua = NULL;
 
 /* Construct the User-Agent string to be sent with HTTP requests. */
-static char *curl_get_ua_string()
+static char *curl_get_ua_string(void)
 {
     char *libcurl_ver;
     static char *s = NULL;
@@ -1064,7 +1064,7 @@ typedef struct chunk CHUNK;
 #define chunk_putb HTChunk_putb
 #endif
 
-void wfdb_wwwquit()
+void wfdb_wwwquit(void)
 {
     if (www_done_init) {
 #if WFDB_NETFILES_LIBCURL
@@ -1081,7 +1081,7 @@ void wfdb_wwwquit()
     }
 }
 
-static void www_init()
+static void www_init(void)
 {
     if (!www_done_init) {
 #if WFDB_NETFILES_LIBCURL
@@ -1127,8 +1127,8 @@ static void www_init()
 	/*	HTHost_setMaxPipelinedRequests(1);	*/
 	HTEventInit();	/* added 19 July 2001 -- necessary for use with
 			   WINSOCK, seems to be harmless otherwise */
-	atexit(wfdb_wwwquit);
 #endif
+	atexit(wfdb_wwwquit);
 	www_done_init = TRUE;
     }
 }
@@ -1452,13 +1452,13 @@ static void nf_delete(netfile *nf)
    argument (normally an http:// or ftp:// url).  If page_size is nonzero and
    the file can be read in segments (this will be true for files served by http
    servers that support range requests, and possibly for other types of files
-   if libwww support is available), nf_new reads the first page_size bytes (or
-   fewer, if the file is shorter than page_size).  Otherwise, nf_new attempts
-   to read the entire file into memory.  If there is insufficient memory, if
-   the file contains no data, or if the file does not exist (the most common
-   of these three cases), nf_new returns a NULL pointer;  otherwise, it
-   allocates, fills in, and returns a pointer to a netfile structure that can
-   be used by nf_fread, etc., to obtain the contents of the file.
+   if NETFILES support is available), nf_new reads the first page_size bytes
+   (or fewer, if the file is shorter than page_size).  Otherwise, nf_new
+   attempts to read the entire file into memory.  If there is insufficient
+   memory, if the file contains no data, or if the file does not exist (the
+   most common of these three cases), nf_new returns a NULL pointer; otherwise,
+   it allocates, fills in, and returns a pointer to a netfile structure that
+   can be used by nf_fread, etc., to obtain the contents of the file.
 
    It would be useful to be able to copy a file that cannot be read in segments
    to a local file, but this operation is not currently implemented.  The way
@@ -1728,32 +1728,28 @@ static int nf_putc(int c, netfile *nf)
    now just before wfdb_fprintf, which refers to it.  There is no completely
    portable way to make a forward reference to a static (local) function. */
 
-void wfdb_clearerr(wp)
-WFDB_FILE *wp;
+void wfdb_clearerr(WFDB_FILE *wp)
 {
     if (wp->type == WFDB_NET)
 	return (nf_clearerr(wp->netfp));
     return (clearerr(wp->fp));
 }
 
-int wfdb_feof(wp)
-WFDB_FILE *wp;
+int wfdb_feof(WFDB_FILE *wp)
 {
     if (wp->type == WFDB_NET)
 	return (nf_feof(wp->netfp));
     return (feof(wp->fp));
 }
 
-int wfdb_ferror(wp)
-WFDB_FILE *wp;
+int wfdb_ferror(WFDB_FILE *wp)
 {
     if (wp->type == WFDB_NET)
 	return (nf_ferror(wp->netfp));
     return (ferror(wp->fp));
 }
 
-int wfdb_fflush(wp)
-WFDB_FILE *wp;
+int wfdb_fflush(WFDB_FILE *wp)
 {
     if (wp == NULL) {	/* flush all WFDB_FILEs */
 	nf_fflush(NULL);
@@ -1765,48 +1761,35 @@ WFDB_FILE *wp;
 	return (fflush(wp->fp));
 }
 
-char* wfdb_fgets(s, size, wp)
-char *s;
-int size;
-WFDB_FILE *wp;
+char* wfdb_fgets(char *s, int size, WFDB_FILE *wp)
 {
     if (wp->type == WFDB_NET)
 	return (nf_fgets(s, size, wp->netfp));
     return (fgets(s, size, wp->fp));
 }
 
-size_t wfdb_fread(ptr, size, nmemb, wp)
-void *ptr;
-size_t size, nmemb;
-WFDB_FILE *wp;
+size_t wfdb_fread(void *ptr, size_t size, size_t nmemb, WFDB_FILE *wp)
 {
     if (wp->type == WFDB_NET)
 	return (nf_fread(ptr, size, nmemb, wp->netfp));
     return (fread(ptr, size, nmemb, wp->fp));
 }
 
-int wfdb_fseek(wp, offset, whence)
-WFDB_FILE *wp;
-long offset;
-int whence;
+int wfdb_fseek(WFDB_FILE *wp, long int offset, int whence)
 {
     if (wp->type == WFDB_NET)
 	return (nf_fseek(wp->netfp, offset, whence));
     return(fseek(wp->fp, offset, whence));
 }
 
-long wfdb_ftell(wp)
-WFDB_FILE *wp;
+long wfdb_ftell(WFDB_FILE *wp)
 {
     if (wp->type == WFDB_NET)
 	return (nf_ftell(wp->netfp));
     return (ftell(wp->fp));
 }
 
-size_t wfdb_fwrite(ptr, size, nmemb, wp)
-void *ptr;
-size_t size, nmemb;
-WFDB_FILE *wp;
+size_t wfdb_fwrite(void *ptr, size_t size, size_t nmemb, WFDB_FILE *wp)
 {
     if (wp->type == WFDB_NET)
 	return (nf_fwrite(ptr, size, nmemb, wp->netfp));
@@ -1820,9 +1803,7 @@ int wfdb_getc(WFDB_FILE *wp)
     return (getc(wp->fp));
 }
 
-int wfdb_putc(c, wp)
-int c;
-WFDB_FILE *wp;
+int wfdb_putc(int c, WFDB_FILE *wp)
 {
     if (wp->type == WFDB_NET)
 	return (nf_putc(c, wp->netfp));
@@ -1845,9 +1826,7 @@ int wfdb_fclose(WFDB_FILE *wp)
     return (status);
 }
 
-WFDB_FILE *wfdb_fopen(fname, mode)
-char *fname;
-const char *mode;
+WFDB_FILE *wfdb_fopen(char *fname, const char *mode)
 {
     char *p = fname;
     WFDB_FILE *wp = (WFDB_FILE *)malloc(sizeof(WFDB_FILE));
@@ -1904,8 +1883,7 @@ const char *mode;
 /* Miscellaneous OS-specific functions. */
 
 #ifdef NOSTRTOK
-char *strtok(p, sep)
-char *p, *sep;
+char *strtok(char *p, char *sep)
 {
     char *psep;
     static char *s;

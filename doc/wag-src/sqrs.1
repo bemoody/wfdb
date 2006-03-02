@@ -1,4 +1,4 @@
-.TH SQRS 1 "22 November 2002" "WFDB 10.3.0" "WFDB Applications Guide"
+.TH SQRS 1 "25 February 2006" "WFDB 10.4.0" "WFDB Applications Guide"
 .SH NAME
 sqrs, sqrs125 \- single-channel QRS detector
 .SH SYNOPSIS
@@ -48,6 +48,16 @@ significantly better performance.
 \fB-f\fR \fItime\fR
 Begin at the specified \fItime\fR in \fIrecord\fR (default: the beginning of
 \fIrecord\fR).
+.TP
+\fB-h\fR
+Print a usage summary.
+.TP
+\fB-H\fR
+Read the signal files in high-resolution mode (default: standard mode).
+These modes are identical for ordinary records.  For multifrequency records,
+the standard decimation of oversampled signals to the frame rate is suppressed
+in high-resolution mode (rather, all other signals are resampled at the highest
+sampling frequency).
 .TP
 \fB-m\fR \fIthreshold\fR
 Specify the detection \fIthreshold\fR (default: 500 units);  use higher values

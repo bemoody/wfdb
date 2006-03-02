@@ -1,10 +1,10 @@
 # file: Makefile	G. Moody	5 September 1990
-#			Last revised:   28 February 2001     Version 10.1.6
+#			Last revised:   2 December 2005     Version 10.3.18
 # UNIX 'make' description file for the WFDB software package
 #
 # -----------------------------------------------------------------------------
 # WFDB software for creating & using annotated waveform (time series) databases
-# Copyright (C) 2001 George B. Moody
+# Copyright (C) 1990-2005 George B. Moody
 #
 # These programs are free software; you can redistribute them and/or modify
 # them under the terms of the GNU General Public License as published by the
@@ -37,4 +37,5 @@
 # appropriate for your system.  To compile the package, just type `make' (from
 # within this directory).  To install the package, type `make install'.  To
 # create source archives, type `make tarballs';  or to make a binary archive,
-# type `make bin-tarball'.  Making archives requires PGP, gzip, and GNU tar).
+# type `make bin-tarball'.  (Making archives requires PGP, gzip, and GNU tar).
+# _____________________________________________________________________________

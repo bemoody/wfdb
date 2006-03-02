@@ -1,11 +1,9 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:    8 August 2005
+#				Last revised:   24 February 2006
 # This section of the Makefile should not need to be changed.
 
 INCLUDES = $(INCDIR)/wfdb/wfdb.h $(INCDIR)/wfdb/ecgcodes.h \
  $(INCDIR)/wfdb/ecgmap.h
-COMPAT_INCLUDES = $(INCDIR)/ecg/db.h $(INCDIR)/ecg/ecgcodes.h \
- $(INCDIR)/ecg/ecgmap.h
 HFILES = wfdb.h ecgcodes.h ecgmap.h wfdblib.h
 CFILES = wfdbinit.c annot.c signal.c calib.c wfdbio.c
 OFILES = wfdbinit.o annot.o signal.o calib.o wfdbio.o
@@ -37,10 +35,6 @@ setup:
 wfdb-config:	wfdb-config.c Makefile
 	$(CC) $(CFLAGS) -DVERSION='"$(VERSION)"' -DCFLAGS='"$(CFLAGS)"' \
 	  -DLDFLAGS='"$(LDFLAGS)"' -I$(INCDIR) -o $@ wfdb-config.c
-
-# `make compat':  install the includes needed for source compatibility with
-# applications written for pre-version 10.0.0 versions of this library
-compat:		$(INCLUDES) $(COMPAT_INCLUDES)
 
 # `make clean':  also remove previously compiled versions of the library
 clean:
@@ -75,14 +69,6 @@ $(INCDIR)/wfdb/ecgcodes.h:	$(INCDIR)/wfdb ecgcodes.h
 $(INCDIR)/wfdb/ecgmap.h:		$(INCDIR)/wfdb ecgmap.h
 	cp -p ecgmap.h $(INCDIR)/wfdb
 	$(SETPERMISSIONS) $(INCDIR)/wfdb/ecgmap.h
-
-# Rules for installing the compatibility (pre-10.0.0) include files
-$(INCDIR)/ecg/db.h:		$(INCDIR)/ecg db.h
-	cp -p db.h $(INCDIR)/ecg; $(SETPERMISSIONS) $(INCDIR)/ecg/db.h
-$(INCDIR)/ecg/ecgcodes.h:	$(INCDIR)/ecg $(INCDIR)/wfdb/ecgcodes.h
-	ln -s $(INCDIR)/wfdb/ecgcodes.h $(INCDIR)/ecg/ecgcodes.h
-$(INCDIR)/ecg/ecgmap.h:		$(INCDIR)/ecg $(INCDIR)/wfdb/ecgmap.h
-	ln -s $(INCDIR)/wfdb/ecgmap.h $(INCDIR)/ecg/ecgmap.h
 
 # Prerequisites for the library modules
 wfdbinit.o:	wfdb.h wfdblib.h wfdbinit.c

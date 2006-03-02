@@ -1,5 +1,5 @@
 file: README		G. Moody	7 September 1989
-			Last revised:	  24 June 2002
+			Last revised:	26 February 2006
 
 This directory and its subdirectories contain documentation for the WFDB
 Software Package, including UNIX man pages in troff source format for the WFDB
@@ -52,6 +52,11 @@ PhysioNet (look in http://www.physionet.org/physiotools/manuals.shtml).
   wug.html' have a black border at the left and lower edges, replace
   /usr/bin/pstoimg with the version found in wug-src/wave/misc and try again.
   These problems occur under Red Hat Linux 7.1, 7.2, and 7.3.
+
+Under Fedora Core 4, most of the software needed to create the formatted
+documentation is standard;  if 'yum' is correctly configured, you can install
+latex2html and texi2html if they are missing using the command (as root):
+	yum install latex2html texi2html
 
 The following files will be found in this directory:
 

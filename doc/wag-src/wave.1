@@ -1,5 +1,5 @@
 '\" t
-.TH WAVE 1 "13 June 2005" "WFDB 10.3.16" "WFDB Applications Guide"
+.TH WAVE 1 "2 September 2005" "WFDB 10.3.18" "WFDB Applications Guide"
 .SH NAME
 wave \- waveform analyzer, viewer, and editor
 .SH SYNOPSIS
@@ -176,8 +176,9 @@ also used, together with \fBHOME\fR and \fBUSER\fR, to locate resource files
 .PP
 You can control many aspects of \fBwave\fR's appearance and behavior by
 setting its resources.  If you are not familiar with this concept, refer to an
-introductory book on using the X Window System, such as Quercia and O'Reilly's
-`X Window System User's Guide'.  Since \fBwave\fR is built using the XView
+introductory book on using the X Window System, such as Darwin, Quercia, and
+O'Reilly's \fIX User's Guide: Open Look Edition\fR (see the link below).
+Since \fBwave\fR is built using the XView
 toolkit, all of the resources listed in \fBxview\fR(7) can be used with
 \fBwave\fR.  In addition, the following \fBwave\fR-specific resources may
 also be set:
@@ -651,19 +652,20 @@ Under these circumstances, \fBwave\fR may exit immediately (without
 quit confirmation) and any unsaved edits may be lost.  This problem is
 the result of a bug in the XView \fItermsw\fR package used for the
 Analysis Commands window.  To avoid this bug, always run \fBwave\fR in
-the background under SunOS.  The Solaris 2.x and Linux versions of the
-XView library do not have this bug.
+the background under SunOS.  The Linux, Mac OS X, MS Windows, and
+Solaris 2.x versions of the XView library do not have this bug.
 .PP
 If \fBwave\fR opens with an empty signal window, this may mean that
-the X server's backing store is disabled.  \fBwave\fR versions 6.8 and later
-incorporate a workaround that avoids this problem.  If you must use an earlier
-version of \fBwave\fR, enable backing
-store and restart the X server.  (Using XFree86 4.x, backing store can
-be enabled by inserting the line `Option "backingstore"' in the
-`Device' section(s) of the \fBXF86Config-4\fR file.  If the X server is
-normally started by a display manager such as \fBxdm\fR, close all windows
-and restart the server with \fI<ctrl><alt><backspace>\fR.  Otherwise, log out,
-log in, and restart the X server manually if necessary.)
+the X server's backing store is disabled.  \fBwave\fR versions 6.8 and
+later incorporate a workaround that avoids this problem.  If you must
+use an earlier version of \fBwave\fR, enable backing store and restart
+the X server.  (Using the X servers from the x.org or XFree86
+projects, backing store can be enabled by inserting the line `Option
+"backingstore"' in the `Device' section(s) of the \fBxorg.conf\fR or
+\fBXF86Config-4\fR file.  If your X server is normally started by a
+display manager such as \fBxdm\fR, close all windows and restart the
+server with \fI<ctrl><alt><backspace>\fR.  Otherwise, log out, log in,
+and restart the X server manually if necessary.)
 .PP
 If this doesn't solve the problem, use any of \fBwave\fR's navigation
 controls, or resize the signal window, to make the signals visible.  On
@@ -690,9 +692,12 @@ root privileges, a \fB.Xdefaults\fR file exists, and \fBwave\fR or another
 XView application has run at least once since the X server was started.
 
 .SH SEE ALSO
-\fBpschart\fR(1), \fBview\fR(1), \fBwview\fR(1), \fBxview\fR(7)
+\fBpschart\fR(1), \fBxview\fR(7)
 .br
-\fIWAVE User's Guide\fR
+\fIWAVE User's Guide\fR (http://www.physionet.org/physiotools/wug/)
+.br
+\fIX Window System User's Guide: Open Look Edition\fR
+(http://www.oreilly.com/openbook/openlook/)
 .SH AVAILABILITY
 .PP
 \fBwave\fR currently runs under FreeBSD, GNU/Linux, Mac OS X, MS-Windows with
@@ -702,7 +707,7 @@ If you would like to use \fBwave\fR on a system other than those listed above,
 you will need to port XView to your system first (or purchase a
 commercial port if one is available).  Sources for XView are available from
 PhysioNet (\fBwww.physionet.org\fR, where the sources for \fBwave\fR itself
-are also available), \fBmetalab.unc.edu\fR, \fBtsx-11.mit.edu\fR, and their
+are also available), \fBwww.ibiblio.org\fR, and their
 mirrors.  \fIWe cannot offer assistance in porting XView; if you wish to try
 this, you are on your own.\fR If you successfully port the \fBcmdtool\fR
 terminal emulator application included in the XView sources, we will

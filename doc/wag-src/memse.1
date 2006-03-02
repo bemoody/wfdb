@@ -1,4 +1,4 @@
-.TH MEMSE 1 "16 June 2003" "WFDB 10.3.8" "WFDB Applications Guide"
+.TH MEMSE 1 "26 February 2006" "WFDB 10.4.0" "WFDB Applications Guide"
 .SH NAME
 memse \- estimate power spectrum using maximum entropy (all poles) method
 .SH SYNOPSIS
@@ -43,6 +43,12 @@ input.
 .PP
 \fIOptions\fR are:
 .TP
+\fB-b\fR \fIlow high\fR [ \fIlow high ...\fR ]
+Print power in the specified bands.  Each \fIlow\fR and \fIhigh\fR pair
+specifies the low and high frequency boundaries of the band of interest,
+in Hz.  Multiple bands may be specified following a single \fB-b\fR option;
+only the last \fB-b\fR option has any effect.  Also see \fB-s\fR below.
+.TP
 \fB-f\fR \fIfrequency\fR
 Show the center frequency for each bin in the first column.  The
 \fIfrequency\fR argument specifies the input sampling frequency;  the center
@@ -66,6 +72,9 @@ square root of the number of input samples.
 .TP
 \fB-P\fR
 Generate a power spectrum (print squared magnitudes).
+.TP
+\fB-s\fR
+Print power in a standard set of frequency bands of interest for HRV analysis.
 .TP
 \fB-w\fR \fIwindow-type\fR
 Apply the specified window to the input data.  \fIwindow-type\fR may be

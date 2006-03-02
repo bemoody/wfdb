@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:	4 August 2005
+#				Last revised:  24 February 2006
 # This section of the Makefile should not need to be changed.
 
 # 'make' or 'make all': compile the WFDB applications without installing them
@@ -12,17 +12,19 @@ install:	config.cache
 	cd app;      $(MAKE) install
 	cd convert;  $(MAKE) install
 	cd data;     $(MAKE) install
+	cd fortran;  $(MAKE) install
 	cd psd;      $(MAKE) install
 	-( cd wave;  $(MAKE) install )
 	cd waverc;   $(MAKE) install
 	test -d doc && ( cd doc; $(MAKE) install )
 
 uninstall:	config.cache
-	cd lib;	     $(MAKE) uninstall
 	cd app;      $(MAKE) uninstall
 	cd convert;  $(MAKE) uninstall
-	cd psd;      $(MAKE) uninstall
 	cd data;     $(MAKE) uninstall
+	cd fortran;  $(MAKE) uninstall
+	cd lib;	     $(MAKE) uninstall
+	cd psd;      $(MAKE) uninstall
 	cd wave;     $(MAKE) uninstall
 	cd waverc;   $(MAKE) uninstall
 	test -d doc && ( cd doc; $(MAKE) uninstall )

@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:  24 February 2003
+#				Last revised:   2 March 2006
 # Change the settings below as appropriate for your setup.
 
 # Set COLORS to 'color' if you have a color printer and would like to print
@@ -208,4 +208,4 @@ clean:
 	cd wag-src; make clean
 	cd wpg-src; make clean
 	cd wug-src; make clean
-	rm -f index.htm index.html wag/* wpg/* wug/* *~
+	rm -f index.htm index.html wag/* wpg/*.htm* wpg/*.pdf wug/*.ps wpg/info/w* wug/* *~

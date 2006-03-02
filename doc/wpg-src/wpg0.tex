@@ -21,7 +21,7 @@
 @center Harvard-MIT Division of Health Sciences and Technology
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1989 -- 2005 George B. Moody
+Copyright @copyright{} 1989 -- 2006 George B. Moody
 @sp 2
 The most recent versions of the software described in this guide may be
 downloaded from @uref{http://www.physionet.org/}.  For further
@@ -161,6 +161,9 @@ study the three nodes above before going on.}
 
 @node     Concepts 1, Concepts 2, Overview, Overview
 @unnumberedsec Records
+@html
+<!-- link: records.htm -->
+@end html
 @cindex record
 @cindex record name
 @cindex tape
@@ -488,6 +491,51 @@ to this guide since the first printing of the tenth edition of this
 guide in June, 1999.  See @file{NEWS}, in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
+
+@unnumberedsubsec Changes in version 10.4.0
+
+Version 10.4.0 and later versions of the WFDB library are intended to
+be compiled using ANSI/ISO C (and C++) compilers only;  previous
+versions also supported the use of traditional (K&R) C compilers.  The
+most obvious change resulting from this decision is in the use of
+prototypes in function declarations, an innovation of ANSI C that
+permits better error-checking by compilers.  The ANSI/ISO C standard is
+now more than 15 years old, and it has been over 10 years since a C
+compiler that does not support function prototypes was used for
+development of the WFDB library.  Code in @file{wfdbio.c} that provides
+limited support for compilers that do not provide an ANSI/ISO C library
+has been retained for now, and @file{wfdb.h} still includes a set of K&R C
+function declarations; both of these features are deprecated, however,
+and may be removed in future versions of the WFDB library.  Users who
+still need to use a K&R C compiler to compile the library itself may
+find 'unprotoize' (included in the GNU gcc distribution) to be helpful.
+
+The mapping of lowest expressible sample values to @code{WFDB_INVALID_SAMPLE}
+performed by @code{getframe()} (in @file{lib/signal.c}) did not work properly
+for signal formats 80 and 160 (in which samples are recorded as unsigned
+integers); this has now been corrected.
+
+The symbol @code{WFDB_GVPAD} is newly defined in @file{<wfdb/wfdb.h>}.
+It may be added to @code{WFDB_HIGHRES} or @code{WFDB_LOWRES} and given
+as input to @code{setgvmode()}.
+The effect of doing so is that missing samples, and samples recognized
+as invalid, are replaced by @code{getframe()}, @code{getvec()}, and
+@code{sample()} with the most recently read valid values rather than by
+the special value @code{WFDB_INVALID_SAMPLE}.
+This behavior allows applications such as digital filters to remain
+ignorant of missing data without significant performance penalties.
+
+@code{sample()} now checks that its signal number input
+is valid, and returns @code{WFDB_INVALID_SAMPLE} if not.  In previous
+versions, @code{sample} returned a sample from signal 0 if the requested
+signal was unavailable.
+
+@code{sample_valid()} now returns -1 in the case of a signal that becomes
+unavailable before the end of the record (previous versions returned 1 in this case).
+
+The FIR filter example (@pxref{Example 7}) now works properly.  The
+previous version always began processing the input at sample 0,
+regardless of start time specified in its argument list.
 
 @unnumberedsubsec Changes in version 10.3.17
 
@@ -969,7 +1017,7 @@ main()
     WFDB_Sample v[2];
     WFDB_Siginfo s[2];
 
-    if (isigopen("100s", s, 2) < 1)
+    if (isigopen("100s", s, 2) < 2)
         exit(1);
     for (i = 0; i < 10; i++) @{
         if (getvec(v) < 0)
@@ -1024,6 +1072,9 @@ just above @code{exit(0);}
 @node     compiling, other languages, print samples, Usage
 @comment  node-name,  next,  previous,  up
 @section Compiling a Program with the WFDB Library
+@html
+<!-- link: compiling.htm -->
+@end html
 @cindex WFDB library (compiling with)
 @cindex compiling
 @cindex loader options
@@ -1132,6 +1183,11 @@ unneeded sources for faster compilation and smaller executable binaries.
 @node     other languages, WFDB path, compiling, Usage
 @comment  node-name,  next,  previous,  up
 @section Using the WFDB library with other languages
+
+Bindings and wrappers are available so that programs written in a
+number of other programming languages can make use of the WFDB library.
+
+@unnumberedsubsec C++ bindings
 @cindex C++ bindings
 
 If you prefer to write your applications in C++, you may do so, but note
@@ -1150,6 +1206,7 @@ using whatever standard methods are supported by your compiler for
 linking C++ programs with C libraries.  See your compiler manual for
 further information.
 
+@unnumberedsubsec Fortran wrappers
 @cindex Fortran bindings
 @cindex wrappers for Fortran
 A set of wrapper functions is also available for those who wish to use the WFDB
@@ -1180,12 +1237,12 @@ is also available, at
 
 @noindent
 To compile this program using @code{g77} (the GNU Fortran compiler), save it as
-@file{fsamples.f} in the current directory, copy
-@uref{http://www.physionet.org/physiotools/wfdb/fortran/wfdbf.c,@file{wfdbf.c}}
+@file{fsamples.f} in the current directory, copy @file{wfdbf.c} (which can be
+found in the same directory as @file{wfdb.h}, usually @file{/usr/include/wfdb})
 to the current directory, then type:
 
 @example
-g77 -o fsamples -fwritable-strings fsamples.f wfdbf.c -lwfdb
+g77 -o fsamples -DFIXSTRINGS fsamples.f wfdbf.c -lwfdb
 @end example
 
 @noindent
@@ -1194,6 +1251,7 @@ information, refer to
 @uref{http://www.physionet.org/physiotools/wfdb/fortran/README,fortran/README}
 in the WFDB Software Package.
 
+@unnumberedsubsec Matlab wrappers
 @cindex Matlab bindings
 @cindex Octave bindings
 @cindex Scilab bindings
@@ -1202,10 +1260,20 @@ in the WFDB Software Package.
 A set of wrappers for Matlab has been written and contributed by Jonas Carlson.
 These wrappers (@code{wfdb_tools}) provide access to almost all of the
 functionality of the WFDB library, including HTTP access to remote data files,
-to users of Matlab R13 (but not earlier versions) under GNU/Linux or
-MS-Windows; other platforms remain to be tested.  The wrappers, together with
-examples and a tutorial/reference guide, are available from
+to users of Matlab R13 (but not earlier versions) under GNU/Linux, Mac OS X,
+and MS-Windows; other platforms remain to be tested.  The wrappers, together
+with examples and a tutorial/reference guide, are available from
 @uref{http://www.@-physio@-net.@-org/@-physio@-tools/@-matlab/@-wfdb_tools/}.
+Using the @code{wfdb_tools} wrappers, the example program can be written in
+Matlab as:
+
+@example
+        S = WFDB_isigopen('100s')
+        DATA = WFDB_getvec(length(S), 10)
+@end example
+
+Note that @code{length(S)} is the number of available signals as determined
+by @code{WFDB_isigopen} (which becomes the number of columns in @code{DATA}).
 
 It should be possible to write a set of wrapper functions similar to
 @code{wfdb_tools} for use with Octave (a freely available open-source
@@ -1222,9 +1290,117 @@ Also available is a reimplementation of a useful subset of the WFDB
 library in native m-code (contributed by Jose Garcia Moros and Salvador Olmos)
 at @uref{http://www.@-physio@-net.@-org/@-physio@-tools/@-matlab/}.
 
+@unnumberedsubsec SWIG wrappers for Java, Perl, Python, and other languages
+@cindex SWIG wrappers
+@cindex Java wrappers
+@cindex Perl wrappers
+@cindex Python wrappers
+@cindex C# wrappers
+
+Isaac Henry has contributed WFDB wrappers for Java, Perl, and Python,
+as well as for .NET languages such as C#, created using the Simplified
+Wrapper Interface Generator (SWIG, @uref{http://www.swig.org/}).  Using
+these wrappers, the example program can be written in any of these languages:
+
+@b{Java:}
+
+@example
+import wfdb.*;
+
+public class rdsamp @{
+    static @{
+        System.loadLibrary("wfdbjava");
+    @}
+
+    public static void main(String argv[]) @{
+        WFDB_SiginfoArray siarray = new WFDB_SiginfoArray(2);
+        if (wfdb.isigopen ("100s", siarray.cast(), 2) < 2)
+            System.exit(1);
+        WFDB_SampleArray v = new WFDB_SampleArray(2);
+        for (int i = 0; i < 10; i++) @{
+            if (wfdb.getvec(v.cast()) < 0)
+                break;
+            System.out.print("\t" + v.getitem(0));
+            System.out.print("\t" + v.getitem(1));
+            System.out.println();
+        @}
+    @}
+@}
+@end example
+
+@b{Perl:}
+
+@example
+package wfdb;
+use wfdb;
+
+$siarray = new wfdb::WFDB_SiginfoArray(2);
+if ($nsig = isigopen("100s", $siarray->cast(), 2) < 2) @{
+    exit(1);
+@}
+$v = new wfdb::WFDB_SampleArray(2);
+for ($i=0; $i < 10; $i++) @{
+    if (getvec($v->cast()) < 0) @{
+        exit(2);
+    @}
+    print "\t", $v->getitem(0), "\t", $v->getitem(1), "\n";
+@}
+@end example
+
+@b{Python:}
+
+@example
+import wfdb, sys
+
+def main(argv):
+    siarray = wfdb.WFDB_SiginfoArray(2)
+    if wfdb.isigopen("100s", siarray.cast(), 2) < 2: sys.exit(1)
+    v = wfdb.WFDB_SampleArray(2)
+    for i in range(0,10):
+        if wfdb.getvec(v.cast()) > 0: sys.exit(2)
+        print v[0],
+        print v[1],
+        print
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
+
+@end example
+
+@b{C#:}
+
+@example
+using System;
+using Wfdb;
+
+public class psamples @{
+    static void Main(string[] argv) @{
+        WFDB_SiginfoArray siarray = new WFDB_SiginfoArray(2);
+        if (wfdb.isigopen("100s", siarray.cast(), 2) < 2)
+            Environment.Exit(1);
+        WFDB_SampleArray v = new WFDB_SampleArray(2);
+        for (int i = 0; i < 10; i++) @{
+            if (wfdb.getvec(v.cast()) < 0)
+                break;
+            Console.Write(v.getitem(0));
+            Console.Write(v.getitem(1));
+            Console.WriteLine();
+        @}
+    @}
+@}
+@end example
+
+All SWIG wrappers for the WFDB library are generated using a single
+interface file, @file{wfdb.i}.  In principle, this file might be used
+to generate wrappers for other programming languages supported by SWIG,
+including several versions of LISP, Modula-3, PHP, Ruby, and Tcl.
+
 @node     WFDB path, running example, other languages, Usage
 @comment  node-name,  next,  previous,  up
 @section The Database Path and Other Environment Variables
+@html
+<!-- link: database-path.htm -->
+@end html
 @cindex database path (setting)
 @cindex path (database)
 @cindex directories for WFDB files
@@ -2174,6 +2350,17 @@ or written by @code{putann}) visible to the application are in units of the
 high-resolution sampling intervals.  (Otherwise, @code{WFDB_Time} data are in
 units of frame intervals.)
 
+Version 10.4 and later versions of the WFDB library support two modes
+of handling invalid or missing samples.  By default, @code{getframe},
+@code{getvec}, and @code{sample} return the special value
+@code{WFDB_INVALID_SAMPLE} in such cases.  If @var{mode} is
+@w{@code{WFDB_GVPAD} + @code{WFDB_LOWRES}} or 
+@w{@code{WFDB_GVPAD} + @code{WFDB_HIGHRES}},
+however, these functions replicate the previous
+valid sample whenever they encounter an invalid or missing sample,
+which may simplify the design of applications such as digital filters.
+The constant @code{WFDB_GVPAD} is defined in @file{<wfdb/wfdb.h>}.
+
 @c @group
 @node     getspf, , setgvmode, special input modes
 @unnumberedsubsec getspf
@@ -2725,16 +2912,20 @@ int sample_valid(void)
 @noindent
 @strong{Return:}
 @table @asis
-@item @i{n}
+@item @i{ n}
 (from @code{sample}): The value (in raw adus) of sample number @var{t}
 in open signal @var{s},if successful, or the value of the previous
 successfully read sample.
-@item @t{0}
-(from @code{sample_valid}): The most recent value returned by
-@code{sample} was invalid
-@item @t{1}
+@item @t{ 1}
 (from @code{sample_valid}): The most recent value returned by
 @code{sample} was valid
+@item @t{ 0}
+(from @code{sample_valid}): The most recent @var{t} given to @code{sample}
+follows the end of the record
+@item @t{-1}
+(from @code{sample_valid}): The most recent value returned by
+@code{sample} was invalid (because signal @var{s} is not available at time
+@var{t})
 @end table
 @c @end group
 
@@ -2747,15 +2938,21 @@ is a time, expressed as a non-negative sample number. If @code{sample}
 is invoked with valid input arguments, the companion function
 @code{sample_valid} returns 1.
 
-There are three ways in which @code{sample} can be invoked with invalid
-input arguments.  In each case, @code{sample_valid} returns 0, but
-@code{sample} attempts to return a reasonable value.  If @var{s} is
-invalid, @code{sample} returns the value of signal 0 at the specified
-time.  If @var{t} is negative, the returned value is that of sample
-number zero of the specified signal.  If @var{t} specifies a sample
-number beyond the end of the record, the returned value is that of the
-last valid sample of the specified signal.  For an example of the use
-of @code{sample} and @code{sample_valid}, @pxref{Example 7}.
+The @code{sample_valid} function can be used to check the results of the most
+recent invocation of @code{sample}.  If @code{sample_valid} returns 1, the
+latest value returned by @code{sample} is valid.  @code{sample_valid} returns 0
+if @code{sample} has most recently returned a padded value following the end of
+the record.  This allows code that uses @code{sample} to use the condition
+@samp{sample_valid() != 0} (or simply @samp{sample_valid()} to determine if
+more samples are available.  If @code{sample_valid} returns -1, the most recent
+value returned by @code{sample} was @code{WFDB_INVALID_SAMPLE} (because the
+requested signal @var{s} was unavailable at the requested time @var{t}).  Use
+the condition @samp{sample_valid() > 0} to check if the most recent value
+returned by @code{sample} is a valid value (e.g., suitable for inclusion in a
+running average or similar calculation).
+
+For an example of the use of @code{sample} and @code{sample_valid},
+@pxref{Example 7}.
 
 Be sure to call @code{wfdbquit} before exiting from any program that
 uses @code{sample}, to be certain that dynamically allocated memory
@@ -2958,6 +3155,10 @@ strings for two or more codes; the behavior of @code{strann} and
 library version 5.3.)
 
 @node     timstr and strtim, datstr and strdat, annstr and strann, conversion
+
+@html
+<!-- link: strtim.htm -->
+@end html
 
 @iftex
 @sp 2
@@ -6362,7 +6563,7 @@ header file is created in the current directory.
  @i{7}  @{
  @i{8}      double *c, one = 1.0, vv, atof();
  @i{9}      int i, j, nc = argc - 4, nsig;
-@i{10}      long nsamp, t;
+@i{10}      WFDB_Time nsamp, t, t0, t1;
 @i{11}      static WFDB_Sample *v;
 @i{12}      static WFDB_Siginfo *s;
 @i{13}  
@@ -6387,34 +6588,40 @@ header file is created in the current directory.
 @i{32}      v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
 @i{33}      if (s == NULL || v == NULL) @{
 @i{34}          fprintf(stderr, "insufficient memory\n");
-@i{35}          exit(3);
+@i{35}          exit(4);
 @i{36}      @}
 @i{37}      if (isigopen(argv[1], s, nsig) != nsig)
-@i{38}          exit(3);
-@i{39}      if (isigsettime(strtim(argv[2])) < 0)
-@i{40}          exit(4);
-@i{41}      if ((nsamp = strtim(argv[3])) < 1) @{
-@i{42}          fprintf(stderr, "%s: inappropriate value for duration\n",
-@i{43}                  argv[0]);
-@i{44}          exit(5);
-@i{45}      @}
-@i{46}      if (osigopen("16l", s, nsig) != nsig)
-@i{47}          exit(6);
-@i{48}  
-@i{49}      (void)sample(0, 0L);
-@i{50}      for (t = 0; t < nsamp && sample_valid(); t++) @{
-@i{51}          for (j = 0; j < nsig; j++) @{
-@i{52}              for (i = 0, vv = 0.; i < nc; i++)
-@i{53}                  if (c[i] != 0.) vv += c[i]*sample(j, t+i);
-@i{54}              v[j] = (int)vv;
-@i{55}          @}
-@i{56}          if (putvec(v) < 0) break;
-@i{57}      @}
-@i{58}  
-@i{59}      (void)newheader("out");
-@i{60}      wfdbquit();
-@i{61}      exit(0);
-@i{62}  @}
+@i{38}          exit(5);
+@i{39}      t0 = strtim(argv[2]);
+@i{40}      if (t0 < (WFDB_Time)0) t0 = -t0;
+@i{41}      (void)sample(0, t0);
+@i{42}      if (!sample_valid()) @{
+@i{43}          fprintf(stderr, "%s: inappropriate value for start time\n",
+@i{44}                 argv[0]);
+@i{45}          exit(6);
+@i{46}      @}
+@i{47}      if ((nsamp = strtim(argv[3])) < 1) @{
+@i{48}          fprintf(stderr, "%s: inappropriate value for duration\n",
+@i{49}                  argv[0]);
+@i{50}          exit(7);
+@i{51}      @}
+@i{52}      t1 = t0 + nsamp;
+@i{53}      if (osigopen("16l", s, nsig) != nsig)
+@i{54}          exit(8);
+@i{55}  
+@i{56}      for (t = t0; t < t1 && sample_valid(); t++) @{
+@i{57}          for (j = 0; j < nsig; j++) @{
+@i{58}              for (i = 0, vv = 0.; i < nc; i++)
+@i{59}                  if (c[i] != 0.) vv += c[i]*sample(j, t+i);
+@i{60}              v[j] = (WFDB_Sample)vv;
+@i{61}          @}
+@i{62}          if (putvec(v) < 0) break;
+@i{63}      @}
+@i{64}  
+@i{65}      (void)newheader("out");
+@i{66}      wfdbquit();
+@i{67}      exit(0);
+@i{68}  @}
 @end example
 
 @noindent
@@ -6439,39 +6646,47 @@ vector.
 
 @item Lines 29--40:
 The record name is @code{argv[1]}, and the start time is @code{argv[2]};
-if the record can't be opened, or the start time is inappropriate, the
-program exits.  See the previous example for details on how @code{isigopen}
-is used.
+if the record can't be opened, the program exits.  See the previous example
+for details on how @code{isigopen} is used. If the user provides an absolute
+start time
+@iftex
+(@pxref{timstr and strtim, , @code{timstr} and @code{strtim}}),
+@end iftex
+@ifinfo
+(@pxref{timstr and strtim}),
+@end ifinfo
+the negative value returned by @code{strtim} is converted to a sample number
+in line 40.
 
-@item Lines 41--45:
+@item Lines 41--46:
+Here, @code{sample} is invoked only for its side effect;  if any samples can
+be read from the specified record beginning at sample number @code{t0}, then
+@code{sample(0, 0L)} returns a valid sample, so that the value returned by
+@code{sample_valid} is true (1).  If not, the program exits.
+
+@item Lines 47--52:
 The @var{duration} argument should be a time interval in @var{HH:MM:SS}
 format; @code{strtim} converts it to the appropriate number of
-samples.
+samples, and @code{t1} is set to the calculated end time in line 52.
 
-@item Lines 46--47:
+@item Lines 53--54:
 The output signals will be written to files in the current directory
 according to the specifications for record @file{16l}
 (@pxref{Piped and Local Records}).  If we can't write as many output
 signals as there are input signals, the program exits.
 
-@item Line 49:
-Here, @code{signal} is invoked only for its side effect;  assuming that
-any samples can be read from the specified record, @code{sample(0, 0L)}
-returns a valid sample, so that the value returned by
-@code{sample_valid()} is true (1).
-
-@item Lines 50--57:
+@item Lines 56--63:
 Here's where the work is done.  The outer loop is executed once per
 sample vector, the middle loop once per signal, and the inner loop
-once per coefficient.  In line 53, we retrieve an input sample,
+once per coefficient.  In line 59, we retrieve an input sample,
 multiply it by a filter coefficient, and add it to a running sum.
-The sum (@code{vv}) is initialized to zero in line 52 before we begin, and is
-converted to an @code{int} in line 54 when we are finished.  Once
-an entire sample vector has been filtered, it is written out in line 56.
-The entire process is repeated up to @code{nsamp} times, or until
-we run out of input samples.
+The sum (@code{vv}) is initialized to zero in line 58 before we begin, and is
+converted to a @code{WFDB_Sample} in line 60 when we are finished.  Once
+an entire output sample vector ia ready, it is written in line 62.
+The entire process is repeated until we reach input sample number @code{t1},
+or we run out of input samples.
 
-@item Line 59:
+@item Line 65:
 The program creates a header file for record @file{out}, using
 the signal specifications from record @file{16l} and the sampling
 frequency from the input record.
@@ -7779,7 +7994,7 @@ are also usually available there.
 
 Before beginning the installation of the WFDB Software Package, obtain and
 install the @code{libcurl} package from @uref{http://curl.haxx.se/}, or else
-the @code{libwww} package from @uref{http://www.w3.org/Library/} or from
+the @code{libwww} package from @uref{http://www.w3.org/Library/} or
 @uref{http://@-www.physio@-net.org/physio@-tools/libwww/}.  One or both of
 these packages is provided with most current versions of GNU/Linux.  (If you
 have a program called @code{curl-config}, then @code{libcurl} is installed
@@ -7848,9 +8063,9 @@ Mac OS X Developer Tools (from @uref{http://developer.apple.com/tools/xcode/})
 @item
 libcurl or libwww (from Fink, @uref{http://fink.sourceforge.net/})
 @item
-an X11 package (from Fink, @uref{http://fink.sourceforge.net/}; XDarwin,
-@uref{http://www.xdarwin.org/}; or Apple,
-@uref{http://www.apple.com/macosx/features/x11/download/})
+an X11 package (from Fink, @uref{http://fink.sourceforge.net/};  Apple,
+@uref{http://www.apple.com/macosx/features/@-x11/@-download/}; or XDarwin,
+@uref{http://www.xdarwin.org/})
 @item
 XView (from PhysioNet, @uref{http://www.physionet.org/physiotools/xview/})
 @end itemize
@@ -8551,19 +8766,24 @@ WWW: @uref{http://www.cinc.org/}
 CinC is the major scientific meeting at which current research in ECG signal
 processing and modelling is discussed; the proceedings of the conference are
 probably the single best source of information in print about these topics.
-CinC conferences have taken place annually since 1974, usually in September; in
-even-numbered years, they are usually convened in North America, and in Europe
-in odd-numbered years.  The deadline for submission of abstracts is 1 May each
-year.  Proceedings of the conferences are published by the IEEE, and usually
-appear about 3 months after the date of the conference.  CinC will be in Lyon
-in 2005 and (in a departure from the usual tradition) in Valencia in 2006.
+CinC conferences have taken place annually since 1974, usually in September.
+They are usually convened in North America and in Europe in alternate years.
+The deadline for submission of abstracts is on or about 1 May each year.
+Proceedings of the conferences are published by the IEEE, and usually
+appear about 3 months after the date of the conference.  CinC will be in
+in Valencia (Spain) in 2006, and in Durham, NC (USA) in 2007.
+
+Since 2000, Computers in Cardiology and PhysioNet have jointly sponsored
+an annual series of open challenges that invite participants to address
+topics of interest to researchers and clinicians, often involving the
+study of WFDB-compatible data sets made available via PhysioNet, and
+culminating with research presentations and awards at CinC.  See
+@uref{http://physionet.org/challenge/} for further information.
 
 @item Proceedings of Computers in Cardiology (ISSN 0276-6574)
 @sp 1
 
-The Web of Science (@uref{http://isi1.isiknowledge.com/portal.cgi?DestApp=WOS})
-includes abstracts published in the Proceedings of CinC since 1996.  IEEE
-members can also find complete CinC proceedings from 1988 to the
+IEEE members can find complete CinC proceedings from 1988 to the
 present using IEEEXplore (@uref{http://ieeexplore.ieee.org/}). Many
 universities provide access to these services for their students, faculty, and
 staff.  Printed volumes of CinC proceedings are available from:
@@ -8955,7 +9175,7 @@ LONGDATE
 
 George B. Moody
 
-Copyright (C) 1989 -- 2003 George B. Moody
+Copyright (C) 1989 -- 2006 George B. Moody
 
 Permission is granted to make and distribute verbatim copies of this
 guide provided that the copyright notice and this permission notice are

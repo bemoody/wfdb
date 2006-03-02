@@ -1,5 +1,5 @@
 file: INSTALL			G. Moody	30 January 2000
-				Last revised:	  8 June 2005
+				Last revised:	  2 March 2006
 WFDB Software Package installation notes
 
 These notes are infrequently updated, but are included here for those who may
@@ -63,10 +63,9 @@ software available for all popular platforms:
 
      All platforms: free from http://physionet.org/physiotools/xview/
 
-Detailed instructions for obtaining and installing these prerequisites, all
-of which are free, open-source software, are included in the WFDB quick-start
-guides for the popular platforms (see above).  Brief notes about other
-platforms are at the end of this file.
+Detailed instructions for obtaining and installing these prerequisites are
+included in the WFDB quick-start guides for the popular platforms (see above).
+Brief notes about other platforms are at the end of this file.
 
 
 BUILDING AND INSTALLING
@@ -106,20 +105,17 @@ If for any reason you wish to uninstall the WFDB Software Package, type:
 	make uninstall
 from this directory.  You will need root permissions to uninstall unless
 you changed WFDBROOT before installing the package.
- 
-This file contains separate sets of notes for GNU/Linux, Mac OS/X,
-and MS-Windows, followed by brief notes on other ports.
-
 
 _______________________________________________________________________________
 
-Under MacOS 9 and earlier, or other operating systems
+Under MS-DOS, MacOS 9 and earlier, or other operating systems
 
 Sorry, but you are on your own here.  Previous versions of the WFDB library
-and some of the applications have been compiled successfully by Macintosh
-users (and on VMS, among other environments).  The sources are written in
-highly portable C and should not be difficult to port to any environment where
-an ANSI/ISO or K&R C compiler and the standard C library are available.
+and some of the applications have been compiled successfully by MS-DOS and
+Macintosh users (and on OS/2 and VMS, among other environments).  The sources
+are written in highly portable C and should not be difficult to port to any
+environment where an ANSI/ISO or K&R C compiler and the standard C library are
+available.
 
 Often vendors of proprietary compilers and operating systems provide little or
 no documentation about how to build libraries (especially shared/dynamically

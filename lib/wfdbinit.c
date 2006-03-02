@@ -1,9 +1,9 @@
 /* file: wfdbinit.c	G. Moody	 23 May 1983
-			Last revised:    7 April 2003		wfdblib 10.3.6
+			Last revised:  23 February 2006		wfdblib 10.4.0
 WFDB library functions wfdbinit, wfdbquit, and wfdbflush
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 2003 George B. Moody
+Copyright (C) 1983-2006 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -32,11 +32,8 @@ This file contains definitions of the following WFDB library functions:
 
 #include "wfdblib.h"
 
-FINT wfdbinit(record, aiarray, nann, siarray, nsig)
-char *record;			/* record name */
-WFDB_Anninfo *aiarray;		/* annotation file information array */
-WFDB_Siginfo *siarray;		/* signal information array */
-unsigned int nann, nsig;	/* number of entries in afarray and siarray */
+FINT wfdbinit(char *record, WFDB_Anninfo *aiarray, unsigned int nann,
+	      WFDB_Siginfo *siarray, unsigned int nsig)
 {
     int stat;
 
@@ -45,17 +42,17 @@ unsigned int nann, nsig;	/* number of entries in afarray and siarray */
     return (stat);
 }
 
-FVOID wfdbquit()
+FVOID wfdbquit(void)
 {
     wfdb_anclose();	/* close annotation files, reset variables */
     wfdb_sigclose();	/* close signals, reset variables */
     wfdb_sampquit();	/* release sample data buffer */
 #if WFDB_NETFILES
-    wfdb_wwwquit();	/* release any resources allocated by libwww */
+    wfdb_wwwquit();	/* release resources allocated by libcurl or libwww */
 #endif
 }
 
-FVOID wfdbflush()	/* write all buffered output to files */
+FVOID wfdbflush(void)	/* write all buffered output to files */
 {
     wfdb_oaflush();	/* flush buffered output annotations */
     wfdb_osflush();	/* flush buffered output samples */

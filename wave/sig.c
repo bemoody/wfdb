@@ -1,10 +1,10 @@
-/* file: sig.c		G. Moody	27 April 1990
-			Last revised:	10 June 2005
+/* file: sig.c		G. Moody	 27 April 1990
+			Last revised:	6 February 2006
 Signal display functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1990-2005 George B. Moody
+Copyright (C) 1990-2006 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -383,21 +383,25 @@ long fdl_time;
 	double w;	/* weight assigned to ymean in y-offset calculation */
 
 	tp = lp->vlist[c];
-	ymean = 0;  ymax = -32768; ymin = 32767;
-	for (j = n = 0, n = 1; j < i; j++) {
+
+	/* Find the first valid sample in the trace, if any. */
+	for (j = 0; j < i && tp[j].y == WFDB_INVALID_SAMPLE; j++)
+	    ;
+	ymean = ymax = ymin = (j < i) ? tp[j].y : 0;
+	for (n = 1; j < i; j++) {
 	    if ((y = tp[j].y) != WFDB_INVALID_SAMPLE) {
-		if (y > ymax) ymax = y;
+	        if (y > ymax) ymax = y;
 		else if (y < ymin) ymin = y;
 		ymean += y;
 		n++;
 	    }
 	}
+	ymean /= n;
 	ymid = (ymax + ymin)/2;
-	if (n > 0) ymean /= n;
 	/* Since ymin <= ymid <= ymax, the next lines imply 0 <= w <= 1 */
 	if (ymid > ymean) /* in this case, ymax must be > ymean */
 	    w = (ymid - ymean)/(ymax - ymean);
-	else if (ymid < ymean) /* in this case, ymin must be < ymin */
+	else if (ymid < ymean) /* in this case, ymin must be < ymean */
 	    w = (ymean - ymid)/(ymean - ymin);
 	else w = 1.0;
 	dy = -(ymid + ((double)ymean-ymid)*w);

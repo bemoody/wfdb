@@ -1,7 +1,8 @@
 all:
 	@rm -f lcheck
 	@make lcheck	
-	@./libcheck $(DBDIR) $(LIBDIR)
+	-@./libcheck $(DBDIR) $(LIBDIR)
+	@../conf/prompt "Press <Enter> to test applications:"; read A
 	@./appcheck $(INCDIR) $(BINDIR) $(LIBDIR)
 
 lcheck:	lcheck.c

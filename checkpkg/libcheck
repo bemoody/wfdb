@@ -1,6 +1,6 @@
 #!/bin/sh
 # file: libcheck		G. Moody       8 September 2001
-#                               Last revised:   11 August 2005
+#                               Last revised:  27 February 2006
 #
 # This script checks the functionality of the WFDB library by comparing the
 # outputs of 'lcheck' with expected outputs.  See 'lcheck.c' for details of
@@ -21,6 +21,10 @@ then
   echo "The 'data' directory, including record 100s, must also be present."
   exit
 fi
+
+# If WFDB was set by the user, unset it for the duration of this test so
+# that we have a known WFDB path.
+unset WFDB
 
 case $# in
   0) VERBOSE=0 ;;

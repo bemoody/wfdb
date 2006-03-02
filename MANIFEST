@@ -342,15 +342,6 @@ doc/wag-src/xview.7
 doc/wpg/
 doc/wpg/info/
 doc/wpg/info/README.info
-doc/wpg/info/wpg
-doc/wpg/info/wpg-1
-doc/wpg/info/wpg-2
-doc/wpg/info/wpg-3
-doc/wpg/info/wpg-4
-doc/wpg/info/wpg-5
-doc/wpg/info/wpg-6
-doc/wpg/info/wpg-7
-doc/wpg/info/wpg-8
 doc/wpg-src/
 doc/wpg-src/ctotexi.c
 doc/wpg-src/dir.top

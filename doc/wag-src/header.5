@@ -1,4 +1,4 @@
-.TH HEADER 5 "1 August 2002" "WFDB software 10.2.7" "WFDB Applications Guide"
+.TH HEADER 5 "5 August 2005" "WFDB software 10.3.18" "WFDB Applications Guide"
 .SH NAME
 header \- WFDB header file format
 .SH DESCRIPTION
@@ -18,7 +18,8 @@ specifies the record name, the number of segments, and the number of signals.
 Header files for ordinary records (those that contain one segment) also
 contain a \fIsignal specification line\fP for each signal.  Header files for
 multi-segment records (supported by WFDB library version 9.1 and later versions)
-contain a \fIsegment specification line\fP for each segment.
+contain a \fIsegment specification line\fP for each segment;  see the section
+on multi-segment records below for details.
 .LP
 \fIComment lines\fP may appear anywhere in a header file.  The first
 printing character in a comment line must be `#'.  Comment lines that follow
@@ -276,15 +277,24 @@ note that whitespace between the block size and description
 fields is not considered to be part of the description,
 however.  If the description is missing, the WFDB library
 functions that read header files supply a description of the
-form ``record \fIxxx\fP, signal \fIn\fP''.
-.SS "Segment specification lines"
+.SS "Info strings"
 .LP
-Each non-empty, non-comment line following the record line in a
-multi-segment record contains specifications for one segment,
-beginning with segment 0.  Header files must contain valid segment
-specification lines for at least as many segments as were indicated
-in the record line.  Any extra segment specification lines are not
-read by WFDB library functions.
+Comment lines that follow the last signal specification line
+in a header file can be read and written by the WFDB library functions
+\fIgetinfo\fP and \fIputinfo\fP;  the contents of these lines (excluding
+the initial `#' comment character) are referred to as `info strings'.
+There must be no whitespace preceding the initial `#' in any line that
+is to be recognized by \fIgetinfo\fP.
+form ``record \fIxxx\fP, signal \fIn\fP''.
+.SS "Multi-segment records"
+.LP
+Each non-empty, non-comment line following the record line in the
+top-level header file of a multi-segment record contains specifications
+for one segment, beginning with segment 0. (Info strings cannot be used in
+the top-level header file of a multi-segment record.)  Top-level header
+files must contain valid segment specification lines for at least as
+many segments as were indicated in the record line.  Any extra segment
+specification lines are not read by WFDB library functions.
 .LP
 A \fIsegment\fP is simply an ordinary (single-segment) record, with
 its own header and signal files.  By including segments in a
@@ -294,17 +304,33 @@ in segment 0 and continuing with those in segment 1, with no need for
 the applications to do anything special to move from one segment to
 another.  The only restrictions are that segments cannot themselves
 contain other segments (they \fImust\fP be single-segment records),
+the sampling frequencies must not change from segment to segment,
 and the number of samples per signal must be defined for each segment
-in the record line of the segment's own header file.  In addition, the
-number of signals and the sampling frequency should match in all
-segments of a record, and it is best if the signal gain, baseline,
-units, ADC resolution and zero, and description match for
-corresponding signals in all segments (these recommendations are not
-enforced by the WFDB library, but existing applications are likely to
+in the record line of the segment's own header file.
+.LP
+Two types of multi-segment records are defined.  In a \fIfixed-layout\fR
+record, the arrangement of signals is constant across all segments, and
+the signal gain, baseline, units, ADC resolution and zero, and description
+match for corresponding signals in all segments (these recommendations are
+not enforced by the WFDB library, but existing applications are likely to
 behave unpredictably if they are not followed).  Note, however, that it
 is not necessary to use the same signal storage format in all segments,
 and significant space savings may be possible in some cases by selecting
-an optimal format for each segment.
+an optimal format for each segment.  Each segment of a fixed-layout record
+is an ordinary record containing one or more samples.
+.LP
+In a \fIvariable-layout\fR record, the arrangement of signals may vary,
+signals may be absent in some segments, and the gains and baselines may
+change between segments.  A variable-layout record can be identified by
+the presence of a \fIlayout segment\fR, which must be segment 0 and must
+have a length of 0 samples.  The layout segment has no associated signal
+files;  its header file specifies the desired arrangement of signals and
+their gains and baselines.  Signal file names in a layout segment header
+are recorded as `~'.  When read using WFDB library version 10.3.17
+or later, the signals of a variable layout record are rearranged, shifted,
+and rescaled as needed in order to present the signals in the arrangement
+and with the gains and baselines specified in the layout segment header.
+.SS "Segment specification lines"
 .LP
 Each segment specification line contains the following fields, separated
 by whitespace:
@@ -317,14 +343,13 @@ digits, and underscores (`_') only.
 \fInumber of samples per signal\fP
 This number must match the number specified in the header file for the
 single-segment record that comprises the segment.
-.SS "Info strings"
 .LP
-Comment lines that follow the last signal specification line
-in a header file can be read and written by the WFDB library functions
-\fIgetinfo\fP and \fIputinfo\fP;  the contents of these lines (excluding
-the initial `#' comment character) are referred to as `info strings'.
-There must be no whitespace preceding the initial `#' in any line that
-is to be recognized by \fIgetinfo\fP.
+Variable-layout records may contain \fInull segments\fR, which can be
+identified if the record name given in the segment specification line is
+`~'.  The number of samples per signal indicates the length of the null
+segment;  when read, these samples have the value WFDB_INVALID_DATA
+(defined in <wfdb/wfdb.h>).  Null segments do not have associated header
+or signal files.
 .SS "Examples:"
 .TP
 \fIExample 1 (MIT DB record 100):\fP

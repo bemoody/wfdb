@@ -1,9 +1,9 @@
 /* file: fir.c		G. Moody	5 January 1987
-			Last revised:  14 November 2002
+			Last revised:  25 February 2006
 
 -------------------------------------------------------------------------------
 fir: General-purpose FIR filter for database records
-Copyright (C) 2002 George B. Moody
+Copyright (C) 1987-2006 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -77,10 +77,11 @@ void init(argc, argv)
 int argc;
 char *argv[];
 {
-    char *irec = "16", *orec = "16";
+    char *irec = "16", *orec = "16", *p;
     double *tc = NULL, atof();
     int i, n = 128, s;
     long from = 0L, shift = 0L, to = 0L;
+    static int gvmode = 0;
     static WFDB_Siginfo *chin, *chout;
     FILE *ifile;
 
@@ -124,6 +125,9 @@ char *argv[];
 	  case 'h':	/* help requested */
 	    help();
 	    exit(0);
+	    break;
+	  case 'H':	/* operate in WFDB_HIGHRES mode */
+	    gvmode = WFDB_HIGHRES;
 	    break;
 	  case 'i':	/* input record name */
 	    if (++i >= argc) {
@@ -190,6 +194,11 @@ char *argv[];
 	help();
 	exit(1);
     }
+
+    if (gvmode == 0 && (p = getenv("WFDBGVMODE")))
+	gvmode = atoi(p);
+    setgvmode(gvmode|WFDB_GVPAD);
+
     if ((nsig = isigopen(irec, NULL, 0)) <= 0)
 	exit(2);
     if ((chin = malloc(nsig * sizeof(WFDB_Siginfo))) == NULL ||
@@ -281,6 +290,7 @@ static char *help_strings[] = {
  " -C file     filter using coefficients read from the specified FILE",
  " -f TIME     begin at specified time",
  " -h          print this usage summary",
+ " -H          read multifrequency signals in high resolution mode",
  " -i IREC     read signals from record IREC (default: 16)",
  " -n NREC     create a header file, using record name NREC and signal",
  "              descriptions from IREC",

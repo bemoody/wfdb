@@ -1,8 +1,8 @@
-/* file wabp.c          Wei Zong      23 October 1998
-   			Last revised:   11 May 2005 (by G. Moody)
+/* file wabp.c          Wei Zong       23 October 1998
+   			Last revised: 25 February 2006 (by G. Moody)
 -----------------------------------------------------------------------------
 wabp: beat detector for arterial blood presure (ABP) signal
-Copyright (C) 2002-2005 Wei Zong
+Copyright (C) 1998-2006 Wei Zong
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -127,7 +127,8 @@ main(int argc, char **argv)
     WFDB_Sample *v;
     WFDB_Siginfo *s;
     WFDB_Time from = 0L, next_minute, now, spm, t, tj, tpq, to = 0L, tt, t1;
-    char *prog_name();
+    char *p, *prog_name();
+    static int gvmode = 0;
     void help();
 
     pname = prog_name(argv[0]);
@@ -147,6 +148,9 @@ main(int argc, char **argv)
 	  case 'h':	/* help requested */
 	    help();
 	    exit(0);
+	    break;
+	  case 'H':	/* operate in WFDB_HIGHRES mode */
+	    gvmode = WFDB_HIGHRES;
 	    break;
 	  case 'm':	/* threshold */
 	    if (++i >= argc || (Tm = atoi(argv[i])) <= 0) {
@@ -199,6 +203,10 @@ main(int argc, char **argv)
 	help();
 	exit(1);
     }
+
+    if (gvmode == 0 && (p = getenv("WFDBGVMODE")))
+	gvmode = atoi(p);
+    setgvmode(gvmode|WFDB_GVPAD);
 
     if ((nsig = isigopen(record, NULL, 0)) < 1) exit(2);
     if ((s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo))) == NULL) {
@@ -394,6 +402,7 @@ static char *help_strings[] = {
  "             do not annotate",
  " -f TIME     begin at specified time (default: beginning of the record)",
  " -h          print this usage summary",
+ " -H          read multifrequency signals in high resolution mode",
  " -R          resample input at 125 Hz (default: do not resample)",
  " -s SIGNAL   analyze specified signal (default: 0)",
  " -t TIME     stop at specified time (default: end of the record)",

@@ -1,9 +1,9 @@
 /* file: mfilt.c	G. Moody	 27 June 1993
-			Last revised:  14 November 2002
+			Last revised:  25 February 2006
 
 -------------------------------------------------------------------------------
 mfilt: General-purpose median filter for database records
-Copyright (C) 2002 George B. Moody
+Copyright (C) 1993-2006 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -100,8 +100,9 @@ void init(argc, argv)
 int argc;
 char *argv[];
 {
-    char *irec = "16", *ofname, *orec = "16";
+    char *irec = "16", *ofname, *orec = "16", *p;
     int format, i;
+    static int gvmode = 0;
     static WFDB_Siginfo *si, *so;
 
     pname = prog_name(argv[0]);
@@ -117,6 +118,9 @@ char *argv[];
 	  case 'h':	/* help requested */
 	    help();
 	    exit(0);
+	    break;
+	  case 'H':	/* operate in WFDB_HIGHRES mode */
+	    gvmode = WFDB_HIGHRES;
 	    break;
 	  case 'i':	/* input record name */
 	    if (++i >= argc) {
@@ -173,6 +177,10 @@ char *argv[];
 	exit(1);
     }
     median = flen/2;
+
+    if (gvmode == 0 && (p = getenv("WFDBGVMODE")))
+	gvmode = atoi(p);
+    setgvmode(gvmode|WFDB_GVPAD);
 
     if ((nsig = isigopen(irec, NULL, 0)) <= 0)
 	exit(2);
@@ -249,6 +257,7 @@ static char *help_strings[] = {
  "and OPTIONS may include:",
  " -f TIME     begin at specified time",
  " -h          print this usage summary",
+ " -H          read multifrequency signals in high resolution mode",
  " -i IREC     read signals from record IREC (default: 16)",
  " -n NREC     create a header file, using record name NREC and signal",
  "              specifications from IREC",

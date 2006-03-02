@@ -1,9 +1,9 @@
 C file: example.f		G. Moody	23 August 1995
-C                               Last revised:   8 October 2001 (comments only)
+C                               Last revised:  23 February 2006
 C
 C -----------------------------------------------------------------------------
 C Sample program illustrating use of Fortran wrappers for the WFDB library
-C Copyright (C) 2001 George B. Moody
+C Copyright (C) 1995-2006 George B. Moody
 C
 C This program is free software; you can redistribute it and/or modify it under
 C the terms of the GNU General Public License as published by the Free Software
@@ -48,14 +48,16 @@ C The next two lines specify the data types returned by the wrappers.
 	real f
 
 C Open up to 32 signals from record 100s.  (There are only 2 signals in this
-C record, however.)
-	i = isigopen("100s", 32)
+C record, however.)  Note how we force the string argument to end with an
+C explicit NULL (CHAR(0));  this is necessary for any strings passed to C
+C functions.
+	i = isigopen("100s"//CHAR(0), 32)
 	write (6,1) i
  1	format("Number of signals in record 100s = ", i2)
 
 C Check out the sampling frequency of record 100s.  The returned value is
 C the sampling frequency in Hz, represented as a C double (Fortran real) value.
-	f = sampfreq("100s")
+	f = sampfreq("100s"//CHAR(0))
 	write (6,2) f
  2	format("Sampling frequency = ", f6.2)
 

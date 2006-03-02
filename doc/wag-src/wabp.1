@@ -1,4 +1,4 @@
-.TH WABP 1 "5 December 2002" "WFDB 10.3.1" "WFDB Applications Guide"
+.TH WABP 1 "25 February 2006" "WFDB 10.4.0" "WFDB Applications Guide"
 .SH NAME
 wabp \- arterial blood pressure (ABP) pulse detector
 .SH SYNOPSIS
@@ -36,6 +36,13 @@ Begin at the specified \fItime\fR in \fIrecord\fR (default: the beginning of
 .TP
 \fB-h\fR
 Print a brief usage summary.
+.TP
+\fB-H\fR
+Read the signal files in high-resolution mode (default: standard mode).
+These modes are identical for ordinary records.  For multifrequency records,
+the standard decimation of oversampled signals to the frame rate is suppressed
+in high-resolution mode (rather, all other signals are resampled at the highest
+sampling frequency).
 .TP
 \fB-R\fR
 Resample the input at 125 Hz (default: do not resample).

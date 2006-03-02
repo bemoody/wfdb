@@ -57,7 +57,7 @@ Harvard-MIT Division of Health Sciences and Technology}
 \pagestyle{empty}
 \vspace*{\fill}
 \noindent
-Copyright \copyright 1992 -- 2005 George B. Moody
+Copyright \copyright 1992 -- 2006 George B. Moody
 
 \vspace{1 in}
 \noindent
@@ -986,8 +986,8 @@ page~\pageref{sec:searching}} {sec:searching}.
 
 \index{printing!signal window contents}\index{screen dump}
 \index{PostScript}
-\index{SPARCprinter}
-If a PostScript printer is available, try printing the contents of the
+If a PostScript printer (or a PostScript interpreter such as GhostScript)
+is available, try printing the contents of the
 signal window.  To do this, press and hold the right mouse button
 while the pointer is above \menubutton{File}; then drag the pointer
 downwards until the {\sf Print} selection is
@@ -4694,27 +4694,25 @@ platform, it should be easy to build and use \WAVE{} on it.
 \index{resolution!of display}
 \index{X Window System!XFree86 server}
 \item [A computer capable of acting as a \WAVE{} host]
-(one for which a binary version of \WAVE{} is available).  Virtually
-any PC with a 386 or better CPU can run Linux, and such systems are
-likely to be the least expensive choice.  Ideally, a Linux PC to be
-used as a \WAVE{} host should have at least 8 Mb of RAM, at least 200
-Mb of available disk space, a three-button mouse (or trackball), and a
-graphics card and monitor (17-inch or larger, with a dot pitch of .26
-mm or less) capable of non-interlaced display at 65 Hz or faster with
-a resolution of at least 1024x768 with 256 colors.  In most cases, you
-will also want the system to be equipped with a CD-ROM drive (for
-loading software and digitized signals) and an Internet connection
-(for obtaining data from PhysioNet and compatible sources).
-Most PCs manufactured since 1995 will easily meet
-these requirements; new PCs will exceed most of them by large factors.
-In mid-2002, it was possible to assemble a suitable Linux PC for about
-US\$300 (not including the monitor).  It is not unreasonable to budget
-an equal or greater amount for a good monitor, since \WAVE{}'s
-usability depends to a significant extent on being able to see its
-output clearly.  If your budget permits, a flat-panel (LCD) monitor is
-an excellent choice, particularly if you plan to do much annotation
-editing, because these monitors typically present very stable images
-that do not tire the eye.
+Virtually any PC with a 386 or better CPU can run Linux, and such systems are
+likely to be the least expensive choice.  Ideally, a Linux PC to be used as a
+\WAVE{} host should have at least 8 Mb of RAM, at least 200 Mb of available
+disk space, a three-button mouse (or trackball), and a graphics card and
+monitor (17-inch or larger, with a dot pitch of .26 mm or less) capable of
+non-interlaced display at 65 Hz or faster with a resolution of at least
+1024x768 with 256 colors.  In most cases, you will also want the system to be
+equipped with an Internet connection (for obtaining data and software from
+PhysioNet and other sources)..  Most PCs manufactured since 1995 will easily
+meet these requirements; new PCs will exceed most of them by large factors.  In
+mid-2005, it was possible to assemble a suitable Linux PC for about US\$200
+(not including the monitor).  It is not unreasonable to budget an equal or
+greater amount for a good monitor, since \WAVE{}'s usability depends to a
+significant extent on being able to see its output clearly.  If your budget
+permits, a flat-panel (LCD) monitor is an excellent choice, particularly if you
+plan to do much annotation editing, because these monitors typically present
+very stable images that do not tire the eye. Fully configured and supported
+Linux PCs are available from many sources if you prefer not to assemble your
+own; try a Google search for ``linux pc'' to find vendors.
 
 Inexpensive three-button mice, trackballs, and touchpads manufactured
 by Logitech and many others are widely available for PCs, and are
@@ -4736,53 +4734,20 @@ other performance upgrades such as a faster CPU.  Although Linux does not
 require large amounts of RAM, it can use additional RAM very effectively, and
 you are likely to find that purchasing (say) 16 or 32 Mb of additional RAM
 results in a bigger performance improvement than spending the same amount on a
-faster CPU.  Fully configured and supported Linux PCs are available from many
-vendors if you prefer not to assemble your own; see the Linux Commercial-HOWTO
-for further information.
+faster CPU.
 
 Although \WAVE{} now runs on MS-Windows, we still recommend using
 GNU/Linux as the platform of choice because of its greater speed, capability,
 configurability, security, and stability, and because of the wider
-range of related software available for GNU/Linux.
-
-Macintoshes and SPARC-based systems may also be worth considering, although
-they tend to be substantiallyly more expensive than comparable or
-faster Linux PCs.
-
-\item [A source of digitized signals]
-\index{SPARCstation}\index{PC}\index{WFDB Software Package}\index{MS-DOS}
-\index{CD-ROM}\index{ADC boards}\index{data acquisition}
-Desktop SPARC systems are equipped with a single-channel
-analog-to-digital converter that may be adequate for some applications
-(newer versions have high-speed two-channel 16-bit ADCs).  Several
-vendors supply data acquisition subsystems for SPARC systems, which
-may be useful if you require more speed, resolution, or inputs.
-\index{resolution!of ADC}
-PC-based hardware and software for digitizing signals is available at
-significantly lower cost from many vendors.  The WFDB Software Package
-includes MS-DOS software for converting signals from analog to digital
-form and back again, using ISA-bus ADC boards from Microstar
-Laboratories (see
-\hyperref{ADC boards}
-{section~}
-{, page~\pageref{sec:adc-boards}}
-{sec:adc-boards}).
-Large collections of digitized reference recordings of ECGs and
-other signals are freely available from
-\htmladdnormallink{PhysioNet}{http://www.physionet.org/},
-and may be purchased on
-\htmladdnormallink{CD-ROMs from MIT}{http://ecg.mit.edu/}
-and others; several
-CD-ROMs are currently available for use in basic research in
-physiologic signal processing as well as for evaluation of
-instrumentation.  Single CD-ROM drives are widely
-available for prices ranging from US\$50 to \$300, depending on speed;
-CD-ROM changers and jukeboxes are also available at higher prices.
+range of related software available for GNU/Linux. Other \WAVE{} users have
+reported success on PCs running FreeBSD.  Macintoshes running OS X
+and SPARC-based systems may also be worth considering, although they tend to
+be substantially more expensive than comparable or faster Linux or FreeBSD PCs.
 \end{description}
 
 \section{Printers}
 
-\index{printing}\index{PostScript}\index{SPARCprinter}\index{Ghostscript}
+\index{printing}\index{PostScript}\index{Ghostscript}
 All currently available \WAVE{}-compatible applications for printing
 require the use of a PostScript (or compatible) printer accessible to
 the \WAVE{} host
@@ -4791,9 +4756,7 @@ system.  If you need
 paper output, therefore, you should obtain a PostScript printer, or a
 PostScript-compatible interpreter (such as the freely available GNU
 Ghostscript) for your printer, or you should be prepared to write your
-own printing applications.  For users of SBus-based SPARC systems, the
-Sun SPARC\-printer is an excellent choice (less expensive and much
-faster than standard PostScript printers, with better quality output).
+own printing applications.  
 
 \section{Remote access requirements}
 
@@ -4826,97 +4789,10 @@ server for Windows.)  If costs of maintenance and system administration are a
 concern, an X terminal is probably a better choice than a networked
 PC.
 
-\section{X11 window managers}
-\index{window manager}\index{ICCCM}
-Unlike other windowing systems, X does not impose a particular `look and feel'
-on the user; rather, the user may select one of a number of `window managers'
-that provide different user interfaces for common operations such as moving and
-resizing windows.  Window managers are X client applications that have a
-special status allowing them to manipulate the windows of other X clients.  Any
-window manager that conforms to the ICCCM (a standard published by the X
-Consortium) may be used with \WAVE{}; among these are {\tt fvwm},
-\index{olwm@{\tt olwm} (Open Look Window Manager)}
-\index{olvwm@{\tt olvwm} (Open Look Virtual Window Manager)}
-{\tt olwm}, and {\tt olvwm},
-included in source form with most Linux distributions
-and widely available elsewhere ({\tt olwm} is also standard on Sun
-workstations);  and {\tt mwm} (the Motif window manager, included with most
-current commercial UNIX systems).  The Open Look window managers ({\tt olwm}
-and {\tt olvwm}) are particularly recommended, since the others do not support
-certain Open Look features of \WAVE{} (notably spot help and `pinnable'
-popups).  If you
-\index{X terminal}
-are using an MS-DOS PC or an X terminal to access \WAVE{}, the window
-manager must usually be run remotely, often on the same computer that runs
-\WAVE{}. (Note:  these recommendations are several years old.  Many
-newer X11 window managers have appeared since then;  \WAVE{} works
-with any of them, although {\tt olwm} and {\tt olvwm} still have a
-slight advantage over the others.
-
-\section{Data acquisition and digitization}
-\label{sec:adc-boards}
-\index{Linux}\index{digitizing signals}\index{ADC boards}
-\index{sample command@{\tt sample} command (for digitization under MS-DOS)}
-PC-based data acquisition is a good choice given the large number of ADC boards
-available;  note, however, that Linux drivers for these boards are rare.
-The WFDB Software Package available separately from MIT includes an MS-DOS
-program (named {\tt sample}) for digitization and replay of analog signals
-using a DAP 1200- or 2400-series data acquisition board (available from
-Microstar Laboratories,
-\htmladdnormallink{http://www.mstarlabs.com/).}{http://www.mstarlabs.com/}
-
-Note that the \WAVE{} host
-\index{WAVE host@\WAVE{} host}
-must be able
-to read the signal files.  If you use an MS-DOS data acquisition
-program, this can be accomplished in several ways:
-
-\begin{itemize}
-
-\item
-The data acquisition PC can be set up to boot either Linux
-\index{Linux}
-or MS-DOS,
-\index{MS-DOS}
-and when running \WAVE{} under Linux, signal
-files written to MS-DOS file systems can be read directly.  (Current
-versions of Linux can also read files in Windows NT, Windows 95, and
-OS/2 file systems.)
-
-\item
-Alternatively, you can transfer the digitized
-signals to another system acting as the \WAVE{} host, either during
-digitization (by writing to a network drive) or afterwards.  Since
-signal files are usually very large, Ethernet
-\index{Ethernet}
-transmission is
-recommended.  If
-\index{sample command@{\tt sample} command (for digitization under MS-DOS)}
-you use {\tt sample} for digitization, signal files can be written
-directly on the host system's drive at rates up to 80,000 samples per
-second using NFS (or up to 100,000 samples per second on local
-disks).  This configuration allows you to examine the signal files
-using \WAVE{} as the data are being acquired; although \WAVE{} does
-not currently support real-time, continuously updated display of
-incoming data, it is not difficult to create a log file for \WAVE{}
-that can be used to drive a continuously updated time-delayed display
-(see
-\hyperref{a note about automatic scrolling}
-{section~}
-{, page~\pageref{sec:autoscroll} }
-{sec:autoscroll}
-for details).
-
-\item
-You can write digitized data to removable storage, then read the data on the
-\WAVE{} host.  Many devices are suitable for this purpose;  consider
-using writable CDs or DVDs, USB or Firewire disk drives, or compact
-flash memory cards.
-\end{itemize}
-
-\index{CD-ROM}\index{MIT-BIH Arrhythmia Database} \index{European ST-T
+\section{Data}
+\index{MIT-BIH Arrhythmia Database} \index{European ST-T
 Database}\index{MIT-BIH Polysomnographic Database} \index{MGH/MF
-Waveform Database} You may also find that an existing database of
+Waveform Database} You may find that an existing database of
 digitally recorded signals may be useful for your studies.  PhysioNet, at
 \htmladdnormallink{http://www.physionet.org/,}{http:/www.physionet.org/},
 offers free on-line access to over 30 such databases with thousands of
@@ -4934,43 +4810,30 @@ This is an excellent way to explore PhysioBank (PhysioNet's collection
 of signal databases).
 
 \section{About Linux}
-
 \label{sec:linux}
 \index{Linux}
 As mentioned earlier, an excellent choice for a \WAVE{}
 host is a PC running Linux.  Linux is a (very) complete, and
 completely free, robust, modern reimplementation of the UNIX operating
 system, written by Linus Torvalds and a cast of thousands.  It is
-available in source and ready-to-run form by anonymous FTP from many
-sources, including
-\htmladdnormallink{{\tt ftp://ftp.tux.org}}{ftp://ftp.tux.org},
-\htmladdnormallink{{\tt public.planetmirror.com}}{ftp://public.planetmirror.com/pub/linux}, and
-\htmladdnormallink{{\tt ftp.funet.fi}}{ftp://ftp.funet.fi/pub/Linux}.
+freely available in source and ready-to-run form from many
+sources (LWN.net maintains a list of over 400 sites at
+\htmladdnormallink{http://lwn.net/Distributions/}{http://lwn.net/Distributions/}).
 You can also obtain Linux on CD-ROMs from many
 commercial sources, generally at very low prices (typically US\$10 to
 \$40, depending mainly on the amount of printed documentation and
 technical support offered).  Current Linux distributions include
 TCP/IP networking including NFS
 support, the complete collection of GNU software including the GNU
-C/C++ compiler, Ghostscript, \TeX, and much more.  Some also include
+C/C++ compiler, Ghostscript, \TeX, X11R6, and much more.  Some also include
 \index{XView}\index{olwm@{\tt olwm} (Open Look Window Manager)}
 \index{olvwm@{\tt olvwm} (Open Look Virtual Window Manager)}
-X11R6, XView 3.2, {\tt olwm} and {\tt olvwm};  these are also available
-from the sites above as well as from PhysioNet.  For further
+XView 3.2, {\tt olwm} and {\tt olvwm};  these are also available
+from PhysioNet.  For further
 information, visit the home page of the Linux Documentation Project
 (\htmladdnormallink{{\tt http://www.tldp.org/}}
 {http://www.tldp.org/}), where you may also find the Linux HOWTO
 documents mentioned earlier.
-
-\index{format!of binary executable files}
-Since mid-1995, Linux has supported ELF binaries, and current versions
-of \WAVE{} for Linux are made available in this format.  Older
-versions of Linux used the {\tt a.out} binary format.  If you have
-been running one of these older versions of Linux, updating your system
-to one with ELF support is highly recommended.  Otherwise, you can attempt
-to compile an {\tt a.out}-format WAVE from the
-\htmladdnormallink{sources}{http://www.physionet.org/physiotools/wfdb/wave/}
-available from PhysioNet.
 
 \section{Other useful software}
 \label{sec:other-software}

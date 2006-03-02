@@ -1,8 +1,8 @@
 /* file: wqrs.c		Wei Zong      23 October 1998
-			Last revised:   11 May 2005 (by G. Moody)
+			Last revised: 25 February 2006 (by G. Moody)
 -----------------------------------------------------------------------------
 wqrs: Single-lead QRS detector based on length transform
-Copyright (C) 1998-2005 Wei Zong
+Copyright (C) 1998-2006 Wei Zong
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -71,7 +71,7 @@ and then compare its output with the reference annotations by:
 #include <wfdb/ecgcodes.h>
 #include <wfdb/ecgmap.h>
 
-#define BUFLN   4096	/* must be a power of 2, see ltsamp() */
+#define BUFLN  16384	/* must be a power of 2, see ltsamp() */
 #define EYE_CLS 0.25    /* eye-closing period is set to 0.25 sec (250 ms) */ 
 #define LPERIOD 1000	/* learning period is the first LPERIOD samples */
 #define MaxQRSw 0.13    /* maximum QRS width (130ms) */                        
@@ -94,7 +94,7 @@ WFDB_Sample *lbuf = NULL;
    Since this program analyzes only one signal, ltsamp() does not have an
    input argument for specifying a signal number; rather, it always filters
    and returns samples from the signal designated by the global variable
-   'signal'.  The caller must never "rewind" by more than BUFLN samples (the
+   'sig'.  The caller must never "rewind" by more than BUFLN samples (the
    length of ltsamp()'s buffers). */
 
 WFDB_Sample ltsamp(WFDB_Time t)
@@ -124,11 +124,14 @@ WFDB_Sample ltsamp(WFDB_Time t)
     }
     while (t > tt) {
 	static int aet = 0, et;
+	WFDB_Sample v0, v1, v2;
 
 	Yn2 = Yn1;
 	Yn1 = Yn;
-	Yn = 2*Yn1 - Yn2 + sample(sig, tt) -
-	     2*sample(sig, tt-LPn) + sample(sig, tt-LP2n);
+	if ((v0 = sample(sig, tt)) != WFDB_INVALID_SAMPLE &&
+	    (v1 = sample(sig, tt-LPn)) != WFDB_INVALID_SAMPLE &&
+	    (v2 = sample(sig, tt-LP2n)) != WFDB_INVALID_SAMPLE)
+	    Yn = 2*Yn1 - Yn2 + v0 - 2*v1 + v2;
 	dy = (Yn - Yn1) / LP2n;		/* lowpass derivative of input */
 	et = ebuf[(++tt)&(BUFLN-1)] = sqrt(lfsc +dy*dy); /* length transform */
 	lbuf[(tt)&(BUFLN-1)] = aet += et - ebuf[(tt-LTwindow)&(BUFLN-1)];
@@ -140,6 +143,7 @@ WFDB_Sample ltsamp(WFDB_Time t)
 
 main(int argc, char **argv)
 { 
+    char *p;
     char *record = NULL;	     /* input record name */
     float sps;			     /* sampling frequency, in Hz (SR) */
     float samplingInterval;          /* sampling interval, in milliseconds */
@@ -154,13 +158,14 @@ main(int argc, char **argv)
 					the threshold is automatically reduced
 					to a minimum value;  the threshold is
 					restored upon a detection */
-    int Ta, T0;			     /* high and low detection thresholds */
+    double Ta, T0;			     /* high and low detection thresholds */
     WFDB_Anninfo a;
     WFDB_Annotation annot;
     WFDB_Gain gain;
     WFDB_Sample *v;
     WFDB_Siginfo *s;
     WFDB_Time from = 0L, next_minute, now, spm, t, tj, tpq, to = 0L, tt, t1;
+    static int gvmode = 0;
     char *prog_name();
     void help();
 
@@ -181,6 +186,9 @@ main(int argc, char **argv)
 	  case 'h':	/* help requested */
 	    help();
 	    exit(0);
+	    break;
+	  case 'H':	/* operate in WFDB_HIGHRES mode */
+	    gvmode = WFDB_HIGHRES;
 	    break;
 	  case 'j':	/* annotate J-points (ends of QRS complexes) */
 	    jflag = 1;
@@ -245,6 +253,10 @@ main(int argc, char **argv)
 	exit(1);
     }
 
+    if (gvmode == 0 && (p = getenv("WFDBGVMODE")))
+	gvmode = atoi(p);
+    setgvmode(gvmode|WFDB_GVPAD);
+
     if ((nsig = isigopen(record, NULL, 0)) < 1) exit(2);
     if ((s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo))) == NULL) {
 	(void)fprintf(stderr, "%s: insufficient memory\n", pname);
@@ -267,6 +279,8 @@ main(int argc, char **argv)
 	if ((to = strtim(argv[to])) < 0L)
 	    to = -to;
     }
+    else
+	to = strtim("e");
 
     annot.subtyp = annot.num = 0;
     annot.chan = sig;
@@ -286,7 +300,7 @@ main(int argc, char **argv)
 
     (void)sample(sig, 0L);
     if (dflag) {
-	for (t = from; (to == 0L || t < to) && sample_valid(); t++)
+	for (t = from; t < to || (to == 0L && sample_valid()); t++)
 	    printf("%6d\t%6d\n", sample(sig, t), ltsamp(t));
 	exit(0);
     }
@@ -311,19 +325,23 @@ main(int argc, char **argv)
     }
 
     /* Average the first 8 seconds of the length-transformed samples
-       to determine the initial thresholds Ta and T0 */
-    t1 = from + strtim("8");
+       to determine the initial thresholds Ta and T0. The number of samples
+       in the average is limited to half of the ltsamp buffer if the sampling
+       frequency exceeds about 2 KHz. */
+    if ((t1 = strtim("8")) > BUFLN*0.9)
+	t1 = BUFLN/2;
+    t1 += from;
     for (T0 = 0, t = from; t < t1 && sample_valid(); t++)
 	T0 += ltsamp(t);
     T0 /= t1 - from;
     Ta = 3 * T0;
 
     /* Main loop */
-    for (t = from; (to == 0L || t < to) && sample_valid(); t++) {
+    for (t = from; t < to || (to == 0L && sample_valid()); t++) {
 	static int learning = 1, T1;
 	
 	if (learning) {
-	    if (t > from + LPERIOD) {
+	    if (t > t1) {
 		learning = 0;
 		T1 = T0;
 		t = from;	/* start over */
@@ -454,6 +472,7 @@ static char *help_strings[] = {
  "             do not annotate",
  " -f TIME     begin at specified time (default: beginning of the record)",
  " -h          print this usage summary",
+ " -H          read multifrequency signals in high resolution mode",
  " -j          find and annotate J-points (QRS ends) as well as QRS onsets",
  " -m THRESH   set detector threshold to THRESH (default: 100)", /* TmDEF */
  " -p FREQ     specify power line (mains) frequency (default: 60)",

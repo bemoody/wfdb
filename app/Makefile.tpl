@@ -1,10 +1,10 @@
 # file: Makefile.tpl		G. Moody	  23 May 2000
-#				Last revised:	  8 June 2005
+#				Last revised:	9 September 2005
 # This section of the Makefile should not need to be changed.
 
 CFILES = ann2rr.c bxb.c calsig.c ecgeval.c epicmp.c fir.c ihr.c mfilt.c \
  mrgann.c mxm.c nguess.c nst.c plotstm.c pscgen.c pschart.c psfd.c rdann.c \
- rdsamp.c rr2ann.c rxr.c sampfreq.c sample.c sigamp.c sigavg.c skewedit.c \
+ rdsamp.c rr2ann.c rxr.c sampfreq.c sigamp.c sigavg.c skewedit.c \
  snip.c sortann.c sqrs.c sqrs125.c sumann.c sumstats.c tach.c time2sec.c \
  wabp.c wfdbcat.c wfdbcollate.c wfdbdesc.c \
  wfdbwhich.c wqrs.c wrann.c wrsamp.c xform.c

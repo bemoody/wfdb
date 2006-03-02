@@ -1,5 +1,5 @@
-# file: Makefile.tpl		G. Moody	24 May 2000
-#				Last revised:	18 July 2002
+# file: Makefile.tpl		G. Moody	  24 May 2000
+#				Last revised:	27 February 2006
 # Change the settings below as appropriate for your setup.
 
 # Set COLORS to 'color' if you have a color printer and would like to print
@@ -79,7 +79,7 @@ wug.html:	wug.tex wug.aux
 	cd ../wug; rm -f .ID_MAP .IMG_PARAMS .ORIG_MAP images.*
 	mv ../wug/*.pl .
 	wave/scripts/fixwug.sh ../wug
-	cd ../wug; ln -s wug.htm index.html; find `pwd` -print | doschk
+	cd ../wug; ln -s wug.htm index.html
 	wave/scripts/fixinfo >../../wave/wave.info
 	touch wug.html
 

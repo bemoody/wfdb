@@ -1,10 +1,10 @@
-/* file: calib.c	G. Moody	4 July 1991
-			Last revised:	2 June 2002		wfdblib 10.2.6
+/* file: calib.c	G. Moody	  4 July 1991
+			Last revised:	23 February 2006	wfdblib 10.4.0
 WFDB library functions for signal calibration
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 2002 George B. Moody
+Copyright (C) 1991-2006 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -67,8 +67,7 @@ static struct cle {
    otherwise, the "+" is discarded before attempting to open the file,
    which may be in any directory in the WFDB path.  If the file can be read,
    its contents are appended to the calibration list. */
-FINT calopen(cfname)
-char *cfname;
+FINT calopen(char *cfname)
 {
     WFDB_FILE *cfile;
     char buf[128], *p1, *p2, *p3, *p4, *p5, *p6;
@@ -170,10 +169,7 @@ char *cfname;
    of finding a match.  If a match is found, it is copied into the caller's
    WFDB_Calinfo structure.  The caller must not write over the storage
    addressed by the desc and units fields. */
-FINT getcal(desc, units, cal)
-char *desc;		/* signal description (or prefix) */
-char *units;		/* signal units (or NULL) */
-WFDB_Calinfo *cal;	/* WFDB_Calinfo structure to be filled in */
+FINT getcal(char *desc, char *units, WFDB_Calinfo *cal)
 {
     for (this_cle = first_cle; this_cle; this_cle = this_cle->next) {
 	if ((desc == NULL || strncmp(desc, this_cle->sigtype,
@@ -193,8 +189,7 @@ WFDB_Calinfo *cal;	/* WFDB_Calinfo structure to be filled in */
 
 /* Function putcal appends the caller's WFDB_Calinfo structure to the end of
    the calibration list. */
-FINT putcal(cal)
-WFDB_Calinfo *cal;	/* WFDB_Calinfo record to be appended to list */
+FINT putcal(WFDB_Calinfo *cal)
 {
 #ifndef lint
     if ((this_cle = (struct cle *)malloc(sizeof(struct cle))) == NULL ||
@@ -230,8 +225,7 @@ WFDB_Calinfo *cal;	/* WFDB_Calinfo record to be appended to list */
 
 /* Function newcal generates a calibration file based on the contents of the
    calibration list. */
-FINT newcal(cfname)	/* name for new calibration file */
-char *cfname;
+FINT newcal(char *cfname)
 {
     WFDB_FILE *cfile;
 
@@ -271,7 +265,7 @@ char *cfname;
 }
 
 /* Function flushcal empties the calibration list. */
-FVOID flushcal()
+FVOID flushcal(void)
 {
     while (first_cle) {
 	free(first_cle->sigtype);

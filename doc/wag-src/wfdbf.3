@@ -1,4 +1,4 @@
-.TH WFDBF 3 "7 April 2003" "WFDB software 10.3.6" "WFDB Applications Guide"
+.TH WFDBF 3 "25 February 2006" "WFDB 10.4.0" "WFDB Applications Guide"
 .SH NAME
 wfdbf \- Waveform Database library wrappers for Fortran
 .SH SYNOPSIS
@@ -181,7 +181,9 @@ files.  Differences in argument-passing conventions between Fortran and C
 (the language of the WFDB library) require the use of a set of wrappers
 as an interface between the library and Fortran code that invokes its
 functions.  These wrappers are contained within 'wfdbf.c', provided in
-the 'fortran' directory of the WFDB software package.
+the 'fortran' directory of the WFDB software package.  When the WFDB Software
+Package is installed, a copy of 'wfdbf.c' is placed in the same directory
+as 'wfdb.h' (normally, /usr/include/wfdb).
 
 .PP
 Most of these wrapper subroutines behave like their similarly-named
@@ -204,12 +206,17 @@ and signal information structures.
 .PP
 To use these wrappers, call them as shown above, then compile your
 code together with wfdbf.c and link to the WFDB library.  If you are
-using the GNU g77 compiler, do so using a command such as:
+using the GNU g77 compiler (recommended), do so using a command such as:
 .br
-	\fBg77 -o foo -fwritable-strings foo.f wfdbf.c -lwfdb\fR
+	\fBg77 -o foo foo.f -DFIXSTRINGS /usr/include/wfdb/wfdbf.c -lwfdb\fR
 .br
-See 'fortran/README' for further information about using the WFDB Fortran
-wrappers.
+The wrappers include optionally compiled code that converts traditional
+space-terminated Fortran strings to null-terminated C strings and vice versa.
+This code is compiled if the symbol FIXSTRINGS is defined, as in the g77
+command above.  If you use a different Fortran compiler, this code may not be
+necessary.  See 'fortran/README' for further information about using the
+WFDB Fortran wrappers.
+
 .SH SEE ALSO
 .TP
 \fIWFDB Programmer's Guide\fR

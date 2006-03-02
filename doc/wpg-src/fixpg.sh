@@ -28,22 +28,10 @@ rm /tmp/.fix.$$
 
 cd $1
 
-R=`grep -l "<TITLE>WFDB Programmer's Guide: WFDB path</TITLE>" *.htm`
-if [ "x$R" != "x" ]; then ln -s $R database-path.htm
-else echo "Can't find database-path.htm"
-fi
-
-R=`grep -l "<H2> Records" *.htm`
-if [ "x$R" != "x" ]; then ln -s $R records.htm
-else echo "Can't find records.htm"
-fi
-
-R=`grep -l "<TITLE>WFDB Programmer's Guide: strtim" *.htm`
-if [ "x$R" != "x" ]; then ln -s $R strtim.htm
-else echo "Can't find strtim.htm"
-fi
-
-R=`grep -l "Compiling a Program with the WFDB Library </H2>" *.htm`
-if [ "x$R" != "x" ]; then ln -s $R compiling.htm
-else echo "Can't find compiling.htm"
-fi
+for L in database-path.htm records.htm strtim.htm compiling.htm
+do
+  R=`grep -l "link: $L" *.htm`
+  if [ "x$R" != "x" ]; then ln -s $R $L
+  else echo "Can't find $L"
+  fi
+done

@@ -81,7 +81,7 @@ MFLAGS =
 # use -g and -O simultaneously.  MFLAGS is gcc-specific.
 # CFLAGS = -O $(CCDEFS) $(LC) -I$(INCDIR)
 # `gcc' users may comment out the previous line, and uncomment the next one.
-CFLAGS = $(MFLAGS) -g -O $(CCDEFS)`$(LC) -I$(INCDIR)
+CFLAGS = $(MFLAGS) -g -O $(CCDEFS) $(LC) -I$(INCDIR)
 
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.

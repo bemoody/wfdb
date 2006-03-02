@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:	 9 April 2003
+#				Last revised:	27 February 2006
 # Change the settings below as appropriate for your setup.
 
 # D2PARGS is a list of options for dvips.  Uncomment one of these to set the
@@ -74,7 +74,9 @@ TMAN = -rC1 -rD1 -man
 # wag0.ps, and takes longer to render as a result.  To enable creation of
 # PostScript with DSCs in this way, uncomment the next two lines:
 WAGPSREQ = wag.pdf
-MAKEWAGPS = acroread -toPostScript -level1 -fast wag.pdf
+# The latest versions of acroread no longer support the -level1 and -fast
+# options used in previous versions of this Makefile (level 2 is the default).
+MAKEWAGPS = acroread -toPostScript wag.pdf
 # You can use pdftops instead of acroread by commenting out the previous line
 # and uncommenting the next one.
 # MAKEWAGPS = pdftops wag.pdf

@@ -1,19 +1,19 @@
 # file: Makefile		G. Moody	23 August 1995
-#				Last revised:	8 October 2001
+#				Last revised:  24 February 2006
 #
-# -----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # UNIX 'make' description file for compiling the Fortran example program
-# Copyright (C) 2001 George B. Moody
+# Copyright (C) 1995-2006 George B. Moody
 #
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 2 of the License, or (at your option)
+# any later version.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-# details.
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
 #
 # You should have received a copy of the GNU General Public License along with
 # this program; if not, write to the Free Software Foundation, Inc., 59 Temple
@@ -22,7 +22,7 @@
 # You may contact the author by e-mail (george@mit.edu) or postal mail
 # (MIT Room E25-505A, Cambridge, MA 02139 USA).  For updates to this software,
 # please visit PhysioNet (http://www.physionet.org/).
-# _____________________________________________________________________________
+# ____________________________________________________________________________
 
 # This file is used with the UNIX `make' command to compile the example
 # program in this directory.  Since this program is intended for instruction

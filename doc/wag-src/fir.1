@@ -1,4 +1,4 @@
-.TH FIR 1 "28 July 2002" "WFDB 10.2.7" "WFDB Applications Guide"
+.TH FIR 1 "25 February 2006" "WFDB 10.4.0" "WFDB Applications Guide"
 .SH NAME
 fir \- general-purpose FIR filter for WFDB records
 .SH SYNOPSIS
@@ -22,6 +22,13 @@ beginning of the record).
 .TP
 \fB-h\fR
 Print a usage summary.
+.TP
+\fB-H\fR
+Read the signal files in high-resolution mode (default: standard mode).
+These modes are identical for ordinary records.  For multifrequency records,
+the standard decimation of oversampled signals to the frame rate is suppressed
+in high-resolution mode (rather, all other signals are resampled at the highest
+sampling frequency).
 .TP
 \fB-i\fR \fIrecord\fR
 Use the specified \fIrecord\fR for input (default: record 16).

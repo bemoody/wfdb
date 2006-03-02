@@ -1,9 +1,9 @@
 /* file: xform.c	G. Moody        8 December 1983
-			Last revised:    13 April 2004
+			Last revised:  20 November 2005
 
 -------------------------------------------------------------------------------
 xform: Sampling frequency, amplitude, and format conversion for WFDB records
-Copyright (C) 1983-2004 George B. Moody
+Copyright (C) 1983-2005 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -703,8 +703,14 @@ char *argv[];
 	n = ofreq/f;
 	mn = m*n;
 	(void)getvec(vin);
-	for (i = 0; i < nosig; i++) 
-	    vv[i] = vin[siglist[i]]*gain[i] + deltav[i];	
+	for (i = 0; i < nosig; i++) {
+	    WFDB_Sample v = vin[siglist[i]];
+
+	    if (v != WFDB_INVALID_SAMPLE)
+		vv[i] = v*gain[i] + deltav[i];
+	    else
+		vv[i] = WFDB_INVALID_SAMPLE;
+	}
     }
 
     /* If in multifrequency mode, set msiglist offsets. */

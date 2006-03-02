@@ -1,5 +1,5 @@
 /* file: xvwave.c	G. Moody	27 April 1990
-			Last revised:	5 August 2005
+			Last revised:	30 August 2005
 XView support functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -133,11 +133,7 @@ Canvas canvas;
 int width;
 int height;
 {
-    XEvent nextev;
-    if (in_xv_main_loop) {
-	XPeekEvent((Display *)xv_get(canvas, XV_DISPLAY), &nextev);
-	if (nextev.type == ConfigureNotify) do_resize(canvas, width, height);
-    }
+    if (in_xv_main_loop) do_resize(canvas, width, height);
 }
 
 /* This function handles interpretation of XView options and initialization of
@@ -703,17 +699,6 @@ int mode;
 	WIN_BELOW, main_panel,
 	WIN_DYNAMIC_VISUAL, use_overlays,
 	0);
-
-#if 0
-    /* Get the actual dimensions of the created canvas.  Use the resize
-       procedure to adjust the width if necessary and to set the scales. */
-    canvas_height = (int)xv_get(canvas, CANVAS_HEIGHT);
-    canvas_width = (int)xv_get(canvas, CANVAS_WIDTH);
-    do_resize(canvas, canvas_width, canvas_height);
-
-    window_fit(canvas);
-    window_fit(frame);
-#endif
 
     /* Get the display and paint window of the canvas, and the X ID (drawable)
        of its paint window. */

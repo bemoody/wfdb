@@ -7,7 +7,7 @@ char *argv[];
 {
     double *c, one = 1.0, vv, atof();
     int i, j, nc = argc - 4, nsig;
-    long nsamp, t;
+    WFDB_Time nsamp, t, t0, t1;
     static WFDB_Sample *v;
     static WFDB_Siginfo *s;
 
@@ -32,26 +32,32 @@ char *argv[];
     v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
     if (s == NULL || v == NULL) {
 	fprintf(stderr, "insufficient memory\n");
-	exit(3);
+	exit(4);
     }
     if (isigopen(argv[1], s, nsig) != nsig)
-        exit(3);
-    if (isigsettime(strtim(argv[2])) < 0)
-        exit(4);
+        exit(5);
+    t0 = strtim(argv[2]);
+    if (t0 < (WFDB_Time)0) t0 = -t0;
+    (void)sample(0, t0);
+    if (!sample_valid()) {
+	fprintf(stderr, "%s: inappropriate value for start time\n",
+		argv[0]);
+	exit(6);
+    }
     if ((nsamp = strtim(argv[3])) < 1) {
         fprintf(stderr, "%s: inappropriate value for duration\n",
                 argv[0]);
-        exit(5);
+        exit(7);
     }
+    t1 = t0 + nsamp;
     if (osigopen("16l", s, nsig) != nsig)
-        exit(6);
+        exit(8);
 
-    (void)sample(0, 0L);
-    for (t = 0; t < nsamp && sample_valid(); t++) {
+    for (t = t0; t < t1 && sample_valid(); t++) {
         for (j = 0; j < nsig; j++) {
             for (i = 0, vv = 0.; i < nc; i++)
                 if (c[i] != 0.) vv += c[i]*sample(j, t+i);
-            v[j] = (int)vv;
+            v[j] = (WFDB_Sample)vv;
         }
         if (putvec(v) < 0) break;
     }

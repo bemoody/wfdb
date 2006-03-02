@@ -1,9 +1,9 @@
 /* file: sigamp.c	G. Moody	30 November 1991
-			Last revised:	14 November 2002
+			Last revised:	25 February 2006
 
 -------------------------------------------------------------------------------
 sigamp: Measure signal amplitudes
-Copyright (C) 2002 George B. Moody
+Copyright (C) 1991-2006 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -50,9 +50,10 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-    char *record = NULL, *prog_name();
+    char *p, *record = NULL, *prog_name();
     int i, j, jlow, jhigh, nmax = NMAX, ampcmp(), getptp(), getrms();
     long from = 0L, to = 0L, t;
+    static int gvmode = 0;
     static WFDB_Siginfo *si;
     static WFDB_Anninfo ai;
     void help();
@@ -90,6 +91,9 @@ char *argv[];
 	  case 'h':	/* help requested */
 	    help();
 	    exit(0);
+	    break;
+	  case 'H':	/* operate in WFDB_HIGHRES mode */
+	    gvmode = WFDB_HIGHRES;
 	    break;
 	  case 'n':
 	    if (++i >= argc) {
@@ -149,6 +153,11 @@ char *argv[];
 	help();
 	exit(1);
     }
+
+    if (gvmode == 0 && (p = getenv("WFDBGVMODE")))
+	gvmode = atoi(p);
+    setgvmode(gvmode|WFDB_GVPAD);
+
     if ((nsig = isigopen(record, NULL, 0)) <= 0) exit(2);
     if ((si = malloc(nsig * sizeof(WFDB_Siginfo))) == NULL ||
 	(v0 = malloc(nsig * sizeof(int))) == NULL ||
@@ -371,6 +380,7 @@ static char *help_strings[] = {
  "              DT2 = 0.05 (seconds after annotation)",
  " -f TIME     begin at specified time",
  " -h          print this usage summary",
+ " -H          read multifrequency signals in high resolution mode",
  " -n NMAX     make up to NMAX measurements per signal (default: 300)",
 				   /* default NMAX is defined as 300 above */
  " -p          print results in physical units (default: ADC units)",

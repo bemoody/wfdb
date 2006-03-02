@@ -1,10 +1,10 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised: 	 1 July 2005	wfdblib 10.3.17
+			Last revised: 25 February 2006	wfdblib 10.4.0
 WFDB library type, constant, structure, and function interface definitions
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1983-2005 George B. Moody
+Copyright (C) 1983-2006 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -32,8 +32,8 @@ _______________________________________________________________________________
 
 /* WFDB library version. */
 #define WFDB_MAJOR   10
-#define WFDB_MINOR   3
-#define WFDB_RELEASE 17
+#define WFDB_MINOR   4
+#define WFDB_RELEASE 0
 #define WFDB_NETFILES 1	/* if 1, library includes code for HTTP, FTP clients */
 #define WFDB_NETFILES_LIBCURL 1
 
@@ -126,6 +126,9 @@ the legal values for the format field in a WFDB_siginfo structure.
 #define WFDB_LOWRES   	0	/* return one sample per signal per frame */
 #define WFDB_HIGHRES	1	/* return each sample of oversampled signals,
 				   duplicating samples of other signals */
+#define WFDB_GVPAD	2	/* replace invalid samples with previous valid
+				   samples */
+
 /* calinfo '.caltype' values
 WFDB_AC_COUPLED and WFDB_DC_COUPLED are used in combination with the pulse
 shape definitions below to characterize calibration pulses. */
@@ -259,6 +262,17 @@ extern FSTRING anndesc(int annotation_code);
 extern FINT setanndesc(int annotation_code, char *annotation_description);
 extern FVOID iannclose(WFDB_Annotator a);
 extern FVOID oannclose(WFDB_Annotator a);
+extern FINT wfdb_isann(int code);
+extern FINT wfdb_isqrs(int code);
+extern FINT wfdb_setisqrs(int code, int newval);
+extern FINT wfdb_map1(int code);
+extern FINT wfdb_setmap1(int code, int newval);
+extern FINT wfdb_map2(int code);
+extern FINT wfdb_setmap2(int code, int newval);
+extern FINT wfdb_ammap(int code);
+extern FINT wfdb_mamap(int code, int subtype);
+extern FINT wfdb_annpos(int code);
+extern FINT wfdb_setannpos(int code, int newval);
 extern FSTRING timstr(WFDB_Time t);
 extern FSTRING mstimstr(WFDB_Time t);
 extern FSITIME strtim(char *time_string);
@@ -269,7 +283,7 @@ extern FSAMPLE muvadu(WFDB_Signal s, int microvolts);
 extern FDOUBLE aduphys(WFDB_Signal s, WFDB_Sample a);
 extern FSAMPLE physadu(WFDB_Signal s, double v);
 extern FSAMPLE sample(WFDB_Signal s, WFDB_Time t);
-extern FINT sample_valid();
+extern FINT sample_valid(void);
 extern FINT calopen(char *calibration_filename);
 extern FINT getcal(char *description, char *units, WFDB_Calinfo *cal);
 extern FINT putcal(WFDB_Calinfo *cal);
@@ -281,6 +295,7 @@ extern FINT newheader(char *record);
 extern FINT setheader(char *record, WFDB_Siginfo *siarray, unsigned int nsig);
 extern FINT setmsheader(char *record, char **segnames, unsigned int nsegments);
 extern FINT wfdbgetskew(WFDB_Signal s);
+extern FVOID wfdbsetiskew(WFDB_Signal s, int skew);
 extern FVOID wfdbsetskew(WFDB_Signal s, int skew);
 extern FLONGINT wfdbgetstart(WFDB_Signal s);
 extern FVOID wfdbsetstart(WFDB_Signal s, long bytes);
@@ -311,7 +326,10 @@ extern FVOID wfdbflush(void);
 extern FINT annopen(), isigopen(), osigopen(), wfdbinit(), getspf(),
     setifreq(), getvec(), getframe(), putvec(), getann(), ungetann(), putann(),
     isigsettime(), isgsettime(), iannsettime(), strecg(), setecgstr(),
-    strann(), setannstr(), setanndesc(), adumuv(), newheader(), setheader(),
+    strann(), setannstr(), setanndesc(), wfdb_isann(), wfdb_isqrs(),
+    wfdb_setisqrs(), wfdb_map1(), wfdb_setmap1(), wfdb_map2(), wfdb_setmap2(),
+    wfdb_ammap(), wfdb_mamap(), wfdb_annpos(), wfdb_setannpos(),
+    adumuv(), newheader(), setheader(),
     setmsheader(), setsampfreq(), setbasetime(), putinfo(), setibsize(),
     setobsize(), calopen(), getcal(), putcal(), newcal(), wfdbgetskew(),
     sample_valid();
@@ -322,8 +340,8 @@ extern FSTRING ecgstr(), annstr(), anndesc(), timstr(), mstimstr(),
 extern FSITIME strtim();
 extern FDATE strdat();
 extern FVOID setgvmode(), wfdbquit(), wfdbquiet(), dbverbose(), setdb(),
-    wfdbflush(), setcfreq(), setbasecount(), flushcal(), wfdbsetskew(), 
-    wfdbsetstart();
+    wfdbflush(), setcfreq(), setbasecount(), flushcal(), wfdbsetiskew(),
+     wfdbsetskew(), wfdbsetstart();
 extern FFREQUENCY getifreq(), sampfreq(), getcfreq();
 extern FDOUBLE aduphys(), getbasecount();
 #endif

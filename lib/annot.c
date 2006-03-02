@@ -1,10 +1,10 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:    14 November 2004	wfdblib 10.3.14
+			Last revised:    23 February 2006	wfdblib 10.4.0
 WFDB library functions for annotations
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1989-2004 George B. Moody
+Copyright (C) 1989-2006 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -27,27 +27,41 @@ _______________________________________________________________________________
 
 This file contains definitions of the following functions, which are not
 visible outside of this file:
- get_ann_table  (reads tables used by annstr, strann, and anndesc)
- put_ann_table  (writes tables used by annstr, strann, and anndesc)
- allociann	(sets max number of simultaneously open input annotators)
- allocoann	(sets max number of simultaneously open output annotators)
+ get_ann_table		(reads tables used by annstr, strann, and anndesc)
+ put_ann_table		(writes tables used by annstr, strann, and anndesc)
+ allociann		(sets max # of simultaneously open input annotators)
+ allocoann		(sets max # of simultaneously open output annotators)
 
 This file also contains definitions of the following WFDB library functions:
- annopen        (opens annotation files)
- getann         (reads an annotation)
- ungetann [5.3] (pushes an annotation back into an input stream)
- putann         (writes an annotation)
- iannsettime    (skips to a specified time in input annotation files)
- ecgstr         (converts MIT annotation codes to ASCII strings)
- strecg         (converts ASCII strings to MIT annotation codes)
- setecgstr      (modifies code-to-string translation table)
- annstr [5.3]   (converts user-defined annotation codes to ASCII strings)
- strann [5.3]   (converts ASCII strings to user-defined annotation codes)
- setannstr [5.3](modifies code-to-string translation table)
- anndesc [5.3]  (converts user-defined annotation codes to text descriptions)
- setanndesc [5.3](modifies code-to-text translation table)
- iannclose [9.1](closes an input annotation file)
- oannclose [9.1](closes an output annotation file)
+ annopen		(opens annotation files)
+ getann			(reads an annotation)
+ ungetann [5.3]		(pushes an annotation back into an input stream)
+ putann			(writes an annotation)
+ iannsettime		(skips to a specified time in input annotation files)
+ ecgstr			(converts MIT annotation codes to ASCII strings)
+ strecg			(converts ASCII strings to MIT annotation codes)
+ setecgstr		(modifies code-to-string translation table)
+ annstr [5.3]		(converts user-defined annot codes to ASCII strings)
+ strann [5.3]   	(converts ASCII strings to user-defined annot codes)
+ setannstr [5.3]	(modifies code-to-string translation table)
+ anndesc [5.3]  	(converts user-defined annot codes to descriptions)
+ setanndesc [5.3]	(modifies code-to-text translation table)
+ iannclose [9.1]	(closes an input annotation file)
+ oannclose [9.1]	(closes an output annotation file)
+
+ These functions are intended primarily for the use by WFDB wrappers:
+
+ wfdb_isann [10.4]	(function version of isann, see ecgmap.h)
+ wfdb_isqrs [10.4]	(function version of isqrs, see ecgmap.h)
+ wfdb_setisqrs [10.4]	(function version of setisqrs, see ecgmap.h)
+ wfdb_map1 [10.4]	(function version of map1, see ecgmap.h)
+ wfdb_setmap1 [10.4]	(function version of setmap1, see ecgmap.h)
+ wfdb_map2 [10.4]	(function version of map2, see ecgmap.h)
+ wfdb_setmap2 [10.4]	(function version of setmap2, see ecgmap.h)
+ wfdb_ammap [10.4]	(function version of ammap, see ecgmap.h)
+ wfdb_mamap [10.4]	(function version of mamap, see ecgmap.h)
+ wfdb_annpos [10.4]	(function version of annpos, see ecgmap.h)
+ wfdb_setannpos	[10.4]	(function version of setannpos, see ecgmap.h)
 
 (Numbers in brackets in the list above indicate the first version of the WFDB
 library that included the corresponding function.  Functions not so marked
@@ -55,8 +69,8 @@ have been included in all published versions of the WFDB library.)
 
 These functions, also defined here, are intended only for the use of WFDB
 library functions defined elsewhere:
- wfdb_anclose     (closes all annotation files)
- wfdb_oaflush     (flushes output annotations)
+ wfdb_anclose		(closes all annotation files)
+ wfdb_oaflush		(flushes output annotations)
 
 Beginning with version 5.3, the functions in this file read and write
 annotation translation table modifications as `modification labels' (`NOTE'
@@ -68,16 +82,12 @@ modification labels, treat them as ordinary NOTE annotations.
 Simultaneous annotations attached to different signals (as indicated by the
 `chan' field) are supported by version 6.1 and later versions.  Annotations
 must be written in time order; simultaneous annotations must be written in
-`chan' order.  Simultaneous annotations are readable but not writeable by
+`chan' order.  Simultaneous annotations are readable but not writable by
 earlier versions.
 */
 
 #include "wfdblib.h"
 #include "ecgcodes.h"
-#define isqrs
-#define map1
-#define map2
-#define annpos
 #include "ecgmap.h"
 
 /* Annotation word format */
@@ -138,8 +148,7 @@ static double tmul;		/* `time' fields in annotations are
 
 /* Local functions (for the use of other functions in this module only). */
 
-static int get_ann_table(i)
-WFDB_Annotator i;
+static int get_ann_table(WFDB_Annotator i)
 {
     char *p1, *p2, *s1, *s2;
     int a;
@@ -183,8 +192,7 @@ static char modified[ACMAX+1];	/* modified[i] is non-zero if setannstr() or
 				   setanndesc() has modified the mnemonic or
 				   description for annotation type i */   
 
-static int put_ann_table(i)
-WFDB_Annotator i;
+static int put_ann_table(WFDB_Annotator i)
 {
     int a, flag = 0;
     char buf[256];
@@ -215,8 +223,7 @@ WFDB_Annotator i;
 }
 
 /* Allocate workspace for up to n input annotators. */
-static int allociann(n)
-unsigned n;
+static int allociann(unsigned n)
 {
     if (maxiann < n) {     /* allocate input annotator data structures */
         unsigned m = maxiann;
@@ -242,8 +249,7 @@ unsigned n;
 }
 
 /* Allocate workspace for up to n output annotators. */
-static int allocoann(n)
-unsigned n;
+static int allocoann(unsigned n)
 {
     if (maxoann < n) {     /* allocate output annotator data structures */
         unsigned m = maxoann;
@@ -270,10 +276,8 @@ unsigned n;
     
 /* WFDB library functions (for general use). */
 
-FINT annopen(record, aiarray, nann)
-char *record;
-WFDB_Anninfo *aiarray;
-unsigned int nann;
+/* annopen: open annotation files for the specified record */
+FINT annopen(char *record, WFDB_Anninfo *aiarray, unsigned int nann)
 {
     int a;
     unsigned int i, niafneeded, noafneeded;
@@ -402,9 +406,8 @@ unsigned int nann;
     return (0);
 }
 
-FINT getann(n, annot)	/* read an annotation from annotator n into *annot */
-WFDB_Annotator n;		/* annotator number */
-WFDB_Annotation *annot;		/* address of structure to be filled in */
+/* getann: read an annotation from annotator n into *annot */
+FINT getann(WFDB_Annotator n, WFDB_Annotation *annot)
 {
     int a, len;
     struct iadata *ia;
@@ -518,9 +521,8 @@ WFDB_Annotation *annot;		/* address of structure to be filled in */
     return (0);
 }
 
-FINT ungetann(n, annot)   /* push back an annotation into an input stream */
-WFDB_Annotator n;		/* annotator number */
-WFDB_Annotation *annot;		/* address of annotation to be pushed back */
+/* ungetann: push back an annotation into an input stream */
+FINT ungetann(WFDB_Annotator n, WFDB_Annotation *annot)
 {
     if (n >= niaf || iad[n] == NULL) {
 	wfdb_error("ungetann: annotator %d is not initialized\n", n);
@@ -537,9 +539,8 @@ WFDB_Annotation *annot;		/* address of annotation to be pushed back */
     return (0);
 }
 
-FINT putann(n, annot)    /* write annotation at annot to annotator n */
-WFDB_Annotator n;		/* annotator number */
-WFDB_Annotation *annot;		/* address of annotation to be written */
+/* putann: write annotation at annot to annotator n */
+FINT putann(WFDB_Annotator n, WFDB_Annotation *annot)
 {
     unsigned annwd;
     char *ap;
@@ -631,8 +632,9 @@ WFDB_Annotation *annot;		/* address of annotation to be written */
     return (0);
 }
 
-FINT iannsettime(t)
-WFDB_Time t;
+/* iannsettime: seek so that for the next annotation read from each input
+   annotator, anntime >= t */
+FINT iannsettime(WFDB_Time t)
 {
     int stat = 0;
     WFDB_Annotation tempann;
@@ -667,6 +669,30 @@ WFDB_Time t;
     return (stat);
 }
 
+/* Functions for converting between anntyp values (annotation codes defined in
+   <ecgcode.h>), mnemonics (short strings, usually only one character), and
+   descriptive strings
+
+   There are two sets of mnemonics (cstring[] and astring[]) and one set of
+   descriptive strings (tstring[]) defined below.  The two sets of mnemonics
+   are identical by default.
+
+   The conversion functions (ecgstr and annstr) translate the annotation code
+   specified by their argument into a mnemonic. Illegal or undefined codes are
+   translated into decimal numerals surrounded by brackets (e.g., `[55]').  The
+   mnemonics returned by annstr (those defined in astring[]) may be modified
+   either by setannstr or by the presence of modification labels in an input
+   annotation file.  Those returned by ecgstr (defined in cstring[]) are
+   usually the same, but they can be modified only by setecgstr, and not by the
+   presence of modification labels as for annstr. The intent is that ecgstr
+   should be used rather than annstr only when it is necessary that a fixed set
+   of mnemonics be used, independent of any modification labels.  The functions
+   strecg and annstr perform the inverse of these translations.
+
+   The functions anndesc and setanndesc are similar to annstr and setannstr,
+   except that they use the descriptive strings (tstring[]).
+*/
+
 static char *cstring[ACMAX+1] = {  /* ECG mnemonics for each code */
         " ",	"N",	"L",	"R",	"a",		/* 0 - 4 */
 	"V",	"F",	"J",	"A",	"S",		/* 5 - 9 */
@@ -680,8 +706,8 @@ static char *cstring[ACMAX+1] = {  /* ECG mnemonics for each code */
 	"[45]",	"[46]",	"[47]",	"[48]",	"[49]"		/* 45 - 49 */
 };
 
-FSTRING ecgstr(code)
-int code;
+/* ecgstr: convert an anntyp value to a mnemonic string */
+FSTRING ecgstr(int code)
 {
     static char buf[9];
 
@@ -693,8 +719,8 @@ int code;
     }
 }
 
-FINT strecg(str)
-char *str;
+/* strecg: convert a mnemonic string to an anntyp value */
+FINT strecg(char *str)
 {
     int code;
 
@@ -704,9 +730,8 @@ char *str;
     return (NOTQRS);
 }
 
-FINT setecgstr(code, string)
-int code;
-char *string;
+/* setecgstr: set the mnemonic string associated with the specified anntyp */
+FINT setecgstr(int code, char *string)
 {
     if (NOTQRS <= code && code <= ACMAX) {
 	if (cstring[code] == NULL || strcmp(cstring[code], string)) {
@@ -732,8 +757,7 @@ static char *astring[ACMAX+1] = {  /* mnemonic strings for each code */
 	"[45]",	"[46]",	"[47]",	"[48]",	"[49]"		/* 45 - 49 */
 };
 
-FSTRING annstr(code)
-int code;
+FSTRING annstr(int code)
 {
     static char buf[9];
 
@@ -745,8 +769,7 @@ int code;
     }
 }
 
-FINT strann(str)
-char *str;
+FINT strann(char *str)
 {
     int code;
 
@@ -756,9 +779,7 @@ char *str;
     return (NOTQRS);
 }
 
-FINT setannstr(code, string)
-int code;
-char *string;
+FINT setannstr(int code, char *string)
 {
     if (0 < code && code <= ACMAX) {
 	if (astring[code] == NULL || strcmp(astring[code], string)) {
@@ -836,8 +857,7 @@ static char *tstring[ACMAX+1] = {  /* descriptive strings for each code */
     (char *)NULL
 };
 
-FSTRING anndesc(code)
-int code;
+FSTRING anndesc(int code)
 {
     if (0 <= code && code <= ACMAX)
 	return (tstring[code]);
@@ -845,9 +865,7 @@ int code;
 	return ("illegal annotation code");
 }
 
-FINT setanndesc(code, string)
-int code;
-char *string;
+FINT setanndesc(int code, char *string)
 {
     if (0 < code && code <= ACMAX) {
 	if (tstring[code] == NULL || strcmp(tstring[code], string)) {
@@ -872,8 +890,8 @@ char *string;
     }
 }
 
-FVOID iannclose(n)      /* close input annotation file n */
-WFDB_Annotator n;
+/* iannclose: close input annotation file n */
+FVOID iannclose(WFDB_Annotator n)
 {
     struct iadata *ia;
 
@@ -891,8 +909,9 @@ WFDB_Annotator n;
     }
 }
 
-FVOID oannclose(n)      /* close output annotation file n */
-WFDB_Annotator n;
+
+/* oannclose: close output annotation file n */
+FVOID oannclose(WFDB_Annotator n)
 {
     int i;
     char cmdbuf[256];
@@ -950,9 +969,72 @@ WFDB_Annotator n;
     }
 }
 
+/* Semi-private functions
+
+   These functions wrap the macros defined in <ecgmap.h>.  They are
+   intended to simplify maintenance of WFDB wrappers generated using
+   SWIG, which cannot wrap macros automatically.
+*/
+
+FINT wfdb_isann(int code)
+{
+    return (isann(code));
+}
+
+FINT wfdb_isqrs(int code)
+{
+    return (isqrs(code));
+}
+
+FINT wfdb_setisqrs(int code, int newval)
+{
+    return (setisqrs(code, newval));
+}
+
+FINT wfdb_map1(int code)
+{
+    return (map1(code));
+}
+
+FINT wfdb_setmap1(int code, int newval)
+{
+    return (setmap1(code, newval));
+}
+
+FINT wfdb_map2(int code)
+{
+    return (map2(code));
+}
+
+FINT wfdb_setmap2(int code, int newval)
+{
+    return (setmap2(code, newval));
+}
+
+FINT wfdb_ammap(int code)
+{
+    return (ammap(code));
+}
+
+FINT wfdb_mamap(int code, int subtype)
+{
+    return (mamap(code, subtype));
+}
+
+FINT wfdb_annpos(int code)
+{
+    return (annpos(code));
+}
+
+FINT wfdb_setannpos(int code, int newval)
+{
+    return (setannpos(code, newval));
+}
+
+
 /* Private functions (for the use of other WFDB library functions only). */
 
-void wfdb_oaflush()
+void wfdb_oaflush(void)
 {
     unsigned int i;
 
@@ -960,7 +1042,7 @@ void wfdb_oaflush()
 	(void)wfdb_fflush(oad[i]->file);
 }
 
-void wfdb_anclose()
+void wfdb_anclose(void)
 {
     WFDB_Annotator an;
 

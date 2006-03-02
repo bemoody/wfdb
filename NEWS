@@ -1,3 +1,72 @@
+10.4.0:
+	Version 10.4.0 and later versions of the WFDB library are intended to
+	be compiled using ANSI/ISO C (and C++) compilers only;  previous
+	versions also supported the use of traditional (K&R) C compilers.  The
+	most obvious change resulting from this decision is in the use of
+	prototypes in function declarations, an innovation of ANSI C that
+	permits better error-checking by compilers.  The ANSI/ISO C standard is
+	now more than 15 years old, and it has been over 10 years since a C
+	compiler that does not support function prototypes was used for
+	development of the WFDB library.  Code in wfdbio.c that provides
+	limited support for compilers that do not provide an ANSI/ISO C library
+	has been retained for now, and wfdb.h still includes a set of K&R C
+	function declarations; both of these features are deprecated, however,
+	and may be removed in future versions of the WFDB library.  Users who
+        still need to use a K&R C compiler to compile the library itself may
+        find 'unprotoize' (included in the GNU gcc distribution) to be helpful.
+
+	The WFDB Fortran wrappers (fortran/wfdbf.c) have been revised for
+	compatibility with gcc 4.x (which no longer supports -fwritable-strings
+	as a way to convert between C and Fortran strings in place), and
+	for compatibility with the new (experimental) Fortran 9x compiler,
+	gfortran, which replaces g77 in gcc 4.x.  The revised wrappers remain
+	compatible with g77 and with the even older f2c translator.
+	
+	The symbol WFDB_GVPAD is newly defined in <wfdb/wfdb.h>.  It may be
+	added to WFDB_HIGHRES or WFDB_LOWRES and given as input to setgvmode().
+	The effect of doing so is that missing samples, and samples recognized
+	as invalid, are replaced by getframe (getvec) with the most recently
+	read valid values rather than by the special value WFDB_INVALID_SAMPLE.
+	This behavior allows applications such as digital filters to remain
+	ignorant of missing data without significant performance penalties.
+
+	The mapping of lowest expressible sample values to WFDB_INVALID_SAMPLE
+	performed by getframe (in lib/signal.c) did not work properly for
+	signal formats 80 and 160 (in which samples are recorded as unsigned
+	integers);  this has now been corrected.
+
+	The WFDB function 'sample()' now checks that its signal number input
+	is valid, and returns WFDB_INVALID_SAMPLE if not.
+
+	WFDB applications nst and xform have been revised so that they
+	correctly handle input that may contain invalid samples.  Programs
+	revised to use WFDB_GVPAD mode are fir, mfilt, sigamp, sqrs, sqrs125,
+	wabp, and wqrs;  all of these now also accept a '-H' option to read
+	multifrequency records in high-resolution mode.
+
+	Peter Domitrovich contributed an integration routine to memse to
+	calculate power in bands of interest for HRV analysis.
+
+	Example 7 in the WFDB Programmer's Guide now works properly.  The
+	previous version always began processing the input at sample 0,
+	regardless of start time specified in its argument list.
+
+	The WFDB Applications Guide now documents the format of variable-
+	layout records (in header.5).
+
+	WAVE now handles the case of running on an X server that does not
+	implement backing store more reliably. 	The code that was introduced
+	in 10.3.16 did not behave properly with some X servers and window
+	managers;  the latest version avoids this behavior.
+
+	An installation bug caused WAVE not to read its default X11 resource
+	file from the standard location in some cases.  The most visible
+	effect was that the signal window background would appear grey
+	rather than white.  This bug has been fixed.
+
+	Hardware recommendations for WAVE have been updated in the WAVE
+	User's Guide.
+
 10.3.17:
 	The WFDB library now supports reading variable-layout records
 	(multi-segment records in which the number, arrangement, gains,
