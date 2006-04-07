@@ -1,9 +1,9 @@
 /* file: ad2m.c		G. Moody	26 August 1983
-			Last revised:    24 July 2002
+			Last revised:   28 March 2006
 
 -------------------------------------------------------------------------------
 ad2m: Convert an AHA format signal file to MIT format
-Copyright (C) 2002 George B. Moody
+Copyright (C) 1983-2006 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -179,7 +179,7 @@ char *argv[];
 
     else {		/* process compressed-format input file */
 	while (t < start_time && getcvec(v) == 2)
-	    ;
+	    ++t;
 	while (getcvec(v) == 2 && putvec(v) > 0 && ++t < nsamp)
 	    ;	/* continue to hard EOF, hard error, or specified time */
 

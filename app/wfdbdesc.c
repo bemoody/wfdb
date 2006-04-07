@@ -1,9 +1,9 @@
 /* file: wfdbdesc.c		G. Moody	  June 1989
-				Last revised:  11 August 2005
+				Last revised:   31 March 2006
 
 -------------------------------------------------------------------------------
 wfdbdesc: Describe signal specifications
-Copyright (C) 2003 George B. Moody
+Copyright (C) 1989-2006 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -101,6 +101,7 @@ char *argv[];
 	  case 80:
 	    t = nbytes / framesize;
 	    break;
+	  default:
 	  case 16:
 	  case 61:
 	  case 160:
@@ -110,6 +111,7 @@ char *argv[];
 	    t = (2L * nbytes) / (3*framesize);
 	    break;
 	  case 310:
+	  case 311:
 	    t = (3L * nbytes) / (4*framesize);
 	    break;
 	}

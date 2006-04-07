@@ -1,5 +1,5 @@
 # file: freebsd.def		G. Moody	5 March 2002
-#				Last revised:  7 August 2005
+#				Last revised:  22 March 2006
 # 'make' definitions for compiling the WFDB Software Package under FreeBSD
 #
 # Based on 'linux.def', with edits for FreeBSD thanks to Giuseppe Pagnoni.
@@ -65,8 +65,20 @@ CC = gcc
 
 # CCDEFS is the set of C compiler options needed to set preprocessor variables
 # while compiling the WFDB Software Package.  CCDEFS should always include
-# VDEFS.
-CCDEFS = $(VDEFS)
+# VDEFS.  Add the following options to CCDEFS as appropriate (separating them
+# by spaces if you use more than one):
+#   -DISPRINTF	  if you do not have `stdlib.h' and your `sprintf' returns an
+#		   int (see wfdblib.h)
+#   -DNETFILES	  if you have libwww and want to be able to access WFDB files
+#		   remotely via http or ftp (as well as local files)
+#   -DNOSTRTOK	  if your standard C library does not include function `strtok'
+#		   (see wfdbio.c)
+#   -DNOTIME	  if you do not have `time.h' (see signal.c)
+#   -DNOVALUES_H  if you do not have `values.h' (see psd/log10.c)
+#   -DOLDC	  if you have neither `stdarg.h' nor `varargs.h' (see wfdbio.c)
+# If your C compiler fails to compile `signal.c', add -DBROKEN_CC to CCDEFS
+# and try again (see signal.c).
+CCDEFS = $(VDEFS) -DNOVALUES_H
 
 # MFLAGS is the set of architecture-dependent (-m*) compiler options, which
 # is usually empty.  See the gcc manual for information about gcc's -m options.

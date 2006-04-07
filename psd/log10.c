@@ -1,9 +1,9 @@
 /* file: log10.c	G. Moody	19 July 1995
-		   Last revised:	 9 June 2005
+		   Last revised:	22 March 2006
 
 -------------------------------------------------------------------------------
 log10: common log transform of 2-column data
-Copyright (C) 1995-2005 George B. Moody
+Copyright (C) 1995-2006 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -28,9 +28,18 @@ _______________________________________________________________________________
 #include <stdio.h>
 #include <math.h>
 
+#ifndef MINDOUBLE
+#ifdef BSD
+#include <float.h>
+#define MINDOUBLE DBL_MIN
+#define NOVALUES_H
+#endif
+
 #ifndef NOVALUES_H
 #include <values.h>
 #endif
+#endif
+
 #ifndef MINDOUBLE
 #define MINDOUBLE 1.0e-10
 #endif

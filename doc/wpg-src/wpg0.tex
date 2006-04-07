@@ -1307,7 +1307,7 @@ these wrappers, the example program can be written in any of these languages:
 @example
 import wfdb.*;
 
-public class rdsamp @{
+public class psamples @{
     static @{
         System.loadLibrary("wfdbjava");
     @}
@@ -1320,9 +1320,7 @@ public class rdsamp @{
         for (int i = 0; i < 10; i++) @{
             if (wfdb.getvec(v.cast()) < 0)
                 break;
-            System.out.print("\t" + v.getitem(0));
-            System.out.print("\t" + v.getitem(1));
-            System.out.println();
+            System.out.println("\t" + v.getitem(0) + "\t" + v.getitem(1));
         @}
     @}
 @}
@@ -1357,10 +1355,8 @@ def main(argv):
     if wfdb.isigopen("100s", siarray.cast(), 2) < 2: sys.exit(1)
     v = wfdb.WFDB_SampleArray(2)
     for i in range(0,10):
-        if wfdb.getvec(v.cast()) > 0: sys.exit(2)
-        print v[0],
-        print v[1],
-        print
+        if wfdb.getvec(v.cast()) < 0: sys.exit(2)
+        print "\t%d\t%d" % (v[0], v[1])
 
 if __name__ == "__main__":
     main(sys.argv[1:])
@@ -1382,9 +1378,7 @@ public class psamples @{
         for (int i = 0; i < 10; i++) @{
             if (wfdb.getvec(v.cast()) < 0)
                 break;
-            Console.Write(v.getitem(0));
-            Console.Write(v.getitem(1));
-            Console.WriteLine();
+	    Console.WriteLine("\t" + v.getitem(0) + "\t" + v.getitem(1));
         @}
     @}
 @}

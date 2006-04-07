@@ -1,5 +1,5 @@
 /* file: memse.c	G. Moody	6 February 1992
-			Last revised:  26 February 2006
+			Last revised:	 13 March 2006
 
 -------------------------------------------------------------------------------
 memse: Estimate power spectrum using maximum entropy (all poles) method
@@ -606,7 +606,7 @@ long input( )
     return (npts);
 }
 
-/* Function 'integ' was contributed by Peter J. Domitrovich, who translated it
+/* Function 'integ' was contributed by Peter P. Domitrovich, who translated it
    from a FORTRAN version by an unknown author from a book written in Chinese.
    This code is designed to integrate functions with sharp peaks. */
 double integ(double *aa, long m, double ee, double a, double b, double epsilon)

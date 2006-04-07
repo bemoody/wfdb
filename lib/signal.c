@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  25 February 2006		wfdblib 10.4.0
+			Last revised:    6 April 2006		wfdblib 10.4.1
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -2950,7 +2950,9 @@ FSITIME strtim(char *string)
       case 'e':	return ((in_msrec ? msnsamples : nsamples) * 
 		        ((gvmode == WFDB_HIGHRES) ? ispfmax : 1));
       case 'f': return ((WFDB_Time)(atol(string+1)*f/ffreq));
-      case 'i':	return (istime * ((gvmode == WFDB_HIGHRES) ? ispfmax : 1));
+      case 'i':	return (istime *
+			(ifreq > 0.0 ? (ifreq/sfreq) : 1.0) *
+			((gvmode == WFDB_HIGHRES) ? ispfmax : 1));
       case 'o':	return (ostime);
       case 's':	return ((WFDB_Time)atol(string+1));
       case '[':	  /* time of day, possibly with date or days since start */
