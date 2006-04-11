@@ -137,6 +137,7 @@ lib-post-install:
  	 ( cp -p /usr/bin/cygwin1.dll $(BINDIR); \
 	   cp -p /usr/bin/cygz.dll $(BINDIR) )
 	cp $(WFDBLIB_DLLNAME) $(BINDIR)
+	cd $(BINDIR); $(SETLPERMISSIONS) *.dll
 
 lib-post-uninstall:
 	rm -f $(LIBDIR)/$(WFDBLIB_BASENAME)

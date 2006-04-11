@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:	23 February 2006       wfdblib 10.4.0
+                        Last revised:	  11 April 2006       wfdblib 10.4.0
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -1251,7 +1251,8 @@ static size_t curl_chunk_write(void *ptr, size_t size, size_t nmemb,
 	memcpy(c->data + c->size, ptr, size);
 	c->size += size;
 	count += size;
-	ptr += size;
+	p = (char *)ptr + size;	/* avoid arithmetic on void pointer */
+	ptr = (void *)p;
 	nmemb--;
     }
     return (count);

@@ -492,6 +492,19 @@ guide in June, 1999.  See @file{NEWS}, in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
+@unnumberedsubsec Changes in version 10.4.2
+
+Mathias Gruber reported a line in wfdbio.c that used void pointer arithmetic
+(permitted as an extension by gcc but not allowed by ANSI/ISO C or most other C
+compilers).  This operation has been replaced by ANSI/ISO C-conformant code.
+
+@unnumberedsubsec Changes in version 10.4.1
+
+A bug caused incorrect output from WFDB library function strtim() when called
+with the argument "i", following use of setifreq() to change the effective
+sampling frequency, resulting in incorrect output from example 10 in the WFDB
+Programmer's Guide.  This has now been corrected.
+
 @unnumberedsubsec Changes in version 10.4.0
 
 Version 10.4.0 and later versions of the WFDB library are intended to
