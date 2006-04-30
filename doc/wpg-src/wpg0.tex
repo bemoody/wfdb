@@ -294,7 +294,9 @@ Some typical uses of the WFDB library are these:
 @cindex waveform editor
 @itemize @bullet
 @item
-A @emph{waveform editor}, such as @code{wave} (@pxref{Sources}), reads the
+A @emph{waveform editor}, such as @code{wave} (see the
+@uref{http://@-www.@-physionet.@-org/@-physio@-tools/@-wug/,
+@cite{WAVE User's Guide}}), reads the
 digitized signals of a database record and displays them with
 annotations superimposed on the waveforms.  Such a program allows the
 user to select any portion of the signals for display at various scales,
@@ -379,24 +381,24 @@ file formats change.  @emph{In extremis}, use @file{rdann} and
 @file{rdsamp} --- available from PhysioNet in source and ready-to run
 formats --- to translate files into text format.
 
-Chapter 1 of this guide begins with a simple example program that reads
-a few samples from a database record.  This example should help you
-understand the mechanics of compiling and using a program that does
-something with an ECG database.  Chapter 2 introduces the library
-functions themselves, with a number of brief examples; you may wish to
-skim through this material on a first reading to get acquainted with
-what is available, and then refer to it as needed while writing your
-programs.  Data structures for annotations and for signal and annotator
-attributes are described in chapter 3.  Chapter 4 contains a table of
-annotation types and descriptions of several annotation-mapping macros.
-Database files and related topics are discussed in chapter 5, which can
-be skipped on a first reading.  Chapter 6 contains additional example
-programs that illuminate a few of the darker corners of the WFDB library.
-The glossary defines the ordinary-sounding words such as @dfn{signal}
-that have specialized meanings in this guide; such words are
-@dfn{emphasized} in their first appearances in order to warn you that
-you should look them up in the glossary on a first reading
-(@pxref{Glossary}).
+Chapter 1 of this guide begins with a simple example program that reads a few
+samples from a database record.  The C version of this program is also
+translated into a variety of other languages supported by the WFDB library
+itself or by separately available bindings.  This example should help you
+understand the mechanics of compiling and using a program that does something
+with an ECG database.  Chapter 2 introduces the library functions themselves,
+with a number of brief examples; you may wish to skim through this material on
+a first reading to get acquainted with what is available, and then refer to it
+as needed while writing your programs.  Data structures for annotations and for
+signal and annotator attributes are described in chapter 3.  Chapter 4 contains
+a table of annotation types and descriptions of several annotation-mapping
+macros.  Database files and related topics are discussed in chapter 5, which
+can be skipped on a first reading.  Chapter 6 contains additional example
+programs that illuminate a few of the darker corners of the WFDB library.  The
+glossary defines the ordinary-sounding words such as @dfn{signal} that have
+specialized meanings in this guide; such words are @dfn{emphasized} in their
+first appearances in order to warn you that you should look them up in the
+glossary on a first reading (@pxref{Glossary}).
 
 If the WFDB library has not yet been installed on your system,
 @pxref{Installation, , Installing the WFDB Software Package}.
@@ -478,8 +480,8 @@ browser.
 @ifinfo
 You can format and print copies of this guide using TeX if you have it (see
 @file{makefile} in the @file{doc} directory of the library distribution for
-instructions on doing so).  You may obtain a preformatted version suitable for
-output on any PostScript device from @uref{http://www.physionet.org/}.
+instructions on doing so).  You may obtain preformatted versions in PDF and
+PostScript formats from @uref{http://www.physionet.org/}.
 @end ifinfo
 
 @node     Recent changes, Usage, Overview, Top
@@ -1092,17 +1094,21 @@ just above @code{exit(0);}
 @cindex compiling
 @cindex loader options
 
-To compile the example program on a Unix system, we can say:
+The WFDB library is developed and tested using @code{gcc}, the GNU C/C++
+compiler, but careful attention has been given to making it usable with any
+ANSI/ISO C compiler.  Since @code{gcc} is free, high quality, and supported, it
+is highly recommended that you use it for compiling your WFDB applications.
+
+To compile the example program using @code{gcc}, we can say:
 
 @example
-cc -o psamples psamples.c -lwfdb
+gcc -o psamples psamples.c -lwfdb
 @end example
 
 @noindent
 to produce an executable program called @code{psamples}.  (Your C
-compiler may be named @file{gcc}, @file{acc}, @file{CC}, or something
-else, rather than @file{cc}, but under any version of Unix, it will
-almost certainly work as shown above.)  You may use any other compiler
+compiler may be named @file{cc}, @file{acc}, @file{CC}, or something
+else, rather than @file{gcc}.)  You may use any other compiler
 options you choose, but the @samp{-lwfdb} option must appear in the
 @code{cc} command line following any and all source (@file{*.c}) and
 object (@file{*.o}) file names, in order to instruct the loader to
@@ -1121,12 +1127,12 @@ If the WFDB library was installed with NETFILES support, it will make use of
 functions contained in the @code{libcurl} or @code{libwww} libraries.  If you
 have dynamically linkable versions of the @code{libcurl} or @code{libwww}
 libraries, as under GNU/Linux, these will be loaded automatically when you run
-@code{psamples}.  If you have only static versions of these libraries, as under
-Solaris or MS-Windows, however, it is necessary to provide additional arguments
-in the @code{cc} command line in order to compile successfully.  One way to do
-this is to follow the model used to compile the standard WFDB applications
-supplied with the WFDB library; see @file{Makefile} in the @file{app} directory
-of the WFDB software package source tree.
+@code{psamples}.  If you have only static versions of these libraries, however,
+it is necessary to provide additional arguments in the @code{cc} command line
+in order to compile successfully.  One way to do this is to follow the model
+used to compile the standard WFDB applications supplied with the WFDB library;
+see @file{Makefile} in the @file{app} directory of the WFDB software package
+source tree.
 
 If you are using WFDB version 10.2.6 or a later version and @file{gcc}
 or a compatible compiler, the @file{wfdb-config} utility is available
@@ -1144,30 +1150,26 @@ Note that this command contains backticks (`), not apostrophes (').
 its @file{*.h} files are installed in non-standard locations, or if
 you have only static @code{libcurl} or @code{libwww} libraries.
 
-Under MS-Windows, it will be easiest to use @file{gcc}, the GNU C/C++
-compiler, which is included in the freely available Cygwin software
-development system (@uref{http://@-www@-.cygwin@-.com/}),
-and also in the freely available MinGW package
-(@uref{http://@-www@-.mingw@-.org/}).  An MS-DOS version of @file{gcc}
-is available in the free djgpp package
-(@uref{http://@-www@-.delorie@-.com/@-djgpp/}). These are used within a
-Cygwin terminal emulator window or an MS-DOS box in exactly the same way
-as described above for Unix C compilers.  
-
-The WFDB library is developed and tested using @code{gcc}, but careful
-attention has been given to making it usable with any K&R or ANSI/ISO C
-compiler.  Note, however, that binary versions of the WFDB library that
-have been compiled using @code{gcc} are @emph{not} compatible with most
-proprietary C/C++ compilers (except under Unix).  Since @code{gcc} is
-free, high quality, and supported, it is highly recommended that you
-use it for compiling your WFDB applications.
+Under MS-Windows, @file{gcc} is included in the freely available Cygwin
+software development system (@uref{http://@-www@-.cygwin@-.com/}), and also in
+the freely available MinGW package (@uref{http://@-www@-.mingw@-.org/}).  An
+MS-DOS version of @file{gcc} is available in the free djgpp package
+(@uref{http://@-www@-.delorie@-.com/@-djgpp/}). These are used within a Cygwin
+terminal emulator window or an MS-DOS box in exactly the same way as described
+above for C compilers on all other platforms.  For most purposes, Cygwin is
+recommended, since it provides a Unix-compatible standard C library
+(@code{cygwin1.dll}), so that applications behave exactly as they do on all
+other platforms.  WAVE can only be built under Windows in this way.  When
+building WFDB-based plugins for use with .NET applications or others such as
+Matlab that rely on the native Windows C library, however, the WFDB library
+must be recompiled to use the native library.  This can be done using either
+MinGW gcc, or Cygwin gcc with its @code{-mno-cygwin} option.
 
 If you choose to use an incompatible proprietary compiler, you are on
 your own!  You may be able to create a linkable version of the WFDB
 library from the sources in the @file{lib} directory of the WFDB source
 tree using a proprietary compiler, but doing so is unsupported (see your
-compiler's documentation, and if you are using MS-DOS or MS-Windows, see
-@file{Makefile.dos} for hints).  If you are not able to build the WFDB
+compiler's documentation).  If you are not able to build the WFDB
 library using your compiler, you can compile the library sources
 together with the source file(s) for your application.  It may be
 easiest to copy the library sources (both the @file{*.c} and the
@@ -1333,7 +1335,7 @@ public class psamples @{
         for (int i = 0; i < 10; i++) @{
             if (wfdb.getvec(v.cast()) < 0)
                 break;
-            System.out.println("\t" + v.getitem(0) + "\t" + v.getitem(1));
+            System.out.println("\t" + v.getitem(0) +"\t"+ v.getitem(1));
         @}
     @}
 @}
@@ -7965,209 +7967,82 @@ The database path (q.v.).
 
 This appendix briefly describes how to install the WFDB Software Package
 on a new system.  The package includes C-language sources for the WFDB
-library and for a variety of applications (@pxref{WFDB Applications}),
-@TeX{} source for this manual, @code{troff} source for Unix @code{man}
-pages for the package, and a one-minute sample record (@samp{100s}).
-
-@menu
-* Distribution::	How to obtain the latest version of the WFDB
-			Software Package.
-* Unix installation::	Installing the WFDB Software Package on Unix,
-			GNU/Linux, and similar systems.
-* Mac OS X installation::	Installing the WFDB Software Package under
-				Mac OS X (Darwin).
-* MS-Windows installation::	Installing the WFDB Software Package on
-                                MS-Windows PCs.
-* Other installation::	Installing the WFDB Software Package on other systems.
-@end menu
-
-@node Distribution, Unix installation, Installation, Installation
-@unnumberedsec How to obtain the WFDB Software Package
+library and for a variety of applications (@pxref{WFDB Applications}) including
+@code{WAVE}, sources for this manual, the @cite{WFDB Applications Guide}, and
+the @cite{WAVE User's Guide}, and a one-minute sample record (@samp{100s}).
 
 The latest version of the WFDB Software Package can always be downloaded in
-source form from PhysioNet
-(@uref{http://www.physio@-net.org/physio@-tools/wfdb.shtml}) and its mirrors;
-binaries for popular operating systems and development snapshots, as well as
-quick-start guides including installation notes for popular operating systems,
-are also usually available there.
+source form from @uref{http://www.physio@-net.org/physio@-tools/@-wfdb.shtml},
+the WFDB home page on PhysioNet.  Binaries for popular operating systems and
+development snapshots are also usually available there.
 
-@node Unix installation, Mac OS X installation, Distribution, Installation
-@unnumberedsec Unix, GNU/Linux, and similar operating systems
+The process for installing the package is the same on all platforms, and
+is documented in detail in the quick-start guides for the popular platforms
+that can be found on the WFDB home page.  In brief:
 
 @cindex curl
 @cindex libcurl
 @cindex libwww
 @cindex W3C libwww
-
-Before beginning the installation of the WFDB Software Package, obtain and
-install the @code{libcurl} package from @uref{http://curl.haxx.se/}, or else
-the @code{libwww} package from @uref{http://www.w3.org/Library/} or
-@uref{http://@-www.physio@-net.org/physio@-tools/libwww/}.  One or both of
-these packages is provided with most current versions of GNU/Linux.  (If you
-have a program called @code{curl-config}, then @code{libcurl} is installed
-already; if you have one named @code{libwww-config}, then @code{libwww} is
-installed already.)  You may omit this step if you do not wish to have NETFILES
-support.
-
-@cindex XView toolkit
-
-If you wish to use @emph{WAVE}, also download and install the @code{XView}
-software from @uref{http://www.physio@-net.org/physio@-tools/xview/}.  Sources
-are available, as are binaries for several versions of GNU/Linux.  If you are
-using SunOS or Solaris, XView binaries are available in the Open Look Software
-Development package and may be installed already.  (If you have a program
-called @code{textedit}, then @code{XView} is installed already.) If you are
-able to use an existing set of binaries, these are recommended, since the
-sources may take a @emph{long} time to compile.  Be sure that the directory
-containing @code{textedit}, usually @code{/usr/openwin/bin}, is in your
-@code{PATH}.  You may omit this step if you do not wish to use @emph{WAVE}.
-
-If you have downloaded the software from PhysioNet or another source, you
-will have a @code{gzip}-compressed @code{tar} archive.  Unpack it using
-the commands:
-
-@example
-gzip -d wfdb.tar.gz
-tar xfv wfdb.tar
-@end example
-
-(If you have GNU @code{tar}, as on GNU/Linux, you can combine these into a
-single command: @samp{tar xfvz wfdb.tar.gz}.)
-
-This will create a directory with a name of the form @code{wfdb-}@var{m.n.r},
-where @var{m.n.r} is the version number of the included WFDB library (e.g.,
-@code{10.2.6}).  Enter this directory.
-
-You should now be ready to configure, compile, and install the software, using
-the commands:
-
-@example
-./configure
-make install
-@end example
-
-The @code{./configure} command asks where you wish to install the package.
-If you accept the default (@code{/usr}), you will need root permissions when
-runnning @code{make install}.  If you choose another location, follow the
-instructions given by @code{configure} for setting your @code{PATH} and
-@code{LD_LIBRARY_PATH} environment variables.
-
-Depending on the speed of your system and of your C compiler, @samp{make} will
-generally require between 1 and 10 minutes.
-
-@node Mac OS X installation, MS-Windows installation, Unix installation, Installation
-@unnumberedsec Mac OS X (Darwin)
-
-The WFDB Software Package, including WAVE, has been successfully compiled under
-Mac OS X 10.2 (Darwin 6.0.1) and 10.3.  It should also work under 10.1, but
-this has not been tested.
-
-Before compiling the WFDB Software Package, download and install:
-
-@itemize @bullet
+@enumerate
 @item
-Mac OS X Developer Tools (from @uref{http://developer.apple.com/tools/xcode/})
+@emph{Install any prerequisites needed for your platform.}  These include
+@code{gcc} (the GNU Compiler Collection), related software development tools
+such as @code{make}, a supported HTTP client library (either @code{libcurl} or
+@code{libwww}; this can be omitted if NETFILES support is not desired), the
+XView libraries (needed for WAVE only), and X11 (needed by XView). All of these
+components are free (open-source) software available for all popular platforms,
+including GNU/Linux, Mac OS X, MS Windows, and Unix.  The quick start guides
+list recommended packages and where to find them.
+
 @item
-libcurl or libwww (from Fink, @uref{http://fink.sourceforge.net/})
+@emph{Download and unpack the WFDB Software Package.}  Versions for all
+platforms are built from a single package of portable sources;  the most
+recent package is always available at
+@uref{http://www.physio@-net.org/physio@-tools/wfdb.tar.gz}.
+
 @item
-an X11 package (from Fink, @uref{http://fink.sourceforge.net/};  Apple,
-@uref{http://www.apple.com/macosx/features/@-x11/@-download/}; or XDarwin,
-@uref{http://www.xdarwin.org/})
+@emph{Configure the package for your system.}  The @code{configure} script
+creates a customized building procedure for your system and allows you
+a few choices about where to install the package.
+
 @item
-XView (from PhysioNet, @uref{http://www.physionet.org/physiotools/xview/})
-@end itemize
+@emph{Make and verify a test build.}  The package includes a set of test
+scripts that are run to verify basic operations of the WFDB library and
+many of the applications, permitting them to be tested before installation.
 
-Now follow the instructions in the previous section for installing from sources
-under Unix or GNU/Linux.
+@item
+@emph{Make, install, and test a final build.}
+@end enumerate
 
-@node MS-Windows installation, Other installation, Mac OS X installation, Installation
-@unnumberedsec MS-Windows
+See the quick start guide for your platform for detailed step-by-step
+instructions.
 
-The WFDB Software Package, except for WAVE, has been successfully compiled
-under all modern versions of MS-Windows (including MS-Windows 95, 98, ME, NT,
-2000, and XP) using the Cygwin development environment.
+@emph{Important:} Although you may be able to compile the WFDB Software Package
+using a proprietary compiler, this is @emph{not supported}.
 
-If you have not already done so, install the Cygwin development environment
-(freely available from @uref{http://www.cygwin.com}).  This
-includes @code{gcc} (the GNU C/C++ compiler) as well as a comprehensive
-assortment of other Unix utilities ported to MS-Windows.  Accept the defaults
-suggested by the installer, but be sure to select and install the @code{bc},
-@code{curl-devel}, @code{gcc}, @code{gcc-mingw}, @code{gv}, @code{ImageMagick},
-@code{make}, @code{sunrpc}, and @code{xorg-x11-devel} packages
-(these are not installed by default in a minimal Cygwin installation).
+@unnumberedsec The WFDB library and languages other than C
 
-@emph{Important:} Although you may be able to compile the WFDB software package
-using a proprietary compiler, this is @emph{not supported}.  The
-@code{Makefile.dos} files in several of the subdirectories of the package's
-source tree can be used with the @code{make} utilities provided with most
-commercial C compilers, although you will need to customize them for your
-compiler. Your feedback is appreciated.
+If you wish to use or develop WFDB applications in C, C++ or Fortran,
+everything necessary is included in the WFDB Software Package.
 
-Open a Cygwin terminal window (the Cygwin installer will have added this to
-your MS-Windows start menu).  Perform the remaining steps by typing the
-commands given below into the terminal window.
+The separate @code{wfdb-swig} package provides wrappers for the WFDB library
+so that it can be used by applications written in a variety of other languages
+supported by SWIG, the Simplified Wrapper Interface Generator.  At the time
+of writing, the languages that are known to work with @code{wfdb-swig} wrappers
+are Perl, Python,, Java, and C#.  Other languages supported by SWIG include
+Guile, mzScheme, PHP, Ruby, and Tcl. You will need to install @code{wfdb-swig}
+wrappers for your platform and language after installing the WFDB Software
+Package.  Download the @code{wfdb-swig} package from
+@uref{http://physio@-net.org/physio@-tools/wfdb-swig.shtml}, the
+@code{wfdb-swig} home page on PhysioNet, and build and install the wrappers
+you need following the instructions on that page.
 
-Check that @code{gcc} is accessible by typing the command:
-
-@example
-which gcc
-@end example
-
-The output of this command should be:
-
-@example
-/usr/bin/gcc
-@end example
-
-If you don't see this output, repeat the steps above as necessary to correct
-the problem before continuing.
-
-Unpack the @code{gzip}-compressed @code{tar} archive you downloaded earlier,
-using the @code{tar} command included with the Cygwin package:
-
-@example
-tar xfvz wfdb.tar.gz
-@end example
-
-If your browser decompressed the file during the download, use this command
-instead:
-
-@example
-tar xfv wfdb.tar
-@end example
-
-This will create a directory with a name of the form @code{wfdb-}@emph{m.n.r},
-where @emph{m.n.r} is the version number of the included WFDB library (e.g.,
-@code{10.2.6}).  Enter this directory.
-
-You should now be ready to configure, compile, and install the software, using
-the commands:
-
-@example
-./configure
-make install
-@end example
-
-@node Other installation, , MS-Windows installation, Installation
-@unnumberedsec Other systems
-
-Copy the contents of @uref{http://www.@-physio@-net/physio@-tools/wfdb/} to
-your hard disk.  Note that the text files are in Unix format (i.e., lines are
-terminated by ASCII line-feed characters only).  If your system expects text
-files in MS-DOS format (with both a carriage return and a line-feed at the end
-of each line; VMS is one such system), use @file{u2d.exe} (available from
-PhysioNet) to reformat the text files under MS-DOS.  If your
-system is a Macintosh (which expects that lines are terminated by carriage
-returns only), you will have to reformat the text files yourself, which may be
-done under MS-DOS on a PC using @file{u2m.exe}, or on a Macintosh using
-third-party software.
-
-The WFDB Software Package is written in highly portable C, and (with the
-exception of a few MS-DOS or Unix-specific display or data-acquisition
-programs) should be easy to compile with any K&R or ANSI C compiler.
-The Unix and MS-DOS @file{make} description files (@file{Makefile}
-and @file{Makefile.dos} in @file{wfdb} and in each of its subdirectories)
-should get you started.
+The separate WFDB_tools package provides WFDB library wrappers for
+Matlab;  download it from
+@uref{http://physio@-net.org/physio@-tools/mat@-lab/wfdb_tools/}, the
+WFDB_tools home page on PhysioNet, and build and install it following the
+instructions on that page.
 
 @node     WFDB Applications, Extensions, Installation, Top
 @appendix WFDB Application Programs
@@ -8981,15 +8856,14 @@ telefax: +49 911 7417755
 
 @item Compilers and software development systems
 
-Any ANSI/ISO C compiler (or any K&R C compiler, if you still have one)
-can be used to compile the WFDB library and applications that use it.
-Under Unix and GNU/Linux, high-quality free compilers and development
-tools are universally available and taken for granted.  Even if you must
-work in the MS-Windows or MS-DOS environment, however, there is no
-reason to purchase expensive, bloated, and inferior proprietary
-compilers and software development systems, since there are several
-excellent, highly recommended, and completely free alternatives based
-on the GNU C/C++ compiler (gcc).
+Any ANSI/ISO C compiler can be used to compile the WFDB library and
+applications that use it.  Under Unix and GNU/Linux, high-quality free
+compilers and development tools are universally available and taken for
+granted.  Even if you must work in the MS-Windows or MS-DOS environment,
+however, there is no reason to purchase expensive, bloated, and inferior
+proprietary compilers and software development systems, since there are several
+excellent, highly recommended, and completely free alternatives based on the
+GNU C/C++ compiler (gcc).
 
 Using any of these packages does not limit you to creating free (open
 source) software, although you are certainly encouraged to do so.  If you
@@ -9016,9 +8890,11 @@ are created using Cygwin.
 
 WWW: @uref{http://www.mingw.org/}
 
-This is another freely available software development platform for
-MS-Windows, also based on @code{gcc} and many of the same utilities as
-Cygwin.
+This is another freely available software development platform for MS-Windows,
+also based on @code{gcc} and many of the same utilities as Cygwin.  The
+difference is that applications built by MinGW gcc use the native MS-Windows C
+library, while those built by Cygwin gcc generally use Cygwin's Unix-compatible
+standard C library.  
 
 @cindex djgpp
 @item djgpp

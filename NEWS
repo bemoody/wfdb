@@ -4,6 +4,10 @@
 	ANSI/ISO C or most other C compilers).  This operation has been
 	replaced by ANSI/ISO C-conformant code.
 
+	Column headings produced using rdann's -v option are now correct
+	even when the starting time, but not the starting date, has been
+	specified in the input record's .hea file.
+
 10.4.1: 
 	A bug caused incorrect output from WFDB library function strtim()
 	when called with the argument "i", following use of setifreq() to

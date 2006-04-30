@@ -1,9 +1,9 @@
 /* file rdann.c	    T. Baker and G. Moody	27 July 1981
-		    Last revised:	        28 November 2004
+		    Last revised:	        26 April 2006
 
 -------------------------------------------------------------------------------
 rdann: Print an annotation file in ASCII form
-Copyright (C) 1981-2004 George B. Moody
+Copyright (C) 1981-2006 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -28,6 +28,12 @@ modification as well!
 */
 
 #include <stdio.h>
+#ifndef BSD
+#include <string.h>
+#else
+#include <strings.h>
+#define strchr index
+#endif
 #ifndef __STDC__
 extern void exit();
 #endif
@@ -223,12 +229,12 @@ char *argv[];
 	(void)printf("Elapsed time  Sample #  ");
       else if (xflag)
 	(void)printf("  Seconds   Minutes     Hours  ");
-      else {
-	if (*(mstimstr((WFDB_Time)(-1))) == '[')
+      else if (strchr(mstimstr((WFDB_Time)(-1)), '/'))
 	  (void)printf("      Time       Date     Sample #  ");
-	else
+      else if (*(mstimstr((WFDB_Time)(-1))) == '[')
+	  (void)printf("      Time     Sample #  ");
+      else
 	  (void)printf("      Time   Sample #  ");
-      }
       (void)printf("Type  Sub Chan  Num\tAux\n");
     }
 
