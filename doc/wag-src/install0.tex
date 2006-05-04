@@ -28,201 +28,55 @@ Harvard-MIT Division of Health Sciences and Technology, Cambridge, MA, USA}
 
 \maketitle
 
-\section*{Summary}
-This appendix briefly describes how to install the WFDB Software Package on a
-new system.  The package includes C-language sources for the WFDB library and
-for the applications described in this manual; \LaTeX{}, {\tt texinfo}, and
-{\tt troff} sources for this and other manuals; and a one-minute sample record
-({\tt 100s}).
+This appendix briefly describes how to install the WFDB Software Package
+on a new system.  The package includes C-language sources for the WFDB
+library and for most of the applications described in this manual, sources
+for this manual, the {\em WFDB Programmer's Guide}, and the
+{\em WAVE User's Guide}, and a one-minute sample record ({\tt 100s}).
 
-\section*{How to obtain the WFDB Software Package}
-The latest version of the WFDB Software Package can always be downloaded in
-source form from PhysioNet and its mirrors (see {\tt
-http://www.physio\-net.org/physio\-tools/wfdb.shtml}); binaries for popular
-operating systems and development snapshots, as well as quick-start guides
-including installation notes for popular operating systems, are also usually
-available there.
+The latest version of the package can always be downloaded in
+source form from {\tt http://physio\-net.org/\-physio\-tools/\-wfdb.shtml},
+the WFDB home page on PhysioNet.  Binaries for popular operating systems and
+development snapshots are also usually available there.
 
-\subsection*{UNIX, GNU/Linux, and similar operating systems}
+The process for installing the package is the same on all platforms, and
+is documented in detail in the quick-start guides for the popular platforms
+that can be found on the WFDB home page.  In brief:
 
-Before beginning the installation of the WFDB Software Package, obtain and
-install the {\tt libwww} package from {\tt http://www.w3.org/Library/} or from
-{\tt http://\-www.physio\-net.org/physio\-tools/libwww/}.  This package is
-provided with most current versions of GNU/Linux.  (If you have a program
-called {\tt libwww-config}, then {\tt libwww} is installed already.)  You may
-omit this step if you do not wish to have NETFILES support.
-
-Also download and install the {\tt XView} software packages from {\tt
-http://www.\-physio\-net.org/\-physio\-tools/xview/} if you wish to use WAVE.
-Sources are available, as are binaries for several versions of GNU/Linux.  If
-you are using SunOS or Solaris, XView binaries are available in the Open Look
-Software Development package and may be installed already.  (If you have a
-program called {\tt textedit}, then {\tt XView} is installed already.) If you
-are able to use an existing set of binaries, these are recommended, since the
-sources may take a {\em long} time to compile.  Be sure that the directory
-containing {\tt textedit}, usually {\tt /usr/openwin/bin}, is in your {\tt
-PATH}.  You may omit this step if you do not wish to use {\em WAVE}.
-
-If you have downloaded the software from PhysioNet or another source, you
-will have a {\tt gzip}-compressed {\tt tar} archive.  Unpack it using
-the commands:
-
-\begin{verbatim}
-gzip -d wfdb.tar.gz
-tar xfv wfdb.tar
-\end{verbatim}
-
-(If you have GNU {\tt tar}, as on GNU/Linux, you can combine these into a
-single command: {\tt tar xfvz wfdb.tar.gz}.)
-
-This will create a directory with a name of the form {\tt wfdb-}{\em m.n.r},
-where {\em m.n.r} is the version number of the included WFDB library (e.g.,
-{\tt 10.3.0}).  Enter this directory.
-
-You should now be ready to configure, compile, and install the software, using
-the commands:
-
-\begin{verbatim}
-./configure
-make install
-\end{verbatim}
-
-The {\tt ./configure} command asks where you wish to install the package.
-If you accept the default ({\tt /usr}), you will need root permissions when
-runnning {\tt make install}.  If you choose another location, follow the
-instructions given by {\tt configure} for setting your {\tt PATH} and
-{\tt LD\_LIBRARY\_PATH} environment variables.
-
-Depending on the speed of your system and of your C compiler, {\tt make} will
-generally require between 1 and 10 minutes.
-
-\subsection*{Mac OS X (Darwin)}
-
-The WFDB Software Package, including WAVE, has been successfully compiled under
-Mac OS X 10.2 (Darwin 6.0.1) and 10.3.  It should also work under 10.1, but
-this has not been tested.
-
-Before compiling the WFDB Software Package, download and install:
-
-\begin{itemize}
+\begin{enumerate}
 \item
-Mac OS X Developer Tools (from {\tt
-http://\-devel\-oper.\-apple.\-com/\-tools/\-xcode/)}
+\emph{Install any prerequisites needed for your platform.}  These include
+{\tt gcc} (the GNU Compiler Collection), related software development tools
+such as {\tt make}, a supported HTTP client library (either {\tt libcurl} or
+{\tt libwww}; this can be omitted if NETFILES support is not desired), the
+XView libraries (needed for WAVE only), and X11 (needed by XView). All of these
+components are free (open-source) software available for all popular platforms,
+including GNU/Linux, Mac OS X, MS Windows, and Unix.  The quick start guides
+list recommended packages and where to find them.
+
 \item
-libwww (from Fink, {\tt http://\-fink.\-source\-forge.\-net/})
+\emph{Download and unpack the WFDB Software Package.}  Versions for all
+platforms are built from a single package of portable sources;  the most
+recent package is always available at
+{\tt http://physio\-net.org/physio\-tools/wfdb.tar.gz}.
+
 \item
-an X11 package  (from Fink, {\tt http://\-fink.\-source\-forge.\-net/};
-XDarwin, {\tt http://\-www.\-xdar\-win.\-org/}; or Apple,
-{\tt http://\-www.\-apple.\-com/\-macosx/\-features/\-x11/\-download/})
+\emph{Configure the package for your system.}  The {\tt configure} script
+creates a customized building procedure for your system and allows you
+a few choices about where to install the package.
+
 \item
-XView (from PhysioNet,
-{\tt http://\-www.\-physionet.\-org/\-physiotools/\-xview/})
-\end{itemize}
+\emph{Make and verify a test build.}  The package includes a set of test
+scripts that are run to verify basic operations of the WFDB library and
+many of the applications, permitting them to be tested before installation.
 
-Now follow the instructions in the previous section for installing from sources
-under Unix or GNU/Linux.
+\item
+\emph{Make, install, and test a final build.}
+\end{enumerate}
 
-\subsection*{MS-Windows}
+See the quick start guide for your platform for detailed step-by-step
+instructions.
 
-The WFDB Software Package, except for WAVE, has been successfully compiled
-under all modern versions of MS-Windows (including MS-Windows 95, 98, ME, NT,
-2000, and XP) using the Cygwin development environment.
-
-If you have not already done so, install the Cygwin development environment
-(freely available from {\tt http://\-www.\-cygwin.\-com/}).  This includes
-{\tt gcc} (the GNU C/C++ compiler) as well as a comprehensive assortment of
-other Unix utilities ported to MS-Windows.  Accept the defaults suggested by
-the installer,  but be sure to select and install the {\tt gcc},
-{\tt binutils}, and {\tt make} packages from the {\tt Devel} category
-(these are not installed by default in a minimal Cygwin installation).
-
-\emph{Important:} Although you may be able to compile the WFDB software
-package using a proprietary compiler, this is \emph{not supported}.  The
-{\tt Makefile.dos} files in several of the subdirectories of the package's
-source tree can be used with the {\tt make} utilities provided with most
-commercial C compilers, although you will need to customize them for your
-compiler. Your feedback is appreciated.
-
-Before beginning the installation of the WFDB Software Package, obtain and
-install the {\tt libwww} package from {\tt http://www.w3.org/Library/} or
-from {\tt http://\-www.physio\-net.org/physio\-tools/libwww/}.  You may
-omit this step if you do not wish to have NETFILES support.
-
-Open a Cygwin terminal window (the Cygwin installer will have added this to
-your MS-Windows start menu).  Perform the remaining steps by typing the
-commands given below into the terminal window.
-
-Check that {\tt gcc} is accessible by typing the command:
-
-\begin{verbatim}
-which gcc
-\end{verbatim}
-
-The output of this command should be:
-
-\begin{verbatim}
-/usr/bin/gcc
-\end{verbatim}
-
-If you don't see this output, repeat the steps above as necessary to correct
-the problem before continuing.
-
-Unpack the {\tt gzip}-compressed {\tt tar} archive you downloaded earlier,
-using the {\tt tar} command included with the Cygwin package:
-
-\begin{verbatim}
-tar xfvz wfdb.tar.gz
-\end{verbatim}
-
-If your browser decompressed the file during the download, use this command
-instead:
-
-\begin{verbatim}
-tar xfv wfdb.tar
-\end{verbatim}
-
-This will create a directory with a name of the form {\tt wfdb-}{\em m.n.r},
-where {\em m.n.r} is the version number of the included WFDB library (e.g.,
-{\tt 10.3.0}).  Enter this directory.
-
-You should now be ready to configure, compile, and install the software, using
-the commands:
-
-\begin{verbatim}
-./configure
-make install
-\end{verbatim}
-
-If you have Microsoft or Turbo C or C++, and a Microstar Laboratories DAP 1200-
-or 2400-series analog interface board, you can compile {\tt sample} (a program
-for creating database records from analog signals, and for replaying them in
-analog form).  To do so successfully, you must first have installed the
-Microstar {\tt \#include} files and DAP interface library on your system.
-Specifically, files {\tt c\_lib.c}, {\tt clock.h}, and {\tt ioutil.h} must be
-installed in your {\tt include} directory, and the version of the file
-{\tt cdapl.lib} that is compatible with your compiler must be installed in a
-directory in which libraries are found by your linker.  Read and customize
-{\tt lib/Makefile.dos} and {\tt app/Makefile.dos} as appropriate for your
-compiler, and use your compiler's {\tt make} utility to generate {\tt wfdb.lib}
-and then {\tt sample.exe}.
-
-\subsection*{Other systems}
-
-Copy the contents of {\tt http://www.\-physio\-net.\-org/physio\-tools/wfdb/}
-to your hard disk.  Note that the text files are in UNIX format (i.e., lines
-are terminated by ASCII line-feed characters only).  If your system expects
-text files in MS-DOS format (with both a carriage return and a line-feed at the
-end of each line; VMS is one such system), use {\tt u2d.exe} (available from
-PhysioNet) to reformat the text files under MS-DOS.  If your system is a
-Macintosh (which expects that lines are terminated by carriage returns only),
-you will have to reformat the text files yourself, which may be done under
-MS-DOS on a PC using {\tt u2m.exe}, or on a Macintosh using third-party
-software.
-
-The WFDB Software Package is written in highly portable C, and (with the
-exception of a few MS-DOS or UNIX-specific display or data-acquisition
-programs) should be easy to compile with any K\&R or ANSI C compiler.
-The UNIX and MS-DOS {\tt make} description files ({\tt Makefile}
-and {\tt Makefile.dos} in {\tt wfdb} and in each of its subdirectories)
-should get you started.
+\emph{Important:} Although you may be able to compile the WFDB Software Package
+using a proprietary compiler, this is \emph{not supported}.
 \end{document}

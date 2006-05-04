@@ -168,36 +168,41 @@ study the three nodes above before going on.}
 @cindex record name
 @cindex tape
 
-The databases for which the WFDB library was designed consist of a small
-number of @dfn{records}, each of which is quite large (typically a
-megabyte or more).  Database records usually originate as multi-channel
-analog tape recordings that have been digitized and stored as disk
-files.  For this historical reason, they are often referred to as
-@dfn{tapes}.  Each record contains a continuous recording from a single
-subject.  A typical application program accesses only a single record,
-and most (if not all) of the access within the record is sequential.
-Much less frequently, it may be of interest to compare the contents of
-several records, or to select sets of records.  These databases are
-therefore qualitatively different from those for which conventional
-database management software is written.
+The databases for which the WFDB library was designed consist of a
+small number of @dfn{records}, each of which is quite large (typically
+a megabyte or more).  Before 1990, database records usually originated
+as multi-channel analog tape recordings that had been digitized and
+stored as disk files.  For this historical reason, they are sometimes
+referred to as @dfn{tapes}, although most newly created records are
+digitally recorded onto disk media.  Each record contains a continuous
+recording from a single subject.  A typical application program
+accesses only a single record, and most (if not all) of the access
+within the record is sequential.  Much less frequently, it may be of
+interest to compare the contents of several records, or to select sets
+of records.  These databases are therefore qualitatively different
+from those for which conventional database management software is
+written.
 
 @cindex file names
-Records are identified by @dfn{record names}, which are three-digit
-numbers for MIT DB records, four-digit numbers for AHA DB records, and
-four-digit numbers prefixed by @samp{e} for ESC DB records.  You may
-create database records with names containing letters, digits, and
-underscores.  Case is significant in record names that contain letters,
-even in environments such as MS-DOS for which case translation is
-normally performed by the operating system on file names; thus
-@samp{e0104} is the name of a record found in the ESC DB, whereas
-@samp{E0104} is not.  A record is comprised of several files, which
-contain signals, annotations, and specifications of signal attributes;
-each file belonging to a given record normally includes the record name
-as the first part of its name.  A record is an extensible collection of
-files, which need not all be located in the same directory, or even on
-the same physical device.  Thus it is possible, for example, to create
-on a magnetic disk a file of your own annotations for a record
-distributed on a CD-ROM, and to treat your file as part of the record.
+Records are identified by @dfn{record names} of up to 20 characters
+(the limit is @code{MAXRNL}, defined in @file{<wfdb/wfdb.h>}).  For
+example, record names in the MIT DB are three-digit numbers, those in
+the AHA DB are four-digit numbers, and those in the ESC DB are
+four-digit numbers prefixed by the letter @samp{e}.  You may create
+database records with names containing letters, digits, and
+underscores.  Case is significant in record names that contain
+letters, even in environments such as MS-Windows for which case
+translation is normally performed by the operating system on file
+names; thus @samp{e0104} is the name of a record found in the ESC DB,
+whereas @samp{E0104} is not.  A record is comprised of several files,
+which contain signals, annotations, and specifications of signal
+attributes; each file belonging to a given record normally includes
+the record name as the first part of its name.  A record is an
+extensible collection of files, which need not all be located in the
+same directory, or even on the same physical device.  Thus it is
+possible, for example, to create a local disk file of your own
+annotations for a record read from a web server or a CDROM, and to
+treat your file as part of the record.
 
 @node     Concepts 2, Concepts 3, Concepts 1, Overview
 @unnumberedsec Signals, Samples, and Time
@@ -422,23 +427,33 @@ differences.
 At the end of the guide is a list of sources for databases and other
 materials that may be useful to readers (@pxref{Sources}).
 
-Many friends have contributed to the development of the WFDB library.  Thanks
-to Paul Albrecht, Ted Baker, Phil Devlin, Scott Greenwald, Isaac Henry, David
-Israel, Roger Mark, Joe Mietus, Warren Muldrow, and especially to Paul
-Schluter, whose elegant 8080 assembly language functions inspired these (long
-live @code{getann}!).  Pat Hamilton and Bob Farrell contributed ports, to
-classic Mac OS and the MS 32-bit Windows environments, respectively.  Jose
-Garcia Moros and Salvador Olmos contributed Matlab/Octave reimplementations of
-a useful subset of the WFDB library.  Jonas Carlson wrote, documented, and
-contributed a set of Matlab wrappers for the WFDB library.  Thanks also to the
-many readers of earlier versions of this guide; if this edition answers your
-questions, it is because someone else has already asked them, and hounded the
-author until he produced comprehensible answers.
+Many friends have contributed to the development of the WFDB library.
+Thanks to Paul Albrecht, Ted Baker, Phil Devlin, Scott Greenwald,
+Thomas Heldt, Isaac Henry, David Israel, Roger Mark, Joe Mietus,
+Warren Muldrow, Wei Zong, and especially to Paul Schluter, whose
+elegant 8080 assembly language functions inspired these (long live
+@code{getann}!).  Pat Hamilton and Bob Farrell contributed ports, to
+classic Mac OS and the MS 32-bit Windows environments, respectively.
+Jose Garcia Moros and Salvador Olmos contributed Matlab/Octave
+reimplementations of a useful subset of the WFDB library.  Jonas
+Carlson wrote, documented, and contributed a set of Matlab wrappers
+for the WFDB library.  Isaac Henry contributed SWIG wrappers that
+provide interfaces for a variety of scripting languages, as well as a
+set of translations of the C example programs in this guide into the
+languages supported by the SWIG wrappers.  Mike Dakin provided the
+first implementation of NETFILES (HTTP client support in the WFDB
+library) based on the W3C's @code{libwww}.  Following the W3C's
+decision to end development of @code{libwww}, Benjamin Moody
+reimplemented NETFILES using @code{libcurl}, and also implemented
+variable-layout records.  Thanks also to the many readers of earlier
+versions of this guide; if this edition answers your questions, it is
+because someone else has already asked them, and hounded the author
+until he produced comprehensible answers.
 
 Before May, 1999, and the release of version 10.0.0 of the library, the
 WFDB library was known as the DB library, and this guide was the @cite{ECG
 Database Programmer's Guide}.  The name of the library was changed because
-of confusion caused by the recent proliferation of another library with
+of confusion caused by the proliferation of another library with
 the same name (a reimplementation of the Berkeley Unix DBM library).
 The names of this guide, and of the @cite{WFDB Applications Guide} (formerly
 the @cite{ECG Database Applications Guide}), have been changed in view of
@@ -850,7 +865,7 @@ exists.  This requirement is eliminated in version 10.2.0.  If an output file
 is specified to be located in a non-existent directory, the WFDB library will
 attempt to create the directory (including, if necessary, any non-existent
 parent directories).  This feature simplifies the use of record names that
-include directory information, as is common when reading data from a CD-ROM or
+include directory information, as is common when reading data from a CDROM or
 a web server such as PhysioNet.  For example, using the WFDB path
 (@file{. http://@-www.@-physio@-net.@-org/@-physio@-bank/@-data@-base}), if the
 current directory, @file{.}, does not contain a subdirectory named
@@ -2900,13 +2915,6 @@ returned by @code{strtim} can always be used safely as arguments to
 This function will fail if a pipe is used for input and |@var{t}| is less
 than the time of the most recent annotation read from the pipe.
 @xref{Example 9}, for an illustration of the use of @code{iannsettime}.
-
-The version of @code{iannsettime} that is included on the first edition
-of the MIT-BIH Arrhythmia Database CD-ROM contains a bug that can
-occasionally cause incorrect results.  To avoid this problem when using
-that version of the library, make at least one call to @code{getann}
-before using @code{iannsettime}.  The bug was corrected in version 4.0
-of the library.
 
 @c @group
 @node     sample, , iannsettime, non-sequential
@@ -5022,7 +5030,7 @@ structures.  It is accessible only via @code{calopen}, @code{getcal},
 @cindex annotator name
 @cindex attributes of annotators
 @cindex AHA-format annotation file
-@cindex MIT-format annotation file
+@cindex WFDB-format annotation file
 @cindex standard annotation file
 @cindex format (annotation file)
 @cindex information structure (annotator)
@@ -5055,11 +5063,12 @@ and found in any of the directories in the database path (@pxref{WFDB path}).
 @cindex @code{WFDB_AHA_WRITE}
 @cindex @code{WFDB_READ}
 @cindex @code{WFDB_WRITE}
-the file type/access code.  Usually, @code{stat} is either @code{WFDB_READ}
-or @code{WFDB_WRITE}, to specify standard (``MIT format'') annotation files
-to be read by @code{getann} or to be written by @code{putann}.  Both MIT
-DB and AHA DB annotation files are kept on-line in MIT format.  The
-symbols @code{WFDB_READ} and @code{WFDB_WRITE} are defined in
+the file type/access code.  Usually, @code{stat} is either
+@code{WFDB_READ} or @code{WFDB_WRITE}, to specify standard (``WFDB
+format'') annotation files to be read by @code{getann} or to be
+written by @code{putann}.  Both MIT DB and AHA DB annotation files can
+be (and generally are) stored in WFDB format.  The symbols
+@code{WFDB_READ} and @code{WFDB_WRITE} are defined in
 @file{<wfdb/wfdb.h>}. An AHA-format annotation file can be read by
 @code{getann} or written by @code{putann} if the @code{stat} field is
 set to @code{WFDB_AHA_READ} or @code{WFDB_AHA_WRITE} before calling
@@ -5392,7 +5401,7 @@ Recall that a WFDB record is not a file; rather, it is an extensible
 @emph{collection} of database files (@pxref{Concepts 1, , Records}).  Thus, for
 example, record 100 of the MIT-BIH Arrhythmia Database consists of the files
 named @file{100.hea}, @file{100.dat}, and @file{100.atr} in the @file{mitdb}
-directory of the MIT-BIH Arrhythmia Database CD-ROM (or in PhysioBank, within
+directory of the MIT-BIH Arrhythmia Database CDROM (or in PhysioBank, within
 @uref{http://@-www.@-physio@-net.@-org/@-physio@-bank/@-data@-base/@-mitdb/}),
 together with any additional files in other directories that you may have
 associated with record 100 (such as your own annotation file).  All files
@@ -5517,7 +5526,7 @@ loss of information, and doing so reduces the storage requirement by a
 factor of eight.
 
 Yet another format has been used more recently for distribution of AHA DB files
-on floppy diskettes and CD-ROMs.  This format is compatible with neither the
+on floppy diskettes and CDROMs.  This format is compatible with neither the
 original AHA format nor with any of the formats supported directly by the WFDB
 library.  Programs @file{a2m} and @file{ad2m}, supplied with the WFDB Software
 Package, can convert files in this format (as well as those in the original AHA
@@ -5568,7 +5577,7 @@ sequential-access only (e.g., 9-track tape), if the storage device has lengthy
 seek times (e.g., optical disk), if many signals must be recorded and Unix's
 per-process limit on open files would otherwise be exceeded, or if very high
 speed is required while the file is being created (because of sampling
-constraints).  CD-ROM signal files, and those available from PhysioNet, are
+constraints).  CDROM signal files, and those available from PhysioNet, are
 multiplexed unless the record contains only one signal.
 
 @node     Multi-Frequency Records, Multi-Segment Records, Multiplexed Signal Files, Database Files
@@ -5997,7 +6006,7 @@ within the @file{examples} directory.
 
 @menu
 * Example 1::			An annotation filter.
-* Example 2::			An MIT-to-AHA format annotation translator.
+* Example 2::			A WFDB-to-AHA format annotation translator.
 * Example 3::			An annotation printer.
 * Example 4::			Generating an R-R interval histogram.
 * Example 5::			A program that prints signal specifications.
@@ -6541,7 +6550,7 @@ close the files properly.
 @end table
 
 @node     Example 7, Example 8, Example 6, Examples
-@unnumberedsec Example 7:  A General-Purpose FIR Filter
+@unnumberedsec Example 7: A General-Purpose FIR Filter
 
 @cindex digital filter
 @cindex filter (digital)
@@ -6701,7 +6710,7 @@ the signal specifications from record @file{16l} and the sampling
 frequency from the input record.
 @end table
 @node     Example 8, Example 9, Example 7, Examples
-@unnumberedsec Example 8:  Creating a New Database Record
+@unnumberedsec Example 8: Creating a New Database Record
 @cindex creating a record
 @cindex records (creating)
 
@@ -7321,33 +7330,6 @@ should skip the first ten minutes, then process the next ten seconds of
 signals from @var{record}.
 
 @item
-Wesley Q. Phortran, IV, wrote this program to print beat times (in
-minutes and seconds) and R-R intervals for the reference annotation file
-of record @file{100}.  Why doesn't it work?
-@example
- @i{1}  #include <wfdb/wfdb.h>
- @i{2}
- @i{3}  main()
- @i{4}  @{
- @i{5}      WFDB_Annotation *annot;
- @i{6}      WFDB_Anninfo ai;
- @i{7}      int t;
- @i{8}
- @i{9}      ai.name = "atr";
-@i{10}      ai.stat = WFDB_READ;
-@i{11}      if (annopen(100, ai, 1)) @{
-@i{12}          while (getann(1, annot)) @{
-@i{13}              printf("%s\t(%d)\t%s\n", timstr(annot.time),
-@i{14}                     annot.time, mstimstr(annot.time - t));
-@i{15}              t = annot.time;
-@i{16}          @}
-@i{17}      @}
-@i{18}  @}
-@end example
-Extra credit: Without actually trying it out, what @emph{does} it
-produce on the standard output?
-
-@item
 Using @code{isigsettime} on a format 8 signal introduces a random offset
 into the signal, since the contents of a format 8 signal file are first
 differences rather than amplitudes.  For an AC-coupled signal such as an
@@ -7367,53 +7349,37 @@ to obtain an @code{isigsettime} equivalent that executes in an average
 of 100 msec or less?
 
 @item
-This exercise assumes that you have access to the MIT-BIH Arrhythmia
-Database, either on a CD-ROM or via PhysioNet.  Since the 360 Hz sampling
-frequency used in that database is an integer multiple of 60 Hz, it is
+This exercise and the next assume that you have access to the web, so
+that you can obtain the freely available input records needed from PhysioNet.
+Since the 360 Hz sampling frequency used in the MIT-BIH Arrhythmia
+Database is an integer multiple of the 60 Hz mains frequency, it is
 quite easy to design a 60 Hz notch filter that can be applied to the
-database.  Write a program that filters two input signals and writes
-out the filtered data using @code{putvec} (@pxref{Example 7}, for a
-model program).  Try it out on MIT-BIH record @file{122} (or use record
-@file{mitdb/x_mitdb/x_122} from PhysioNet).  Use your programs from
-the previous exercises to display your output.
+database to suppress power-line interference (for example, by
+averaging pairs of samples that are 180 degrees out of phase).  Write
+a program that filters two input signals and writes out the filtered
+data using @code{putvec} (@pxref{Example 7}, for a model program).
+Try it out on MIT DB record @file{122} (if you have a NETFILES-enabled
+WFDB library, use the default WFDB path, and open record
+@file{mitdb/122}; otherwise, download the record from
+@uref{http://www.physio@-net.org/physio@-bank/data@-base/mitdb/}.)
+Use your programs from the previous exercises to display your output
+and compare it with the original signals.
 
 @item
-If you used Example 7 as a model in the previous exercise, you may have
-noticed that it is quite slow.  Make it faster by arranging for
-@code{sample} to return a pointer to a vector of samples from all
-signals (thereby reducing the number of function calls).  Speed it up
-further by defining a macro that calls the function only if the proper
-sample vector is not already in the circular buffer; otherwise the macro
-should evaluate to a pointer to the correct sample vector.
-
-@item
-Prof. Nottin Ventedhier says, ``Real programmers don't use inefficient
-library I/O routines --- they write their own, in assembly language.''
-Implement a version of the QRS detector in Example 10 @emph{without}
-using the WFDB library.  (To keep it simple, assume that only one input
-format --- of your choice --- needs to be supported.)  How much faster
-than the original is your version?
-
-@item
-(Non-trivial) Write a QRS detector that is independent of sampling frequency.
-Some useful constants (for adult human ECGs): average normal QRS duration = 80
-milliseconds, average QRS amplitude = 1 millivolt, average R-R interval = 1
-second; assume that upper and lower limits for these quantities are within a
-factor of 3 of the average values.  Run your detector on MIT-BIH Arrhythmia
-Database record @file{200}.  (This record is available on PhysioNet.  If you
-have a NETFILES-enabled WFDB library, use the default WFDB path, and open
+(Non-trivial) Write a QRS detector that is independent of sampling
+frequency without using @code{setifreq}.  Some useful constants (for
+adult human ECGs): average normal QRS duration = 80 milliseconds,
+average QRS amplitude = 1 millivolt, average R-R interval = 1 second;
+assume that upper and lower limits for these quantities are within a
+factor of 3 of the average values.  Run your detector on MIT-BIH
+Arrhythmia Database record @file{200}.  (If you have a
+NETFILES-enabled WFDB library, use the default WFDB path, and open
 record @file{mitdb/200}; otherwise, download the record from
-@uref{http://www.physio@-net.org/physio@-bank/data@-base/mitdb/}.)  Read the
-documentation on the annotation comparator, @file{bxb}, and figure out how to
-use it to compare the annotation file produced by your program against the
-reference annotator @file{atr}.  How does your detector compare to Example
-10?
-
-@item
-If the previous exercise was too easy, modify your detector so that the
-annotations it generates match those in the @file{atr} file.  Copying
-the @file{atr} file is not permitted.  You may find this rather
-difficult.  Good luck!
+@uref{http://www.physio@-net.org/physio@-bank/data@-base/mitdb/}.)
+Read the documentation on the annotation comparator, @file{bxb}, and
+figure out how to use it to compare the annotation file produced by
+your program against the reference annotator @file{atr}.  How does
+your detector compare to Example 10?
 @end enumerate
 
 @node     Glossary, Installation, Exercises, Top
@@ -7456,10 +7422,10 @@ record names.
 
 @item AHA format
 @cindex AHA format (defined)
-The format used for interchange of AHA DB and MIT DB records on 9-track
-tape between institutions, not used for on-line files because it is
-relatively wasteful of storage space compared to MIT format
-(q.v.).
+The format formerly used for interchange of AHA DB and MIT DB records
+on 9-track tape between institutions, not used for on-line files
+because it is relatively wasteful of storage space compared to other
+WFDB-compatible formats.  (q.v.).
 
 @item Annotation
 @cindex annotation (defined)
@@ -7481,7 +7447,7 @@ A set of annotations in time order.
 @cindex annotator name (defined)
 A name associated with an annotation file.  The annotation file name is
 constructed from the record name by appending a @samp{.} and the annotator
-name.  On CD-ROMs and MS-DOS file systems, the annotator name is restricted
+name.  On CDROMs and MS-DOS file systems, the annotator name is restricted
 to three characters.
 
 @item Annotator [number]
@@ -7538,11 +7504,12 @@ A memory-resident linked list of @code{WFDB_Calinfo} objects
 Each such structure specifies the size and type of the calibration pulse,
 and the customary plotting scale, for a particular type of signal.
 
-@item CD-ROM
-@cindex CD-ROM (defined)
-A read-only medium used for distribution of the MIT-BIH and ESC
-databases, among others.  CD-ROMs are physically identical in appearance
-to audio compact disks.
+@item CDROM
+@cindex CDROM (defined)
+A read-only medium used for distribution of a number of databases
+readable using the WFDB library, including the ESC and Long-Term ST
+databases, among others.  CDROMs are physically identical in
+appearance to audio compact disks.
 
 @item Closing [a record]
 The process of completing I/O associated with a record.
@@ -7685,8 +7652,11 @@ record names.
 
 @item MIT format
 @cindex MIT format (defined)
-The standard format for storage of WFDB records on CD-ROMs, used on the
-MIT, ESC, and MGH DB CD-ROMs, among others, and on PhysioNet.
+One of a set of WFDB-compatible formats for header, signal, and
+annotation files that were first used for the MIT-BIH Arrhythmia
+Database.  The term WFDB-compatible format should be used unless referring
+specifically to the formats used for the MIT DB (single-segment header format,
+signal format 212, and bit-packed annotation format).
 
 @item Modification label
 @cindex modification label (defined)
@@ -7819,7 +7789,7 @@ An extensible set of files that may include signal files, annotation
 files, and a header file, all of which are associated with the
 same original signals.  Only the header file is mandatory.
 Although records are sometimes called tapes for historical reasons,
-records are now more commonly maintained on CD-ROMs or magnetic disks
+records are now more commonly maintained on CDROMs or magnetic disks
 than on tape.
 
 @item Record name
@@ -7953,6 +7923,11 @@ A database record.
 In this guide, synonymous with sample number (q.v.).  Thus the ``time of
 an annotation'' is the sample number of the sample to which the
 annotation ``points''.
+
+@item WFDB-compatible format
+@cindex WFDB-compatible format (defined)
+Any of the standard formats readable and writable by the WFDB library,
+for storage of WFDB records in PhysioBank and on CDROMs.
 
 @item WFDB library
 A set of functions (subroutines), able to read and write database files,
@@ -8160,32 +8135,33 @@ nst @var{[ options ... ]}
 
 The motivation for developing the MIT and AHA databases was to provide
 material for evaluating the accuracy of arrhythmia detectors,
-particularly with respect to ventricular arrhythmias.  Between 1984 and
-1987, the Association for the Advancement of Medical Instrumentation
-(AAMI) sponsored the development of a recommended practice (designated
-ECAR) for using the databases for this purpose.  The aim of ECAR was to
-specify the evaluation methodology in sufficient detail to permit
-reproducible testing, and to encourage informed comparisons of the
-performance of ventricular arrhythmia detectors in the analysis of these
-standard test recordings.  More recently, the AAMI has developed, and
-ANSI has adopted as American National Standards, a standard (ANSI/AAMI
-EC38:1998) for ambulatory electrocardiographs, and a companion standard
-(ANSI/AAMI EC57:1998) for testing and reporting performance results of
-cardiac rhythm and ST segment measurement algorithms.  EC38 and EC57
-specify standard protocols for evaluating
-the automated analysis algorithms that are included in many such
-devices.  These protocols include those developed for the earlier
-recommended practice, and extend them to evaluation of supraventricular
-arrhythmia and ischemia detection.  EC38 and EC57 specify the use of
-@file{bxb}, @file{rxr}, @file{mxm}, and @file{epic} to perform
-evaluations, and further specifies the use of the MIT DB (as well as two
-other databases included on the MIT-BIH Arrhythmia Database CD-ROM), the
-AHA DB, and (for devices that perform analysis of the ST segment) the
-ESC DB.  If you are interested in this subject, obtain copies of the
-American National Standards for @cite{Ambulatory Electrocardiographs}
-(ANSI/AAMI EC38:1998) and for @cite{Testing and Reporting Performance
-Results of Cardiac Rhythm and ST Segment Measurements Algorithms} (ANSI/AAMI
-EC57:1998; @pxref{Sources}).
+particularly with respect to ventricular arrhythmias.  Between 1984
+and 1987, the Association for the Advancement of Medical
+Instrumentation (AAMI) sponsored the development of a recommended
+practice (designated ECAR) for using the databases for this purpose.
+The aim of ECAR was to specify the evaluation methodology in
+sufficient detail to permit reproducible testing, and to encourage
+informed comparisons of the performance of ventricular arrhythmia
+detectors in the analysis of these standard test recordings.  More
+recently, the AAMI has developed, and ANSI has adopted as American
+National Standards, a standard (ANSI/AAMI EC38:1998) for ambulatory
+electrocardiographs, and a companion standard (ANSI/AAMI EC57:1998)
+for testing and reporting performance results of cardiac rhythm and ST
+segment measurement algorithms.  EC38 and EC57 specify standard
+protocols for evaluating the automated analysis algorithms that are
+included in many such devices.  These protocols include those
+developed for the earlier recommended practice, and extend them to
+evaluation of supraventricular arrhythmia and ischemia detection.
+EC38 and EC57 specify the use of @file{bxb}, @file{rxr}, @file{mxm},
+and @file{epic} to perform evaluations, and further specifies the use
+of the MIT DB (as well as two other databases formerly available on
+the MIT-BIH Arrhythmia Database CDROM and now freely available on
+PhysioNet), the AHA DB, and (for devices that perform analysis of the
+ST segment) the ESC DB.  If you are interested in this subject, obtain
+copies of the American National Standards for @cite{Ambulatory
+Electrocardiographs} (ANSI/AAMI EC38:1998) and for @cite{Testing and
+Reporting Performance Results of Cardiac Rhythm and ST Segment
+Measurements Algorithms} (ANSI/AAMI EC57:1998; @pxref{Sources}).
 
 @cindex QRS detector
 @cindex detector (QRS)
@@ -8263,8 +8239,9 @@ for arrhythmia detectors'', @cite{Computers in Cardiology}
 @strong{11}:381-384 (1984).  Program @file{nst} adds calibrated amounts
 of noise to ECGs (or other signals), generating an output record in WFDB
 format.  @file{nst} was used to generate the graded series of noisy ECG
-records in the @file{nstdb} directory of the MIT-BIH Arrhythmia Database
-CD-ROM.  These records are among those specified as standard test
+records in the MIT-BIH Noise Stress Test Database (see
+@uref{http://physio@-net.org/physio@-bank/data@-base/nstdb/}).
+These records are among those specified as standard test
 material by EC38 (section 4.2.14.2) and EC57 (section 3.2).
 
 @node     Signal processing, Graphics, Evaluation, WFDB Applications
@@ -8341,8 +8318,6 @@ header files based on its measurements.
 
 @example
 wave -r @var{record [ }-a @var{annotator ]}
-view @var{record annotator}
-wview @var{record annotator}
 pschart @var{[ [ options ... ] script ... ]}
 psfd @var{[ [ options ... ] script ... ]}
 @end example
@@ -8350,29 +8325,20 @@ psfd @var{[ [ options ... ] script ... ]}
 @cindex ECG waveform editor
 @cindex waveform editor
 @file{wave} is an X Window System client application for viewing
-and editing WFDB records.  (@file{wave} is not included in the WFDB software
-package, but is available separately; @pxref{Sources}.)  @file{wave} can be
-run on Unix systems, and can be accessed remotely using networked PCs or
-other systems for which X11 servers are available.  Run @file{wave}
-without any arguments to obtain instructions for printing its on-line
-manual.
-
-@file{view}, included on the MIT-BIH Arrhythmia Database and European ST-T
-Database CD-ROMs, among others, is an MS-DOS application for viewing WFDB
-records on CGA, EGA, VGA, SVGA, XGA, or Hercules graphics-capable PCs.  See
-@file{bin.doc} in the @file{bin} directory of the CD-ROM for more
-information.
-
-@file{wview}, included on recent (1995 and later) CD-ROMs and also
-available separately (@pxref{Sources}, is an MS-Windows application for
-viewing WFDB records.  It has most of the display capabilities of
-@file{wave}, but lacks support for annotation editing.
+and editing WFDB records.  (@file{wave} is included in the WFDB software
+package.)  @file{wave} can be
+run on all popular platforms, including FreeBSD, GNU/Linux, Mac OS X,
+MS Windows, Solaris, and other systems for which X11 servers are available.
+Run @file{wave} without any arguments to obtain instructions for printing its
+on-line manual.
 
 @file{pschart} and @file{psfd} produce annotated ``chart recordings''
 and ``full-disclosure'' plots that can be printed on PostScript devices.
 These programs were used to prepare the @cite{MIT-BIH Arrhythmia
 Database Directory} and the @cite{European ST-T Database
-Directory}.
+Directory}.  The popular Chart-O-Matic web service
+(@uref{http://physionet.org/cgi-bin/chart}) creates browser-viewable plots
+using @file{pschart}.
 
 @node     Extensions, Sources, WFDB Applications, Top
 @appendix Extensions
@@ -8468,7 +8434,7 @@ you are designing a new format, you may wish to specify a `magic number'
 with which your files will begin, to allow @code{annopen} to recognize
 the format automatically; a good choice of such a number is one in which
 the first byte is non-zero (to distinguish it from AHA format files) and
-the high six bits of the second byte are zero (to distinguish it from MIT
+the high six bits of the second byte are zero (to distinguish it from WFDB
 format files).
 
 Some users may wish to define additional annotation codes.  An easy and
@@ -8555,7 +8521,7 @@ corrections to the author (@email{george@@mit.edu}).
 @itemx MIT-BIH Arrhythmia Database Directory
 @itemx MIT-BIH Polysomnographic Database
 @itemx MIMIC Database
-@itemx MGH/Marquette Foundation Waveform Database CD-ROMs
+@itemx MGH/Marquette Foundation Waveform Database CROMs
 @itemx Other reference databases of physiologic signals
 @itemx WFDB Software Package
 @itemx W3C libwww sources
@@ -8574,9 +8540,9 @@ master PhysioNet web server is located at MIT in Cambridge, Massachusetts;
 about ten public mirrors are located elsewhere in the US and around
 the world (see @uref{http://@-www.@-physio@-net.@-org/@-mirrors/} for a list).
 
-@cindex CD-ROM
+@cindex CDROM
 @cindex ESC DB
-@item European ST-T Database CD-ROM
+@item European ST-T Database CDROM
 @itemx European ST-T Database Directory
 @itemx VALE Database Directory
 @sp 1
@@ -8594,7 +8560,7 @@ telefax: +39 050 503596
 Over half of this database has been contributed to PhysioNet (see above), from
 which it may be downloaded freely.
 
-@cindex CD-ROM
+@cindex CDROM
 @cindex LTST DB
 @item Long-Term ST Database
 @sp 1
@@ -8706,7 +8672,7 @@ GNU software is included in all Linux distributions (in fact, since Linux
 is the name of the kernel only, and the largest component of these
 distributions is actually GNU software, it is proper to refer to them as
 GNU/Linux distributions).  GNU software for all popular (and many other)
-operating systems is available on CD-ROM or tape from the address above, and
+operating systems is available on CDROM or tape from the address above, and
 is also freely available by anonymous FTP from @code{ftp.gnu.org} and and many
 other archive sites.  Please support the FSF with a donation if you use GNU
 software.
@@ -8720,7 +8686,7 @@ and @code{ctan.tug.org}.  Many of the sources of GNU software (above) also make
 @TeX{}, etc. available.  CTAN is indexed on the World Wide Web (one such index
 is @uref{http://www.ctan.org/}).
 
-The Unix @TeX{} distribution is also distributed on CD-ROM and in other tape
+The Unix @TeX{} distribution is also distributed on CDROM and in other tape
 formats by the Free Software Foundation (address above) and others.  It is
 also included with most GNU/Linux distributions (see below).
 
@@ -8797,12 +8763,12 @@ WWW: @uref{http://www.linuxdoc.org/}
 GNU/Linux is freely available by anonymous FTP in source and binary form from
 many sites, including:
 @display
-tsx-11.mit.edu
+www.kernel.org
 metalab.unc.edu
 ftp.funet.fi
 @end display
 
-Many low-cost (typically US$10 to US$30) distributions of GNU/Linux on CD-ROMs
+Many low-cost (typically US$10 to US$30) distributions of GNU/Linux on CDROMs
 are widely available.  Among the more popular are:
 
 @display
@@ -8811,47 +8777,44 @@ Debian (non-commercial)
 WWW: @uref{http://www.debian.org/}
 
 
+Fedora
+
+WWW: @uref{http://fedora.redhat.com/}
+
+
 Gentoo (non-commercial)
 
 WWW: @uref{http://www.gentoo.org/}
 
 
-MandrakeSoft S.A.
-43, rue d'Aboukir
-75002 Paris
-France
+Knoppix (non-commercial, live CD)
 
-email: @email{webmaster@@linux-mandrake.com}
-WWW: @uref{http://www.linux-mandrake.com/}
-telephone: +1 626 296 6290 (USA), +33(0) 1 40 41 00 41 (France)
-telefax: +1 801 765 1313
+WWW: @uref{http://www.knoppix.org/}
+
+
+Mandriva
+
+WWW: @uref{http://www.mandriva.com/}
 
 
 Red Hat
-2600 Meridian Parkway
-Durham, NC 27713
 
-email: @email{orders@@redhat.com}
 WWW: @uref{http://www.redhat.com/}
-telephone: 1 888 733 4281 (USA and Canada) or +1 919 547 0012
-telefax: +1 919 547 0024
 
 
 Slackware
 
-email: @email{info@@slackware.com}
 WWW: @uref{http://www.slackware.com/}
 
 
-S.u.S.E. GmbH
-Schanzaeckerstr. 10
-D-90443 Nurnberg
-Germany
+SuSE (Novell)
 
-email: @email{suse@@suse.de}
-WWW: @uref{http://www.suse.de/} (Germany), @uref{http://www.suse.com/} (USA)
-telephone: +49 911 74053 31
-telefax: +49 911 7417755
+WWW: @uref{http://www.novell.com/linux/}
+
+
+Ubuntu
+
+WWW: @uref{http://www.ubuntu.com/}
 @end display
 
 @item Compilers and software development systems
@@ -8925,6 +8888,10 @@ telefax: +1 425 453 3199
 The most popular Web browsers may be downloaded by anonymous FTP.
 
 @display
+Firefox
+FTP: @code{ftp.mozilla.org}
+WWW: @uref{http://www.mozilla.org/firefox/}
+
 Netscape
 FTP: @code{ftp.netscape.com}
 WWW: @uref{http://www.netscape.com/}
@@ -8936,6 +8903,10 @@ WWW: @uref{http://www.mozilla.org/}
 MS Internet Explorer
 FTP: @code{ftp.microsoft.com}
 WWW: @uref{http://www.microsoft.com/}
+
+Opera
+FTP: @code{ftp.opera.com}
+WWW: @uref{http://www.opera.com/}
 @end display
 @end table
 
@@ -8951,6 +8922,9 @@ WWW: @uref{http://www.microsoft.com/}
 @ifinfo
 280 adu = (280 adu - (-300 adu)) / 10 adu/mmHg = 58 mmHg.
 @end ifinfo
+@ifhtml
+280 adu = (280 adu - (-300 adu)) / 10 adu/mmHg = 58 mmHg.
+@end ifhtml
 
 @item 4.
 @iftex
@@ -8959,16 +8933,24 @@ WWW: @uref{http://www.microsoft.com/}
 @ifinfo
 120 mmHg = 120 mmHg * 10 adu/mmHg + (- 300 adu) = 900 adu.
 @end ifinfo
+@ifhtml
+120 mmHg = 120 mmHg * 10 adu/mmHg + (- 300 adu) = 900 adu.
+@end ifhtml
 
 @item 5.
 The range of sample values is
 @iftex
-@minus{}2048 to +2047 adu, or @minus{}174.8
+@minus{}2047 to +2047 adu, or @minus{}174.7 to +234.7 mmHg.  The
+special value @minus{}2048
 @end iftex
 @ifinfo
--2048 to +2047 adu, or -174.8
+-2047 to +2047 adu, or -174.7 to +234.7 mmHg.  The special value -2048
 @end ifinfo
-to +234.7 mmHg.
+@ifhtml
+-2047 to +2047 adu, or -174.7 to +234.7 mmHg.  The special value -2048
+@end ifhtml
+adu, if found in the input, is replaced with @code{WFDB_INVALID_SAMPLE}
+(-32768) to indicate missing or out-of-range samples.
 
 @item 6.
 We don't know how big @file{signal.dat} is, because we don't know how
@@ -8986,50 +8968,13 @@ done using @file{xform};  it reduces the storage requirement by
 one-fifth.
 
 @item 8.
-On a Unix system that supports the @samp{graph} and @samp{plot}
-commands, a simple solution is to write the sample numbers and values on
-the standard output in two-column ASCII format.  The plotting is then
-performed by the pipeline:
+If you have installed PhysioToolkit's @code{plt} package, a simple
+solution is to write the sample numbers and values on the standard
+output in two-column ASCII format.  The plotting is then performed by
+the pipeline:
 @example
-@var{your-program} | graph | plot
+@var{your-program} | plt 0 1
 @end example
-
-@item 11.
-Line 5 allocates storage for a pointer; in line 12, @code{getann} needs
-storage for the annotation structure.  @samp{t} is declared as an
-@code{int} in line 7, which works on a 32-bit machine, but probably not
-on a 16-bit machine.  Line 11 contains three errors (did you find all of
-them?): the first argument to @code{annopen} should be a character
-string, not an integer; the second argument should be a @emph{pointer}
-to a @code{WFDB_Anninfo} object, not the object itself; and (as written)
-the @samp{if} condition is satisfied only if @code{annopen} fails (it
-returns zero if successful).  Line 12 also contains three errors: the
-first argument to @code{getann} is the annotator number, but the first
-(in this case, the only) input annotator is @code{0}, not @code{1}; the
-second argument to @code{getann} should be, but is not, a pointer to an
-allocated @code{WFDB_Annotation} structure; and the @samp{while} loop
-terminates only if @code{getann} @emph{succeeds}.  There are two errors
-in lines 13 and 14: @samp{annot.time} is a long integer (unless
-@code{long} is equivalent to @code{int} on your machine, @samp{%d} is an
-incorrect specification for printing it); and the functions
-@code{timstr} and @code{mstimstr} return pointers to static storage that
-is overwritten by each call.  If the other errors are fixed, the
-@code{printf} statement will print the same string twice (which one
-depends on the order of evaluation of function arguments, which may vary
-between compilers).  Having fixed all of these errors, the output is
-still incorrect, since @code{getann} returns rhythm and signal quality
-annotations as well as beat labels (only the latter should be used for
-calculating R-R intervals), and @samp{t} is not initialized, which makes
-the first interval wrong in any case.  As for the extra credit question,
-the program probably produces nothing at all on its standard output!
-If, by some miracle, @code{annopen} succeeds, it returns zero, and the
-body of the @samp{if} is never executed.  If @code{annopen} simply
-fails, perhaps because the input annotation file can't be opened,
-@code{getann} also fails, and the program probably dumps core with an
-illegal memory reference in the @code{printf} statement, since
-@code{annot} hasn't been initialized.  More likely, the program will
-dump core in @code{annopen}, attempting to reference memory location
-100.
 
 @end table
 

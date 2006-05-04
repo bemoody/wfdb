@@ -44,7 +44,9 @@ OTHERFILES = wave.hl0 wave.info demo.txt Wave.res wavemenu.def Makefile
 all:	wave
 
 # `make install':  compile and install WAVE and its help files
-install:  $(BINDIR) $(HELPDIR)/wave $(MENUDIR) $(RESDIR) wave wave.hlp news.hlp
+install:  $(BINDIR) $(HELPDIR)/wave $(MENUDIR) $(RESDIR) wave.hlp news.hlp
+	rm -f wave.o analyze.o xvwave.o
+	$(MAKE) wave  # make sure all compiled-in paths are up-to-date
 	$(STRIP) wave; $(SETXPERMISSIONS) wave;	../install.sh $(BINDIR) wave
 	cp $(HELPFILES) wave.hlp wave.info demo.txt $(HELPDIR)/wave
 	cd $(HELPDIR)/wave; $(SETPERMISSIONS) $(HELPFILES) wave.info demo.txt
@@ -104,7 +106,7 @@ manual:
 
 # `make guide': print the WAVE User's Guide
 guide:
-	cd ../../manuals/wavguide; make guide
+	cd ../doc; make wug-book
 
 # `make TAGS':  make an `emacs' TAGS file
 TAGS:		$(HFILES) $(CFILES)
@@ -119,7 +121,7 @@ listing:	wave.hlp news.hlp
 	$(PRINT) README REGCARD $(HFILES) $(CFILES) $(HELPFILES) $(OTHERFILES)
 
 # Dependencies and special rules for compilation of the modules of `wave'
-wave.o:		wave.h wave.c
+wave.o:
 	$(CC) -c $(WCFLAGS) -DHELPDIR=\"$(HELPDIR)\" wave.c
 init.o:		wave.h xvwave.h init.c
 	$(CC) -c $(WCFLAGS) init.c
@@ -143,11 +145,11 @@ sig.o:		wave.h xvwave.h sig.c
 	$(CC) -c $(WCFLAGS) sig.c
 annot.o:	wave.h xvwave.h annot.c
 	$(CC) -c $(WCFLAGS) -DWAVEVERSION=\"$(WAVEVERSION)\" annot.c
-analyze.o:	wave.h xvwave.h analyze.c
+analyze.o:
 	$(CC) -c $(WCFLAGS) -DMENUDIR=\"$(MENUDIR)\" analyze.c
 scope.o:	wave.h xvwave.h scope.c
 	$(CC) -c $(WCFLAGS) scope.c
-xvwave.o:	wave.h xvwave.h bitmaps.h xvwave.c
+xvwave.o:
 	$(CC) -c $(WCFLAGS) -DRESDIR=\"$(RESDIR)\" xvwave.c
 help.o:		help.c
 	$(CC) -c $(WCFLAGS) -w help.c

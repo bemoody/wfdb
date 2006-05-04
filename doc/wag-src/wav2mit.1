@@ -1,6 +1,6 @@
 .TH WAV2MIT 1  "12 February 2003" "WFDB 10.3.2" "WFDB Applications Guide"
 .SH NAME
-wav2mit, mit2wav \- convert between .wav and MIT formats
+wav2mit, mit2wav \- convert between .wav and WFDB-compatible formats
 .SH SYNOPSIS
 \fBwav2mit -i\fR \fIfile\fR\fB.wav\fR [ \fIoptions\fR ... ]
 .br
@@ -8,18 +8,18 @@ wav2mit, mit2wav \- convert between .wav and MIT formats
 .SH DESCRIPTION
 .PP
 These programs convert files in the widely-used \fB.wav\fR audio file
-format into MIT-format files (as used in PhysioBank) and vice versa.
-Most \fB.wav\fR files are already written in an MIT-compatible format,
+format into WFDB format files (as used in PhysioBank) and vice versa.
+Most \fB.wav\fR files are already written in a WFDB-compatible format,
 although the reverse is not true.  (An embedded header is required
-by \fB.wav\fR format, and is allowed but is not usually present in MIT-format
+by \fB.wav\fR format, and is allowed but is not usually present in WFDB-format
 signal files.)
 .PP
-\fBwav2mit\fR creates a WFDB (MIT-format) record from \fIfile\fR\fB.wav\fR.
+\fBwav2mit\fR creates a WFDB record from \fIfile\fR\fB.wav\fR.
 If the input file is written in an MIT-compatible signal file format,
 all that is required in this case is to create a suitable
-MIT-format \fB.hea\fR header file that describes the \fB.wav\fR file's format.
+WFDB-format \fB.hea\fR header file that describes the \fB.wav\fR file's format.
 Some \fB.wav\fR files are written using variants of the format that are not
-compatible with MIT format;  the current version of \fBwav2mit\fR does not
+readable by the WFDB library;  the current version of \fBwav2mit\fR does not
 attempt to convert such files, but warns that they are not compatible.
 Options for \fBwav2mit\fR include:
 .TP
@@ -30,9 +30,9 @@ Print a brief usage summary.
 Create the specified \fIrecord\fR (default: use the base name of the input
 file as the record name).
 .PP
-\fBmit2wav\fR reads the specified MIT-format \fIrecord\fR (header and signal
+\fBmit2wav\fR reads the specified WFDB-format \fIrecord\fR (header and signal
 files) and creates a \fB.wav\fR file containing the same data.  Note that
-much of the data description contained in the MIT-format header file cannot
+much of the data description contained in the WFDB-format header file cannot
 be preserved in the \fB.wav\fR file.  Options for \fBmit2wav\fR include:
 .TP
 \fB-h\fR

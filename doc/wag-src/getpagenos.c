@@ -4,6 +4,11 @@ Extract page numbers for the table of contents for the WFDB Applications Guide
 */
 
 #include <stdio.h>
+#ifndef BSD
+# include <string.h>
+#else           /* for Berkeley UNIX only */
+# include <strings.h>
+#endif
 
 main()
 {

@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody		24 May 2000
-#				Last revised:		19 June 2000
+#				Last revised:		 4 May 2006
 # Change the settings below as appropriate for your setup.
 
 # `make all' creates wavescript and wave-remote without installing them.
@@ -8,7 +8,9 @@ all:	wavescript wave-remote
 # `make install' installs `url_view', `wavescript', and `wave-remote'.  See
 # the WAVE User's Guide for instructions on setting up `wavescript' as a helper
 # application for  your Web browser.
-install:	$(BINDIR) wavescript wave-remote
+install:	$(BINDIR) wave-remote
+	rm -f wavescript
+	$(MAKE) wavescript	# make sure wavescript has the correct BINDIR
 	$(STRIP) wavescript
 	$(STRIP) wave-remote
 	$(SETXPERMISSIONS) url_view wavescript wave-remote

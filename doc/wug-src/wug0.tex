@@ -630,7 +630,10 @@ window (item 1 from the worksheet).
 
 \subsection*{About window managers}
 
-{\small
+{
+\begin{latexonly}
+\small
+\end{latexonly}
 Some window managers require you to place and size windows manually,
 so the terminal window may not appear immediately.  Usually such
 window managers show an outline of the window in place of the mouse
@@ -673,12 +676,15 @@ If you have previous experience with X Window System and Open Look
 user interface applications, much of what you see will be familiar.
 This exercise does not assume that you have any such experience, but
 you may find it helpful to read through an introductory book on the
-Open Look user interface such as Sun's {\it OpenWindows User's Guide},
-or a more general introduction such as O'Reilly's {\it X Window System
-in a Nutshell}.  Please note that, although \WAVE{} uses many Open
+Open Look user interface such as the {\it OpenLook User's Guide},
+available freely from
+(\htmladdnormallink{http://www\-.oreilly\-.com/open\-book/open\-look/}
+{http://www.oreilly.com/openbook/openlook/}).
+Please note that, although \WAVE{} uses many Open
 Look controls, it is not fully Open Look compliant; in particular,
 actions within its signal window (see chapter 2) do not comply with
 Open Look style guidelines.}
+
 \index{Open Look}
 
 \subsection*{If you need to run \WAVE{} remotely}
@@ -724,11 +730,11 @@ available on any \WAVE{} host.  Check that it is available by typing
 \index{rdann command@{\tt rdann} command}
 The output should be
 \begin{verbatim}
-      21596      2       1
-      21597     -2      -5
-      21598     -5      -6
-      21599     -5      -5
-         0:59.508    21423     N     0     0     0
+      21596    982     995
+      21597    978     989
+      21598    975     988
+      21599    975     989
+         0:59.508    21423     N    0    0    0
 \end{verbatim}
 If you do not obtain this output, see your system administrator.
 
@@ -1152,6 +1158,7 @@ specify the beginning and end of a segment of the record, and to
 choose signals.  The {\sf Analyze} window also contains buttons specifying
 various actions that you can apply to the signals.  The separate
 {\sf Analysis Commands} window behaves like an OpenWindows {\tt cmdtool}
+window (a scrollable terminal emulator).  
 \index{cmdtool@{\tt cmdtool}}
 \begin{figure}
 \centerline{\epsfig{file=analysis-commands}}
@@ -1164,7 +1171,7 @@ various actions that you can apply to the signals.  The separate
 \end{latexonly}
 \label{fig:analysis-commands}
 \end{figure}
-window (a scrollable terminal emulator).  Commands may be run in the
+Commands may be run in the
 {\sf Analysis Commands} window either by clicking left on action buttons
 \index{action buttons}
 in the {\sf Analyze} window, or by typing directly into the window (depending
@@ -1678,11 +1685,11 @@ annotated independently, read this section.
 \index{annotation!chan@{\tt chan}}
 \index{signal!number}
 Using the \amenubutton{Show annotations} menu button
-in \WAVE{}'s {\sf View} window, you
+in \WAVE{}'s {\sf View} window,
 \begin{wrapfigure}[6]{l}{6cm}
 \mbox{\epsfig{file=attach-to-signals}}
 \end{wrapfigure}
-may choose to display annotations attached to signals, rather than
+you may choose to display annotations attached to signals, rather than
 in the center of the signal window as is the usual default.  In this case, the
 {\tt chan} field of each annotation specifies the signal number of the signal
 to which it is attached.  If annotation editing is enabled when annotations
@@ -1871,12 +1878,19 @@ text editor use the {\tt EDITOR} environment variable in the same way.
 \index{environment variables!EDITOR}
 \index{textedit command@{\tt textedit} command}
 
-Click left on the \button{Edit menu} button in the {\sf Analyze}
+Click left on the \button{Edit menu} button in the {\sf Analyze} window.
 \begin{wrapfigure}[12]{r}{7.25cm}
 \mbox{\epsfig{file=system-menu}}
 \end{wrapfigure}
-window. Unless your \WAVE{} menu has already been customized, \WAVE{}
-pops up a notice as shown at right.  Click left on \button{Copy} to
+Unless your \WAVE{} menu has already been customized, \WAVE{}
+pops up a notice as shown
+\begin{latexonly}
+at right.
+\end{latexonly}
+\begin{htmlonly}
+above.
+\end{htmlonly}
+Click left on \button{Copy} to
 continue with this exercise.  After a few seconds, the \WAVE{} menu
 file appears (in an OpenWindows {\tt textedit} window as in
 figure~\ref{fig:wave-menu}, unless you have specified a different
@@ -2503,14 +2517,14 @@ and have your web browser open the data specified by the link.
 
 \subsection*{Controlling \WAVE{} from a web browser}
 
-Most web browsers, such as Mozilla or Netscape, can use so-called \emph{helper}
+Most web browsers, such as Firefox or Mozilla, can use so-called \emph{helper}
 or \emph{viewer} applications.  These are external applications that are
 invoked by the browser to present data in formats that (usually) are not
 supported by the browser directly.  For example, browsers often use {\tt
 ghostscript} to display PostScript data.  It is possible to configure Mozilla
 and other web browsers so that \WAVE{} can be used indirectly as a helper
 application.
-\index{Mozilla}\index{Netscape}\index{web browser}
+\index{Mozilla}\index{Firefox}\index{web browser}
 
 By using
 \hyperref{{\tt wavescript}}
@@ -2524,8 +2538,35 @@ is not necessary to start a new \WAVE{} process each time.
 
 You can set up your browser to view files with the MIME type
 {\tt appli\-cation/\-x-wavescript} using {\tt wavescript}.  Some browsers,
-including Mozilla and Netscape, also allow you to specify that any URL with the
-{\tt .xws} suffix should be handled by {\tt wavescript}.
+including Firefox, Mozilla, and Netscape, also allow you to specify that any
+URL with the {\tt .xws} suffix should be handled by {\tt wavescript}.
+
+If you use Firefox, click on any {\tt .xws} link
+\begin{rawhtml}
+(such as <a href="example.xws">this one</a>)
+\end{rawhtml}
+and Firefox will open a dialog box asking what it should do.
+
+\begin{figure}
+\centerline{\epsfig{file=firefox-new-helper}}
+\caption{Adding {\tt wavescript} as a Firefox helper: step 1.}
+\label{fig:firefox-new-helper}
+\end{figure}
+
+Choose ``Open with'', click on ``Browse...'', and choose {\tt wavescript}
+(usually in {\tt /usr/bin}) in the file selection dialog, then check
+``Do this automatically for files like this from now on.''  The dialog
+box will expand to include instructions for modifying your choice.
+
+\begin{figure}
+\centerline{\epsfig{file=firefox-new-helper2}}
+\caption{Adding {\tt wavescript} as a Firefox helper: step 2.}
+\label{fig:firefox-new-helper}
+\end{figure}
+
+Dismiss the dialog by clicking ``OK'', and \WAVE{} should open the
+record specified by the {\tt .xws} file.
+\index{Firefox}
 
 If you use Mozilla, choose {\sf Preferences} from the {\sf Edit} menu,
 then open the {\sf Navigator} category and choose {\sf Helper Applications}.
@@ -2662,14 +2703,16 @@ happens, simply delete any {\tt .xws} files from your browser's cache.
 \index{Galeon}\index{Konqueror}\index{Mozilla}\index{Netscape}\index{Opera}
 \index{web browser}
 
-\WAVE{} uses a web browser to display external data associated with link
-annotations, and to display the on-line version of this guide.  A suitable web
-browser must be installed on the \WAVE{} host in order for this to work.  By
-default, \WAVE{} uses Mozilla (\htmladdnormallink{{\tt
-http://www.mozilla.org/}}{http://www.mozilla.org/}); several other browsers,
-including Galeon, Konqueror, Netscape, and Opera, can also be controlled by
-\WAVE{}.  If you prefer to use one of these rather than Mozilla, set the
-environment variable {\tt URLV} to the name of your browser.
+On Unix and Unix-like platforms such as GNU/Linux, \WAVE{} uses a web
+browser to display external data associated with link annotations, and
+to display the on-line version of this guide.  A suitable web browser
+must be installed on the \WAVE{} host in order for this to work.  By
+default, \WAVE{} uses Firefox (\htmladdnormallink{{\tt
+http://www.mozilla.org/firefox/}}{http://www.mozilla.org/firefox/});
+several other browsers, including Galeon, Konqueror, Mozilla,
+Netscape, and Opera, can also be controlled by \WAVE{}.  If you prefer
+to use one of these rather than Firefox, set the environment variable
+{\tt URLV} to the name of your browser.
 
 \WAVE{} controls the web browser in the same way it controls other
 external programs:  by running commands in the {\sf Analysis Commands}
@@ -2689,21 +2732,21 @@ evaluating {\tt \$URL}.)
 The program {\tt url\_view} is a shell script (normally installed at the
 same time as \WAVE{}, and in the same directory) that handles starting
 the browser if necessary and instructing it to display the specified
-URL.  If {\tt URLV} is not set, or if you have set it to {\tt mozilla},
+URL.  If {\tt URLV} is not set, or if you have set it to {\tt firefox},
 {\tt url\_view} does so using the command:
 \begin{verbatim}
- ( mozilla -remote 'openURL($URL)' || mozilla $URL ) &
+ ( firefox -remote 'openURL($URL)' || firefox $URL ) &
 \end{verbatim}
 \noindent
-In this case, \WAVE{} (via {\tt url\_view}) first uses Mozilla's
-{\tt -remote} option to instruct an already-running copy of Mozilla
-to open the desired URL.  This is a very fast operation if Mozilla is
-already running (since Mozilla is already in RAM, it is not necessary
-to load another in order to run the {\tt mozilla -remote ...}
+In this case, \WAVE{} (via {\tt url\_view}) first uses Firefox's
+{\tt -remote} option to instruct an already-running copy of Firefox
+to open the desired URL.  This is a very fast operation if Firefox is
+already running (since Firefox is already in RAM, it is not necessary
+to load another in order to run the {\tt firefox -remote ...}
 process, and the remote process efficiently delivers its message and
-exits immediately).  If Mozilla was not running, the {\tt
-mozilla -remote} command fails, and (in this case only) {\tt url\_view}
-starts a new Mozilla browser process.
+exits immediately).  If Firefox was not running, the {\tt
+firefox -remote} command fails, and (in this case only) {\tt url\_view}
+starts a new Firefox browser process.
 \index{Mozilla}
 
 The {\tt url\_view} script includes analogous commands for each of the other
@@ -2725,7 +2768,7 @@ to modify the action in the \WAVE{} menu file, be careful not to change the
 {\tt <Open URL>} tag at the beginning of the line, since \WAVE{} uses this tag
 to identify the browser interface command within the menu file.)  Consult the
 documentation for your browser to see what commands will be needed.  (The {\tt
--remote} option is used by Mozilla, Netscape, and Opera;  Galeon and
+-remote} option is used by Firefox, Mozilla, Netscape, and Opera;  Galeon and
 Konqueror use variations on this approach, and other browsers will
 probably require different methods.)  Browsers that do not support any means of
 remote control are best avoided (since the only way to use them is to start a
@@ -4760,34 +4803,22 @@ own printing applications.
 
 \section{Remote access requirements}
 
-\index{network access}\index{modem access}\index{PPP}\index{SLIP}\index{TERM}
-\index{Ethernet}
-In order to use \WAVE{}, you may log onto a \WAVE{} host directly, or you
-may do so remotely using virtually any local system (computer or X
-terminal) connected by TCP/IP-based Ethernet to a \WAVE{} host.  (PPP,
-SLIP, or TERM serial-line connections also work, and may be acceptable
-for viewing data, but even 28.8 Kbaud connections are likely to be
-intolerably slow for extensive annotation editing.)  Thus it is
-possible for several users to access \WAVE{} simultaneously using a
-single \WAVE{} host, provided only that each user's computer or terminal
-runs an X server.  X servers are available for virtually any computer
-in current use, including those running any version of UNIX, as well
-as for MS-DOS and MS-Windows PCs, Macintoshes, Amigas, and DEC VAXen
+\index{network access}\index{modem
+access}\index{PPP}\index{SLIP}\index{TERM} \index{Ethernet} Since any
+recently manufactured PC or Macintosh can act as a \WAVE{} host,
+remote access to \WAVE{} is likely to be of interest mainly to those
+seeking to use older hardware.  For this purpose, virtually any local
+system (computer or X terminal) connected by TCP/IP-based Ethernet to
+a \WAVE{} host can be used.  (PPP, SLIP, or TERM serial-line
+connections also work, and may be acceptable for viewing data, but
+even fast serial connections are likely to be intolerably slow for
+extensive annotation editing.)  Thus it is possible for several users
+to access \WAVE{} simultaneously using a single \WAVE{} host, provided
+only that each user's computer or terminal runs an X server.  Free or
+inexpensive X servers are available for virtually any computer made in
+the last 20 years, including those running any version of UNIX, as well as
+for MS-DOS and MS-Windows PCs, Macintoshes, Amigas, and DEC VAXen
 running VMS.
-
-\index{Linux}\index{X Window System!XFree86 server} For many users
-seeking to add an additional point of access to \WAVE{}, a networked
-PC may be attractive.  With current CPUs and graphics adapters,
-rendering speed is much faster than was available on far more
-expensive workstations only a few years ago.  X server software for
-MS-Windows is freely available as part of Cygwin, and may be a good
-choice if you are heavily invested in Windows-based software.  (For
-less than the cost of a commercial Windows X server, however, you can
-buy a 300 Gb disk drive and install Linux, X.org, and \WAVE{} on it
-with 298 Gb to spare.  Consider this before choosing a commercial X
-server for Windows.)  If costs of maintenance and system administration are a
-concern, an X terminal is probably a better choice than a networked
-PC.
 
 \section{Data}
 \index{MIT-BIH Arrhythmia Database} \index{European ST-T
@@ -4795,7 +4826,7 @@ Database}\index{MIT-BIH Polysomnographic Database} \index{MGH/MF
 Waveform Database} You may find that an existing database of
 digitally recorded signals may be useful for your studies.  PhysioNet, at
 \htmladdnormallink{http://www.physionet.org/,}{http:/www.physionet.org/},
-offers free on-line access to over 30 such databases with thousands of
+offers free on-line access to over 40 such databases with thousands of
 recordings ranging in length from a few seconds to several days.
 These include all or most of the MIT-BIH Arrhythmia Database, the
 European ST-T Database, the MIT-BIH Polysomnographic Database, the
@@ -4900,10 +4931,10 @@ installed.
 \index{WWW}\index{WFDB Software Package}\index{downloading}
 \index{installing \WAVE{}}
 Current sources for \WAVE{}, and precompiled \WAVE{} binaries for
-PCs running Linux and SPARCstations running SunOS and
-Solaris, may be obtained from PhysioNet. Point your Web browser to 
-\htmladdnormallink{{\tt http://www.physionet.org/}}
-{http://www.physionet.org/} for details.
+GNU/Linux or Mac OS X may be obtained from PhysioNet. Point your Web browser
+to
+\htmladdnormallink{{\tt http://www.physionet.org/}}{http://www.physionet.org/}
+for details.
 
 Note that \WAVE{} cannot be run at all until the WFDB library (contained within
 the WFDB Software Package) and the XView libraries ({\tt libxview.so.3} and

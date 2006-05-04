@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:	19 February 2003
+#				Last revised:	   4 May 2006
 # This section of the Makefile should not need to be changed.
 
 # Programs to be compiled.
@@ -18,12 +18,8 @@ install:	$(BINDIR) all scripts
 	../install.sh $(BINDIR) $(XFILES)
 	$(MAKE) clean
 
-# `make scripts': install scripts
+# `make scripts': customize and install scripts
 scripts:
-	cp $(SCRIPTS) $(BINDIR)
-	cd $(BINDIR); $(SETXPERMISSIONS) $(SCRIPTS)
-
-# `make custom-scripts': customize and install scripts
 	sed s+BINDIR+$(BINDIR)+g <hrfft >$(BINDIR)/hrfft
 	sed s+BINDIR+$(BINDIR)+g <hrlomb >$(BINDIR)/hrlomb
 	sed s+BINDIR+$(BINDIR)+g <hrmem >$(BINDIR)/hrmem

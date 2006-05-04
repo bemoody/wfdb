@@ -8,6 +8,12 @@
 	even when the starting time, but not the starting date, has been
 	specified in the input record's .hea file.
 
+	Problems with compiled-in paths in several applications (wfdb-config,
+	wavescript, pschart, and psfd) occurred as a result of Makefile
+	bugs, which have now been fixed.
+
+	Many minor documentation updates.
+
 10.4.1: 
 	A bug caused incorrect output from WFDB library function strtim()
 	when called with the argument "i", following use of setifreq() to

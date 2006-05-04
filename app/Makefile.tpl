@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  23 May 2000
-#				Last revised:	9 September 2005
+#				Last revised:	   4 May 2006
 # This section of the Makefile should not need to be changed.
 
 CFILES = ann2rr.c bxb.c calsig.c ecgeval.c epicmp.c fir.c ihr.c mfilt.c \
@@ -30,6 +30,9 @@ all:	$(XFILES)
 
 # `make' or `make install':  build and install applications, clean up
 install:	all $(BINDIR) $(PSPDIR) scripts
+	rm -f pschart psfd
+	$(MAKE) pschart psfd	# be sure compiled-in paths are up-to-date
+	$(STRIP) pschart psfd
 	$(SETXPERMISSIONS) $(XFILES)
 	../install.sh $(BINDIR) $(XFILES)
 	cp $(PSFILES) $(PSPDIR)
@@ -73,10 +76,10 @@ nst:		nst.c
 	$(CC) $(CFLAGS) nst.c -o $@ $(LDFLAGS) -lm
 plotstm:	plotstm.c
 	$(CC) $(CFLAGS) plotstm.c -o $@
-pschart:	pschart.c
+pschart:
 	$(CC) $(CFLAGS) -DPROLOG=\"$(PSPDIR)/pschart.pro\" pschart.c -o $@ \
           $(LDFLAGS)
-psfd:		psfd.c
+psfd:
 	$(CC) $(CFLAGS) -DPROLOG=\"$(PSPDIR)/psfd.pro\" psfd.c -o $@ $(LDFLAGS)
 sigamp:		sigamp.c
 	$(CC) $(CFLAGS) sigamp.c -o $@ $(LDFLAGS) -lm
