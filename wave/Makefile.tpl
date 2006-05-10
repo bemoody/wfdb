@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	31 May 2000
-#				Last revised: 2 December 2005
+#				Last revised:    8 May 2006
 # Change the settings below as appropriate for your setup.
 
 # Choose directories in which to install WAVE and its ancillary files by
@@ -41,7 +41,7 @@ HELPFILES = analysis.hlp buttons.hlp editing.hlp intro.hlp log.hlp news.hlp \
  printing.hlp resource.hlp
 OTHERFILES = wave.hl0 wave.info demo.txt Wave.res wavemenu.def Makefile
 
-all:	wave
+all:	wave wave.hlp news.hlp
 
 # `make install':  compile and install WAVE and its help files
 install:  $(BINDIR) $(HELPDIR)/wave $(MENUDIR) $(RESDIR) wave.hlp news.hlp
@@ -53,7 +53,6 @@ install:  $(BINDIR) $(HELPDIR)/wave $(MENUDIR) $(RESDIR) wave.hlp news.hlp
 	-cp wavemenu.def $(MENUDIR) && \
 	 $(SETPERMISSIONS) $(MENUDIR)/wavemenu.def
 	-cp Wave.res $(RESDIR)/Wave && $(SETPERMISSIONS) $(RESDIR)/Wave
-	$(MAKE) clean
 
 uninstall:
 	../uninstall.sh $(BINDIR) wave
@@ -72,7 +71,7 @@ wave:		$(OFILES)
 help:
 	@echo "*************************************************************"
 	@echo "To print the WAVE manual, type 'make manual'."
-	@echo "If you have a PostScript Printer, you may also wish to print"
+	@echo "If you have a PostScript printer, you may also wish to print"
 	@echo "the WAVE User's Guide, by typing 'make guide'."
 	@echo "*************************************************************"
 	@echo
@@ -83,7 +82,7 @@ help:
 	@echo
 	@echo "*************************************************************"
 	@echo "To print the WAVE manual, type 'make manual'."
-	@echo "If you have a PostScript Printer, you may also wish to print"
+	@echo "If you have a PostScript printer, you may also wish to print"
 	@echo "the WAVE User's Guide, by typing 'make guide'."
 	@echo "*************************************************************"
 

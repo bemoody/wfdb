@@ -18,11 +18,10 @@ MFILES = Makefile Makefile.dos
 all:	$(XFILES)
 	$(STRIP) $(XFILES)
 
-# `make' or `make install':  build and install applications, clean up
+# `make' or `make install':  build and install applications
 install:	$(BINDIR) all $(SCRIPTS)
 	$(SETXPERMISSIONS) $(XFILES) $(SCRIPTS)
 	../install.sh $(BINDIR) $(XFILES) $(SCRIPTS)
-	$(MAKE) clean
 
 uninstall:
 	../uninstall.sh $(BINDIR) $(XFILES) $(SCRIPTS)

@@ -12,11 +12,10 @@ SCRIPTS = hrfft hrlomb hrmem hrplot plot2d plot3d
 all:	$(XFILES)
 	$(STRIP) $(XFILES)
 
-# `make' or `make install':  build and install applications, clean up
+# `make' or `make install':  build and install applications
 install:	$(BINDIR) all scripts
 	$(SETXPERMISSIONS) $(XFILES)
 	../install.sh $(BINDIR) $(XFILES)
-	$(MAKE) clean
 
 # `make scripts': customize and install scripts
 scripts:

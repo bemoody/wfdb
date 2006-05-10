@@ -386,12 +386,11 @@ sed "s/WFDB_NETFILES 1/WFDB_NETFILES $NETFILES/" < ../lib/wfdb.h0 | \
 if [ $LIBTYPE = "static" -a $NETLIB != "none" ]
     then
     LL = "$LL $LL $LL"
+    sed "s/LC =/LC = $LC/" <site.def | sed "s/LL =/LL = $LL/" >site.tmp
+    mv site.tmp site.def
 fi
 sed "s/LC =/LC = $LC/" <site-slib.def | sed "s/LL =/LL = $LL/" >site.tmp
 mv site.tmp site-slib.def
-sed "s/LC =/LC = $LC/" <site.def | sed "s/LL =/LL = $LL/" >site.tmp
-mv site.tmp site.def
-
 
 cd ..
 echo

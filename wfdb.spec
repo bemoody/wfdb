@@ -1,13 +1,12 @@
 # Note that this is NOT a relocatable package
 
-Summary: Waveform Database library
+Summary: Waveform Database Software Package
 Name: wfdb
 Version: VERSION
 Release: RPMRELEASE
 License: GPL
 Group: Libraries
-Source0: http://www.physionet.org/physiotools/archives/wfdb-VERSION.tar.gz
-Source1: http://www.physionet.org/physiotools/archives/wfdb-MAJOR.MINOR/wfdb-VERSION.tar.gz
+Source: http://www.physionet.org/physiotools/archives/wfdb-VERSION.tar.gz
 URL: http://www.physionet.org/physiotools/wfdb.shtml
 Vendor: PhysioNet
 Packager: George Moody <george@mit.edu>
@@ -16,6 +15,9 @@ Requires: curl-devel >= 7.10
 BuildRoot: /var/tmp/%{name}-root
 
 %changelog
+* Wed May 10 2006 George B Moody <george@mit.edu>
+- rewrote install section to solve problems with compiled-in paths
+
 * Wed Aug 3 2005 George B Moody <george@mit.edu>
 - added --dynamic to 'configure' argument list
 
@@ -40,32 +42,47 @@ BuildRoot: /var/tmp/%{name}-root
 %setup
 
 %build
-PATH=$PATH:/usr/openwin/bin ./configure --prefix=/usr --dynamic --mandir=%{_mandir}
-make
-
-# The 'make' command above actually *installs* the WFDB library and its *.h
-# files in /usr/lib and /usr/include/wfdb/, because it is not possible
-# otherwise to compile the apps and link them to the shared WFDB library.  As
-# far as I can tell, there is no way to avoid this given the way RPM works.
-
 # The 'make' commands below create HTML, PDF, and PostScript versions of the
 # WFDB Programmer's Guide, WFDB Applications Guide, and WAVE User's Guide.
+make clean
+PATH=$PATH:/usr/openwin/bin ./configure --prefix=/usr --dynamic --mandir=%{_mandir}
 cd doc/wpg-src; make
 cd ../wag-src; make
 cd ../wug-src; make
 
 %install
 rm -rf $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT/usr/lib $RPM_BUILD_ROOT/usr/include/wfdb
-mkdir -p $RPM_BUILD_ROOT/usr/bin
-cd lib; cp -p libwfdb.so* $RPM_BUILD_ROOT/usr/lib
-    cp -p wfdb.h ecgcodes.h ecgmap.h wfdblib.h $RPM_BUILD_ROOT/usr/include/wfdb
-    cp -p wfdb-config $RPM_BUILD_ROOT/usr/bin
-cd ../wave; make WFDBROOT=$RPM_BUILD_ROOT/usr install
-cd ../waverc; make WFDBROOT=$RPM_BUILD_ROOT/usr install
-cd ../app; make WFDBROOT=$RPM_BUILD_ROOT/usr install
-cd ../psd; make WFDBROOT=$RPM_BUILD_ROOT/usr install
-cd ../convert; make WFDBROOT=$RPM_BUILD_ROOT/usr install
+mkdir -p $RPM_BUILD_ROOT/usr/bin $RPM_BUILD_ROOT/usr/help
+mkdir -p $RPM_BUILD_ROOT/usr/lib/ps $RPM_BUILD_ROOT/usr/include/wfdb
+mkdir -p $RPM_BUILD_ROOT/usr/lib/X11/app-defaults
+make install
+cd lib
+ cp -p libwfdb.so* $RPM_BUILD_ROOT/usr/lib
+ cp -p wfdb.h ecgcodes.h ecgmap.h wfdblib.h $RPM_BUILD_ROOT/usr/include/wfdb
+ cp -p wfdb-config $RPM_BUILD_ROOT/usr/bin
+cd ../wave
+ cp -p wave $RPM_BUILD_ROOT/usr/bin
+ cp -p *.hlp wave.info demo.txt $RPM_BUILD_ROOT/usr/help
+ cp -p wavemenu.def $RPM_BUILD_ROOT/usr/lib
+ cp -p Wave.res $RPM_BUILD_ROOT/usr/lib/X11/app-defaults/Wave
+cd ../waverc;
+ cp -p wavescript wave-remote url_view $RPM_BUILD_ROOT/usr/bin
+cd ../app;
+ cp -p ann2rr bxb calsig ecgeval epicmp fir ihr mfilt \
+  mrgann mxm nguess nst plotstm pscgen pschart psfd rdann \
+  rdsamp rr2ann rxr sampfreq sigamp sigavg skewedit \
+  snip sortann sqrs sqrs125 sumann sumstats tach time2sec \
+  wabp wfdbcat wfdbcollate wfdbdesc wfdbwhich wqrs \
+  wrann wrsamp xform $RPM_BUILD_ROOT/usr/bin
+ make scripts; cp -p /usr/bin/setwfdb /usr/bin/cshsetwfdb $RPM_BUILD_ROOT/usr/bin
+ cp -p *.pro $RPM_BUILD_ROOT/usr/lib/ps
+cd ../psd;
+ cp -p coherence fft log10 lomb memse $RPM_BUILD_ROOT/usr/bin
+ make scripts; cp -p /usr/bin/hrfft /usr/bin/hrlomb /usr/bin/hrmem \
+  /usr/bin/hrplot /usr/bin/plot2d /usr/bin/plot3d $RPM_BUILD_ROOT/usr/bin
+cd ../convert;
+ cp -p a2m ad2m m2a md2a readid makeid edf2mit mit2edf wav2mit mit2wav \
+  revise ahaconvert $RPM_BUILD_ROOT/usr/bin
 cd ../data; make WFDBROOT=$RPM_BUILD_ROOT/usr install
 cd ../doc; make WFDBROOT=$RPM_BUILD_ROOT/usr install
 
@@ -74,10 +91,12 @@ rm -rf $RPM_BUILD_ROOT
 make clean
 
 %post
-/sbin/ldconfig
-test -e /usr/lib/libwfdb.so.10 -a ! -e /usr/lib/libwfdb.so && ln -sf /usr/lib/libwfdb.so.10 /usr/lib/libwfdb.so
+/sbin/ldconfig || \
+ ( test -e /usr/lib/libwfdb.so.10 -a ! -e /usr/lib/libwfdb.so && \
+   ln -sf /usr/lib/libwfdb.so.10 /usr/lib/libwfdb.so )
 
-%postun -p /sbin/ldconfig
+%postun
+/sbin/ldconfig || true
 
 # ---- wfdb [shared library] package ------------------------------------------
 

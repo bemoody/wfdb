@@ -1,3 +1,6 @@
+10.4.3: Updated wfdb.spec (used to generate WFDB RPMs) to account for
+	applications with compiled-in paths.
+
 10.4.2:
 	Mathias Gruber reported a line in wfdbio.c that used void pointer
 	arithmetic (permitted as an extension by gcc but not allowed by

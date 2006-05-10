@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  23 May 2000
-#				Last revised:	   4 May 2006
+#				Last revised:	   5 May 2006
 # This section of the Makefile should not need to be changed.
 
 CFILES = ann2rr.c bxb.c calsig.c ecgeval.c epicmp.c fir.c ihr.c mfilt.c \
@@ -28,16 +28,15 @@ MFILES = Makefile
 all:	$(XFILES)
 	$(STRIP) $(XFILES)
 
-# `make' or `make install':  build and install applications, clean up
+# `make' or `make install':  build and install applications
 install:	all $(BINDIR) $(PSPDIR) scripts
-	rm -f pschart psfd
+	rm -f pschart psfd pschart.exe psfd.exe
 	$(MAKE) pschart psfd	# be sure compiled-in paths are up-to-date
 	$(STRIP) pschart psfd
 	$(SETXPERMISSIONS) $(XFILES)
 	../install.sh $(BINDIR) $(XFILES)
 	cp $(PSFILES) $(PSPDIR)
 	cd $(PSPDIR); $(SETPERMISSIONS) $(PSFILES)
-	$(MAKE) clean
 
 # `make scripts': install customized scripts for setting WFDB path
 scripts:

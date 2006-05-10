@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:      4 May 2006
+#				Last revised:      5 May 2006
 # This section of the Makefile should not need to be changed.
 
 INCLUDES = $(INCDIR)/wfdb/wfdb.h $(INCDIR)/wfdb/ecgcodes.h \
@@ -11,7 +11,7 @@ MFILES = Makefile Makefile.dos
 
 # `make' or `make all':  build the WFDB library and wfdb-config
 all:	setup $(OFILES)
-	rm -f wfdb-config
+	rm -f wfdb-config wfdb-config.exe
 	$(MAKE) wfdb-config	# be sure that compiled-in paths are up-to-date
 	$(BUILDLIB) $(OFILES) $(BUILDLIB_LDFLAGS)
 
@@ -35,8 +35,8 @@ setup:
 	sed "s+DBDIR+$(DBDIR)+" <wfdblib.h0 >wfdblib.h
 
 wfdb-config:
-	$(CC) $(CFLAGS) -DVERSION='"$(VERSION)"' -DCFLAGS='"$(CFLAGS)"' \
-	  -DLDFLAGS='"$(LDFLAGS)"' -I$(INCDIR) -o $@ wfdb-config.c
+	$(CC) $(CFLAGS) -DVERSION='"$(VERSION)"' -DCFLAGS='"-I$(INCDIR)"' \
+	  -DLDFLAGS='"-L$(LIBDIR) -lwfdb"' -I$(INCDIR) -o $@ wfdb-config.c
 
 # `make clean':  also remove previously compiled versions of the library
 clean:
