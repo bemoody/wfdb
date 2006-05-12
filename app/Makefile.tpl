@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  23 May 2000
-#				Last revised:	   5 May 2006
+#				Last revised:	  11 May 2006
 # This section of the Makefile should not need to be changed.
 
 CFILES = ann2rr.c bxb.c calsig.c ecgeval.c epicmp.c fir.c ihr.c mfilt.c \
@@ -37,6 +37,11 @@ install:	all $(BINDIR) $(PSPDIR) scripts
 	../install.sh $(BINDIR) $(XFILES)
 	cp $(PSFILES) $(PSPDIR)
 	cd $(PSPDIR); $(SETPERMISSIONS) $(PSFILES)
+
+# 'make collect': retrieve the installed applications
+collect:
+	../conf/collect.sh $(BINDIR) $(XFILES) $(SCRIPTS)
+	../conf/collect.sh $(PSPDIR) $(PSFILES)
 
 # `make scripts': install customized scripts for setting WFDB path
 scripts:

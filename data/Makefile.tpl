@@ -16,6 +16,12 @@ install:	$(DBDIR) $(DBDIR)/pipe $(DBDIR)/tape
 	-cd $(DBDIR)/pipe; $(SETPERMISSIONS) *
 	-cd $(DBDIR)/tape; $(SETPERMISSIONS) *
 
+# 'make collect': retrieve the installed files
+collect:
+	../conf/collect.sh $(DBDIR) $(DBFILES) wfdbcal dbcal
+	cd pipe; ../../conf/collect.sh $(DBDIR)/pipe *
+	cd tape; ../../conf/collect.sh $(DBDIR)/tape *
+	
 uninstall:
 	../uninstall.sh $(DBDIR) $(DBFILES) dbcal
 

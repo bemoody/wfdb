@@ -1,5 +1,5 @@
 /* file: xvwave.c	G. Moody	27 April 1990
-			Last revised:	30 August 2005
+			Last revised:	 12 May 2006
 XView support functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -291,6 +291,7 @@ Notify_signal_mode when;
     char buf[80], new_annotator[30], new_time[30], new_record[70],
 	new_siglist[70];
     FILE *sfile;
+    extern void wfdb_addtopath();
 
     sfile = fopen(sentinel, "r");
     new_annotator[0] = new_time[0] = new_record[0] = new_siglist[0] = '\0';
@@ -306,6 +307,9 @@ Notify_signal_mode when;
 	      new_time[sizeof(new_time)-1] = '\0';
 	      strncpy(new_time, buf+3, sizeof(new_time)-1);
 	      new_time[strlen(new_time)-1] = '\0';
+	      break;
+	  case 'p':	/* add path to WFDB path variable */
+	      wfdb_addtopath(buf+3);
 	      break;
 	  case 'r':	/* (re)open record */
 	      new_record[sizeof(new_record)-1] = '\0';

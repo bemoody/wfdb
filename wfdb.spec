@@ -15,6 +15,9 @@ Requires: curl-devel >= 7.10
 BuildRoot: /var/tmp/%{name}-root
 
 %changelog
+* Wed May 11 2006 George B Moody <george@mit.edu>
+- better solution for problems with compiled-in paths
+
 * Wed May 10 2006 George B Moody <george@mit.edu>
 - rewrote install section to solve problems with compiled-in paths
 
@@ -52,39 +55,9 @@ cd ../wug-src; make
 
 %install
 rm -rf $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT/usr/bin $RPM_BUILD_ROOT/usr/help
-mkdir -p $RPM_BUILD_ROOT/usr/lib/ps $RPM_BUILD_ROOT/usr/include/wfdb
-mkdir -p $RPM_BUILD_ROOT/usr/lib/X11/app-defaults
 make install
-cd lib
- cp -p libwfdb.so* $RPM_BUILD_ROOT/usr/lib
- cp -p wfdb.h ecgcodes.h ecgmap.h wfdblib.h $RPM_BUILD_ROOT/usr/include/wfdb
- cp -p wfdb-config $RPM_BUILD_ROOT/usr/bin
-cd ../wave
- cp -p wave $RPM_BUILD_ROOT/usr/bin
- cp -p *.hlp wave.info demo.txt $RPM_BUILD_ROOT/usr/help
- cp -p wavemenu.def $RPM_BUILD_ROOT/usr/lib
- cp -p Wave.res $RPM_BUILD_ROOT/usr/lib/X11/app-defaults/Wave
-cd ../waverc;
- cp -p wavescript wave-remote url_view $RPM_BUILD_ROOT/usr/bin
-cd ../app;
- cp -p ann2rr bxb calsig ecgeval epicmp fir ihr mfilt \
-  mrgann mxm nguess nst plotstm pscgen pschart psfd rdann \
-  rdsamp rr2ann rxr sampfreq sigamp sigavg skewedit \
-  snip sortann sqrs sqrs125 sumann sumstats tach time2sec \
-  wabp wfdbcat wfdbcollate wfdbdesc wfdbwhich wqrs \
-  wrann wrsamp xform $RPM_BUILD_ROOT/usr/bin
- make scripts; cp -p /usr/bin/setwfdb /usr/bin/cshsetwfdb $RPM_BUILD_ROOT/usr/bin
- cp -p *.pro $RPM_BUILD_ROOT/usr/lib/ps
-cd ../psd;
- cp -p coherence fft log10 lomb memse $RPM_BUILD_ROOT/usr/bin
- make scripts; cp -p /usr/bin/hrfft /usr/bin/hrlomb /usr/bin/hrmem \
-  /usr/bin/hrplot /usr/bin/plot2d /usr/bin/plot3d $RPM_BUILD_ROOT/usr/bin
-cd ../convert;
- cp -p a2m ad2m m2a md2a readid makeid edf2mit mit2edf wav2mit mit2wav \
-  revise ahaconvert $RPM_BUILD_ROOT/usr/bin
-cd ../data; make WFDBROOT=$RPM_BUILD_ROOT/usr install
-cd ../doc; make WFDBROOT=$RPM_BUILD_ROOT/usr install
+make collect
+cd /tmp/wfdb; cp -pr . $RPM_BUILD_ROOT
 
 %clean
 rm -rf $RPM_BUILD_ROOT

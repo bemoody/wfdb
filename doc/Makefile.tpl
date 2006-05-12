@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:     4 May 2006
+#				Last revised:    11 May 2006
 # Change the settings below as appropriate for your setup.
 
 # Set COLORS to 'color' if you have a color printer and would like to print
@@ -107,6 +107,9 @@ all:
 
 install:
 	cd wag-src; $(MAKE) wag.man
+
+collect:
+	cd wag-src; $(MAKE) collect
 
 uninstall:
 	cd wag-src; $(MAKE) uninstall

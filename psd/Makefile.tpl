@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:	   4 May 2006
+#				Last revised:	  11 May 2006
 # This section of the Makefile should not need to be changed.
 
 # Programs to be compiled.
@@ -16,6 +16,10 @@ all:	$(XFILES)
 install:	$(BINDIR) all scripts
 	$(SETXPERMISSIONS) $(XFILES)
 	../install.sh $(BINDIR) $(XFILES)
+
+# 'make collect': retrieve the installed applications
+collect:
+	../conf/collect.sh $(BINDIR) $(XFILES) $(SCRIPTS)
 
 # `make scripts': customize and install scripts
 scripts:

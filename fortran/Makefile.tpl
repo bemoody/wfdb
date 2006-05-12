@@ -18,6 +18,9 @@ install:
 	../install.sh $(INCDIR)/wfdb wfdbf.c
 	$(SETPERMISSIONS) $(INCDIR)/wfdb/wfdbf.c
 
+collect:
+	../conf/collect.sh $(INCDIR)/wfdb wfdbf.c
+
 uninstall:
 	../uninstall.sh $(INCDIR)/wfdb wfdbf.c
 

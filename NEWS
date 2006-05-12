@@ -1,3 +1,7 @@
+10.4.4: Added 'collect.sh' script to 'conf', and 'collect' target to
+        'make' template files (Makefile.tpl) to simplify creation of
+        binary tarballs and RPMs.
+
 10.4.3: Updated wfdb.spec (used to generate WFDB RPMs) to account for
 	applications with compiled-in paths.
 

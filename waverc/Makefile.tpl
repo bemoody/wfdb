@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody		24 May 2000
-#				Last revised:		 5 May 2006
+#				Last revised:		11 May 2006
 # Change the settings below as appropriate for your setup.
 
 # `make all' creates wavescript and wave-remote without installing them.
@@ -14,6 +14,10 @@ install:	$(BINDIR) wave-remote
 	$(STRIP) wavescript wave-remote
 	$(SETXPERMISSIONS) url_view wavescript wave-remote
 	../install.sh $(BINDIR) url_view wavescript wave-remote
+
+# 'make collect': retrieve the installed applications
+collect:
+	../conf/collect.sh $(BINDIR) url_view wavescript wave-remote
 
 uninstall:
 	../uninstall.sh $(BINDIR) url_view wavescript wave-remote

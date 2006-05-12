@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:     4 May 2006
+#				Last revised:    11 May 2006
 # This section of the Makefile should not need to be changed.
 
 # 'make' or 'make all': compile the WFDB applications without installing them
@@ -17,6 +17,18 @@ install:	config.cache
 	-( cd wave;  $(MAKE) install )
 	cd waverc;   $(MAKE) install
 	test -d doc && ( cd doc; $(MAKE) install )
+
+# 'make collect': collect the installed files into /tmp/wfdb/
+collect:
+	cd lib;	     $(MAKE) collect
+	cd app;      $(MAKE) collect
+	cd convert;  $(MAKE) collect
+	cd data;     $(MAKE) collect
+	cd fortran;  $(MAKE) collect
+	cd psd;      $(MAKE) collect
+	-( cd wave;  $(MAKE) collect )
+	cd waverc;   $(MAKE) collect
+	test -d doc && ( cd doc; $(MAKE) collect )
 
 uninstall:	config.cache
 	cd app;      $(MAKE) uninstall
@@ -115,11 +127,14 @@ tarballs:	clean
 
 # 'make bin-tarball': make a gzipped tar archive of the WFDB software package
 # binaries and other installed files
-bin-tarball:	test-install
+bin-tarball:	install collect
 	cp conf/archname /tmp; chmod +x /tmp/archname
-	cd $(HOME); mv wfdb-test $(PACKAGE)-`/tmp/archname`
-	cd $(HOME); tar cfvz $(PACKAGE)-`/tmp/archname`.tar.gz \
+	rm -rf /tmp/$(PACKAGE)-`/tmp/archname`
+	mv /tmp/wfdb /tmp/$(PACKAGE)-`/tmp/archname`
+	cd /tmp; tar cfvz $(PACKAGE)-`/tmp/archname`.tar.gz \
 	 $(PACKAGE)-`/tmp/archname`
+	mv /tmp/$(PACKAGE)-`/tmp/archname`.tar.gz ..
+	rm -rf /tmp/$(PACKAGE)-`/tmp/archname`
 	rm -f /tmp/archname
 
 # 'make doc-tarball': make a gzipped tar archive of formatted documents

@@ -474,7 +474,7 @@ USA
 
 @end display
 
-@iftex
+@ifnotinfo
 @cindex Emacs Info
 @cindex GNU emacs
 @cindex Info (GNU emacs)
@@ -485,19 +485,20 @@ copy code from the examples into your own programs.  Installation
 instructions are included in the WFDB Software Package; type @kbd{C-h i}
 within GNU @code{emacs} to start up @code{info} (@pxref{Sources}, for
 information about obtaining GNU @code{emacs}).
-@end iftex
+@end ifnotinfo
 
+@ifnothtml
 An HTML version of this guide, suitable for viewing using any web browser,
 is included with the WFDB Software Package.  The latest version may always be
 viewed at @uref{http://@-www.@-physio@-net.@-org/@-physio@-tools/@-wpg/} using your web
 browser.
+@end ifnothtml
 
-@ifinfo
 You can format and print copies of this guide using TeX if you have it (see
 @file{makefile} in the @file{doc} directory of the library distribution for
 instructions on doing so).  You may obtain preformatted versions in PDF and
 PostScript formats from @uref{http://www.physionet.org/}.
-@end ifinfo
+
 
 @node     Recent changes, Usage, Overview, Top
 @comment  node-name,  next,  previous,  up
@@ -1092,12 +1093,15 @@ wfdbquit();
 
 @noindent
 just above @code{exit(0);}
-@iftex
+@ifhtml
 (@pxref{wfdbquit, , @code{wfdbquit}}).
-@end iftex
+@end ifhtml
 @ifinfo
 (@pxref{wfdbquit}).
 @end ifinfo
+@iftex
+(@pxref{wfdbquit, , @code{wfdbquit}}).
+@end iftex
 
 @node     compiling, other languages, print samples, Usage
 @comment  node-name,  next,  previous,  up
@@ -1764,22 +1768,28 @@ With few exceptions, WFDB library functions return integers that indicate
 success or failure.  The tables that follow the function prototypes
 list the possible returns and their meanings.  By convention, a
 return code of
-@iftex
-@minus{}1
-@end iftex
+@ifhtml
+-1
+@end ifhtml
 @ifinfo
 -1
 @end ifinfo
+@iftex
+@minus{}1
+@end iftex
 indicates end-of-file on input files, and no
 error message is printed.  Other negative return codes signify other
 types of errors, and are usually accompanied by descriptive messages on
 the standard error output (but
-@iftex
+@ifhtml
 @pxref{wfdbquiet and wfdbverbose, , @code{wfdbquiet} and @code{wfdbverbose}}).
-@end iftex
+@end ifhtml
 @ifinfo
 @pxref{wfdbquiet and wfdbverbose}).
 @end ifinfo
+@iftex
+@pxref{wfdbquiet and wfdbverbose, , @code{wfdbquiet} and @code{wfdbverbose}}).
+@end iftex
 Zero may indicate success or failure, depending on context (see the
 descriptions of the individual functions below).  Positive codes
 (returned by only a few functions) always indicate success.
@@ -1853,9 +1863,9 @@ remainder of @var{record} after discarding the @samp{+}.  Otherwise,
 @code{annopen} closes any previously opened annotation files, and takes
 all of @var{record} as the record name.  @var{aiarray} is a pointer to
 an array of @code{WFDB_Anninfo} structures
-@iftex
+@ifnotinfo
 (@pxref{WFDB_Anninfo structures, , Annotator Information Structures}),
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{WFDB_Anninfo structures}),
 @end ifinfo
@@ -1885,9 +1895,9 @@ attempts to open three annotation files for record @file{100s}.
 Annotator @file{a} becomes input annotator 0, @file{b} becomes output
 annotator 0, and @file{c} becomes input annotator 1.  Thus
 @code{getann(1, &annot)}
-@iftex
+@ifnotinfo
 (@pxref{getann, , @code{getann}})
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{getann})
 @end ifinfo
@@ -1941,9 +1951,9 @@ closes any previously opened input signal files, and takes all of
 @code{isigopen} reads the standard input rather than a @file{hea}
 file.  @var{Siarray} is a pointer to an array of @code{WFDB_Siginfo}
 structures
-@iftex
+@ifnotinfo
 (@pxref{WFDB_Siginfo structures, , Signal Information Structures}),
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{WFDB_Siginfo structures}),
 @end ifinfo
@@ -2018,9 +2028,9 @@ consequence, @code{isigopen} fails if @var{nsig} is less than the
 total number of signals in such cases.)  If necessary, the caller can
 inspect the file names and signal descriptions in @var{siarray} to
 determine which signals were opened; 
-@iftex
+@ifnotinfo
 @pxref{WFDB_Siginfo structures, , Signal Information Structures}.
-@end iftex
+@end ifnotinfo
 @ifinfo
 @pxref{WFDB_Siginfo structures}.
 @end ifinfo
@@ -2029,9 +2039,9 @@ illustrate the use of @code{isigopen}; for example, @pxref{Example
 5}.
 
 If @var{nsig} is less than 0, @code{isigopen} fills in up to
-@iftex
+@ifnotinfo
 @minus{}@var{nsig}
-@end iftex
+@end ifnotinfo
 @ifinfo
 -@var{nsig}
 @end ifinfo
@@ -2143,9 +2153,9 @@ the caller to @code{osigfopen}, rather than read from a header
 file as in @code{osigopen}.  Any previously open output signals are
 closed by @code{osigfopen}.  @var{siarray} is a pointer to an array of
 @code{WFDB_Siginfo} structures
-@iftex
+@ifnotinfo
 (@pxref{WFDB_Siginfo structures, , Signal Information Structures}),
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{WFDB_Siginfo structures}),
 @end ifinfo
@@ -2196,9 +2206,9 @@ Failure: unable to open input annotation file
 Failure: unable to open output annotation file
 @item @t{-5}
 Failure: illegal @code{stat} (in @var{aiarray}) specified for annotation file
-@iftex
+@ifnotinfo
 (@pxref{WFDB_Anninfo structures, , Annotator Information Structures})
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{WFDB_Anninfo structures})
 @end ifinfo
@@ -2224,9 +2234,9 @@ if (n == 0)
 
 @noindent
 @xref{Example 9}, for an illustration of the use of @code{wfdbinit}.
-@iftex
+@ifnotinfo
 @xref{osigopen, , @code{osigopen}}, and @pxref{osigfopen, , @code{osigfopen}},
-@end iftex
+@end ifnotinfo
 @ifinfo
 @xref{osigopen}, and @pxref{osigfopen},
 @end ifinfo
@@ -2558,9 +2568,9 @@ The caller should allocate storage for an array of @code{WFDB_Sample}s
 @var{vector} must be determined by summing the values of the @code{spf}
 (samples per frame) fields in the @code{WFDB_Siginfo} structures associated
 with the input signals
-@iftex
+@ifnotinfo
 (@pxref{isigopen, , @code{isigopen}}).
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{isigopen}).
 @end ifinfo
@@ -2596,9 +2606,9 @@ to @code{putvec}.  (The length of the array must be no less than the number of
 output signals, as given to @code{osigfopen} or @code{osigopen}.)  On entry,
 @var{vector[i]} contains the next sample from signal @var{i}.  For example,
 this modified version of the previous example
-@iftex
+@ifnotinfo
 (@pxref{getvec, , @code{getvec}})
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{getvec})
 @end ifinfo
@@ -2636,9 +2646,9 @@ for a copy of this program.)
 
 All programs that write signals or annotations @emph{must} invoke
 @code{wfdbquit} to close the output files properly
-@iftex
+@ifnotinfo
 (@pxref{wfdbquit, , @code{wfdbquit}}).
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{wfdbquit}).
 @end ifinfo
@@ -2676,9 +2686,9 @@ Failure: unexpected physical end of file
 @noindent
 This function reads the next annotation from the input annotator
 specified by @var{an} into the annotation structure
-@iftex
+@ifnotinfo
 (@pxref{WFDB_Annotation structures, , Annotation Structures})
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{WFDB_Annotation structures})
 @end ifinfo
@@ -2709,18 +2719,18 @@ main()
 (See @uref{http://www.physionet.org/physiotools/wfdb/examples/exgetann.c}
 for a copy of this program.)
 
-@iftex
+@ifnotinfo
 @xref{WFDB_Anninfo structures, , Annotator Information Structures},
-@end iftex
+@end ifnotinfo
 @ifinfo
 @xref{WFDB_Anninfo structures},
 @end ifinfo
 for information on the contents of the @code{WFDB_Anninfo} structure,
 and
-@iftex
+@ifnotinfo
 @pxref{timstr and strtim, , @code{mstimstr}}, and
 @pxref{annstr and strann, , @code{annstr}},
-@end iftex
+@end ifnotinfo
 @ifinfo
 @pxref{timstr and strtim}, and @pxref{annstr and strann},
 @end ifinfo
@@ -2790,9 +2800,9 @@ Earlier versions require that annotations be supplied to @code{putann} in
 canonical order, and return an error code of @t{-3} if an out-of-order
 annotation is supplied.  All programs that write signals or annotations
 @emph{must} invoke @code{wfdbquit} to close the output files properly
-@iftex
+@ifnotinfo
 (@pxref{wfdbquit, , @code{wfdbquit}}).
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{wfdbquit}).
 @end ifinfo
@@ -2842,9 +2852,9 @@ samples returned from @code{getvec} will be those with sample number
 |@var{t}|.  Only the magnitude of @var{t} is significant, not its sign;
 hence values returned by @code{strtim} can always be used safely as
 arguments to @code{isigsettime}
-@iftex
+@ifnotinfo
 (@pxref{timstr and strtim, , @code{timstr} and @code{strtim}}).
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{timstr and strtim}).
 @end ifinfo
@@ -2906,9 +2916,9 @@ the first occurring on or after sample number |@var{t}| in that file.
 Only the magnitude of @var{t} is significant, not its sign; hence values
 returned by @code{strtim} can always be used safely as arguments to
 @code{iannsettime}
-@iftex
+@ifnotinfo
 (@pxref{timstr and strtim, , @code{timstr} and @code{strtim}}).
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{timstr and strtim}).
 @end ifinfo
@@ -3025,9 +3035,9 @@ surrounded by brackets (e.g., @samp{[55]}); @code{anndesc} returns @code{NULL}
 in such cases.  The strings returned by @code{annstr} are mnemonics
 (usually only one character), which may be modified either by @code{setannstr}
 or by the presence of @dfn{modification labels} in an input annotation file
-@iftex
+@ifnotinfo
 (@pxref{annstr and strann, , @code{setannstr}}).
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{annstr and strann}).
 @end ifinfo
@@ -3155,9 +3165,9 @@ before the output annotation files are opened.
 
 By passing a negative value as @var{code} to @code{setannstr} or
 @code{setanndesc}, the translation for
-@iftex
+@ifnotinfo
 @minus{}@var{code}
-@end iftex
+@end ifnotinfo
 @ifinfo
 -@var{code}
 @end ifinfo
@@ -3177,9 +3187,9 @@ library version 5.3.)
 <!-- link: strtim.htm -->
 @end html
 
-@iftex
+@ifnotinfo
 @sp 2
-@end iftex
+@end ifnotinfo
 
 The next three functions convert between ``standard time format''
 strings and times in units of sample intervals.  Normally they should be
@@ -3222,9 +3232,9 @@ format by @code{timstr}, or to @var{HH:MM:SS.SSS} format by
 time from the beginning of the record, and it is converted to a time of
 day using the base time for the record as indicated by the @file{hea}
 file or the caller
-@iftex
+@ifnotinfo
 (@pxref{setbasetime, , @code{setbasetime}});
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{setbasetime});
 @end ifinfo
@@ -3298,9 +3308,9 @@ time of the next sample in input signal 0
 If the argument is bracketed (as in the second, third, and fourth examples), it
 is taken as a time of day, and @code{strtim} uses the base time defined
 by the header file or by the caller
-@iftex
+@ifnotinfo
 (@pxref{setbasetime, , @code{setbasetime}});
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{setbasetime});
 @end ifinfo
@@ -3316,9 +3326,9 @@ with sampling frequencies below 1 KHz), @code{strtim(mstimstr(@var{t}))}
 example above) is provided to allow ``conversion'' of time intervals
 already expressed in sample intervals.  The similar @samp{c}-format
 converts counter values
-@iftex
+@ifnotinfo
 (@pxref{counter conversion, , @code{getcfreq}})
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{counter conversion})
 @end ifinfo
@@ -3409,9 +3419,9 @@ header file indicates that the gain is uncalibrated, or if the
 specified input signal is not currently open, a gain of @code{WFDB_DEFGAIN}
 (defined in @file{<wfdb/wfdb.h>}) ADC units per millivolt, and a baseline
 of zero, are assumed.  If the physical units
-@iftex
+@ifnotinfo
 (@pxref{WFDB_Siginfo structures, , Signal Information Structures})
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{WFDB_Siginfo structures})
 @end ifinfo
@@ -3591,9 +3601,9 @@ Failure: no match found
 This function attempts to find calibration data for signals of type
 @var{desc}, having physical units as given by @var{units}.  If
 successful, it fills in the contents of the @code{WFDB_Calinfo} structure
-@iftex
+@ifnotinfo
 (@pxref{WFDB_Calinfo structures, , Calibration Information Structures})
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{WFDB_Calinfo structures})
 @end ifinfo
@@ -3751,9 +3761,9 @@ is written to the standard output.  Record names may include letters in
 lower or upper case, digits, and underscores (@samp{_}); they may not
 include any other characters.  If @var{record} does not conform to these
 requirements, @code{newheader} will return
-@iftex
+@ifnotinfo
 @minus{}1;
-@end iftex
+@end ifnotinfo
 @ifinfo
 -1;
 @end ifinfo
@@ -3818,9 +3828,9 @@ The header file for record @file{new} will contain the same signal
 information as that for record @file{old}, except that the @code{gain}
 for signal 0 will have been changed as shown.  Any ``info'' strings in
 the @file{hea} file for record @file{old} must be copied explicitly;
-@iftex
+@ifnotinfo
 @pxref{getinfo, , @code{getinfo}}, and @pxref{putinfo, , @code{putinfo}}.
-@end iftex
+@end ifnotinfo
 @ifinfo
 @pxref{getinfo}, and @pxref{putinfo}.
 @end ifinfo
@@ -3896,26 +3906,26 @@ other WFDB library functions.  It also resets the following:
 the factors used for converting between samples, seconds, and counter
 values (reset to 1), the base time (reset to 0, i.e., midnight), and the
 base counter value (reset to 0);
-@iftex
+@ifnotinfo
 @pxref{timstr and strtim, , @code{timstr} and @code{strtim}}
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{timstr and strtim})
 @end ifinfo
 @item
 the parameters used for converting between adus and physical units (reset to
 @code{WFDB_DEFGAIN} adu/mV, a quantity defined in @file{<wfdb/wfdb.h>});
-@iftex
+@ifnotinfo
 @pxref{aduphys and physadu, , @code{aduphys} and @code{physadu}}
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{aduphys and physadu})
 @end ifinfo
 @item
 internal variables used to determine output signal specifications;
-@iftex
+@ifnotinfo
 @pxref{newheader, , @code{newheader}}.
-@end iftex
+@end ifnotinfo
 @ifinfo
 @pxref{newheader}.
 @end ifinfo
@@ -4071,9 +4081,9 @@ This function determines the sampling frequency (in Hz) for the record
 specified by its argument.  If its argument is NULL, @code{sampfreq}
 returns the currently defined sampling frequency, if any.  It also sets
 the internal variables used by the time-conversion functions
-@iftex
+@ifnotinfo
 (@pxref{timstr and strtim, , @code{timstr} and @code{strtim}})
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{timstr and strtim})
 @end ifinfo
@@ -4081,9 +4091,9 @@ for converting between sample intervals and seconds.  @xref{Example 3},
 for an illustration of the use of @code{sampfreq}.  Note that the value
 returned by @code{sampfreq} for a multifrequency record depends on the
 current @code{getvec} mode
-@iftex
+@ifnotinfo
 (@pxref{setgvmode, , @code{setgvmode}}).
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{setgvmode}).
 @end ifinfo
@@ -4112,16 +4122,16 @@ negative)
 @noindent
 This function sets the sampling frequency used by the time-conversion
 functions
-@iftex
+@ifnotinfo
 (@pxref{timstr and strtim, , @code{timstr} and @code{strtim}}).
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{timstr and strtim}).
 @end ifinfo
 Use @code{setsampfreq} before creating a new @file{hea} file
-@iftex
+@ifnotinfo
 (@pxref{newheader, , @code{newheader}}).
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{newheader}).
 @end ifinfo
@@ -4157,9 +4167,9 @@ the date should be separated from the time by a space or tab character.  If
 @var{string} is empty or @code{NULL}, the current date and time are read
 from the system clock.  Use @code{setbasetime} after defining the sampling
 frequency and before creating a header file
-@iftex
+@ifnotinfo
 (@pxref{newheader, , @code{newheader}}).
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{newheader}).
 @end ifinfo
@@ -4224,9 +4234,9 @@ void setcfreq(WFDB_Frequency @var{freq})
 @noindent
 This function sets the counter frequency.  Use @code{setcfreq}
 before creating a @file{hea} file
-@iftex
+@ifnotinfo
 (@pxref{newheader, , @code{newheader}}).
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{newheader}).
 @end ifinfo
@@ -4266,9 +4276,9 @@ void setbasecount(double @var{count})
 @noindent
 This function sets the base counter value.  Use @code{setbasecount}
 before creating a header file
-@iftex
+@ifnotinfo
 (@pxref{newheader, , @code{newheader}}).
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{newheader}).
 @end ifinfo
@@ -4324,12 +4334,12 @@ invoked, either explicitly or by the WFDB library while attempting to open
 an input file (e.g., using @code{annopen} or @code{isigopen}).  (The
 features described in this paragraph were first introduced in WFDB library
 version 8.0.)
-@iftex
-@xref{getwfdb, , @code{getwfdb}},
-@end iftex
 @ifinfo
-@xref{getwfdb},
+@xref{getwfdb}
 @end ifinfo
+@ifnotinfo
+@xref{getwfdb, , @code{getwfdb}}
+@end ifnotinfo
 for an example of the use of @code{setwfdb}.
 
 @c @group
@@ -4528,9 +4538,9 @@ the system default buffer size (@code{BUFSIZ}) is used.  Note that
 the default buffer size has no effect on reading signals for which
 an explicit buffer size is given in the header file, i.e.,
 those for which the @code{bsize} field of the @code{WFDB_Siginfo} structure
-@iftex
+@ifnotinfo
 (@pxref{WFDB_Siginfo structures, , Signal Information Structures})
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{WFDB_Siginfo structures})
 @end ifinfo
@@ -4571,9 +4581,9 @@ used.  Note that the default buffer size has no effect on writing
 signals for which an explicit buffer size is given in the @file{hea}
 file read by @code{osigopen}, or in the @code{bsize} field of the
 @code{WFDB_Siginfo} structure
-@iftex
+@ifnotinfo
 (@pxref{WFDB_Siginfo structures, , Signal Information Structures})
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{WFDB_Siginfo structures})
 @end ifinfo
@@ -5087,9 +5097,9 @@ array of @code{WFDB_Anninfo} objects.  Output annotator numbers used by
 @code{putann} also start at 0; note that input annotator 0 and output
 annotator 0 are distinct.  Annotator numbers are supplied to
 @code{getann} and @code{putann} in their first arguments.
-@iftex
+@ifnotinfo
 @xref{annopen, , @code{annopen}},
-@end iftex
+@end ifnotinfo
 @ifinfo
 @xref{annopen},
 @end ifinfo
@@ -5132,9 +5142,9 @@ annotation code; an integer between 1 and @code{ACMAX}.
 @cindex user-defined fields in annotation
 @cindex signal (associating annotation with)
 numbers between
-@iftex
+@ifnotinfo
 @minus{}128
-@end iftex
+@end ifnotinfo
 @ifinfo
 -128
 @end ifinfo
@@ -5160,9 +5170,9 @@ char} that specifies the number of bytes that follow (up to 255).  In
 MIT DB @file{atr} files, the @code{aux} field is used with rhythm
 change annotations to specify the new rhythm, and with comment
 annotations to store the text of the comment
-@iftex
+@ifnotinfo
 (@pxref{Annotation Codes}).
-@end iftex
+@end ifnotinfo
 The string can contain arbitrary binary
 data, including embedded nulls.  It is unwise to store anything but ASCII
 strings, however, if the annotation file may be transported to a system with
@@ -5497,9 +5507,9 @@ case, it is likely that a single calibration file will be adequate for use
 with all of your records.  Calibration files are text files, with lines
 terminated by ASCII carriage-return/line-feed pairs, created by
 @code{newcal}, from which @code{calopen} reads the calibration list
-@iftex
+@ifnotinfo
 (@pxref{WFDB_Calinfo structures, , Calibration Information Structures}).
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{WFDB_Calinfo structures}).
 @end ifinfo
@@ -5606,9 +5616,9 @@ within the format field in the header file, and specified in the
 @code{spf} field of the @code{WFDB_Siginfo} structure for the signal.
 
 A frame can be read as it was written
-@iftex
+@ifnotinfo
 (@pxref{getframe, , @code{getframe}})
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{getframe})
 @end ifinfo
@@ -5736,9 +5746,9 @@ total numbers of signals and annotation files still apply.
 If the sampling frequencies or lengths of the records do not match, a warning
 message will be produced (unless @code{wfdbquiet} was invoked).  The
 time-conversion functions
-@iftex
+@ifnotinfo
 (@pxref{timstr and strtim, , @code{timstr} and @code{strtim}})
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{timstr and strtim})
 @end ifinfo
@@ -6667,9 +6677,9 @@ The record name is @code{argv[1]}, and the start time is @code{argv[2]};
 if the record can't be opened, the program exits.  See the previous example
 for details on how @code{isigopen} is used. If the user provides an absolute
 start time
-@iftex
+@ifnotinfo
 (@pxref{timstr and strtim, , @code{timstr} and @code{strtim}}),
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{timstr and strtim}),
 @end ifinfo
@@ -7495,9 +7505,9 @@ A file containing data used to build a calibration list (q.v.).
 @item Calibration list
 @cindex calibration list (defined)
 A memory-resident linked list of @code{WFDB_Calinfo} objects
-@iftex
+@ifnotinfo
 (@pxref{WFDB_Calinfo structures, , Calibration Information Structures}).
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{WFDB_Calinfo structures}).
 @end ifinfo
@@ -7852,9 +7862,9 @@ but this is only a convention and is not required.
 A set of signals that are multiplexed together and stored in the same
 file.  It is possible to reset input pointers for all signals in a
 given signal group
-@iftex
+@ifnotinfo
 (@pxref{isgsettime, , @code{isgsettime}}),
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{isgsettime}),
 @end ifinfo
@@ -7893,9 +7903,9 @@ each digitized signal and use these measurements to correct for skew.
 @item Standard time format
 @cindex standard time format (defined)
 Any string format legal as an argument for @code{strtim}
-@iftex
+@ifnotinfo
 (@pxref{timstr and strtim, , @code{timstr} and @code{strtim}}).
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{timstr and strtim}).
 @end ifinfo
@@ -8059,9 +8069,9 @@ is suitable. Programs that accept @emph{time} arguments or commands (usually
 shown as @var{from} and @var{to} below) use @code{strtim} to convert these
 strings into sample intervals; hence they accept any of the varieties of
 standard time format described earlier
-@iftex
+@ifnotinfo
 (@pxref{timstr and strtim, , @code{timstr} and @code{strtim}}).
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{timstr and strtim}).
 @end ifinfo
@@ -8372,9 +8382,9 @@ library.
 
 The cleanest mechanism for adding additional fields to @file{hea} files is
 to include them in `info' strings
-@iftex
+@ifnotinfo
 (@pxref{getinfo, , @code{getinfo}}),
-@end iftex
+@end ifnotinfo
 @ifinfo
 (@pxref{getinfo}),
 @end ifinfo

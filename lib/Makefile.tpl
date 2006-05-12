@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:      5 May 2006
+#				Last revised:     11 May 2006
 # This section of the Makefile should not need to be changed.
 
 INCLUDES = $(INCDIR)/wfdb/wfdb.h $(INCDIR)/wfdb/ecgcodes.h \
@@ -21,6 +21,12 @@ install:	$(INCLUDES) $(LIBDIR) $(BINDIR) all
 	$(SETLPERMISSIONS) $(LIBDIR)/$(WFDBLIB)
 	$(MAKE) lib-post-install
 	../install.sh $(BINDIR) wfdb-config
+
+# 'make collect':  retrieve the installed WFDB library and headers
+collect:
+	../conf/collect.sh $(INCDIR)/wfdb wfdb.h ecgcodes.h ecgmap.h
+	../conf/collect.sh $(LIBDIR) $(WFDBLIB)
+	../conf/collect.sh $(BINDIR) wfdb-config
 
 uninstall:
 	../uninstall.sh $(BINDIR) wfdb-config

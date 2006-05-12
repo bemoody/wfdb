@@ -1,5 +1,5 @@
-# file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:	27 February 2006
+# file: Makefile.tpl		G. Moody	24 May 2000
+#				Last revised:	11 May 2006
 # Change the settings below as appropriate for your setup.
 
 # D2PARGS is a list of options for dvips.  Uncomment one of these to set the
@@ -93,6 +93,9 @@ all:	wag.html wag.ps wag.pdf
 	cp -p wag.ps wag.pdf ../wag
 
 install:	wag.man
+
+collect:
+	$(MAKE) MANDIR=/tmp/wfdb/$(MANDIR) install
 
 uninstall:
 	../../uninstall.sh $(MAN1) *.1 ad2m.1 ann2rr.1 m2a.1 md2a.1 hrlomb.1 \

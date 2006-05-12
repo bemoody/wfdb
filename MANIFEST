@@ -122,6 +122,7 @@ checkpkg/Makefile.tpl
 checkpkg/mitdb/
 conf/
 conf/archname
+conf/collect.sh
 conf/cygwin.def
 conf/cygwin-slib.def
 conf/darwin.def
