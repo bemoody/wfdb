@@ -1,10 +1,10 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:	  11 April 2006       wfdblib 10.4.0
+                        Last revised:	20 December 2007       wfdblib 10.4.5
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1988-2006 George B. Moody
+Copyright (C) 1988-2007 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -159,7 +159,7 @@ If WFDB or DEFWFDB is of the form '@FILE', getwfdb reads the WFDB path from the
 specified (local) FILE (using wfdb_getiwfdb); such files may be nested up to
 10 levels. */
 
-static char *wfdbpath;
+static char *wfdbpath = NULL;
 
 FSTRING getwfdb(void)
 {
@@ -181,6 +181,7 @@ FVOID setwfdb(char *p)
 
     if (p == NULL && (p = getenv("WFDB")) == NULL) p = DEFWFDB;
     wfdb_parse_path(p);
+    if (wfdbpath) free(wfdbpath);
     if (wfdbpath = (char *)malloc(strlen(p)+1))
 	strcpy(wfdbpath, p);
     wfdb_export_config();
@@ -211,7 +212,9 @@ FSTRING wfdbfile(char *s, char *record)
 {
     WFDB_FILE *ifile;
 
-    if ((ifile = wfdb_open(s, record, WFDB_READ))) {
+    if (s == NULL && record == NULL)
+	return (wfdb_filename);
+    else if ((ifile = wfdb_open(s, record, WFDB_READ))) {
 	(void)wfdb_fclose(ifile);
 	return (wfdb_filename);
     }
@@ -309,15 +312,15 @@ significant types of platforms addressed here:
 Differences among these platforms:
 
 1. Directory separators vary:
-     UNIX and variants (including Mac OS/X and Cygwin) use `/'.
-     MS-DOS and OS/2 use `\'.
-     MacOS 9 and earlier uses `:'.
+     UNIX and variants (including Mac OS/X and Cygwin) use '/'.
+     MS-DOS and OS/2 use '\'.
+     MacOS 9 and earlier uses ':'.
 
 2. Path component separators also vary:
-     UNIX and variants use `:' (as in the PATH environment variable)
-     MS-DOS and OS/2 use `;' (also as in the PATH environment variable;
-       `:' within a path component follows a drive letter)
-     MacOS uses `;' (`:' is a directory separator, as noted above)
+     UNIX and variants use ':' (as in the PATH environment variable)
+     MS-DOS and OS/2 use ';' (also as in the PATH environment variable;
+       ':' within a path component follows a drive letter)
+     MacOS uses ';' (':' is a directory separator, as noted above)
    See the notes above wfdb_open for details about path separators and how
    WFDB file names are constructed.
 
@@ -352,7 +355,7 @@ OS- and compiler-dependent definitions:
 /* For other ANSI C compilers.  Such compilers must predefine __STDC__ in order
    to conform to the ANSI specification. */
 #ifdef __STDC__
-#ifdef MAC	/* Macintosh only.  Be sure to define MAC in `wfdblib.h'. */
+#ifdef MAC	/* Macintosh only.  Be sure to define MAC in 'wfdblib.h'. */
 #define DSEP	':'
 #define PSEP	';'
 #else		/* Other ANSI C compilers (UNIX and variants). */
@@ -497,11 +500,13 @@ void wfdb_export_config(void)
     if (p = (char *)malloc(strlen(wfdbpath)+6)) {
 	sprintf(p, "WFDB=%s", wfdbpath);
 	putenv(p);
+	free(p);
     }
     if (getenv("WFDBCAL") == NULL) {
 	if (p = malloc(strlen(DEFWFDBCAL)+9)) {
 	    sprintf(p, "WFDBCAL=%s", DEFWFDBCAL);
 	    putenv(p);
+	    free(p);
 	}
     }
     if (getenv("WFDBANNSORT") == NULL) {
@@ -532,8 +537,8 @@ system's limit on the length of environment variables. */
 
 void wfdb_addtopath(char *s)
 {
-    char *d, *p, *t;
-    int i, j, l;
+    char *p, *t;
+    int i, len;
     struct wfdb_path_component *c0;
 
     if (s == NULL || *s == '\0') return;
@@ -562,15 +567,15 @@ void wfdb_addtopath(char *s)
 
     /* If we've come this far, the path component of s was not found in the
        current WFDB path;  now append it. */
-    l = strlen(wfdbpath); 	/* wfdbpath set by getwfdb() -- see above */
-    if ((t = (char *)malloc((unsigned)(l + i + 2))) == NULL) {
+    len = strlen(wfdbpath); 	/* wfdbpath set by getwfdb() -- see above */
+    if ((t = (char *)malloc((unsigned)(len + i + 2))) == NULL) {
 	wfdb_error("wfdb_addtopath: insufficient memory\n");
 	return;			/* WFDB path is unchanged */
     }
     (void)strcpy(t, wfdbpath);
-    t[l++] = PSEP;		/* append a path separator */
-    (void)strncpy(t+l, s, i); 	/* append the new path component */
-    t[l+i] = '\0';
+    t[len++] = PSEP;		/* append a path separator */
+    (void)strncpy(t+len, s, i); 	/* append the new path component */
+    t[len+i] = '\0';
     setwfdb(t);
     free(t);
 }
@@ -761,14 +766,14 @@ be opened in any directory, provided that the WFDB path includes a null
 Beginning with version 10.0.1, the WFDB library accepts whitespace (space, tab,
 or newline characters) as path component separators under any OS.  Multiple
 consecutive whitespace characters are treated as a single path component
-separator.  Use a `.' to specify the current directory as a path component when
+separator.  Use a '.' to specify the current directory as a path component when
 using whitespace as a path component separator.
 
-If the WFDB path includes components of the forms `http://somewhere.net/mydata'
-or `ftp://somewhere.else/yourdata', the sequence `://' is explicitly recognized
-as part of a URL prefix (under any OS), and the `:' and `/' characters within
-the `://' are not interpreted further.  Note that the MS-DOS `\' is *not*
-acceptable as an alternative to `/' in a URL prefix.  To make WFDB paths
+If the WFDB path includes components of the forms 'http://somewhere.net/mydata'
+or 'ftp://somewhere.else/yourdata', the sequence '://' is explicitly recognized
+as part of a URL prefix (under any OS), and the ':' and '/' characters within
+the '://' are not interpreted further.  Note that the MS-DOS '\' is *not*
+acceptable as an alternative to '/' in a URL prefix.  To make WFDB paths
 containing URL prefixes more easily (human) readable, use whitespace for path
 component separators.
 
@@ -796,7 +801,7 @@ Pre-10.0.1 versions of this library that were compiled for environments other
 than MS-DOS used file names in the format TYPE.RECORD.  This file name format
 is no longer supported. */
 
-WFDB_FILE *wfdb_open(char *s, char *record, int mode)
+WFDB_FILE *wfdb_open(char *s, const char *record, int mode)
 {
     char *wfdb, *p;
     struct wfdb_path_component *c0;
@@ -848,16 +853,16 @@ WFDB_FILE *wfdb_open(char *s, char *record, int mode)
 	wfdb = c0->prefix;
 	while (*wfdb && p < wfdb_filename+MFNLEN-20) {
 	  if (*wfdb == '%') {
-		/* Perform substitutions in the WFDB path where `%' is found */
+		/* Perform substitutions in the WFDB path where '%' is found */
 		wfdb++;
 		if (*wfdb == 'r') {
-		    /* `%r' -> record name */
+		    /* '%r' -> record name */
 		    (void)strcpy(p, irec);
 		    p += strlen(p);
 		    wfdb++;
 		}
 		else if ('1' <= *wfdb && *wfdb <= '9' && *(wfdb+1) == 'r') {
-		    /* `%Nr' -> first N characters of record name */
+		    /* '%Nr' -> first N characters of record name */
 		    int n = *wfdb - '0';
 		    int len = strlen(irec);
 
@@ -867,7 +872,7 @@ WFDB_FILE *wfdb_open(char *s, char *record, int mode)
 		    *p = '\0';
 		    wfdb += 2;
 		}
-		else    /* `%X' -> X, if X is neither `r', nor a non-zero digit
+		else    /* '%X' -> X, if X is neither 'r', nor a non-zero digit
 			   followed by 'r' */
 		    *p++ = *wfdb++;
 	    }
@@ -935,21 +940,21 @@ int wfdb_checkname(char *p, char *s)
 }
 
 /* wfdb_setirec saves the current record name (its argument) in irec (defined
-above) to be substituted for `%r' in the WFDB path by wfdb_open as necessary.
+above) to be substituted for '%r' in the WFDB path by wfdb_open as necessary.
 wfdb_setirec is invoked by isigopen (except when isigopen is invoked
 recursively to open a segment within a multi-segment record) and by annopen
 (when it is about to open a file for input). */
 
-void wfdb_setirec(char *p)
+void wfdb_setirec(const char *p)
 {
-    char *r;
+    const char *r;
 
     for (r = p; *r; r++)
 	if (*r == DSEP) p = r+1;	/* strip off any path information */
 #ifdef MSDOS
 	else if (*r == ':') p = r+1;
 #endif
-    if (strcmp(p, "-"))	       /* don't record `-' (stdin) as record name */
+    if (strcmp(p, "-"))	       /* don't record '-' (stdin) as record name */
 	strncpy(irec, p, WFDB_MAXRNL);
 }
 
@@ -1935,8 +1940,8 @@ FINT WEP(int nParameter)
 
 /* This is a quick-and-dirty reimplementation of getenv for the Windows 16-bit
    DLL environment.  It searches the MSDOS environment for a line beginning
-   with the specified variable name, followed by `='.  This function can be
-   fooled by pathologic variable names (e.g., with embedded `=' characters),
+   with the specified variable name, followed by '='.  This function can be
+   fooled by pathologic variable names (e.g., with embedded '=' characters),
    but should be adequate for typical use. */
 
 char FAR *wgetenv(char far *var)

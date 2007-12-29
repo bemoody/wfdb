@@ -204,14 +204,14 @@ if [ "x$WCC" = "x" ]
 then
     WCC="no gcc"
 fi
-if ( echo $WCC | grep "no \|not " >wcc.t1 )
+if ( echo $WCC | egrep "no |not " >wcc.t1 )
 then
     WCC=`which cc 2>&1`
     if [ "x$WCC" = "x" ]
     then
         WCC="no cc"
     fi
-    if ( echo $WCC | grep "no \|not " >wcc.t2 )
+    if ( echo $WCC | egrep "no |not " >wcc.t2 )
     then
         echo "not found"
 	echo
@@ -322,7 +322,7 @@ if [ x$NETLIB = xunknown ]
 	then
 	WHICH="no curl-config"
     fi
-    if ( echo $WHICH | grep "no \|not " >which.t1 )
+    if ( echo $WHICH | egrep "no |not " >which.t1 )
 	then
 	echo "not found"
 	./prompt "Looking for libwww ..."
@@ -331,7 +331,7 @@ if [ x$NETLIB = xunknown ]
 	    then
 	    WHICH="no libwww-config"
 	fi
-	if ( echo $WHICH | grep "no \|not " >which.t2 )
+	if ( echo $WHICH | egrep "no |not " >which.t2 )
 	    then
 	    echo "not found"
 	    echo "The WFDB software will be compiled without NETFILES"
@@ -440,7 +440,7 @@ else
 	WAVE=1;
 	sed "s+/usr/openwin+/opt/openwin+" <wave/Makefile >tmp.$$
 	mv tmp.$$ wave/Makefile
-    elif ( echo $TEXTEDIT | grep "no \|not " >textedit.t1 )
+    elif ( echo $TEXTEDIT | egrep "no |not " >textedit.t1 )
 	then
 	WAVE=0;
     else

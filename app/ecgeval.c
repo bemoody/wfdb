@@ -1,9 +1,9 @@
 /* file: ecgeval.c	G. Moody	22 March 1992
-			Last revised:  22 November 2002
+			Last revised:  30 November 2006
 
 -------------------------------------------------------------------------------
 ecgeval: Generate and run a script of commands to compare sets of annotations
-Copyright (C) 2002 George B. Moody
+Copyright (C) 1992-2006 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -145,13 +145,14 @@ main()
     (void)fprintf(stderr, "\t\t_________________________________________\n\n");
 
     (void)fprintf(stderr,
+"The most recent version of this program can always be obtained as part of\n");
+    (void)fprintf(stderr,
+"the WFDB Software Package, from PhysioNet (http://physionet.org/).\n");
+    (void)fprintf(stderr,
  "If you have questions about this software, please contact the author:\n");
     (void)fprintf(stderr,
  "\tGeorge B. Moody\n\tMIT Room E25-505A\n\tCambridge, MA 02139 USA\n");
-    (void)fprintf(stderr, "\te-mail: george@mit.edu (Internet)\n");
-    (void)fprintf(stderr, "\tphone:  +1 617 253-7424\t");
-    (void)fprintf(stderr, "\tfax:  +1 617 253-2514\n\n");
-
+    (void)fprintf(stderr, "\temail: george@mit.edu\n\n");
     if (getdblists() < 0) exit(1);
 
     (void)fprintf(stderr,
@@ -165,9 +166,9 @@ main()
     (void)fprintf(stderr,
  "performance results of cardiac rhythm and ST segment measurement\n");
     (void)fprintf(stderr,
-"algorithms.  For some questions, a default answer is provided in brackets\n");
+"algorithms.  For some questions, a default answer is provided in brackets.\n");
     (void)fprintf(stderr,
- "press RETURN (ENTER) to accept the default, or type the desired answer\n");
+ "Press RETURN (ENTER) to accept the default, or type the desired answer\n");
     (void)fprintf(stderr,
  "followed by RETURN.  After you have answered all of the questions, you\n");
     (void)fprintf(stderr,

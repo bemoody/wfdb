@@ -107,7 +107,7 @@ WFDB_Sample slpsamp(WFDB_Time t)
     return (lbuf[t&(BUFLN-1)]);
 }
 
-main(int argc, char **argv)
+int main(int argc, char **argv)
 { 
     char *record = NULL;	     /* input record name */
     float sps;			     /* sampling frequency, in Hz (SR) */
@@ -124,9 +124,8 @@ main(int argc, char **argv)
     int Ta, T0;			     /* high and low detection thresholds */
     WFDB_Anninfo a;
     WFDB_Annotation annot;
-    WFDB_Sample *v;
     WFDB_Siginfo *s;
-    WFDB_Time from = 0L, next_minute, now, spm, t, tj, tpq, to = 0L, tt, t1;
+    WFDB_Time from = 0L, next_minute, spm, t, tpq, to = 0L, tt, t1;
     char *p, *prog_name();
     static int gvmode = 0;
     void help();

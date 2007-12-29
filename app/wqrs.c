@@ -1,8 +1,8 @@
 /* file: wqrs.c		Wei Zong      23 October 1998
-			Last revised: 25 February 2006 (by G. Moody)
+			Last revised: 17 September 2007 (by G. Moody)
 -----------------------------------------------------------------------------
 wqrs: Single-lead QRS detector based on length transform
-Copyright (C) 1998-2006 Wei Zong
+Copyright (C) 1998-2007 Wei Zong
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -158,7 +158,7 @@ main(int argc, char **argv)
 					the threshold is automatically reduced
 					to a minimum value;  the threshold is
 					restored upon a detection */
-    double Ta, T0;			     /* high and low detection thresholds */
+    double Ta, T0;		     /* high and low detection thresholds */
     WFDB_Anninfo a;
     WFDB_Annotation annot;
     WFDB_Gain gain;
@@ -417,7 +417,7 @@ main(int argc, char **argv)
 	       was detected recently. */
 	    if (++timer > ExpectPeriod && Ta > Tm) {
 		Ta--;
-		T0 = Ta / 3;
+		T1 = Ta / 3;
 	    }      
 	}
 

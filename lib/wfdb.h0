@@ -1,10 +1,10 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised:   11 May 2006	wfdblib 10.4.4
+			Last revised:   27 December 2007	wfdblib 10.4.5
 WFDB library type, constant, structure, and function interface definitions
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1983-2006 George B. Moody
+Copyright (C) 1983-2007 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -33,7 +33,7 @@ _______________________________________________________________________________
 /* WFDB library version. */
 #define WFDB_MAJOR   10
 #define WFDB_MINOR   4
-#define WFDB_RELEASE 4
+#define WFDB_RELEASE 5
 #define WFDB_NETFILES 1	/* if 1, library includes code for HTTP, FTP clients */
 #define WFDB_NETFILES_LIBCURL 1
 
@@ -171,7 +171,7 @@ struct WFDB_anninfo {	/* annotator information structure */
     int stat;		/* file type/access code (READ, WRITE, etc.) */
 };
 
-struct WFDB_ann {		/* annotation structure */
+struct WFDB_ann {	/* annotation structure */
     WFDB_Time time;	/* annotation time, in sample intervals from
 			   the beginning of the record */
     char anntyp;	/* annotation type (< ACMAX, see <wfdb/ecgcodes.h> */
@@ -233,12 +233,15 @@ extern "C" {
 
 /* Define function prototypes for ANSI C compilers and C++ compilers */
 #ifdef wfdb_PROTO
-extern FINT annopen(char *record, WFDB_Anninfo *aiarray, unsigned int nann);
-extern FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig);
-extern FINT osigopen(char *record, WFDB_Siginfo *siarray, unsigned int nsig);
+extern FINT annopen(const char *record, WFDB_Anninfo *aiarray,
+		    unsigned int nann);
+extern FINT isigopen(const char *record, WFDB_Siginfo *siarray, int nsig);
+extern FINT osigopen(const char *record, WFDB_Siginfo *siarray,
+		     unsigned int nsig);
 extern FINT osigfopen(WFDB_Siginfo *siarray, unsigned int nsig);
-extern FINT wfdbinit(char *record, WFDB_Anninfo *aiarray, unsigned int nann,
-                  WFDB_Siginfo *siarray, unsigned int nsig);
+extern FINT wfdbinit(const char *record,
+		     WFDB_Anninfo *aiarray, unsigned int nann,
+		     WFDB_Siginfo *siarray, unsigned int nsig);
 extern FINT getspf(void);
 extern FVOID setgvmode(int mode);
 extern FINT setifreq(WFDB_Frequency freq);

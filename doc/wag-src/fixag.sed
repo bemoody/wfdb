@@ -80,7 +80,7 @@ s+(http://www.physionet.org/physiobank/database)+<A HREF="http://www.physionet.o
 s+(http://www.aami.org/)+<A HREF="http://www.aami.org/" target="other">(http://www.aami.org/)</A>+
 s+"http://www.gnuplot.info/"+"http://www.gnuplot.info/" target="other"+
 s+http://www.mstarlabs.com/+<A HREF="http://www.mstarlabs.com/" target="other">http://www.mstarlabs.com/</A>+
-s+"http://www.hsr.nl/edf/"+"http://www.hsr.nl/edf/" target="other"+
+s+"http://www.edfplus.info/"+"http://www.edfplus.info/" target="other"+
 s+>Evaluating ECG Analyzers<+><a href="eval.htm">Evaluating ECG Analyzers</a><+
 s+>WFDB Programmer's Guide<+><a href="../wpg/wpg.htm">WFDB Programmer's Guide</a><+
 s+>WFDB Applications Guide<+><a href="wag.htm">WFDB Applications Guide</a><+

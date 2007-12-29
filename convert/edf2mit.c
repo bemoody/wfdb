@@ -133,7 +133,7 @@ char **argv;
 
     fread(buf, 1, 8, ifile);
     /* Check to see that the input is an EDF file.  (This check will detect
-       up most but not all other types of files.) */
+       most but not all other types of files.) */
     if (strncmp(buf, "0       ", 8)) {
 	(void)fprintf(stderr,
            "%s: input does not appear to be EDF -- no conversion attempted.\n",

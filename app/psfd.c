@@ -1,9 +1,9 @@
 /* file: psfd.c		G. Moody         9 August 1988
-			Last revised:	11 August 2005
+			Last revised:	  2 June 2006
 
 -------------------------------------------------------------------------------
 psfd: Produces annotated full-disclosure ECG plots on a PostScript device
-Copyright (C) 1988-2005 George B. Moody
+Copyright (C) 1988-2006 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -773,7 +773,7 @@ long t0, t1;
        range and filter variables. */
     for (i = 0; i < nosig; i++) {
 	accept[i] = 0;
-	vmax[i] = -32768; vmin[i] = 32767; vs[i] = 0L; vsum[i] = 0L;
+	vmax[i] = vmin[i] = WFDB_INVALID_SAMPLE; vs[i] = 0L; vsum[i] = 0L;
 	if (nosamp > buflen[i]) {
 	    if ((vbuf[i] = realloc(vbuf[i], nosamp * sizeof(int))) == NULL) {
 		buflen[i] = 0;
@@ -789,7 +789,7 @@ long t0, t1;
 	/* Fill the buffers. */
 	if (isigsettime(t0) < 0) return (0);
 
-	for (j = 0L, k = 1, tt = 0; j < jmax && getvec(v) == nisig; j++) {
+	for (j = 0L, k = 1, tt = 0; j < jmax && getvec(v) >= 0; j++) {
 	    for (i = 0; i < nosig; i++) {
 		int vtmp = v[siglist[i]];
 
@@ -802,8 +802,10 @@ long t0, t1;
 		    /* average the valid samples in each group */
 		    if (vn[i] > 0) {
 			vsum[i] += vbuf[i][tt] = vtmp = vs[i]/vn[i];
-			if (vtmp > vmax[i]) vmax[i] = vtmp;
-			else if (vtmp < vmin[i]) vmin[i] = vtmp;
+			if (vtmp > vmax[i] || vmax[i] == WFDB_INVALID_SAMPLE)
+			    vmax[i] = vtmp;
+			else if (vtmp<vmin[i] || vmin[i]==WFDB_INVALID_SAMPLE)
+			    vmin[i] = vtmp;
 			vn[i] = vs[i] = 0;
 			accept[i]++;
 		    }
@@ -835,8 +837,10 @@ long t0, t1;
 	    if (accept[i]) {
 		vsm = vsum[i]/accept[i];
 		vb = (vmax[i] + vmin[i])/2;
-		if (vb > vsm) w = (vb - vsm)/(vmax[i] - vsm);
-		else if (vb < vsm) w = (vsm - vb)/(vsm - vmin[i]);
+		if (vb > vsm && vmax[i] != vsm)
+		    w = (vb - vsm)/(vmax[i] - vsm);
+		else if (vb < vsm && vmin[i] != vsm)
+		    w = (vsm - vb)/(vsm - vmin[i]);
 		else w = 0.0;
 		vbase[i] = vsm + ((double)vb-vsm)*w;
 	    }

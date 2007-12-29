@@ -2,20 +2,21 @@
 		Automated ECG Analyzer Evaluation Program
 		_________________________________________
 
+The most recent version of this program can always be obtained as part of
+the WFDB Software Package, from PhysioNet (http://physionet.org/).
 If you have questions about this software, please contact the author:
 	George B. Moody
 	MIT Room E25-505A
 	Cambridge, MA 02139 USA
-	e-mail: george@mit.edu (Internet)
-	phone:  +1 617 253-7424		fax:  +1 617 253-2514
+	email: george@mit.edu
 
 This program constructs a script (batch) file which evaluates a set of
 test annotation files by comparing them with reference annotation files
 in accordance with American National Standards ANSI/AAMI EC38:1998 and
 ANSI/AAMI EC57:1998 for ambulatory ECGs and for testing and reporting
 performance results of cardiac rhythm and ST segment measurement
-algorithms.  For some questions, a default answer is provided in brackets
-press RETURN (ENTER) to accept the default, or type the desired answer
+algorithms.  For some questions, a default answer is provided in brackets.
+Press RETURN (ENTER) to accept the default, or type the desired answer
 followed by RETURN.  After you have answered all of the questions, you
 are given a chance to change any of your answers before beginning the
 actual evaluation.  At that time, you may exit from this program and

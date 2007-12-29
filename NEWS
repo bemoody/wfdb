@@ -1,6 +1,45 @@
+10.4.5pre1:
+	Bob Farrell and Tony Ricke chased down and provided fixes for memory
+	leaks in several WFDB library functions, and also provided revisions
+	to permit additional type checking and to avoid type mismatch warnings.
+
+	Alexander Khaustov reported a bug in convert/ad2m.c and provided a fix
+	for it.  The bug caused ad2m to truncate its output prematurely if the
+        "-f" option had been used.
+
+	Changes in the build system make it easier to build WFDB using Cygwin
+	gcc (with or without the Cygwin POSIX library).
+
+	Handle missing samples properly in pschart.c and psfd.c.
+
+        Removed unused variables from app/wapb.c (thanks to Thomas Heldt).
+
+	Corrected threshold update in app/wqrs.c.
+
+	When creating annotation files, if the input sampling frequency differs
+	from the frame rate of the input record (either because of using
+	WFDB_HIGHRES mode while reading a multifrequency record, or because
+	of having used setifreq() to modify the sampling frequency), a comment
+	is written to the beginning of the annotation file indicating the
+	resolution of the annotation times in ticks per second (thus allowing
+	the application to store its annotations with whatever time resolution
+	is desired).  When reading an annotation file, if such a resolution
+	comment is found, getann adjusts the times of annotations to match the
+	currently defined sampling frequency.  The resolutions are kept
+	independently for each annotation file, so (for example) bxb can
+	compare two annotation files written with different resolutions.
+
+	This version also includes preliminary support for reading EDF files
+	natively.  When attempting to open a given record N, if N.hea does
+	not exist, the WFDB library looks for N.edf and N.EDF (looking for
+	these files at each location in the WFDB path before continuing the
+	search at the next WFDB path location).  If an EDF file is found it
+	is opened in WFDB_HIGHRES mode.  The current (beta) version does not
+	properly read annotation files associated with EDF files.
+
 10.4.4: Added 'collect.sh' script to 'conf', and 'collect' target to
-        'make' template files (Makefile.tpl) to simplify creation of
-        binary tarballs and RPMs.
+	'make' template files (Makefile.tpl) to simplify creation of
+	binary tarballs and RPMs.
 
 10.4.3: Updated wfdb.spec (used to generate WFDB RPMs) to account for
 	applications with compiled-in paths.
@@ -29,8 +68,9 @@
 	corrected.
 
 	Matt Osborn reported a bug in convert/ad2m that prevented proper use
-	of the -f option when processing a compressed signal file.  This has
-	now been corrected.
+	of the -f option when processing a compressed signal file.  [This was
+	partially fixed in this version, but the fix introduced another bug,
+	which was corrected in version 10.4.5.]
 
 10.4.0:
 	Version 10.4.0 and later versions of the WFDB library are intended to
@@ -46,8 +86,8 @@
 	has been retained for now, and wfdb.h still includes a set of K&R C
 	function declarations; both of these features are deprecated, however,
 	and may be removed in future versions of the WFDB library.  Users who
-        still need to use a K&R C compiler to compile the library itself may
-        find 'unprotoize' (included in the GNU gcc distribution) to be helpful.
+	still need to use a K&R C compiler to compile the library itself may
+	find 'unprotoize' (included in the GNU gcc distribution) to be helpful.
 
 	The WFDB Fortran wrappers (fortran/wfdbf.c) have been revised for
 	compatibility with gcc 4.x (which no longer supports -fwritable-strings
@@ -166,7 +206,7 @@
 	Benjamin Moody has added an interface between the WFDB library and
 	libcurl as an alternative to the existing libwww interface, and has
 	updated 'configure' and conf/*.def to search for and use libcurl if
-        it is available.  The primary advantages of libcurl over libwww are
+	it is available.  The primary advantages of libcurl over libwww are
 	that libcurl is smaller and faster, it supports access to
 	password-protected files, and it is actively maintained.  Both
 	libraries are freely available on all popular platforms.
@@ -193,7 +233,7 @@
 10.3.15:
 	Rules for generating the binary tarball for MS-Windows have been
 	fixed so that the Cygwin DLLs are now included with correct
-        permissions.
+	permissions.
 
 	Installation of shared libraries under GNU/Linux requires an extra
 	step if SELinux is enabled (as under Fedora Core 2 and later);  this
@@ -315,7 +355,7 @@
 
 	In lib/signal.c, several bugs have been identified and fixed.  Thanks
 	to Piotr Wlodarek, who found a buffer overrun in isigopen.  Also,
-       	isgsettime sometimes performed incorrect seeks on multifrequency
+	isgsettime sometimes performed incorrect seeks on multifrequency
 	records that had been opened in high-resolution mode;  this has been
 	fixed, together with a related bug that caused the value returned by
 	strtim("e") to be calculated incorrectly in some such cases.
@@ -430,7 +470,7 @@
 	Fixed man page installation bug;  thanks to Joe Mietus for the bug
 	report.
 
-        Updated INSTALL (installation notes).
+	Updated INSTALL (installation notes).
 
 10.3.2:
 	New applications wav2mit and mit2wav create WFDB-format records from
@@ -568,7 +608,7 @@
 	sorting was suppressed, the warning produced by oannclose() (in
 	lib/annot.c) once again includes the correct 'sortann' command
 	needed to put the annotations into order.  (This feature was broken
-        by a previous revision.)
+	by a previous revision.)
 
 	Added 'ahaconvert', a shell script (in convert) that can reformat
 	all (or any subset) of the records on an AHA DB CD-ROM using a2m
@@ -657,7 +697,7 @@
 
 	Added rules for creating 'dbu.hlp' (MS-Windows help file version of
 	the WFDB Programmer's Guide) to doc/Makefile.tpl.  Updated rules for
-        generating the info version of the Programmer's Guide.
+	generating the info version of the Programmer's Guide.
 
 	Special pipe and tape header files from 'data' are now installed
 	by default.
@@ -683,8 +723,8 @@
 	installer for the WFDB Software Package.
 
 	The environment variable WFDBNOSORT was replaced by WFDBANNSORT, and
-        the environment variable WFDBGVMODE was introduced (see 'Annotation
-        Order' and 'Multi-Frequency Records', in the WFDB Programmer's Guide,
+	the environment variable WFDBGVMODE was introduced (see 'Annotation
+	Order' and 'Multi-Frequency Records', in the WFDB Programmer's Guide,
 	for details).
 
 10.2.0:

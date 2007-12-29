@@ -1,9 +1,9 @@
 /* file: pschart.c	G. Moody       15 March 1988
-			Last revised:  11 August 2005
+			Last revised:   2 June 2006
 
 -------------------------------------------------------------------------------
 pschart: Produce annotated `chart recordings' on a PostScript device
-Copyright (C) 1988-2005 George B. Moody
+Copyright (C) 1988-2006 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -744,7 +744,7 @@ char *record, *title;
        range variables. */
     for (i = 0; i < nosig; i++) {
 	accept[i] = 0;
-	vmax[i] = -32768; vmin[i] = 32767; vsum[i] = 0L;
+	vmax[i] = vmin[i] = WFDB_INVALID_SAMPLE; vsum[i] = 0L;
 	if (nsamp > buflen[i]) {
 	    if ((vbuf[i] = realloc(vbuf[i], nsamp * sizeof(int))) == NULL) {
 		buflen[i] = 0;
@@ -759,14 +759,16 @@ char *record, *title;
     if (nosig > 0) {
 	/* Fill the buffers. */
 	if (isigsettime(t0) < 0) return (0);
-	for (j = 0; j < jmax && getvec(v) == nisig; j++) {
+	for (j = 0; j < jmax && getvec(v) >= 0; j++) {
 	    for (i = 0; i < nosig; i++) {
 		int vtmp = v[siglist[i]];
 
-		vbuf[i][j] = vtmp;
+		vbuf[i][j] = vmax[i] = vmin[i] = vtmp;
 		if (vtmp != WFDB_INVALID_SAMPLE) {
-		    if (vtmp > vmax[i]) vmax[i] = vtmp;
-		    else if (vtmp < vmin[i]) vmin[i] = vtmp;
+		    if (vtmp > vmax[i] || vmax[i] == WFDB_INVALID_SAMPLE)
+			vmax[i] = vtmp;
+		    else if (vtmp < vmin[i] || vmin[i] == WFDB_INVALID_SAMPLE)
+			vmin[i] = vtmp;
 		    vsum[i] += vtmp;
 		    accept[i]++;
 		}
@@ -783,8 +785,10 @@ char *record, *title;
 	    if (accept[i]) {
 		vs = vsum[i]/accept[i];
 		vb = (vmax[i] + vmin[i])/2;
-		if (vb > vs) w = (vb - vs)/(vmax[i] - vs);
-		else if (vb < vs) w = (vs - vb)/(vs - vmin[i]);
+		if (vb > vs && vmax[i] != vs)
+		    w = (vb - vs)/(vmax[i] - vs);
+		else if (vb < vs && vmin[i] != vs)
+		    w = (vs - vb)/(vs - vmin[i]);
 		else w = 0.0;
 		vbase[i] = vs + ((double)vb-vs)*w;
 	    }

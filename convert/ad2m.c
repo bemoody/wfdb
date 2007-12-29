@@ -1,9 +1,9 @@
 /* file: ad2m.c		G. Moody	26 August 1983
-			Last revised:   28 March 2006
+			Last revised:   20 December 2007
 
 -------------------------------------------------------------------------------
 ad2m: Convert an AHA format signal file to MIT format
-Copyright (C) 1983-2006 George B. Moody
+Copyright (C) 1983-2007 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -43,8 +43,6 @@ extern void exit();
 #include <wfdb/wfdb.h>
 
 #define EODF	0100000	/* AHA data file end-of-data marker */
-#define NSAMPL 2700000L	/* long format length: 3 hours at 250 samp/sec */
-#define NSAMPS	525000L	/* short format length: 35 minutes at 250 samp/sec */
 #define FNLEN	12	/* maximum length for signal file name */
 
 char *pname;
@@ -55,7 +53,7 @@ char *argv[];
 {
     char dfname[FNLEN], *ifname = NULL, *p, *record = NULL, *prog_name();
     int cflag = 0, i, v[2], getcvec();
-    long t = 0L, start_time = 0L, end_time = 0L, nsamp = NSAMPS;
+    long t = 0L, start_time = 0L, end_time = 0L;
     static WFDB_Siginfo dfarray[2];
     void help();
 
@@ -146,13 +144,19 @@ char *argv[];
 
     if (end_time == 0L && strlen(record) == 4) {      /* assume AHA DB input */
 	if (record[1] == '2' || record[1] == '3')     /* short format record */
-	    end_time = NSAMPS;
+	    end_time = strtim("35:0");
 	else if (record[1] == '0' || record[1] == '1') /* long format record */
-	    end_time = NSAMPL;
+	    end_time = strtim("3:0:0");
     }
 
-    if (end_time != 0L)
-	nsamp = end_time - start_time;
+    if (end_time == 0L) {
+	(void)fprintf(stderr,
+               "%s: warning: end time not specified, output may be truncated\n",
+		      pname);
+	(void)fprintf(stderr,
+		      "               rerun with -t TIME to override\n");
+	end_time = start_time + strtim("100:0:0");
+    }
 
     (void)sprintf(dfname, "%s.dat", record);
     dfarray[0].fname = dfarray[1].fname = dfname;
@@ -165,9 +169,9 @@ char *argv[];
     if (!cflag) {	/* process tape-format input file */
 	if (isigopen("16", dfarray, 2) < 2)
 	    exit(2);
-	if (start_time > 0L && isigsettime(start_time) < 0)
+	if (start_time > 0L && isigsettime(t = start_time) < 0)
 	    exit(2);
-	while (getvec(v) == 2 && v[0] != EODF && putvec(v) > 0 && ++t < nsamp)
+	while (getvec(v) == 2 && v[0] != EODF && putvec(v)>0 && ++t < end_time)
 	    ;	/* continue to soft EOF, hard error, or specified time */
 
 	(void)newheader(record);	/* write header with correct signal
@@ -180,7 +184,7 @@ char *argv[];
     else {		/* process compressed-format input file */
 	while (t < start_time && getcvec(v) == 2)
 	    ++t;
-	while (getcvec(v) == 2 && putvec(v) > 0 && ++t < nsamp)
+	while (getcvec(v) == 2 && putvec(v) > 0 && ++t < end_time)
 	    ;	/* continue to hard EOF, hard error, or specified time */
 
 	(void)newheader(record);	/* write header with correct signal

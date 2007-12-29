@@ -1,10 +1,10 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:    6 April 2006		wfdblib 10.4.1
+			Last revised: 25 September 2007		wfdblib 10.4.5
 WFDB library functions for signals
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1989-2006 George B. Moody
+Copyright (C) 1989-2007 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -37,6 +37,7 @@ visible outside of this file:
  make_vsd	(makes a virtual signal object)
  sigmap_init	(manages the signal maps)
  sigmap		(creates a virtual signal vector from a raw sample vector)
+ edfparse [10.4.5](gets header info from an EDF file)
  readheader	(reads a header file)
  hsdfree	(deallocates memory used by readheader)
  isigclose	(closes input signals)
@@ -510,7 +511,7 @@ static void sigmap_cleanup(void)
 {
     int i;
 
-    maxvsig = need_sigmap = nvsig = tspf = 0;
+    need_sigmap = nvsig = tspf = 0;
     if (ovec) { free(ovec); ovec = NULL; }
     if (smi) {
 	for (i = 0; i < tspf; i += smi[i].spf)
@@ -522,8 +523,8 @@ static void sigmap_cleanup(void)
     if (vsd) {
 	struct isdata *is;
 
-	while (nvsig)
-	    if (is = vsd[--nisig]) {
+	while (maxvsig)
+	    if (is = vsd[--maxvsig]) {
 		if (is->info.fname) (void)free(is->info.fname);
 		if (is->info.units) (void)free(is->info.units);
 		if (is->info.desc)  (void)free(is->info.desc);
@@ -667,7 +668,8 @@ static void sigmap(WFDB_Sample *vector)
       if (ovec[smi[i].index] == WFDB_INVALID_SAMPLE)
 	vector[i] = WFDB_INVALID_SAMPLE;
       else {
-	vector[i] = v = ovec[smi[i].index] * smi[i].scale + smi[i].offset;
+	v = ovec[smi[i].index] * smi[i].scale + smi[i].offset;
+	vector[i] = (WFDB_Sample)v;
 #if defined(WFDB_OVERFLOW_CHECK)
 	if (((v > 0.0 && v - ovec[i]) > 1.0) || ((v - ovec[i]) < -1.0))
 	    wfdb_error("sigmap: overflow detected\n");
@@ -678,7 +680,187 @@ static void sigmap(WFDB_Sample *vector)
 
 /* end of code for handling variable-layout records */
 
-static int readheader(char *record)
+/* get header information from an EDF file */
+static int edfparse(WFDB_FILE *ifile)
+{
+    static char buf[9], junk[80], *edf_fname, *p;
+    double *pmax, *pmin, spr;
+    int i, s, nsig, offset, day, month, year, hour, minute, second;
+    long adcrange, *dmax, *dmin, nframes;
+ 
+    edf_fname = wfdbfile(NULL, NULL);
+
+    /* Read the first 8 bytes and check for the magic string.  (This might
+       accept some non-EDF files.) */
+    wfdb_fread(buf, 1, 8, ifile);
+    if (strncmp(buf, "0       ", 8)) {
+	wfdb_error("init: '%s' is not EDF or EDF+\n", edf_fname);
+	return (-2);
+    }
+
+    /* Read the remainder of the fixed-size section of the header. */
+    wfdb_fread(junk, 1, 80, ifile);	/* patient ID (ignored) */
+    wfdb_fread(junk, 1, 80, ifile);	/* recording ID (ignored) */
+    wfdb_fread(buf, 1, 8, ifile);	/* recording date */
+    sscanf(buf, "%d%*c%d%*c%d", &day, &month, &year);
+    year += 1900;			/* EDF has only two-digit years */
+    if (year < 1985) year += 100;	/* fix this before 1/1/2085! */
+    wfdb_fread(buf, 1, 8, ifile);	/* recording time */
+    sscanf(buf, "%d%*c%d%*c%d", &hour, &minute, &second);
+    wfdb_fread(buf, 1, 8, ifile);	/* number of bytes in header */
+    sscanf(buf, "%d", &offset);
+    wfdb_fread(junk, 1, 44, ifile);	/* free space (ignored) */
+    wfdb_fread(buf, 1, 8, ifile);	/* number of frames (EDF blocks) */
+    sscanf(buf, "%ld", &nframes);
+    wfdb_fread(buf, 1, 8, ifile);	/* data record duration (seconds) */
+    sscanf(buf, "%lf", &spr);
+    if (spr <= 0.0) spr = 1.0;
+    wfdb_fread(buf+4, 1, 4, ifile);	/* number of signals */
+    sscanf(buf+4, "%d", &nsig);
+
+    if (nsig < 1 || (nsig + 1)*256 != offset) {
+	wfdb_error("init: '%s' is not EDF or EDF+\n", edf_fname);
+	return (-2);
+    }
+
+    /* Allocate workspace. */
+    if (maxhsig < nsig) {
+	unsigned m = maxhsig;
+	struct hsdata **hsdnew = realloc(hsd, nsig*sizeof(struct hsdata *));
+
+	if (hsdnew == NULL) {
+	    wfdb_error("init: too many (%d) signals in header file\n", nsig);
+	    return (-2);
+	}
+	hsd = hsdnew;
+	while (m < nsig) {
+	    if ((hsd[m] = calloc(1, sizeof(struct hsdata))) == NULL) {
+		wfdb_error("init: too many (%d) signals in header file\n",
+			   nsig);
+		while (--m > maxhsig)
+		    free(hsd[m]);
+		return (-2);
+	    }
+	    m++;
+	}
+	maxhsig = nsig;
+    }
+    if ((dmax = malloc(nsig * sizeof(long))) == NULL ||
+	(dmin = malloc(nsig * sizeof(long))) == NULL ||
+	(pmax = malloc(nsig * sizeof(double))) == NULL ||
+	(pmin = malloc(nsig * sizeof(double))) == NULL) {
+	wfdb_error("init: too many (%d) signals in header file\n", nsig);
+	if (pmax) free(pmax);
+	if (dmin) free(dmin);
+	if (dmax) free(dmax);
+	return (-2);
+    }      
+
+    /* Strip off any path info from the EDF file name. */
+    p = edf_fname + strlen(edf_fname) - 4;
+    while (--p > edf_fname)
+	if (*p == '/') edf_fname = p+1;
+
+    /* Read the variable-size section of the header. */
+    for (s = 0; s < nsig; s++) {
+	hsd[s]->start = offset;
+	hsd[s]->skew = 0;
+	if (hsd[s]->info.fname = (char *)malloc(strlen(edf_fname)+1))
+	    strcpy(hsd[s]->info.fname, edf_fname);
+	hsd[s]->info.group = hsd[s]->info.bsize = hsd[s]->info.cksum = 0;
+	hsd[s]->info.fmt = 16;
+	hsd[s]->info.nsamp = nframes;
+
+	wfdb_fread(junk, 1, 16, ifile);	/* signal type */
+	junk[16] = ' ';
+	for (i = 16; i >= 0 && junk[i] == ' '; i--)
+	    junk[i] = '\0';
+	if (hsd[s]->info.desc = (char *)malloc(strlen(junk)+1))
+	    strcpy(hsd[s]->info.desc, junk);
+    }
+
+    for (s = 0; s < nsig; s++)
+	wfdb_fread(junk, 1, 80, ifile); /* transducer type (ignored) */
+
+    for (s = 0; s < nsig; s++) {
+	wfdb_fread(buf, 1, 8, ifile);	/* signal units */
+	for (i = 7; i >= 0 && buf[i] == ' '; i--)
+	    buf[i] = '\0';
+	if (hsd[s]->info.units = (char *)malloc(strlen(buf)+1))
+	    strcpy(hsd[s]->info.units, buf);
+    }
+
+    for (s = 0; s < nsig; s++) {
+	wfdb_fread(buf, 1, 8, ifile);	/* physical minimum */
+	sscanf(buf, "%lf", &pmin[s]);
+    }
+
+    for (s = 0; s < nsig; s++) {
+	wfdb_fread(buf, 1, 8, ifile);	/* physical maximum */
+	sscanf(buf, "%lf", &pmax[s]);
+    }
+
+    for (s = 0; s < nsig; s++) {
+	wfdb_fread(buf, 1, 8, ifile);	/* digital minimum */
+	sscanf(buf, "%d", &dmin[s]);
+    }
+
+    for (s = 0; s < nsig; s++) {
+	wfdb_fread(buf, 1, 8, ifile);	/* digital maximum */
+	sscanf(buf, "%d", &dmax[s]);
+	hsd[s]->info.initval = hsd[s]->info.adczero = (dmax[s]+1 + dmin[s])/2;
+	adcrange = dmax[s] - dmin[s];
+	for (i = 0; adcrange > 1; i++)
+	    adcrange /= 2;
+	hsd[s]->info.adcres = i;
+	if (pmax[s] != pmin[s]) {
+	    hsd[s]->info.gain = (dmax[s] - dmin[s])/(pmax[s] - pmin[s]);
+	    hsd[s]->info.baseline = dmax[s] - pmax[s] * hsd[s]->info.gain + 1;
+	}
+	else			/* gain is undefined */
+	    hsd[s]->info.gain = hsd[s]->info.baseline = 0;
+    }
+
+    for (s = 0; s < nsig; s++)
+	wfdb_fread(junk, 1, 80, ifile);	/* filtering information (ignored) */
+
+    for (s = framelen = 0; s < nsig; s++) {
+	int n;
+
+	wfdb_fread(buf, 1, 8, ifile);	/* samples per frame (EDF block) */
+	buf[8] = ' ';
+	for (i = 8; i >= 0 && buf[i] == ' '; i--)
+	    buf[i] = '\0';
+	sscanf(buf, "%d", &n);
+	if ((hsd[s]->info.spf = n) > ispfmax) ispfmax = n;	
+	framelen += n;
+    }
+
+    (void)wfdb_fclose(ifile);	/* (don't bother reading nsig*32 bytes of free
+				   space) */
+    hheader = NULL;	/* make sure getinfo doesn't try to read the EDF file */
+
+    ffreq = 1.0 / spr;	/* frame frequency = 1/(seconds per EDF block) */
+    cfreq = sfreq = ffreq; /* set sampling and counter frequencies to match */
+    setsampfreq(sfreq);
+    /* *** */
+    /*    printf("ffreq = %g, sampfreq(NULL) = %g\n", ffreq, sampfreq(NULL));
+     */
+    sprintf(buf, "%02d:%02d:%02d %02d/%02d/%04d",
+	    hour, minute, second, day, month, year);
+    setbasetime(buf);
+
+    setgvmode(WFDB_HIGHRES);
+
+    free(pmin);
+    free(pmax);
+    free(dmin);
+    free(dmax);
+    return (nsig);
+
+}
+
+static int readheader(const char *record)
 {
     char linebuf[256], *p, *q;
     WFDB_Frequency f;
@@ -708,8 +890,13 @@ static int readheader(char *record)
 
     /* Try to open the header file. */
     if ((hheader = wfdb_open("hea", record, WFDB_READ)) == NULL) {
-	wfdb_error("init: can't open header for record %s\n", record);
-	return (-1);
+	if ((hheader = wfdb_open("edf", record, WFDB_READ)) ||
+	    (hheader = wfdb_open("EDF", record, WFDB_READ)))
+	    return (edfparse(hheader));
+	else {
+	    wfdb_error("init: can't open header for record %s\n", record);
+	    return (-1);
+	}
     }
 
     /* Read the first line and check for a magic string. */
@@ -766,7 +953,7 @@ static int readheader(char *record)
 	   a directory separator (whether valid or not for this OS);  if so,
 	   compare only the final portion of the argument against the name in
 	   the header file. */
-	char *r, *s;
+	const char *r, *s;
 
 	for (r = record, s = r + strlen(r) - 1; r != s; s--)
 	    if (*s == '/' || *s == '\\' || *s == ':')
@@ -1131,7 +1318,7 @@ static void isigclose(void)
     struct isdata *is;
     struct igdata *ig;
 
-    if (nisig == 0) return;
+    /* if (nisig == 0) return; */
     if (sbuf && !in_msrec) {
 	(void)free(sbuf);
 	sbuf = NULL;
@@ -1744,7 +1931,7 @@ static int rgetvec(WFDB_Sample *vector)
 
 /* WFDB library functions. */
 
-FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
+FINT isigopen(const char *record, WFDB_Siginfo *siarray, int nsig)
 {
     int navail, ngroups, nn;
     struct hsdata *hs;
@@ -1925,13 +2112,13 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
     return (s);
 }
 
-FINT osigopen(char *record, WFDB_Siginfo *siarray, unsigned int nsig)
+FINT osigopen(const char *record, WFDB_Siginfo *siarray, unsigned int nsig)
 {
     int n;
     struct osdata *os, *op;
     struct ogdata *og;
     WFDB_Signal s;
-    unsigned int buflen, ga;
+    unsigned int ga;
 
     /* Close previously opened output signals unless otherwise requested. */
     if (*record == '+') record++;
@@ -2385,7 +2572,6 @@ FINT isigsettime(WFDB_Time t)
 {
     WFDB_Group g;
     int stat = 0;
-    WFDB_Signal s;
 	
     /* Return immediately if no seek is needed. */
     if (t == istime || nisig == 0) return (0);
@@ -2746,7 +2932,7 @@ FSTRING getinfo(char *record)
 
     /* Find a line beginning with '#'. */
     do {
-	if (wfdb_fgets(linebuf, 256, hheader) == NULL)
+	if (hheader == NULL || wfdb_fgets(linebuf, 256, hheader) == NULL)
 	    return (NULL);
     } while (linebuf[0] != '#');
 
@@ -2838,7 +3024,7 @@ FINT setbasetime(char *string)
 	wfdb_error("setbasetime: incorrect time format, '%s'\n", string);
 	return (-1);
     }
-    btime *= 1000.0/sfreq;
+    btime = (long)(btime * 1000.0/sfreq);
     return (0);
 }
 
@@ -2870,8 +3056,8 @@ FSTRING mstimstr(WFDB_Time t)
     if (t > 0L || (btime == 0L && bdate == (WFDB_Date)0)) { /* time interval */
 	if (t < 0L) t = -t;
 	/* Convert from sample intervals to seconds. */
-	s = t / f;
-	msec = (t - s*f)*1000/f;
+	s = (long)(t / f);
+	msec = (int)((t - s*f)*1000/f);
 	t = s;
 	seconds = t % 60;
 	t /= 60;
@@ -2888,8 +3074,8 @@ FSTRING mstimstr(WFDB_Time t)
 	/* Convert to sample intervals since midnight. */
 	t = (WFDB_Time)(btime*sfreq/1000.0 + 0.5) - t;
 	/* Convert from sample intervals to seconds. */
-	s = t / f;
-	msec = (t - s*f)*1000/f;
+	s = (long)(t / f);
+	msec = (int)((t - s*f)*1000/f);
 	t = s;
 	seconds = t % 60;
 	t /= 60;
@@ -2949,8 +3135,8 @@ FSITIME strtim(char *string)
 			(WFDB_Time)atol(string+1));
       case 'e':	return ((in_msrec ? msnsamples : nsamples) * 
 		        ((gvmode == WFDB_HIGHRES) ? ispfmax : 1));
-      case 'f': return ((WFDB_Time)(atol(string+1)*f/ffreq));
-      case 'i':	return (istime *
+      case 'f': return (WFDB_Time)(atol(string+1)*f/ffreq);
+      case 'i':	return (WFDB_Time)(istime *
 			(ifreq > 0.0 ? (ifreq/sfreq) : 1.0) *
 			((gvmode == WFDB_HIGHRES) ? ispfmax : 1));
       case 'o':	return (ostime);
@@ -2983,16 +3169,16 @@ FSITIME strtim(char *string)
 FSTRING datstr(WFDB_Date date)
 {
     int d, m, y, gcorr, jm, jy;
-    long jd;
+    WFDB_Date jd;
 
     if (date >= 2299161L) {	/* Gregorian calendar correction */
-	gcorr = ((date - 1867216L) - 0.25)/36524.25;
+	gcorr = (int)(((date - 1867216L) - 0.25)/36524.25);
 	date += 1 + gcorr - (long)(0.25*gcorr);
     }
     date += 1524;
-    jy = 6680 + ((date - 2439870L) - 122.1)/365.25;
-    jd = 365L*jy + (0.25*jy);
-    jm = (date - jd)/30.6001;
+    jy = (int)(6680 + ((date - 2439870L) - 122.1)/365.25);
+    jd = (WFDB_Date)(365L*jy + (0.25*jy));
+    jm = (int)((date - jd)/30.6001);
     d = date - jd - (int)(30.6001*jm);
     if ((m = jm - 1) > 12) m -= 12;
     y = jy - 4715;
@@ -3014,11 +3200,11 @@ FDATE strdat(char *string)
 	return (0L);
     if (m > 2) { jy = y; jm = m + 1; }
     else { jy = y - 1; 	jm = m + 13; }
-    if (jy > 0) date = 365.25*jy;
+    if (jy > 0) date = (WFDB_Date)(365.25*jy);
     else date = -(long)(-365.25 * (jy + 0.25));
     date += (int)(30.6001*jm) + d + 1720995L;
     if (d + 31L*(m + 12L*y) >= (15 + 31L*(10 + 12L*1582))) { /* 15/10/1582 */
-	gcorr = 0.01*jy;		/* Gregorian calendar correction */
+	gcorr = (int)(0.01*jy);		/* Gregorian calendar correction */
 	date += 2 - gcorr + (int)(0.25*gcorr);
     }
     return (date);

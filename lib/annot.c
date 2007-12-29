@@ -1,10 +1,10 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:    23 February 2006	wfdblib 10.4.0
+			Last revised:    26 December 2007	wfdblib 10.4.5
 WFDB library functions for annotations
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1989-2006 George B. Moody
+Copyright (C) 1989-2007 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -119,10 +119,12 @@ static struct iadata {
     WFDB_Anninfo info;	   	/* input annotator information */
     WFDB_Annotation ann;	/* next annotation to be returned by getann */
     WFDB_Annotation pann; 	/* pushed-back annotation from ungetann */
+    WFDB_Frequency afreq;	/* time resolution, in ticks/second */
     unsigned word;		/* next word from the input file */
     int ateof;			/* EOF-reached indicator */
     char auxstr[1+255+1];	/* aux string buffer (byte count+data+null) */
     unsigned index;		/* next available position in auxstr */
+    double tmul;		/* tmul * annotation time = sample count */
     WFDB_Time tt;		/* annotation time (MIT format only).  This
 				   equals ann.time unless a SKIP follows ann;
 				   in such cases, it is the time of the SKIP
@@ -136,15 +138,13 @@ static struct oadata {
     WFDB_FILE *file;		/* file pointer for output annotation file */
     WFDB_Anninfo info;		/* output annotator information */
     WFDB_Annotation ann;	/* most recent annotation written by putann */
+    WFDB_Frequency afreq;	/* time resolution, in ticks/second */
     int seqno;			/* annotation serial number (AHA format only)*/
     char *rname;		/* record with which annotator is associated */
     char out_of_order;		/* if >0, one or more annotations written by
 				   putann are not in the canonical (time, chan)
 				   order */
 } **oad;
-
-static double tmul;		/* `time' fields in annotations are
-				   tmul * times in annotation files */
 
 /* Local functions (for the use of other functions in this module only). */
 
@@ -158,8 +158,13 @@ static int get_ann_table(WFDB_Annotator i)
 	return (-1);
     while (getann(i,&annot) == 0 && annot.time == 0L &&
 	   annot.anntyp == NOTE && annot.subtyp == 0) {
-	if (annot.aux == NULL || *annot.aux < 1 || *(annot.aux+1) == '#')
+	if (annot.aux == NULL || *annot.aux < 1)
 	    continue;
+	if (*(annot.aux+1) == '#') {
+	    if (strncmp(annot.aux + 1, "## time resolution: ", 20) == 0)
+		sscanf(annot.aux + 20, "%lf", &(iad[i]->afreq));
+	    continue;
+	}
 	p1 = strtok(annot.aux+1, " \t");
 	a = atoi(p1);
 	if (0 <= a && a <= ACMAX && (p1 = strtok((char *)NULL, " \t"))) {
@@ -182,9 +187,18 @@ static int get_ann_table(WFDB_Annotator i)
 
     }
     if (annot.time != 0L || annot.anntyp != NOTE || annot.subtyp != 0 ||
-	annot.aux == NULL ||
-	strncmp(annot.aux + 1, "## sampling frequency: ", 23))
+	annot.aux == NULL) {
+	/* If there is a time resolution note (and afreq was set above) we
+	   will want the time in this annotation to be scaled by tmul ... but
+	   we can't evaluate tmul yet, because the user may change the presented
+	   sampling frequency using setifreq.  Rather, we flag the time of this
+	   annotation by making it negative, so that when we eventually get
+	   it back again (in getann, after tmul has been evaluated) we will
+	   know that its time field still needs to be scaled. */
+	if (iad[i]->afreq)
+	    annot.time = -annot.time;
 	(void)ungetann(i, &annot);
+    }
     return (0);
 }
 
@@ -277,17 +291,15 @@ static int allocoann(unsigned n)
 /* WFDB library functions (for general use). */
 
 /* annopen: open annotation files for the specified record */
-FINT annopen(char *record, WFDB_Anninfo *aiarray, unsigned int nann)
+FINT annopen(const char *record, WFDB_Anninfo *aiarray, unsigned int nann)
 {
     int a;
     unsigned int i, niafneeded, noafneeded;
 
     if (*record == '+')		/* don't close open annotation files */
 	record++;		/* discard the '+' prefix */
-    else {
+    else
 	wfdb_anclose();		/* close previously opened annotation files */
-	tmul = 0.0;
-    }
 
     /* Prescan aiarray to see how large maxiann and maxoann must be. */
     niafneeded = niaf;
@@ -419,6 +431,9 @@ FINT getann(WFDB_Annotator n, WFDB_Annotation *annot)
 
     if (ia->pann.anntyp) {
 	*annot = ia->pann;
+	if (annot->time < (WFDB_Time)0 && ia->tmul > 0.0)
+	    /* scale the time, which was flagged by get_ann_table (see above) */
+	    annot->time = (-annot->time)*(ia->tmul) + 0.5; 
 	ia->pann.anntyp = 0;
 	return (0);
     }
@@ -440,14 +455,15 @@ FINT getann(WFDB_Annotator n, WFDB_Annotation *annot)
 	    return (0);
 	}
 	ia->tt += ia->word & DATA; /* annotation time */
-	if (ia->tt > 0L && tmul <= 0.0) {
-	    WFDB_Frequency f = sampfreq(NULL);
 
-	    tmul = getspf();
-	    if (f != (WFDB_Frequency)0)
-		tmul = tmul * getifreq() / f;
+	if (ia->pann.time == (WFDB_Time)0 && ia->tt > (WFDB_Time)0) {
+	    ia->tmul = (ia->afreq > 0.0) ? getifreq()/ia->afreq : getspf();
+	    /*	    printf("tt = %ld, tmul = %g, afreq = %g, ffreq = %g, ifreq = %g, spf = %d\n",
+		   ia->tt, ia->tmul, ia->afreq, sampfreq(NULL), getifreq(), getspf());
+	    */
 	}
-	ia->ann.time = (WFDB_Time)(ia->tt * tmul + 0.5);
+
+	ia->ann.time = (WFDB_Time)(ia->tt * ia->tmul + 0.5);
 	ia->ann.anntyp = (ia->word & CODE) >> CS; /* set annotation type */
 	ia->ann.subtyp = 0;	/* reset subtype field */
 	ia->ann.aux = NULL;	/* reset aux field */
@@ -482,15 +498,7 @@ FINT getann(WFDB_Annotator n, WFDB_Annotation *annot)
 	}
 	a = ia->word >> 8;		 /* AHA annotation code */
 	ia->ann.anntyp = ammap(a);	 /* convert to MIT annotation code */
-	if (tmul <= 0.0) {
-	    WFDB_Frequency f = sampfreq(NULL);
-
-	    tmul = getspf();
-	    if (f != (WFDB_Frequency)0)
-		tmul = tmul * getifreq() / f;
-	}
-	ia->ann.time = (WFDB_Time)(wfdb_g32(ia->file) * tmul + 0.5);
-					 /* time of annotation */
+	ia->ann.time = (WFDB_Time)wfdb_g32(ia->file);  /* time of annotation */
 	if (wfdb_g16(ia->file) <= 0)	 /* serial number (starts at 1) */
 	    wfdb_error("getann: unexpected annot number in annotator %s\n",
 		       ia->info.name);
@@ -553,18 +561,20 @@ FINT putann(WFDB_Annotator n, WFDB_Annotation *annot)
 	wfdb_error("putann: can't write annotation file %d\n", n);
 	return (-2);
     }
-    if (annot->time == 0L)
-	t = 0L;
-    else {
-	if (tmul <= 0.0) {
-	    WFDB_Frequency f = sampfreq(NULL);
+    if (oa->ann.time <= 0L && oa->afreq <= 0.0) {
+	if ((oa->afreq = getifreq()) != sampfreq(NULL)) {
+	    static WFDB_Annotation annot;
+	    static char buf[30];
 
-	    tmul = getspf();
-	    if (f != (WFDB_Frequency)0)
-		tmul = tmul * getifreq() / f;
+	    /* time resolution of annotations is unequal to that of signals */
+	    (void)sprintf(buf+1, "## time resolution: %g", oa->afreq);
+	    buf[0] = strlen(buf+1);
+	    annot.anntyp = NOTE;
+	    annot.aux = buf;
+	    if (putann(n, &annot) < 0) return (-1);
 	}
-	t = (WFDB_Time)(annot->time / tmul + 0.5);
     }
+    t = annot->time;
     if (((delta = t - oa->ann.time) < 0L ||
 	(delta == 0L && annot->chan <= oa->ann.chan)) &&
 	(t != 0L || oa->ann.time != 0L)) {
@@ -908,7 +918,6 @@ FVOID iannclose(WFDB_Annotator n)
 	maxiann--;
     }
 }
-
 
 /* oannclose: close output annotation file n */
 FVOID oannclose(WFDB_Annotator n)
