@@ -1,10 +1,10 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised:   27 December 2007	wfdblib 10.4.5
+			Last revised:   8 January 2008	wfdblib 10.4.5
 WFDB library type, constant, structure, and function interface definitions
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1983-2007 George B. Moody
+Copyright (C) 1983-2008 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -263,6 +263,8 @@ extern FINT strann(char *annotation_mnemonic_string);
 extern FINT setannstr(int annotation_code, char *annotation_mnemonic_string);
 extern FSTRING anndesc(int annotation_code);
 extern FINT setanndesc(int annotation_code, char *annotation_description);
+extern FVOID setafreq(WFDB_Frequency f);
+extern FFREQUENCY getafreq(void);
 extern FVOID iannclose(WFDB_Annotator a);
 extern FVOID oannclose(WFDB_Annotator a);
 extern FINT wfdb_isann(int code);
@@ -342,10 +344,10 @@ extern FSTRING ecgstr(), annstr(), anndesc(), timstr(), mstimstr(),
     datstr(), getwfdb(), getinfo(), wfdberror(), wfdbfile();
 extern FSITIME strtim();
 extern FDATE strdat();
-extern FVOID setgvmode(), wfdbquit(), wfdbquiet(), dbverbose(), setdb(),
-    wfdbflush(), setcfreq(), setbasecount(), flushcal(), wfdbsetiskew(),
-     wfdbsetskew(), wfdbsetstart();
-extern FFREQUENCY getifreq(), sampfreq(), getcfreq();
+extern FVOID setafreq(), setgvmode(), wfdbquit(), wfdbquiet(), dbverbose(),
+    setdb(), wfdbflush(), setcfreq(), setbasecount(), flushcal(),
+    wfdbsetiskew(), wfdbsetskew(), wfdbsetstart();
+extern FFREQUENCY getafreq(), getifreq(), sampfreq(), getcfreq();
 extern FDOUBLE aduphys(), getbasecount();
 #endif
 

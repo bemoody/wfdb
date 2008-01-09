@@ -1,10 +1,10 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:    26 December 2007	wfdblib 10.4.5
+			Last revised:    8 January 2008		wfdblib 10.4.5
 WFDB library functions for annotations
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1989-2007 George B. Moody
+Copyright (C) 1989-2008 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -46,6 +46,8 @@ This file also contains definitions of the following WFDB library functions:
  setannstr [5.3]	(modifies code-to-string translation table)
  anndesc [5.3]  	(converts user-defined annot codes to descriptions)
  setanndesc [5.3]	(modifies code-to-text translation table)
+ setafreq [10.4.5]	(sets time resolution for output annotation files)
+ getafreq [10.4.5]	(returns time resolution for output annotation files)
  iannclose [9.1]	(closes an input annotation file)
  oannclose [9.1]	(closes an output annotation file)
 
@@ -138,13 +140,14 @@ static struct oadata {
     WFDB_FILE *file;		/* file pointer for output annotation file */
     WFDB_Anninfo info;		/* output annotator information */
     WFDB_Annotation ann;	/* most recent annotation written by putann */
-    WFDB_Frequency afreq;	/* time resolution, in ticks/second */
     int seqno;			/* annotation serial number (AHA format only)*/
     char *rname;		/* record with which annotator is associated */
     char out_of_order;		/* if >0, one or more annotations written by
 				   putann are not in the canonical (time, chan)
 				   order */
 } **oad;
+static WFDB_Frequency oafreq;	/* time resolution in ticks/sec for newly-
+				   created output annotators */
 
 /* Local functions (for the use of other functions in this module only). */
 
@@ -230,6 +233,11 @@ static int put_ann_table(WFDB_Annotator i)
 	}
     if (flag) {	/* if a table was written, mark its end */
 	(void)sprintf(buf+1, "## end of definitions");
+	buf[0] = strlen(buf+1);
+	if (putann(i, &annot) < 0) return (-1);
+    }
+    if (oafreq) {
+	(void)sprintf(buf+1, "## time resolution: %g", oafreq);
 	buf[0] = strlen(buf+1);
 	if (putann(i, &annot) < 0) return (-1);
     }
@@ -456,12 +464,8 @@ FINT getann(WFDB_Annotator n, WFDB_Annotation *annot)
 	}
 	ia->tt += ia->word & DATA; /* annotation time */
 
-	if (ia->pann.time == (WFDB_Time)0 && ia->tt > (WFDB_Time)0) {
+	if (ia->pann.time == (WFDB_Time)0 && ia->tt > (WFDB_Time)0)
 	    ia->tmul = (ia->afreq > 0.0) ? getifreq()/ia->afreq : getspf();
-	    /*	    printf("tt = %ld, tmul = %g, afreq = %g, ffreq = %g, ifreq = %g, spf = %d\n",
-		   ia->tt, ia->tmul, ia->afreq, sampfreq(NULL), getifreq(), getspf());
-	    */
-	}
 
 	ia->ann.time = (WFDB_Time)(ia->tt * ia->tmul + 0.5);
 	ia->ann.anntyp = (ia->word & CODE) >> CS; /* set annotation type */
@@ -561,20 +565,20 @@ FINT putann(WFDB_Annotator n, WFDB_Annotation *annot)
 	wfdb_error("putann: can't write annotation file %d\n", n);
 	return (-2);
     }
-    if (oa->ann.time <= 0L && oa->afreq <= 0.0) {
-	if ((oa->afreq = getifreq()) != sampfreq(NULL)) {
+    t = annot->time;
+    if (oa->ann.time == (WFDB_Time)0 && oafreq == 0.0 &&
+	getifreq() != sampfreq(NULL)) {
+	if ((oafreq = getifreq()) != 0.0) {
 	    static WFDB_Annotation annot;
-	    static char buf[30];
+	    char buf[30];
 
-	    /* time resolution of annotations is unequal to that of signals */
-	    (void)sprintf(buf+1, "## time resolution: %g", oa->afreq);
-	    buf[0] = strlen(buf+1);
 	    annot.anntyp = NOTE;
 	    annot.aux = buf;
+	    (void)sprintf(buf+1, "## time resolution: %g", oafreq);
+	    buf[0] = strlen(buf+1);
 	    if (putann(n, &annot) < 0) return (-1);
 	}
     }
-    t = annot->time;
     if (((delta = t - oa->ann.time) < 0L ||
 	(delta == 0L && annot->chan <= oa->ann.chan)) &&
 	(t != 0L || oa->ann.time != 0L)) {
@@ -898,6 +902,20 @@ FINT setanndesc(int code, char *string)
 	wfdb_error("setanndesc: illegal annotation code %d\n", code);
 	return (-1);
     }
+}
+
+
+/*  setafreq: set time resolution for output annotation files */
+FVOID setafreq(WFDB_Frequency f)
+{
+    if (f > 0.0)
+	oafreq = f;
+}
+
+/* getafreq: return time resolution for output annotation files */
+FFREQUENCY getafreq(void)
+{
+    return (oafreq);
 }
 
 /* iannclose: close input annotation file n */

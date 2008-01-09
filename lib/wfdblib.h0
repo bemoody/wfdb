@@ -1,5 +1,5 @@
 /* file: wfdblib.h	G. Moody	13 April 1989
-                        Last revised:	29 March 2007       wfdblib 10.4.5
+                        Last revised:	31 December 2007       wfdblib 10.4.5
 External definitions for WFDB library private functions
 
 _______________________________________________________________________________
@@ -83,44 +83,53 @@ symbols reserved to the library begin with the characters "wfdb_".
 # endif
 #endif
 
-/* Uncomment the next line if this software is to be compiled on a Macintosh.*/
+/* Macintosh users are strongly advised to use Mac OS X or later.  If you are
+   doing so, no special configuration is needed, and you may ignore this
+   section.
+
+   If you are running Mac OS 9 or earlier, you may be able to use the WFDB
+   software package, but this configuration has not been tested for many years,
+   and is not supported!  If you would like to try it, define MAC. */
 /* #define MAC */
-/* Macintosh users only:  If the version of "ISO 9660 File Access" in the
-   "System:Extensions" folder is earlier than 5.0, either update your system
-   software (recommended) or uncomment the next line. */
-/* #define FIXISOCD */
 
 /* DEFWFDB is the default value of the WFDB path if the WFDB environment
    variable is not set.  This value is edited by the configuration script
    (../configure), which also edits this block of comments to match.
 
-   In most cases, it is sufficient to use the string ". DBDIR" for
-   this purpose, thus restricting the search for WFDB files to the current
-   directory ("."), followed by DBDIR).
+   If WFDB_NETFILES support is disabled, the string ". DBDIR" is
+   usually sufficient for a default WFDB path, thus restricting the search for
+   WFDB files to the current directory ("."), followed by DBDIR).
    
-   If WFDB_NETFILES support is enabled, the setting below adds the
+   If WFDB_NETFILES support is enabled, the first setting below adds the
    web-accessible PhysioBank databases to the default path; you may wish to
    change this to use a nearby PhysioNet mirror (for a list of mirrors, see
-   http://www.physionet.org/mirrors/).  DEFWFDB must not be NULL, however.
-   The default given below for the Macintosh specifies that the WFDB path is to
-   be read from the file udb/dbpath.mac on the third edition of the MIT-BIH
-   Arrhythmia Database CD-ROM (which has a volume name of `MITADB3'); you may
-   prefer to use a file on a writable disk for this purpose to make
-   reconfiguration possible.  See getwfdb() in wfdbio.c for further
-   information.
+   http://physionet.org/mirrors/).  DEFWFDB must not be NULL, however.
 */
+
+#ifndef WFDB_NETFILES
+# define DEFWFDB	". DBDIR"
+#else
+# define DEFWFDB ". DBDIR http://physionet.org/physiobank/database"
+#endif
+
+/* Mac OS 9 and earlier, only:  The value of DEFWFDB given below specifies
+   that the WFDB path is to be read from the file udb/dbpath.mac on the third
+   edition of the MIT-BIH Arrhythmia Database CD-ROM (which has a volume name
+   of `MITADB3');  you may prefer to use a file on a writable disk for this
+   purpose, to make reconfiguration possible.  See getwfdb() in wfdbio.c for
+   further information.
+  
+   If the version of "ISO 9660 File Access" in the "System:Extensions" folder
+   is earlier than 5.0, either update your system software (recommended) or
+   define FIXISOCD. */
+
 #ifdef MAC
+/* #define FIXISOCD */
 # ifdef FIXISOCD
 #  define DEFWFDB	"@MITADB3:UDB:DBPATH.MAC;1"
 # else
 #  define DEFWFDB	"@MITADB3:UDB:DBPATH.MAC"
-# define __STDC__
-# endif
-#else
-# if WFDB_NETFILES
-# define DEFWFDB ". DBDIR http://www.physionet.org/physiobank/database"
-# else
-#  define DEFWFDB	". DBDIR"
+#  define __STDC__
 # endif
 #endif
 
@@ -152,7 +161,7 @@ symbols reserved to the library begin with the characters "wfdb_".
    (returning each sample of any oversampled signals, and duplicating samples
    of other signals as necessary).  If the operating mode is not selected by
    invoking setgvmode(), the value of the environment variable WFDBGVMODE
-   determines the mode (0: WFDB_LOWRES, non-zero: WFDB_HIGHRES);  if WFDBGVMODE
+   determines the mode (0: WFDB_LOWRES, 1: WFDB_HIGHRES);  if WFDBGVMODE
    is not set, the value of DEFWFDBMODE determines the mode. */
 #define DEFWFDBGVMODE WFDB_LOWRES
 

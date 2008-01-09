@@ -1,9 +1,9 @@
 /* file: wfdbdesc.c		G. Moody	  June 1989
-				Last revised:   31 March 2006
+				Last revised:   6 January 2008
 
 -------------------------------------------------------------------------------
 wfdbdesc: Describe signal specifications
-Copyright (C) 1989-2006 George B. Moody
+Copyright (C) 1989-2008 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -64,6 +64,7 @@ char *argv[];
     else if (nsig > 0)
 	nsig = isigopen(argv[1], s, -nsig);
     (void)printf("Record %s", argv[1]);
+    setgvmode(WFDB_LOWRES);
     t = strtim("e");
     if (nsig > 0 && s[0].nsamp != t) {
 	msrec = 1;
@@ -91,7 +92,7 @@ char *argv[];
     else if (s[0].fmt && (ifile = fopen(s[0].fname, "rb")) &&
 	     (fseek(ifile, 0L, 2) == 0)) {
 	int framesize = 0;
-	long nbytes = ftell(ifile);
+	long nbytes = ftell(ifile) - wfdbgetstart(0);
 
 	fclose(ifile);
 	for (i = 0; i < nsig && s[i].group == 0; i++)

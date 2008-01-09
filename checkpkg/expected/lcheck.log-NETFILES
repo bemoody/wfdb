@@ -10,7 +10,7 @@
 [OK]:  WFDB_DEFFREQ = 250
 [OK]:  WFDB_DEFGAIN = 200
 [OK]:  WFDB_DEFRES = 12
-[OK]:  Default WFDB path = . /usr/database http://www.physionet.org/physiobank/database
+[OK]:  Default WFDB path = . /usr/database http://physionet.org/physiobank/database
 [OK]:  WFDB path modified successfully
 [OK]:  WFDB calibration list opened successfully
 [OK]:  getcal was successful

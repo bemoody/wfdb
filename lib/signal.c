@@ -1,10 +1,10 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised: 25 September 2007		wfdblib 10.4.5
+			Last revised:  8 January 2008		wfdblib 10.4.5
 WFDB library functions for signals
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1989-2007 George B. Moody
+Copyright (C) 1989-2008 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -288,6 +288,7 @@ static int gvmode = -1;		/* getvec mode (WFDB_HIGHRES or WFDB_LOWRES
 static int gvpad;		/* getvec padding (if non-zero, replace invalid
 				   samples with previous valid samples) */
 static int gvc;			/* getvec sample-within-frame counter */
+static int isedf;		/* if non-zero, record is stored as EDF/EDF+ */
 WFDB_Sample *sbuf = NULL;	/* buffer used by sample() */
 static int sample_vflag;	/* if non-zero, last value returned by sample()
 				   was valid */
@@ -712,6 +713,7 @@ static int edfparse(WFDB_FILE *ifile)
     wfdb_fread(junk, 1, 44, ifile);	/* free space (ignored) */
     wfdb_fread(buf, 1, 8, ifile);	/* number of frames (EDF blocks) */
     sscanf(buf, "%ld", &nframes);
+    nsamples = nframes;
     wfdb_fread(buf, 1, 8, ifile);	/* data record duration (seconds) */
     sscanf(buf, "%lf", &spr);
     if (spr <= 0.0) spr = 1.0;
@@ -841,23 +843,20 @@ static int edfparse(WFDB_FILE *ifile)
     hheader = NULL;	/* make sure getinfo doesn't try to read the EDF file */
 
     ffreq = 1.0 / spr;	/* frame frequency = 1/(seconds per EDF block) */
-    cfreq = sfreq = ffreq; /* set sampling and counter frequencies to match */
-    setsampfreq(sfreq);
-    /* *** */
-    /*    printf("ffreq = %g, sampfreq(NULL) = %g\n", ffreq, sampfreq(NULL));
-     */
+    cfreq = ffreq; /* set sampling and counter frequencies to match */
+    sfreq = ffreq * ispfmax;
+    if (getafreq() == 0.0) setafreq(sfreq);
+    gvmode &= WFDB_HIGHRES;
     sprintf(buf, "%02d:%02d:%02d %02d/%02d/%04d",
 	    hour, minute, second, day, month, year);
     setbasetime(buf);
-
-    setgvmode(WFDB_HIGHRES);
 
     free(pmin);
     free(pmax);
     free(dmin);
     free(dmax);
+    isedf = 1;
     return (nsig);
-
 }
 
 static int readheader(const char *record)
@@ -872,6 +871,7 @@ static int readheader(const char *record)
     /* If another input header file was opened, close it. */
     if (hheader) (void)wfdb_fclose(hheader);
 
+    isedf = 0;
     if (strcmp(record, "~") == 0) {
 	if (in_msrec && vsd) {
 	    char *p;
@@ -2902,6 +2902,8 @@ FLONGINT wfdbgetstart(WFDB_Signal s)
 {
     if (s < nisig)
         return (igd[vsd[s]->info.group]->start);
+    else if (s == 0 && hsd != NULL)
+	return (hsd[0]->start);
     else
 	return (0L);
 }
@@ -2926,7 +2928,8 @@ FSTRING getinfo(char *record)
 	return (NULL);
     }
     else if (record == NULL && hheader == NULL) {
-	wfdb_error("getinfo: caller did not specify record name\n");
+	if (isedf == 0)
+	    wfdb_error("getinfo: caller did not specify record name\n");
 	return (NULL);
     }
 
