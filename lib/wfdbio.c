@@ -1,10 +1,10 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:	20 December 2007       wfdblib 10.4.5
+                        Last revised:	11 January 2008       wfdblib 10.4.5
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1988-2007 George B. Moody
+Copyright (C) 1988-2008 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -34,11 +34,9 @@ This file contains definitions of the following WFDB library functions:
  getwfdb		(returns the database path string)
  setwfdb		(sets the database path string)
  wfdbquiet		(suppresses WFDB library error messages)
- wfdbverbose *		(enables WFDB library error messages)
- wfdberror ***		(returns the most recent WFDB library error message)
- wfdbfile **		(returns the complete pathname of a WFDB file)
-
-(* New in version 4.0; ** new in version 4.3; *** new in version 4.5.)
+ wfdbverbose [4.0]	(enables WFDB library error messages)
+ wfdberror [4.5]	(returns the most recent WFDB library error message)
+ wfdbfile [4.3]		(returns the complete pathname of a WFDB file)
 
 These functions, also defined here, are intended only for the use of WFDB
 library functions defined elsewhere:
@@ -46,19 +44,21 @@ library functions defined elsewhere:
  wfdb_g32		(reads a 32-bit integer)
  wfdb_p16		(writes a 16-bit integer)
  wfdb_p32		(writes a 32-bit integer)
- wfdb_free_path_list *** (frees all data structures assigned to the path list)
- wfdb_parse_path ***	(splits WFDB path into components)
- wfdb_export_config **** (puts the WFDB path, etc. into the environment)
- wfdb_getiwfdb *	(sets WFDB from the contents of a file)
- wfdb_addtopath *	(adds path component of string argument to WFDB path)
+ wfdb_free_path_list [10.0.1] (frees data structures assigned to the path list)
+ wfdb_parse_path [10.0.1] (splits WFDB path into components)
+ wfdb_export_config [10.3.9] (puts the WFDB path, etc. into the environment)
+ wfdb_getiwfdb [6.2]	(sets WFDB from the contents of a file)
+ wfdb_addtopath [6.2]	(adds path component of string argument to WFDB path)
  wfdb_error		(produces an error message)
- wfdb_fprintf ***	(like fprintf, but first arg is a WFDB_FILE pointer)
+ wfdb_fprintf [10.0.1]	(like fprintf, but first arg is a WFDB_FILE pointer)
  wfdb_open		(finds and opens database files)
  wfdb_checkname		(checks record and annotator names for validity)
- wfdb_setirec **	(saves current record name)
+ wfdb_striphea [10.4.5] (removes trailing '.hea' from a record name, if present)
+ wfdb_setirec [9.7]	(saves current record name)
 
-(* New in version 6.2; ** new in version 9.7; *** new in version 10.0.1;
-**** new in version 10.3.9)
+(Numbers in brackets in the lists above indicate the first version of the WFDB
+library that included the corresponding function.  Functions not so marked
+have been included in all published versions of the WFDB library.)
 
 The next two groups of functions, which together enable input from remote
 (http and ftp) files, were first implemented in version 10.0.1 by Michael
@@ -214,7 +214,11 @@ FSTRING wfdbfile(char *s, char *record)
 
     if (s == NULL && record == NULL)
 	return (wfdb_filename);
-    else if ((ifile = wfdb_open(s, record, WFDB_READ))) {
+
+    /* Remove trailing .hea, if any, from record name. */
+    wfdb_striphea(record);
+
+    if ((ifile = wfdb_open(s, record, WFDB_READ))) {
 	(void)wfdb_fclose(ifile);
 	return (wfdb_filename);
     }
@@ -730,15 +734,15 @@ char *format;
 #endif
 #endif
 
-#define spr1(S, RECORD, TYPE)   ((TYPE == (char *)NULL) ? \
+#define spr1(S, RECORD, TYPE)   ((*TYPE == '\0') ? \
 				     (void)sprintf(S, "%s", RECORD) : \
 				     (void)sprintf(S, "%s.%s", RECORD, TYPE))
 #ifdef FIXISOCD
-# define spr2(S, RECORD, TYPE)  ((TYPE == (char *)NULL) ? \
+# define spr2(S, RECORD, TYPE)  ((*TYPE == '\0') ? \
 				     (void)sprintf(S, "%s;1", RECORD) : \
 				     (void)sprintf(S, "%s.%.3s;1",RECORD,TYPE))
 #else
-# define spr2(S, RECORD, TYPE)  ((TYPE == (char *)NULL) ? \
+# define spr2(S, RECORD, TYPE)  ((*TYPE == '\0') ? \
 				     (void)sprintf(S, "%s.", RECORD) : \
 				     (void)sprintf(S, "%s.%.3s", RECORD, TYPE))
 #endif
@@ -801,11 +805,22 @@ Pre-10.0.1 versions of this library that were compiled for environments other
 than MS-DOS used file names in the format TYPE.RECORD.  This file name format
 is no longer supported. */
 
-WFDB_FILE *wfdb_open(char *s, const char *record, int mode)
+WFDB_FILE *wfdb_open(const char *s, const char *record, int mode)
 {
     char *wfdb, *p;
     struct wfdb_path_component *c0;
     WFDB_FILE *ifile;
+
+    /* If the type (s) is empty, replace it with an empty string so that
+       strcmp(s, ...) will not segfault. */
+    if (s == NULL) s = "";
+
+    /* If the record name is empty, use s as the record name and replace s
+       with an empty string. */
+    if (record == NULL || *record == '\0') {
+	if (*s) { record = s; s = ""; }
+	else return (NULL);	/* failure -- both components are empty */
+    }
 
     /* Check to see if standard input or output is requested. */
     if (strcmp(s, "-") == 0 ||
@@ -824,14 +839,6 @@ WFDB_FILE *wfdb_open(char *s, const char *record, int mode)
 	    wfdb_stdout.fp = stdout;
 	    return (&wfdb_stdout);
 	}
-
-    /* If the record name is empty, use the type as the record name and empty
-       the type string. */
-    if (record == NULL || *record == '\0') {
-	if (s == NULL || *s == '\0')
-	    return (NULL);	/* failure -- both components are empty */
-	record = s; s = NULL;
-    }
 
     /* If the file is to be opened for output, use the current directory.
        An output file can be opened in another directory if the path to
@@ -948,15 +955,35 @@ recursively to open a segment within a multi-segment record) and by annopen
 void wfdb_setirec(const char *p)
 {
     const char *r;
+    int len;
 
     for (r = p; *r; r++)
 	if (*r == DSEP) p = r+1;	/* strip off any path information */
 #ifdef MSDOS
 	else if (*r == ':') p = r+1;
 #endif
-    if (strcmp(p, "-"))	       /* don't record '-' (stdin) as record name */
-	strncpy(irec, p, WFDB_MAXRNL);
+    len = strlen(p);
+    //    if (len > 4 && strcmp(p + len-4, ".hea") == 0)
+    //len -= 4;		/* final '.hea' is not part of record name */
+    if (len > WFDB_MAXRNL)
+	len = WFDB_MAXRNL;
+    if (strcmp(p, "-")) {       /* don't record '-' (stdin) as record name */
+	strncpy(irec, p, len);
+	irec[len] = '\0';
+    }
 }
+
+/* Remove trailing '.hea' from a record name, if present. */
+void wfdb_striphea(char *p)
+{
+    if (p) {
+	int len = strlen(p);
+
+	if (len > 4 && strcmp(p + len-4, ".hea") == 0)
+	    p[len-4] = '\0';
+    }
+}
+
 
 /* WFDB file I/O functions
 

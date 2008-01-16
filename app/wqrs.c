@@ -1,8 +1,8 @@
 /* file: wqrs.c		Wei Zong      23 October 1998
-			Last revised: 17 September 2007 (by G. Moody)
+			Last revised: 14 January 2008 (by G. Moody)
 -----------------------------------------------------------------------------
 wqrs: Single-lead QRS detector based on length transform
-Copyright (C) 1998-2007 Wei Zong
+Copyright (C) 1998-2008 Wei Zong
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -271,6 +271,12 @@ main(int argc, char **argv)
     	if (PWFreq == 60.0) setifreq(sps = 120.);
     	else setifreq(sps = 150.);
     }
+    if (sps < PWFreq) {
+	(void)fprintf(stderr, "%s: sampling frequency (%g Hz) is too low%s",
+		      pname, sps,
+		      (gvmode & WFDB_HIGHRES) ? "\n" : ", try -H option\n");
+	exit(3);
+    }
     if (from > 0L) {
 	if ((from = strtim(argv[from])) < 0L)
 	from = -from;
@@ -290,13 +296,13 @@ main(int argc, char **argv)
     lfsc = 1.25*gain*gain/sps;	/* length function scale constant */
     spm = 60 * sps;
     next_minute = from + spm;
-    LPn = sps/PWFreq;   /* The LP filter will have a notch at the
+    LPn = sps/PWFreq; 		/* The LP filter will have a notch at the
 				    power line (mains) frequency */
     if (LPn > 8)  LPn = 8;	/* avoid filtering too agressively */
     LP2n = 2 * LPn;
-    EyeClosing = sps * EYE_CLS;   /* set eye-closing period */
-    ExpectPeriod = sps * NDP;	   /* maximum expected RR interval */
-    LTwindow = sps * MaxQRSw;     /* length transform window size */
+    EyeClosing = sps * EYE_CLS; /* set eye-closing period */
+    ExpectPeriod = sps * NDP;	/* maximum expected RR interval */
+    LTwindow = sps * MaxQRSw;   /* length transform window size */
 
     (void)sample(sig, 0L);
     if (dflag) {
@@ -427,11 +433,12 @@ main(int argc, char **argv)
 	    (void)fprintf(stderr, ".");
 	    (void)fflush(stderr);
 	    if (++minutes >= 60) {
-		(void)fprintf(stderr, "\n");
+		(void)fprintf(stderr, " %s\n", timstr(t));
 		minutes = 0;
 	    }
 	}
     }
+    if (minutes) (void)fprintf(stderr, " %s\n", timstr(t));
 
     (void)free(lbuf);
     (void)free(ebuf);

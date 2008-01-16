@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  8 January 2008		wfdblib 10.4.5
+			Last revised:  14 January 2008		wfdblib 10.4.5
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -94,6 +94,7 @@ This file also contains definitions of the following WFDB library functions:
  physadu [6.0]	(converts physical units to ADC units)
  sample [10.3.0](get a sample from a given signal at a given time)
  sample_valid [10.3.0](verify that last value returned by sample was valid)
+
 (Numbers in brackets in the list above indicate the first version of the WFDB
 library that included the corresponding function.  Functions not so marked
 have been included in all published versions of the WFDB library.)
@@ -888,15 +889,20 @@ static int readheader(const char *record)
 	return (0);
     }
 
-    /* Try to open the header file. */
-    if ((hheader = wfdb_open("hea", record, WFDB_READ)) == NULL) {
-	if ((hheader = wfdb_open("edf", record, WFDB_READ)) ||
-	    (hheader = wfdb_open("EDF", record, WFDB_READ)))
-	    return (edfparse(hheader));
-	else {
-	    wfdb_error("init: can't open header for record %s\n", record);
+    /* If the record name includes a '.', assume it is a file name. */
+    if (p = strstr(record, ".")) {
+	if ((hheader = wfdb_open(NULL, record, WFDB_READ)) == NULL) {
+	    wfdb_error("init: can't open %s\n", record);
 	    return (-1);
 	}
+	else if (strcmp(p+1, "hea"))	/* assume EDF if suffix is not '.hea' */
+	    return (edfparse(hheader));
+    }
+
+    /* Otherwise, assume the file name is record.hea. */
+    else if ((hheader = wfdb_open("hea", record, WFDB_READ)) == NULL) {
+	wfdb_error("init: can't open header for record %s\n", record);
+	return (-1);
     }
 
     /* Read the first line and check for a magic string. */
@@ -948,7 +954,7 @@ static int readheader(const char *record)
        may be corrupted.  The requirement for a match is waived for remote
        files since the user may not be able to make any corrections to them. */
     if (hheader->type == WFDB_LOCAL &&
-	hheader->fp != stdin && strcmp(p, record) != 0) {
+	hheader->fp != stdin && strncmp(p, record, strlen(p)) != 0) {
 	/* If there is a mismatch, check to see if the record argument includes
 	   a directory separator (whether valid or not for this OS);  if so,
 	   compare only the final portion of the argument against the name in
@@ -1931,7 +1937,7 @@ static int rgetvec(WFDB_Sample *vector)
 
 /* WFDB library functions. */
 
-FINT isigopen(const char *record, WFDB_Siginfo *siarray, int nsig)
+FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
 {
     int navail, ngroups, nn;
     struct hsdata *hs;
@@ -1943,6 +1949,9 @@ FINT isigopen(const char *record, WFDB_Siginfo *siarray, int nsig)
     /* Close previously opened input signals unless otherwise requested. */
     if (*record == '+') record++;
     else isigclose();
+
+    /* Remove trailing .hea, if any, from record name. */
+    wfdb_striphea(record);
 
     /* Save the current record name. */
     if (!in_msrec) wfdb_setirec(record);
@@ -2112,7 +2121,7 @@ FINT isigopen(const char *record, WFDB_Siginfo *siarray, int nsig)
     return (s);
 }
 
-FINT osigopen(const char *record, WFDB_Siginfo *siarray, unsigned int nsig)
+FINT osigopen(char *record, WFDB_Siginfo *siarray, unsigned int nsig)
 {
     int n;
     struct osdata *os, *op;
@@ -2123,6 +2132,9 @@ FINT osigopen(const char *record, WFDB_Siginfo *siarray, unsigned int nsig)
     /* Close previously opened output signals unless otherwise requested. */
     if (*record == '+') record++;
     else osigclose();
+
+    /* Remove trailing .hea, if any, from record name. */
+    wfdb_striphea(record);
 
     if ((n = readheader(record)) < 0)
 	return (n);
@@ -2402,7 +2414,7 @@ FINT setifreq(WFDB_Frequency f)
 	    ifreq = 0.0;
 	    return (-2);
 	}
-	ifreq = f;
+	setafreq(ifreq = f);
 	/* The 0.005 below is the maximum tolerable error in the resampling
 	   frequency (in Hz).  The code in the while loop implements Euclid's
 	   algorithm for finding the greatest common divisor of two integers,
@@ -2665,6 +2677,9 @@ FINT newheader(char *record)
     WFDB_Signal s;
     WFDB_Siginfo *osi;
 
+    /* Remove trailing .hea, if any, from record name. */
+    wfdb_striphea(record);
+
     if ((osi = malloc(nosig*sizeof(WFDB_Siginfo))) == NULL) {
 	wfdb_error("newheader: insufficient memory\n");
 	return (-1);
@@ -2694,6 +2709,9 @@ FINT setheader(char *record, WFDB_Siginfo *siarray, unsigned int nsig)
 	(void)wfdb_fclose(oheader);
 	oheader = NULL;
     }
+
+    /* Remove trailing .hea, if any, from record name. */
+    wfdb_striphea(record);
 
     /* Quit (with message from wfdb_checkname) if name is illegal. */
     if (wfdb_checkname(record, "record"))
@@ -2771,6 +2789,9 @@ FINT setmsheader(char *record, char **segment_name, unsigned int nsegments)
 	(void)wfdb_fclose(oheader);
 	oheader = NULL;
     }
+
+    /* Remove trailing .hea, if any, from record name. */
+    wfdb_striphea(record);
 
     /* Quit (with message from wfdb_checkname) if name is illegal. */
     if (wfdb_checkname(record, "record"))
@@ -2923,6 +2944,9 @@ FSTRING getinfo(char *record)
     char *p;
     static char linebuf[256];
 
+    /* Remove trailing .hea, if any, from record name. */
+    wfdb_striphea(record);
+
     if (record != NULL && readheader(record) < 0) {
 	wfdb_error("getinfo: can't read record %s header\n", record);
 	return (NULL);
@@ -2961,6 +2985,9 @@ FINT putinfo(char *s)
 FFREQUENCY sampfreq(char *record)
 {
     int n;
+
+    /* Remove trailing .hea, if any, from record name. */
+    wfdb_striphea(record);
 
     if (record != NULL) {
 	/* Save the current record name. */

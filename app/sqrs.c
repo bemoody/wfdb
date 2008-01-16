@@ -1,9 +1,9 @@
 /* file: sqrs.c		G. Moody	27 October 1990
-			Last revised:  25 February 2006
+			Last revised:	14 January 2008
 
 -------------------------------------------------------------------------------
 sqrs: Single-channel QRS detector
-Copyright (C) 1990-2006 George B. Moody
+Copyright (C) 1990-2008 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -167,13 +167,22 @@ char *argv[];
 	(void)fprintf(stderr, "%s: insufficient memory\n", pname);
 	exit(2);
     }
-    a.name = "qrs"; a.stat = WFDB_WRITE;
-    if ((nsig = wfdbinit(record, &a, 1, s, nsig)) < 1) exit(2);
-    if (sampfreq((char *)NULL) < 240. || sampfreq((char *)NULL) > 260.)
+    if ((nsig = isigopen(record, s, nsig)) < 1) exit(2);
+    if (sampfreq((char *)NULL) < 50.) {
+	(void)fprintf(stderr, "%s: sampling frequency (%g Hz) is too low%s",
+		      pname, sampfreq((char *)NULL),
+		      gvmode & WFDB_HIGHRES ? "\n" : ", try -H option\n");
+	exit(3);
+    }
+    if (sampfreq((char *)NULL) < 240. || sampfreq((char *)NULL) > 260.) 
 	setifreq(250.);
+
+    a.name = "qrs"; a.stat = WFDB_WRITE;
+    if (annopen(record, &a, 1) < 0) exit(2);
+
     if (from > 0L) {
 	if ((from = strtim(argv[from])) < 0L)
-	from = -from;
+	    from = -from;
 	if (isigsettime(from) < 0)
 	    exit(2);
     }
@@ -246,12 +255,12 @@ char *argv[];
 	    (void)fprintf(stderr, ".");
 	    (void)fflush(stderr);
 	    if (++minutes >= 60) {
-		(void)fprintf(stderr, "\n");
+		(void)fprintf(stderr, " %s\n", timstr(now));
 		minutes = 0;
 	    }
 	}
     } while (getvec(v) > 0 && (to == 0L || now <= to));
-
+    if (minutes) (void)fprintf(stderr, " %s\n", timstr(now));
     wfdbquit();
     exit(0);	/*NOTREACHED*/
 }

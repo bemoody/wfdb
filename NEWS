@@ -1,4 +1,14 @@
-10.4.5pre1:
+10.4.5:
+	TODO: Maybe setifreq could set a hook to be invoked by isigopen, so
+	that it could be invoked before opening the signals ... then it would
+	be OK to use wfdbinit after setifreq.
+
+	FIXME: It looks like isigsettime doesn't work properly after setifreq
+	has been used on EDF input.  The byte offset (nb) calculated in
+	isgsetframe looks right, but (e.g.) skipping the first two minutes
+	results in the record ending two minutes early, as if the initial skip
+	had been 2*nb.  Test case: sqrs -r foo.edf -H -f 2:0
+
 	Bob Farrell and Tony Ricke chased down and provided fixes for memory
 	leaks in several WFDB library functions, and also provided revisions
 	to permit additional type checking and to avoid type mismatch warnings.
@@ -14,7 +24,8 @@
 
         Removed unused variables from app/wapb.c (thanks to Thomas Heldt).
 
-	Corrected threshold update in app/wqrs.c.
+	Corrected threshold update in app/wqrs.c, and added a check to avoid
+	problems when the sampling frequency is too low.
 
 	When creating annotation files, if the input sampling frequency differs
 	from the frame rate of the input record (either because of using
@@ -29,13 +40,25 @@
 	independently for each annotation file, so (for example) bxb can
 	compare two annotation files written with different resolutions.
 
-	This version also includes preliminary support for reading EDF files
-	natively.  When attempting to open a given record N, if N.hea does
-	not exist, the WFDB library looks for N.edf and N.EDF (looking for
-	these files at each location in the WFDB path before continuing the
-	search at the next WFDB path location).  If an EDF file is found it
-	is opened in WFDB_HIGHRES mode.  The current (beta) version does not
-	properly read annotation files associated with EDF files.
+	The ability to set the time resolution of annotation files has required
+	a minor change in the semantics of setifreq().  It is now necessary
+	to invoke setifreq() before creating an annotation file that will
+	have a resolution matching the (modified) input sampling frequency.
+	Since setifreq() must be invoked after opening the input signals,
+	this implies that wfdbinit cannot be used to open both input signals
+	and output annotation files if setifreq() is to be used;  rather, the
+	sequence should be isigopen, setifreq, and finally annopen.
+
+	If a string that includes a '.' is supplied to a WFDB library function
+	where a record name is expected, the WFDB library assumes that it is
+	the name of a file located in the WFDB path. If the name ends in '.hea',
+	the file is assumed to be a WFDB-format header file, and its record name
+	is assumed to be the first part of the string, exclusive of the '.hea'.
+
+	This version also includes support for reading EDF files natively.
+	If a string supplied as a record name contains a '.' but does not end
+	in '.hea', it is assumed to be the record name of an EDF file of the
+	same name.
 
 10.4.4: Added 'collect.sh' script to 'conf', and 'collect' target to
 	'make' template files (Makefile.tpl) to simplify creation of

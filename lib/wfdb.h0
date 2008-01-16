@@ -1,5 +1,5 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised:   8 January 2008	wfdblib 10.4.5
+			Last revised:   11 January 2008	wfdblib 10.4.5
 WFDB library type, constant, structure, and function interface definitions
 
 _______________________________________________________________________________
@@ -233,13 +233,13 @@ extern "C" {
 
 /* Define function prototypes for ANSI C compilers and C++ compilers */
 #ifdef wfdb_PROTO
-extern FINT annopen(const char *record, WFDB_Anninfo *aiarray,
+extern FINT annopen(char *record, WFDB_Anninfo *aiarray,
 		    unsigned int nann);
-extern FINT isigopen(const char *record, WFDB_Siginfo *siarray, int nsig);
-extern FINT osigopen(const char *record, WFDB_Siginfo *siarray,
+extern FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig);
+extern FINT osigopen(char *record, WFDB_Siginfo *siarray,
 		     unsigned int nsig);
 extern FINT osigfopen(WFDB_Siginfo *siarray, unsigned int nsig);
-extern FINT wfdbinit(const char *record,
+extern FINT wfdbinit(char *record,
 		     WFDB_Anninfo *aiarray, unsigned int nann,
 		     WFDB_Siginfo *siarray, unsigned int nsig);
 extern FINT getspf(void);

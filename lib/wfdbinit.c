@@ -1,9 +1,9 @@
 /* file: wfdbinit.c	G. Moody	 23 May 1983
-			Last revised:   29 March 2007		wfdblib 10.4.5
+			Last revised:  11 January 2008		wfdblib 10.4.5
 WFDB library functions wfdbinit, wfdbquit, and wfdbflush
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1983-2007 George B. Moody
+Copyright (C) 1983-2008 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -32,7 +32,7 @@ This file contains definitions of the following WFDB library functions:
 
 #include "wfdblib.h"
 
-FINT wfdbinit(const char *record, WFDB_Anninfo *aiarray, unsigned int nann,
+FINT wfdbinit(char *record, WFDB_Anninfo *aiarray, unsigned int nann,
 	      WFDB_Siginfo *siarray, unsigned int nsig)
 {
     int stat;
