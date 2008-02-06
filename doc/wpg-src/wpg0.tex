@@ -21,7 +21,7 @@
 @center Harvard-MIT Division of Health Sciences and Technology
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1989 -- 2007 George B. Moody
+Copyright @copyright{} 1989 -- 2008 George B. Moody
 @sp 2
 The most recent versions of the software described in this guide may be
 downloaded from @uref{http://www.physionet.org/}.  For further
@@ -515,6 +515,43 @@ changes that may not be described here.
 Bob Farrell and Tony Ricke chased down and provided fixes for memory leaks
 in several WFDB library functions, and also provided revisions to permit
 additional type checking and to avoid type mismatch warnings.
+
+Changes in the build system make it easier to build WFDB using Cygwin
+gcc (with or without the Cygwin POSIX library).
+
+When creating annotation files, if the input sampling frequency differs
+from the frame rate of the input record (either because of using
+@code{WFDB_HIGHRES} mode while reading a multifrequency record, or because
+of having used @code{setifreq()} to modify the sampling frequency), a comment
+is written to the beginning of the annotation file indicating the
+resolution of the annotation times in ticks per second (thus allowing
+the application to store its annotations with whatever time resolution
+is desired).  When reading an annotation file, if such a resolution
+comment is found, getann adjusts the times of annotations to match the
+currently defined sampling frequency.  The resolutions are kept
+independently for each annotation file, so (for example) @code{bxb} can
+compare two annotation files written with different resolutions.
+
+The ability to set the time resolution of annotation files has required
+a minor change in the semantics of @code{setifreq()}.  It is now necessary
+to invoke @code{setifreq()} before creating an annotation file that will
+have a resolution matching the (modified) input sampling frequency.
+Since @code{setifreq()} must be invoked after opening the input signals,
+this implies that @code{wfdbinit()} cannot be used to open both input signals
+and output annotation files if @code{setifreq()} is to be used;  rather, the
+sequence should be @code{isigopen()}, @code{setifreq()}, and finally
+@code{annopen()}.
+
+If a string that includes a @samp{.} is supplied to a WFDB library function
+where a record name is expected, the WFDB library assumes that it is
+the name of a file located in the WFDB path. If the name ends in @samp{.hea},
+the file is assumed to be a WFDB-format header file, and its record name
+is assumed to be the first part of the string, exclusive of the @samp{.hea'}.
+
+This version also includes support for reading EDF files natively.
+If a string supplied as a record name contains a @samp{.} but does not end
+in @samp{.hea}, it is assumed to be the record name of an EDF file of the
+same name.
 
 (WFDB library versions 10.4.3 and 10.4.4 were identical to version 10.4.2.)
 
@@ -2241,6 +2278,7 @@ if (n == 0)
 @end example
 
 @noindent
+Avoid using @code{wfdbinit} and @code{setifreq} in the same program.
 @xref{Example 9}, for an illustration of the use of @code{wfdbinit}.
 @ifnotinfo
 @xref{osigopen, , @code{osigopen}}, and @pxref{osigfopen, , @code{osigfopen}},
@@ -2281,7 +2319,8 @@ This function sets the current input sampling frequency (in samples per
 second per signal).  It should be invoked after opening the input
 signals (using @code{isigopen} or @code{wfdbinit}), and before using any
 of @code{getvec}, @code{getann}, @code{putann}, @code{isigsettime},
-@code{isgsettime}, @code{timstr}, @code{mstimstr}, or @code{strtim}.
+@code{isgsettime}, @code{timstr}, @code{mstimstr}, @code{strtim},
+or @code{annopen}.
 @emph{Note that the operation of @code{getframe} is unaffected by
 @code{setifreq}.}
 
@@ -2331,6 +2370,9 @@ main(int argc, char **argv)
 copy of this program.  Compile it as shown in the previous chapter, then run it
 using a command such as @samp{psamplex 100}.)  The QRS detector in chapter 6
 also illustrates the use of @code{setifreq} (@pxref{Example 10}).
+
+@noindent
+Avoid using @code{wfdbinit} and @code{setifreq} in the same program.
 
 @c @group
 @node     getifreq, setgvmode, setifreq, special input modes
@@ -7132,18 +7174,18 @@ is based on a Pascal program written by W.A.H. Engelse and C. Zeelenberg,
 @i{21}          exit(1);
 @i{22}      @}
 @i{23}      a.name = "qrs"; a.stat = WFDB_WRITE;
-@i{24}  
-@i{25}      if ((nsig = isigopen(argv[1], NULL, 0)) < 1) exit(2);
-@i{26}      s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
-@i{27}      v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
-@i{28}      if (s == NULL || v == NULL) @{
-@i{29}          fprintf(stderr, "%s: insufficient memory\n", argv[0]);
-@i{30}          exit(2);
-@i{31}      @}
-@i{32}      if (wfdbinit(argv[1], &a, 1, s, nsig) != nsig) exit(2);
-@i{33}      if (sampfreq((char *)NULL) < 240. ||
-@i{34}          sampfreq((char *)NULL) > 260.)
-@i{35}          setifreq(250.);
+@i{24}      if ((nsig = isigopen(argv[1], NULL, 0)) < 1) exit(2);
+@i{25}      s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+@i{26}      v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
+@i{27}      if (s == NULL || v == NULL) @{
+@i{28}          fprintf(stderr, "%s: insufficient memory\n", argv[0]);
+@i{29}          exit(2);
+@i{30}      @}
+@i{31}      if (isigopen(argv[1], s, nsig) != nsig) exit(2);
+@i{32}      if (sampfreq((char *)NULL) < 240. ||
+@i{33}          sampfreq((char *)NULL) > 260.)
+@i{34}          setifreq(250.);
+@i{35}      if (annopen(argv[1], &a, 1) < 0) exit(2);
 @i{36}      if (argc > 2) scmin = muvadu(0, atoi(argv[2]));
 @i{37}      if (scmin < 1) scmin = muvadu(0, 1000);
 @i{38}      slopecrit = scmax = 10 * scmin;
@@ -7217,13 +7259,14 @@ A macro that evaluates to the absolute value of its argument.
 @item Lines 11--12:
 The names of these variables match those in the original Pascal program.
 
-@item Lines 33--35:
+@item Lines 32--35:
 Most of this program is independent of sampling frequency, but the filter
 (lines 45--46) and the threshold are as specified by the authors
 of the original program for human ECGs sampled at 250 Hz (e.g., the AHA DB).
 If the sampling frequency of the input record is significantly
 different, we use @code{setifreq} to specify that we want @code{getvec}
-to give us data resampled at 250 Hz.
+to give us data resampled at 250 Hz.  The output annotation file is
+created in line 35 only after invoking @code{setifreq} if necessary.
 
 @item Lines 36--38:
 The threshold is actually a slope criterion (with units of amplitude/time);

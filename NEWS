@@ -1,14 +1,4 @@
 10.4.5:
-	TODO: Maybe setifreq could set a hook to be invoked by isigopen, so
-	that it could be invoked before opening the signals ... then it would
-	be OK to use wfdbinit after setifreq.
-
-	FIXME: It looks like isigsettime doesn't work properly after setifreq
-	has been used on EDF input.  The byte offset (nb) calculated in
-	isgsetframe looks right, but (e.g.) skipping the first two minutes
-	results in the record ending two minutes early, as if the initial skip
-	had been 2*nb.  Test case: sqrs -r foo.edf -H -f 2:0
-
 	Bob Farrell and Tony Ricke chased down and provided fixes for memory
 	leaks in several WFDB library functions, and also provided revisions
 	to permit additional type checking and to avoid type mismatch warnings.
@@ -45,9 +35,9 @@
 	to invoke setifreq() before creating an annotation file that will
 	have a resolution matching the (modified) input sampling frequency.
 	Since setifreq() must be invoked after opening the input signals,
-	this implies that wfdbinit cannot be used to open both input signals
+	this implies that wfdbinit() cannot be used to open both input signals
 	and output annotation files if setifreq() is to be used;  rather, the
-	sequence should be isigopen, setifreq, and finally annopen.
+	sequence should be isigopen(), setifreq(), and finally annopen().
 
 	If a string that includes a '.' is supplied to a WFDB library function
 	where a record name is expected, the WFDB library assumes that it is

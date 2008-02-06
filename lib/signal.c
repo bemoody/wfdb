@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  14 January 2008		wfdblib 10.4.5
+			Last revised:  6 February 2008		wfdblib 10.4.5
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -270,7 +270,7 @@ static struct igdata {		/* shared by all signals in a group (file) */
     char *bp;			/* pointer to next location in buf[] */
     char *be;			/* pointer to input buffer endpoint */
     char count;			/* input counter for bit-packed signal */
-    char seek;			/* flag to indicate if seeks are permitted */
+    char seek;			/* 0: do not seek on file, 1: seeks permitted */
     int stat;			/* signal file status flag */
 } **igd;
 static WFDB_Sample *tvector;	/* getvec workspace */
@@ -2598,12 +2598,10 @@ FINT isigsettime(WFDB_Time t)
     
 FINT isgsettime(WFDB_Group g, WFDB_Time t)
 {
-    int spf, stat, tr, trem = 0;
+    int spf, stat, trem = 0;
 
     /* Handle negative arguments as equivalent positive arguments. */
     if (t < 0L) t = -t;
-
-    tr = t;
 
     /* Convert t to raw sample intervals if we are resampling. */
     if (ifreq > (WFDB_Frequency)0)
@@ -2631,13 +2629,6 @@ FINT isgsettime(WFDB_Group g, WFDB_Time t)
 	    rgvstat = rgetvec(gv1);
 	    rgvtime = nticks;
 	}
-    }
-
-    if (ifreq > (WFDB_Frequency)0 && tr != t) {
-	t = (WFDB_Time)(t * ifreq/sfreq);
-
-	while (t++ < tr)
-	    getvec(uvector);
     }
 
     return (stat);
