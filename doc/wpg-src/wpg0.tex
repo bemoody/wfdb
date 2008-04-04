@@ -510,6 +510,14 @@ guide in June, 1999.  See @file{NEWS}, in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
+@unnumberedsubsec Changes in version 10.4.6
+
+The WFDB functions @code{setafreq()} and @code{getafreq()} (for
+setting and getting the time resolution of newly-created output
+annotation files in ticks per second) were new in version 10.4.5, but
+were undocumented.  They are now described in this Guide, and wrappers
+for these functions are now included in @file{fortran/wfdbf.c}.
+
 @unnumberedsubsec Changes in version 10.4.5
 
 Bob Farrell and Tony Ricke chased down and provided fixes for memory leaks
@@ -1779,7 +1787,7 @@ several groups, with examples to illustrate their usage.
 The remainder of the nodes in this section describe functions for:
 				
 * selecting::			Selecting database records (opening files).
-* special input modes::         Setting the input sampling frequency and more.
+* special I/O modes::           Setting the input sampling frequency and more.
 * signal and annotation I/O::	Reading and writing signals and annotations.
 * non-sequential::		Non-sequential access to WFDB files.
 * conversion::			Time and other conversion functions.
@@ -1861,7 +1869,7 @@ to go any further; the remaining sections deal with special-purpose
 functions that exist to serve unusual applications.
 
 @page
-@node selecting,special input modes,introduction to functions,Functions
+@node selecting,special I/O modes,introduction to functions,Functions
 @section Selecting Database Records
 @cindex selecting database records
 @cindex opening database files
@@ -2289,8 +2297,8 @@ Avoid using @code{wfdbinit} and @code{setifreq} in the same program.
 for methods of opening output signal files.
 
 @page
-@node     special input modes, signal and annotation I/O, selecting, Functions
-@section Special Input Modes
+@node     special I/O modes, signal and annotation I/O, selecting, Functions
+@section Special I/O Modes
 
 @menu
 * setifreq::			Setting the input sampling frequency.
@@ -2298,10 +2306,14 @@ for methods of opening output signal files.
 * setgvmode::                   Setting the resolution for a multifrequency
                                 record.
 * getspf::                      Determining the number of samples per frame.
+* setafreq::			Setting the time resolution for output
+                                annotations.
+* getafreq::                    Determining the time resolution for output
+                                annotations.
 @end menu
 
 @c @group
-@node     setifreq, getifreq, special input modes, special input modes
+@node     setifreq, getifreq, special I/O modes, special I/O modes
 @unnumberedsubsec setifreq
 @findex setifreq (10.2.6)
 @cindex interpolation
@@ -2375,7 +2387,7 @@ also illustrates the use of @code{setifreq} (@pxref{Example 10}).
 Avoid using @code{wfdbinit} and @code{setifreq} in the same program.
 
 @c @group
-@node     getifreq, setgvmode, setifreq, special input modes
+@node     getifreq, setgvmode, setifreq, special I/O modes
 @unnumberedsubsec getifreq
 @findex getifreq (10.2.6)
 
@@ -2397,7 +2409,7 @@ the record (as would be returned by @code{sampfreq}, @pxref{sampfreq}),
 or the frequency chosen using a previous invocation of @code{setifreq}.
 
 @c @group
-@node     setgvmode, getspf, getifreq, special input modes
+@node     setgvmode, getspf, getifreq, special I/O modes
 @unnumberedsubsec setgvmode
 @findex setgvmode (9.0)
 @cindex interpolation
@@ -2446,7 +2458,7 @@ which may simplify the design of applications such as digital filters.
 The constant @code{WFDB_GVPAD} is defined in @file{<wfdb/wfdb.h>}.
 
 @c @group
-@node     getspf, , setgvmode, special input modes
+@node     getspf, setafreq, setgvmode, special I/O modes
 @unnumberedsubsec getspf
 @findex getspf (9.6)
 @cindex interpolation
@@ -2473,8 +2485,57 @@ in high resolution mode, however, @code{getspf} returns the number of
 samples per signal per frame (hence @code{sampfreq(NULL)/getspf()} is
 the number of frames per second).
 
+@node     setafreq, getafreq, getspf, special I/O modes
+@unnumberedsubsec setafreq
+@findex setafreq (10.4.5)
+@cindex interpolation
+@cindex decimation
+@cindex resampling
+@cindex resolution
+
+@example
+void setafreq(WFDB_Frequency @var{frequency})
+@end example
+@noindent
+@c @end group
+
+@noindent
+This function sets the time resolution, in ticks per second, for any output
+annotation files created after it has been invoked.  By default, the time
+resolution is equal to the input sampling frequency (and @code{setifreq}
+invokes @code{setafreq} to maintain this behavior if the input sampling
+frequency is changed).
+
+@noindent
+This function has no effect on output annotation files that are already open
+when it is invoked, nor on annotations read from input annotation files
+(for which the @code{time} fields always are expressed in units equal to
+the input sample intervals).
+
+@c @group
+@node     getafreq, , setafreq, special I/O modes
+@unnumberedsubsec getafreq
+@findex getafreq (10.4.5)
+
+@example
+WFDB_Frequency getafreq(void)
+@end example
+@noindent
+@strong{Return:}
+@table @asis
+@item @t{>0}
+output annotation time resolution, if previously set by @code{setafreq}
+@item @t{0}
+otherwise
+@end table
+@c @end group
+
+@noindent
+This function returns the current output annotation time resolution
+in ticks per second if it has been set using @code{getafreq}.
+
 @page
-@node     signal and annotation I/O, non-sequential, special input modes, Functions
+@node     signal and annotation I/O, non-sequential, special I/O modes, Functions
 @section Reading and Writing Signals and Annotations
 @cindex signal I/O
 
@@ -5506,6 +5567,8 @@ There are four types of files supported by the WFDB library:
 
 The other topics in this section deal with special types of database access:
 
+* EDF Files::                   a popular format readable by WFDB 10.4.5 and
+                                 later.
 * AHA Format Files::		not used for on-line WFDB records.
 * Standard I/O::		pipes and I/O redirection for WFDB files.
 * Multiplexed Signal Files::	signal groups.
@@ -5564,7 +5627,7 @@ application program are always amplitudes of type @code{int} (at least
 correct).  Annotation files are binary, and contain records of variable
 length that average slightly over 16 bits per annotation.
 
-@node     Calibration Files, AHA Format Files, Annotation Files, Database Files
+@node     Calibration Files, EDF Files, Annotation Files, Database Files
 @unnumberedsubsec Calibration Files
 @cindex calibration file
 
@@ -5584,7 +5647,44 @@ terminated by ASCII carriage-return/line-feed pairs, created by
 The WFDB Software Package includes a standard calibration file,
 @file{wfdbcal}, in the @file{data} directory.
 
-@node     AHA Format Files, Standard I/O, Calibration Files, Database Files
+@node     EDF Files, AHA Format Files, Calibration Files, Database Files
+@unnumberedsubsec EDF Files
+@cindex EDF
+@cindex European Data Format
+
+European Data Format (EDF) was defined in 1990, and it has become a very
+widely supported open format for exchange of recorded physiologic signals,
+especially polysomnograms. EDF files encapsulate functional equivalents of
+header and signal files, and EDF+ files can also include annotation streams
+(stored as signals).
+
+EDF files begin with an embedded (text) header containing specifications of the
+signals and a limited amount of demographic information, followed by the binary
+samples of the signals.  Within each block of samples, typically one second to
+one minute in length, all samples of the first signal are stored consecutively,
+followed by all samples of the second signal, etc.
+
+EDF files can be read directly using WFDB library version 10.4.5 and later.
+The name of the file, which must include a '.' and cannot end in '.hea', can
+be passed as a record name to any WFDB library function that accepts record
+names.  Although the WFDB library does not support EDF as an output format, the
+@file{mit2edf} application included in the WFDB Software Package can convert
+anything readable by the WFDB library into EDF.
+
+EDF+, defined in 2003, is backwards-compatible with EDF (any EDF reader,
+including the WFDB library, can read EDF+), but the additional features of
+EDF+, including methods for reading annotations and recognizing signal
+discontinuities (which are marked by annotations), are available only from
+EDF+-specific readers.  The WFDB library does not currently include built-in
+support for the additional features of EDF+, but annotation streams are
+available as signals, so it is possible for an application using the WFDB
+library to provide its own means of decoding annotation streams as they are
+read.
+
+Further information about EDF and EDF+ is available at
+@uref{http://www.edfplus.info/}.
+
+@node     AHA Format Files, Standard I/O, EDF Files, Database Files
 @unnumberedsubsec AHA Format Files
 @cindex AHA format
 
@@ -5971,7 +6071,7 @@ by passing @code{slpdb/slp37} as the @var{record} argument to @code{wfdbinit}
 (or @code{isigopen}, @code{annopen}, etc.).
 
 Current implementations of @code{libcurl} and @code{libwww} permit input from
-@uref{http://} URLs in much the same way that local files are read, provided
+@code{http://} URLs in much the same way that local files are read, provided
 that the remote web server supports HTTP 1.1 range requests (most, including
 PhysioNet's, do).  This means that it is not necessary to download an entire
 file in order to examine part of it, and you may notice little or no speed
@@ -8601,6 +8701,7 @@ corrections to the author (@email{george@@mit.edu}).
 @itemx MIT-BIH Polysomnographic Database
 @itemx MIMIC Database
 @itemx MGH/Marquette Foundation Waveform Database CROMs
+@item Long-Term ST Database
 @itemx Other reference databases of physiologic signals
 @itemx WFDB Software Package
 @itemx W3C libwww sources
@@ -8639,24 +8740,6 @@ telefax: +39 050 503596
 Over half of this database has been contributed to PhysioNet (see above), from
 which it may be downloaded freely.
 
-@cindex CDROM
-@cindex LTST DB
-@item Long-Term ST Database
-@sp 1
-@display
-Franc Jager
-Laboratory of Biomedical Computer Systems and Imaging
-University of Ljubljana
-Faculty of Computer and Information Science
-Trzaska 25
-1000 Ljubljana, Slovenia
-
-email: @email{lbcsi@@fri.uni-lj.si}
-@end display
-
-Over half of this database has been contributed to PhysioNet (see above), from
-which it may be downloaded freely.
-
 @cindex AHA DB
 @item AHA Database for Evaluation of Ventricular Arrhythmia Detectors
 @sp 1
@@ -8690,15 +8773,17 @@ telefax: +1 703 276 0793
 WWW: @uref{http://www.cinc.org/}
 @end display
 
-CinC is the major scientific meeting at which current research in ECG signal
-processing and modelling is discussed; the proceedings of the conference are
-probably the single best source of information in print about these topics.
-CinC conferences have taken place annually since 1974, usually in September.
-They are usually convened in North America and in Europe in alternate years.
-The deadline for submission of abstracts is on or about 1 May each year.
-Proceedings of the conferences are published by the IEEE, and usually
-appear about 3 months after the date of the conference.  CinC will be in
-in Valencia (Spain) in 2006, and in Durham, NC (USA) in 2007.
+CinC is the major scientific meeting at which current research in ECG
+signal processing and modelling is discussed; the proceedings of the
+conference are probably the single best source of information in print
+about these topics.  CinC conferences have taken place annually since
+1974, usually in September.  They are usually convened in North
+America and in Europe in alternate years.  The deadline for submission
+of abstracts is on or about 1 May each year.  Proceedings of CinC
+conferences since 2006 are available on-line at
+@uref{http://cinc.mit.edu/archives/}, and usually appear about a month
+after the date of the conference.  CinC will be in in Bologna (Italy)
+in 2008, and in Park City, Utah (USA) in 2009.
 
 Since 2000, Computers in Cardiology and PhysioNet have jointly sponsored
 an annual series of open challenges that invite participants to address
@@ -8710,7 +8795,10 @@ culminating with research presentations and awards at CinC.  See
 @item Proceedings of Computers in Cardiology (ISSN 0276-6574)
 @sp 1
 
-IEEE members can find complete CinC proceedings from 1988 to the
+CinC proceedings from 2006 to present are available on-line at
+@uref{http://cinc.mit.edu/archives/}.
+
+IEEE members can find CinC proceedings from 1988 to the
 present using IEEEXplore (@uref{http://ieeexplore.ieee.org/}). Many
 universities provide access to these services for their students, faculty, and
 staff.  Printed volumes of CinC proceedings are available from:
@@ -8815,7 +8903,7 @@ libraries are also available from PhysioNet.
 
 @cindex X11
 @cindex X Window System
-@item X11R6 (the X Window System, Version 11, Release 6)
+@item X11 (the X Window System, Version 11)
 @sp 1
 @display
 
@@ -8856,9 +8944,9 @@ Debian (non-commercial)
 WWW: @uref{http://www.debian.org/}
 
 
-Fedora
+Fedora (non-commercial)
 
-WWW: @uref{http://fedora.redhat.com/}
+WWW: @uref{http://fedoraproject.org/}
 
 
 Gentoo (non-commercial)
@@ -8881,7 +8969,7 @@ Red Hat
 WWW: @uref{http://www.redhat.com/}
 
 
-Slackware
+Slackware (non-commercial)
 
 WWW: @uref{http://www.slackware.com/}
 

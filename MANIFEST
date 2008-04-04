@@ -158,6 +158,7 @@ convert/makeid.c
 convert/md2a.c
 convert/mit2edf.c
 convert/mit2wav.c
+convert/rdedfann.c
 convert/readid.c
 convert/README
 convert/revise.c
@@ -303,6 +304,7 @@ doc/wag-src/pnnlist.1
 doc/wag-src/pschart.1
 doc/wag-src/psfd.1
 doc/wag-src/rdann.1
+doc/wag-src/rdedfann.1
 doc/wag-src/rdsamp.1
 doc/wag-src/README
 doc/wag-src/rxr.1

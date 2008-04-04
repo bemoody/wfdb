@@ -1,9 +1,9 @@
 /* file: rxr.c		G. Moody	16 August 1989
-			Last revised:     20 May 2002
+			Last revised:    31 March 2008
 
 -------------------------------------------------------------------------------
 rxr: ANSI/AAMI-standard run-by-run annotation file comparator
-Copyright (C) 2002 George B. Moody
+Copyright (C) 1989-2008 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -52,7 +52,7 @@ extern void exit();
 char *pname;		/* name by which this program was invoked */
 char *record;
 WFDB_Anninfo an[2];
-WFDB_Annotation annot[2];
+WFDB_Annotation annot[2], tempann;
 int fflag = 3;
 FILE *ofile, *sfile;
 long start, end_time, match_dt;
@@ -86,7 +86,7 @@ static long f_end;
 void rxr(stat, type)
 int stat, type;
 {
-    int i, j;
+    int i, j, goflag = 1;
     int run_length[2];
     unsigned int a, b;
     long run_start, run_end;
@@ -258,8 +258,15 @@ int stat, type;
 		break;
 	    }
 	}
-    } while (getann(a, &annot[a]) >= 0 &&
-	     (end_time <= 0L || annot[a].time <= end_time));
+	if (getann(a, &tempann) < 0) {
+	    if (run_length[a] > 0)
+		annot[a].anntyp = NORMAL;
+	    else
+		goflag = 0;
+	}
+	else
+	    annot[a] = tempann;
+    } while (goflag > 0 && (end_time <= 0L || annot[a].time <= end_time));
 }
 
 /* `pstat' prints a statistic described by s, defined as the quotient of a and
@@ -369,6 +376,8 @@ unsigned int i;
 	      return (']');
 	  }
 	case RHYTHM:
+	  if (annot.aux == NULL || *(annot.aux) == 0)
+	      return('O');
 	  /* An `(AF' rhythm change annotation is mapped to `{' only if AF is
 	     not already in progress.  If VF was in progress, it is assumed to
 	     have ended. */

@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:    14 January 2008	wfdblib 10.4.5
+			Last revised:     4 April 2008	wfdblib 10.4.6
 WFDB library functions for annotations
 
 _______________________________________________________________________________
@@ -188,7 +188,7 @@ static int get_ann_table(WFDB_Annotator i)
 		(void)setanndesc(a, s2);
 	    }
 	    else
-		(void)setanndesc(a, (char*)NULL);
+		(void)setanndesc(a, (char *)NULL);
 	}
 
     }
@@ -754,6 +754,7 @@ FINT strecg(char *str)
 {
     int code;
 
+    if (str == NULL) str = "";
     for (code = 1; code <= ACMAX; code++)
 	if (strcmp(str, cstring[code]) == 0)
 	    return (code);
@@ -763,6 +764,7 @@ FINT strecg(char *str)
 /* setecgstr: set the mnemonic string associated with the specified anntyp */
 FINT setecgstr(int code, char *string)
 {
+    if (string == NULL) string = "";
     if (NOTQRS <= code && code <= ACMAX) {
 	if (cstring[code] == NULL || strcmp(cstring[code], string)) {
 	    char *p = malloc(strlen(string)+1);
@@ -803,6 +805,7 @@ FINT strann(char *str)
 {
     int code;
 
+    if (str == NULL) str = "";
     for (code = 1; code <= ACMAX; code++)
 	if (strcmp(str, astring[code]) == 0)
 	    return (code);
@@ -811,6 +814,7 @@ FINT strann(char *str)
 
 FINT setannstr(int code, char *string)
 {
+    if (string == NULL) string = "";
     if (0 < code && code <= ACMAX) {
 	if (astring[code] == NULL || strcmp(astring[code], string)) {
 	    char *p = malloc(strlen(string)+1);
@@ -897,6 +901,7 @@ FSTRING anndesc(int code)
 
 FINT setanndesc(int code, char *string)
 {
+    if (string == NULL) string = "";
     if (0 < code && code <= ACMAX) {
 	if (tstring[code] == NULL || strcmp(tstring[code], string)) {
 	    char *p = malloc(strlen(string)+1);

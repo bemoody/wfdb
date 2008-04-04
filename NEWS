@@ -1,3 +1,30 @@
+10.4.6:
+	The WFDB functions setafreq() and getafreq() (for setting and getting
+	the time resolution of newly-created output annotation files in ticks
+	per second) were new in version 10.4.5, but were undocumented.  They
+	are now described in the WFDB Programmer's Guide, and wrappers for
+	these functions are now included in fortran/wfdbf.c.
+
+	WFDB functions strecg(), setecgstr(), strann(), setannstr(), and
+	setanndesc() now handle NULL string inputs properly. (Previous versions
+	passed NULL strings to strcmp(), with undesirable results.)
+
+	A new format converter, rdedfann, is included in convert/.  It extracts
+	annotations from EDF+ files and writes them to the standard output in
+	rdann output format.  After changing the EDF+ annotation mnemonics
+	to WFDB mnemonics (using your favorite scripting language, such as
+	perl or sed), wrann can then write a WFDB-compatible annotation file
+	from the transformed text.
+
+	wrann now works when creating annotation files for EDF and other
+	multifrequency records.  The incompatibility between rdann's -x
+	format and wrann has now been noted in the rdann and wrann man pages.
+
+	rxr did not account properly for runs that are not followed by at
+	least one beat annotation (common in the cudb).  Shibu Kallidukkil
+	supplied an example that evoked this problem, which has now been
+	corrected.
+
 10.4.5:
 	Bob Farrell and Tony Ricke chased down and provided fixes for memory
 	leaks in several WFDB library functions, and also provided revisions

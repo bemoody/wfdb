@@ -1,9 +1,9 @@
 /* file: wfdbf.c	G. Moody	 23 August 1995
-			Last revised:   24 February 2006	wfdblib 10.4.0
+			Last revised:   8 February 2008		wfdblib 10.4.6
 
 _______________________________________________________________________________
 wfdbf: Fortran wrappers for the WFDB library functions
-Copyright (C) 1995-2006 George B. Moody
+Copyright (C) 1995-2008 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -46,7 +46,7 @@ that the trailing `_' in these function names should *not* appear in your
 Fortran program;  thus, for example, `annopen_' should be invoked as
 `annopen'.  UNIX Fortran compilers and translators append a `_' to the
 names of all external symbols referenced in Fortran source files when
-generating object files.  Thus the linker can recognize that annopen1_
+generating object files.  Thus the linker can recognize that annopen_
 (defined below) is the function required by a Fortran program that invokes
 `annopen';  if the Fortran program were to invoke `annopen_', the linker
 would search (unsuccessfully) for a function named `annopen__'.
@@ -231,6 +231,16 @@ long setifreq_(double *freq)
 double getifreq_(long int *dummy)
 {
     return (getifreq());
+}
+
+long setafreq_(double *freq)
+{
+    return (setafreq(*freq));
+}
+
+double getafreq_(long int *dummy)
+{
+    return (getafreq());
 }
 
 long getvec_(long int *long_vector)

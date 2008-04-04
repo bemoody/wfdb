@@ -1,5 +1,5 @@
 # file: wfdbcal		G. Moody	  June 1991
-#			Last revised:	5 March 2004
+#			Last revised:	14 March 2008
 # Default calibration database for WFDB library
 #
 # Format:
@@ -65,6 +65,10 @@ P	- - undefined 100 mmHg
 Atip	- - undefined 1 mV
 HVA	- - undefined 5 mV
 Vtip	- - undefined 10 mV
+
+# ECG from Non-Invasive Fetal ECG Database
+Thorax	- - undefined 2 mV
+Abdomen	- - undefined 200 uV
 
 # Definitions for nameless signals with defined units
 record	- - undefined 1 mV

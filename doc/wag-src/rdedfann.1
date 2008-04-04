@@ -1,0 +1,46 @@
+.TH RDEDFANN 1  "4 April 2008" "WFDB 10.4.6" "WFDB Applications Guide"
+.SH NAME
+rdedfann \- extract annotations from an EDF+ file
+.SH SYNOPSIS
+\fBrdedfann -r\fR \fIedffile\fR [ \fIoptions\fR ... ]
+.SH DESCRIPTION
+This program prints the annotations from an EDF+ file in the same format as
+\fBrdann\fR does for WFDB-compatible annotation files.
+
+.PP
+Options include:
+.TP
+\fB-h\fR
+Print a brief usage summary.
+\fB-v\fR
+Verbose mode (print column headings).
+
+.PP
+Note that the annotation mnemonics in EDF+ files do not in general
+match those used in WFDB-compatible annotation files, so that it will
+usually be necessary to translate those that come from EDF+ file
+before the text can be converted by \fBwrann\fR.  For example, this
+command can be used to extract annotations from \fBfoo.edf\fR, change
+the EDF+ annotation type "QRS" to the WFDB type "N", and then produce
+a WFDB-compatible annotation file \fBfoo.edf.qrs\fR:
+.br
+        \fBrdedf -r foo.edf | sed "s/QRS/ N" | wrann -r foo.edf -a qrs\fR
+
+.SH ENVIRONMENT
+.PP
+It may be necessary to set and export the shell variable \fBWFDB\fR (see
+\fBsetwfdb\fR(1)).
+.SH AVAILABILITY
+This program is provided in the \fIconvert\fR directory of the WFDB Software
+Package.  Run \fBmake\fR in that directory to compile and install it if it
+has not been installed already.
+.SH SEE ALSO
+\fBedftomit\fR(1)
+.HP
+http://www.edfplus.info/spscs/edfplus.html
+Full specification of EDF+, by Bob Kemp and Jesus Olivan.
+.SH AUTHOR
+George B. Moody (george@mit.edu)
+.SH SOURCES
+http://www.physionet.org/physiotools/wfdb/convert/rdedfann.c
+

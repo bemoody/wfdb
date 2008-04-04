@@ -5,8 +5,8 @@ wrann \- write a WFDB annotation file
 \fBwrann -r\fR \fIrecord\fR \fB-a\fR \fIannotator\fR
 .SH DESCRIPTION
 \fBwrann\fR translates its standard input into an annotation file.
-The format of \fBwrann\fR input should be that produced by \fBrdann\fR(1).
-Specifically, the pipeline
+The format of \fBwrann\fR input should be that produced by \fBrdann\fR(1)
+using its default settings.  Specifically, the pipeline
 .br
 	\fBrdann -r\fR \fIrecord\fR \fB-a\fR \fIiann\fR \fB-f 0 | wrann -r\fR \fIrecord\fR \fB-a\fR \fIoann\fR
 .br
@@ -18,6 +18,9 @@ The usual application for \fBwrann\fR is as an aid to annotation file
 editing:  an annotation file may be translated into ASCII format
 using \fBrdann\fR, edited using a text editor, and then translated back
 into annotation file format using \fBwrann\fR.
+.PP
+Note the alternate format selected by \fBrdann\fR's \fB-x\fR option is
+incompatible with \fBwrann\fR.
 .SH ENVIRONMENT
 .PP
 It may be necessary to set and export the shell variable \fBWFDB\fR (see

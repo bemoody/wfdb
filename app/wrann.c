@@ -1,9 +1,9 @@
 /* file wrann.c		G. Moody	 6 July 1983
-			Last revised:  12 February 2000
+			Last revised:  14 March 2008
 
 -------------------------------------------------------------------------------
 wrann: Translate an ASCII file in 'rdann' output format to an annotation file
-Copyright (C) 2000 George B. Moody
+Copyright (C) 1983-2008 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -98,6 +98,7 @@ char *argv[];
 	exit(1);
     }
 
+    setafreq(sampfreq(record));
     ai.stat = WFDB_WRITE;
     if (annopen(record, &ai, 1) < 0)	/* open annotation file */
 	exit(2);

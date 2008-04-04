@@ -1,10 +1,10 @@
 /* file: init.c		G. Moody	 1 May 1990
-			Last revised:   5 August 2005
+			Last revised:   14 March 2008
 Initialization functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1990-2005 George B. Moody
+Copyright (C) 1990-2008 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -145,6 +145,7 @@ char *s;
        if the value were WFDB_DEFFREQ (from wfdb.h);  the units are samples per
        second per signal. */
     if (nsig < 0 || (freq = sampfreq(NULL)) <= 0.) freq = WFDB_DEFFREQ;
+    setifreq(freq);
 
     /* Quit if isigopen failed. */
     if (nsig < 0)

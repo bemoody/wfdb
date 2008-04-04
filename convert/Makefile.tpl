@@ -1,10 +1,11 @@
 # file: Makefile.tpl		G. Moody	24 May 2000
-#				Last revised:	11 May 2006
+#				Last revised:	4 April 2008
 # This section of the Makefile should not need to be changed.
 
 CFILES = a2m.c ad2m.c m2a.c md2a.c readid.c makeid.c edf2mit.c mit2edf.c \
- wav2mit.c mit2wav.c revise.c
-XFILES = a2m ad2m m2a md2a readid makeid edf2mit mit2edf wav2mit mit2wav revise
+ rdedfann.c wav2mit.c mit2wav.c revise.c
+XFILES = a2m ad2m m2a md2a readid makeid edf2mit mit2edf rdedfann wav2mit \
+ mit2wav revise
 SCRIPTS = ahaconvert
 MFILES = Makefile
 

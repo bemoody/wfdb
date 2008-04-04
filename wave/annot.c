@@ -1,10 +1,10 @@
 /* file: annot.c	G. Moody	  1 May 1990
-			Last revised:    10 June 2005
+			Last revised:    14 March 2008
 Annotation list handling and display functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1990-2005 George B. Moody
+Copyright (C) 1990-2008 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -152,11 +152,13 @@ annot_init()
     tupdate = time((time_t *)NULL);
 
     /* Return 0 if no annotations are requested or available. */
+    setafreq(freq);
     if (nann < 1 || annopen(record, &af, 1) < 0) {
 	ap_start = annp = scope_annp = NULL;
 	if (frame) xv_set(frame, FRAME_BUSY, FALSE, NULL);
 	return (annotations = 0);
     }
+    setafreq(freq);
     if ((ap_start = annp = scope_annp = a = get_ap()) == NULL ||
 	getann(0, &(a->this))) {
 	(void)annopen(record, NULL, 0);
@@ -956,6 +958,7 @@ int post_changes()
     }
 
     af.stat = (af.stat == WFDB_AHA_READ) ? WFDB_AHA_WRITE : WFDB_WRITE;
+    setafreq(freq);
     if (annopen(record, &af, 1)) {
 	/* An error from annopen is most likely to result from not being able
 	   to create the output file.  Warn the user and try again later. */
@@ -1029,6 +1032,7 @@ int post_changes()
 	}
 	a = a->next;
     }
+    setafreq(freq);
     (void)annopen(record, NULL, 0);	/* force flush and close of output */
 
     changes = 0;

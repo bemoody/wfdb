@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	24 May 2000
-#				Last revised:	11 May 2006
+#				Last revised:	19 February 2008
 # Change the settings below as appropriate for your setup.
 
 # D2PARGS is a list of options for dvips.  Uncomment one of these to set the
@@ -159,10 +159,12 @@ wag.man:
 # 'make wag.pdf': format the WFDB Applications Guide as PDF
 wag.pdf:	wag0.ps
 	ps2pdf wag0.ps wag.pdf
+	$(SETPERMISSIONS) wag.pdf
 
 # 'make wag.ps': format the WFDB Applications Guide as PostScript
 wag.ps:		$(WAGPSREQ)
 	$(MAKEWAGPS)
+	$(SETPERMISSIONS) wag.ps
 
 wag0.ps:	wag.tex
 	$(MAKE) wag2.ps
