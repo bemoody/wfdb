@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:     4 April 2008	wfdblib 10.4.6
+			Last revised:     8 April 2008	wfdblib 10.4.6
 WFDB library functions for annotations
 
 _______________________________________________________________________________
@@ -174,17 +174,11 @@ static int get_ann_table(WFDB_Annotator i)
 	p1 = strtok(annot.aux+1, " \t");
 	a = atoi(p1);
 	if (0 <= a && a <= ACMAX && (p1 = strtok((char *)NULL, " \t"))) {
-	    p2 = p1 + strlen(p1) + 1;
-	    if ((s1 = (char *)malloc(((unsigned)(strlen(p1) + 1)))) == NULL ||
-		(*p2 &&
-		 (s2 = (char *)malloc(((unsigned)(strlen(p2)+1)))) == NULL)) {
-		wfdb_error("annopen: insufficient memory\n");
-		return (-1);
-	    }
-	    (void)strcpy(s1, p1);
+	    SSTRCPY(s1, p1);
 	    (void)setannstr(a, s1);
+	    p2 = p1 + strlen(p1) + 1;
 	    if (*p2) {
-		(void)strcpy(s2, p2);
+		SSTRCPY(s2, p2);
 		(void)setanndesc(a, s2);
 	    }
 	    else
@@ -255,20 +249,10 @@ static int allociann(unsigned n)
 {
     if (maxiann < n) {     /* allocate input annotator data structures */
         unsigned m = maxiann;
-        struct iadata **iadnew = realloc(iad, n*sizeof(struct iadata *));
 
-	if (iadnew == NULL) {
-	    wfdb_error("annopen: too many (%d) input annotators\n", n);
-	    return (-1);
-	}
-	iad = iadnew;
+        SREALLOC(iad, n, sizeof(struct iadata *));
 	while (m < n) {
-	    if ((iad[m] = calloc(1, sizeof(struct iadata))) == NULL) {
-		wfdb_error("annopen: too many (%d) input annotators\n", n);
-		while (--m > maxiann)
-		    free(iad[m]);
-		return (-1);
-	    }
+	    SUALLOC(iad[m], 1, sizeof(struct iadata));
 	    m++;
 	}
         maxiann = n;
@@ -281,20 +265,10 @@ static int allocoann(unsigned n)
 {
     if (maxoann < n) {     /* allocate output annotator data structures */
         unsigned m = maxoann;
-        struct oadata **oadnew = realloc(oad, n*sizeof(struct oadata *));
 
-	if (oadnew == NULL) {
-	    wfdb_error("annopen: too many (%d) output annotators\n", n);
-	    return (-1);
-	}
-	oad = oadnew;
+	SREALLOC(oad, n, sizeof(struct oadata *));
 	while (m < n) {
-	    if ((oad[m] = calloc(1, sizeof(struct oadata))) == NULL) {
-		wfdb_error("annopen: too many (%d) output annotators\n", n);
-		while (--m > maxoann)
-		    free(oad[m]);
-		return (-1);
-	    }
+	    SUALLOC(oad[m], 1, sizeof(struct oadata));
 	    m++;
 	}
         maxoann = n;
@@ -356,13 +330,8 @@ FINT annopen(char *record, WFDB_Anninfo *aiarray, unsigned int nann)
 			 aiarray[i].name, record);
 		return (-3);
 	    }
-	    if ((ia->info.name =
-		 (char *)malloc((unsigned)(strlen(aiarray[i].name)+1)))
-		 == NULL) {
-		wfdb_error("annopen: insufficient memory\n");
-		return (-3);
-	    }
-	    (void)strcpy(ia->info.name, aiarray[i].name);
+	    ia->info.name = NULL;
+	    SSTRCPY(ia->info.name, aiarray[i].name);
 
 	    /* Try to figure out what format the file is in.  AHA-format files
 	       begin with a null byte and an ASCII character which is one
@@ -411,20 +380,10 @@ FINT annopen(char *record, WFDB_Anninfo *aiarray, unsigned int nann)
 			 aiarray[i].name, record);
 		return (-4);
 	    }
-	    if ((oa->info.name =
-		 (char *)malloc((unsigned)(strlen(aiarray[i].name)+1)))
-		== NULL) {
-		wfdb_error("annopen: insufficient memory\n");
-		return (-4);
-	    }
-	    (void)strcpy(oa->info.name, aiarray[i].name);
-	    if ((oa->rname =
-		 (char *)malloc((unsigned)(strlen(record)+1)))
-		== NULL) {
-		wfdb_error("annopen: insufficient memory\n");
-		return (-4);
-	    }
-	    (void)strcpy(oa->rname, record);
+	    oa->info.name = NULL;
+	    SSTRCPY(oa->info.name, aiarray[i].name);
+	    oa->rname = NULL;
+	    SSTRCPY(oa->rname, record);
 	    oa->ann.time = 0L;
 	    oa->info.stat = aiarray[i].stat;
 	    oa->out_of_order = 0;
@@ -764,12 +723,14 @@ FINT strecg(char *str)
 /* setecgstr: set the mnemonic string associated with the specified anntyp */
 FINT setecgstr(int code, char *string)
 {
-    if (string == NULL) string = "";
     if (NOTQRS <= code && code <= ACMAX) {
-	if (cstring[code] == NULL || strcmp(cstring[code], string)) {
-	    char *p = malloc(strlen(string)+1);
-	    if (p) strcpy(cstring[code] = p, string);
-	}
+	if (string == NULL) string = "";
+	cstring[code] = NULL;   /* This statement (and the corresponding
+				   statements in setannstr and setanndesc)
+				   leak memory if the function is called
+				   more than once with the same value for
+				   code -- which is unlikely. */
+	SSTRCPY(cstring[code], string);
 	return (0);
     }
     wfdb_error("setecgstr: illegal annotation code %d\n", code);
@@ -814,21 +775,16 @@ FINT strann(char *str)
 
 FINT setannstr(int code, char *string)
 {
-    if (string == NULL) string = "";
-    if (0 < code && code <= ACMAX) {
+    int mflag = 0;
+
+    if (code > 0) mflag = 1;
+    else code = -code;
+    if (code <= ACMAX) {
+	if (string == NULL) string = "";
 	if (astring[code] == NULL || strcmp(astring[code], string)) {
-	    char *p = malloc(strlen(string)+1);
-	    if (p) {
-		strcpy(astring[code] = p, string);
-		modified[code] = 1;
-	    }
-	}
-	return (0);
-    }
-    else if (-ACMAX < code && code <= 0) {
-	if (astring[-code] == NULL || strcmp(astring[-code], string)) {
-	    char *p = malloc(strlen(string)+1);
-	    if (p) strcpy(astring[-code] = p, string);
+	    astring[code] = NULL;
+	    SSTRCPY(astring[code], string);
+	    if (mflag) modified[code] = 1;
 	}
 	return (0);
     }
@@ -901,21 +857,16 @@ FSTRING anndesc(int code)
 
 FINT setanndesc(int code, char *string)
 {
-    if (string == NULL) string = "";
-    if (0 < code && code <= ACMAX) {
+    int mflag = 0;
+
+    if (code > 0) mflag = 1;
+    else code = -code;
+    if (code <= ACMAX) {
+	if (string == NULL) string = "";
 	if (tstring[code] == NULL || strcmp(tstring[code], string)) {
-	    char *p = malloc(strlen(string)+1);
-	    if (p) {
-		strcpy(tstring[code] = p, string);
-		modified[code] = 1;
-	    }
-	}
-	return (0);
-    }
-    else if (-ACMAX < code && code <= 0) {
-	if (tstring[-code] == NULL || strcmp(tstring[-code], string)) {
-	    char *p = malloc(strlen(string)+1);
-	    if (p) strcpy(tstring[-code] = p, string);
+	    tstring[code] = NULL;
+	    SSTRCPY(tstring[code], string);
+	    if (mflag) modified[code] = 1;
 	}
 	return (0);
     }
@@ -946,8 +897,8 @@ FVOID iannclose(WFDB_Annotator n)
 
     if (n < niaf && (ia = iad[n]) != NULL && ia->file != NULL) {
 	(void)wfdb_fclose(ia->file);
-	(void)free(ia->info.name);
-	(void)free(ia);
+	SFREE(ia->info.name);
+	SFREE(ia);
 	while (n < niaf-1) {
 	    iad[n] = iad[n+1];
 	    n++;
@@ -1004,9 +955,9 @@ FVOID oannclose(WFDB_Annotator n)
 		       oa->rname, oa->info.name);
 	    wfdb_error("to rearrange annotations in the correct order.\n");
 	}
-	(void)free(oa->info.name);
-	(void)free(oa->rname);
-	(void)free(oa);
+	SFREE(oa->info.name);
+	SFREE(oa->rname);
+	SFREE(oa);
 	while (n < noaf-1) {
 	    oad[n] = oad[n+1];
 	    n++;

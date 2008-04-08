@@ -1,10 +1,10 @@
 /* file: calib.c	G. Moody	  4 July 1991
-			Last revised:	23 February 2006	wfdblib 10.4.0
+			Last revised:	  8 April 2008		wfdblib 10.4.6
 WFDB library functions for signal calibration
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1991-2006 George B. Moody
+Copyright (C) 1991-2008 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -104,27 +104,11 @@ FINT calopen(char *cfname)
 	    continue;
 
 	/* This line appears to be a correctly formatted entry.  Allocate
-	   memory for a calibration list entry.  (There doesn't seem to be any
-	   way to make lint shut up about the pointer casts below, or about
-	   those in getcal;  hence the `#ifndef lint' directives.) */
-#ifndef lint
-	if ((this_cle = (struct cle *)malloc(sizeof(struct cle))) == NULL ||
-	    (this_cle->sigtype =
-	     (char *)malloc((unsigned)(strlen(p1)+1))) == NULL ||
-	    (this_cle->units =
-	     (char *)malloc((unsigned)(strlen(p6)+1))) == NULL) {
-	    if (this_cle) {
-		if (this_cle->sigtype) free(this_cle->sigtype);
-		free((char *)this_cle);
-	    }
-	    wfdb_error("calopen: insufficient memory\n");
-	    (void)wfdb_fclose(cfile);
-	    return (-1);
-	}
-#endif
+	   memory for a calibration list entry. */
+	SUALLOC(this_cle, 1, (sizeof(struct cle)));
 
 	/* Fill in the fields of the new calibration list entry. */
-	(void)strcpy(this_cle->sigtype, p1);
+	SSTRCPY(this_cle->sigtype, p1);
 	if (strcmp(p2, "-") == 0) {
 	    this_cle->caltype = WFDB_AC_COUPLED;
 	    this_cle->low = 0.0;
@@ -145,7 +129,7 @@ FINT calopen(char *cfname)
 	    this_cle->caltype |= WFDB_CAL_SAWTOOTH;
 	/* otherwise pulse shape is undefined */
 	this_cle->scale = atof(p5);
-	(void)strcpy(this_cle->units, p6);
+	SSTRCPY(this_cle->units, p6);
 	this_cle->next = NULL;
 
 	/* Append the new entry to the end of the list. */
@@ -191,27 +175,13 @@ FINT getcal(char *desc, char *units, WFDB_Calinfo *cal)
    the calibration list. */
 FINT putcal(WFDB_Calinfo *cal)
 {
-#ifndef lint
-    if ((this_cle = (struct cle *)malloc(sizeof(struct cle))) == NULL ||
-	(this_cle->sigtype =
-	 (char *)malloc((unsigned)(strlen(cal->sigtype)+1))) == NULL ||
-	(this_cle->units =
-	 (char *)malloc((unsigned)(strlen(cal->units)+1))) == NULL) {
-	if (this_cle) {
-	    if (this_cle->sigtype) free(this_cle->sigtype);
-	    free((char *)this_cle);
-	}
-	wfdb_error("putcal: insufficient memory\n");
-	return (-1);
-    }
-#endif
-
-    (void)strcpy(this_cle->sigtype, cal->sigtype);
+    SUALLOC(this_cle, 1, sizeof(struct cle));
+    SSTRCPY(this_cle->sigtype, cal->sigtype);
     this_cle->caltype = cal->caltype;
     this_cle->low = cal->low;
     this_cle->high = cal->high;
     this_cle->scale = cal->scale;
-    (void)strcpy(this_cle->units, cal->units);
+    SSTRCPY(this_cle->units, cal->units);
     this_cle->next = NULL;
 
     if (first_cle) {
@@ -268,12 +238,10 @@ FINT newcal(char *cfname)
 FVOID flushcal(void)
 {
     while (first_cle) {
-	free(first_cle->sigtype);
-	free(first_cle->units);
+	SFREE(first_cle->sigtype);
+	SFREE(first_cle->units);
 	this_cle = first_cle->next;
-#ifndef lint
-	free(first_cle);
-#endif
+	SFREE(first_cle);
 	first_cle = this_cle;
     }
 }

@@ -1,5 +1,5 @@
 /* file: wfdblib.h	G. Moody	13 April 1989
-                        Last revised:	11 January 2008       wfdblib 10.4.5
+                        Last revised:	 8 April 2008       wfdblib 10.4.6
 External definitions for WFDB library private functions
 
 _______________________________________________________________________________
@@ -199,6 +199,18 @@ symbols reserved to the library begin with the characters "wfdb_".
 #ifndef FALSE
 #define FALSE 0
 #endif 
+
+/* Dynamic memory allocation macros for the WFDB library. */
+#define MEMERR(P, N, S) \
+    { wfdb_error("WFDB: can't allocate (%ld*%ld) bytes for %s\n", \
+	     (size_t)N, (size_t)S, #P);			      \
+      if (wfdb_me_fatal()) exit(1); }
+#define SFREE(P) { if (P) { free (P); P = 0; } }
+#define SUALLOC(P, N, S) { if (!(P = calloc((N), (S)))) MEMERR(P, (N), (S)); }
+#define SALLOC(P, N, S) { SFREE(P); SUALLOC(P, (N), (S)) }
+#define SREALLOC(P, N, S) { if (!(P = realloc(P, (N)*(S)))) MEMERR(P,(N),(S)); }
+#define SSTRCPY(P, Q) { if (Q) { \
+	 SALLOC(P, (size_t)strlen(Q)+1,1); strcpy(P, Q); } }
 
 /* Structures used by internal WFDB library functions only */
 struct netfile {

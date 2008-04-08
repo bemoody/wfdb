@@ -5,6 +5,24 @@
 	are now described in the WFDB Programmer's Guide, and wrappers for
 	these functions are now included in fortran/wfdbf.c.
 
+	An important change in the WFDB library: memory allocation errors are
+	now treated as fatal by default (in previous versions, the functions
+	that encountered them returned error values that permitted the
+	application to handle them).  These errors occur when there is
+	insufficient memory available to the WFDB library.  After invoking
+	wfdbmemerr(0), if such an error occurs, the function in which it
+	occurs will continue if possible.  By default, however, such an
+	error will cause the process to terminate.  In either case, the WFDB
+	library emits an appropriate error message to aid in troubleshooting.
+
+	New macros for handling dynamically allocated memory are defined in
+	lib/wfdblib.h and used throughout the WFDB library, eliminating most
+	known memory leaks.  Three known leaks remain (in setecgstr, setannstr,
+	and setanndesc);  these are documented and harmless in current
+	applications.  Thanks to Yinqi Zhang for reporting a leak in copysi()
+	(an internal WFDB library function defined in signal.c), which prompted
+	the cleanup.
+	
 	WFDB functions strecg(), setecgstr(), strann(), setannstr(), and
 	setanndesc() now handle NULL string inputs properly. (Previous versions
 	passed NULL strings to strcmp(), with undesirable results.)

@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:	11 January 2008       wfdblib 10.4.5
+                        Last revised:	  8 April 2008       wfdblib 10.4.6
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -37,9 +37,12 @@ This file contains definitions of the following WFDB library functions:
  wfdbverbose [4.0]	(enables WFDB library error messages)
  wfdberror [4.5]	(returns the most recent WFDB library error message)
  wfdbfile [4.3]		(returns the complete pathname of a WFDB file)
+ wfdbmemerr [10.4.6]    (set behavior on memory errors)
 
 These functions, also defined here, are intended only for the use of WFDB
 library functions defined elsewhere:
+
+ wfdb_me_fatal [10.4.6] (indicates if memory errors are fatal)
  wfdb_g16		(reads a 16-bit integer)
  wfdb_g32		(reads a 32-bit integer)
  wfdb_p16		(writes a 16-bit integer)
@@ -181,9 +184,7 @@ FVOID setwfdb(char *p)
 
     if (p == NULL && (p = getenv("WFDB")) == NULL) p = DEFWFDB;
     wfdb_parse_path(p);
-    if (wfdbpath) free(wfdbpath);
-    if (wfdbpath = (char *)malloc(strlen(p)+1))
-	strcpy(wfdbpath, p);
+    SSTRCPY(wfdbpath, p);
     wfdb_export_config();
 }
 
@@ -225,7 +226,23 @@ FSTRING wfdbfile(char *s, char *record)
     else return (NULL);
 }
 
+/* Determine how the WFDB library handles memory allocation errors (running
+out of memory).  Call wfdbmemerr(0) in order to have these errors returned
+to the caller;  by default, such errors cause the running process to exit. */
+
+static int wfdb_mem_behavior = 1;
+
+FVOID wfdbmemerr(int behavior)
+{
+    wfdb_mem_behavior = behavior;
+}
+
 /* Private functions (for the use of other WFDB library functions only). */
+
+int wfdb_me_fatal()	/* used by the MEMERR macro defined in wfdblib.h */
+{
+    return (wfdb_mem_behavior);
+}
 
 /* The next four functions read and write integers in PDP-11 format, which is
 common to both MIT and AHA database files.  The purpose is to achieve
@@ -290,8 +307,8 @@ void wfdb_free_path_list(void)
 
     while (c1) {
 	c0 = c1->next;
-	if (c1->prefix) (void)free(c1->prefix);
-	(void)free(c1);
+	SFREE(c1->prefix);
+	SFREE(c1);
 	c1 = c0;
     }
     wfdb_path_list = NULL;
@@ -432,12 +449,8 @@ int wfdb_parse_path(char *p)
 	} while (!found_end);
 
 	/* current component begins at p, ends at q-1 */
-	if ((c1 = calloc(1, sizeof(struct wfdb_path_component))) == NULL ||
-	    (c1->prefix = calloc(q-p+1, sizeof(char))) == NULL) {
-	    wfdb_error("wfdb_parse_path: insufficient memory\n");
-	    if (c1) (void)free(c1);
-	    return (-1);
-	}
+	SUALLOC(c1, 1, sizeof(struct wfdb_path_component));
+	SALLOC(c1->prefix, q-p+1, sizeof(char));
 	memcpy(c1->prefix, p, q-p);
 	c1->type = current_type;
 	if (c0) c0->next = c1;
@@ -474,13 +487,11 @@ char *wfdb_getiwfdb(char *p)
 	    if (fseek(wfdbpfile, 0L, SEEK_END) == 0)
 		len = ftell(wfdbpfile);
 	    else len = 255;
-	    if ((p = (char *)malloc((unsigned)len+1)) == NULL) p = "";
-	    else {
-		rewind(wfdbpfile);
-		len = fread(p, 1, (int)len, wfdbpfile);
-		while (p[len-1] == '\n' || p[len-1] == '\r')
-		    p[--len] = '\0';
-	    }
+	    SUALLOC(p, 1, len+1);
+	    rewind(wfdbpfile);
+	    len = fread(p, 1, (int)len, wfdbpfile);
+	    while (p[len-1] == '\n' || p[len-1] == '\r')
+		p[--len] = '\0';
 	    (void)fclose(wfdbpfile);
 	}
     }	
@@ -501,28 +512,25 @@ void wfdb_export_config(void)
 {
     char *p;
 
-    if (p = (char *)malloc(strlen(wfdbpath)+6)) {
-	sprintf(p, "WFDB=%s", wfdbpath);
-	putenv(p);
-	free(p);
-    }
+    SUALLOC(p, 1, strlen(wfdbpath)+6);
+    sprintf(p, "WFDB=%s", wfdbpath);
+    putenv(p);
     if (getenv("WFDBCAL") == NULL) {
-	if (p = malloc(strlen(DEFWFDBCAL)+9)) {
-	    sprintf(p, "WFDBCAL=%s", DEFWFDBCAL);
-	    putenv(p);
-	    free(p);
-	}
+	SALLOC(p, 1, strlen(DEFWFDBCAL)+9);
+	sprintf(p, "WFDBCAL=%s", DEFWFDBCAL);
+	putenv(p);
     }
     if (getenv("WFDBANNSORT") == NULL) {
-	static char p[14];
+	SALLOC(p, 1, 14);
 	sprintf(p, "WFDBANNSORT=%d", DEFWFDBANNSORT == 0 ? 0 : 1);
 	putenv(p);
     }
     if (getenv("WFDBGVMODE") == NULL) {
-	static char p[13];
+	SALLOC(p, 1, 13);
 	sprintf(p, "WFDBGVMODE=%d", DEFWFDBGVMODE == 0 ? 0 : 1);
 	putenv(p);
     }
+    SFREE(p);
 }
 #endif
 
@@ -572,16 +580,13 @@ void wfdb_addtopath(char *s)
     /* If we've come this far, the path component of s was not found in the
        current WFDB path;  now append it. */
     len = strlen(wfdbpath); 	/* wfdbpath set by getwfdb() -- see above */
-    if ((t = (char *)malloc((unsigned)(len + i + 2))) == NULL) {
-	wfdb_error("wfdb_addtopath: insufficient memory\n");
-	return;			/* WFDB path is unchanged */
-    }
+    SUALLOC(t, 1, len + i + 2);
     (void)strcpy(t, wfdbpath);
     t[len++] = PSEP;		/* append a path separator */
     (void)strncpy(t+len, s, i); 	/* append the new path component */
     t[len+i] = '\0';
     setwfdb(t);
-    free(t);
+    SFREE(t);
 }
 
 /* The wfdb_error function handles error messages, normally by printing them
@@ -1042,16 +1047,11 @@ static char *curl_get_ua_string(void)
 {
     char *libcurl_ver;
     static char *s = NULL;
-    if (s) {
-	free(s);
-	s = NULL;
-    }
+
     libcurl_ver = curl_version();
-    s = malloc(32 + strlen(libcurl_ver));
-    if (s) {
-	sprintf(s, "libwfdb/%d.%d.%d (%s)", WFDB_MAJOR, WFDB_MINOR,
+    SALLOC(s, 1, 32 + strlen(libcurl_ver));
+    sprintf(s, "libwfdb/%d.%d.%d (%s)", WFDB_MAJOR, WFDB_MINOR,
 		WFDB_RELEASE, libcurl_ver);
-    }
     return (s);
 }
 
@@ -1233,16 +1233,10 @@ static long www_get_cont_len(const char *url)
 /* Create a new, empty chunk. */
 static CHUNK *curl_chunk_new(long len)
 {
-    struct chunk *c = malloc(sizeof(struct chunk));
-    if (!c) {
-	wfdb_error("curl_chunk_new: not enough memory\n");
-	return NULL;
-    }
-    if (!(c->data = malloc(len))) {
-	wfdb_error("curl_chunk_new: not enough memory\n");
-	free(c);
-	return NULL;
-    }
+    struct chunk *c;
+
+    SUALLOC(c, 1, sizeof(struct chunk));
+    SALLOC(c->data, 1, len);
     c->size = 0L;
     c->buffer_size = len;
     return c;
@@ -1252,9 +1246,8 @@ static CHUNK *curl_chunk_new(long len)
 static void curl_chunk_delete(struct chunk *c)
 {
     if (c) {
-	if (c->data)
-	    free(c->data);
-	free(c);
+	SFREE(c->data);
+	SFREE(c);
     }
 }
 
@@ -1267,19 +1260,13 @@ static size_t curl_chunk_write(void *ptr, size_t size, size_t nmemb,
 {
     size_t count=0;
     char *p;
-
     struct chunk *c = (struct chunk *) stream;
+
     while (nmemb > 0) {
 	while ((c->size + size) > c->buffer_size) {
 	    c->buffer_size += 1024;
-	    if (p = realloc(c->data, c->buffer_size))
-		c->data = p;
-	    else {
-		wfdb_error("curl_chunk_write: insufficient memory\n");
-		return (count);
-	    }
+	    SREALLOC(c->data, 1, c->buffer_size);
 	}
-
 	memcpy(c->data + c->size, ptr, size);
 	c->size += size;
 	count += size;
@@ -1475,9 +1462,9 @@ static CHUNK *www_get_url_chunk(const char *url)
 static void nf_delete(netfile *nf)
 {
     if (nf) {
-	if (nf->url) free(nf->url);
-	if (nf->data) free(nf->data);
-	free(nf);
+	SFREE(nf->url);
+	SFREE(nf->data);
+	SFREE(nf);
     }
 }
 
@@ -1498,17 +1485,15 @@ static void nf_delete(netfile *nf)
    to do this would be to invoke
       HTLoadToFile(url, request, filename);
 */
-static netfile* nf_new(const char* url)
+static netfile *nf_new(const char* url)
 {
-    netfile* nf = NULL;
-    CHUNK* chunk = NULL;
+    netfile *nf;
+    CHUNK *chunk = NULL;
     long bytes_received = 0L;
 
-    nf = malloc(sizeof(netfile));
-
+    SUALLOC(nf, 1, sizeof(netfile));
     if (nf && url && *url) {
-	nf->url = calloc(strlen(url) + 1, sizeof(char));
-	strcpy(nf->url, url);
+	SSTRCPY(nf->url, url);
 	nf->base_addr = 0;
 	nf->pos = 0;
 	nf->data = NULL;
@@ -1535,9 +1520,10 @@ static netfile* nf_new(const char* url)
 	    nf->mode = NF_FULL_MODE;
 	    bytes_received = nf->cont_len = chunk_size(chunk);
 	}
-	if (bytes_received > 0L &&
-	    (nf->data = calloc(bytes_received, sizeof(char))))
-		memcpy(nf->data, chunk_data(chunk), bytes_received);
+	if (bytes_received > 0L) {
+	    SALLOC(nf->data, bytes_received, sizeof(char));
+	    memcpy(nf->data, chunk_data(chunk), bytes_received);
+	}
 	if (nf->data == NULL) {
 	    if (bytes_received > 0L)
 		wfdb_error("nf_new: insufficient memory (needed %ld bytes)\n",
@@ -1855,19 +1841,16 @@ int wfdb_fclose(WFDB_FILE *wp)
     status = fclose(wp->fp);
 #endif
     if (wp->fp != stdin)
-	(void)free(wp);
+	SFREE(wp);
     return (status);
 }
 
 WFDB_FILE *wfdb_fopen(char *fname, const char *mode)
 {
     char *p = fname;
-    WFDB_FILE *wp = (WFDB_FILE *)malloc(sizeof(WFDB_FILE));
+    WFDB_FILE *wp;
 
-    if (wp == NULL) {
-	wfdb_error("wfdb_fopen: out of memory\n");
-	return (NULL);
-    }
+    SUALLOC(wp, 1, sizeof(WFDB_FILE));
     while (*p)
 	if (*p++ == ':' && *p++ == '/' && *p++ == '/') {
 #if WFDB_NETFILES
@@ -1876,7 +1859,7 @@ WFDB_FILE *wfdb_fopen(char *fname, const char *mode)
 		return (wp);
 	    }
 #endif
-	    free(wp);
+	    SFREE(wp);
 	    return (NULL);
 	}
     if (wp->fp = fopen(fname, mode)) {
@@ -1909,7 +1892,7 @@ WFDB_FILE *wfdb_fopen(char *fname, const char *mode)
 		return (wp);
 	}
     }
-    free(wp);
+    SFREE(wp);
     return (NULL);
 }
 

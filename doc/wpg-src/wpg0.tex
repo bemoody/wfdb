@@ -518,6 +518,29 @@ annotation files in ticks per second) were new in version 10.4.5, but
 were undocumented.  They are now described in this Guide, and wrappers
 for these functions are now included in @file{fortran/wfdbf.c}.
 
+An important change in the WFDB library: memory allocation errors are
+now treated as fatal by default (in previous versions, the functions
+that encountered them returned error values that permitted the
+application to handle them).  These errors occur when there is
+insufficient memory available to the WFDB library.  After invoking
+@code{wfdbmemerr(0)}, if such an error occurs, the function in which it
+occurs will continue running if possible. By default, however, such an
+error will cause the process to terminate.  In either case, the WFDB
+library emits an appropriate error message to aid in troubleshooting.
+
+New macros for handling dynamically allocated memory are defined in
+@file{lib/wfdblib.h} and used throughout the WFDB library, eliminating most
+known memory leaks.  Three known leaks remain (in @code{setecgstr()}, 
+@code{setannstr()}, and @code{setanndesc()});  these are documented and
+harmless in current applications.  Thanks to Yinqi Zhang for reporting a leak
+in @code{copysi()} (an internal WFDB library function defined in
+@file{signal.c}), which prompted the cleanup.
+	
+WFDB functions @code{strecg()}, @code{setecgstr()}, @code{strann()},
+@code{setannstr()}, and @code{setanndesc()} now handle NULL string inputs
+properly. (Previous versions passed NULL strings to @code{strcmp()}, with
+undesirable results.)
+
 @unnumberedsubsec Changes in version 10.4.5
 
 Bob Farrell and Tony Ricke chased down and provided fixes for memory leaks
@@ -3817,6 +3840,7 @@ first introduced in WFDB library version 6.0.)
 * iannclose and oannclose::     Closing annotation files.
 * wfdbquiet and wfdbverbose::	Suppressing error messages from the WFDB library.
 * wfdberror::			Retrieving error messages from the WFDB library.
+* wfdbmemerr::                  Setting WFDB library behavior on memory errors.
 * sampfreq::			Reading the sampling frequency of a WFDB record.
 * setsampfreq::			Setting the sampling frequency.
 * setbasetime::			Setting the base time.
@@ -4139,7 +4163,7 @@ This function can be used to restore normal error reporting after using
 version 4.0.)
 
 @c @group
-@node     wfdberror, sampfreq, wfdbquiet and wfdbverbose, miscellaneous functions
+@node     wfdberror, wfdbmemerr, wfdbquiet and wfdbverbose, miscellaneous functions
 @unnumberedsubsec wfdberror
 @findex wfdberror (4.5)
 
@@ -4168,7 +4192,30 @@ library version 4.5.  Versions earlier than 9.4 return an empty string
 rather than the library version number if there have been no errors.
 
 @c @group
-@node     sampfreq, setsampfreq, wfdberror, miscellaneous functions
+@node     wfdbmemerr, sampfreq, wfdberror, miscellaneous functions
+@unnumberedsubsec wfdbmemerr
+@findex wfdbmemerr (10.4.6)
+
+@example
+@code{void wfdbmemerr(int behavior)}
+@end example
+@noindent
+@c @end group
+
+@noindent
+This function sets how the WFDB library behaves in the event of a memory
+allocation error.  If @var{behavior} is any non-zero value, then such an
+event causes the WFDB library to emit an appropriate error message and then
+terminate the running program.  (This behavior is the default.)
+
+If @var{behavior} is zero, a subsequent memory allocation error will cause
+the WFDB library function in which it occurs to continue running if possible
+(after emitting an error message as above).
+
+This function was first introduced in WFDB library version 10.4.6.
+
+@c @group
+@node     sampfreq, setsampfreq, wfdbmemerr, miscellaneous functions
 @unnumberedsubsec sampfreq
 @findex sampfreq
 

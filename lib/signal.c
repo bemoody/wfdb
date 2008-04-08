@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  6 February 2008		wfdblib 10.4.5
+			Last revised:    8 April 2008		wfdblib 10.4.6
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -153,7 +153,7 @@ void example(void)
     if (n < 1) { /* no signals -- quit or try another record, etc. */ }
 	
     /* Allocate WFDB_Siginfo structures before calling isigopen again. */
-    si = calloc(n, sizeof(WFDB_Siginfo));
+    SUALLOC(si, n, sizeof(WFDB_Siginfo));
     nsig = isigopen("record", si, n);
     /* Note that nsig equals n only if all signals were readable. */
 
@@ -161,7 +161,7 @@ void example(void)
     for (i = framelen = 0; i < nsig; i++)
         framelen += si[i].spf;
     /* Allocate WFDB_Samples before calling getframe. */
-    vector = calloc(framelen, sizeof(WFDB_Sample));
+    SUALLOC(vector, framelen, sizeof(WFDB_Sample));
     getframe(vector);
 }
 #endif
@@ -327,20 +327,10 @@ static int allocisig(unsigned int n)
 {
     if (maxisig < n) {
 	unsigned m = maxisig;
-	struct isdata **isdnew = realloc(isd, n*sizeof(struct isdata *));
 
-	if (isdnew == NULL) {
-	    wfdb_error("init: too many (%d) input signals\n", n);
-	    return (-1);
-	}
-	isd = isdnew;
+	SREALLOC(isd, n, sizeof(struct isdata *));
 	while (m < n) {
-	    if ((isd[m] = calloc(1, sizeof(struct isdata))) == NULL) {
-		wfdb_error("init: too many (%d) input signals\n", n);
-		while (--m > maxisig)
-		    free(isd[m]);
-		return (-1);
-	    }
+	    SUALLOC(isd[m], 1, sizeof(struct isdata));
 	    m++;
 	}
 	maxisig = n;
@@ -353,20 +343,10 @@ static int allocigroup(unsigned int n)
 {
     if (maxigroup < n) {
 	unsigned m = maxigroup;
-	struct igdata **igdnew = realloc(igd, n*sizeof(struct igdata *));
 
-	if (igdnew == NULL) {
-	    wfdb_error("init: too many (%d) input signal groups\n", n);
-	    return (-1);
-	}
-	igd = igdnew;
+	SREALLOC(igd, n, sizeof(struct igdata *));
 	while (m < n) {
-	    if ((igd[m] = calloc(1, sizeof(struct igdata))) == NULL) {
-		wfdb_error("init: too many (%d) input signal groups\n", n);
-		while (--m > maxigroup)
-		    free(igd[m]);
-		return (-1);
-	    }
+	    SUALLOC(igd[m], 1, sizeof(struct igdata));
 	    m++;
 	}
 	maxigroup = n;
@@ -379,20 +359,10 @@ static int allocosig(unsigned int n)
 {
     if (maxosig < n) {
 	unsigned m = maxosig;
-	struct osdata **osdnew = realloc(osd, n*sizeof(struct osdata *));
 
-	if (osdnew == NULL) {
-	    wfdb_error("init: too many (%d) output signals\n", n);
-	    return (-1);
-	}
-	osd = osdnew;
+	SREALLOC(osd, n, sizeof(struct osdata *));
 	while (m < n) {
-	    if ((osd[m] = calloc(1, sizeof(struct osdata))) == NULL) {
-		wfdb_error("init: too many (%d) output signals\n", n);
-		while (--m > maxosig)
-		    free(osd[m]);
-		return (-1);
-	    }
+	    SUALLOC(osd[m], 1, sizeof(struct osdata));
 	    m++;
 	}
 	maxosig = n;
@@ -405,20 +375,10 @@ static int allocogroup(unsigned int n)
 {
     if (maxogroup < n) {
 	unsigned m = maxogroup;
-	struct ogdata **ogdnew = realloc(ogd, n*sizeof(struct ogdata *));
 
-	if (ogdnew == NULL) {
-	    wfdb_error("init: too many (%d) output signal groups\n", n);
-	    return (-1);
-	}
-	ogd = ogdnew;
+	SREALLOC(ogd, n, sizeof(struct ogdata *));
 	while (m < n) {
-	    if ((ogd[m] = calloc(1, sizeof(struct ogdata))) == NULL) {
-		wfdb_error("init: too many (%d) output signal groups\n", n);
-		while (--m > maxogroup)
-		    free(ogd[m]);
-		return (-1);
-	    }
+	    SUALLOC(ogd[m], 1, sizeof(struct ogdata));
 	    m++;
 	}
 	maxogroup = n;
@@ -440,31 +400,10 @@ static int copysi(WFDB_Siginfo *to, WFDB_Siginfo *from)
 {
     if (to == NULL || from == NULL) return (0);
     *to = *from;
-    /* The next line works around an optimizer bug in gcc (version 2.96, maybe
-       others). */
     to->fname = to->desc = to->units = NULL;
-    if (from->fname) {
-        to->fname = (char *)malloc((size_t)strlen(from->fname)+1);
-	if (to->fname == NULL) return (-1);
-	(void)strcpy(to->fname, from->fname);
-    }
-    if (from->desc) {
-        to->desc = (char *)malloc((size_t)strlen(from->desc)+1);
-	if (to->desc == NULL) {
-	    (void)free(to->fname);
-	    return (-1);
-	}
-	(void)strcpy(to->desc, from->desc);
-    }
-    if (from->units) {
-        to->units = (char *)malloc((size_t)strlen(from->units)+1);
-	if (to->units == NULL) {
-	    (void)free(to->desc);
-	    (void)free(to->fname);
-	    return (-1);
-	}
-	(void)strcpy(to->units, from->units);
-    }
+    SSTRCPY(to->fname, from->fname);
+    SSTRCPY(to->desc, from->desc);
+    SSTRCPY(to->units, from->units);
     return (1);
 }
 
@@ -514,12 +453,11 @@ static void sigmap_cleanup(void)
     int i;
 
     need_sigmap = nvsig = tspf = 0;
-    if (ovec) { free(ovec); ovec = NULL; }
+    SFREE(ovec);
     if (smi) {
 	for (i = 0; i < tspf; i += smi[i].spf)
-	    if (smi[i].desc) free(smi[i].desc);
-	free(smi);
-	smi = NULL;
+	    SFREE(smi[i].desc);
+	SFREE(smi);
     }
 
     if (vsd) {
@@ -527,13 +465,12 @@ static void sigmap_cleanup(void)
 
 	while (maxvsig)
 	    if (is = vsd[--maxvsig]) {
-		if (is->info.fname) (void)free(is->info.fname);
-		if (is->info.units) (void)free(is->info.units);
-		if (is->info.desc)  (void)free(is->info.desc);
-		(void)free(is);
+		SFREE(is->info.fname);
+		SFREE(is->info.units);
+		SFREE(is->info.desc);
+		SFREE(is);
 	    }
-    	(void)free(vsd);
-	vsd = NULL;
+    	SFREE(vsd);
     }
 }
 
@@ -548,20 +485,10 @@ static int make_vsd(void)
 
     if (maxvsig < nvsig) {
 	unsigned m = maxvsig;
-	struct isdata **vsdnew = realloc(vsd, nvsig*sizeof(struct isdata *));
 
-	if (vsdnew == NULL) {
-	    wfdb_error("init: too many (%d) input signals\n", nvsig);
-	    return (-1);
-	}
-	vsd = vsdnew;
+	SREALLOC(vsd, nvsig, sizeof(struct isdata *));
 	while (m < nvsig) {
-	    if ((vsd[m] = calloc(1, sizeof(struct isdata))) == NULL) {
-		wfdb_error("init: too many (%d) input signals\n", nvsig);
-		while (--m > maxvsig)
-		    free(isd[m]);
-		return (-1);
-	    }
+	    SUALLOC(vsd[m], 1, sizeof(struct isdata));
 	    m++;
 	}
 	maxvsig = nvsig;
@@ -587,18 +514,9 @@ static int sigmap_init(void)
 	nvsig = nisig;
 	for (s = tspf = 0; s < nisig; s++)
 	    tspf += isd[s]->info.spf;
-	if ((smi = malloc(tspf * sizeof(struct sigmapinfo))) == NULL) {
-	    wfdb_error("sigmap_init: out of memory\n");
-	    return (-1);
-	}
-
+	SALLOC(smi, tspf, sizeof(struct sigmapinfo));
 	for (i = s = 0; i < nisig; i++) {
-	    if (smi[s].desc = malloc(strlen(isd[i]->info.desc)+1))
-		strcpy(smi[s].desc, isd[i]->info.desc);
-	    else {
-		wfdb_error("sigmap_init: out of memory\n");
-		return (-1);
-	    }
+	    SSTRCPY(smi[s].desc, isd[i]->info.desc);
 	    smi[s].gain = isd[i]->info.gain;
 	    smi[s].baseline = isd[i]->info.baseline;
 	    k = smi[s].spf = isd[i]->info.spf;
@@ -606,11 +524,7 @@ static int sigmap_init(void)
 		smi[s + j] = smi[s];
 	    s += k;	    
 	}
-
-	if ((ovec = malloc(tspf * sizeof(WFDB_Sample))) == NULL) {
-	    wfdb_error("sigmap_init: out of memory\n");
-	    return (-1);
-	}
+	SALLOC(ovec, tspf, sizeof(WFDB_Sample));
 	return (make_vsd());
     }
 
@@ -729,35 +643,18 @@ static int edfparse(WFDB_FILE *ifile)
     /* Allocate workspace. */
     if (maxhsig < nsig) {
 	unsigned m = maxhsig;
-	struct hsdata **hsdnew = realloc(hsd, nsig*sizeof(struct hsdata *));
 
-	if (hsdnew == NULL) {
-	    wfdb_error("init: too many (%d) signals in header file\n", nsig);
-	    return (-2);
-	}
-	hsd = hsdnew;
+	SREALLOC(hsd, nsig, sizeof(struct hsdata *));
 	while (m < nsig) {
-	    if ((hsd[m] = calloc(1, sizeof(struct hsdata))) == NULL) {
-		wfdb_error("init: too many (%d) signals in header file\n",
-			   nsig);
-		while (--m > maxhsig)
-		    free(hsd[m]);
-		return (-2);
-	    }
+	    SUALLOC(hsd[m], 1, sizeof(struct hsdata));
 	    m++;
 	}
 	maxhsig = nsig;
     }
-    if ((dmax = malloc(nsig * sizeof(long))) == NULL ||
-	(dmin = malloc(nsig * sizeof(long))) == NULL ||
-	(pmax = malloc(nsig * sizeof(double))) == NULL ||
-	(pmin = malloc(nsig * sizeof(double))) == NULL) {
-	wfdb_error("init: too many (%d) signals in header file\n", nsig);
-	if (pmax) free(pmax);
-	if (dmin) free(dmin);
-	if (dmax) free(dmax);
-	return (-2);
-    }      
+    SUALLOC(dmax, nsig, sizeof(long));
+    SUALLOC(dmin, nsig, sizeof(long));
+    SUALLOC(pmax, nsig, sizeof(double));
+    SUALLOC(pmin, nsig, sizeof(double));
 
     /* Strip off any path info from the EDF file name. */
     p = edf_fname + strlen(edf_fname) - 4;
@@ -768,8 +665,7 @@ static int edfparse(WFDB_FILE *ifile)
     for (s = 0; s < nsig; s++) {
 	hsd[s]->start = offset;
 	hsd[s]->skew = 0;
-	if (hsd[s]->info.fname = (char *)malloc(strlen(edf_fname)+1))
-	    strcpy(hsd[s]->info.fname, edf_fname);
+	SSTRCPY(hsd[s]->info.fname, edf_fname);
 	hsd[s]->info.group = hsd[s]->info.bsize = hsd[s]->info.cksum = 0;
 	hsd[s]->info.fmt = 16;
 	hsd[s]->info.nsamp = nframes;
@@ -778,8 +674,7 @@ static int edfparse(WFDB_FILE *ifile)
 	junk[16] = ' ';
 	for (i = 16; i >= 0 && junk[i] == ' '; i--)
 	    junk[i] = '\0';
-	if (hsd[s]->info.desc = (char *)malloc(strlen(junk)+1))
-	    strcpy(hsd[s]->info.desc, junk);
+	SSTRCPY(hsd[s]->info.desc, junk);
     }
 
     for (s = 0; s < nsig; s++)
@@ -789,8 +684,7 @@ static int edfparse(WFDB_FILE *ifile)
 	wfdb_fread(buf, 1, 8, ifile);	/* signal units */
 	for (i = 7; i >= 0 && buf[i] == ' '; i--)
 	    buf[i] = '\0';
-	if (hsd[s]->info.units = (char *)malloc(strlen(buf)+1))
-	    strcpy(hsd[s]->info.units, buf);
+	SSTRCPY(hsd[s]->info.units, buf);
     }
 
     for (s = 0; s < nsig; s++) {
@@ -852,10 +746,10 @@ static int edfparse(WFDB_FILE *ifile)
 	    hour, minute, second, day, month, year);
     setbasetime(buf);
 
-    free(pmin);
-    free(pmax);
-    free(dmin);
-    free(dmax);
+    SFREE(pmin);
+    SFREE(pmax);
+    SFREE(dmin);
+    SFREE(dmax);
     isedf = 1;
     return (nsig);
 }
@@ -877,10 +771,9 @@ static int readheader(const char *record)
 	if (in_msrec && vsd) {
 	    char *p;
 
-	    hsd = calloc(1, sizeof(struct hsdata *));
-	    hsd[0] = calloc(1, sizeof(struct hsdata));
-	    p = calloc(2, sizeof(char)); *p = '~';
-	    hsd[0]->info.desc = p;
+	    SALLOC(hsd, 1, sizeof(struct hsdata *));
+	    SALLOC(hsd[0], 1, sizeof(struct hsdata));
+	    SSTRCPY(hsd[0]->info.desc, "~");
 	    hsd[0]->info.spf = 1;
 	    hsd[0]->info.fmt = 0;
 	    hsd[0]->info.nsamp = nsamples = segp->nsamp;
@@ -1059,12 +952,7 @@ static int readheader(const char *record)
 	msbdate = bdate;
 	msnsamples = nsamples;
 	/* Read the names and lengths of the segment records. */
-	segarray = (struct segrec *)calloc(segments, sizeof(struct segrec));
-	if (segarray == (struct segrec *)NULL) {
-	    wfdb_error("init: insufficient memory\n");
-	    segments = 0;
-	    return (-2);
-	}
+	SALLOC(segarray, segments, sizeof(struct segrec));
 	segp = segarray;
 	for (i = 0, ns = (WFDB_Time)0L; i < segments; i++, segp++) {
 	    /* Get next segment spec, skip empty lines and comments. */
@@ -1073,8 +961,7 @@ static int readheader(const char *record)
 		    wfdb_error(
 			"init: unexpected EOF in header file for record %s\n",
 			record);
-		    (void)free(segarray);
-		    segarray = (struct segrec *)NULL;
+		    SFREE(segarray);
 		    segments = 0;
 		    return (-2);
 		}
@@ -1083,8 +970,7 @@ static int readheader(const char *record)
 		wfdb_error(
 		    "init: `%s' is too long for a segment name in record %s\n",
 		    p, record);
-		(void)free(segarray);
-		segarray = (struct segrec *)NULL;
+		SFREE(segarray);
 		segments = 0;
 		return (-2);
 	    }
@@ -1094,8 +980,7 @@ static int readheader(const char *record)
 		wfdb_error(
 		"init: length must be specified for segment %s in record %s\n",
 		           segp->recname, record);
-		(void)free(segarray);
-		segarray = (struct segrec *)NULL;
+		SFREE(segarray);
 		segments = 0;
 		return (-2);
 	    }
@@ -1117,21 +1002,10 @@ static int readheader(const char *record)
     /* Allocate workspace. */
     if (maxhsig < nsig) {
 	unsigned m = maxhsig;
-	struct hsdata **hsdnew = realloc(hsd, nsig*sizeof(struct hsdata *));
 
-	if (hsdnew == NULL) {
-	    wfdb_error("init: too many (%d) signals in header file\n", nsig);
-	    return (-2);
-	}
-	hsd = hsdnew;
+	SREALLOC(hsd, nsig, sizeof(struct hsdata *));
 	while (m < nsig) {
-	    if ((hsd[m] = calloc(1, sizeof(struct hsdata))) == NULL) {
-		wfdb_error("init: too many (%d) signals in header file\n",
-			   nsig);
-		while (--m > maxhsig)
-		    free(hsd[m]);
-		return (-2);
-	    }
+	    SUALLOC(hsd[m], 1, sizeof(struct hsdata));
 	    m++;
 	}
 	maxhsig = nsig;
@@ -1160,13 +1034,8 @@ static int readheader(const char *record)
 	   match that of the previous signal, the group number is one
 	   greater than that of the previous signal. */
 	if (s == 0 || strcmp(p, hp->info.fname)) {
-		hs->info.group = (s == 0) ? 0 : hp->info.group + 1;
-		if ((hs->info.fname =(char *)malloc((unsigned)(strlen(p)+1)))
-		     == NULL) {
-		    wfdb_error("init: insufficient memory\n");
-		    return (-2);
-		}
-		(void)strcpy(hs->info.fname, p);
+	    hs->info.group = (s == 0) ? 0 : hp->info.group + 1;
+	    SSTRCPY(hs->info.fname, p);
 	}
 	/* If the file names of the current and previous signals match,
 	   they are assigned the same group number and share a copy of the
@@ -1176,12 +1045,7 @@ static int readheader(const char *record)
 	   this has been done. */
 	else {
 	    hs->info.group = hp->info.group;
-	    if ((hs->info.fname = (char *)malloc(strlen(hp->info.fname)+1))
-		     == NULL) {
-		    wfdb_error("init: insufficient memory\n");
-		    return (-2);
-		}
-		(void)strcpy(hs->info.fname, hp->info.fname);
+	    SSTRCPY(hs->info.fname, hp->info.fname);
 	}
 
 	/* Determine the signal format. */
@@ -1228,10 +1092,7 @@ static int readheader(const char *record)
 		    break;
 	}
 	if (p && *p) {
-	    if ((hs->info.units=(char *)malloc(WFDB_MAXUSL+1)) == NULL) {
-		wfdb_error("init: insufficient memory\n");
-		return (-2);
-	    }
+	    SALLOC(hs->info.units, WFDB_MAXUSL+1, 1);
 	    (void)strncpy(hs->info.units, p, WFDB_MAXUSL);
 	}
 	else
@@ -1288,10 +1149,7 @@ static int readheader(const char *record)
 	    
 	/* Get the signal description.  If missing, a description of
 	   the form "record xx, signal n" is filled in. */
-	if ((hs->info.desc = (char *)malloc(WFDB_MAXDSL+1)) == NULL) {
-	    wfdb_error("init: insufficient memory\n");
-	    return (-2);
-	}
+	SALLOC(hs->info.desc, 1, WFDB_MAXDSL+1);
 	if (p = strtok((char *)NULL, "\n\r"))
 	    (void)strncpy(hs->info.desc, p, WFDB_MAXDSL);
 	else
@@ -1308,13 +1166,12 @@ static void hsdfree(void)
     if (hsd) {
 	while (maxhsig)
 	    if (hs = hsd[--maxhsig]) {
-		if (hs->info.fname) (void)free(hs->info.fname);
-		if (hs->info.units) (void)free(hs->info.units);
-		if (hs->info.desc)  (void)free(hs->info.desc);
-		(void)free(hs);
+		SFREE(hs->info.fname);
+		SFREE(hs->info.units);
+		SFREE(hs->info.desc);
+		SFREE(hs);
 	    }
-	(void)free(hsd);
-	hsd = NULL;
+	SFREE(hsd);
     }
     maxhsig = 0;
 }
@@ -1326,20 +1183,18 @@ static void isigclose(void)
 
     /* if (nisig == 0) return; */
     if (sbuf && !in_msrec) {
-	(void)free(sbuf);
-	sbuf = NULL;
+	SFREE(sbuf);
 	sample_vflag = 0;
     }
     if (isd) {
 	while (nisig)
 	    if (is = isd[--nisig]) {
-		if (is->info.fname) (void)free(is->info.fname);
-		if (is->info.units) (void)free(is->info.units);
-		if (is->info.desc)  (void)free(is->info.desc);
-		(void)free(is);
+		SFREE(is->info.fname);
+		SFREE(is->info.units);
+		SFREE(is->info.desc);
+		SFREE(is);
 	    }
-	(void)free(isd);
-	isd = NULL;
+	SFREE(isd);
     }
     else
 	nisig = 0;
@@ -1349,11 +1204,10 @@ static void isigclose(void)
 	while (nigroups)
 	    if (ig = igd[--nigroups]) {
 		if (ig->fp) (void)wfdb_fclose(ig->fp);
-		if (ig->buf) (void)free(ig->buf);
-		(void)free(ig);
+		SFREE(ig->buf);
+		SFREE(ig);
 	    }
-	(void)free(igd);
-	igd = NULL;
+	SFREE(igd);
     }
     else
 	nigroups = 0;
@@ -1378,13 +1232,12 @@ static void osigclose(void)
     if (osd) {
 	while (nosig)
 	    if (os = osd[--nosig]) {
-		if (os->info.fname) (void)free(os->info.fname);
-		if (os->info.units) (void)free(os->info.units);
-		if (os->info.desc)  (void)free(os->info.desc);
-		(void)free(os);
+		SFREE(os->info.fname);
+		SFREE(os->info.units);
+		SFREE(os->info.desc);
+		SFREE(os);
 	    }
-	(void)free(osd);
-	osd = NULL;
+	SFREE(osd);
     }
     else
 	nosig = 0;
@@ -1407,11 +1260,10 @@ static void osigclose(void)
 			og->fp = NULL;
 		    }
 		}
-		if (og->buf) (void)free(og->buf);
-		(void)free(og);
+		SFREE(og->buf);
+		SFREE(og);
 	    }
-	(void)free(ogd);
-	ogd = NULL;
+	SFREE(ogd);
     }
     else
 	nogroups = 0;
@@ -2029,9 +1881,7 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
 	    if ((ig->bsize = hs->info.bsize) == 0) ig->bsize = ibsize;
 	    ig->seek = 1;
 	}
-
-	/* Skip this group if a buffer can't be allocated. */
-	if ((ig->buf = (char *)malloc(ig->bsize)) == NULL) continue;
+	SALLOC(ig->buf, 1, ig->bsize);
 
 	/* Check that the signal file is readable. */
 	if (hs->info.fmt == 0)
@@ -2040,8 +1890,7 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
 	    ig->fp = wfdb_open(hs->info.fname, (char *)NULL, WFDB_READ);
 	    /* Skip this group if the signal file can't be opened. */
 	    if (ig->fp == NULL) {
-	        (void)free(ig->buf);
-		ig->buf = NULL;
+	        SFREE(ig->buf);
 		continue;
 	    }
 	}
@@ -2051,10 +1900,7 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
 	ig->start = hs->start;
 	ig->stat = 1;
 	while (si < sj && s < nsig) {
-	    if (copysi(&is->info, &hs->info) < 0) {
-		wfdb_error("isigopen: insufficient memory\n");
-		return (-3);
-	    }
+	    copysi(&is->info, &hs->info);
 	    is->info.group = nigroups + g;
 	    is->skew = hs->skew;
 	    ++s;
@@ -2077,10 +1923,8 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
        maximum number of samples per signal per frame and the maximum skew. */
     for (si = 0; si < s; si++) {
         is = isd[nisig + si];
-	if (siarray != NULL && copysi(&siarray[si], &is->info) < 0) {
-	    wfdb_error("isigopen: insufficient memory\n");
-	    return (-3);
-	}
+	if (siarray) 
+	    copysi(&siarray[si], &is->info);
 	is->samp = is->info.initval;
 	if (ispfmax < is->info.spf) ispfmax = is->info.spf;
 	if (skewmax < is->skew) skewmax = is->skew;
@@ -2098,12 +1942,9 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
 	framelen += isd[si]->info.spf;
 
     /* Allocate workspace for getvec and isgsettime. */
-    if (framelen > tuvlen &&
-	((tvector = realloc(tvector, sizeof(WFDB_Sample)*framelen)) == NULL ||
-	 (uvector = realloc(uvector, sizeof(WFDB_Sample)*framelen)) == NULL)) {
-	wfdb_error("isigopen: can't allocate frame buffer\n");
-	if (tvector) (void)free(tvector);
-	return (-3);
+    if (framelen > tuvlen) {
+	SREALLOC(tvector, framelen, sizeof(WFDB_Sample));
+	SREALLOC(uvector, framelen, sizeof(WFDB_Sample));
     }
     tuvlen = framelen;
 
@@ -2112,11 +1953,7 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
     if (skewmax != 0 && (!in_msrec || dsbuf == NULL)) {
 	dsbi = -1;	/* mark buffer contents as invalid */
 	dsblen = framelen * (skewmax + 1);
-	if (dsbuf) free(dsbuf);
-	if ((dsbuf=(WFDB_Sample *)malloc(dsblen*sizeof(WFDB_Sample))) == NULL)
-	    wfdb_error("isigopen: can't allocate buffer for deskewing\n");
-	/* If the buffer couldn't be allocated, the signals can still be read,
-	   but won't be deskewed. */
+	SALLOC(dsbuf, dsblen, sizeof(WFDB_Sample));
     }
     return (s);
 }
@@ -2163,11 +2000,8 @@ FINT osigopen(char *record, WFDB_Siginfo *siarray, unsigned int nsig)
 	os = osd[nosig];
 
 	/* Copy signal information from readheader's workspace. */
-	if (copysi(&os->info, &hsd[s]->info) < 0 ||
-	    copysi(siarray, &hsd[s]->info) < 0) {
-	    wfdb_error("osigopen: insufficient memory\n");
-	    return (-3);
-	}
+	copysi(&os->info, &hsd[s]->info);
+	copysi(siarray, &hsd[s]->info);
 	if (os->info.spf < 1) os->info.spf = siarray->spf = 1;
 	os->info.cksum = siarray->cksum = 0;
 	os->info.nsamp = siarray->nsamp = (WFDB_Time)0L;
@@ -2180,11 +2014,7 @@ FINT osigopen(char *record, WFDB_Siginfo *siarray, unsigned int nsig)
 	    og = ogd[os->info.group];
 	    og->bsize = os->info.bsize;
 	    obuflen = og->bsize ? og->bsize : obsize;
-	    if ((og->buf = (char *)malloc(obuflen)) == NULL) {
-	        wfdb_error("osigopen: can't allocate buffer for %s\n",
-			   os->info.fname);
-		return (-3);
-	    }
+	    SALLOC(og->buf, 1, obuflen);
 	    og->bp = og->buf;
 	    og->be = og->buf + obuflen;
 	    if (os->info.fmt == 0)
@@ -2194,8 +2024,7 @@ FINT osigopen(char *record, WFDB_Siginfo *siarray, unsigned int nsig)
 		og->fp = wfdb_open(os->info.fname,(char *)NULL, WFDB_WRITE);
 		if (og->fp == NULL) {
 		    wfdb_error("osigopen: can't open %s\n", os->info.fname);
-		    free(og->buf);
-		    og->buf = NULL;
+		    SFREE(og->buf);
 		    osigclose();
 		    return (-3);
 		}
@@ -2290,10 +2119,7 @@ FINT osigfopen(WFDB_Siginfo *siarray, unsigned int nsig)
 	}
 
 	/* Copy signal information from the caller's array. */
-	if (copysi(&os->info, siarray) < 0) {
-	    wfdb_error("osigfopen: insufficient memory\n");
-	    return (-3);
-	}
+	copysi(&os->info, siarray);
 	if (os->info.spf < 1) os->info.spf = 1;
 	os->info.cksum = 0;
 	os->info.nsamp = (WFDB_Time)0L;
@@ -2306,11 +2132,7 @@ FINT osigfopen(WFDB_Siginfo *siarray, unsigned int nsig)
 	    og->bsize = os->info.bsize;
 	    obuflen = og->bsize ? og->bsize : obsize;
 	    /* This is the first signal in a new group; allocate buffer. */
-	    if ((og->buf = (char *)malloc(obuflen)) == NULL) {
-	        wfdb_error("osigfopen: can't allocate buffer for %s\n",
-			   os->info.fname);
-		return (-3);
-	    }
+	    SALLOC(og->buf, 1,obuflen);
 	    og->bp = og->buf;
 	    og->be = og->buf + obuflen;
 	    if (os->info.fmt == 0)
@@ -2320,8 +2142,7 @@ FINT osigfopen(WFDB_Siginfo *siarray, unsigned int nsig)
 	        og->fp = wfdb_open(os->info.fname,(char *)NULL, WFDB_WRITE);
 		if (og->fp == NULL) {
 		    wfdb_error("osigfopen: can't open %s\n", os->info.fname);
-		    free(og->buf);
-		    og->buf = NULL;
+		    SFREE(og->buf);
 		    osigclose();
 		    return (-3);
 		}
@@ -2406,14 +2227,8 @@ FINT setifreq(WFDB_Frequency f)
     if (f > 0.0) {
 	WFDB_Frequency error, g = sfreq;
 
-	gv0 = realloc(gv0, nisig*sizeof(WFDB_Sample));
-	gv1 = realloc(gv1, nisig*sizeof(WFDB_Sample));
-	if (gv0 == NULL || gv1 == NULL) {
-	    wfdb_error("setifreq: too many (%d) input signals\n", nisig);
-	    if (gv0) (void)free(gv0);
-	    ifreq = 0.0;
-	    return (-2);
-	}
+	SREALLOC(gv0, nisig, sizeof(WFDB_Sample));
+	SREALLOC(gv1, nisig, sizeof(WFDB_Sample));
 	setafreq(ifreq = f);
 	/* The 0.005 below is the maximum tolerable error in the resampling
 	   frequency (in Hz).  The code in the while loop implements Euclid's
@@ -2671,22 +2486,16 @@ FINT newheader(char *record)
     /* Remove trailing .hea, if any, from record name. */
     wfdb_striphea(record);
 
-    if ((osi = malloc(nosig*sizeof(WFDB_Siginfo))) == NULL) {
-	wfdb_error("newheader: insufficient memory\n");
-	return (-1);
-    }
+    SUALLOC(osi, nosig, sizeof(WFDB_Siginfo));
     for (s = 0; s < nosig; s++)
-	if (copysi(&osi[s], &osd[s]->info) < 0) {
- 	    wfdb_error("newheader: insufficient memory\n");
-	    return (-1);
-	}
+	copysi(&osi[s], &osd[s]->info);
     stat = setheader(record, osi, nosig);
     for (s = 0; s < nosig; s++) {
-      if (osi[s].fname) (void)free(osi[s].fname);
-      if (osi[s].desc) (void)free(osi[s].desc);
-      if (osi[s].units) (void)free(osi[s].units);
+	SFREE(osi[s].fname);
+	SFREE(osi[s].desc);
+	SFREE(osi[s].units);
     }
-    (void)free(osi);
+    SFREE(osi);
     return (stat);
 }
 
@@ -2793,17 +2602,13 @@ FINT setmsheader(char *record, char **segment_name, unsigned int nsegments)
 	return (-1);
     }
 
-    if ((ns = (long *)malloc((unsigned)(sizeof(long)*nsegments))) == NULL) {
-	wfdb_error("setmsheader: insufficient memory\n");
-	return (-2);
-    }
-
+    SUALLOC(ns, nsegments, (sizeof(long)*nsegments));
     for (i = 0; i < nsegments; i++) {
 	if (strlen(segment_name[i]) > WFDB_MAXRNL) {
 	    wfdb_error(
 	     "setmsheader: `%s' is too long for a segment name in record %s\n",
 		     segment_name[i], record);
-	    (void)free(ns);
+	    SFREE(ns);
 	    return (-2);
 	}
 	in_msrec = 1;
@@ -2812,13 +2617,13 @@ FINT setmsheader(char *record, char **segment_name, unsigned int nsegments)
 	if (n < 0) {
 	    wfdb_error("setmsheader: can't read segment %s header\n",
 		     segment_name[i]);
-	    (void)free(ns);
+	    SFREE(ns);
 	    return (-3);
 	}
 	if ((ns[i] = hsd[0]->info.nsamp) <= 0L) {
 	    wfdb_error("setmsheader: length of segment %s must be specified\n",
 		     segment_name[i]);
-	    (void)free(ns);
+	    SFREE(ns);
 	    return (-4);
 	}
 	if (i == 0) {
@@ -2835,14 +2640,14 @@ FINT setmsheader(char *record, char **segment_name, unsigned int nsegments)
 		wfdb_error(
 		    "setmsheader: incorrect number of signals in segment %s\n",
 			 segment_name[i]);
-		(void)free(ns);
+		SFREE(ns);
 		return (-4);
 	    }
 	    if (msfreq != ffreq) {
 		wfdb_error(
 		   "setmsheader: incorrect sampling frequency in segment %s\n",
 			 segment_name[i]);
-		(void)free(ns);
+		SFREE(ns);
 		return (-4);
 	    }
 	    msnsamples += ns[i];
@@ -2853,7 +2658,7 @@ FINT setmsheader(char *record, char **segment_name, unsigned int nsegments)
     if ((oheader = wfdb_open("hea", record, WFDB_WRITE)) == NULL) {
 	wfdb_error("setmsheader: can't create header file for record %s\n",
 		 record);
-	(void)free(ns);
+	SFREE(ns);
 	return (-1);
     }
 
@@ -2881,7 +2686,7 @@ FINT setmsheader(char *record, char **segment_name, unsigned int nsegments)
     for (i = 0; i < nsegments; i++)
 	(void)wfdb_fprintf(oheader, "%s %ld\r\n", segment_name[i], ns[i]);
 
-    (void)free(ns);
+    SFREE(ns);
     return (0);
 }
 
@@ -3313,12 +3118,8 @@ FSAMPLE sample(WFDB_Signal s, WFDB_Time t)
 
     /* Allocate the sample buffer on the first call. */
     if (sbuf == NULL) {
-	sbuf= (WFDB_Sample *)malloc((unsigned)nisig*BUFLN*sizeof(WFDB_Sample));
-	if (sbuf) tt = (WFDB_Time)-1L;
-	else {
-	    (void)fprintf(stderr, "sample(): insufficient memory\n");
-	    exit(2);
-	}
+	SALLOC(sbuf, nisig, BUFLN*sizeof(WFDB_Sample));
+	tt = (WFDB_Time)-1L;
     }
 
     /* If the caller requested a sample from an unavailable signal, return
@@ -3374,8 +3175,7 @@ FINT sample_valid(void)
 void wfdb_sampquit(void)
 {
     if (sbuf) {
-	(void)free(sbuf);
-	sbuf = NULL;
+	SFREE(sbuf);
 	sample_vflag = 0;
     }
 }
@@ -3389,32 +3189,25 @@ void wfdb_sigclose(void)
     pdays = (WFDB_Date)-1;
     segments = in_msrec = skewmax = 0;
     if (dsbuf) {
-	(void)free(dsbuf);
-	dsbuf = NULL;
+	SFREE(dsbuf);
 	dsbi = -1;
     }
     if (segarray) {
 	int i;
 
-	(void)free(segarray);
-	segarray = segp = segend = (struct segrec *)NULL;
+	SFREE(segarray);
+	segp = segend = (struct segrec *)NULL;
 	for (i = 0; i < maxisig; i++) {
-	    if (isd[i]->info.desc) {
-		(void)free(isd[i]->info.desc);
-		isd[i]->info.desc = NULL;
-	    }
-	    if (isd[i]->info.units) {
-		(void)free(isd[i]->info.units);
-		isd[i]->info.units = NULL;
-	    }
+	    SFREE(isd[i]->info.fname);  /* missing before 10.4.6 */
+	    SFREE(isd[i]->info.desc);
+	    SFREE(isd[i]->info.units);
 	}
     }
-    if (gv0) (void)free(gv0);
-    if (gv1) (void)free(gv1);
-    if (tvector) (void)free(tvector);
-    if (uvector) (void)free(uvector);
+    SFREE(gv0);
+    SFREE(gv1);
+    SFREE(tvector);
+    SFREE(uvector);
     tuvlen = 0;
-    gv0 = gv1 = tvector = uvector = NULL;
 
     sigmap_cleanup();
 }
