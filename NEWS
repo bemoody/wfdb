@@ -27,6 +27,9 @@
 	setanndesc() now handle NULL string inputs properly. (Previous versions
 	passed NULL strings to strcmp(), with undesirable results.)
 
+	A pair of new utility applications, signame and signum, convert signal
+	numbers to signal names and vice versa.
+
 	A new format converter, rdedfann, is included in convert/.  It extracts
 	annotations from EDF+ files and writes them to the standard output in
 	rdann output format.  After changing the EDF+ annotation mnemonics

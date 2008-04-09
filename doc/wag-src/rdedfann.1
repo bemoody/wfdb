@@ -1,4 +1,4 @@
-.TH RDEDFANN 1  "4 April 2008" "WFDB 10.4.6" "WFDB Applications Guide"
+.TH RDEDFANN 1  "9 April 2008" "WFDB 10.4.6" "WFDB Applications Guide"
 .SH NAME
 rdedfann \- extract annotations from an EDF+ file
 .SH SYNOPSIS
@@ -24,7 +24,7 @@ command can be used to extract annotations from \fBfoo.edf\fR, change
 the EDF+ annotation type "QRS" to the WFDB type "N", and then produce
 a WFDB-compatible annotation file \fBfoo.edf.qrs\fR:
 .br
-        \fBrdedf -r foo.edf | sed "s/QRS/ N" | wrann -r foo.edf -a qrs\fR
+        \fBrdedfann -r foo.edf | sed "s/QRS/ N" | wrann -r foo.edf -a qrs\fR
 
 .SH ENVIRONMENT
 .PP

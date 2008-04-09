@@ -32,6 +32,8 @@ app/sampfreq.c
 app/setwfdb
 app/sigamp.c
 app/sigavg.c
+app/signame.c
+app/signum.c
 app/skewedit.c
 app/snip.c
 app/sortann.c
@@ -313,6 +315,8 @@ doc/wag-src/setwfdb.1
 doc/wag-src/sigamp.1
 doc/wag-src/sigavg.1
 doc/wag-src/signal.5
+doc/wag-src/signame.1
+doc/wag-src/signum.1
 doc/wag-src/skewedit.1
 doc/wag-src/snip.1
 doc/wag-src/sortann.1
