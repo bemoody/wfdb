@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody         24 May 2000
-#                             Last revised:   8 August 2005
+#                             Last revised:   15 April 2008
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -36,7 +36,7 @@ do
     *)                  cat <<EOF
 usage: $0 [options]
 Options:
-    --dynamic           make a shared (dynamically linkable) WFDB library
+   --dynamic           make a shared (dynamically linkable) WFDB library
                          if possible [default]
     --help              print this message
     -m32                on 64-bit Linux, force compilation in 32-bit mode
@@ -380,7 +380,14 @@ esac
 
 echo "NETFILES=$NETFILES" >../config.cache
 echo "NETFILES_LIBCURL=$NETFILES_LIBCURL" >>../config.cache
+MAJOR=`grep ^MAJOR ../conf/version.def | cut -f 3 -d " "`
+MINOR=`grep ^MINOR ../conf/version.def | cut -f 3 -d " "`
+RELEASE=`grep ^RELEASE ../conf/version.def | cut -f 3 -d " "`
+echo "MAJOR = $MAJOR, MINOR = $MINOR, RELEASE = $RELEASE"
 sed "s/WFDB_NETFILES 1/WFDB_NETFILES $NETFILES/" < ../lib/wfdb.h0 | \
+    sed "s/WFDBMAJOR/$MAJOR/" | \
+    sed "s/WFDBMINOR/$MINOR/" | \
+    sed "s/WFDBRELEASE/$RELEASE/" | \
     sed "s/WFDB_NETFILES_LIBCURL 1/WFDB_NETFILES_LIBCURL $NETFILES_LIBCURL/" \
       >../lib/wfdb.h
 if [ $LIBTYPE = "static" -a $NETLIB != "none" ]

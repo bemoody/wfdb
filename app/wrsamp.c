@@ -1,8 +1,8 @@
 /* file: wrsamp.c	G. Moody	10 August 1993
-			Last revised:   11 August 2005
+			Last revised:    15 July 2008
 -------------------------------------------------------------------------------
 wrsamp: Select fields or columns from a file and generate a WFDB record
-Copyright (C) 2002 George B. Moody
+Copyright (C) 1993-2008 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -27,7 +27,11 @@ Portions of this program were derived from the `field' utility described in
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <wfdb/wfdb.h>
+
+/* The following definition yields dither with a triangular PDF in (-1,1). */
+#define DITHER	        (((double)rand() + (double)rand())/RAND_MAX - 1.0)
 
 #define isfsep(c)	((fsep && ((c)==fsep)) || ((c)==' ' || (c)=='\t'))
 
@@ -44,7 +48,7 @@ char *argv[];
 #ifndef atof
     double atof();
 #endif
-    int c, cf = 0, *fv = NULL, i, lmax = 1024, mf;
+    int c, cf = 0, dflag = 0, *fv = NULL, i, lmax = 1024, mf;
     FILE *ifile = stdin;
     long t = 0L, t0 = 0L, t1 = 0L;
 #ifndef atol
@@ -61,6 +65,11 @@ char *argv[];
 	switch (*(argv[i]+1)) {
 	  case 'c':
 	    cf = -1;
+	    break;
+	  case 'd':
+	    dflag = 1;
+	    srand((long)0);	/* seed for dither RNG -- replace 0 with a
+				   different value to get different dither */
 	    break;
 	  case 'f':
 	    if (++i >= argc || (t0 = atol(argv[i])) <= 0L) {
@@ -275,6 +284,7 @@ char *argv[];
 		    }
 		    else {
 			v *= scalef[i];
+			if (dflag) v += DITHER;
 			if (v >= 0) vout[i] = (int)(v + 0.5);
 			else vout[i] = (int)(v - 0.5);
 		    }
@@ -332,6 +342,7 @@ static char *help_strings[] = {
  "where COLUMN selects a field to be copied (leftmost field is column 0),",
  "and OPTIONS may include:",
  " -c          check that each input line contains the same number of fields",
+ " -d          add dither to the input",
  " -f N        start copying with line N (default: 0)",
  " -F FREQ     specify frequency to be written to header file (default: 250)",
  " -G GAIN     specify gain(s) to be written to header file (default: 200)",

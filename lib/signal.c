@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:    8 April 2008		wfdblib 10.4.6
+			Last revised:   15 April 2008		wfdblib 10.4.7
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -482,7 +482,11 @@ static int make_vsd(void)
 	wfdb_error("make_vsd: oops! nvsig = %d, nisig = %d\n", nvsig, nisig);
 	return (-1);
     }
-
+    for (i = 0; i < maxvsig; i++) {
+        SFREE(vsd[i]->info.fname);
+        SFREE(vsd[i]->info.desc);
+        SFREE(vsd[i]->info.units);
+    } 
     if (maxvsig < nvsig) {
 	unsigned m = maxvsig;
 

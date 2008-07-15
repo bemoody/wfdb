@@ -1,8 +1,8 @@
 /* file: nguess.c		G. Moody	9 June 1986
-				Last revised: 17 February 2003
+				Last revised:  11 June 2008
 -------------------------------------------------------------------------------
 nguess: Guess the times of missing normal sinus beats in an annotation file
-Copyright (C) 2003 George B. Moody
+Copyright (C) 1986-2008 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -127,6 +127,13 @@ char *argv[];
 	    help();
 	    exit(0);
 	    break;
+	  case 'm':  /* multiple of predicted interval needed for inserting Q */
+	    if (++i >= argc || (alpha = atof(argv[i]) - 1.0) <= 0) {
+		(void)fprintf(stderr, "%s: multiplier (> 1) must follow -m\n",
+			      pname);
+		exit(1);
+	    }
+	    break;
 	  case 'o':	/* output annotator follows */
 	    if (++i >= argc) {
 		(void)fprintf(stderr, "%s: output annotator must follow -o\n",
@@ -192,7 +199,7 @@ char *argv[];
 	to = strtim(argv[(int)to]);
 	if (to < (WFDB_Time)0) to = -to;
     }
-    if (to < from) {
+    if (to < from && to > 0L) {
 	WFDB_Time tt = from;
 
 	from = to;
@@ -231,8 +238,13 @@ char *argv[];
 
 	/* From the previous RR intervals, choose the best predictor. */
 	for (i = n, bestpe = 99999., worst = 0.; i > 0; i--) {
+	    double error;
+
+	    /* Put an upper bound on the prediction error, to limit the
+	       influence of a single observation on pe[i]. */
+	    if ((error = fabs(rr[i] - rr[0])) > sps/2) error = sps/2;
 	    if (rr[i] > 0 &&
-		(pe[i] += (fabs(rr[i]-rr[0])-pe[i])/20.) <= bestpe) {
+		(pe[i] += (error - pe[i])/20.) <= bestpe) {
 		bestpe = pe[i];
 		best = i; 
 	    }		/* find best predicting interval */
@@ -336,6 +348,7 @@ static char *help_strings[] = {
  "where RECORD and ANNOTATOR specify the input, and OPTIONS may include:",
  " -f TIME    start at specified TIME",
  " -h         print this usage summary",
+ " -m M       insert a Q if RR > M * prediction (M > 1; default: M = 1.75)",
  " -o OANN    write output as annotator OANN (default: nguess)",
  " -t TIME    stop at specified TIME",
  "The output contains copies of all N annotations, with additional Q",

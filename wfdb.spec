@@ -15,6 +15,9 @@ Requires: curl-devel >= 7.10
 BuildRoot: /var/tmp/%{name}-root
 
 %changelog
+* Wed Apr 9 2008 George B Moody <george@mit.edu>
+- added rdedfann, signame, signum
+
 * Wed May 11 2006 George B Moody <george@mit.edu>
 - better solution for problems with compiled-in paths
 
@@ -161,6 +164,7 @@ power spectrum estimation, and many others.
 %{_bindir}/pschart
 %{_bindir}/psfd
 %{_bindir}/rdann
+%{_bindir}/rdedfann
 %{_bindir}/rdsamp
 %{_bindir}/readid
 %{_bindir}/revise
@@ -170,6 +174,8 @@ power spectrum estimation, and many others.
 %{_bindir}/setwfdb
 %{_bindir}/sigamp
 %{_bindir}/sigavg
+%{_bindir}/signame
+%{_bindir}/signum
 %{_bindir}/skewedit
 %{_bindir}/snip
 %{_bindir}/sortann

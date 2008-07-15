@@ -6,12 +6,15 @@
 <BR><HR>
 <H2>Other links of interest</H2>
 <UL>
-<LI><A HREF="http://www.physionet.org/">PhysioNet</A><BR>
+<LI><A HREF="http://physionet.org/">PhysioNet</A><BR>
 PhysioNet offers free access via the web to large collections of
 recorded physiologic signals and related open-source software.
-PhysioNet is a public service of the Research Resource for
-Complex Physiologic Signals, funded by the National Center for
-Research Resources of the National Institutes of Health.  
+The PhysioNet web site is a public service of the 
+<A HREF="http://physionet.org/resource.shtml">PhysioNet Resource</a>
+funded by the <a href="http://www.nih.gov/" target="other">National
+Institutes of Health</a>'s <a href="http://www.nibib.nih.gov"
+target="other">NIBIB</a> and <a href="http://www.nigms.nih.gov"
+target="other">NIGMS</a>.
 The most recent version of this guide, and of the software it
 describes, may be obtained from PhysioNet.
 <LI><I><A HREF="../wpg/wpg.htm">WFDB Programmer's Guide</A></I>

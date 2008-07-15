@@ -1,5 +1,5 @@
 /* file: sqrs.c		G. Moody	27 October 1990
-			Last revised:	14 January 2008
+			Last revised:	  15 May 2008
 
 -------------------------------------------------------------------------------
 sqrs: Single-channel QRS detector
@@ -89,7 +89,7 @@ char *argv[];
     long from = 0L, next_minute, now, spm, to = 0L;
     WFDB_Anninfo a;
     WFDB_Annotation annot;
-    static int gvmode = 0;
+    static int gvmode = WFDB_LOWRES;
     static WFDB_Siginfo *s;
     void help();
 

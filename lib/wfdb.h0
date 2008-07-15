@@ -1,5 +1,5 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised:   8 February 2008	wfdblib 10.4.6
+			Last revised:   14 July 2008		wfdblib 10.4.7
 WFDB library type, constant, structure, and function interface definitions
 
 _______________________________________________________________________________
@@ -31,9 +31,9 @@ _______________________________________________________________________________
 #define wfdb_WFDB_H
 
 /* WFDB library version. */
-#define WFDB_MAJOR   10
-#define WFDB_MINOR   4
-#define WFDB_RELEASE 6
+#define WFDB_MAJOR   WFDBMAJOR
+#define WFDB_MINOR   WFDBMINOR
+#define WFDB_RELEASE WFDBRELEASE
 #define WFDB_NETFILES 1	/* if 1, library includes code for HTTP, FTP clients */
 #define WFDB_NETFILES_LIBCURL 1
 
@@ -321,6 +321,7 @@ extern FINT setibsize(int input_buffer_size);
 extern FINT setobsize(int output_buffer_size);
 extern FSTRING wfdbfile(char *file_type, char *record);
 extern FVOID wfdbflush(void);
+extern FVOID wfdbmemerr(int exit_on_error);
 #endif
 
 #ifdef wfdb_CPP
@@ -346,7 +347,7 @@ extern FSITIME strtim();
 extern FDATE strdat();
 extern FVOID setafreq(), setgvmode(), wfdbquit(), wfdbquiet(), dbverbose(),
     setdb(), wfdbflush(), setcfreq(), setbasecount(), flushcal(),
-    wfdbsetiskew(), wfdbsetskew(), wfdbsetstart();
+    wfdbsetiskew(), wfdbsetskew(), wfdbsetstart(), wfdbmemerr();
 extern FFREQUENCY getafreq(), getifreq(), sampfreq(), getcfreq();
 extern FDOUBLE aduphys(), getbasecount();
 #endif

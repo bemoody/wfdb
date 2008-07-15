@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:     8 April 2008	wfdblib 10.4.6
+			Last revised:    18 April 2008	wfdblib 10.4.7
 WFDB library functions for annotations
 
 _______________________________________________________________________________
@@ -154,7 +154,7 @@ static WFDB_Frequency oafreq;	/* time resolution in ticks/sec for newly-
 
 static int get_ann_table(WFDB_Annotator i)
 {
-    char *p1, *p2, *s1, *s2;
+    char *p1, *p2, *s1 = NULL, *s2 = NULL;
     int a;
     WFDB_Annotation annot;
 

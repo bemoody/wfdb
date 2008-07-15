@@ -350,6 +350,9 @@ char *argv[];
 	setwfdb(nwfdbp);
     }
 
+    /* Make sure there is a calibration database defined. */
+    if (!getenv("WFDBCAL"))
+	putenv("WFDBCAL=wfdbcal");
     /* Initialize the annotation table. */
     (void)read_anntab();
 

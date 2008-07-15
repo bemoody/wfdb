@@ -510,6 +510,12 @@ guide in June, 1999.  See @file{NEWS}, in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
+@unnumberedsubsec Changes in version 10.4.7
+
+Yinqi Zhang reported and contributed a fix for a memory leak in
+@code{make_vsd()} (an internal WFDB library function defined in
+@file{signal.c}).
+
 @unnumberedsubsec Changes in version 10.4.6
 
 The WFDB functions @code{setafreq()} and @code{getafreq()} (for
@@ -522,11 +528,12 @@ An important change in the WFDB library: memory allocation errors are
 now treated as fatal by default (in previous versions, the functions
 that encountered them returned error values that permitted the
 application to handle them).  These errors occur when there is
-insufficient memory available to the WFDB library.  After invoking
-@code{wfdbmemerr(0)}, if such an error occurs, the function in which it
-occurs will continue running if possible. By default, however, such an
-error will cause the process to terminate.  In either case, the WFDB
-library emits an appropriate error message to aid in troubleshooting.
+insufficient memory available to the WFDB library. To obtain the old
+behavior, in which the calling function will continue execution if
+possible after a memory allocation error, invoke @code{wfdbmemerr(0)}.
+By default, however, such an error will cause the process to
+terminate.  In either case, the WFDB library emits an appropriate
+error message to aid in troubleshooting.
 
 New macros for handling dynamically allocated memory are defined in
 @file{lib/wfdblib.h} and used throughout the WFDB library, eliminating most
@@ -4197,20 +4204,20 @@ rather than the library version number if there have been no errors.
 @findex wfdbmemerr (10.4.6)
 
 @example
-@code{void wfdbmemerr(int behavior)}
+@code{void wfdbmemerr(int exit_on_error)}
 @end example
 @noindent
 @c @end group
 
 @noindent
 This function sets how the WFDB library behaves in the event of a memory
-allocation error.  If @var{behavior} is any non-zero value, then such an
-event causes the WFDB library to emit an appropriate error message and then
-terminate the running program.  (This behavior is the default.)
+allocation error.  If @var{exit_on_error} is true (any non-zero value), then
+such an event causes the WFDB library to emit an appropriate error message
+and then terminate the running program.  (This behavior is the default.)
 
-If @var{behavior} is zero, a subsequent memory allocation error will cause
-the WFDB library function in which it occurs to continue running if possible
-(after emitting an error message as above).
+If @var{exit_on_error} is false (zero), a subsequent memory allocation error
+will cause the WFDB library function in which it occurs to continue running
+if possible (after emitting an error message as above).
 
 This function was first introduced in WFDB library version 10.4.6.
 
@@ -8759,13 +8766,13 @@ WWW: @uref{http://www.physionet.org/}
 @end display
 
 PhysioNet offers free access via the web to large collections of
-recorded physiologic signals and related open-source software.
-PhysioNet is a public service of the Research Resource for
-Complex Physiologic Signals, funded by the National Center for
-Research Resources of the National Institutes of Health.  The
-master PhysioNet web server is located at MIT in Cambridge, Massachusetts;
-about ten public mirrors are located elsewhere in the US and around
-the world (see @uref{http://@-www.@-physio@-net.@-org/@-mirrors/} for a list).
+recorded physiologic signals and related open-source software.  The
+PhysioNet web site is a public service of the PhysioNet Resource
+funded by the National Institutes of Health's NIBIB and NIGMS.  The
+master PhysioNet web server is located at MIT in Cambridge,
+Massachusetts; about ten public mirrors are located elsewhere in the
+US and around the world (see
+@uref{http://@-www.@-physio@-net.@-org/@-mirrors/} for a list).
 
 @cindex CDROM
 @cindex ESC DB

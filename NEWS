@@ -1,3 +1,13 @@
+10.4.7: 
+	Yinqi Zhang reported and contributed a fix for a memory leak in
+	make_vsd() (an internal WFDB library function defined in signal.c).
+
+	Application nguess has new -m option that allows varying the
+	threshold for inserting inferred sinus beat labels in its output.
+
+	Applications wrsamp and xform can now add dithering to their
+	inputs using a new -d option.
+
 10.4.6:
 	The WFDB functions setafreq() and getafreq() (for setting and getting
 	the time resolution of newly-created output annotation files in ticks
@@ -9,11 +19,12 @@
 	now treated as fatal by default (in previous versions, the functions
 	that encountered them returned error values that permitted the
 	application to handle them).  These errors occur when there is
-	insufficient memory available to the WFDB library.  After invoking
-	wfdbmemerr(0), if such an error occurs, the function in which it
-	occurs will continue if possible.  By default, however, such an
-	error will cause the process to terminate.  In either case, the WFDB
-	library emits an appropriate error message to aid in troubleshooting.
+	insufficient memory available to the WFDB library.  To obtain the
+        old behavior, in which the calling function will continue execution
+        if possible after a memory allocation error, invoke wfdbmemerr(0).
+        By default, however, such an error will cause the process to terminate.
+        In either case, the WFDB library emits an appropriate error message to
+        aid in troubleshooting.
 
 	New macros for handling dynamically allocated memory are defined in
 	lib/wfdblib.h and used throughout the WFDB library, eliminating most

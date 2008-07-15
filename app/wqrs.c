@@ -1,5 +1,5 @@
 /* file: wqrs.c		Wei Zong      23 October 1998
-			Last revised: 14 January 2008 (by G. Moody)
+			Last revised:   15 May 2008 (by G. Moody)
 -----------------------------------------------------------------------------
 wqrs: Single-lead QRS detector based on length transform
 Copyright (C) 1998-2008 Wei Zong
@@ -165,7 +165,7 @@ main(int argc, char **argv)
     WFDB_Sample *v;
     WFDB_Siginfo *s;
     WFDB_Time from = 0L, next_minute, now, spm, t, tj, tpq, to = 0L, tt, t1;
-    static int gvmode = 0;
+    static int gvmode = WFDB_GVPAD | WFDB_LOWRES;
     char *prog_name();
     void help();
 
@@ -188,7 +188,7 @@ main(int argc, char **argv)
 	    exit(0);
 	    break;
 	  case 'H':	/* operate in WFDB_HIGHRES mode */
-	    gvmode = WFDB_HIGHRES;
+	    gvmode = WFDB_GVPAD | WFDB_HIGHRES;
 	    break;
 	  case 'j':	/* annotate J-points (ends of QRS complexes) */
 	    jflag = 1;
@@ -262,20 +262,23 @@ main(int argc, char **argv)
 	(void)fprintf(stderr, "%s: insufficient memory\n", pname);
 	exit(2);
     }
-    a.name = "wqrs"; a.stat = WFDB_WRITE;
-    if ((nsig = wfdbinit(record, &a, 1, s, nsig)) < 1) exit(2);
-    if (sig < 0 || sig >= nsig) sig = 0;
-    if ((gain = s[sig].gain) == 0.0) gain = WFDB_DEFGAIN;
+    if ((nsig = isigopen(record, s, nsig)) < 1) exit(2);
     sps = sampfreq((char *)NULL);
-    if (Rflag) {
-    	if (PWFreq == 60.0) setifreq(sps = 120.);
-    	else setifreq(sps = 150.);
-    }
     if (sps < PWFreq) {
 	(void)fprintf(stderr, "%s: sampling frequency (%g Hz) is too low%s",
 		      pname, sps,
 		      (gvmode & WFDB_HIGHRES) ? "\n" : ", try -H option\n");
 	exit(3);
+    }
+    if (gvmode & WFDB_HIGHRES)
+	setafreq(sampfreq((char *)NULL));
+    a.name = "wqrs"; a.stat = WFDB_WRITE;
+    if (annopen(record, &a, 1) < 0) exit(2);
+    if (sig < 0 || sig >= nsig) sig = 0;
+    if ((gain = s[sig].gain) == 0.0) gain = WFDB_DEFGAIN;
+    if (Rflag) {
+    	if (PWFreq == 60.0) setifreq(sps = 120.);
+    	else setifreq(sps = 150.);
     }
     if (from > 0L) {
 	if ((from = strtim(argv[from])) < 0L)

@@ -1,4 +1,4 @@
-.TH NGUESS 1 "17 February 2003" "WFDB 10.3.2" "WFDB Applications Guide"
+.TH NGUESS 1 "11 June 2008" "WFDB 10.4.7" "WFDB Applications Guide"
 .SH NAME
 nguess \- guess the times of missing normal beats in an annotation file
 .SH SYNOPSIS
@@ -23,6 +23,12 @@ beginning of the record.
 .TP
 \fB-h\fR
 Print a usage summary.
+.TP
+\fB-m\fR \fIM\fR
+Insert Q annotations in the output at the inferred locations of sinus beats
+only when the input RR interval exceeds \fIM\fR times the predicted RR interval
+(default: \fIM\fR = 1.75).  \fIM\fR must be greater than 1;  its useful range
+is roughly 1.5 to 2.
 .TP
 \fB-o\fR \fIoutput-annotator\fR
 Write output to the annotation file specified by \fIoutput-annotator\fR

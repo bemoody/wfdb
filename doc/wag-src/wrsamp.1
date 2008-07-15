@@ -1,4 +1,4 @@
-.TH WRSAMP 1 "26 January 2004" "WFDB 10.3.12" "WFDB Applications Guide"
+.TH WRSAMP 1 "18 April 2008" "WFDB 10.4.7" "WFDB Applications Guide"
 .SH NAME
 wrsamp \- write WFDB signal files
 .SH SYNOPSIS
@@ -31,6 +31,15 @@ the output in place of the missing or improperly formatted sample.
 Check that each input line contains the same number of fields.  (This test is
 normally disabled, to allow for input files containing preambles, trailers,
 or occasional extra fields not intended to be read as samples.)
+.TP
+\fB-d\fR
+Dither the input before converting it to integer output, by adding a random
+value to each sample.  The random values are selected from a triangular
+probability density function between -1 and +1.  Dithering is appropriate
+whenever the output has a lower resolution than the input.  Note that the RNG
+used to generate the pseudo-random values is started with a fixed seed, so
+that \fBwrsamp\fR's output is strictly reproducible.  Change the seed in the
+source and recompile to obtain a different realization of dither if desired.
 .TP
 \fB-f\fR \fIn\fR
 Start copying with line \fIn\fR.  By default, \fBwrsamp\fR starts at the

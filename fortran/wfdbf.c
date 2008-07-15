@@ -1,5 +1,5 @@
 /* file: wfdbf.c	G. Moody	 23 August 1995
-			Last revised:   8 February 2008		wfdblib 10.4.6
+			Last revised:     14 July 2008		wfdblib 10.4.7
 
 _______________________________________________________________________________
 wfdbf: Fortran wrappers for the WFDB library functions
@@ -235,7 +235,8 @@ double getifreq_(long int *dummy)
 
 long setafreq_(double *freq)
 {
-    return (setafreq(*freq));
+    setafreq(*freq);
+    return (0L);
 }
 
 double getafreq_(long int *dummy)
@@ -659,6 +660,12 @@ long wfdbfile_(char *file_type, char *record, char *pathname)
 {
     strcpy(pathname, wfdbfile(fcstring(file_type), fcstring(record)));
     cfstring(pathname);
+    return (0L);
+}
+
+long wfdbmemerr_(long int *exit_if_error)
+{
+    wfdbmemerr((int)(*exit_if_error));
     return (0L);
 }
 

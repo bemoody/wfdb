@@ -159,3 +159,5 @@ rpms:		tarballs
 	mv $(RPMROOT)/RPMS/*/wfdb*-$(VERSION)-$(RPMRELEASE).*.rpm ..
 	mv $(RPMROOT)/SRPMS/$(PACKAGE)-$(RPMRELEASE).src.rpm ..
 	rm -f $(PACKAGE)-$(RPMRELEASE).spec
+	echo "Remember to sign the RPMs by"
+	echo "   cd ..; rpm --addsign wfdb*$(VERSION)*rpm"

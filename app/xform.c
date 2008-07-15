@@ -1,9 +1,9 @@
 /* file: xform.c	G. Moody        8 December 1983
-			Last revised:  20 November 2005
+			Last revised:    15 July 2008
 
 -------------------------------------------------------------------------------
 xform: Sampling frequency, amplitude, and format conversion for WFDB records
-Copyright (C) 1983-2005 George B. Moody
+Copyright (C) 1983-2008 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -26,7 +26,11 @@ _______________________________________________________________________________
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <wfdb/wfdb.h>
+
+/* The following definition yields dither with a triangular PDF in (-1,1). */
+#define DITHER	        (((double)rand() + (double)rand())/RAND_MAX - 1.0)
 
 char *pname, *prog_name();
 double gcd();
@@ -39,8 +43,8 @@ char *argv[];
     char btstring[30], **description, **filename, *irec = NULL, *orec = NULL,
 	*nrec = NULL, *script = NULL, *startp = "0:0", **units;
     double *gain, ifreq, ofreq = 0.0;
-    int clip = 0, *deltav, fflag = 0, gflag = 0, Hflag = 0, i, iframelen,
-	j, m, Mflag = 0, mn, *msiglist, n, nann = 0, nisig,
+    int clip = 0, *deltav, dflag = 0, fflag = 0, gflag = 0, Hflag = 0, i,
+	iframelen, j, m, Mflag = 0, mn, *msiglist, n, nann = 0, nisig,
 	nminutes = 0, nosig = 0, oframelen, reopen = 0, sflag = 0,
 	*siglist = NULL, spf, uflag = 0, use_irec_desc = 1, *v, *vin, *vmax,
 	*vmin, *vout, vt, *vv;
@@ -80,6 +84,11 @@ char *argv[];
 	    break;
 	  case 'c':	/* clip (limit) output (default: discard high bits) */
 	    clip = 1;
+	    break;
+	  case 'd':
+	    dflag = 1;
+	    srand((long)0);	/* seed for dither RNG -- replace 0 with a
+				   different value to get different dither */
 	    break;
 	  case 'f':	/* starting time */
 	    if (++i >= argc) {
@@ -813,7 +822,11 @@ char *argv[];
 		if ((vt = vin[siglist[i]]) == WFDB_INVALID_SAMPLE)
 		    vout[i] = vt;
 		else {
-		    vout[i] = vt*gain[i] + deltav[i];
+		    double vd = vt*gain[i] + deltav[i];
+
+		    if (dflag) vd += DITHER;
+		    if (vd >= 0) vout[i] = (int)(vd + 0.5);
+		    else vout[i] = (int)(vd - 0.5);
 		    if (vout[i] > vmax[i]) {
 			(void)fprintf(stderr, "v[%d] = %d (out of range)\n",
 				      i, vout[i]);
@@ -849,7 +862,11 @@ char *argv[];
 		if ((vt = vin[msiglist[i] + k]) == WFDB_INVALID_SAMPLE)
 		    vout[j] = vt;
 		else {
-		    vout[j] = vt*gain[i] + deltav[i];
+		    double vd = vt*gain[i] + deltav[i];
+
+		    if (dflag) vd += DITHER;
+		    if (vd >= 0) vout[i] = (int)(vd + 0.5);
+		    else vout[i] = (int)(vd - 0.5);
 		    if (vout[j] > vmax[i]) {
 			(void)fprintf(stderr, "v[%d] = %d (out of range)\n",
 				      i, vout[j]);
@@ -893,7 +910,11 @@ char *argv[];
 			vv[i] == WFDB_INVALID_SAMPLE)
 			vout[i] = WFDB_INVALID_SAMPLE;
 		    else {
-			vout[i] = vv[i] + x*(v[i]-vv[i]);
+			double vd = vv[i] + x*(v[i]-vv[i]);
+
+			if (dflag) vd += DITHER;
+			if (vd >= 0) vout[i] = (int)(vd + 0.5);
+			else vout[i] = (int)(vd - 0.5);
 			if (vout[i] > vmax[i]) {
 			    (void)fprintf(stderr,"v[%d] = %d (out of range)\n",
 					  i, vout[i]);
@@ -931,8 +952,13 @@ char *argv[];
 	    for (i = 0; i < nosig; i++) {
 		if ((vt = vin[siglist[i]]) == WFDB_INVALID_SAMPLE)
 		    v[i] = vt;
-		else
-		    v[i] = vt * gain[i] + deltav[i];
+		else {
+		    double vd = vt*gain[i] + deltav[i];
+
+		    if (dflag) vd += DITHER;
+		    if (vd >= 0) v[i] = (int)(vd + 0.5);
+		    else v[i] = (int)(vd - 0.5);
+		}
 	    }
 	    while (ot <= it) {
 		double x = (ot%n == 0) ? 1.0 : (double)(ot % n)/(double)n;
@@ -941,7 +967,11 @@ char *argv[];
 			vv[i] == WFDB_INVALID_SAMPLE)
 			vout[i] = WFDB_INVALID_SAMPLE;
 		    else {
-			vout[i] = vv[i] + x*(v[i]-vv[i]);
+			double vd =  vv[i] + x*(v[i]-vv[i]);
+
+			if (dflag) vd += DITHER;
+			if (vd >= 0) vout[i] = (int)(vd + 0.5);
+			else vout[i] = (int)(vd - 0.5);
 			if (vout[i] > vmax[i]) {
 			    (void)fprintf(stderr,"v[%d] = %d (out of range)\n",
 					  i, vout[i]);
@@ -1060,6 +1090,7 @@ static char *help_strings[] = {
  " -a ANNOTATOR [ANNOTATOR ...]  copy annotations for the specified ANNOTATOR",
  "              from IREC;  two or more ANNOTATORs may follow -a",
  " -c          clip output (default: wrap around if out-of-range)",
+ " -d          add dither to the input if changing sampling frequency or gain",
  " -f TIME     begin at specified time",
  " -h          print this usage summary",
  " -H          open the input record in `high resolution' mode",

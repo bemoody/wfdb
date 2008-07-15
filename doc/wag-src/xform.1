@@ -1,4 +1,4 @@
-.TH XFORM 1 "26 January 2004" "WFDB 10.3.12" "WFDB Applications Guide"
+.TH XFORM 1 "18 April 2008" "WFDB 10.4.7" "WFDB Applications Guide"
 .SH NAME
 xform \- sampling frequency, amplitude, and format conversion for WFDB records
 .SH SYNOPSIS
@@ -27,6 +27,18 @@ advantage that the affected portions of the output signals can (usually) be
 interpreted properly.  Clipping mode is appropriate for testing algorithms or
 devices that must operate using a more restricted amplitude range than was
 used when digitizing the original record.
+.TP
+\fB-d\fR
+Dither the input by adding a pseudo-random value to each
+sample.  The pseudo-random values are selected from a triangular
+probability density function between -1 and +1.  Dithering is
+appropriate whenever the output has a lower resolution than the input,
+as may occur when changing the sampling frequency or gain.  The
+\fB-d\fR option has no effect unless the sampling frequency or gain
+are changed in the output record.  Note that the RNG used to generate the
+pseudo-random values is started with a fixed seed, so that \fBxform\fR's
+output is strictly reproducible.  Change the seed in the source and recompile
+to obtain a different realization of dither if desired.
 .TP
 \fB-f\fR \fItime\fR
 Begin at the specified \fItime\fR in the input record (default: the
