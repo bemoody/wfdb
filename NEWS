@@ -1,3 +1,13 @@
+10.4.8:
+	New application convert/ahaecg2mit.c converts files from the AHA DB
+	DVD into WFDB records.  (ECRI, distributors of the AHA DB, recently
+	began shipping it on DVDs in a format incompatible with its previous
+	formats.)
+
+	Applications wrsamp and xform use rand() and srand() rather than the
+	POSIX rand48() and srand48() to generate dither (the POSIX functions
+	are not universally available).
+
 10.4.7: 
 	Yinqi Zhang reported and contributed a fix for a memory leak in
 	make_vsd() (an internal WFDB library function defined in signal.c).

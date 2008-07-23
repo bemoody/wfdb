@@ -74,6 +74,14 @@ those that support the \fB-H\fR option.  For further information, see the
 section titled "Multi-Frequency Records" in chapter 5 of
 the \fIWFDB Programmer's Guide\fR.
 
+.PP
+Note that applications built using version 10.4.5 and later versions of the
+WFDB library can read EDF files directly, so that the conversion performed
+by \fBedf2mit\fR is no longer necessary.   The native WFDB files produced by
+'edf2mit' can be read more efficiently and with lower latency and memory
+requirements than the EDF files;  in most cases, however, the difference
+will not be noticeable.
+
 .SH ENVIRONMENT
 .PP
 It may be necessary to set and export the shell variable \fBWFDB\fR (see
@@ -83,7 +91,8 @@ These programs are provided in the \fIconvert\fR directory of the WFDB Software
 Package.  Run \fBmake\fR in that directory to compile and install them if they
 have not been installed already.
 .SH SEE ALSO
-\fBa2m\fR(1), \fBsnip\fR(1), \fBxform\fR(1), \fBwfdb\fR(3), \fBheader\fR(5)
+\fBa2m\fR(1), \fBrdedfann\fR(1), \fBsnip\fR(1), \fBxform\fR(1), \fBwfdb\fR(3),
+\fBheader\fR(5)
 .HP
 Bob Kemp, Alpo V\[:a]rri, Agostinho C. Rosa, Kim D. Nielsen and John Gade.
 A simple format for exchange of digitized polygraphic recordings.

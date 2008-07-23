@@ -151,6 +151,7 @@ convert/
 convert/a2m.c
 convert/ad2m.c
 convert/ahaconvert
+convert/ahaecg2mit.c
 convert/edf2mit.c
 convert/m2a.c
 convert/Makefile

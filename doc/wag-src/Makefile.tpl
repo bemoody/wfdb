@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	24 May 2000
-#				Last revised:	19 February 2008
+#				Last revised:	23 July 2008
 # Change the settings below as appropriate for your setup.
 
 # D2PARGS is a list of options for dvips.  Uncomment one of these to set the
@@ -98,8 +98,9 @@ collect:
 	$(MAKE) MANDIR=/tmp/wfdb/$(MANDIR) install
 
 uninstall:
-	../../uninstall.sh $(MAN1) *.1 ad2m.1 ann2rr.1 m2a.1 md2a.1 hrlomb.1 \
-	 hrmem.1 hrplot.1 plot3d.1 cshsetwfdb.1 rr2ann.1
+	../../uninstall.sh $(MAN1) *.1 ad2m.1 ahaconvert.1 ahaecg2mit.1 \
+	 ann2rr.1 m2a.1 md2a.1 hrlomb.1 hrmem.1 hrplot.1 plot3d.1 cshsetwfdb.1 \
+	 rr2ann.1
 	../../uninstall.sh $(MAN3) *.3
 	../../uninstall.sh $(MAN5) *.5
 	../../uninstall.sh $(MAN7) *.7
@@ -144,6 +145,7 @@ wag.man:
 	./maninst.sh $(MAN1) $(MAN3) $(MAN5) $(MAN7) "$(SETPERMISSIONS)"
 	cd $(MAN1); $(LN) a2m.1 ad2m.1
 	cd $(MAN1); $(LN) a2m.1 ahaconvert.1
+	cd $(MAN1); $(LN) a2m.1 ahaecg2mit.1
 	cd $(MAN1); $(LN) a2m.1 m2a.1
 	cd $(MAN1); $(LN) a2m.1 md2a.1
 	cd $(MAN1); $(LN) ann2rr.1 rr2ann.1
