@@ -129,6 +129,7 @@ power spectrum estimation, and many others.
 %{_bindir}/a2m
 %{_bindir}/ad2m
 %{_bindir}/ahaconvert
+%{_bindir}/ahaecg2mit
 %{_bindir}/ann2rr
 %{_bindir}/bxb
 %{_bindir}/calsig
