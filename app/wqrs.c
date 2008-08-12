@@ -1,5 +1,5 @@
 /* file: wqrs.c		Wei Zong      23 October 1998
-			Last revised:   15 May 2008 (by G. Moody)
+			Last revised:  12 August 2008 (by G. Moody)
 -----------------------------------------------------------------------------
 wqrs: Single-lead QRS detector based on length transform
 Copyright (C) 1998-2008 Wei Zong
@@ -49,9 +49,7 @@ server).  The output of 'wqrs' is an annotation file named RECORD.wqrs (where
 RECORD is replaced by the name of the input record).  Within the output
 annotation file, the time of each NORMAL annotation marks a QRS onset;  if
 the '-j' option is used, additional JPT annotations mark the J points (the
-ends of the QRS complexes).  During the learning period (the first LPERIOD
-samples), LEARN annotations are used instead of NORMAL annotations, and there
-are no JPT annotations.
+ends of the QRS complexes).
 
 For example, to mark QRS complexes in record 100 beginning 5 minutes from the
 start, ending 10 minutes and 35 seconds from the start, and using signal 1, use
@@ -73,7 +71,6 @@ and then compare its output with the reference annotations by:
 
 #define BUFLN  16384	/* must be a power of 2, see ltsamp() */
 #define EYE_CLS 0.25    /* eye-closing period is set to 0.25 sec (250 ms) */ 
-#define LPERIOD 1000	/* learning period is the first LPERIOD samples */
 #define MaxQRSw 0.13    /* maximum QRS width (130ms) */                        
 #define NDP	 2.5    /* adjust threshold if no QRS found in NDP seconds */
 #define PWFreqDEF 60    /* power line (mains) frequency, in Hz (default) */
@@ -162,9 +159,8 @@ main(int argc, char **argv)
     WFDB_Anninfo a;
     WFDB_Annotation annot;
     WFDB_Gain gain;
-    WFDB_Sample *v;
     WFDB_Siginfo *s;
-    WFDB_Time from = 0L, next_minute, now, spm, t, tj, tpq, to = 0L, tt, t1;
+    WFDB_Time from = 0L, next_minute, spm, t, tj, tpq, to = 0L, tt, t1;
     static int gvmode = WFDB_GVPAD | WFDB_LOWRES;
     char *prog_name();
     void help();

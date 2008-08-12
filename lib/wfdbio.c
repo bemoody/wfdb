@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:	  8 April 2008       wfdblib 10.4.6
+                        Last revised:	 12 August 2008       wfdblib 10.4.9
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -828,8 +828,7 @@ WFDB_FILE *wfdb_open(const char *s, const char *record, int mode)
     }
 
     /* Check to see if standard input or output is requested. */
-    if (strcmp(s, "-") == 0 ||
-	(strcmp(s, "hea") == 0 && strcmp(record, "-") == 0))
+    if (strcmp(record, "-") == 0)
 	if (mode == WFDB_READ) {
 	    static WFDB_FILE wfdb_stdin;
 
