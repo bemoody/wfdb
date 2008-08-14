@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   15 April 2008		wfdblib 10.4.7
+			Last revised:   14 August 2008		wfdblib 10.4.9
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -1464,6 +1464,9 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
     WFDB_Signal s;
     unsigned int b, d = 1, n, nn;
 
+    /* Do nothing if the input pointer is correct already. */
+    if (istime == (in_msrec ? t + segp->samp0 : t))
+	return (0);
 
     /* Find the first signal that belongs to group g. */
     for (s = 0; s < nisig && g != isd[s]->info.group; s++)
