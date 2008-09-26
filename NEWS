@@ -1,11 +1,18 @@
 10.4.9:
+	The "configure" script is now non-interactive by default.  A new
+	"-i" option selects interactive mode.
+
+	The new "install-wave32" script simplifies installation of WAVE on
+	64-bit Linux.
+
 	The WFDB library once again correctly interprets a hyphen ('-')
 	(used in place of a record name, annotator name, signal file name,
 	or calibration file name) as a reference to the standard input or
         output, for platforms that support POSIX standard I/O;  see section
         5.2, "Using Standard I/O for Database Files", in the WFDB Programmer's
 	Guide.  This feature was broken in 10.4.5 as a side effect of changes
-	in wfdb_open (an internal WFDB function defined in wfdbio.c).
+	in wfdb_open (an internal WFDB library function defined in
+	lib/wfdbio.c).
 
 10.4.8:
 	New application convert/ahaecg2mit.c converts files from the AHA DB

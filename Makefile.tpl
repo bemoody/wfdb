@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:    11 May 2006
+#				Last revised:    26 September 2008
 # This section of the Makefile should not need to be changed.
 
 # 'make' or 'make all': compile the WFDB applications without installing them

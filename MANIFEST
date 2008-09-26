@@ -475,6 +475,7 @@ fortran/README
 fortran/wfdbf.c
 INSTALL
 install.sh
+install-wave32
 lib/
 lib/annot.c
 lib/calib.c
@@ -487,9 +488,11 @@ lib/Makefile.tpl
 lib/README
 lib/signal.c
 lib/wfdb-config.c
+lib/wfdb.h
 lib/wfdb.h0
 lib/wfdbinit.c
 lib/wfdbio.c
+lib/wfdblib.h
 lib/wfdblib.h0
 Makefile
 Makefile.top

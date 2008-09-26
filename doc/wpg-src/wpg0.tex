@@ -510,6 +510,18 @@ guide in June, 1999.  See @file{NEWS}, in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
+@unnumberedsubsec Changes in version 10.4.9
+
+The WFDB library once again correctly interprets a hyphen (@code{-})
+(used in place of a record name, annotator name, signal file name,
+or calibration file name) as a reference to the standard input or
+output, for platforms that support POSIX standard I/O (@pxref{Standard I/O}).
+This feature was broken in 10.4.5 as a side effect of changes
+in @code{wfdb_open} (an internal WFDB library function defined in
+@file{lib/wfdbio.c}).
+
+(WFDB library version 10.4.8 was identical to version 10.4.7.)
+
 @unnumberedsubsec Changes in version 10.4.7
 
 Yinqi Zhang reported and contributed a fix for a memory leak in

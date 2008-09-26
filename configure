@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody         24 May 2000
-#                             Last revised:   15 April 2008
+#                             Last revised: 26 September 2008
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -12,11 +12,22 @@
 # except on x86_64 Linux, where they are prefixed to CFLAGS.  The help
 # text below documents only -m32;  see the gcc manual for other -m options.
 
+# Defaults (overridden by --interactive):
+LIBTYPE=dynamic
+DIR=/usr
+MANDIR=unknown
+
 NETLIB=unknown
+WAVE=unknown
+
+# Read and process command-line arguments
 for i in $*
 do
   case $i in
     --dynamic)          LIBTYPE=dynamic ;;
+    -i|--interactive)   LIBTYPE=
+			DIR=
+			MANDIR= ;;
     -m*)                if [ "x$MFLAGS" = x ]
                         then
 		            MFLAGS=$i
@@ -60,7 +71,25 @@ EOF
 done
 
 echo "Checking the operating system type ..."
-OS=`uname`
+case `uname` in
+  Linux*)    case `uname -m` in
+	        x86_64) OS=Linux-64 ;;
+                *) OS=Linux ;;
+             esac ;;
+  FreeBSD*)  OS=FreeBSD ;;
+  Solaris*)  OS=Solaris ;;
+  SunOS*)    OS=Solaris ;;
+  HP-UX*)    OS=HPUX ;;
+  CYGWIN*)   if [ "x$NOCYGWIN" = "xyes" ]
+             then
+	         OS=mingw-compat
+             else
+	         OS=cygwin
+             fi ;;
+  MINGW*)    OS=mingw ;;
+  Darwin*)   OS=Darwin ;;
+  *)         OS=generic ;;
+esac
 echo "Configuring the WFDB software package for $OS."
 
 SRCDIR="`pwd`"
@@ -90,61 +119,62 @@ echo >>site.def
 
 rm -f site-slib.def
 touch site-slib.def
-case `uname` in
-  Linux*) OS=Linux
-    case `arch` in
-      x86_64)
-	if [ "x$MFLAGS" = x ]
+
+case $OS in
+  Linux)
+	cat site.def linux-slib.def >site-slib.def
+	cat linux.def >>site.def ;;
+  Linux-64)
+	if [ "x$MFLAGS" = "x-m32" ]
 	then
-	    LIB=lib64
-	    cat site.def linux-slib.def | sed s+/lib\$+/lib64+g >site-slib.def
-	    cat linux.def | sed s+/lib\$+/lib64+g >>site.def
-	else
+	    OS=Linux
 	    cat site.def linux-slib.def | \
 		sed "s+MFLAGS =+MFLAGS = $MFLAGS+" >site-slib.def
 	    cat linux.def | \
 		sed "s+MFLAGS =+MFLAGS = $MFLAGS+" >>site.def
+	else
+	    LIB=lib64
+            WAVE=0
+	    cat site.def linux-slib.def | sed s+/lib\$+/lib64+g >site-slib.def
+	    cat linux.def | sed s+/lib\$+/lib64+g >>site.def
 	fi ;;
-      *) cat site.def linux-slib.def >site-slib.def
-	 cat linux.def >>site.def ;;
-    esac ;;
-  FreeBSD*) OS=FreeBSD
-    cat site.def freebsd-slib.def >site-slib.def
-    cat freebsd.def >>site.def ;;
-  SunOS*) OS=Solaris
-    cat site.def solaris-slib.def >site-slib.def
-    cat solaris.def >>site.def
-    echo "It is normal, and harmless, for Solaris to be recognized as"
-    echo "SunOS." ;;
-  HP-UX*) OS=HPUX
-    cat site.def hpux-slib.def >site-slib.def
-    cat hpux.def >>site.def ;;
-  CYGWIN*)
-    if [ "x$NOCYGWIN" = "xyes" ]
-    then
-	OS=mingw
-	sed 's/NOCYGWIN/-mno-cygwin/' site.def mingw-slib.def >site-slib.def
-	sed 's/NOCYGWIN/-mno-cygwin/' mingw.def >>site.def
-    else
-	OS=cygwin  
+  FreeBSD)
+	cat site.def freebsd-slib.def >site-slib.def
+	cat freebsd.def >>site.def ;;
+  Solaris)
+	cat site.def solaris-slib.def >site-slib.def
+	cat solaris.def >>site.def ;;
+  HP-UX)
+	cat site.def hpux-slib.def >site-slib.def
+	cat hpux.def >>site.def ;;
+  cygwin)
 	cat site.def cygwin-slib.def >site-slib.def
-	cat cygwin.def >>site.def
-    fi ;;
-  MINGW*) OS=mingw
-    sed 's/NOCYGWIN//' site.def mingw-slib.def >site-slib.def
-    sed 's/NOCYGWIN//' mingw.def >>site.def ;;
-  Darwin*) OS=Darwin
-    LIBTYPE=dynamic
-    cat site.def darwin-slib.def >site-slib.def
-    cat darwin.def >>site.def
-    echo "It is normal for Mac OS X to be recognized as Darwin."
-    echo "Building static libraries is not supported on Darwin." ;;
-  *)      OS=generic
-    cat site.def generic-slib.def >site-slib.def
-    cat generic.def >>site.def
-    echo "Using the generic configuration, which may need to be customized"
-    echo "for your operating system.  'configure' will offer suggestions for"
-    echo "customization after it completes the generic configuration." ;;
+	cat cygwin.def >>site.def ;;
+  mingw)
+	WAVE=0
+	sed 's/NOCYGWIN//' site.def mingw-slib.def >site-slib.def
+	sed 's/NOCYGWIN//' mingw.def >>site.def ;;
+  mingw-compat)
+	OS=mingw
+	WAVE=0
+	sed 's/NOCYGWIN/-mno-cygwin/' site.def mingw-slib.def >site-slib.def
+	sed 's/NOCYGWIN/-mno-cygwin/' mingw.def >>site.def ;;
+  Darwin)
+	echo "It is normal for Mac OS X to be recognized as Darwin."
+	if [ x$LIBTYPE != xdynamic ]
+	then
+	    echo "Building static libraries is not supported on Darwin."
+	    LIBTYPE=dynamic
+	fi
+	cat site.def darwin-slib.def >site-slib.def
+	cat darwin.def >>site.def ;;
+  *)    OS=generic
+	cat site.def generic-slib.def >site-slib.def
+	cat generic.def >>site.def
+	echo "Using the generic configuration, which may need to be customized"
+	echo "for your operating system.  'configure' will offer suggestions"
+	echo "for customization after it completes the generic configuration."
+	;;
 esac
 
 if [ -s site-slib.def ]
@@ -276,6 +306,11 @@ echo  "The WFDB software will be installed in '$DIR'."
 
 MANTMP=`grep "MANDIR =" site.def |sed 's+$(WFDBROOT)/++' |cut -d " " -f 3`
 MANDEF=$DIR/$MANTMP
+if [ x$MANDIR = xunknown ]
+then
+   MANDIR=$MANDEF
+fi
+
 if [ x$MANDIR = x ]
 then
     echo
@@ -420,10 +455,9 @@ done
 
 echo rm conf/site.def conf/site-slib.def
 
-if [ "$OS" = "mingw" ]
+if [ "x$WAVE" = "x0" ]
     then
     cp -p wave/nomake wave/Makefile
-    cp -p wave/nomake waverc/Makefile
     echo "WAVE=0" >>config.cache
     WAVECOMP="WAVE will not be compiled."
 else

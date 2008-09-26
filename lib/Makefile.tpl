@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:     11 May 2006
+#				Last revised:     26 September 2008
 # This section of the Makefile should not need to be changed.
 
 INCLUDES = $(INCDIR)/wfdb/wfdb.h $(INCDIR)/wfdb/ecgcodes.h \
@@ -42,11 +42,11 @@ setup:
 
 wfdb-config:
 	$(CC) $(CFLAGS) -DVERSION='"$(VERSION)"' -DCFLAGS='"-I$(INCDIR)"' \
-	  -DLDFLAGS='"-L$(LIBDIR) -lwfdb"' -I$(INCDIR) -o $@ wfdb-config.c
+	  -DLDFLAGS='"-lwfdb"' -I$(INCDIR) -o $@ wfdb-config.c
 
-# `make clean':  also remove previously compiled versions of the library
+# `make clean': remove binaries and backup files
 clean:
-	rm -f $(OFILES) libwfdb.* *.dll *~ wfdb.h wfdblib.h wfdb-config
+	rm -f $(OFILES) libwfdb.* *.dll *~ wfdb-config
 
 # `make TAGS':  make an `emacs' TAGS file
 TAGS:		$(HFILES) $(CFILES)
