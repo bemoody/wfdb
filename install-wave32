@@ -1,5 +1,5 @@
 #! /bin/sh
-# file: install-wave32		G. Moody		26 September 2008
+# file: install-wave32		G. Moody		7 October 2008
 #
 # Build and install WAVE on 64-bit Linux
 #
@@ -53,4 +53,8 @@ make install
 # WAVE itself:
 
 cd ../wave
+make install
+
+# Compile and install applications for remote control of WAVE.
+cd ../waverc
 make install

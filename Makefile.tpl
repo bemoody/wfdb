@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:    26 September 2008
+#				Last revised:    10 October 2008
 # This section of the Makefile should not need to be changed.
 
 # 'make' or 'make all': compile the WFDB applications without installing them
@@ -144,20 +144,25 @@ doc-tarball:
 	cd doc; $(MAKE) tarball
 
 # 'make rpms': make source and binary RPMs
-RPMROOT=/usr/src/redhat
+RPMROOT=$(HOME)/rpmbuild
 
 rpms:		tarballs
+	mkdir -p $(RPMROOT)/BUILD $(RPMROOT)/RPMS $(RPMROOT)/SOURCES \
+	 $(RPMROOT)/SPECS $(RPMROOT)/SRPMS
 	cp -p ../$(PACKAGE).tar.gz $(RPMROOT)/SOURCES
 	sed s/VERSION/$(VERSION)/g <wfdb.spec | \
 	 sed s/MAJOR/$(MAJOR)/g | sed s/MINOR/$(MINOR)/g | \
 	 sed s/RPMRELEASE/$(RPMRELEASE)/ >$(PACKAGE)-$(RPMRELEASE).spec
 	cp -p $(PACKAGE)-$(RPMRELEASE).spec $(RPMROOT)/SPECS
+	cd; if [ -e .rpmmacros ]; then cp -p .rpmmacros ..rpmmacros; fi
+	cp conf/rpm.mc $(HOME)/.rpmmacros
 	if [ -x /usr/bin/rpmbuild ]; \
 	 then rpmbuild -ba $(PACKAGE)-$(RPMRELEASE).spec; \
 	 else echo "rpmbuild not found in /usr/bin; attempting to use rpm"; \
 	  rpm -ba $(PACKAGE)-$(RPMRELEASE).spec; fi
 	mv $(RPMROOT)/RPMS/*/wfdb*-$(VERSION)-$(RPMRELEASE).*.rpm ..
 	mv $(RPMROOT)/SRPMS/$(PACKAGE)-$(RPMRELEASE).src.rpm ..
-	rm -f $(PACKAGE)-$(RPMRELEASE).spec
+	rm -f $(PACKAGE)-$(RPMRELEASE).spec $(HOME)/.rpmmacros
+	cd; if [ -e ..rpmmacros ]; then mv ..rpmmacros .rpmmacros; fi
 	echo "Remember to sign the RPMs by"
 	echo "   cd ..; rpm --addsign wfdb*$(VERSION)*rpm"

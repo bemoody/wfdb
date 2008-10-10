@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody         24 May 2000
-#                             Last revised: 26 September 2008
+#                             Last revised:   7 October 2008
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -13,6 +13,7 @@
 # text below documents only -m32;  see the gcc manual for other -m options.
 
 # Defaults (overridden by --interactive):
+INTERACTIVE=no
 LIBTYPE=dynamic
 DIR=/usr
 MANDIR=unknown
@@ -25,7 +26,8 @@ for i in $*
 do
   case $i in
     --dynamic)          LIBTYPE=dynamic ;;
-    -i|--interactive)   LIBTYPE=
+    -i|--interactive)   INTERACTIVE=yes
+    			LIBTYPE=
 			DIR=
 			MANDIR= ;;
     -m*)                if [ "x$MFLAGS" = x ]
@@ -47,9 +49,10 @@ do
     *)                  cat <<EOF
 usage: $0 [options]
 Options:
-   --dynamic           make a shared (dynamically linkable) WFDB library
+    --dynamic           make a shared (dynamically linkable) WFDB library
                          if possible [default]
     --help              print this message
+    --interactive       ask about library type and installation directories
     -m32                on 64-bit Linux, force compilation in 32-bit mode
     --mandir=MANDIR     install man pages in MANDIR
     --prefix=PREFIX     install files in PREFIX [default: $DIR]
@@ -458,6 +461,7 @@ echo rm conf/site.def conf/site-slib.def
 if [ "x$WAVE" = "x0" ]
     then
     cp -p wave/nomake wave/Makefile
+    cp -p wave/nomake waverc/Makefile
     echo "WAVE=0" >>config.cache
     WAVECOMP="WAVE will not be compiled."
 else
@@ -576,6 +580,12 @@ $WAVECOMP
 Manual pages will be installed in subdirectories of '$MANDIR'.
 Sample data files will be installed in '$DIR/database', which
  will be included in the default WFDB path.
+
+If you need to compile a different WFDB library type, or install into different
+directories, rerun this script with its "-i" (interactive) option:
+      ./configure -i
+Other options can be viewed by rerunning this script with its "-h" option:
+      ./configure -h
 
 WFDB software configuration is complete.
 Now run 'make' to compile and test, followed by 'make install' to recompile

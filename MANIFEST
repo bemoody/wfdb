@@ -144,6 +144,7 @@ conf/mingw.def
 conf/mingw-slib.def
 conf/prompt-c
 conf/prompt-n
+conf/rpm.mc
 conf/solaris.def
 conf/solaris-slib.def
 conf/version.def
