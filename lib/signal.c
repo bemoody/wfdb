@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   14 August 2008		wfdblib 10.4.9
+			Last revised:   27 October 2008		wfdblib 10.4.10
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -703,12 +703,12 @@ static int edfparse(WFDB_FILE *ifile)
 
     for (s = 0; s < nsig; s++) {
 	wfdb_fread(buf, 1, 8, ifile);	/* digital minimum */
-	sscanf(buf, "%d", &dmin[s]);
+	sscanf(buf, "%ld", &dmin[s]);
     }
 
     for (s = 0; s < nsig; s++) {
 	wfdb_fread(buf, 1, 8, ifile);	/* digital maximum */
-	sscanf(buf, "%d", &dmax[s]);
+	sscanf(buf, "%ld", &dmax[s]);
 	hsd[s]->info.initval = hsd[s]->info.adczero = (dmax[s]+1 + dmin[s])/2;
 	adcrange = dmax[s] - dmin[s];
 	for (i = 0; adcrange > 1; i++)

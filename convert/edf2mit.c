@@ -1,5 +1,5 @@
 /* file: edf2mit.c		G. Moody       16 October 1996
-				Last revised:    4 June 2004
+				Last revised:  27 October 2008
 
 -------------------------------------------------------------------------------
 Convert EDF (European Data Format) file to MIT format header and signal files
@@ -297,7 +297,7 @@ char **argv;
 	for (j = 8; j >= 0 && buf[j] == ' '; j--)
 	    buf[j] = '\0';
 	if (vflag) printf("Signal %d digital minimum: '%s'\n", i, buf);
-	sscanf(buf, "%d", &sigdmin[i]);
+	sscanf(buf, "%ld", &sigdmin[i]);
     }
 
     for (i = 0; i < nsig; i++) {
@@ -306,7 +306,7 @@ char **argv;
 	for (j = 8; j >= 0 && buf[j] == ' '; j--)
 	    buf[j] = '\0';
 	if (vflag) printf("Signal %d digital maximum: '%s'\n", i, buf);
-	sscanf(buf, "%d", &sigdmax[i]);
+	sscanf(buf, "%ld", &sigdmax[i]);
     }
 
     for (i = 0; i < nsig; i++) {

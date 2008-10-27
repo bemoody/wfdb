@@ -1,5 +1,5 @@
 /* file: fft.c		G. Moody	24 February 1988
-		   Last revised:	  10 June 2005
+		   Last revised:	27 October 2008
 
 -------------------------------------------------------------------------------
 fft: Fast Fourier transform of real data
@@ -409,6 +409,8 @@ char *argv[];
 		    ;
 		}
 		if (n < nflag) break;
+		for (i = n; i < m; i++)    /* re-zero the padding, if any */
+		    c[i] = 0;
 		fft();
 		if (Nflag)
 		    fft_out();

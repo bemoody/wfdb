@@ -510,6 +510,13 @@ guide in June, 1999.  See @file{NEWS}, in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
+@unnumberedsubsec Changes in version 10.4.10
+
+EDF digital maximum and minimum values are now read properly in 64-bit
+builds;  previous versions had a bug in @code{edfparse} (an internal WFDB
+library function defined in @file{lib/signal.c}) that did not appear in
+32-bit builds.	Thanks to Joe Mietus for reporting the problem.
+
 @unnumberedsubsec Changes in version 10.4.9
 
 The WFDB library once again correctly interprets a hyphen (@code{-})

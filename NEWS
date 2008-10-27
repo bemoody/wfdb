@@ -1,3 +1,15 @@
+10.4.10:
+	EDF digital maximum and minimum values are now read properly in 64-bit
+	builds;  previous versions had a bug in edfparse (an internal WFDB
+	library function defined in lib/signal.c) that did not appear in
+	32-bit builds.  A similar bug was also corrected in convert/edf2mit.
+	Thanks to Joe Mietus for reporting the problem.
+
+	Using a block size that is not a power of 2 with the "-n" and "-N"
+	options of "fft" now works properly (although powers of 2 are still
+	recommended for best results).  Thanks again to Joe Mietus for
+	reporting the problem and valuable assistance in correcting it.
+
 10.4.9:
 	The "configure" script is now non-interactive by default.  A new
 	"-i" option selects interactive mode.
