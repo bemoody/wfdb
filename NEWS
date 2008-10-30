@@ -10,6 +10,9 @@
 	recommended for best results).  Thanks again to Joe Mietus for
 	reporting the problem and valuable assistance in correcting it.
 
+	The "-f" option now works properly in ann2rr (previous versions
+	worked only if "-t" was also provided).
+
 10.4.9:
 	The "configure" script is now non-interactive by default.  A new
 	"-i" option selects interactive mode.

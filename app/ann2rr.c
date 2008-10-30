@@ -1,5 +1,5 @@
 /* file: ann2rr.c		G. Moody	 16 May 1995
-				Last revised:  8 February 2003
+				Last revised:  30 October 2008
 -------------------------------------------------------------------------------
 ann2rr: Calculate RR intervals from an annotation file
 Copyright (C) 2003 George B. Moody
@@ -208,7 +208,7 @@ char *argv[];
 	to = strtim(argv[(int)to]);
 	if (to < (WFDB_Time)0) to = -to;
     }
-    if (to < from) {
+    if (to > (WFDB_Time)0 && to < from) {
 	WFDB_Time tt = from;
 
 	from = to;
