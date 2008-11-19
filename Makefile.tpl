@@ -128,14 +128,12 @@ tarballs:	clean
 # 'make bin-tarball': make a gzipped tar archive of the WFDB software package
 # binaries and other installed files
 bin-tarball:	install collect
-	cp conf/archname /tmp; chmod +x /tmp/archname
-	rm -rf /tmp/$(PACKAGE)-`/tmp/archname`
-	mv /tmp/wfdb /tmp/$(PACKAGE)-`/tmp/archname`
-	cd /tmp; tar cfvz $(PACKAGE)-`/tmp/archname`.tar.gz \
-	 $(PACKAGE)-`/tmp/archname`
-	mv /tmp/$(PACKAGE)-`/tmp/archname`.tar.gz ..
-	rm -rf /tmp/$(PACKAGE)-`/tmp/archname`
-	rm -f /tmp/archname
+	rm -rf /tmp/$(PACKAGE)-$(ARCH)
+	mv /tmp/wfdb /tmp/$(PACKAGE)-$(ARCH)
+	cd /tmp; tar cfvz $(PACKAGE)-$(ARCH).tar.gz \
+	 $(PACKAGE)-$(ARCH)
+	mv /tmp/$(PACKAGE)-$(ARCH).tar.gz ..
+	rm -rf /tmp/$(PACKAGE)-$(ARCH)
 
 # 'make doc-tarball': make a gzipped tar archive of formatted documents
 # (requires many freely-available utilities that are not part of this

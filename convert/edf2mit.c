@@ -1,5 +1,5 @@
 /* file: edf2mit.c		G. Moody       16 October 1996
-				Last revised:  27 October 2008
+				Last revised:  18 November 2008
 
 -------------------------------------------------------------------------------
 Convert EDF (European Data Format) file to MIT format header and signal files
@@ -209,13 +209,13 @@ char **argv;
 
     if (nsig < 1) exit(1);
 
-    if ((si = malloc(nsig * sizeof(WFDB_Siginfo))) == NULL ||
-	(spb = malloc(nsig * sizeof(int))) == NULL ||
-	(sigdmax = malloc(nsig * sizeof(long))) == NULL ||
-	(sigdmin = malloc(nsig * sizeof(long))) == NULL ||
-	(sigpmax = malloc(nsig * sizeof(double))) == NULL ||
-	(sigpmin = malloc(nsig * sizeof(double))) == NULL ||
-	(sampfreq = malloc(nsig * sizeof(double))) == NULL) {
+    if ((si = calloc(nsig, sizeof(WFDB_Siginfo))) == NULL ||
+	(spb = calloc(nsig, sizeof(int))) == NULL ||
+	(sigdmax = calloc(nsig, sizeof(long))) == NULL ||
+	(sigdmin = calloc(nsig, sizeof(long))) == NULL ||
+	(sigpmax = calloc(nsig, sizeof(double))) == NULL ||
+	(sigpmin = calloc(nsig, sizeof(double))) == NULL ||
+	(sampfreq = calloc(nsig, sizeof(double))) == NULL) {
 	fprintf(stderr, "%s: insufficient memory\n", pname);
 	exit(2);
     }      

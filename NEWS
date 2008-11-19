@@ -1,3 +1,6 @@
+10.4.11:
+	Build process improvements, especially on Cygwin and MinGW targets.
+
 10.4.10:
 	EDF digital maximum and minimum values are now read properly in 64-bit
 	builds;  previous versions had a bug in edfparse (an internal WFDB

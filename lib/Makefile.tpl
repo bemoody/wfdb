@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:     26 September 2008
+#				Last revised:   19 November 2008
 # This section of the Makefile should not need to be changed.
 
 INCLUDES = $(INCDIR)/wfdb/wfdb.h $(INCDIR)/wfdb/ecgcodes.h \
@@ -25,7 +25,7 @@ install:	$(INCLUDES) $(LIBDIR) $(BINDIR) all
 # 'make collect':  retrieve the installed WFDB library and headers
 collect:
 	../conf/collect.sh $(INCDIR)/wfdb wfdb.h ecgcodes.h ecgmap.h
-	../conf/collect.sh $(LIBDIR) $(WFDBLIB)
+	../conf/collect.sh $(LIBDIR) $(WFDBLIB) $(WFDBLIB_DLLNAME)
 	../conf/collect.sh $(BINDIR) wfdb-config
 
 uninstall:
@@ -56,17 +56,9 @@ TAGS:		$(HFILES) $(CFILES)
 listing:
 	$(PRINT) README $(MFILES) $(HFILES) $(CFILES) wfdb-config.c
 
-# Rules for creating installation directories
-$(BINDIR):
-	mkdir -p $(BINDIR); $(SETDPERMISSIONS) $(BINDIR)
-$(INCDIR):
-	mkdir -p $(INCDIR); $(SETDPERMISSIONS) $(INCDIR)
-$(INCDIR)/wfdb:	$(INCDIR)
-	mkdir -p $(INCDIR)/wfdb; $(SETDPERMISSIONS) $(INCDIR)/wfdb
-$(INCDIR)/ecg:	$(INCDIR)
-	mkdir -p $(INCDIR)/ecg; $(SETDPERMISSIONS) $(INCDIR)/ecg
-$(LIBDIR):
-	mkdir -p $(LIBDIR); $(SETDPERMISSIONS) $(LIBDIR)
+# Rule for creating installation directories
+$(BINDIR) $(INCDIR) $(INCDIR)/wfdb $(INCDIR)/ecg $(LIBDIR):
+	mkdir -p $@; $(SETDPERMISSIONS) $@
 
 # Rules for installing the include files
 $(INCDIR)/wfdb/wfdb.h:		$(INCDIR)/wfdb wfdb.h

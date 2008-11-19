@@ -18,7 +18,7 @@
 # the .h ("include") files associated with these libraries.  These components
 # fall into three categories:
 #
-#  1. 32-bit libraries an available from Fedora repositories
+#  1. 32-bit libraries available from Fedora repositories
 #     These include the standard C library, the X11 client libraries, the X11
 #     pixmap libraries, the libcurl (HTTP client) libraries, and their
 #     respective developer's toolkits.  The easiest way to install these on
@@ -58,3 +58,7 @@ make install
 # Compile and install applications for remote control of WAVE.
 cd ../waverc
 make install
+
+# Clean up intermediate binaries and other temporary files.
+cd ..
+make clean

@@ -1,5 +1,5 @@
 # file: mingw-slib.def	I. Henry and G. Moody	11 February 2005
-#				Last revised:	  8 June 2005
+#				Last revised:	19 November 2008
 #
 # This section contains settings suitable for generating a DLL (shared library)
 # under MS Windows using the free gcc ANSI C compiler.
@@ -46,8 +46,8 @@ DBDIR = $(WFDBROOT)/database
 INCDIR = $(WFDBROOT)/include
 
 # LIBDIR specifies the name of a directory in which to install the WFDB
-# library.
-LIBDIR = $(WFDBROOT)/lib
+# library.  Under Windows, this is the same as BINDIR (above).
+LIBDIR = $(WFDBROOT)/bin
 
 # CC is the name of your C compiler ('configure' will modify this).
 CC = gcc NOCYGWIN
@@ -132,15 +132,4 @@ lib-post-uninstall:
 	rm -f $(LIBDIR)/$(WFDBLIB_SONAME)
 	rm -f $(BINDIR)/$(WFDBLIB_DLLNAME)
 
-
 #______________________________________________________________________________
-
-
-
-
-
-
-
-
-
-

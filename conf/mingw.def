@@ -1,5 +1,5 @@
 # file: mingw.def		I. Henry and G. Moody       11 February 2005 
-#				Last revised:		     5 August 2005
+#				Last revised:		    19 November 2008
 #
 # This file contains default 'make' definitions for compiling the WFDB Software
 # Package under MS Windows using the free Mininmalist GNU for Windows (MinGW) 
@@ -52,8 +52,8 @@ INCDIR = $(WFDBROOT)/include
 INFODIR = $(WFDBROOT)/info
 
 # LIBDIR specifies the name of a directory in which to install the WFDB
-# library.
-LIBDIR = $(WFDBROOT)/lib
+# library.  Under Windows, this is the same as BINDIR (above).
+LIBDIR = $(WFDBROOT)/bin
 
 # MANDIR is the root of the man page directory tree.  On most systems, this is
 # something like /usr/man or /usr/local/man (type 'man man' to find out).
