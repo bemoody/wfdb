@@ -1,14 +1,15 @@
 #! /bin/sh
-# file: install-wave32		G. Moody		7 October 2008
-#
+# file: install-wave32		G. Moody	7 October 2008
+#				Last revised:  13 January 2009 for Fedora 10
 # Build and install WAVE on 64-bit Linux
 #
-# This script has been tested on 64-bit Fedora 9 running on an Intel Core2
-# CPU.  The methods used here (but not this script itself) have also been
-# tested on 64-bit Fedora 7 and 8 running on both AMD and Intel 64-bit CPUs.
-# It requires root (superuser) permissions and must be run from within the
-# top-level WFDB source directory (the directory that also contains the
-# 'configure' script).
+# This script has been tested on 64-bit Fedora 10 running on an Intel Core2
+# CPU.  The previous version (find it in the sources for wfdb-10.4.11) was
+# tested on 64-bit Fedora 9, also on an Intel Core2 CPU.  The methods used here
+# (but not this script itself) have also been tested on 64-bit Fedora 7 and 8
+# running on both AMD and Intel 64-bit CPUs. It requires root (superuser)
+# permissions and must be run from within the top-level WFDB source directory
+# (the directory that also contains the 'configure' script).
 #
 # WAVE must be compiled as a 32-bit application, because it depends on the
 # XView toolkit, which does not support 64-bit mode (and most likely, never
@@ -24,11 +25,15 @@
 #     respective developer's toolkits.  The easiest way to install these on
 #     Fedora is using the yum commands below.  These packages may have different
 #     names in other Linux distributions, and "yum" itself may not be available
-#     as a package manager in some distributions.  These commands are safe to run
-#     even if any or all of these packages are already installed.
-
-yum -y update glibc-devel.i386 libX11-devel.i386 libXpm-devel.i386 libcurl-devel.i386
-yum -y install glibc-devel.i386 libX11-devel.i386 libXpm-devel.i386 libcurl-devel.i386
+#     as a package manager in some distributions.  These commands are safe to
+#     run even if any or all of these packages are already installed.
+yum -y update libgcc.i386 glibc-devel.i386 libX11-devel.i386 \
+ libXpm-devel.i386 libcurl-devel.i386 xorg-x11-fonts-misc
+yum -y install libgcc.i386 glibc-devel.i386 libX11-devel.i386 \
+ libXpm-devel.i386 libcurl-devel.i386 xorg-x11-fonts-misc
+# On Debian-based distributions, such as Ubuntu, it's awkward to force apt-get
+# to install 32-bit packages, especially if like-named 64-bit packages have
+# been installed already.  Google on "getlibs" for an alternative.
 
 #  2. XView libraries available from PhysioNet
 #     These are available as RPMs for Fedora and other RPM-based distributions,
@@ -36,10 +41,13 @@ yum -y install glibc-devel.i386 libX11-devel.i386 libXpm-devel.i386 libcurl-deve
 #     easiest way to install them on Fedora is using the RPM command below.
 #     Again, this command is safe even if any or all of these are already
 #     installed.
-
 rpm -ivh http://physionet.org/physiotools/xview/i386-Fedora/xview-3.2p1.4-21.1.fc8.i386.rpm \
  http://physionet.org/physiotools/xview/i386-Fedora/xview-clients-3.2p1.4-21.1.fc8.i386.rpm \
  http://physionet.org/physiotools/xview/i386-Fedora/xview-devel-3.2p1.4-21.1.fc8.i386.rpm
+#
+# On Debian or Ubuntu, simply run
+#	apt-get install xviewg-dev
+# instead of the rpm commands above (32-bit XView is in the Debian repositories).
 
 #  3. the 32-bit version of the WFDB library
 #     This is easily compiled and installed by the following commands:

@@ -1,8 +1,8 @@
 /* file wabp.c          Wei Zong       23 October 1998
-   			Last revised: 25 February 2006 (by G. Moody)
+   			Last revised:  7 January 2009 (by G. Moody)
 -----------------------------------------------------------------------------
 wabp: beat detector for arterial blood presure (ABP) signal
-Copyright (C) 1998-2006 Wei Zong
+Copyright (C) 1998-2009 Wei Zong
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -171,11 +171,12 @@ int main(int argc, char **argv)
 	    break;
 	  case 's':	/* signal */
 	    if (++i >= argc) {
-		(void)fprintf(stderr, "%s: signal number must follow -s\n",
+		(void)fprintf(stderr,
+			      "%s: signal number or name must follow -s\n",
 			      pname);
 		exit(1);
 	    }
-	    sig = atoi(argv[i]);
+	    sig = findsig(argv[i]);
 	    break;
 	  case 't':	/* end time */
 	    if (++i >= argc) {
@@ -403,7 +404,7 @@ static char *help_strings[] = {
  " -h          print this usage summary",
  " -H          read multifrequency signals in high resolution mode",
  " -R          resample input at 125 Hz (default: do not resample)",
- " -s SIGNAL   analyze specified signal (default: 0)",
+" -s SIGNAL   analyze specified signal (default: first ABP, ART, or BP signal)",
  " -t TIME     stop at specified time (default: end of the record)",
  " -v          verbose mode",
  " ",

@@ -1,9 +1,9 @@
 /* file: xform.c	G. Moody        8 December 1983
-			Last revised:    15 July 2008
+			Last revised:   7 January 2009
 
 -------------------------------------------------------------------------------
 xform: Sampling frequency, amplitude, and format conversion for WFDB records
-Copyright (C) 1983-2008 George B. Moody
+Copyright (C) 1983-2009 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -158,7 +158,7 @@ char *argv[];
 	    }
 	    /* fill the signal list */
 	    for (i -= j; i < argc && *argv[i] != '-'; )
-		siglist[nosig++] = atoi(argv[i++]);
+		siglist[nosig++] = i++;
 	    i--;
 	    break;
 	  case 'S':	/* script name follows */
@@ -209,6 +209,10 @@ char *argv[];
        value, quit (isigopen will have emitted an error message). */
     if ((nisig = isigopen(irec, NULL, 0)) < 0) exit(2);
 
+    /* Determine the input sampling frequency. */
+    ifreq = sampfreq(NULL);
+    (void)setsampfreq(0.);
+
     /* If the input record contains no signals, we won't write any -- but
        we might still read and write annotations. */
     if (nisig == 0) nosig = 0;
@@ -221,20 +225,27 @@ char *argv[];
 	    exit(2);
 	}
 
+	/* Open the input signals. */
+	if (isigopen(irec, dfin, nisig) != nisig) exit(2);
+
 	/* If a signal list was specified using -s, check that the specified
-	   signal numbers are legal. */
+	   signal numbers or names are legal. */
 	if (sflag) {
-	    for (i = 0; i < nosig && nosig > 0; i++)
-		if (siglist[i] < 0 || siglist[i] >= nisig) {
+	    for (i = 0; i < nosig && nosig > 0; i++) {
+	        char *s;
+
+		s = argv[siglist[i]];
+		if ((siglist[i] = findsig(s)) < 0) {
 		    (void)fprintf(stderr,
-		       "%s: warning: signal %d can't be read from record %s\n",
-				  pname, siglist[i], irec);
+		       "%s: warning: record %s doesn't have a signal '%s'\n",
+				  pname, irec, s);
 		    /* Delete illegal signal numbers from the list. */
 		    for (j = i; j+1 < nosig; j++)
 			siglist[j] = siglist[j+1];
 		    nosig--;
 		    i--;
 		}
+	    }
 	    /* If the signal list contained no valid signal numbers, treat
 	       this situation as if no signal list was specified. */
 	    if (nosig == 0)
@@ -266,12 +277,6 @@ char *argv[];
 	    exit(2);
 	}
     }
-
-    /* Determine the input sampling frequency. */
-    ifreq = sampfreq(NULL);
-    (void)setsampfreq(0.);
-
-    if (isigopen(irec, dfin, nisig) != nisig) exit(2);
 
     if (Hflag)
 	setgvmode(WFDB_HIGHRES);
@@ -1108,7 +1113,7 @@ static char *help_strings[] = {
  "desired signal files, you will be asked for output specifications.  Use",
  "`-n' to name the record to be created.  Use `-s' to select a subset of the",
  "input signals, or to re-order them in the output file;  arguments that",
- "follow `-s' are *input* signal numbers (0,1,2,...).",
+ "follow `-s' are *input* signal numbers (0,1,2,...) or names.",
 NULL
 };
 

@@ -1,8 +1,8 @@
 /* file: wqrs.c		Wei Zong      23 October 1998
-			Last revised:  12 August 2008 (by G. Moody)
+			Last revised:  7 January 2009 (by G. Moody)
 -----------------------------------------------------------------------------
 wqrs: Single-lead QRS detector based on length transform
-Copyright (C) 1998-2008 Wei Zong
+Copyright (C) 1998-2009 Wei Zong
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -217,11 +217,12 @@ main(int argc, char **argv)
 	    break;
 	  case 's':	/* signal */
 	    if (++i >= argc) {
-		(void)fprintf(stderr, "%s: signal number must follow -s\n",
+		(void)fprintf(stderr,
+			      "%s: signal number or name must follow -s\n",
 			      pname);
 		exit(1);
 	    }
-	    sig = atoi(argv[i]);
+	    sig = findsig(argv[i]);
 	    break;
 	  case 't':	/* end time */
 	    if (++i >= argc) {

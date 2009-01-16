@@ -66,8 +66,8 @@ char *argv[];
     (void)printf("Record %s", argv[1]);
     setgvmode(WFDB_LOWRES);
     t = strtim("e");
-    if (nsig > 0 && s[0].nsamp != t) {
-	msrec = 1;
+    if (nsig > 0 && (s[0].fmt == 0 || s[0].nsamp != 0) && s[0].nsamp != t) {
+ 	msrec = 1;
 	(void)printf(" (a %s-layout multi-segment record)\n",
 		     s[0].nsamp == 0L ? "variable" : "fixed");
 	if (s[0].nsamp != 0L) {

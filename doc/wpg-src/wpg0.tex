@@ -510,6 +510,30 @@ guide in June, 1999.  See @file{NEWS}, in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
+@unnumberedsubsec Changes in version 10.4.12
+
+A new WFDB library function, @code{findsig}, returns the signal number of the
+input signal matching its string argument, or -1 if no such input signal
+exists.  If the string argument could be interpreted as an input signal number,
+it is taken as such; otherwise, the string argument must be an exact match to a
+signal name (@code{desc} field in the @code{siginfo} structure).
+
+Previous versions of WFDB library function @code{setifreq} entered an infinite
+loop if invoked (contrary to specifications) before opening an input record.
+@code{setifreq} now detects the error, emits an appropriate warning, and
+returns.
+
+If a WFDB application that uses WFDB library version 10.4.5 through 10.4.11
+attempted to read an annotation file before reading the sampling frequency of
+the associated record (for example, by invoking @code{isigopen} or
+@code{sampfreq}), the annotation times might all appear to be zero.  This may
+occur when reading annotations created using WFDB 10.4.5 or later.  The times
+supplied when creating the file are correctly written but may be incorrectly
+read in these cases.  This problem was corrected in this release; thanks to
+Thomas Heldt for reporting it and providing a reproducible example of it.
+
+(WFDB library version 10.4.11 was identical to version 10.4.10.)
+
 @unnumberedsubsec Changes in version 10.4.10
 
 EDF digital maximum and minimum values are now read properly in 64-bit
@@ -3870,6 +3894,7 @@ first introduced in WFDB library version 6.0.)
 * sampfreq::			Reading the sampling frequency of a WFDB record.
 * setsampfreq::			Setting the sampling frequency.
 * setbasetime::			Setting the base time.
+* findsig::                     Finding a signal by name.
 * counter conversion::		Functions for reading and setting counter
 				conversion parameters.
 * setwfdb::			Dynamically changing the database path.
@@ -4322,7 +4347,7 @@ Use @code{setsampfreq} before creating a new @file{hea} file
 @xref{Example 8}, for an illustration of the use of @code{setsampfreq}.
 
 @c @group
-@node     setbasetime, counter conversion, setsampfreq, miscellaneous functions
+@node     setbasetime, findsig, setsampfreq, miscellaneous functions
 @unnumberedsubsec setbasetime
 @findex setbasetime
 @cindex current time
@@ -4350,7 +4375,7 @@ ASCII string in @var{HH:MM:SS} format.  An optional base date in
 the date should be separated from the time by a space or tab character.  If
 @var{string} is empty or @code{NULL}, the current date and time are read
 from the system clock.  Use @code{setbasetime} after defining the sampling
-frequency and before creating a header file
+frequency and before creating a header file.
 @ifnotinfo
 (@pxref{newheader, , @code{newheader}}).
 @end ifnotinfo
@@ -4359,10 +4384,47 @@ frequency and before creating a header file
 @end ifinfo
 @xref{Example 8}, for an illustration of the use of @code{setbasetime}.
 
+There is no @code{getbasetime} function;  use @code{mstimstr(0)} at any
+time after opening a record to convert the base date and time into a string.
+
 @sp 2
 
 @c @group
-@node     counter conversion, setwfdb, setbasetime, miscellaneous functions
+@node     findsig, counter conversion, setbasetime, miscellaneous functions
+@findex findsig (10.4.12)
+@cindex signal name
+@cindex signal number
+@cindex finding signal by name
+@cindex signal lookup
+
+@example
+int findsig(char *@var{string})
+@end example
+@noindent
+@strong{Return:}
+@table @asis
+@item @t{ WFDB_Signal}
+Success
+@item @t{-1}
+Failure: signal not found
+@end table
+@c @end group
+
+@noindent
+This function converts its argument to an input signal number.
+If @var{string} is numeric and can be interpreted as a valid
+input signal number, it is taken as such;  otherwise, it is
+assumed to be a signal name, and if it is an exact match to the
+@code{desc} field of a currently open input signal's @code{siginfo}
+structure, @code{findsig} returns the corresponding signal number.
+If two or more signals have identical matching names, @code{findsig}
+returns the lowest matching signal number.
+
+
+@sp 2
+
+@c @group
+@node     counter conversion, setwfdb, findsig, miscellaneous functions
 @cindex base counter value
 @cindex counter (base)
 @cindex counter frequency

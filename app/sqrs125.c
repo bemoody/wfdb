@@ -1,9 +1,9 @@
 /* file: sqrs125.c	G. Moody	27 October 1990
-			Last revised:	14 January 2008
+			Last revised:	 7 January 2009
 
 -------------------------------------------------------------------------------
 sqrs125: Single-channel QRS detector for data sampled at 100 - 150 Hz
-Copyright (C) 1990-2008 George B. Moody
+Copyright (C) 1990-2009 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -27,17 +27,17 @@ The detector algorithm is based on example 10 in the WFDB Programmer's
 Guide, which in turn is based on a Pascal program written by W.A.H. Engelse
 and C. Zeelenberg, "A single scan algorithm for QRS-detection and feature
 extraction", Computers in Cardiology 6:37-42 (1979).  `sqrs' does not include
-the feature extraction capability of the Pascal program.  The output of `sqrs'
+the feature extraction capability of the Pascal program.  The output of sqrs125
 is an annotation file (with annotator name `qrs') in which all detected beats
 are labelled normal;  the annotation file may also contain `artifact'
-annotations at locations which `sqrs' believes are noise-corrupted.
+annotations at locations which `sqrs125' believes are noise-corrupted.
 
 The filter calculations and default thresholds used by this version have been
 optimized for signals sampled at 125 Hz, and may be used for signals sampled
 at rates between 100 and 150 Hz.  (The original program, sqrs.c, was intended
 for use with signals sampled at 250 Hz).
 
-`sqrs' can process records containing any number of signals, but it uses only
+sqrs125 can process records containing any number of signals, but it uses only
 one signal for QRS detection (signal 0 by default;  this can be changed using
 the `-s' option, see below).  For best results on adult human ECGs, use `xform'
 to resample the input signal at 125 Hz if a significantly different sampling
@@ -53,7 +53,7 @@ particularly those which can analyze two or more input signals, may exhibit
 significantly better performance.
 
 Usage:
-    sqrs -r RECORD [ OPTIONS ]
+    sqrs125 -r RECORD [ OPTIONS ]
   where RECORD is the record name, and OPTIONS may include:
     -f TIME		to specify the starting TIME (default: the beginning of
 			the record)
@@ -68,11 +68,11 @@ Usage:
 For example, to mark QRS complexes in record 100 beginning 5 minutes from the
 start, ending 10 minutes and 35 seconds from the start, and using signal 1, use
 the command:
-    sqrs -r 100 -f 5:0 -t 10:35 -s 1
+    sqrs125 -r 100 -f 5:0 -t 10:35 -s 1
 The output may be read using (for example):
     rdann -a qrs -r 100
 To evaluate the performance of this program, run it on the entire record, by:
-    sqrs -r 100
+    sqrs125 -r 100
 and then compare its output with the reference annotations by:
     bxb -r 100 -a atr qrs
 */
@@ -136,11 +136,12 @@ char *argv[];
 	    break;
 	  case 's':	/* signal */
 	    if (++i >= argc) {
-		(void)fprintf(stderr, "%s: signal number must follow -s\n",
+		(void)fprintf(stderr,
+			      "%s: signal number or name must follow -s\n",
 			      pname);
 		exit(1);
 	    }
-	    signal = atoi(argv[i]);
+	    signal = findsig(argv[i]);
 	    break;
 	  case 't':	/* end time */
 	    if (++i >= argc) {

@@ -1,9 +1,9 @@
 /* file: sqrs.c		G. Moody	27 October 1990
-			Last revised:	  15 May 2008
+			Last revised:   7 January 2009
 
 -------------------------------------------------------------------------------
 sqrs: Single-channel QRS detector
-Copyright (C) 1990-2008 George B. Moody
+Copyright (C) 1990-2009 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -128,11 +128,12 @@ char *argv[];
 	    break;
 	  case 's':	/* signal */
 	    if (++i >= argc) {
-		(void)fprintf(stderr, "%s: signal number must follow -s\n",
+		(void)fprintf(stderr,
+			      "%s: signal number or name must follow -s\n",
 			      pname);
 		exit(1);
 	    }
-	    signal = atoi(argv[i]);
+	    signal = findsig(argv[i]);
 	    break;
 	  case 't':	/* end time */
 	    if (++i >= argc) {

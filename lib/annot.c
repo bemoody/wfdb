@@ -1,10 +1,10 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:    18 April 2008	wfdblib 10.4.7
+			Last revised:    16 January 2009	wfdblib 10.4.12
 WFDB library functions for annotations
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1989-2008 George B. Moody
+Copyright (C) 1989-2009 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -167,7 +167,12 @@ static int get_ann_table(WFDB_Annotator i)
 	if (*(annot.aux+1) == '#') {
 	    if (strncmp(annot.aux + 1, "## time resolution: ", 20) == 0) {
 		sscanf(annot.aux + 20, "%lf", &(iad[i]->afreq));
-		if (iad[i]->afreq) iad[i]->tmul = getifreq()/iad[i]->afreq;
+		if (iad[i]->afreq) {
+		    WFDB_Frequency sf = getifreq();
+
+		    if (sf > 0.)
+		        iad[i]->tmul = sf/iad[i]->afreq;
+		}
 	    }
 	    continue;
 	}
@@ -189,7 +194,14 @@ static int get_ann_table(WFDB_Annotator i)
     if (annot.time != 0L || annot.anntyp != NOTE || annot.subtyp != 0 ||
 	annot.aux == NULL) {
 	if (iad[i]->tmul) annot.time /= iad[i]->tmul;
-	iad[i]->tmul = (iad[i]->afreq) ? getifreq()/iad[i]->afreq : getspf();
+	if (iad[i]->afreq) {
+	    WFDB_Frequency sf = getifreq();
+
+	    if (sf > 0.)
+	      iad[i]->tmul = sf/iad[i]->afreq;
+	}
+	else
+	    iad[i]->tmul = getspf();
 	annot.time = (WFDB_Time)(annot.time * iad[i]->tmul + 0.5);
 	(void)ungetann(i, &annot);
     }
@@ -228,7 +240,7 @@ static int put_ann_table(WFDB_Annotator i)
 	if (putann(i, &annot) < 0) return (-1);
     }
 
-    if (oafreq != oad[i]->afreq) {
+    if (oafreq != oad[i]->afreq && oafreq > 0.) {
 	(void)sprintf(buf+1, "## time resolution: %g", oafreq);
 	buf[0] = strlen(buf+1);
 	oad[i]->afreq = oafreq;
@@ -540,7 +552,7 @@ FINT putann(WFDB_Annotator n, WFDB_Annotation *annot)
 	return (-2);
     }
     t = annot->time;
-    if (oa->ann.time == (WFDB_Time)0 && oafreq != oa->afreq) {
+    if (oa->ann.time == (WFDB_Time)0 && oafreq != oa->afreq && oafreq > 0.) {
 	static WFDB_Annotation tra;
 	char buf[30];
 

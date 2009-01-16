@@ -1,9 +1,9 @@
 /* file: calsig.c	G. Moody	 4 March 1991
-			Last revised:  14 November 2002
+			Last revised:  7 January 2009
 
 -------------------------------------------------------------------------------
 calsig: measure gains and baselines in a WFDB record and rewrite header
-Copyright (C) 2002 George B. Moody
+Copyright (C) 1991-2009 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -198,7 +198,7 @@ char *argv[];
 	for (i = 0; i < nsig; i++)
 	    do_cal[i] = 0;
 	for (i = 0; i < ncsig; i++) {
-	    n = atoi(argv[isiglist+i]);
+	    n = findsig(argv[isiglist+i]);
 	    if (0 <= n && n < nsig)
 		do_cal[i] = 1;
 	}

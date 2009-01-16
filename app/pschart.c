@@ -1,9 +1,9 @@
 /* file: pschart.c	G. Moody       15 March 1988
-			Last revised:   2 June 2006
+			Last revised:  15 January 2009
 
 -------------------------------------------------------------------------------
 pschart: Produce annotated `chart recordings' on a PostScript device
-Copyright (C) 1988-2006 George B. Moody
+Copyright (C) 1988-2009 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -163,6 +163,7 @@ int smode = 1;			/* scale mode (0: no scales; 1: mm/unit in
 				   mm/unit above strips; 4: units/tick above
 				   strips; 5: mm/unit within strips; 6: units/
 				   tick within strips) */
+char **snstr;			/* signal names (if provided on command line) */
 char *sqstr;			/* signal quality string (1 char/signal) */
 double tpmv = TPMV;		/* grid ticks per millivolt */
 double tps = TPS;		/* grid ticks per second */
@@ -175,6 +176,9 @@ int uflag = 0;			/* if non-zero, insert an extra `%!' at the
 				   bug in the Adobe TranScript package */
 int vflag = 0;			/* if non-zero, echo commands */
 double vscale = VSCALE;		/* voltage scale (mm/millivolt) */
+int xflag = 0;                  /* if non-zero, plot only in (xvmin, xvmax) */
+int xvmax;			/* high end of range if xflag set */
+int xvmin;			/* low end of range if xflag set */
 
 double h_sep = H_SEP;		/* horizontal space between strips (mm) */
 double l_sep = L_SEP;		/* distance from labels to sides of grid */
@@ -448,9 +452,10 @@ char *argv[];
 			pname);
 		exit(1);
 	    }
-	    /* allocate storage for the signal list and for sqstr */
+	    /* allocate storage for the signal list, snstr, and sqstr */
 	    if (j - i > nomax) {
 		if ((siglist = realloc(siglist, (j-i)*sizeof(int))) == NULL ||
+		    (snstr = realloc(sqstr, (j-i+1)*sizeof(char *))) == NULL ||
 		    (sqstr = realloc(sqstr, (j-i+1)*sizeof(char))) == NULL) {
 		    (void)fprintf(stderr, "%s: insufficient memory\n", pname);
 		    exit(2);
@@ -459,7 +464,7 @@ char *argv[];
 	    /* fill the signal list */
 	    nosig = 0;
 	    while (++i < j)
-		siglist[nosig++] = atoi(argv[i]);
+		snstr[nosig++] = argv[i];
 	    i--;
 	    break;
 	  case 'S':	/* set modes for scale and time stamp printing */
@@ -514,6 +519,17 @@ char *argv[];
 			pname);
 		exit(1);
 	    }
+	    break;
+	  case 'x':     /* specify range of raw sample values to be plotted */
+	    if (++i >= argc-1) {
+		(void)fprintf(stderr,
+			      "%s: sample range must follow -x\n",
+			pname);
+		exit(1);
+	    }
+	    xflag = 1;
+   	    xvmin = atoi(argv[i++]);
+	    xvmax = atoi(argv[i]);
 	    break;
 	  case '1':	/* abbreviate aux strings to one character on output */
 	    aux_shorten = 1;
@@ -643,14 +659,15 @@ FILE *cfile;
 		nosig = nisig;
 	    }
 	    else {
-		for (i = 0; i < nosig; i++)
-		    if (siglist[i] < 0 || siglist[i] >= nisig) {
+		for (i = 0; i < nosig; i++) {
+		    if ((siglist[i] = findsig(snstr[i])) < 0) {
 			(void)fprintf(stderr,
-				      "record %s doesn't have a signal %d\n",
-				      record, siglist[i]);
+				      "record %s doesn't have a signal '%s'\n",
+				      record, snstr[i]);
 			wfdbquit();
 			return;
 		    }
+		}
 	    }
 	    if (nisig > nimax) {
 		if ((uncal = realloc(uncal, nisig * sizeof(int))) == NULL ||
@@ -763,7 +780,9 @@ char *record, *title;
 	    for (i = 0; i < nosig; i++) {
 		int vtmp = v[siglist[i]];
 
-		vbuf[i][j] = vmax[i] = vmin[i] = vtmp;
+		if (xflag && (vtmp > xvmax || vtmp < xvmin))
+		    vtmp = WFDB_INVALID_SAMPLE;
+		vbuf[i][j] = vtmp;
 		if (vtmp != WFDB_INVALID_SAMPLE) {
 		    if (vtmp > vmax[i] || vmax[i] == WFDB_INVALID_SAMPLE)
 			vmax[i] = vtmp;
@@ -1834,6 +1853,7 @@ static char *help_strings[] = {
  " -v N      set voltage scale to N mm/mV (default: 5)",     /* ** VSCALE ** */
  " -V        verbose mode",
  " -w N      set line width to N mm (default: 0.2; 0 is narrowest possible)",
+ " -x MIN MAX  plot samples only if raw values are between MIN and MAX",
  " -1        print only first character of comment annotation strings",
  " -         read script from standard input",
  "Script line format:",

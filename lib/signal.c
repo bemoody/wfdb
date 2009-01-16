@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   27 October 2008		wfdblib 10.4.10
+			Last revised:   27 October 2008		wfdblib 10.4.12
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -55,6 +55,7 @@ This file also contains definitions of the following WFDB library functions:
  isigopen	(opens input signals)
  osigopen	(opens output signals)
  osigfopen	(opens output signals by name)
+ findsig [10.4.12] (find an input signal with a specified name)
  getspf [9.6]	(returns number of samples returned by getvec per frame)
  setgvmode [9.0](sets getvec operating mode)
  setifreq [10.2.6](sets the getvec sampling frequency)
@@ -1464,8 +1465,9 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
     WFDB_Signal s;
     unsigned int b, d = 1, n, nn;
 
-    /* Do nothing if the input pointer is correct already. */
-    if (istime == (in_msrec ? t + segp->samp0 : t))
+    /* Do nothing if there is no more than one input signal group and
+       the input pointer is correct already. */
+    if (nigroups < 2 && istime == (in_msrec ? t + segp->samp0 : t))
 	return (0);
 
     /* Find the first signal that belongs to group g. */
@@ -2171,6 +2173,32 @@ FINT osigfopen(WFDB_Siginfo *siarray, unsigned int nsig)
     return (nosig);
 }
 
+/* Function findsig finds an open input signal with the name specified by its
+(string) argument, and returns the associated signal number.  If the argument
+is a decimal numeral and is less than the number of open input signals, it is
+assumed to represent a signal number, which is returned.  Otherwise, findsig
+looks for a signal with a description matching the string, and returns the
+first match if any, or -1 if not. */
+
+int findsig(char *p)
+{
+  char *q = p;
+  int s;
+
+  while ('0' <= *q && *q <= '9')
+      q++;
+  if (*q == 0) {	/* all digits, probably a signal number */
+      s = atoi(p);
+      if (s < nisig) return (s);
+  }
+  /* Otherwise, p is either an integer too large to be a signal number or a
+     string containing a non-digit character.  Assume it's a signal name. */
+  for (s = 0; s < nisig; s++)
+      if ((q = isd[s]->info.desc) && strcmp(p, q) == 0) return (s);
+  /* No match found. */
+  return (-1);
+}
+
 /* Function getvec can operate in two different modes when reading
 multifrequency records.  In WFDB_LOWRES mode, getvec returns one sample of each
 signal per frame (decimating any oversampled signal by returning the average of
@@ -2231,9 +2259,14 @@ static WFDB_Sample *gv0, *gv1;
 
 FINT setifreq(WFDB_Frequency f)
 {
-    if (f > 0.0) {
-	WFDB_Frequency error, g = sfreq;
+    WFDB_Frequency error, g = sfreq;
 
+    if (g <= 0.0) {
+	ifreq = 0.0;
+	wfdb_error("setifreq: no open input record\n");
+	return (-1);
+    }
+    if (f > 0.0) {
 	SREALLOC(gv0, nisig, sizeof(WFDB_Sample));
 	SREALLOC(gv1, nisig, sizeof(WFDB_Sample));
 	setafreq(ifreq = f);

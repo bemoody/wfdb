@@ -1,3 +1,34 @@
+10.4.12:
+	A new WFDB library function, findsig(), returns the signal number
+	of the input signal matching its string argument, or -1 if no such
+	input signal exists.  If the string argument could be interpreted
+	as an input signal number, it is taken as such;  otherwise, the
+	string argument must be an exact match to a signal name ("desc"
+	field in the siginfo structure).
+
+	WFDB applications calsig, pschart, psfd, rdsamp, sqrs,
+	sqrs125, wabp, wqrs, and xform now accept signal names in any
+	context in which an input signal number can be given.
+
+	The install-wave32 script now installs 32-bit libgcc and Open Look
+	glyph fonts if they are missing, as by default in Fedora 10.
+
+	Previous versions of WFDB library function setifreq() entered an
+	infinite loop if invoked (contrary to specifications) before
+	opening an input record.  setifreq() now detects the error, emits
+	an appropriate warning, and returns.
+
+	If a WFDB application that uses WFDB library version 10.4.5
+	through 10.4.11 attempted to read an annotation file before
+	reading the sampling frequency of the associated record (for
+	example, by invoking isigopen() or sampfreq()), the annotation
+	times might all appear to be zero.  This may occur when
+	reading annotations created using WFDB 10.4.5 or later.  The
+	times supplied when creating the file are correctly written
+	but may be incorrectly read in these cases.  This problem was
+	corrected in this release; thanks to Thomas Heldt for
+	reporting it and providing a reproducible example of it.
+	
 10.4.11:
 	Build process improvements, especially on Cygwin and MinGW targets.
 

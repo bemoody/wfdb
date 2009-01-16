@@ -1,9 +1,9 @@
 /* file: rdsamp.c	G. Moody	 23 June 1983
-			Last revised:    29 June 2005
+			Last revised:   7 January 2009
 
 -------------------------------------------------------------------------------
 rdsamp: Print an arbitrary number of samples from each signal
-Copyright (C) 1983-2004 George B. Moody
+Copyright (C) 1983-2009 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -48,6 +48,11 @@ _______________________________________________________________________________
 #define WFDBP ";\\mghdb"
 #endif
 
+/* values for timeunits */
+#define SECONDS 1
+#define MINUTES 2
+#define HOURS   3
+
 char *pname;
 
 main(argc, argv)
@@ -56,7 +61,7 @@ char *argv[];
 {
     char *record = NULL, *prog_name();
     int highres = 0, i, isiglist, nsig, nosig = 0, pflag = 0, s, *sig = NULL,
-	vflag = 0;
+        timeunits = SECONDS, vflag = 0;
     long from = 0L, maxl = 0L, to = 0L;
     WFDB_Sample *v;
     WFDB_Siginfo *si;
@@ -127,6 +132,9 @@ char *argv[];
 	    break;
 	  case 'p':	/* output in physical units specified */
 	    ++pflag;
+	    if (*(argv[i]+2) == 'h') timeunits = HOURS;
+	    else if (*(argv[i]+2) == 'm') timeunits = MINUTES;
+	    else timeunits = SECONDS;
 	    break;
 	  case 's':	/* signal list follows */
 	    isiglist = i+1; /* index of first argument containing a signal # */
@@ -195,8 +203,9 @@ char *argv[];
 	}
 #endif
 	for (i = 0; i < nosig; i++) {
-	    if ((s = atoi(argv[isiglist+i])) < 0 || s >= nsig) {
-		(void)fprintf(stderr, "%s: can't read signal %d\n", pname, s);
+	    if ((s = findsig(argv[isiglist+i])) < 0) {
+		(void)fprintf(stderr, "%s: can't read signal '%s'\n", pname,
+			      argv[isiglist+i]);
 		exit(2);
 	    }
 	    sig[i] = s;
@@ -256,9 +265,15 @@ char *argv[];
 	char *p, *fmt = pflag > 1 ?  "\t%15.8lf" : "\t%7.3f";
 	double freq = sampfreq(NULL);
 
+	if (timeunits == HOURS) freq *= 3600.;
+	else if (timeunits == MINUTES) freq *= 60.;
+
 	/* Print units as a second line of column headers if '-v' selected. */
 	if (vflag) {
-	    (void)printf("(sec)");
+	    if (timeunits == HOURS)        (void)printf("(hrs)");
+	    else if (timeunits == MINUTES) (void)printf("(min)");
+	    else if (timeunits == SECONDS) (void)printf("(sec)");
+
 	    for (i = 0; i < nsig; i++) {
 		p = si[sig[i]].units;
 		if (p == NULL) p = "mV";
@@ -270,7 +285,7 @@ char *argv[];
 	}
 
 	while ((to == 0L || from < to) && getvec(v) >= 0) {
-	    (void)printf("%7.3lf", (double)(from++)/freq);
+	  (void)printf("%7.3lf", (double)(from++)/freq);
 	    for (i = 0; i < nsig; i++) {
 		if (v[sig[i]] != WFDB_INVALID_SAMPLE)
 		    (void)printf(fmt,
@@ -322,7 +337,8 @@ static char *help_strings[] = {
  " -H          read multifrequency signals in high resolution mode",
  " -l INTERVAL truncate output after the specified time interval (hh:mm:ss)",
  " -p          print times and samples in physical units (default: raw units)",
- "              (use -p -p for greater precision)",
+ "              (use -p -p for greater precision;  use -ph, -pm, or -ps to",
+ "              print times in hours, minutes, or seconds respectively",
  " -s SIGNAL [SIGNAL ...]  print only the specified signal(s)",
  " -t TIME     stop at specified time",
  " -v          print column headings",
