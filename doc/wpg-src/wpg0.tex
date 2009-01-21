@@ -512,6 +512,17 @@ changes that may not be described here.
 
 @unnumberedsubsec Changes in version 10.4.12
 
+The rule for sorting annotations within a file has been changed to allow a much
+larger number of simultaneous annotations (i.e., annotations in a given
+annotation file with identical @code{time} fields) than was previously
+possible.  Since version 6.1, the WFDB library sorts simultaneous annotations
+according to the value of their @code{chan} fields, allowing for 256
+simultaneous annotations at any given time.  Beginning in version 10.4.12, the
+library sorts simultaneous annotations according to their @code{num} fields,
+then sorts those with identical @code{num} fields according to their
+@code{chan} fields, allowing up to 65,536 simultaneous annotations at any given
+time.
+
 A new WFDB library function, @code{findsig}, returns the signal number of the
 input signal matching its string argument, or -1 if no such input signal
 exists.  If the string argument could be interpreted as an input signal number,
@@ -5399,7 +5410,7 @@ annotation code; an integer between 1 and @code{ACMAX}.
 @code{ACMAX} is defined in @file{<wfdb/@-ecgcodes.h>}.
 
 @item signed char subtyp
-@itemx signed char chan
+@itemx unsigned char chan
 @itemx signed char num
 @cindex annotation subtype
 @cindex subtype (annotation)
@@ -5417,7 +5428,7 @@ and 127.  In MIT DB @file{atr} files, the
 indicate which signals are affected (@pxref{Annotation Codes}).
 The @code{chan} field is intended to indicate the signal to which the
 annotation is attached.  More than one annotation may be written with
-the same @code{time} if the @code{chan} fields are distinct and in
+the same @code{time} if the @code{num} or @code{chan} fields are distinct and in
 ascending order.  The semantics of the @code{chan} field are
 unspecified, however; users may assign any desired meaning, which need
 not have anything to do with signal numbers.  In user-created annotation
@@ -6229,22 +6240,23 @@ NETFILES support was introduced in WFDB library version 10.0.1.
 @cindex canonical order of annotations
 @cindex order of annotations
 
-WFDB applications may generally assume (and most of them do assume) that
-all annotations in any given annotation file are in @dfn{canonical
-order}.  Successful use of @code{iannsettime} requires that this assumption
-be correct.  Early versions of the WFDB library (before version 6.2) defined
-canonical order as time order.  More recent versions of the WFDB library define
-canonical order as @code{time} and @code{chan} order (thus annotations
-are arranged first in @code{time} order, and any simultaneous annotations are
-arranged according to the value of their @code{chan} fields, from
-smallest to largest).  
+WFDB applications may generally assume (and most of them do assume) that all
+annotations in any given annotation file are in @dfn{canonical order}.
+Successful use of @code{iannsettime} requires that this assumption be correct.
+The earliest versions of the WFDB library (before version 6.1) defined
+canonical order as time order.  Versions 6.1 through 10.4.11 define canonical
+order as @code{time} and @code{chan} order, and versions 10.4.12 and later also
+use @code{num} for ordering (thus annotations are arranged first in @code{time}
+order, and any simultaneous annotations are arranged according to the value of
+their @code{num} fields, from smallest to largest, and those with identical
+@code{num} fields are similarly arranged in @code{chan} order).
 
 @cindex location (of annotation)
 @cindex annotation location
 @cindex virtual array of annotations
 @cindex annotation (canonical order)
 @cindex canonical order of annotations
-The combination of the @code{time} and @code{chan} fields of an
+The combination of the @code{time}, @code{num}, and @code{chan} fields of an
 annotation defines a unique @dfn{location} in a virtual array of
 annotations which an annotation file represents.  No two annotations may
 occupy the same location in this virtual array.  This restriction was
@@ -6272,15 +6284,15 @@ Although it is possible using current versions of the WFDB library to write two
 or more annotations to the same location, @emph{only the last annotation
 written to any given location is retained} in the canonically-ordered
 annotation file.  Thus that an application that generates an annotation file
-can change the @code{anntyp}, @code{subtyp}, @code{num}, or @code{aux} fields
-of a previously-written annotation simply by writing another annotation to the
-same location (i.e, with the same @code{time} and @code{chan} fields).  As a
-special case, an application may @emph{delete} a previously-written annotation
-by writing a @code{NOTQRS} annotation to the same location.  To move an
-annotation to a different location (i.e., to change its @code{time} or
-@code{chan} fields), it is necessary to delete it from the original location,
-and then to insert it at the desired location, using two separate invocations
-of @code{putann}.
+can change the @code{anntyp}, @code{subtyp}, or @code{aux} fields of a
+previously-written annotation simply by writing another annotation to the same
+location (i.e, with the same @code{time}, @code{num}, and @code{chan} fields).
+As a special case, an application may @emph{delete} a previously-written
+annotation by writing a @code{NOTQRS} annotation to the same location.  To move
+an annotation to a different location (i.e., to change its @code{time},
+@code{num}, or @code{chan} fields), it is necessary to delete it from the
+original location, and then to insert it at the desired location, using two
+separate invocations of @code{putann}.
 
 @cindex unsorted annotation files
 @cindex @code{WFDBANNSORT} (environment variable)
@@ -7936,7 +7948,7 @@ typically used for user-created signals.  Records @file{8l} and
 @item Location [of an annotation]
 @cindex location (of annotations)
 @cindex annotation location (defined)
-Every annotation has both @code{time} and @code{chan} attributes that
+Every annotation has @code{time}, @code{num}, and @code{chan} attributes that
 define its location within a virtual array of annotations.  See
 @dfn{Canonical order of annotations}.
 
@@ -7945,11 +7957,11 @@ define its location within a virtual array of annotations.  See
 @cindex canonical order of annotations
 Normally, annotations are arranged in time order within an annotation file.
 Annotations that have identical @code{time} attributes are arranged in
-@code{chan} order.  Annotations that have identical @dfn{locations} (i.e.,
-identical @code{time} and @code{chan} attributes) should not normally occur in
-a single annotation file; if this does happen, the last annotation at any given
-location is treated as a replacement of any previous annotations at that
-location.
+@code{num} and @code{chan} order.  Annotations that have identical
+@dfn{locations} (i.e., identical @code{time}, @code{num}, and @code{chan}
+attributes) should not normally occur in a single annotation file; if this does
+happen, the last annotation at any given location is treated as a replacement
+of any previous annotations at that location.
 
 @item Low-resolution mode
 @cindex low-resolution mode (defined)

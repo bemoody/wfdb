@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:    16 January 2009	wfdblib 10.4.12
+			Last revised:    20 January 2009	wfdblib 10.4.12
 WFDB library functions for annotations
 
 _______________________________________________________________________________
@@ -86,6 +86,10 @@ Simultaneous annotations attached to different signals (as indicated by the
 must be written in time order; simultaneous annotations must be written in
 `chan' order.  Simultaneous annotations are readable but not writable by
 earlier versions.
+
+Beginning in version 10.4.12, the canonical annotation order is given by
+the time, num, and chan fields in that order.  Thus simultaneous annotations
+may be attached to the same signal provided that their num fields are unique.
 */
 
 #include "wfdblib.h"
@@ -108,6 +112,8 @@ earlier versions.
 #define CHN	((unsigned)(62 << CS))	/* change 'chan' field */
 #define AUX	((unsigned)(63 << CS))	/* auxiliary information */
 
+#define AUXBUFLEN 520
+
 /* Constants for AHA annotation files only */
 #define ABLKSIZ	1024		/* AHA annotation file block length */
 #define AUXLEN	6		/* length of AHA aux field */
@@ -124,7 +130,7 @@ static struct iadata {
     WFDB_Frequency afreq;	/* time resolution, in ticks/second */
     unsigned word;		/* next word from the input file */
     int ateof;			/* EOF-reached indicator */
-    char auxstr[1+255+1];	/* aux string buffer (byte count+data+null) */
+    char auxstr[AUXBUFLEN];		/* aux string buffer */
     unsigned index;		/* next available position in auxstr */
     double tmul, ptmul;		/* tmul * annotation time = sample count */
     WFDB_Time tt;		/* annotation time (MIT format only).  This
@@ -144,8 +150,8 @@ static struct oadata {
     int seqno;			/* annotation serial number (AHA format only)*/
     char *rname;		/* record with which annotator is associated */
     char out_of_order;		/* if >0, one or more annotations written by
-				   putann are not in the canonical (time, chan)
-				   order */
+				   putann are not in the canonical (time, num,
+				   chan) order */
 } **oad;
 static WFDB_Frequency oafreq;	/* time resolution in ticks/sec for newly-
 				   created output annotators */
@@ -463,7 +469,7 @@ FINT getann(WFDB_Annotator n, WFDB_Annotation *annot)
 	      case NUM:	  ia->ann.num = DATA & ia->word; break;
 	      case AUX:			/* auxiliary information */
 		len = ia->word & 0377;	/* length of auxiliary data */
-		if (ia->index >= 256 - len)
+		if (ia->index >= AUXBUFLEN-2 - len)
 		    ia->index = 0;	/* buffer index */
 		ia->ann.aux = ia->auxstr + ia->index;    /* save pointer */
 		ia->auxstr[ia->index++] = len;	/* save length byte */
@@ -566,11 +572,10 @@ FINT putann(WFDB_Annotator n, WFDB_Annotation *annot)
 	tra.aux = NULL;
 	if (putann(n, &tra) < 0) return (-1);
     }
-    if (((delta = t - oa->ann.time) < 0L ||
-	(delta == 0L && annot->chan <= oa->ann.chan)) &&
-	(t != 0L || oa->ann.time != 0L)) {
-	oa->out_of_order = 1;
-    }
+    delta = t - oa->ann.time;
+    if (!(annot->chan > oa->ann.chan || annot->num > oa->ann.num || delta>0L ||
+	  (t == 0L && oa->ann.time == 0L)))
+        oa->out_of_order = 1;
     switch (oa->info.stat) {
       case WFDB_WRITE:	/* MIT-format output file */
       default:

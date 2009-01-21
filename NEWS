@@ -1,4 +1,15 @@
 10.4.12:
+	The rule for sorting annotations within a file has been changed to
+	allow a much larger number of simultaneous annotations (i.e.,
+	annotations in a given annotation file with identical 'time' fields)
+	than was previously possible.  Since version 6.1, the WFDB library
+	sorts simultaneous annotations according to the value of their 'chan'
+	fields, allowing for 256 simultaneous annotations at any given time.
+	Beginning in version 10.4.12, the library sorts simultaneous
+	annotations according to their 'num' fields, then sorts those with
+	identical 'num' fields according to their 'chan' fields, allowing up to
+	65,536 simultaneous annotations at any given time.
+
 	A new WFDB library function, findsig(), returns the signal number
 	of the input signal matching its string argument, or -1 if no such
 	input signal exists.  If the string argument could be interpreted

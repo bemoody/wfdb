@@ -1,8 +1,8 @@
 /* file sortann.c	G. Moody	 7 April 1997
-			Last revised:	  4 May 1999
+			Last revised:	20 January 2009
 -------------------------------------------------------------------------------
 sortann: Rearrange annotations in canonical order
-Copyright (C) 1999 George B. Moody
+Copyright (C) 1997-2009 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -24,9 +24,9 @@ _______________________________________________________________________________
 
 It is possible to create an annotation file containing out-of-order
 annotations.  This program rewrites such files with the annotations in time
-order.  Any simultaneous annotations are written in `chan' order.
+order.  Any simultaneous annotations are written in 'num' and 'chan' order.
 
-If the input contains two or more annotations with the same time and chan
+If the input contains two or more annotations with the same time, num, and chan
 fields, only the last one is copied.  As a special case of this policy, if the
 last such annotation has anntyp = 0 (NOTQRS), no annotation is written at that
 location (thus a program that generates input for sortann can effectively
@@ -50,12 +50,10 @@ the sections.  Note that you must specify an output annotator name (with -o)
 when using the -f or -t options (to avoid replacing the entire input file with
 a sorted subset of its contents).
 
-Running out of memory is unlikely unless:
- 1. you have less than 2 Mb of memory and you are attempting to sort a 24-hour
-    or longer annotation file.
- 2. you have compiled sortann using a 16-bit compiler and you are attempting
-    to sort more than about 4000 annotations (note that the precompiled
-    versions of sortann for MS-DOS and UNIX do not have this limitation).
+The working memory required by sortann is approximately 10 times the size of
+the annotation file.  Since annotation files are rarely as large as 1 megabyte
+and available memory is rarely less than 10 megabytes, it is unlikely that
+sortann will exhaust available memory, however.
 */
 
 #include <stdio.h>
@@ -246,9 +244,10 @@ WFDB_Annotation *pa;
 	copybytes(p, pa->aux, *(pa->aux)+2);
 	(newp->annotation).aux = p;
     }
-    if (lastp == &annlist || pa->time > (lastp->annotation).time ||
-	(pa->time == (lastp->annotation).time &&
-	 pa->chan > (lastp->annotation).chan)) {
+    if (lastp == &annlist ||
+	pa->chan > (lastp->annotation).chan ||
+	pa->num > (lastp->annotation).num ||
+	pa->time > (lastp->annotation).time) {
 	/* this annotation is in order -- add to end of list */
 	newp->prev = lastp;
 	lastp->next = newp;
@@ -264,6 +263,9 @@ WFDB_Annotation *pa;
 	while (ap) {
 	    if (pa->time > (ap->annotation).time ||
 		(pa->time == (ap->annotation).time &&
+		 pa->num > (ap->annotation).num) ||
+		(pa->time == (ap->annotation).time &&
+		 pa->num == (ap->annotation).num &&
 		 pa->chan >= (ap->annotation).chan)) {
 		break;
 	    }
@@ -276,7 +278,8 @@ WFDB_Annotation *pa;
 	    (newp->next)->prev = annlist.next = newp;
 	}
 	else if (pa->time == (ap->annotation).time &&
-	    pa->chan == (ap->annotation).chan) {    /* replace ap by newp */
+		 pa->num == (ap->annotation).num &&
+		 pa->chan == (ap->annotation).chan) {  /* replace ap by newp */
 	    if (newp->prev = ap->prev) (newp->prev)->next = newp;
 	    if (newp->next = ap->next) (newp->next)->prev = newp;
 	    else lastp = newp;

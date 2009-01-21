@@ -1123,6 +1123,7 @@ char *record, *title;
 	int x, y, c;
 	unsigned int ia;
 
+
 	if (iannsettime(t0) < 0 && nann == 1) return (1);
 	setrgbcolor(&ac);
 	setroman(fs_ann);
@@ -1132,6 +1133,7 @@ char *record, *title;
 	    else
 		c = -1;
 	    while (getann(ia, &annot) >= 0 && annot.time < t1) {
+	      if (annot.time == 0) continue;
 		if (Mflag >= 2 && annot.chan != c) {
 		    int i, j;
 		    i = c = annot.chan;

@@ -1,10 +1,10 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised:   14 July 2008		wfdblib 10.4.7
+			Last revised:   19 January 2009	       wfdblib 10.4.12
 WFDB library type, constant, structure, and function interface definitions
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1983-2008 George B. Moody
+Copyright (C) 1983-2009 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -176,9 +176,9 @@ struct WFDB_ann {	/* annotation structure */
 			   the beginning of the record */
     char anntyp;	/* annotation type (< ACMAX, see <wfdb/ecgcodes.h> */
     signed char subtyp;	/* annotation subtype */
-    signed char chan;	/* channel number */
+    unsigned char chan;	/* channel number */
     signed char num;	/* annotator number */
-    char *aux;		/* pointer to auxiliary information */ 
+    unsigned char *aux;	/* pointer to auxiliary information */
 };
 
 /* Composite data types */
