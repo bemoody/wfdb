@@ -1,3 +1,18 @@
+10.4.13:
+	For portability, the WFDB library has always stored parameters such as
+	sampling frequency and gain as strings rather than as floating-point
+	numbers.  Although the resultant loss of precision has been almost
+	always negligible, it has been observable in the specific case of
+	converting very large time intervals from sample intervals to seconds,
+	when the sampling frequency in Hz cannot be represented exactly in
+	binary (e.g., if the sampling frequency is once per minute, or 1/60 Hz).
+	This situation cannot be wholly avoided, but it can be minimized.
+	Changes in this release, in setheader() and in functions that record
+	time units in annotation files, increase the precision with which
+	non-integer parameters are recorded, so that loss of precision as
+	a result of converting them to and from strings should almost never
+	be observable.
+
 10.4.12:
 	The rule for sorting annotations within a file has been changed to
 	allow a much larger number of simultaneous annotations (i.e.,

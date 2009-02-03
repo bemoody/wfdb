@@ -1,9 +1,9 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:   19 November 2008
+#				Last revised:   3 February 2009
 # This section of the Makefile should not need to be changed.
 
-INCLUDES = $(INCDIR)/wfdb/wfdb.h $(INCDIR)/wfdb/ecgcodes.h \
- $(INCDIR)/wfdb/ecgmap.h
+INCLUDES = $(INCDIR)/wfdb/wfdb.h $(INCDIR)/wfdb/wfdblib.h \
+ $(INCDIR)/wfdb/ecgcodes.h $(INCDIR)/wfdb/ecgmap.h
 HFILES = wfdb.h ecgcodes.h ecgmap.h wfdblib.h
 CFILES = wfdbinit.c annot.c signal.c calib.c wfdbio.c
 OFILES = wfdbinit.o annot.o signal.o calib.o wfdbio.o
@@ -63,6 +63,8 @@ $(BINDIR) $(INCDIR) $(INCDIR)/wfdb $(INCDIR)/ecg $(LIBDIR):
 # Rules for installing the include files
 $(INCDIR)/wfdb/wfdb.h:		$(INCDIR)/wfdb wfdb.h
 	cp -p wfdb.h $(INCDIR)/wfdb; $(SETPERMISSIONS) $(INCDIR)/wfdb/wfdb.h
+$(INCDIR)/wfdb/wfdblib.h:		$(INCDIR)/wfdb wfdblib.h
+	cp -p wfdblib.h $(INCDIR)/wfdb; $(SETPERMISSIONS) $(INCDIR)/wfdb/wfdblib.h
 $(INCDIR)/wfdb/ecgcodes.h:	$(INCDIR)/wfdb ecgcodes.h
 	cp -p ecgcodes.h $(INCDIR)/wfdb
 	$(SETPERMISSIONS) $(INCDIR)/wfdb/ecgcodes.h

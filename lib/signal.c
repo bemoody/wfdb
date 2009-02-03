@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   27 October 2008		wfdblib 10.4.12
+			Last revised:   29 January 2009		wfdblib 10.4.13
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -2564,11 +2564,11 @@ FINT setheader(char *record, WFDB_Siginfo *siarray, unsigned int nsig)
     }
 
     /* Write the general information line. */
-    (void)wfdb_fprintf(oheader, "%s %d %g", record, nsig, ffreq);
+    (void)wfdb_fprintf(oheader, "%s %d %.12g", record, nsig, ffreq);
     if ((cfreq > 0.0 && cfreq != ffreq) || bcount != 0.0) {
-	(void)wfdb_fprintf(oheader, "/%g", cfreq);
+	(void)wfdb_fprintf(oheader, "/%.12g", cfreq);
 	if (bcount != 0.0)
-	    (void)wfdb_fprintf(oheader, "(%g)", bcount);
+	    (void)wfdb_fprintf(oheader, "(%.12g)", bcount);
     }
     (void)wfdb_fprintf(oheader, " %ld", nsig > 0 ? siarray[0].nsamp : 0L);
     if (btime != 0L || bdate != (WFDB_Date)0) {
@@ -2597,7 +2597,7 @@ FINT setheader(char *record, WFDB_Siginfo *siarray, unsigned int nsig)
 			       ogd[osd[s]->info.group]->start);
 	else if (prolog_bytes)
 	    (void)wfdb_fprintf(oheader, "+%ld", prolog_bytes);
-	(void)wfdb_fprintf(oheader, " %g", siarray[s].gain);
+	(void)wfdb_fprintf(oheader, " %.12g", siarray[s].gain);
 	if (siarray[s].baseline != siarray[s].adczero)
 	    (void)wfdb_fprintf(oheader, "(%d)", siarray[s].baseline);
 	if (siarray[s].units && (p = strtok(siarray[s].units, " \t\n\r")))
@@ -2703,11 +2703,11 @@ FINT setmsheader(char *record, char **segment_name, unsigned int nsegments)
     }
 
     /* Write the first line of the master header. */
-    (void)wfdb_fprintf(oheader,"%s/%u %d %g", record, nsegments, nsig, msfreq);
+    (void)wfdb_fprintf(oheader,"%s/%u %d %.12g", record, nsegments, nsig, msfreq);
     if ((mscfreq > 0.0 && mscfreq != msfreq) || msbcount != 0.0) {
-	(void)wfdb_fprintf(oheader, "/%g", mscfreq);
+	(void)wfdb_fprintf(oheader, "/%.12g", mscfreq);
 	if (msbcount != 0.0)
-	    (void)wfdb_fprintf(oheader, "(%g)", msbcount);
+	    (void)wfdb_fprintf(oheader, "(%.12g)", msbcount);
     }
     (void)wfdb_fprintf(oheader, " %ld", msnsamples);
     if (msbtime != 0L || msbdate != (WFDB_Date)0) {

@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:    20 January 2009	wfdblib 10.4.12
+			Last revised:    30 January 2009	wfdblib 10.4.13
 WFDB library functions for annotations
 
 _______________________________________________________________________________
@@ -247,7 +247,7 @@ static int put_ann_table(WFDB_Annotator i)
     }
 
     if (oafreq != oad[i]->afreq && oafreq > 0.) {
-	(void)sprintf(buf+1, "## time resolution: %g", oafreq);
+	(void)sprintf(buf+1, "## time resolution: %.12g", oafreq);
 	buf[0] = strlen(buf+1);
 	oad[i]->afreq = oafreq;
 	if (putann(i, &annot) < 0) return (-1);
@@ -560,12 +560,12 @@ FINT putann(WFDB_Annotator n, WFDB_Annotation *annot)
     t = annot->time;
     if (oa->ann.time == (WFDB_Time)0 && oafreq != oa->afreq && oafreq > 0.) {
 	static WFDB_Annotation tra;
-	char buf[30];
+	char buf[40];
 
 	oa->afreq = oafreq;
 	tra.anntyp = NOTE;
 	tra.aux = buf;
-	(void)sprintf(buf+1, "## time resolution: %g", oafreq);
+	(void)sprintf(buf+1, "## time resolution: %.12g", oafreq);
 	buf[0] = strlen(buf+1);
 	if (putann(n, &tra) < 0) return (-1);
 	tra.anntyp = 0;
