@@ -510,6 +510,27 @@ guide in June, 1999.  See @file{NEWS}, in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
+@unnumberedsubsec Changes in version 10.4.13
+
+A new WFDB library function, @code{tnextvec()}, finds the next valid sample
+from a chosen signal, occurring at or after a specified time.  This
+function is particularly useful when reading variable-layout
+multi-segment records that may have lengthy gaps in signals of interest.
+
+For portability, the WFDB library has always stored parameters such as
+sampling frequency and gain as strings rather than as floating-point
+numbers.  Although the resultant loss of precision has been almost
+always negligible, it has been observable in the specific case of
+converting very large time intervals from sample intervals to seconds,
+when the sampling frequency in Hz cannot be represented exactly in
+binary (e.g., if the sampling frequency is once per minute, or 1/60
+Hz).  This situation cannot be wholly avoided, but it can be
+minimized.  Changes in this release, in @code{setheader()} and in functions
+that record time units in annotation files, increase the precision
+with which non-integer parameters are recorded, so that loss of
+precision as a result of converting them to and from strings should
+almost never be observable.
+
 @unnumberedsubsec Changes in version 10.4.12
 
 The rule for sorting annotations within a file has been changed to allow a much
@@ -3018,6 +3039,7 @@ input.
 @menu
 * isigsettime::			Setting time of next samples read.
 * isgsettime::			As above, but for one signal group only.
+* tnextvec::                    Finding the next valid sample in a signal.
 * iannsettime::			Setting time of next annotations read.
 * sample::			A random access interface to input signals.
 @end menu
@@ -3058,7 +3080,7 @@ than the current sample number.  @xref{Example 7}, and @pxref{Example 9},
 for illustrations of the use of @code{isigsettime}.
 
 @c @group
-@node     isgsettime, iannsettime, isigsettime, non-sequential
+@node     isgsettime, tnextvec, isigsettime, non-sequential
 @unnumberedsubsec isgsettime
 @findex isgsettime
 @cindex signals (non-sequential access)
@@ -3084,7 +3106,37 @@ group specified by @var{sgroup}.  This function may be of use if more than
 one record is open simultaneously (@pxref{Multiple Record Access}).
 
 @c @group
-@node     iannsettime, sample, isgsettime, non-sequential
+@node     tnextvec, iannsettime, isgsettime, non-sequential
+@unnumberedsubsec tnextvec
+@findex tnextvec
+@cindex signals (non-sequential access)
+@cindex finding valid samples
+@cindex skipping gaps in signals
+@cindex invalid samples (skipping)
+@cindex valid samples (searching for)
+
+@example
+WFDB_Time tnextvec(WFDB_Signal @var{s}, WFDB_Time @var{t})
+@end example
+@noindent
+@strong{Return:}
+@table @asis
+@item @t{>= 0}
+Time of the next valid sample of signal @var{s} at or after @var{t}
+@item @t{-1}
+Failure: EOF reached or improper seek
+@end table
+@c @end group
+
+@noindent
+This function resets the input signal file pointers so that the next
+samples read by @code{getvec} from each input annotation file will
+include the next valid sample of the specified signal @var{s}
+occurring at or after @var{t}.  Use @code{tnextvec} to skip lengthy
+gaps in a signal of interest efficiently.
+
+@c @group
+@node     iannsettime, sample, tnextvec, non-sequential
 @unnumberedsubsec iannsettime
 @findex iannsettime
 @cindex annotations (non-sequential access)

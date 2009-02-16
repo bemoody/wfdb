@@ -1,5 +1,5 @@
 /* file: rdsamp.c	G. Moody	 23 June 1983
-			Last revised:   7 January 2009
+			Last revised:   15 February 2009
 
 -------------------------------------------------------------------------------
 rdsamp: Print an arbitrary number of samples from each signal
@@ -28,30 +28,13 @@ _______________________________________________________________________________
 #include <stdio.h>
 #include <wfdb/wfdb.h>
 
-/* Define the default WFDB path for CD-ROM versions of this program (the MS-DOS
-   executables found in the `bin' directories of the various CD-ROMs).  This
-   program has been revised since the appearance of these CD-ROMs; compiling
-   this file will not produce executables identical to those on the CD-ROMs.
-   Note that the drive letter is not included in these WFDB path definitions,
-   since it varies among systems.
- */
-#ifdef MITCDROM
-#define WFDBP ";\\mitdb;\\nstdb;\\stdb;\\vfdb;\\afdb;\\cdb;\\svdb;\\ltdb;\\cudb"
-#endif
-#ifdef STTCDROM
-#define WFDBP ";\\edb;\\valedb"
-#endif
-#ifdef SLPCDROM
-#define WFDBP ";\\slpdb"
-#endif
-#ifdef MGHCDROM
-#define WFDBP ";\\mghdb"
-#endif
-
 /* values for timeunits */
-#define SECONDS 1
-#define MINUTES 2
-#define HOURS   3
+#define SECONDS   1
+#define MINUTES   2
+#define HOURS     3
+#define TIMSTR    4
+#define MSTIMSTR  5
+#define HHMMSS	  6
 
 char *pname;
 
@@ -59,46 +42,17 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-    char *record = NULL, *prog_name();
+    char *record = NULL, *search = NULL, *prog_name();
     int highres = 0, i, isiglist, nsig, nosig = 0, pflag = 0, s, *sig = NULL,
         timeunits = SECONDS, vflag = 0;
-    long from = 0L, maxl = 0L, to = 0L;
+    WFDB_Frequency freq;
     WFDB_Sample *v;
     WFDB_Siginfo *si;
+    WFDB_Time from = 0L, maxl = 0L, to = 0L;
     void help();
 
-#ifdef WFDBP
-    char *wfdbp = getwfdb();
-    if (*wfdbp == '\0')
-	setwfdb(WFDBP);
-#endif
-
     pname = prog_name(argv[0]);
-
-    /* Accept old syntax. */
-    if (argc >= 2 && argv[1][0] != '-') {
-	record = argv[1];
-	i = 2;
-	if (argc > 2 && argv[2][0] != '-') {
-	    from = 2;
-	    i = 3;
-	}
-	if (argc > 3 && argv[3][0] != '-') {
-	    to = 3;
-	    i = 4;
-	}
-	if (argc > 4) {
-	    isiglist = 4;
-	    while (i < argc && argv[i][0] != '-') {
-		i++;
-		nosig++;
-	    }
-	}
-    }
-    else
-	i = 1;
-
-    for ( ; i < argc; i++) {
+    for (i = 1 ; i < argc; i++) {
 	if (*argv[i] == '-') switch (*(argv[i]+1)) {
 	  case 'f':	/* starting time */
 	    if (++i >= argc) {
@@ -130,9 +84,13 @@ char *argv[];
 	    }
 	    record = argv[i];
 	    break;
+	  case 'P':	/* output in high-precision physical units */
+	    ++pflag;	/* (fall through to case 'p') */
 	  case 'p':	/* output in physical units specified */
 	    ++pflag;
-	    if (*(argv[i]+2) == 'h') timeunits = HOURS;
+	    if (*(argv[i]+2) == 'd') timeunits = TIMSTR;
+	    else if (*(argv[i]+2) == 'e') timeunits = HHMMSS;
+	    else if (*(argv[i]+2) == 'h') timeunits = HOURS;
 	    else if (*(argv[i]+2) == 'm') timeunits = MINUTES;
 	    else timeunits = SECONDS;
 	    break;
@@ -148,6 +106,16 @@ char *argv[];
 		exit(1);
 	    }
 	    break;
+	  case 'S':	/* search for valid sample of specified signal */
+	    if (++i >= argc) {
+		(void)fprintf(stderr,
+			      "%s: signal name or number must follow -S\n",
+			      pname);
+		exit(1);
+	    }
+	    search = argv[i];
+	    break;
+	      
 	  case 't':	/* end time */
 	    if (++i >= argc) {
 		(void)fprintf(stderr, "%s: time must follow -t\n",pname);
@@ -185,16 +153,13 @@ char *argv[];
 	if (si[i].gain == 0.0) si[i].gain = WFDB_DEFGAIN;
     if (highres)
         setgvmode(WFDB_HIGHRES);
+    freq = sampfreq(NULL);
     if (from > 0L && (from = strtim(argv[from])) < 0L)
 	from = -from;
     if (isigsettime(from) < 0)
 	exit(2);
     if (to > 0L && (to = strtim(argv[to])) < 0L)
 	to = -to;
-    if (maxl > 0L && (maxl = strtim(argv[maxl])) < 0L)
-	maxl = -maxl;
-    if (maxl && (to == 0L || to > from + maxl))
-	to = from + maxl;
     if (nosig) {		/* print samples only from specified signals */
 #ifndef lint
 	if ((sig = (int *)malloc((unsigned)nosig*sizeof(int))) == NULL) {
@@ -223,13 +188,40 @@ char *argv[];
 	    sig[i] = i;
     }
 
+    /* Reset 'from' if a search was requested. */
+    if (search &&
+	((s = findsig(search)) < 0 || (from = tnextvec(s, from)) < 0)) {
+	(void)fprintf(stderr, "%s: can't read signal '%s'\n", pname, search);
+	exit(2);
+    }
+
+    /* Reset 'to' if a duration limit was specified. */
+    if (maxl > 0L && (maxl = strtim(argv[maxl])) < 0L)
+	maxl = -maxl;
+    if (maxl && (to == 0L || to > from + maxl))
+	to = from + maxl;
+
     /* Print column headers if '-v' option selected. */
     if (vflag) {
 	char *p, *r, *t;
 	int j, l;
 
-	if (pflag == 0) (void)printf("samp #");
-	else (void)printf("time");
+	if (pflag == 0) (void)printf("       sample #");
+	else if (timeunits == TIMSTR || timeunits == HHMMSS) {
+	    p = timstr(0L);
+	    if (*p != '[')
+		timeunits = HHMMSS;
+	    if (timeunits == HHMMSS)
+		printf("   Elapsed time");
+	    else {
+		if (freq > 1.0) {
+		    timeunits = MSTIMSTR;
+		    (void)printf("   ");
+		}
+		(void)printf("   Time      Date    ");
+	    }
+	}
+	else (void)printf("   Elapsed time");
 	if ((t = malloc((strlen(record)+30) * sizeof(char))) == NULL) {
 	    fprintf(stderr, "%s: insufficient memory\n", pname);
 	    exit(2);
@@ -253,9 +245,14 @@ char *argv[];
 		p = t;
 	    }
 	    l = strlen(p);
-	    if (l > 7) p += l - 7;
-	    /* Print the last 7 characters of each signal description. */
-	    (void)printf("\t%s%s", pflag > 1 ? "      " : "", p);
+	    if (pflag > 1) {
+		if (l > 15) p += l - 15;
+		(void)printf("\t%15s", p);
+	    }
+	    else {
+		if (l > 7) p+= l - 7;
+		(void)printf("\t%7s", p);
+	    }
 	}
 	(void)printf("\n");
     }
@@ -263,29 +260,44 @@ char *argv[];
     /* Print data in physical units if '-p' option selected. */
     if (pflag) {
 	char *p, *fmt = pflag > 1 ?  "\t%15.8lf" : "\t%7.3f";
-	double freq = sampfreq(NULL);
 
 	if (timeunits == HOURS) freq *= 3600.;
 	else if (timeunits == MINUTES) freq *= 60.;
 
 	/* Print units as a second line of column headers if '-v' selected. */
 	if (vflag) {
-	    if (timeunits == HOURS)        (void)printf("(hrs)");
-	    else if (timeunits == MINUTES) (void)printf("(min)");
-	    else if (timeunits == SECONDS) (void)printf("(sec)");
+ 	    if (timeunits == TIMSTR)    (void)printf("(hh:mm:ss dd/mm/yyyy)"); 
+ 	    else if (timeunits == MSTIMSTR)
+	      (void)printf("(hh:mm:ss.mmm dd/mm/yyyy)"); 
+	    else if (timeunits == HHMMSS)  (void)printf("   hh:mm:ss.mmm");
+	    else if (timeunits == HOURS)   (void)printf("        (hours)");
+	    else if (timeunits == MINUTES) (void)printf("      (minutes)");
+	    else if (timeunits == SECONDS) (void)printf("      (seconds)");
 
 	    for (i = 0; i < nsig; i++) {
+		char ustring[16];
+	
 		p = si[sig[i]].units;
 		if (p == NULL) p = "mV";
-		if ((int)strlen(p) > 5) p[5] = '\0';
-		/* Print the first 5 characters of each signal units string. */
-		(void)printf("\t%s(%s)", pflag > 1 ? "      " : "", p);
+		if (pflag > 1)
+		    sprintf(ustring, "%14s", p);
+		else
+		    sprintf(ustring, "%6s", p);
+		for (p = ustring+2; *p == ' '; p++)
+		    ;
+		*(p-1) = '(';
+		(void)printf("\t%s)", ustring);
 	    }
 	    (void)printf("\n");
 	}
 
 	while ((to == 0L || from < to) && getvec(v) >= 0) {
-	  (void)printf("%7.3lf", (double)(from++)/freq);
+	    if (timeunits == TIMSTR) (void)printf("%s", timstr(-from));
+	    else if (timeunits == MSTIMSTR) (void)printf("%s", mstimstr(-from));
+	    else if (timeunits == HHMMSS) (void)printf("%15s", from == 0L ?
+						   "0:00.000" : mstimstr(from));
+	    else (void)printf("%15.3lf", (double)from/freq);
+	    from++;
 	    for (i = 0; i < nsig; i++) {
 		if (v[sig[i]] != WFDB_INVALID_SAMPLE)
 		    (void)printf(fmt,
@@ -299,9 +311,9 @@ char *argv[];
 
     else {
 	while ((to == 0L || from < to) && getvec(v) >= 0) {
-	    (void)printf("%6ld", from++);
+	    (void)printf("%15ld", from++);
 	    for (i = 0; i < nsig; i++)
-		(void)printf("\t%5d", v[sig[i]]);
+		(void)printf("\t%7d", v[sig[i]]);
 	    (void)printf("\n");
 	}
     }
@@ -337,9 +349,17 @@ static char *help_strings[] = {
  " -H          read multifrequency signals in high resolution mode",
  " -l INTERVAL truncate output after the specified time interval (hh:mm:ss)",
  " -p          print times and samples in physical units (default: raw units)",
- "              (use -p -p for greater precision;  use -ph, -pm, or -ps to",
- "              print times in hours, minutes, or seconds respectively",
+ " -P          same as -p, but with greater precision",
+ "              -p and -P may be followed by a character to choose a time",
+ "              format;  choices are:",
+ "  -pd (or -Pd)  print time of day and date if known",
+ "  -pe (or -Pe)  print elapsed time as <hours>:<minutes>:<seconds>",
+ "  -ph (or -Ph)  print elapsed time in hours",
+ "  -pm (or -Pm)  print elapsed time in minutes",
+ "  -ps (or -Ps)  print elapsed time in seconds",
  " -s SIGNAL [SIGNAL ...]  print only the specified signal(s)",
+ " -S SIGNAL   search for a valid sample of the specified SIGNAL at or after",
+ "		the time specified with -f, and begin printing then",
  " -t TIME     stop at specified time",
  " -v          print column headings",
 NULL

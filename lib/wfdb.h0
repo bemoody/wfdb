@@ -1,5 +1,5 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised:   19 January 2009	       wfdblib 10.4.12
+			Last revised:   13 February 2009	wfdblib 10.4.13
 WFDB library type, constant, structure, and function interface definitions
 
 _______________________________________________________________________________
@@ -254,6 +254,7 @@ extern FINT ungetann(WFDB_Annotator a, WFDB_Annotation *annot);
 extern FINT putann(WFDB_Annotator a, WFDB_Annotation *annot);
 extern FINT isigsettime(WFDB_Time t);
 extern FINT isgsettime(WFDB_Group g, WFDB_Time t);
+extern FSITIME tnextvec(WFDB_Signal s, WFDB_Time t);
 extern FINT iannsettime(WFDB_Time t);
 extern FSTRING ecgstr(int annotation_code);
 extern FINT strecg(char *annotation_mnemonic_string);
@@ -343,7 +344,7 @@ extern FLONGINT wfdbgetstart();
 extern FSAMPLE muvadu(), physadu(), sample();
 extern FSTRING ecgstr(), annstr(), anndesc(), timstr(), mstimstr(),
     datstr(), getwfdb(), getinfo(), wfdberror(), wfdbfile();
-extern FSITIME strtim();
+extern FSITIME strtim(), tnextvec();
 extern FDATE strdat();
 extern FVOID setafreq(), setgvmode(), wfdbquit(), wfdbquiet(), dbverbose(),
     setdb(), wfdbflush(), setcfreq(), setbasecount(), flushcal(),

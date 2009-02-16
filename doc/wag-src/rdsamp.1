@@ -1,4 +1,4 @@
-.TH RDSAMP 1 "7 January 2009" "WFDB 10.4.12" "WFDB Applications Guide"
+.TH RDSAMP 1 "15 February 2009" "WFDB 10.4.13" "WFDB Applications Guide"
 .SH NAME
 rdsamp \- read WFDB signal files
 .SH SYNOPSIS
@@ -34,14 +34,42 @@ time format;  default: no limit).  If both \fB-l\fR and \fB-t\fR are used,
 \fB-p\fR
 Print times in seconds and milliseconds, and values in physical units.  By
 default, \fBrdsamp\fR prints times in sample intervals and values in A/D units.
-Use \fB-p -p\fR to obtain higher precision in the sample values
-(8 decimal places rather than 3).  Use \fB-pm\fR or \fB-ph\fR to print times
-in minutes or hours respectively.
+.TP
+\fB-P\fR
+Same as \fB-p\fR, but yields higher precision in the sample values
+(8 decimal places rather than 3).
+.IP
+A single character can be attached to either \fB-p\fR or \fB-P\fR to choose the
+format for the printed times in the first column of output.  The choices are:
+.TP
+\fB-pd\fR (or \fB-Pd\fR)
+Print time of day and date if known, as [hh:mm:ss DD/MM/YYYY].  The base time
+and date must appear in the header file for the record;  otherwise, this format
+is equivalent to "e" format (below).
+.TP
+\fB-pe\fR (or \fB-Pe\fR)
+Print the elapsed time from the beginning of the record, as hh:mm:ss.
+.TP
+\fB-ph\fR (or \fB-Ph\fR)
+Print the elapsed time in hours.
+.TP
+\fB-pm\fR (or \fB-Pm\fR)
+Print the elapsed time in seconds.
+.TP
+\fB-ps\fR (or \fB-Ps\fR)
+Print the elapsed time in seconds.  This is the default format when using
+\fB-p\fR or \fB-P\fR.
 .TP
 \fB-s\fR \fIsignal-list\fR
 Print only the signals named in the \fIsignal-list\fR (one or more input signal
-numbers or names, separated by spaces;  default: print all signals).  This option
-may be used to re-order or duplicate signals.
+numbers or names, separated by spaces;  default: print all signals).  This
+option may be used to re-order or duplicate signals.
+.TP
+\fB-S\fR \fIsignal\fR
+Search for the first valid sample of the specified \fIsignal\fR (a signal name
+or number) at or following the time specified with \fB-f\fR (or the beginning of
+the record if the \fB-f\fR option is not present), and begin printing at that
+time.
 .TP
 \fB-t\fR \fItime\fR
 Stop at the specified \fItime\fR.  By default, \fBrdsamp\fR stops at the end
@@ -53,13 +81,6 @@ Print column headings.
 .PP
 It may be necessary to set and export the shell variable \fBWFDB\fR (see
 \fBsetwfdb\fR(1)).
-.SH CD-ROM Versions
-The first edition of the MIT-BIH Arrhythmia Database CD-ROM, the first and
-second editions of the European ST-T Database CD-ROM, and the first edition of
-the MIT-BIH Polysomnographic Database CD-ROM contain versions of \fBrdsamp\fR
-that use an older command syntax (still supported by the current version but
-not described here).  Refer to \fIbin.doc\fR in the CD-ROM directory that
-contains \fBrdsamp\fR for further information.
 .SH SEE ALSO
 \fBrdann\fR(1), \fBsetwfdb\fR(1), \fBwrsamp\fR(1)
 .SH AUTHOR

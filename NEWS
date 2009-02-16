@@ -1,4 +1,9 @@
 10.4.13:
+	A new WFDB library function, tnextvec(), finds the next valid sample
+	from a chosen signal, occurring at or after a specified time.  This
+	function is particularly useful when reading variable-layout
+	multi-segment records that may have lengthy gaps in signals of interest.
+
 	For portability, the WFDB library has always stored parameters such as
 	sampling frequency and gain as strings rather than as floating-point
 	numbers.  Although the resultant loss of precision has been almost
@@ -12,6 +17,11 @@
 	non-integer parameters are recorded, so that loss of precision as
 	a result of converting them to and from strings should almost never
 	be observable.
+
+	Several options have been added to rdsamp, which can now print the
+	time of each sample in a variey of formats, and can use the new
+	tnextvec() function (see above) to search for valid samples of a
+	signal of interest.
 
 10.4.12:
 	The rule for sorting annotations within a file has been changed to

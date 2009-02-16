@@ -1,5 +1,5 @@
 /* file: mainpan.c	G. Moody	30 April 1990
-			Last revised:	10 June 2005
+			Last revised:	15 February 2009
 Functions for the main control panel of WAVE
 
 -------------------------------------------------------------------------------
@@ -110,7 +110,7 @@ static void create_load_panel()
     record_item = xv_create(load_panel, PANEL_TEXT,
 	XV_HELP_DATA, "wave:file.load.record",
 	PANEL_LABEL_STRING, "Record: ",
-	PANEL_VALUE_DISPLAY_LENGTH, 8,
+	PANEL_VALUE_DISPLAY_LENGTH, 32,
 	PANEL_NOTIFY_PROC, disp_proc,
 	PANEL_VALUE, record,
 	0);
@@ -754,8 +754,36 @@ Event *event;
 	    display_start_time = 0L;
 	cache_time = -1L;
 	break;
-      case ']':	/* Find next occurrence of specified annotation. */
+      case ']':	/* Find next occurrence of specified annotation or signal. */
       case '[':	/* Find previous occurrence of specified annotation. */
+	if (1) {
+	    char *fp = (char *)xv_get(find_item, PANEL_VALUE);
+
+	    if ((i = findsig(fp)) >= 0) {
+		WFDB_Time tnext = tnextvec(i, display_start_time + nsamp);
+
+		if (tnext >= 0L) {
+		    display_start_time = tnext;
+		    cache_time = -1L;
+		    break;
+		}
+		else {
+#ifdef NOTICE
+		    Xv_notice notice = xv_create((Frame)frame, NOTICE,
+					         XV_SHOW, TRUE,
+#else
+		    (void)notice_prompt((Frame)frame, (Event *)NULL,
+#endif
+			                NOTICE_MESSAGE_STRINGS,
+			                "No match found!", 0,
+			                NOTICE_BUTTON_YES, "Continue", 0);
+#ifdef NOTICE
+		    xv_destroy_safe(notice);
+#endif
+		    break;
+		}
+	    }
+	}
 	if (annotator[0]) {
 	    char *fp = (char *)xv_get(find_item, PANEL_VALUE);
 	    static char auxstr[256];

@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   29 January 2009		wfdblib 10.4.13
+			Last revised:   14 February 2009	wfdblib 10.4.13
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -65,6 +65,7 @@ This file also contains definitions of the following WFDB library functions:
  putvec		(writes a sample to each output signal)
  isigsettime	(skips to a specified time in each signal)
  isgsettime	(skips to a specified time in a specified signal group)
+ tnextvec [10.4.13] (skips to next valid sample of a specified signal)
  setibsize [5.0](sets the default buffer size for getvec)
  setobsize [5.0](sets the default buffer size for putvec)
  newheader	(creates a new header file)
@@ -276,6 +277,7 @@ static struct igdata {		/* shared by all signals in a group (file) */
 } **igd;
 static WFDB_Sample *tvector;	/* getvec workspace */
 static WFDB_Sample *uvector;	/* isgsettime workspace */
+static WFDB_Sample *vvector;	/* tnextvec workspace */
 static int tuvlen;		/* lengths of tvector and uvector in samples */
 static WFDB_Time istime;	/* time of next input sample */
 static int ibsize;		/* default input buffer size */
@@ -1950,10 +1952,18 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
     for (si = framelen = 0; si < nisig; si++)
 	framelen += isd[si]->info.spf;
 
-    /* Allocate workspace for getvec and isgsettime. */
+    /* Allocate workspace for getvec, isgsettime, and tnextvec. */
     if (framelen > tuvlen) {
 	SREALLOC(tvector, framelen, sizeof(WFDB_Sample));
 	SREALLOC(uvector, framelen, sizeof(WFDB_Sample));
+	if (nvsig > nisig) {
+	    int vframelen;
+	    for (si = vframelen = 0; si < nvsig; si++)
+		vframelen += vsd[si]->info.spf;
+	    SREALLOC(vvector, vframelen, sizeof(WFDB_Sample));
+	}
+	else
+	    SREALLOC(vvector, framelen, sizeof(WFDB_Sample));
     }
     tuvlen = framelen;
 
@@ -2193,8 +2203,14 @@ int findsig(char *p)
   }
   /* Otherwise, p is either an integer too large to be a signal number or a
      string containing a non-digit character.  Assume it's a signal name. */
-  for (s = 0; s < nisig; s++)
-      if ((q = isd[s]->info.desc) && strcmp(p, q) == 0) return (s);
+  if (need_sigmap) {
+      for (s = 0; s < nvsig; s++)
+	  if ((q = vsd[s]->info.desc) && strcmp(p, q) == 0) return (s);
+  }
+  else {
+      for (s = 0; s < nisig; s++)
+	  if ((q = isd[s]->info.desc) && strcmp(p, q) == 0) return (s);
+  }
   /* No match found. */
   return (-1);
 }
@@ -2488,6 +2504,61 @@ FINT isgsettime(WFDB_Group g, WFDB_Time t)
 
     return (stat);
 }
+
+FSITIME tnextvec(WFDB_Signal s, WFDB_Time t)
+{
+    int stat = 0;
+    WFDB_Time tf;
+
+    if (in_msrec && need_sigmap) { /* variable-layout multi-segment record */
+	if (s >= nvsig) {
+	    wfdb_error("nextvect: illegal signal number %d\n", s);
+	    return ((WFDB_Time) -1);
+	}
+	/* Go to the start (t) if not already there. */
+	if (t != istime && isigsettime(t) < 0) return ((WFDB_Time) -1);
+	while (stat >= 0) {
+	    char *p = vsd[s]->info.desc, *q;
+	    int ss;
+
+	    tf = segp->samp0 + segp->nsamp;  /* end of current segment */
+	    /* Check if signal s is available in the current segment. */
+	    for (ss = 0; ss < nisig; ss++)
+		if ((q = isd[ss]->info.desc) && strcmp(p, q) == 0)
+		    break;
+	    if (ss < nisig) {
+		/* The current segment contains the desired signal.
+		   Read samples until we find a valid one or reach
+		   the end of the segment. */
+		for ( ; t <= tf && (stat = getvec(vvector)) > 0; t++)
+		    if (vvector[s] != WFDB_INVALID_SAMPLE) {
+			isigsettime(t);
+			return (t);
+		    }
+		if (stat < 0) return ((WFDB_Time) -1);
+	    }
+	    /* Go on to the next segment. */
+	    if (t != tf) stat = isigsettime(t = tf);
+	}
+    }
+    else {	/* single-segment or fixed-layout multi-segment record */
+	/* Go to the start (t) if not already there. */
+	if (t != istime && isigsettime(t) < 0) return ((WFDB_Time) -1);
+	if (s >= nisig) {
+	    wfdb_error("nextvect: illegal signal number %d\n", s);
+	    return ((WFDB_Time) -1);
+	}
+	for ( ; stat=getvec(vvector) > 0; t++)
+	    /* Read samples until we find a valid one or reach the end of the
+	       record. */
+	    if (vvector[s] != WFDB_INVALID_SAMPLE) {
+		isigsettime(t);
+		return (t);
+	    }
+    }
+    /* Error or end of record without finding another sample of signal s. */
+    return ((WFDB_Time) stat);
+}  
 
 FINT setibsize(int n)
 {

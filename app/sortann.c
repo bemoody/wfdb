@@ -1,5 +1,5 @@
 /* file sortann.c	G. Moody	 7 April 1997
-			Last revised:	20 January 2009
+			Last revised:	4 February 2009
 -------------------------------------------------------------------------------
 sortann: Rearrange annotations in canonical order
 Copyright (C) 1997-2009 George B. Moody
@@ -284,7 +284,7 @@ WFDB_Annotation *pa;
 	    if (newp->next = ap->next) (newp->next)->prev = newp;
 	    else lastp = newp;
 	    if ((ap->annotation).aux) free((ap->annotation).aux);
-	    free(ap);
+	    if (ap != &annlist) free(ap);
 	}
 	else {	/* insert newp immediately after ap */
 	    newp->prev = ap;
@@ -297,10 +297,9 @@ WFDB_Annotation *pa;
 
 void cleanup()	/* free the memory used for the annotation list */
 {
-    while (lastp != &annlist) {
+    while (lastp != NULL && lastp != &annlist) {
 	if ((lastp->annotation).aux) free((lastp->annotation).aux);
-	lastp = lastp->prev;
-	free(lastp->next);
+	if (lastp = lastp->prev) free(lastp->next);
     }
 }
 
