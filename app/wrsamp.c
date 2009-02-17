@@ -1,8 +1,8 @@
 /* file: wrsamp.c	G. Moody	10 August 1993
-			Last revised:    15 July 2008
+			Last revised:   20 January 2009
 -------------------------------------------------------------------------------
 wrsamp: Select fields or columns from a file and generate a WFDB record
-Copyright (C) 1993-2008 George B. Moody
+Copyright (C) 1993-2009 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -199,7 +199,6 @@ char *argv[];
 	(void)fprintf(stderr, "%s: insufficient memory\n", pname);
 	exit(2);
     }
-
     /* open output file */
     if (record == NULL)
 	(void)sprintf(ofname, "-");
@@ -219,6 +218,7 @@ char *argv[];
 	si[i].units = "";
 	si[i].group = 0;
 	si[i].fmt = 16;
+	si[i].spf = 1;
 	si[i].bsize = 0;
 	si[i].adcres = WFDB_DEFRES;
 	si[i].adczero = 0;
@@ -238,7 +238,6 @@ char *argv[];
 	    while (*scale != '\0' && *scale != ' ')
 		scale++;
     }
-
     if (osigfopen(si, nf) < nf || setsampfreq(freq) < 0)
 	exit(2);
 
@@ -285,8 +284,8 @@ char *argv[];
 		    else {
 			v *= scalef[i];
 			if (dflag) v += DITHER;
-			if (v >= 0) vout[i] = (int)(v + 0.5);
-			else vout[i] = (int)(v - 0.5);
+			if (v >= 0) vout[i] = (WFDB_Sample)(v + 0.5);
+			else vout[i] = (WFDB_Sample)(v - 0.5);
 		    }
 		}
 		if (putvec(vout) < 0) break;
@@ -310,7 +309,6 @@ char *argv[];
 	}
 	else *cp++ = c;
     } while (c != EOF);
-
     if (record != NULL)
 	(void)newheader(record);
     wfdbquit();

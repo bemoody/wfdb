@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:    30 January 2009	wfdblib 10.4.13
+			Last revised:    16 February 2009	wfdblib 10.4.13
 WFDB library functions for annotations
 
 _______________________________________________________________________________
@@ -130,7 +130,7 @@ static struct iadata {
     WFDB_Frequency afreq;	/* time resolution, in ticks/second */
     unsigned word;		/* next word from the input file */
     int ateof;			/* EOF-reached indicator */
-    char auxstr[AUXBUFLEN];		/* aux string buffer */
+    unsigned char auxstr[AUXBUFLEN]; /* aux string buffer */
     unsigned index;		/* next available position in auxstr */
     double tmul, ptmul;		/* tmul * annotation time = sample count */
     WFDB_Time tt;		/* annotation time (MIT format only).  This
@@ -171,8 +171,8 @@ static int get_ann_table(WFDB_Annotator i)
 	if (annot.aux == NULL || *annot.aux < 1)
 	    continue;
 	if (*(annot.aux+1) == '#') {
-	    if (strncmp(annot.aux + 1, "## time resolution: ", 20) == 0) {
-		sscanf(annot.aux + 20, "%lf", &(iad[i]->afreq));
+	    if (strncmp((char *)annot.aux+1, "## time resolution: ", 20) == 0) {
+		sscanf((char *)annot.aux + 20, "%lf", &(iad[i]->afreq));
 		if (iad[i]->afreq) {
 		    WFDB_Frequency sf = getifreq();
 
@@ -182,7 +182,7 @@ static int get_ann_table(WFDB_Annotator i)
 	    }
 	    continue;
 	}
-	p1 = strtok(annot.aux+1, " \t");
+	    p1 = strtok((char *)annot.aux+1, " \t");
 	a = atoi(p1);
 	if (0 <= a && a <= ACMAX && (p1 = strtok((char *)NULL, " \t"))) {
 	    SSTRCPY(s1, p1);
@@ -227,7 +227,7 @@ static int put_ann_table(WFDB_Annotator i)
     annot.time = 0L;
     annot.anntyp = NOTE;
     annot.subtyp = annot.chan = annot.num = 0;
-    annot.aux = buf;
+    annot.aux = (unsigned char *)buf;
     for (a = 0; a <= ACMAX; a++)
 	if (modified[a]) {
 	    if (flag == 0) { /* mark the beginning of the table */
@@ -547,7 +547,7 @@ FINT ungetann(WFDB_Annotator n, WFDB_Annotation *annot)
 FINT putann(WFDB_Annotator n, WFDB_Annotation *annot)
 {
     unsigned annwd;
-    char *ap;
+    unsigned char *ap;
     int i, len;
     long delta;
     WFDB_Time t;
@@ -564,7 +564,7 @@ FINT putann(WFDB_Annotator n, WFDB_Annotation *annot)
 
 	oa->afreq = oafreq;
 	tra.anntyp = NOTE;
-	tra.aux = buf;
+	tra.aux = (unsigned char *)buf;
 	(void)sprintf(buf+1, "## time resolution: %.12g", oafreq);
 	buf[0] = strlen(buf+1);
 	if (putann(n, &tra) < 0) return (-1);
