@@ -1,3 +1,15 @@
+10.4.14:
+	WFDB library function setwfdb() now exports the WFDB library environment
+	variables (WFDB, WFDBCAL, WFDBANNSORT, and WFDBGVMODE) on all modern
+	platforms, so that a process started by a WFDB application inherits the
+	WFDB environment of its parent.  (This is not possible on platforms
+ 	that do not provide a working putenv() function, such as MacOS 9 and
+ 	earlier, and 16-bit versions of MS-Windows.)  Some previous versions
+	also included this capability, but the older implementation caused a
+	memory leak, and it was disabled in version 10.4.6.  Thanks to Omar
+	Abdala and Dan Scott for reporting the problem and help in identifying
+	its cause.
+
 10.4.13:
 	A new WFDB library function, tnextvec(), finds the next valid sample
 	from a chosen signal, occurring at or after a specified time.  This

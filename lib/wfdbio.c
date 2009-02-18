@@ -1,10 +1,10 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:	 12 August 2008       wfdblib 10.4.9
+                        Last revised:	18 February 2009       wfdblib 10.4.14
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1988-2008 George B. Moody
+Copyright (C) 1988-2009 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -508,29 +508,48 @@ char *wfdb_getiwfdb(char *p)
 #ifndef HAS_PUTENV
 #define wfdb_export_config()
 #else
+static char *p_wfdb, *p_wfdbcal, *p_wfdbannsort, *p_wfdbgvmode;
+
+/* wfdb_free_config frees all memory allocated by wfdb_export_config.
+   This function must be invoked before exiting to avoid a memory leak.
+   It must not be invoked at any other time, since pointers passed to
+   putenv must be maintained by the caller, according to POSIX.1-2001
+   semantics for putenv.  */
+void wfdb_free_config(void)
+{
+    SFREE(p_wfdb);
+    SFREE(p_wfdbcal);
+    SFREE(p_wfdbannsort);
+    SFREE(p_wfdbgvmode);
+}
+
 void wfdb_export_config(void)
 {
-    char *p;
+    static int first_call = 1;
 
-    SUALLOC(p, 1, strlen(wfdbpath)+6);
-    sprintf(p, "WFDB=%s", wfdbpath);
-    putenv(p);
+    /* Register the cleanup function so that it is invoked on exit. */
+    if (first_call) {
+	atexit(wfdb_free_config);
+	first_call = 0;
+    }
+    SALLOC(p_wfdb, 1, strlen(wfdbpath)+6);
+    sprintf(p_wfdb, "WFDB=%s", wfdbpath);
+    putenv(p_wfdb);
     if (getenv("WFDBCAL") == NULL) {
-	SALLOC(p, 1, strlen(DEFWFDBCAL)+9);
-	sprintf(p, "WFDBCAL=%s", DEFWFDBCAL);
-	putenv(p);
+	SALLOC(p_wfdbcal, 1, strlen(DEFWFDBCAL)+9);
+	sprintf(p_wfdbcal, "WFDBCAL=%s", DEFWFDBCAL);
+	putenv(p_wfdbcal);
     }
     if (getenv("WFDBANNSORT") == NULL) {
-	SALLOC(p, 1, 14);
-	sprintf(p, "WFDBANNSORT=%d", DEFWFDBANNSORT == 0 ? 0 : 1);
-	putenv(p);
+	SALLOC(p_wfdbannsort, 1, 14);
+	sprintf(p_wfdbannsort, "WFDBANNSORT=%d", DEFWFDBANNSORT == 0 ? 0 : 1);
+	putenv(p_wfdbannsort);
     }
     if (getenv("WFDBGVMODE") == NULL) {
-	SALLOC(p, 1, 13);
-	sprintf(p, "WFDBGVMODE=%d", DEFWFDBGVMODE == 0 ? 0 : 1);
-	putenv(p);
+	SALLOC(p_wfdbgvmode, 1, 13);
+	sprintf(p_wfdbgvmode, "WFDBGVMODE=%d", DEFWFDBGVMODE == 0 ? 0 : 1);
+	putenv(p_wfdbgvmode);
     }
-    SFREE(p);
 }
 #endif
 
