@@ -47,6 +47,7 @@ app/wabp.c
 app/wfdbcat.c
 app/wfdbcollate.c
 app/wfdbdesc.c
+app/wfdbtime.c
 app/wfdbwhich.c
 app/wqrs.c
 app/wrann.c
@@ -342,6 +343,7 @@ doc/wag-src/wfdbcollate.1
 doc/wag-src/wfdb-config.1
 doc/wag-src/wfdbdesc.1
 doc/wag-src/wfdbf.3
+doc/wag-src/wfdbtime.1
 doc/wag-src/wfdbwhich.1
 doc/wag-src/wqrs.1
 doc/wag-src/wrann.1

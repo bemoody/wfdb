@@ -1,4 +1,4 @@
-.TH RDSAMP 1 "15 February 2009" "WFDB 10.4.13" "WFDB Applications Guide"
+.TH RDSAMP 1 "18 February 2009" "WFDB 10.4.14" "WFDB Applications Guide"
 .SH NAME
 rdsamp \- read WFDB signal files
 .SH SYNOPSIS
@@ -54,11 +54,14 @@ Print the elapsed time from the beginning of the record, as hh:mm:ss.
 Print the elapsed time in hours.
 .TP
 \fB-pm\fR (or \fB-Pm\fR)
-Print the elapsed time in seconds.
+Print the elapsed time in minutes.
 .TP
 \fB-ps\fR (or \fB-Ps\fR)
 Print the elapsed time in seconds.  This is the default format when using
 \fB-p\fR or \fB-P\fR.
+.TP
+\fB-pS\fR (or \fB-PS\fR)
+Print the elapsed time in sample intervals.
 .TP
 \fB-s\fR \fIsignal-list\fR
 Print only the signals named in the \fIsignal-list\fR (one or more input signal

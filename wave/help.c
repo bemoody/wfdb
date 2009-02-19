@@ -87,7 +87,6 @@ invoke_more_help(client_window, sys_command)
     Xv_Window	    client_window;
     char	   *sys_command;
 {
-    char	    buffer[64];
     char	   *display_env;
     pid_t	    pid;
 
@@ -97,8 +96,9 @@ invoke_more_help(client_window, sys_command)
      */
     display_env = defaults_get_string("server.name", "Server.Name", NULL);
     if (display_env) {
-	sprintf(buffer, "DISPLAY=%s", display_env);
-	putenv(buffer);
+	char *p = malloc(strlen(display_env) + 9);
+	sprintf(p, "DISPLAY=%s", display_env);
+	putenv(p);
     }
 
     /* Invoke More Help application */

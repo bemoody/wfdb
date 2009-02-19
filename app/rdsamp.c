@@ -1,5 +1,5 @@
 /* file: rdsamp.c	G. Moody	 23 June 1983
-			Last revised:   15 February 2009
+			Last revised:   18 February 2009
 
 -------------------------------------------------------------------------------
 rdsamp: Print an arbitrary number of samples from each signal
@@ -29,12 +29,14 @@ _______________________________________________________________________________
 #include <wfdb/wfdb.h>
 
 /* values for timeunits */
-#define SECONDS   1
-#define MINUTES   2
-#define HOURS     3
-#define TIMSTR    4
-#define MSTIMSTR  5
-#define HHMMSS	  6
+#define SECONDS     1
+#define MINUTES     2
+#define HOURS       3
+#define TIMSTR      4
+#define MSTIMSTR    5
+#define SHORTTIMSTR 6
+#define HHMMSS	    7
+#define SAMPLES     8
 
 char *pname;
 
@@ -92,6 +94,7 @@ char *argv[];
 	    else if (*(argv[i]+2) == 'e') timeunits = HHMMSS;
 	    else if (*(argv[i]+2) == 'h') timeunits = HOURS;
 	    else if (*(argv[i]+2) == 'm') timeunits = MINUTES;
+	    else if (*(argv[i]+2) == 'S') timeunits = SAMPLES;
 	    else timeunits = SECONDS;
 	    break;
 	  case 's':	/* signal list follows */
@@ -207,12 +210,17 @@ char *argv[];
 	int j, l;
 
 	if (pflag == 0) (void)printf("       sample #");
+	else if (timeunits == SAMPLES) (void)printf("sample interval");
 	else if (timeunits == TIMSTR || timeunits == HHMMSS) {
 	    p = timstr(0L);
 	    if (*p != '[')
 		timeunits = HHMMSS;
+	    else if (strlen(p) < 16)
+		timeunits = SHORTTIMSTR;
 	    if (timeunits == HHMMSS)
 		printf("   Elapsed time");
+	    else if (timeunits == SHORTTIMSTR)
+		printf("     Time");
 	    else {
 		if (freq > 1.0) {
 		    timeunits = MSTIMSTR;
@@ -266,14 +274,20 @@ char *argv[];
 
 	/* Print units as a second line of column headers if '-v' selected. */
 	if (vflag) {
- 	    if (timeunits == TIMSTR)    (void)printf("(hh:mm:ss dd/mm/yyyy)"); 
- 	    else if (timeunits == MSTIMSTR)
-	      (void)printf("(hh:mm:ss.mmm dd/mm/yyyy)"); 
-	    else if (timeunits == HHMMSS)  (void)printf("   hh:mm:ss.mmm");
-	    else if (timeunits == HOURS)   (void)printf("        (hours)");
-	    else if (timeunits == MINUTES) (void)printf("      (minutes)");
-	    else if (timeunits == SECONDS) (void)printf("      (seconds)");
+	    char s[12];
 
+	    switch (timeunits) {
+ 	    case TIMSTR:      (void)printf("(hh:mm:ss dd/mm/yyyy)"); break;
+ 	    case MSTIMSTR:    (void)printf("(hh:mm:ss.mmm dd/mm/yyyy)"); break;
+	    case SHORTTIMSTR: (void)printf("(hh:mm:ss.mmm)"); break;
+	    case HHMMSS:      (void)printf("   hh:mm:ss.mmm"); break;
+	    case HOURS:       (void)printf("        (hours)"); break;
+	    case MINUTES:     (void)printf("      (minutes)"); break;
+	    default:
+	    case SECONDS:     (void)printf("      (seconds)"); break;
+	    case SAMPLES:     (void)sprintf(s, "(%g", 1./freq);
+			      (void)printf("%10s sec)", s);
+	    }
 	    for (i = 0; i < nsig; i++) {
 		char ustring[16];
 	
@@ -292,11 +306,18 @@ char *argv[];
 	}
 
 	while ((to == 0L || from < to) && getvec(v) >= 0) {
-	    if (timeunits == TIMSTR) (void)printf("%s", timstr(-from));
-	    else if (timeunits == MSTIMSTR) (void)printf("%s", mstimstr(-from));
-	    else if (timeunits == HHMMSS) (void)printf("%15s", from == 0L ?
-						   "0:00.000" : mstimstr(from));
-	    else (void)printf("%15.3lf", (double)from/freq);
+	    switch (timeunits) {
+	      case TIMSTR:   (void)printf("%s", timstr(-from)); break;
+	      case SHORTTIMSTR:
+	      case MSTIMSTR: (void)printf("%s", mstimstr(-from)); break;
+	      case HHMMSS:   (void)printf("%15s", from == 0L ?
+					  "0:00.000" : mstimstr(from)); break;
+	      case SAMPLES:  (void)printf("%15ld", from); break;
+	      default:
+	      case SECONDS:  (void)printf("%15.3lf", (double)from/freq); break;
+	      case MINUTES:  (void)printf("%15.5lf", (double)from/freq); break;
+	      case HOURS:    (void)printf("%15.7lf", (double)from/freq); break;
+	    }
 	    from++;
 	    for (i = 0; i < nsig; i++) {
 		if (v[sig[i]] != WFDB_INVALID_SAMPLE)
@@ -357,6 +378,7 @@ static char *help_strings[] = {
  "  -ph (or -Ph)  print elapsed time in hours",
  "  -pm (or -Pm)  print elapsed time in minutes",
  "  -ps (or -Ps)  print elapsed time in seconds",
+ "  -pS (or -PS)  print elapsed time in sample intervals",
  " -s SIGNAL [SIGNAL ...]  print only the specified signal(s)",
  " -S SIGNAL   search for a valid sample of the specified SIGNAL at or after",
  "		the time specified with -f, and begin printing then",

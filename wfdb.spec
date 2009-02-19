@@ -15,6 +15,9 @@ Requires: curl-devel >= 7.10
 BuildRoot: /var/tmp/%{name}-root
 
 %changelog
+* Wed Feb 18 2009 George B Moody <george@mit.edu>
+- added wfdbtime
+
 * Wed Apr 9 2008 George B Moody <george@mit.edu>
 - added rdedfann, signame, signum
 
@@ -192,6 +195,7 @@ power spectrum estimation, and many others.
 %{_bindir}/wfdbcat
 %{_bindir}/wfdbcollate
 %{_bindir}/wfdbdesc
+%{_bindir}/wfdbtime
 %{_bindir}/wfdbwhich
 %{_bindir}/wqrs
 %{_bindir}/wrann
@@ -246,5 +250,3 @@ Programmer's Guide, the WFDB Applications Guide, and the WAVE User's Guide.
 %files doc
 %defattr(-,root,root)
 %doc doc/wag doc/wpg doc/wug
-
-
