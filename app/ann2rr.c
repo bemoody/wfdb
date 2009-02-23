@@ -1,8 +1,8 @@
 /* file: ann2rr.c		G. Moody	 16 May 1995
-				Last revised:  30 October 2008
+				Last revised:  23 February 2009
 -------------------------------------------------------------------------------
 ann2rr: Calculate RR intervals from an annotation file
-Copyright (C) 2003 George B. Moody
+Copyright (C) 1995-2009 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -287,7 +287,8 @@ char *argv[];
 		      case 'h': (void)printf(t1fstr, t1/sph); break;
 		      case 'm': (void)printf(t1fstr, t1/spm); break;
 		      case 's': (void)printf(t1fstr, t1/sps); break;
-		      case 't': (void)printf("%s", mstimstr(-t1)); break;
+		      case 't': (void)printf("%s", mstimstr(t1)); break;
+		      case 'T': (void)printf("%s", mstimstr(-t1)); break;
 		      default:  (void)printf("%ld", t1); break;
 		    }
 		}

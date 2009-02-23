@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	31 May 2000
-#				Last revised:   11 May 2006
+#				Last revised:   21 February 2009
 # Change the settings below as appropriate for your setup.
 
 # Choose directories in which to install WAVE and its ancillary files by
@@ -151,11 +151,11 @@ sig.o:		wave.h xvwave.h sig.c
 	$(CC) -c $(WCFLAGS) sig.c
 annot.o:	wave.h xvwave.h annot.c
 	$(CC) -c $(WCFLAGS) -DWAVEVERSION=\"$(WAVEVERSION)\" annot.c
-analyze.o:
+analyze.o:    	analyze.c
 	$(CC) -c $(WCFLAGS) -DMENUDIR=\"$(MENUDIR)\" analyze.c
 scope.o:	wave.h xvwave.h scope.c
 	$(CC) -c $(WCFLAGS) scope.c
-xvwave.o:
+xvwave.o:     	xvwave.c
 	$(CC) -c $(WCFLAGS) -DRESDIR=\"$(RESDIR)\" xvwave.c
 help.o:		help.c
 	$(CC) -c $(WCFLAGS) -w help.c
