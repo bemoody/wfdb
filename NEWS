@@ -1,14 +1,19 @@
+10.4.15:
+	WFDB library function mstimstr() now outputs time to the nearest
+	millisecond, rather than truncating its calculation to the next
+ 	lowest number of milliseconds.
+
 10.4.14:
-	WFDB library function setwfdb() now exports the WFDB library environment
-	variables (WFDB, WFDBCAL, WFDBANNSORT, and WFDBGVMODE) on all modern
-	platforms, so that a process started by a WFDB application inherits the
-	WFDB environment of its parent.  (This is not possible on platforms
- 	that do not provide a working putenv() function, such as MacOS 9 and
- 	earlier, and 16-bit versions of MS-Windows.)  Some previous versions
-	also included this capability, but the older implementation caused a
-	memory leak, and it was disabled in version 10.4.6.  Thanks to Omar
-	Abdala and Dan Scott for reporting the problem and help in identifying
-	its cause.
+	WFDB library function setwfdb() now exports the WFDB library
+	environment variables (WFDB, WFDBCAL, WFDBANNSORT, and WFDBGVMODE) on
+	all modern platforms, so that a process started by a WFDB application
+	inherits the WFDB environment of its parent.  (This is not possible on
+	platforms that do not provide a working putenv() function, such as
+	MacOS 9 and earlier, and 16-bit versions of MS-Windows.)  Some previous
+	versions also included this capability, but the older implementation
+	caused a memory leak, and it was disabled in version 10.4.6.  Thanks to
+	Omar Abdala and Dan Scott for reporting the problem and help in
+	identifying its cause.
 
 	A new WFDB application, wfdbtime, is convenient for use in scripts to
 	convert among absolute and elapsed times and times in sample intervals.
@@ -17,7 +22,8 @@
 	A new WFDB library function, tnextvec(), finds the next valid sample
 	from a chosen signal, occurring at or after a specified time.  This
 	function is particularly useful when reading variable-layout
-	multi-segment records that may have lengthy gaps in signals of interest.
+	multi-segment records that may have lengthy gaps in signals of
+	interest.
 
 	For portability, the WFDB library has always stored parameters such as
 	sampling frequency and gain as strings rather than as floating-point
@@ -25,13 +31,13 @@
 	always negligible, it has been observable in the specific case of
 	converting very large time intervals from sample intervals to seconds,
 	when the sampling frequency in Hz cannot be represented exactly in
-	binary (e.g., if the sampling frequency is once per minute, or 1/60 Hz).
-	This situation cannot be wholly avoided, but it can be minimized.
+	binary (e.g., if the sampling frequency is once per minute, or 1/60
+	Hz).  This situation cannot be wholly avoided, but it can be minimized.
 	Changes in this release, in setheader() and in functions that record
 	time units in annotation files, increase the precision with which
-	non-integer parameters are recorded, so that loss of precision as
-	a result of converting them to and from strings should almost never
-	be observable.
+	non-integer parameters are recorded, so that loss of precision as a
+	result of converting them to and from strings should almost never be
+	observable.
 
 	Several options have been added to rdsamp, which can now print the
 	time of each sample in a variey of formats, and can use the new

@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   14 February 2009	wfdblib 10.4.13
+			Last revised:   24 February 2009	wfdblib 10.4.15
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -2994,7 +2994,8 @@ FSTRING mstimstr(WFDB_Time t)
 	if (t < 0L) t = -t;
 	/* Convert from sample intervals to seconds. */
 	s = (long)(t / f);
-	msec = (int)((t - s*f)*1000/f);
+	msec = (int)((t - s*f)*1000/f + 0.5);
+	if (msec == 1000) { msec = 0; s++; }
 	t = s;
 	seconds = t % 60;
 	t /= 60;
@@ -3012,7 +3013,8 @@ FSTRING mstimstr(WFDB_Time t)
 	t = (WFDB_Time)(btime*sfreq/1000.0 + 0.5) - t;
 	/* Convert from sample intervals to seconds. */
 	s = (long)(t / f);
-	msec = (int)((t - s*f)*1000/f);
+	msec = (int)((t - s*f)*1000/f + 0.5);
+	if (msec == 1000) { msec = 0; s++; }
 	t = s;
 	seconds = t % 60;
 	t /= 60;
