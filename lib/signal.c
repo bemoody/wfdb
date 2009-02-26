@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   24 February 2009	wfdblib 10.4.15
+			Last revised:   26 February 2009	wfdblib 10.4.15
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -76,6 +76,7 @@ This file also contains definitions of the following WFDB library functions:
  wfdbsetskew [9.4](sets skew to be written by setheader)
  wfdbgetstart [9.4](returns byte offset of sample 0 within signal file)
  wfdbsetstart [9.4](sets byte offset to be written by setheader)
+ wfdbputprolog [10.4.15](writes a prolog to a signal file)
  getinfo [4.0]	(reads a line of info for a record)
  putinfo [4.0]	(writes a line of info for a record)
  sampfreq	(returns the sampling frequency of the specified record)
@@ -2844,6 +2845,18 @@ FVOID wfdbsetstart(WFDB_Signal s, long int bytes)
     if (s < nosig)
         ogd[osd[s]->info.group]->start = bytes;
     prolog_bytes = bytes;
+}
+
+FINT wfdbputprolog(char *buf, long int size, WFDB_Signal s)
+{
+    long int n;
+    WFDB_Group g = osd[s]->info.group;
+
+    n = wfdb_fwrite(buf, 1, size, ogd[g]->fp);
+    wfdbsetstart(s, n);
+    if (n != size)
+	wfdb_error("wfdbputprolog: only %ld of %ld bytes written\n", n, size);
+    return (n == size ? 0 : -1);
 }
 
 FSTRING getinfo(char *record)

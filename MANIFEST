@@ -168,6 +168,7 @@ convert/readid.c
 convert/README
 convert/revise.c
 convert/wav2mit.c
+convert/wfdb2mat.c
 COPYING
 data/
 data/100a.atr

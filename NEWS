@@ -3,6 +3,13 @@
 	millisecond, rather than truncating its calculation to the next
  	lowest number of milliseconds.
 
+	A new WFDB library function, wfdbputprolog(), can write a prolog at the
+	beginning of a signal file.  WFDB applications ignore embedded prologs.
+
+	A new WFDB application, convert/wfdb2mat, can convert all or part of
+	a WFDB-compatible signal file into a Matlab-compatible .mat file that
+	remains readable by WFDB applications.
+
 10.4.14:
 	WFDB library function setwfdb() now exports the WFDB library
 	environment variables (WFDB, WFDBCAL, WFDBANNSORT, and WFDBGVMODE) on
