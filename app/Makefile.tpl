@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  23 May 2000
-#				Last revised:	  18 February 2009
+#				Last revised:	  26 February 2009
 # This section of the Makefile should not need to be changed.
 
 CFILES = ann2rr.c bxb.c calsig.c ecgeval.c epicmp.c fir.c ihr.c mfilt.c \
@@ -13,7 +13,7 @@ XFILES = ann2rr bxb calsig ecgeval epicmp fir ihr mfilt \
  rdsamp rr2ann rxr sampfreq sigamp sigavg signame signum \
  skewedit snip sortann sqrs sqrs125 sumann sumstats tach \
  time2sec wabp wfdbcat wfdbcollate wfdbdesc \
- wfdbwhich wqrs wrann wrsamp xform
+ wfdbtime wfdbwhich wqrs wrann wrsamp xform
 SCRIPTS = cshsetwfdb setwfdb
 PSFILES = pschart.pro psfd.pro 12lead.pro
 MFILES = Makefile

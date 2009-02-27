@@ -510,6 +510,15 @@ guide in June, 1999.  See @file{NEWS}, in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
+@unnumberedsubsec Changes in version 10.4.15
+
+WFDB library function @code{mstimstr} now outputs time to the nearest
+millisecond, rather than truncating its calculation to the next lowest number
+of milliseconds.
+
+A new WFDB library function, @code{wfdbputprolog}, can write a prolog at the
+beginning of a signal file.  WFDB applications ignore embedded prologs.
+
 @unnumberedsubsec Changes in version 10.4.14
 
 WFDB library function @code{setwfdb()} now exports the WFDB library
@@ -3987,6 +3996,7 @@ first introduced in WFDB library version 6.0.)
 * wfdbsetskew::                 Recording intersignal skew.
 * wfdbgetstart::                Reading the prolog size in a signal file.
 * wfdbsetstart::                Recording the prolog size in a signal file.
+* wfdbputprolog::               Writing a prolog to a signal file.
 
 @end menu
 
@@ -5046,7 +5056,7 @@ recorded byte offsets.  For an example of how this can be done,
 version 9.4.)
 
 @c @group
-@node     wfdbsetstart, , wfdbgetstart, miscellaneous functions
+@node     wfdbsetstart, wfdbputprolog, wfdbgetstart, miscellaneous functions
 @unnumberedsubsec wfdbsetstart
 @findex wfdbsetstart (9.4)
 @cindex byte offset
@@ -5068,6 +5078,26 @@ within signal files as performed by @code{isigsettime}, which are
 determined solely by the contents of the @file{hea} file at the time
 the signals were opened.  (This function was first introduced in WFDB library
 version 9.4.)
+
+@c @group
+@node     wfdbputprolog, , wfdbgetstart, miscellaneous functions
+@unnumberedsubsec wfdbputprolog
+@findex wfdbputprolog (10.4.15)
+@cindex byte offset
+@cindex cruft (in signal files)
+@cindex prolog (in signal files)
+@cindex start of sample data
+
+@example
+void wfdbputprolog(char *@var{prolog}, long @var{bytes}, WFDB_Signal @var{s})
+@end example
+@c @end group
+
+@noindent
+This function writes the specified @var{prolog} of length @var{bytes} to the
+signal file for the specified output signal @var{s}, and invokes
+@code{wfdbsetstart(}@var{s, bytes}@code{)}.  (This function was first
+introduced in WFDB library version 10.4.15.)
 
 
 @node     Data Types, Annotation Codes, Functions, Top

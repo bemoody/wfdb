@@ -337,6 +337,7 @@ doc/wag-src/wag.ht1
 doc/wag-src/wag.tex
 doc/wag-src/wav2mit.1
 doc/wag-src/wave.1
+doc/wag-src/wfdb2mat.1
 doc/wag-src/wfdb.3
 doc/wag-src/wfdbcal.5
 doc/wag-src/wfdbcat.1

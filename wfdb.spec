@@ -15,6 +15,9 @@ Requires: curl-devel >= 7.10
 BuildRoot: /var/tmp/%{name}-root
 
 %changelog
+* Thu Feb 29 2009 George B Moody <george@mit.edu>
+- added wfdb2mat
+
 * Wed Feb 18 2009 George B Moody <george@mit.edu>
 - added wfdbtime
 
@@ -192,6 +195,7 @@ power spectrum estimation, and many others.
 %{_bindir}/url_view
 %{_bindir}/wabp
 %{_bindir}/wav2mit
+%{_bindir}/wfdb2mat
 %{_bindir}/wfdbcat
 %{_bindir}/wfdbcollate
 %{_bindir}/wfdbdesc
