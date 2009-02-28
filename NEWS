@@ -1,3 +1,8 @@
+10.4.16:
+	WFDB application wrann is now (slightly) less fussy about its input
+	and no longer requires the tab character preceding an aux string to
+	occur in a specific column as did earlier versions.
+
 10.4.15:
 	WFDB library function mstimstr() now outputs time to the nearest
 	millisecond, rather than truncating its calculation to the next

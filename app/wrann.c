@@ -1,9 +1,9 @@
 /* file wrann.c		G. Moody	 6 July 1983
-			Last revised:  14 March 2008
+			Last revised:  27 February 2009
 
 -------------------------------------------------------------------------------
 wrann: Translate an ASCII file in 'rdann' output format to an annotation file
-Copyright (C) 1983-2008 George B. Moody
+Copyright (C) 1983-2009 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -103,22 +103,22 @@ char *argv[];
     if (annopen(record, &ai, 1) < 0)	/* open annotation file */
 	exit(2);
     while (fgets(line, sizeof(line), stdin) != NULL) {
+	static char a[256];
 	p = line+9;
 	if (line[0] == '[')
 	    while (*p != ']')
 		p++;
 	while (*p != ' ')
 	    p++;
-	(void)sscanf(p+1, "%ld%s%d%d%d", &tm, annstr, &sub, &ch, &nm);
+	*(a+1) = '\0';
+	(void)sscanf(p+1, "%ld%s%d%d%d\t%s", &tm, annstr, &sub, &ch, &nm, a+1);
 	annot.anntyp = strann(annstr);
 	annot.time = tm; annot.subtyp = sub; annot.chan = ch; annot.num = nm;
-	for (p = line+40; *p; p++)
-	    if (*p == '\t') {
-		*p = strlen(p+1) - 1;
-		annot.aux = p;
-		break;
-	    }
-	if (*p == '\0')
+	if (*(a+1)) {
+	    *a = strlen(a+1);
+	    annot.aux = a;
+	}
+	else
 	    annot.aux = NULL;
 	(void)putann(0, &annot);
     }

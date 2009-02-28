@@ -1,5 +1,5 @@
-/* file: wfdb2mat.c	G. Moody	 26 February 2009
-
+/* file: wfdb2mat.c	G. Moody	26 February 2009
+			Last revised:	28 February 2009
 -------------------------------------------------------------------------------
 wfdb2mat: Convert (all or part of) a WFDB signal file to Matlab .mat format
 Copyright (C) 2009 George B. Moody
@@ -40,7 +40,9 @@ which can be rearranged as desired within the rows of the matrix.  Since .mat
 files are written in column-major order (i.e., all of column n precedes all of
 column n+1), each vector of samples is written as a column rather than as a
 row, so that the column number in the .mat file equals the sample number in the
-input record.  If this seems odd, transpose your matrix after reading it!
+input record (minus however many samples were skipped at the beginning of the
+record, as specified using the -f option).  If this seems odd, transpose your
+matrix after reading it!
 
 This program writes version 4 MAT-file format output files, as documented in
 http://www.mathworks.com/access/helpdesk/help/pdf_doc/matlab/matfile_format.pdf
@@ -71,6 +73,18 @@ wfdb2mat.
 #include <stdio.h>
 #include <wfdb/wfdb.h>
 
+/* Dynamic memory allocation macros. */
+#define MEMERR(P, N, S) \
+    { wfdb_error("%s: can't allocate (%ld*%ld) bytes for %s\n", \
+		 pname, (size_t)N, (size_t)S, #P);		\
+      exit(1); }
+#define SFREE(P) { if (P) { free (P); P = 0; } }
+#define SUALLOC(P, N, S) { if (!(P = calloc((N), (S)))) MEMERR(P, (N), (S)); }
+#define SALLOC(P, N, S) { SFREE(P); SUALLOC(P, (N), (S)) }
+#define SREALLOC(P, N, S) { if (!(P = realloc(P, (N)*(S)))) MEMERR(P,(N),(S)); }
+#define SSTRCPY(P, Q) { if (Q) { \
+	 SALLOC(P, (size_t)strlen(Q)+1,1); strcpy(P, Q); } }
+
 char *pname;
 
 main(argc, argv)
@@ -78,7 +92,7 @@ int argc;
 char *argv[];
 {
     char *matname, *orec, *p, *record = NULL, *search = NULL, *prog_name();
-    static int prolog[6];    /* assumes sizeof(int) == 4; if not true, fix! */
+    static char prolog[24];
     int highres = 0, i, isiglist, nisig, nosig = 0, pflag = 0, s, *sig = NULL,
         type = 50, vflag = 0;
     WFDB_Frequency freq;
@@ -165,11 +179,8 @@ char *argv[];
 	exit(1);
     }
     if ((nisig = isigopen(record, NULL, 0)) <= 0) exit(2);
-    if ((vi = malloc(nisig * sizeof(WFDB_Sample))) == NULL ||
-	(si = malloc(nisig * sizeof(WFDB_Siginfo))) == NULL) {
-	(void)fprintf(stderr, "%s: insufficient memory\n", pname);
-	exit(2);
-    }
+    SUALLOC(si, nisig, sizeof(WFDB_Siginfo));
+    SUALLOC(vi, nisig, sizeof(WFDB_Sample));
     if ((nisig = isigopen(record, si, nisig)) <= 0)
 	exit(2);
     for (i = 0; i < nisig; i++)
@@ -185,12 +196,9 @@ char *argv[];
 	to = -to;
 
     if (nosig) {	      /* convert samples only from specified signals */
-	if ((sig = (int *)malloc((unsigned)nosig*sizeof(int))) == NULL ||
-	    (vo = malloc(nosig * sizeof(WFDB_Sample))) == NULL ||
-	    (so = malloc((unsigned)nosig * sizeof(WFDB_Siginfo))) == NULL) {
-	    (void)fprintf(stderr, "%s: insufficient memory\n", pname);
-	    exit(2);
-	}
+	SUALLOC(so, nosig, sizeof(WFDB_Siginfo));
+	SUALLOC(vo, nosig, sizeof(WFDB_Sample));
+	SUALLOC(sig, nosig, sizeof(int));
 	for (i = 0; i < nosig; i++) {
 	    if ((s = findsig(argv[isiglist+i])) < 0) {
 		(void)fprintf(stderr, "%s: can't read signal '%s'\n", pname,
@@ -202,11 +210,9 @@ char *argv[];
     }
     else {			/* convert samples from all signals */
 	nosig = nisig;
-	if ((sig = (int *)malloc((unsigned)nosig*sizeof(int))) == NULL ||
-	    (so = malloc((unsigned)nosig * sizeof(WFDB_Siginfo))) == NULL) {
-	    (void)fprintf(stderr, "%s: insufficient memory\n", pname);
-	    exit(2);
-	}
+	SUALLOC(so, nosig, sizeof(WFDB_Siginfo));
+	SUALLOC(vo, nosig, sizeof(WFDB_Sample));
+	SUALLOC(sig, nosig, sizeof(int));
 	for (i = 0; i < nosig; i++)
 	    sig[i] = i;
     }
@@ -237,14 +243,11 @@ char *argv[];
 	exit(1);
     }
 
-    /* Generate the names for the output .mat file, and the output record. */
-    if ((matname = (char *)malloc(strlen(record)+5)) == NULL ||
-	(orec = (char *)malloc(strlen(record)+1)) == NULL) {
-	(void)fprintf(stderr, "%s: insufficient memory\n", pname);
-	exit(2);
-    }
+    /* Generate the names for the output .mat file and the output record. */
+    SUALLOC(matname, strlen(record)+6, sizeof(char));
+    sprintf(matname, "%sm.mat", record);
+    SUALLOC(orec, strlen(record)+2, sizeof(char));
     sprintf(orec, "%sm", record);
-    sprintf(matname, "%s.mat", orec);
 
     /* Determine if we can write 8-bit unsigned samples, or if 16 bits are
        needed per sample. */
@@ -254,6 +257,7 @@ char *argv[];
 	so[i] = si[sig[i]];
 	so[i].fname = matname;
 	so[i].fmt = (type == 30) ? 16 : 80;
+	if (so[i].units == NULL) SSTRCPY(so[i].units, "mV");
     }
 
     /* Create an empty .mat file. */
@@ -262,33 +266,55 @@ char *argv[];
 	exit(1);
     }
     
-    /* Fill in the .mat file's prolog and write it. */
-    prolog[0] = type;		/* format */
-    prolog[1] = nosig;		/* number of rows */
-    prolog[2] = to - from;	/* number of columns */
-    prolog[3] = 0;		/* matrix is real */
-    prolog[4] = 4;		/* strlen("val") + 1 */
-    prolog[5] = ((int)'v') | ((int)'a' << 8) | ((int)'l' << 16); /* "val" */
-    wfdbputprolog((char *)prolog, sizeof(prolog), 0);
+    /* Fill in the .mat file's prolog and write it. (Elements of prolog[]
+       not set explicitly below are always zero.) */
+    prolog[ 0] = type & 0xff;				/* format */
+    prolog[ 1] = (type >> 8) & 0xff;
+    prolog[ 4] = nosig & 0xff;			/* number of rows */
+    prolog[ 5] = (nosig >> 8) & 0xff;
+    prolog[ 6] = (nosig >> 16) & 0xff;
+    prolog[ 7] = (nosig >> 24) & 0xff;
+    prolog[ 8] = (to - from) & 0xff;		/* number of columns */
+    prolog[ 9] = ((to - from) >> 8) & 0xff;
+    prolog[10] = ((to - from) >> 16) & 0xff;
+    prolog[11] = ((to - from) >> 24) & 0xff;
+    prolog[16] = 4;		/* strlen("val") + 1 */
+    sprintf(prolog+20, "val");
+    wfdbputprolog((char *)prolog, 24, 0);
 
     /* Copy the selected data into the .mat file. */
-    for (t = from; from < to && getvec(vi) >= 0; t++) {
+    for (t = from; t < to && getvec(vi) >= 0; t++) {
 	for (i = 0; i < nosig; i++)
 	    vo[i] = vi[sig[i]];
 	if (putvec(vo) != nosig)
 	    break;
     }
 
+    if (t != to)
+	fprintf(stderr, "%s (warning): matrix is missing final %ld columns\n",
+		pname, to - t);
+
     /* Create the new header file. */
     newheader(orec);
-    if (p = malloc(strlen(record)+40)) {
-	sprintf(p, "created using wfdb2mat from record %s", record);
-	putinfo(p);
-	free(p);
+    /* Copy info from the old record, if any */
+    if (p = getinfo(record))
+	do {
+	    (void)putinfo(p);
+	} while (p = getinfo((char *)NULL));
+    /* Append additional info summarizing what wfdb2mat has done. */
+    SUALLOC(p, strlen(pname)+strlen(record)+80, 1);
+    (void)sprintf(p, "Produced by %s from record %s", pname, record);
+    if (from) {
+	char *q = mstimstr(from);
+	while (*q == ' ') q++;
+	strcat(p, ", beginning at ");
+	strcat(p, q);
     }
+    (void)putinfo(p);
+    SFREE(p);
 
     /* Summarize the contents of the .mat file. */
-    printf("Generated %s, containing matrix 'val'\n", matname);
+    printf("Wrote %s, containing matrix 'val' ", matname);
     printf(" with %d rows and %d columns\n", nosig, to-from);
     printf("Duration: %s\n", timstr(to-from));
     printf("Sampling frequency: %g columns/second\n", sampfreq(NULL));
