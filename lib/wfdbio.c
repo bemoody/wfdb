@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:	18 February 2009       wfdblib 10.4.14
+                        Last revised:	  3 March 2009       wfdblib 10.4.17
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -949,13 +949,14 @@ WFDB_FILE *wfdb_open(const char *s, const char *record, int mode)
 }
 
 /* wfdb_checkname checks record and annotator names -- they must not be empty,
-   and they must contain only letters, digits, tildes, underscores, and
+   and they must contain only letters, digits, hyphens, tildes, underscores, and
    directory separators. */
 
 int wfdb_checkname(char *p, char *s)
 {
     do {
-	if (('0' <= *p && *p <= '9') || *p == '_' || *p == '~' || *p == DSEP ||
+	if (('0' <= *p && *p <= '9') || *p == '_' || *p == '~' || *p== '-' ||
+	    *p == DSEP ||
 #ifdef MSDOS
 	    *p == ':' ||
 #endif
