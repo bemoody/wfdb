@@ -1,5 +1,5 @@
 /* file: wfdb2mat.c	G. Moody	26 February 2009
-			Last revised:	28 February 2009
+			Last revised:	  1 March 2009
 -------------------------------------------------------------------------------
 wfdb2mat: Convert (all or part of) a WFDB signal file to Matlab .mat format
 Copyright (C) 2009 George B. Moody
@@ -91,7 +91,7 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-    char *matname, *orec, *p, *record = NULL, *search = NULL, *prog_name();
+    char *matname, *orec, *p, *q, *record = NULL, *search = NULL, *prog_name();
     static char prolog[24];
     int highres = 0, i, isiglist, nisig, nosig = 0, pflag = 0, s, *sig = NULL,
         type = 50, vflag = 0;
@@ -297,27 +297,31 @@ char *argv[];
     /* Create the new header file. */
     newheader(orec);
     /* Copy info from the old record, if any */
-    if (p = getinfo(record))
+    if (p = getinfo(NULL))
 	do {
 	    (void)putinfo(p);
 	} while (p = getinfo((char *)NULL));
     /* Append additional info summarizing what wfdb2mat has done. */
-    SUALLOC(p, strlen(pname)+strlen(record)+80, 1);
-    (void)sprintf(p, "Produced by %s from record %s", pname, record);
-    if (from) {
-	char *q = mstimstr(from);
-	while (*q == ' ') q++;
-	strcat(p, ", beginning at ");
+    SUALLOC(p, strlen(record)+80, 1);
+    (void)sprintf(p, "Creator: %s", pname);
+    (void)putinfo(p);
+    (void)sprintf(p, "Source: record %s", record);
+    q = mstimstr(-from);
+    while (*q == ' ') q++;
+    if (from != 0 || *q == '[') {
+	strcat(p, "  Start: ");
 	strcat(p, q);
     }
     (void)putinfo(p);
-    SFREE(p);
 
     /* Summarize the contents of the .mat file. */
-    printf("Wrote %s, containing matrix 'val' ", matname);
-    printf(" with %d rows and %d columns\n", nosig, to-from);
+    printf("%s\n", p);
+    printf("val has %d row%s (signal%s) and %d column%s (sample%s/signal)\n",
+	   nosig, nosig == 1 ? "" : "s", nosig == 1 ? "" : "s",
+	   to-from, to == from+1 ? "" : "s", to == from+1 ? "" : "s");
     printf("Duration: %s\n", timstr(to-from));
-    printf("Sampling frequency: %g columns/second\n", sampfreq(NULL));
+    printf("Sampling frequency: %g Hz  Sampling interval: %g sec\n",
+	   freq, 1/freq);
     printf("Row\tSignal\tGain\tBase\tUnits\n");
     for (i = 0; i < nosig; i++)
 	printf("%d\t%s\t%g\t%d\t%s\n", i+1, so[i].desc, so[i].gain,
@@ -325,6 +329,7 @@ char *argv[];
     printf("\nTo convert from raw units to the physical units shown\n"
 	   "above, subtract 'base' and divide by 'gain'.\n");
 
+    SFREE(p);
     wfdbquit();
 
     exit(0);	/*NOTREACHED*/

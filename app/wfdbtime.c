@@ -27,32 +27,33 @@ _______________________________________________________________________________
 #include <stdio.h>
 #include <wfdb/wfdb.h>
 
-main(argc, argv)
-int argc;
-char **argv;
+main(int argc, char **argv)
 {
-    char sbuf[32];
+    char *record = NULL, sbuf[32];
     int i;
     WFDB_Time t;
 
-    if (strcmp(argv[1], "-H") == 0) {
-	setgvmode(WFDB_HIGHRES);
-	argc--; argv++;
+    for (i = 1; i < argc; i++) {
+	if (strcmp(argv[i], "-r") == 0) {
+	    if (record) wfdbquit();
+	    setgvmode(WFDB_HIGHRES);
+	    if (++i == argc) break;
+	    record = argv[i];
+	    if (isigopen(record, NULL, 0) < 0) exit(2);
+	}
+	else if (record) {
+	    if ((t = strtim(argv[i])) < 0L) t = -t;
+	    sprintf(sbuf, "s%ld", t);
+	    printf("%15s\t%15s", sbuf, (t == 0L) ? "0:00.000" : mstimstr(t));
+	    printf("\t%15s\n", mstimstr(-t));
+	}
     }
-    if (strcmp(argv[1], "-r") <= 0 && isigopen(argv[2], NULL, 0) < 0) {
-	fprintf(stderr, "usage: %s [-H] -r RECORD TIME [ TIME ... ]\n",
-		argv[0]);
+    if (record == NULL) {
+	fprintf(stderr, "usage: %s [ -r RECORD [ TIME ] ]\n", argv[0]);
 	fprintf(stderr, " where RECORD is the name of the input record\n");
-	fprintf(stderr, " (use -H for high resolution mode multifrequency"
-		" record)\n");
 	fprintf(stderr, " Each TIME is a time to be converted\n");
 	exit(1);
     }
-    for (i = 3; i < argc; i++) {
-	if ((t = strtim(argv[i])) < 0L) t = -t;
-	sprintf(sbuf, "s%ld", t);
-	printf("%15s\t%15s", sbuf, (t == 0L) ? "0:00.000" : mstimstr(t));
-	printf("\t%15s\n", mstimstr(-t));
-    }
+    wfdbquit();
     exit(0);
 }

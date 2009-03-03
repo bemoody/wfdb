@@ -1,8 +1,8 @@
-.TH WFDBTIME 1 "18 February 2009" "WFDB 10.4.14" "WFDB Applications Guide"
+.TH WFDBTIME 1 "1 March 2009" "WFDB 10.4.16" "WFDB Applications Guide"
 .SH NAME
 wfdbtime \- convert time to sample number, elapsed, and absolute time
 .SH SYNOPSIS
-\fBwfdbtime\fR [ \fB-H\fR ] \fB-r\fR \fIrecord\fR \fItime\fR [ \fItime\fR ... ]
+\fBwfdbtime\fR \fB-r\fR \fIrecord\fR \fItime\fR [ \fItime\fR ... ]
 .SH DESCRIPTION
 .PP
 Using the specified \fIrecord\fR as a reference for determining the
@@ -17,6 +17,10 @@ an absolute time and date (in the form [\fIhh:mm:ss.sss
 DD/MM/YYYY\fR]).  If the base time for the record is undefined, the
 absolute time cannot be calculated, and in this case the elapsed time
 appears (a second time) instead.
+.PP
+Additional \fB-r\fI record\fR arguments may be given in the same command,
+to reset the sample interval length and base time for any subsequent \fItime\fR
+arguments.
 .SH EXAMPLES
 .PP
 The command
@@ -25,6 +29,7 @@ wfdbtime -r mimicdb/237/237 0 10:0 s20 "[14:0:0 20/7/1995]" e
 .LP
 produces the output
 .IP
+.br
              s0	       0:00.000	[12:40:38.000 20/07/1995]
 .br
          s75000	      10:00.000	[12:50:38.000 20/07/1995]

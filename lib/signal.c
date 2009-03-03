@@ -3098,7 +3098,7 @@ FSITIME strtim(char *string)
 	    if (strchr(p, '/')) days = strdat(p) - bdate;
 	    else days = atol(p+1);
 	}
-	t = strtim(string+1) - (WFDB_Time)(btime*f/1000.0);
+	t = strtim(string+1) - (WFDB_Time)(btime*f/1000.0 + 0.5);
 	if (days > 0L) t += (WFDB_Time)(days*24*60*60*f);
 	return (-t);
       default:
