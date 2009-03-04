@@ -1,6 +1,5 @@
 /* file: xform.c	G. Moody        8 December 1983
-			Last revised:   7 January 2009
-
+			Last revised:    4 March 2009
 -------------------------------------------------------------------------------
 xform: Sampling frequency, amplitude, and format conversion for WFDB records
 Copyright (C) 1983-2009 George B. Moody
@@ -401,7 +400,7 @@ char *argv[];
 			      format);
 		(void)fgets(answer, sizeof(answer), ttyin);
 		(void)sscanf(answer, "%d", &format);
-		for (i = 0; i < WFDB_NFMTS; i++)
+		for (i = 1; i < WFDB_NFMTS; i++) /* skip format[0] (= 0) */
 		    if (format == formats[i]) break;
 	    } while (i >= WFDB_NFMTS);
 	    if (nosig > 1) {
@@ -587,7 +586,7 @@ char *argv[];
 	exit(2);
     (void)fprintf(stderr, " done\n");
 
-    /* If an output record was specified using `-o', check that the output
+     /* If an output record was specified using `-o', check that the output
        signals are writable.  Suppress warning messages about possible
        sampling frequency differences. */
     wfdbquiet();
@@ -597,7 +596,19 @@ char *argv[];
     }
     wfdbverbose();
 
-    /* If the `-n' option was specified, copy the signal descriptions from the
+    /* Make sure that signal file format is not 0 (putvec cannot write to
+       a null record). */
+    for (i = 0; i < nosig; i++) {
+	if (dfout[i].fmt == 0) {
+	    (void)fprintf(stderr, "%s: signal %d format cannot be 0"
+			  " (changing to format 16)\n", pname, i);
+	    dfout[i].fmt = 16;
+	    reopen = 1;	/* record must be (re)opened using osigfopen to make
+			   the change effective */
+	}
+    }
+
+   /* If the `-n' option was specified, copy the signal descriptions from the
        input record header file into the WFDB_Siginfo structures for the output
        record (for eventual storage in the new output header file).  To make
        the changes effective, the output signals must be (re)opened using

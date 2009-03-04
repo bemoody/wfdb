@@ -2,6 +2,9 @@
 	Internal WFDB library function wfdb_checkname() now allows hyphens
 	(-) within record and annotator names.
 
+	WFDB applications xform and wfdb2mat now properly handle variable-layout
+	multisegment input records.
+
 10.4.16:
 	WFDB library function strtim() now rounds rather than truncating when
 	the sampling frequency is not an integer.
@@ -10,7 +13,7 @@
 	and no longer requires the tab character preceding an aux string to
 	occur in a specific column as did earlier versions.
 
-	Bug fixes in convert/wfdbtomat.
+	Bug fixes in convert/wfdb2mat.
 
 10.4.15:
 	WFDB library function mstimstr() now outputs time to the nearest

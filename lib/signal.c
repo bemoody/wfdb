@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   26 February 2009	wfdblib 10.4.15
+			Last revised:    4 March 2009	wfdblib 10.4.17
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -580,7 +580,7 @@ static int sigmap_init(void)
     return (0);
 }
 
-static void sigmap(WFDB_Sample *vector)
+static int sigmap(WFDB_Sample *vector)
 {
     int i;
     double v;
@@ -600,6 +600,7 @@ static void sigmap(WFDB_Sample *vector)
 #endif
       }
     }
+    return (tspf);
 }
 
 /* end of code for handling variable-layout records */
@@ -785,7 +786,7 @@ static int readheader(const char *record)
 	    hsd[0]->info.spf = 1;
 	    hsd[0]->info.fmt = 0;
 	    hsd[0]->info.nsamp = nsamples = segp->nsamp;
-	    return (1);	       
+	    return (maxhsig = 1);	       
 	}
 	return (0);
     }
@@ -2377,7 +2378,7 @@ FINT getframe(WFDB_Sample *vector)
     else		/* no deskewing necessary */
 	stat = getskewedframe(vector);
     if (need_sigmap && stat > 0)
-	sigmap(vector);
+	stat = sigmap(vector);
     istime++;
     return (stat);
 }
