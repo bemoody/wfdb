@@ -1,5 +1,5 @@
 10.4.18:
-	The WFDB library no longer emits spurious checksum errors when reading
+	The WFDB library no longer reports spurious checksum errors when reading
 	EDF files, which don't have checksums.
 
 	WFDB application wfdb2mat now correctly handles EDF input records, so
@@ -24,8 +24,8 @@
 
 10.4.15:
 	WFDB library function mstimstr() now outputs time to the nearest
-	millisecond, rather than truncating its calculation to the next
- 	lowest number of milliseconds.
+	millisecond, rather than truncating its calculation to the nearest
+ 	lower number of milliseconds.
 
 	A new WFDB library function, wfdbputprolog(), can write a prolog at the
 	beginning of a signal file.  WFDB applications ignore embedded prologs.
