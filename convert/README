@@ -31,6 +31,13 @@ records can be discontinuous, there is currently no support for reading or
 writing discontinuous EDF+ files using the WFDB library, or for writing an EDF+
 annotation stream, either natively or using a converter.)
 
+The popular Matlab application (and the mostly compatible open-source Octave
+application) cannot read WFDB files unless they have been prepared specifically
+for Matlab.  Program `wfdb2mat' does this, converting all or any part of the
+samples in a record into a Matlab- and Octave-compatible '.mat' file, and also
+creating a new .hea file that allows WFDB applications to read the '.mat' file
+directly.
+
 The popular .wav format used for audio files is readable by WFDB applications
 once a short header (.hea) file that describes the format of the .wav file
 has been created;  'wav2mit' does this.  Note that there are many variants
@@ -96,6 +103,7 @@ README		this file
 edf2mit.c	Converts an EDF file to a WFDB record
 mit2edf.c	Converts a WFDB record into an EDF file
 rdedfann.c	Converts an EDF+ annotation stream into a WFDB annotation file
+wfdb2mat.c	Converts a WFDB record into a .mat file
 wav2mit.c	Makes .hea file so that a .wav file is readable as a WFDB record
 mit2wav.c	Converts a WFDB record into a .wav file
 ahaecg2mit.c	Converts an AHA DB DVD file to a WFDB record

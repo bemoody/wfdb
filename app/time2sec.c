@@ -1,9 +1,9 @@
 /* file: time2sec.c	G. Moody	9 July 2003
-
+			Last revised:  14 March 2009
 -------------------------------------------------------------------------------
 time2sec: Convert a string in WFDB standard time format to time in seconds
 
-Copyright (C) 2003 George B. Moody
+Copyright (C) 2003-2009 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -32,17 +32,27 @@ int argc;
 char **argv;
 {
     double t;
+    int milliseconds;
+    long seconds;
 
     if (argc == 4 && strcmp(argv[1], "-r") == 0) {
 	(void)isigopen(argv[2], NULL, 0);
 	t = strtim(argv[3]);
 	if (t < 0) t = -t;
-	printf("%g\n", t/sampfreq(NULL));
+	seconds = (long)(t/sampfreq(NULL));
+	t -= (double)(seconds*sampfreq(NULL));
+	milliseconds = (long)((t*1000.)/sampfreq(NULL) + 0.5);
+	if (milliseconds >= 1000) { seconds++; milliseconds -= 1000; }
+	printf("%ld", seconds);
+	if (milliseconds)
+	    printf(".%03d", milliseconds);
+	printf("\n");
+	//	printf("%.12g\n", t/sampfreq(NULL));
 	exit(0);
     }
     else if (argc == 2 && argv[1][0] != '-') {
 	setsampfreq(1000.0);
-	printf("%g\n", strtim(argv[1])/1000.0);
+	printf("%.12g\n", strtim(argv[1])/1000.0);
 	exit(0);
     }
 

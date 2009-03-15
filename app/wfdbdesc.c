@@ -1,5 +1,5 @@
 /* file: wfdbdesc.c		G. Moody	  June 1989
-				Last revised:   26 January 2009
+				Last revised:   14 March 2009
 
 -------------------------------------------------------------------------------
 wfdbdesc: Describe signal specifications
@@ -120,7 +120,7 @@ char *argv[];
 		     mstimstr(t), t);
     }
     else (void)printf("not specified\n");
-    (void)printf("Sampling frequency: %g Hz\n", sampfreq(NULL));
+    (void)printf("Sampling frequency: %.12g Hz\n", sampfreq(NULL));
     (void)printf("%d signal%s\n", nsig, nsig == 1 ? "" : "s");
     if (nsig < 1) exit(2);
     if (msrec && s[0].nsamp != 0L) {
@@ -137,7 +137,7 @@ char *argv[];
         (void)printf(" Gain: ");
         if (s[i].gain == 0.)
             (void)printf("uncalibrated; assume %g", WFDB_DEFGAIN);
-        else (void)printf("%g", s[i].gain);
+        else (void)printf("%.12g", s[i].gain);
 	(void)printf(" adu/%s\n", s[i].units ? s[i].units : "mV");
         (void)printf(" Initial value: %d\n", s[i].initval);
 	if (s[i].fmt != 0)

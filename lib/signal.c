@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:    4 March 2009	wfdblib 10.4.17
+			Last revised:   14 March 2009	wfdblib 10.4.18
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -721,7 +721,7 @@ static int edfparse(WFDB_FILE *ifile)
 	hsd[s]->info.adcres = i;
 	if (pmax[s] != pmin[s]) {
 	    hsd[s]->info.gain = (dmax[s] - dmin[s])/(pmax[s] - pmin[s]);
-	    hsd[s]->info.baseline = dmax[s] - pmax[s] * hsd[s]->info.gain + 1;
+	    hsd[s]->info.baseline = dmax[s] - pmax[s] * hsd[s]->info.gain + 0.5;
 	}
 	else			/* gain is undefined */
 	    hsd[s]->info.gain = hsd[s]->info.baseline = 0;
@@ -1471,7 +1471,8 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
 
     /* Do nothing if there is no more than one input signal group and
        the input pointer is correct already. */
-    if (nigroups < 2 && istime == (in_msrec ? t + segp->samp0 : t))
+    if (nigroups < 2 && istime == (in_msrec ? t + segp->samp0 : t) &&
+	igd[g]->start == 0)
 	return (0);
 
     /* Find the first signal that belongs to group g. */
@@ -1751,7 +1752,7 @@ static int getskewedframe(WFDB_Sample *vector)
 	}
 	if (--is->info.nsamp == (WFDB_Time)0L &&
 	    (is->info.cksum & 0xffff) &&
-	    !in_msrec &&
+	    !in_msrec && !isedf &&
 	    is->info.fmt != 0) {
 	    wfdb_error("getvec: checksum error in signal %d\n", s);
 	    stat = -4;

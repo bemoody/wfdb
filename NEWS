@@ -1,3 +1,10 @@
+10.4.18:
+	The WFDB library no longer emits spurious checksum errors when reading
+	EDF files, which don't have checksums.
+
+	WFDB application wfdb2mat now correctly handles EDF input records, so
+	it is now possible to use it to convert EDF to .mat format directly.
+
 10.4.17:
 	Internal WFDB library function wfdb_checkname() now allows hyphens
 	(-) within record and annotator names.

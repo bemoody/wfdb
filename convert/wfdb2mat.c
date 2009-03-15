@@ -1,5 +1,5 @@
 /* file: wfdb2mat.c	G. Moody	26 February 2009
-			Last revised:	  1 March 2009
+			Last revised:	  14 March 2009
 -------------------------------------------------------------------------------
 wfdb2mat: Convert (all or part of) a WFDB signal file to Matlab .mat format
 Copyright (C) 2009 George B. Moody
@@ -248,6 +248,15 @@ char *argv[];
     sprintf(matname, "%sm.mat", record);
     SUALLOC(orec, strlen(record)+2, sizeof(char));
     sprintf(orec, "%sm", record);
+    /* If the input record is an EDF file, it will have a '.' in its name.
+       The output record will not be an EDF file, so it may not have a '.'
+       in its name.  Replace any '.' with '_' here. */
+    for (p = orec + strlen(orec) - 1; p > orec && *p != '/'; p--)
+	if (*p == '.') *p = '_';
+    /* To avoid confusion, also make this replacement in matname, but leave
+       the '.' just before 'mat' alone. */
+    for (p = matname + strlen(matname) - 5; p > matname && *p != '/'; p--)
+	if (*p == '.') *p = '_';
 
     /* Determine if we can write 8-bit unsigned samples, or if 16 bits are
        needed per sample. */
@@ -256,6 +265,8 @@ char *argv[];
     for (i = 0; i < nosig; i++) {
 	so[i] = si[sig[i]];
 	so[i].fname = matname;
+	so[i].group = 0;
+	so[i].spf = 1;
 	so[i].fmt = (type == 30) ? 16 : 80;
 	if (so[i].units == NULL) SSTRCPY(so[i].units, "mV");
     }
@@ -320,11 +331,11 @@ char *argv[];
 	   nosig, nosig == 1 ? "" : "s", nosig == 1 ? "" : "s",
 	   to-from, to == from+1 ? "" : "s", to == from+1 ? "" : "s");
     printf("Duration: %s\n", timstr(to-from));
-    printf("Sampling frequency: %g Hz  Sampling interval: %g sec\n",
+    printf("Sampling frequency: %.12g Hz  Sampling interval: %.10g sec\n",
 	   freq, 1/freq);
     printf("Row\tSignal\tGain\tBase\tUnits\n");
     for (i = 0; i < nosig; i++)
-	printf("%d\t%s\t%g\t%d\t%s\n", i+1, so[i].desc, so[i].gain,
+	printf("%d\t%s\t%.12g\t%d\t%s\n", i+1, so[i].desc, so[i].gain,
 	       so[i].baseline, so[i].units);
     printf("\nTo convert from raw units to the physical units shown\n"
 	   "above, subtract 'base' and divide by 'gain'.\n");

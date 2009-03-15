@@ -1,8 +1,8 @@
 /* file: mit2edf.c		G. Moody	2 November 2002
-				Last revised:      5 May 2004
+				Last revised:    14 March 2009
 -------------------------------------------------------------------------------
 Convert MIT format header and signal files to EDF (European Data Format) file
-Copyright (C) 2002-2004 George B. Moody
+Copyright (C) 2002-2009 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -155,7 +155,15 @@ char **argv;
 	bytes_per_block = samples_per_frame * 2 * frames_per_block;
     }
 
-    if (frames_per_block < 1) {
+    seconds_per_block = frames_per_block / frames_per_second;
+
+    if (frames_per_block < 1 && bytes_per_block < EDFMAXBLOCK/60) {
+	frames_per_block = strtim("1:0");     /* the number of frames/minute */
+	bytes_per_block = 2* samples_per_frame * frames_per_block;
+	seconds_per_block = 60;
+    }
+
+    if (bytes_per_block > EDFMAXBLOCK) {
 	fprintf(stderr, "%s: can't convert record %s to EDF\n", pname, record);
 	fprintf(stderr,
  " EDF blocks cannot be larger than %d bytes, but each input frame requires\n",
@@ -165,8 +173,6 @@ char **argv;
 		samples_per_frame * 2);
 	exit(5);
     }
-
-    seconds_per_block = frames_per_block / frames_per_second;
 
     /* Calculate the number of blocks to be written.  strtim("e") is the frame
        number of the last frame in the record, and that of the first frame is
@@ -367,9 +373,9 @@ char **argv;
 	    blockp[j] = blockp[j-1] + 2 * frames_per_block * si[j-1].spf;
 	for (i = 0; i < frames_per_block; i++) {
 	    if (nsig != getframe(v)) {
-		/* end of input: pad last block with zeroes */
+		/* end of input: pad last block with invalid samples */
 		for (j = 0; j < samples_per_frame; j++)
-		    v[j] = 0;
+		    v[j] = WFDB_INVALID_SAMPLE;
 	    }
 	    vp = v;
 	    for (j = 0; j < nsig; j++) {
