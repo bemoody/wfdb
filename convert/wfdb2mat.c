@@ -1,5 +1,5 @@
 /* file: wfdb2mat.c	G. Moody	26 February 2009
-			Last revised:	  14 March 2009
+			Last revised:	  25 March 2009
 -------------------------------------------------------------------------------
 wfdb2mat: Convert (all or part of) a WFDB signal file to Matlab .mat format
 Copyright (C) 2009 George B. Moody
@@ -94,7 +94,7 @@ char *argv[];
     char *matname, *orec, *p, *q, *record = NULL, *search = NULL, *prog_name();
     static char prolog[24];
     int highres = 0, i, isiglist, nisig, nosig = 0, pflag = 0, s, *sig = NULL,
-        type = 50, vflag = 0;
+        stat = 0, type = 50, vflag = 0;
     WFDB_Frequency freq;
     WFDB_Sample *vi, *vo;
     WFDB_Siginfo *si, *so;
@@ -294,16 +294,23 @@ char *argv[];
     wfdbputprolog((char *)prolog, 24, 0);
 
     /* Copy the selected data into the .mat file. */
-    for (t = from; t < to && getvec(vi) >= 0; t++) {
+    for (t = from; t < to && stat >= 0; t++) {
+	stat = getvec(vi);
 	for (i = 0; i < nosig; i++)
 	    vo[i] = vi[sig[i]];
 	if (putvec(vo) != nosig)
 	    break;
     }
 
-    if (t != to)
-	fprintf(stderr, "%s (warning): matrix is missing final %ld columns\n",
+    /* If the input ended prematurely, pad the matrix with invalid samples. */
+    if (t != to) {
+	fprintf(stderr, "%s (warning): final %ld columns are invalid\n",
 		pname, to - t);
+	for (i = 0; i < nosig; i++)
+	    vo[i] = WFDB_INVALID_SAMPLE;
+	while (t++ < to)
+	    putvec(vo);
+    }
 
     /* Create the new header file. */
     newheader(orec);
