@@ -1,5 +1,5 @@
 /* file wrann.c		G. Moody	 6 July 1983
-			Last revised:  27 February 2009
+			Last revised:   9 April 2009
 
 -------------------------------------------------------------------------------
 wrann: Translate an ASCII file in 'rdann' output format to an annotation file
@@ -49,17 +49,8 @@ char *argv[];
 
     pname = prog_name(argv[0]);
 
-    /* Accept old syntax. */
-    if (argc >= 3 && argv[1][0] != '-') {
-	ai.name = argv[1];
-	record = argv[2];
-	i = 3;
-    }
-    else
-	i = 1;
-
     /* Interpret command-line options. */
-    for ( ; i < argc; i++) {
+    for (i = 1; i < argc; i++) {
 	if (*argv[i] == '-') switch (*(argv[i]+1)) {
 	  case 'a':	/* annotator follows */
 	    if (++i >= argc) {
@@ -113,7 +104,13 @@ char *argv[];
 	*(a+1) = '\0';
 	(void)sscanf(p+1, "%ld%s%d%d%d\t%s", &tm, annstr, &sub, &ch, &nm, a+1);
 	annot.anntyp = strann(annstr);
-	annot.time = tm; annot.subtyp = sub; annot.chan = ch; annot.num = nm;
+	if (line[0] == '[') {
+	    annot.time = -strtim(line);
+	    if (annot.time < 0L) continue;
+	}
+	else
+	    annot.time = tm;
+	annot.subtyp = sub; annot.chan = ch; annot.num = nm;
 	if (*(a+1)) {
 	    *a = strlen(a+1);
 	    annot.aux = a;

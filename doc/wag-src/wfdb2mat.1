@@ -30,8 +30,9 @@ row, so that the column number in the \fB.mat\fR file equals the sample
 number in the input record.  If this seems odd, transpose your matrix
 after reading it!
 .PP
-This program writes version 4 MAT-file format output files, as documented in
-http://www.mathworks.com/access/helpdesk/help/pdf_doc/matlab/matfile_format.pdf.
+This program writes version 4 MAT-file format output files (see
+http://www.mathworks.com/access/helpdesk/help/pdf_doc/matlab/matfile_format.pdf
+for details).
 The samples are written as 16-bit signed integers in little-endian format, or
 as 8-bit unsigned integers for records that contain only 8-bit unsigned samples.
 Although version 5 and newer versions of Matlab normally use a different (less
