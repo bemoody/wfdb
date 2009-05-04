@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:   3 February 2009
+#				Last revised:      3 May 2009
 # This section of the Makefile should not need to be changed.
 
 INCLUDES = $(INCDIR)/wfdb/wfdb.h $(INCDIR)/wfdb/wfdblib.h \
@@ -9,28 +9,24 @@ CFILES = wfdbinit.c annot.c signal.c calib.c wfdbio.c
 OFILES = wfdbinit.o annot.o signal.o calib.o wfdbio.o
 MFILES = Makefile Makefile.dos
 
-# `make' or `make all':  build the WFDB library and wfdb-config
+# `make' or `make all':  build the WFDB library
 all:	setup $(OFILES)
-	rm -f wfdb-config wfdb-config.exe
-	$(MAKE) wfdb-config	# be sure that compiled-in paths are up-to-date
 	$(BUILDLIB) $(OFILES) $(BUILDLIB_LDFLAGS)
 
 # `make install':  install the WFDB library and headers
-install:	$(INCLUDES) $(LIBDIR) $(BINDIR) all
+install:	$(INCLUDES) $(LIBDIR)
+	$(MAKE) clean	    # force recompilation since config may have changed
+	$(MAKE) all
 	cp $(WFDBLIB) $(LIBDIR) 
 	$(SETLPERMISSIONS) $(LIBDIR)/$(WFDBLIB)
 	$(MAKE) lib-post-install
-	../install.sh $(BINDIR) wfdb-config
 
 # 'make collect':  retrieve the installed WFDB library and headers
 collect:
 	../conf/collect.sh $(INCDIR)/wfdb wfdb.h ecgcodes.h ecgmap.h
 	../conf/collect.sh $(LIBDIR) $(WFDBLIB) $(WFDBLIB_DLLNAME)
-	../conf/collect.sh $(BINDIR) wfdb-config
 
 uninstall:
-	../uninstall.sh $(BINDIR) wfdb-config
-	../uninstall.sh $(BINDIR)
 	../uninstall.sh $(INCDIR)/wfdb $(HFILES)
 	../uninstall.sh $(INCDIR)
 	../uninstall.sh $(LIBDIR) $(WFDBLIB)
@@ -40,13 +36,9 @@ uninstall:
 setup:
 	sed "s+DBDIR+$(DBDIR)+" <wfdblib.h0 >wfdblib.h
 
-wfdb-config:
-	$(CC) $(CFLAGS) -DVERSION='"$(VERSION)"' -DCFLAGS='"-I$(INCDIR)"' \
-	  -DLDFLAGS='"-lwfdb"' -I$(INCDIR) -o $@ wfdb-config.c
-
 # `make clean': remove binaries and backup files
 clean:
-	rm -f $(OFILES) libwfdb.* *.dll *~ wfdb-config
+	rm -f $(OFILES) libwfdb.* *.dll *~
 
 # `make TAGS':  make an `emacs' TAGS file
 TAGS:		$(HFILES) $(CFILES)
@@ -54,10 +46,10 @@ TAGS:		$(HFILES) $(CFILES)
 
 # `make listing':  print a listing of WFDB library sources
 listing:
-	$(PRINT) README $(MFILES) $(HFILES) $(CFILES) wfdb-config.c
+	$(PRINT) README $(MFILES) $(HFILES) $(CFILES)
 
 # Rule for creating installation directories
-$(BINDIR) $(INCDIR) $(INCDIR)/wfdb $(INCDIR)/ecg $(LIBDIR):
+$(INCDIR) $(INCDIR)/wfdb $(INCDIR)/ecg $(LIBDIR):
 	mkdir -p $@; $(SETDPERMISSIONS) $@
 
 # Rules for installing the include files

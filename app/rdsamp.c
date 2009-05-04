@@ -1,5 +1,5 @@
 /* file: rdsamp.c	G. Moody	 23 June 1983
-			Last revised:   18 February 2009
+			Last revised:   20 April 2009
 
 -------------------------------------------------------------------------------
 rdsamp: Print an arbitrary number of samples from each signal
@@ -290,17 +290,17 @@ char *argv[];
 	    }
 	    for (i = 0; i < nsig; i++) {
 		char ustring[16];
+		int len;
 	
 		p = si[sig[i]].units;
 		if (p == NULL) p = "mV";
-		if (pflag > 1)
-		    sprintf(ustring, "%14s", p);
-		else
-		    sprintf(ustring, "%6s", p);
-		for (p = ustring+2; *p == ' '; p++)
-		    ;
-		*(p-1) = '(';
-		(void)printf("\t%s)", ustring);
+		len = strlen(p);
+		if (pflag > 1) { if (len > 13) len = 13; }
+		else if (len > 5) len = 5;
+		ustring[0] = '(';
+		strncpy(ustring+1, p, len);
+		ustring[len+1] = '\0';
+		(void)printf(pflag > 1 ? "\t%14s)" : "\t%6s)", ustring);    
 	    }
 	    (void)printf("\n");
 	}

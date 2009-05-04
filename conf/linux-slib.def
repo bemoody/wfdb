@@ -1,5 +1,5 @@
 # file: linux-slib.def		G. Moody	31 May 2000
-#                               Last revised:  4 August 2005
+#                               Last revised:    3 May 2009
 # This section contains settings suitable for generating an ELF-format shared
 # library under Linux.
 
@@ -57,8 +57,9 @@ CC = gcc
 
 # CCDEFS is the set of C compiler options needed to set preprocessor variables
 # while compiling the WFDB Software Package.  CCDEFS should always include
-# VDEFS.
-CCDEFS = $(VDEFS)
+# VDEFS (the version definitions).  Under Linux, -fno-stack-protector is needed
+# when compiling the WFDB Toolkit for Matlab;  it's harmless otherwise.
+CCDEFS = $(VDEFS) -fno-stack-protector
 
 # MFLAGS is the set of architecture-dependent (-m*) compiler options, which
 # is usually empty.  See the gcc manual for information about gcc's -m options.
@@ -66,7 +67,7 @@ MFLAGS =
 
 # CFLAGS is the set of C compiler options used when compiling the shared
 # library.  CFLAGS should always include CCDEFS.
-CFLAGS = $(MFLAGS) -fpic -g -O $(CCDEFS) $(LC) -I$(INCDIR)
+CFLAGS = $(MFLAGS) -fpic -g -O $(CCDEFS) $(LC) -I$(INCDIR) -fno-stack-protector
 
 # WFDBLIB_BASENAME is the name, without version numbers, of the alternate
 # library.  WFDBLIB_SONAME is the shared object name ("soname") of the

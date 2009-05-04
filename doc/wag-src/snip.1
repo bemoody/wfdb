@@ -1,4 +1,4 @@
-.TH SNIP 1 "31 July 2002" "WFDB 10.2.7" "WFDB Applications Guide"
+.TH SNIP 1 "17 Aril 2009" "WFDB 10.4.20" "WFDB Applications Guide"
 .SH NAME
 snip \- copy an excerpt of a WFDB record
 .SH SYNOPSIS
@@ -30,6 +30,16 @@ beginning of the record).
 .TP
 \fB-h\fR
 Print a usage summary.
+.TP
+\fB-l\fR \fIduration\fR
+Snip a segment of the specified \fIduration\fR (hh:mm:ss or s\fInnnn\fR;
+overrides \fB-t\fR if given).
+.TP
+\fB-m\fR
+Preserve segments of multi-segment input, if possible.
+.TP
+\fB-s\fR
+Suppress output of info strings in the output header file.
 .TP
 \fB-t\fR \fItime\fR
 Process until the specified \fItime\fR in the input record (default: continue

@@ -1,4 +1,4 @@
-.TH RDSAMP 1 "18 February 2009" "WFDB 10.4.14" "WFDB Applications Guide"
+.TH RDSAMP 1 "30 April 2009" "WFDB 10.4.20" "WFDB Applications Guide"
 .SH NAME
 rdsamp \- read WFDB signal files
 .SH SYNOPSIS
@@ -79,7 +79,14 @@ Stop at the specified \fItime\fR.  By default, \fBrdsamp\fR stops at the end
 of the record.
 .TP
 \fB-v\fR
-Print column headings.
+Print column headings (signal names on the first line, units on the second).
+The names of some signals are too wide to fit in the columns; such
+names are shortened by omitting the initial characters (since names of
+related signals often differ only at the end, this helps to make the
+columns identifiable).  Names of units are shortened when necessary by
+omitting the final characters, since the initial characters are
+usually most important for distinguishing different units.
+
 .SH ENVIRONMENT
 .PP
 It may be necessary to set and export the shell variable \fBWFDB\fR (see

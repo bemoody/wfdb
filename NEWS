@@ -1,8 +1,18 @@
 10.4.20:
-	wrann now determines output annotation times using the first column
-	of input, if the first column appears to contain absolute times
-	rather than elapsed times;  otherwise, it uses the sample numbers
-	in the second column, as in previous versions.
+	WFDB application 'snip' can now create excerpts of multi-segment
+	records that preserve the segmentation of the original records.
+
+	WFDB application 'wrann' now determines output annotation times using
+	the first column of input, if the first column appears to contain
+	absolute times rather than elapsed times; otherwise, it uses the sample
+	numbers in the second column, as in previous versions.
+
+	WFDB application 'rdsamp' now handles long units strings more cleanly.
+	
+	Several new functions have been added to lib/wfdbio.c, to make
+	configuration constants accessible at run time;  these are needed
+	by the WFDB Toolkit for Matlab.  wfdb-config.c has been rewritten to
+	use several of these functions, and has been moved from lib to app.
 
 10.4.19:
 	pschart and psfd now handle signal names in their command-line argument

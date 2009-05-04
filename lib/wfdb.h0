@@ -324,6 +324,11 @@ extern FINT setobsize(int output_buffer_size);
 extern FSTRING wfdbfile(char *file_type, char *record);
 extern FVOID wfdbflush(void);
 extern FVOID wfdbmemerr(int exit_on_error);
+extern const FSTRING wfdbversion();
+extern const FSTRING wfdbldflags();
+extern const FSTRING wfdbcflags();
+extern const FSTRING wfdbdefwfdb();
+extern const FSTRING wfdbdefwfdbcal();
 #endif
 
 #ifdef wfdb_CPP

@@ -1,9 +1,9 @@
 /* file: wfdb-config.c	G. Moody	27 April 2002
-			Last revised:	23 February 2006	wfdblib 10.4.0
+			Last revised:	 3 May 2009	wfdblib 10.4.20
 
 -------------------------------------------------------------------------------
 wfdb-config: Print WFDB library version and linking information
-Copyright (C) 2002-2006 George B. Moody
+Copyright (C) 2002-2009 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -32,18 +32,6 @@ extern void exit();
 
 #include <wfdb/wfdb.h>
 
-#ifndef VERSION
-#define VERSION	"VERSION not defined"
-#endif
-
-#ifndef LDFLAGS
-#define LDFLAGS "LDFLAGS not defined"
-#endif
-
-#ifndef CFLAGS
-#define CFLAGS	"CFLAGS not defined"
-#endif
-
 char *pname;
 
 main(int argc, char **argv)
@@ -60,11 +48,11 @@ main(int argc, char **argv)
 
     for (i = 1; i < argc; i++) {
 	if (strcmp(argv[i], "--version") == 0)
-	    printf("%s\n", VERSION);
+	    printf("%s\n", wfdbversion());
 	else if (strcmp(argv[i], "--libs") == 0)
-	    printf("%s\n", LDFLAGS);
+	    printf("%s\n", wfdbldflags());
 	else if (strcmp(argv[i], "--cflags") == 0)
-	    printf("%s\n", CFLAGS);
+	    printf("%s\n", wfdbcflags());
 	else
 	    help();
     }

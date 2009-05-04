@@ -1,5 +1,5 @@
 # file: linux.def		G. Moody	31 May 2000
-#				Last revised:  4 August 2005
+#				Last revised:    3 May 2009
 # 'make' definitions for compiling the WFDB Software Package under Linux
 
 # Choose a value for WFDBROOT to determine where the WFDB Software Package will
@@ -63,8 +63,9 @@ CC = gcc
 
 # CCDEFS is the set of C compiler options needed to set preprocessor variables
 # while compiling the WFDB Software Package.  CCDEFS should always include
-# VDEFS.
-CCDEFS = $(VDEFS)
+# VDEFS (the version definitions).  Under Linux, -fno-stack-protector is needed
+# when compiling the WFDB Toolkit for Matlab;  it's harmless otherwise.
+CCDEFS = $(VDEFS) -fno-stack-protector
 
 # MFLAGS is the set of architecture-dependent (-m*) compiler options, which
 # is usually empty.  See the gcc manual for information about gcc's -m options.
@@ -144,7 +145,7 @@ XINCDIR = $(XHOME)/include
 XLIBDIR = $(XHOME)/lib
 
 # WCFLAGS is the set of C compiler options to use when compiling WAVE.
-WCFLAGS = $(CFLAGS) -I$(OWINCDIR) -I$(XINCDIR)
+WCFLAGS = $(CFLAGS) -I$(OWINCDIR) -I$(XINCDIR) -fno-stack-protector
 
 # HELPOBJ can be set to "help.o" if you wish to recompile the XView spot help
 # functions in "wave/help.c" (recommended under Linux).

@@ -39,6 +39,13 @@ This file contains definitions of the following WFDB library functions:
  wfdbfile [4.3]		(returns the complete pathname of a WFDB file)
  wfdbmemerr [10.4.6]    (set behavior on memory errors)
 
+These functions expose config strings needed by the WFDB Toolkit for Matlab:
+ wfdbversion [10.4.20]  (return the string defined by VERSION)
+ wfdbldflags [10.4.20]  (return the string defined by LDFLAGS)
+ wfdbcflags [10.4.20]   (return the string defined by CFLAGS)
+ wfdbdefwfdb [10.4.20]  (return the string defined by DEFWFDB)
+ wfdbdefwfdbcal [10.4.20] (return the string defined by DEFWFDBCAL)
+
 These functions, also defined here, are intended only for the use of WFDB
 library functions defined elsewhere:
 
@@ -235,6 +242,46 @@ static int wfdb_mem_behavior = 1;
 FVOID wfdbmemerr(int behavior)
 {
     wfdb_mem_behavior = behavior;
+}
+
+/* Functions that expose configuration constants used by the WFDB Toolkit for
+   Matlab. */
+
+#ifndef VERSION
+#define VERSION "VERSION not defined"
+#endif
+
+#ifndef LDFLAGS
+#define LDFLAGS "LDFLAGS not defined"
+#endif
+
+#ifndef CFLAGS
+#define CFLAGS  "CFLAGS not defined"
+#endif
+
+const FSTRING wfdbversion()
+{
+   return VERSION;
+}
+
+const FSTRING wfdbldflags()
+{
+   return LDFLAGS;
+}
+
+const FSTRING wfdbcflags()
+{
+   return CFLAGS;
+}
+
+const FSTRING wfdbdefwfdb()
+{
+   return DEFWFDB;
+}
+
+const FSTRING wfdbdefwfdbcal()
+{
+   return DEFWFDBCAL;
 }
 
 /* Private functions (for the use of other WFDB library functions only). */

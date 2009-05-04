@@ -46,6 +46,7 @@ app/time2sec.c
 app/wabp.c
 app/wfdbcat.c
 app/wfdbcollate.c
+app/wfdb-config.c
 app/wfdbdesc.c
 app/wfdbtime.c
 app/wfdbwhich.c
@@ -492,7 +493,6 @@ lib/Makefile.top
 lib/Makefile.tpl
 lib/README
 lib/signal.c
-lib/wfdb-config.c
 lib/wfdb.h
 lib/wfdb.h0
 lib/wfdbinit.c

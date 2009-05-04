@@ -15,6 +15,9 @@ Requires: curl-devel >= 7.10
 BuildRoot: /var/tmp/%{name}-root
 
 %changelog
+* Sun May 3 2009 George B Moody <george@mit.edu>
+- moved wfdb-config from devel to apps
+
 * Thu Feb 29 2009 George B Moody <george@mit.edu>
 - added wfdb2mat
 
@@ -111,7 +114,6 @@ and Fortran, examples in C and in Fortran, and miscellaneous documentation.
 
 %files devel
 %defattr(-,root,root)
-%{_bindir}/wfdb-config
 %{_prefix}/database
 %{_prefix}/include/wfdb
 %doc checkpkg examples fortran lib/COPYING.LIB COPYING INSTALL MANIFEST NEWS README README.NETFILES
@@ -195,6 +197,7 @@ power spectrum estimation, and many others.
 %{_bindir}/url_view
 %{_bindir}/wabp
 %{_bindir}/wav2mit
+%{_bindir}/wfdb-config
 %{_bindir}/wfdb2mat
 %{_bindir}/wfdbcat
 %{_bindir}/wfdbcollate
