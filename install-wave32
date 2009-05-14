@@ -27,10 +27,15 @@
 #     names in other Linux distributions, and "yum" itself may not be available
 #     as a package manager in some distributions.  These commands are safe to
 #     run even if any or all of these packages are already installed.
-yum -y update libgcc.i386 glibc-devel.i386 libX11-devel.i386 \
- libXpm-devel.i386 libcurl-devel.i386 xorg-x11-fonts-misc
-yum -y install libgcc.i386 glibc-devel.i386 libX11-devel.i386 \
- libXpm-devel.i386 libcurl-devel.i386 xorg-x11-fonts-misc
+
+if [ "x$1" != "x-q" ]
+then
+    yum -y update libgcc.i386 glibc-devel.i386 libX11-devel.i386 \
+	libXpm-devel.i386 libcurl-devel.i386 xorg-x11-fonts-misc
+    yum -y install libgcc.i386 glibc-devel.i386 libX11-devel.i386 \
+	libXpm-devel.i386 libcurl-devel.i386 xorg-x11-fonts-misc
+fi
+
 # On Debian-based distributions, such as Ubuntu, it's awkward to force apt-get
 # to install 32-bit packages, especially if like-named 64-bit packages have
 # been installed already.  Google on "getlibs" for an alternative.
@@ -41,9 +46,14 @@ yum -y install libgcc.i386 glibc-devel.i386 libX11-devel.i386 \
 #     easiest way to install them on Fedora is using the RPM command below.
 #     Again, this command is safe even if any or all of these are already
 #     installed.
-rpm -ivh http://physionet.org/physiotools/xview/i386-Fedora/xview-3.2p1.4-21.1.fc8.i386.rpm \
- http://physionet.org/physiotools/xview/i386-Fedora/xview-clients-3.2p1.4-21.1.fc8.i386.rpm \
- http://physionet.org/physiotools/xview/i386-Fedora/xview-devel-3.2p1.4-21.1.fc8.i386.rpm
+
+if [ "x$1" != "x-q" ]
+then
+    rpm -ivh http://physionet.org/physiotools/xview/i386-Fedora/xview-3.2p1.4-21.1.fc8.i386.rpm \
+	http://physionet.org/physiotools/xview/i386-Fedora/xview-clients-3.2p1.4-21.1.fc8.i386.rpm \
+	http://physionet.org/physiotools/xview/i386-Fedora/xview-devel-3.2p1.4-21.1.fc8.i386.rpm
+fi
+
 #
 # On Debian or Ubuntu, simply run
 #	apt-get install xviewg-dev

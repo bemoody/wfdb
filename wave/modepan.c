@@ -1,10 +1,10 @@
 /* file: modepan.c	G. Moody        30 April 1990
-			Last revised:	12 July 2003
+			Last revised:	 12 May 2009
 Mode panel functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 2003 George B. Moody
+Copyright (C) 1990-2009 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -122,7 +122,7 @@ void create_mode_popup()
 	XV_HELP_DATA, "wave:view.draw",
 	PANEL_LABEL_STRING, "Draw: ",
 	PANEL_CHOICE_STRINGS,
-	      "all signals", "listed signals only", NULL,
+	      "all signals", "listed signals only", "valid signals only", NULL,
 	PANEL_VALUE, 0,
 	PANEL_DEFAULT_VALUE, 0,
 	0);
@@ -228,7 +228,7 @@ void set_modes()
     /* Check the signal display options next. */
     i = sig_mode;
     sig_mode = (int)xv_get(sig_item, PANEL_VALUE);
-    if (i != sig_mode)
+    if (i != sig_mode || sig_mode == 2)
 	set_baselines();
 
     /* Check the annotation display mode next. */

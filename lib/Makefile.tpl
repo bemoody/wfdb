@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:      3 May 2009
+#				Last revised:     14 May 2009
 # This section of the Makefile should not need to be changed.
 
 INCLUDES = $(INCDIR)/wfdb/wfdb.h $(INCDIR)/wfdb/wfdblib.h \
@@ -70,3 +70,5 @@ annot.o:	wfdb.h ecgcodes.h ecgmap.h wfdblib.h annot.c
 signal.o:	wfdb.h wfdblib.h signal.c
 calib.o:	wfdb.h wfdblib.h calib.c
 wfdbio.o:	wfdb.h wfdblib.h wfdbio.c
+	$(CC) $(CFLAGS) -DVERSION='"$(VERSION)"' -DCFLAGS='"-I$(INCDIR)"' \
+	  -DLDFLAGS='"-lwfdb"' -c wfdbio.c

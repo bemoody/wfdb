@@ -1,3 +1,13 @@
+10.4.21:
+	Changes in lib/Makefile.tpl were needed in order to pass configuration
+	constants to the functions added to wfdbio.c in 10.4.20, but were
+	omitted from that release;  they have been included in this version.
+
+	Several changes in WAVE, including an option (accessible from the View
+	panel) to display valid signals only, have been designed to provide
+	more convenient access to variable-layout records such as those in the
+	MIMIC II Waveform Database.
+
 10.4.20:
 	WFDB application 'snip' can now create excerpts of multi-segment
 	records that preserve the segmentation of the original records.

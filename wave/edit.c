@@ -1,10 +1,10 @@
 /* file: edit.c		G. Moody	 1 May 1990
-			Last revised:	10 June 2005
+			Last revised:	12 May 2009
 Annotation-editing functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1990-2005 George B. Moody
+Copyright (C) 1990-2009 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -96,8 +96,8 @@ int stat;
     }
     invalid_data = (isigsettime(level_time) < 0 || getvec(level_v) < 0);
     for (i = 0; i < nsig; i++) {
-	sprintf(level_name_string[i], "%8s: ", signame[i]);
-	if (invalid_data) {
+	sprintf(level_name_string[i], "%s: ", signame[i]);
+	if (invalid_data || level_v[i] == WFDB_INVALID_SAMPLE) {
 	    sprintf(level_value_string[i], " ");
 	    sprintf(level_units_string[i], " ");
 	}

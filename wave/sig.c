@@ -1,10 +1,10 @@
 /* file: sig.c		G. Moody	 27 April 1990
-			Last revised:	6 February 2006
+			Last revised:	  13 May 2009
 Signal display functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1990-2006 George B. Moody
+Copyright (C) 1990-2009 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -54,6 +54,7 @@ GC gc;
     int j, xn, xp;
     XPoint *p, *q;
 
+    if (ybase == -9999) return;
     for (j = 0, p = q = b; j <= n; j++) {
 	if (j == n || q->y == WFDB_INVALID_SAMPLE) {
 	    if (p < q) {
@@ -90,11 +91,24 @@ struct display_list *lp;
 	    if (lp->vlist[i])
 		drawtrace(lp->vlist[i], lp->ndpts, base[i], draw_sig, 0);
 	}
-    else
+    else if (sig_mode == 1)
 	for (i = 0; i < siglistlen; i++) {
 	    if (0 <= siglist[i] && siglist[i] < nsig && lp->vlist[siglist[i]])
 		drawtrace(lp->vlist[siglist[i]], lp->ndpts,base[i],draw_sig,0);
 	}
+    else {	/* sig_mode == 2 (show valid signals only) */
+	int j, nvsig;
+	for (i = nvsig = 0; i < nsig; i++)
+	    if (lp->vlist[i] && vvalid[i]) nvsig++;
+	for (i = j = 0; i < nsig; i++) {
+	    if (lp->vlist[i] && vvalid[i]) {
+		base[i] = canvas_height*(2*(j++)+1.)/(2.*nvsig);
+		drawtrace(lp->vlist[i], lp->ndpts, base[i], draw_sig, 0);
+	    }
+	    else
+		base[i] = -9999;
+	}
+    }
     highlighted = -1;
 }
 
@@ -105,7 +119,7 @@ int i;
 
     if (!lp_current) return;
     if (0 <= highlighted && highlighted < lp_current->nsig) {
-	if (sig_mode == 0) {
+	if (sig_mode != 1) {
 	    drawtrace(lp_current->vlist[highlighted], lp_current->ndpts,
 		      base[highlighted], unhighlight_sig, 1);
 	    drawtrace(lp_current->vlist[highlighted], lp_current->ndpts,
@@ -125,7 +139,7 @@ int i;
     }
     highlighted = i;
     if (0 <= highlighted && highlighted < lp_current->nsig) {
-	if (sig_mode == 0) {
+	if (sig_mode != 1) {
 	    drawtrace(lp_current->vlist[highlighted], lp_current->ndpts,
 		      base[highlighted], clear_sig, 1);
 	    drawtrace(lp_current->vlist[highlighted], lp_current->ndpts,
@@ -181,12 +195,12 @@ void do_disp()
     /* Show the annotations, if available. */
     show_annotations(display_start_time, nsamp);
 
-    /* If requested, show the signal names. */
-    if (show_signame) show_signal_names();
-
     /* Get a display list for the requested screen, and show it. */
     lp = find_display_list(display_start_time);
     show_display_list(lp);
+
+    /* If requested, show the signal names. */
+    if (show_signame) show_signal_names();
 
     /* If requested, show the signal baselines. */
     if (show_baseline) show_signal_baselines(lp);
@@ -350,7 +364,7 @@ long fdl_time;
 		    }
 		    else
 			lp->vlist[c][x0].y = WFDB_INVALID_SAMPLE;
-		    vvalid[c] = 0;
+		    //	    vvalid[c] = 0;
 		}
 	    }
 	}
@@ -465,11 +479,24 @@ static void show_signal_names()
 	for (i = 0; i < nsig; i++)
 	    XDrawString(display, osb, draw_sig, xoff, base[i] - yoff,
 			signame[i], strlen(signame[i]));
-    else
+    else if (sig_mode == 1) {
 	for (i = 0; i < siglistlen; i++)
 	    if (0 <= siglist[i] && siglist[i] < nsig)
 		XDrawString(display, osb, draw_sig, xoff, base[i] - yoff,
 			    signame[siglist[i]], strlen(signame[siglist[i]]));
+    }
+    else {	/* sig_mode == 2 (show valid signals only) */
+	int j, nvsig;
+	for (i = nvsig = 0; i < nsig; i++)
+	    if (vvalid[i]) nvsig++;
+	for (i = j = 0; i < nsig; i++) {
+	    if (vvalid[i]) {
+		base[i] = canvas_height*(2*(j++)+1.)/(2.*nvsig);
+		XDrawString(display, osb, draw_sig, xoff, base[i] - yoff,
+			signame[i], strlen(signame[i]));
+	    }
+	}
+    }
 }
 
 static void show_signal_baselines(lp)
@@ -479,6 +506,7 @@ struct display_list *lp;
 
     yoff = mmy(2);
     for (i = 0; i < nsig; i++) {
+	if (base[i] == -9999) continue;
 	if (dc_coupled[i] && 0 <= lp->sb[i] && lp->sb[i] < canvas_height) {
 	    XDrawLine(display, osb, draw_ann,
 		      0, lp->sb[i]+base[i], canvas_width, lp->sb[i]+base[i]);
@@ -499,7 +527,7 @@ int i, x;
 {
     int ix, j = -1, xx, yy;
 
-    if (sig_mode == 0) j = i;
+    if (sig_mode != 1) j = i;
     else if (0 <= i && i < siglistlen) j = siglist[i];
     if (j < 0 || j >= nsig || lp_current->vlist[j] == NULL) return (-1);
     if (nsamp > canvas_width) ix = x;
