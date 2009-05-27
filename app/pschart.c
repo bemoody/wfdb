@@ -1,5 +1,5 @@
 /* file: pschart.c	G. Moody       15 March 1988
-			Last revised:   9 April 2009
+			Last revised:   27 May 2009
 
 -------------------------------------------------------------------------------
 pschart: Produce annotated `chart recordings' on a PostScript device
@@ -446,7 +446,7 @@ char *argv[];
 	    /* count the number of output signals (arguments not beginning with
 	       a hyphen, and not including the last argument, which must be
 	       the name of the script) */
-	    for (j = i+1; j < argc-2 && *argv[j] != '-'; j++)
+	    for (j = i+1; j < argc-1 && *argv[j] != '-'; j++)
 		;
 	    if (j == i+1) {
 		(void)fprintf(stderr, "%s: signal list must follow -s\n",

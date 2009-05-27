@@ -1,5 +1,5 @@
 /* file: psfd.c		G. Moody         9 August 1988
-			Last revised:	 18 March 2009
+			Last revised:	  27 May 2009
 
 -------------------------------------------------------------------------------
 psfd: Produces annotated full-disclosure ECG plots on a PostScript device
@@ -417,7 +417,7 @@ char *argv[];
 	    /* count the number of output signals (arguments not beginning with
 	       a hyphen, and not including the last argument, which must be
 	       the name of the script) */
-	    for (j = i+1; j < argc-2 && *argv[j] != '-'; j++)
+	    for (j = i+1; j < argc-1 && *argv[j] != '-'; j++)
 		;
 	    if (j == i+1) {
 		(void)fprintf(stderr, "%s: signal list must follow -s\n",
