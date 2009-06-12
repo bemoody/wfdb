@@ -1,10 +1,10 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   14 March 2009	wfdblib 10.4.18
+			Last revised:   10 June 2009	wfdblib 10.4.22
 WFDB library functions for signals
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1989-2008 George B. Moody
+Copyright (C) 1989-2009 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -2039,10 +2039,18 @@ FINT osigopen(char *record, WFDB_Siginfo *siarray, unsigned int nsig)
 	    SALLOC(og->buf, 1, obuflen);
 	    og->bp = og->buf;
 	    og->be = og->buf + obuflen;
-	    if (os->info.fmt == 0)
-	        og->fp = NULL;	/* don't open a file for a null signal */
-	    /* An error in opening an output file is fatal. */
-	    else {
+	    if (os->info.fmt == 0) {
+		/* If the signal file name was NULL or "~", don't create a
+		   signal file. */
+		if (os->info.fname == NULL || strcmp("~", os->info.fname) == 0)
+		    og->fp = NULL;
+		/* Otherwise, assume that the user wants to write a signal
+		   file in the default format (16). */
+		else
+		    os->info.fmt = 16;
+	    }
+	    if (os->info.fmt != 0) {
+		/* An error in opening an output file is fatal. */
 		og->fp = wfdb_open(os->info.fname,(char *)NULL, WFDB_WRITE);
 		if (og->fp == NULL) {
 		    wfdb_error("osigopen: can't open %s\n", os->info.fname);
@@ -2157,10 +2165,18 @@ FINT osigfopen(WFDB_Siginfo *siarray, unsigned int nsig)
 	    SALLOC(og->buf, 1,obuflen);
 	    og->bp = og->buf;
 	    og->be = og->buf + obuflen;
-	    if (os->info.fmt == 0)
-	        og->fp = NULL;   /* don't open a file for a null signal */
-	    /* An error in opening an output file is fatal. */
-	    else {
+	    if (os->info.fmt == 0) {
+		/* If the signal file name was NULL or "~", don't create a
+		   signal file. */
+		if (os->info.fname == NULL || strcmp("~", os->info.fname) == 0)
+		    og->fp = NULL;
+		/* Otherwise, assume that the user wants to write a signal
+		   file in the default format (16). */
+		else
+		    os->info.fmt = 16;
+	    }
+	    if (os->info.fmt != 0) {
+		/* An error in opening an output file is fatal. */
 	        og->fp = wfdb_open(os->info.fname,(char *)NULL, WFDB_WRITE);
 		if (og->fp == NULL) {
 		    wfdb_error("osigfopen: can't open %s\n", os->info.fname);

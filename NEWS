@@ -1,3 +1,7 @@
+10.4.22:
+	An uninitialized variable in convert/mit2wav.c caused problems in
+	previous versions;  thanks to Greg Downs for the bug report and fix.
+
 10.4.21:
 	Changes in lib/Makefile.tpl were needed in order to pass configuration
 	constants to the functions added to wfdbio.c in 10.4.20, but were

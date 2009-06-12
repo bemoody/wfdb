@@ -135,7 +135,8 @@ main(int argc, char **argv)
     char buf[80], *nrec = NULL, *ofname, *record = NULL, tfname[10];
     double sps;
     FILE *sfile;
-    int bitspersample, bytespersecond, framelen, i, mag, nsig, *offset, *shift;
+    int bitspersample = 0, bytespersecond, framelen, i, mag, nsig, *offset,
+	*shift;
     long nsamp;
     static WFDB_Sample *x, *y;
     static WFDB_Siginfo *s;
