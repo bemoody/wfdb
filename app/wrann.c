@@ -1,5 +1,5 @@
 /* file wrann.c		G. Moody	 6 July 1983
-			Last revised:   9 April 2009
+			Last revised:   15 July 2009
 
 -------------------------------------------------------------------------------
 wrann: Translate an ASCII file in 'rdann' output format to an annotation file
@@ -94,7 +94,7 @@ char *argv[];
     if (annopen(record, &ai, 1) < 0)	/* open annotation file */
 	exit(2);
     while (fgets(line, sizeof(line), stdin) != NULL) {
-	static char a[256];
+	static char a[256], *ap;
 	p = line+9;
 	if (line[0] == '[')
 	    while (*p != ']')
@@ -102,7 +102,7 @@ char *argv[];
 	while (*p != ' ')
 	    p++;
 	*(a+1) = '\0';
-	(void)sscanf(p+1, "%ld%s%d%d%d\t%s", &tm, annstr, &sub, &ch, &nm, a+1);
+	(void)sscanf(p+1, "%ld%s%d%d%d", &tm, annstr, &sub, &ch, &nm);
 	annot.anntyp = strann(annstr);
 	if (line[0] == '[') {
 	    annot.time = -strtim(line);
@@ -111,8 +111,10 @@ char *argv[];
 	else
 	    annot.time = tm;
 	annot.subtyp = sub; annot.chan = ch; annot.num = nm;
-	if (*(a+1)) {
-	    *a = strlen(a+1);
+	if (ap = strchr(p+1, '\t')) {	/* look for aux string after tab */
+	    strncpy(a+1, ap+1, sizeof(a)-2); /* leave room for count and null */
+	    *a = strlen(a+1) - 1;	/* set byte count (excluding newline) */
+	    a[*a+1] = '\0';		/* replace trailing newline with null */
 	    annot.aux = a;
 	}
 	else

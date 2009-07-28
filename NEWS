@@ -1,6 +1,25 @@
 10.4.22:
+	When reading multifrequency records in WFDB_LOWRES mode, invalid
+	sample values occurring in signals that need to be decimated were
+	not always handled properly in WFDB library function getvec(),
+	resulting in spurious artifacts during intervals that contained a
+	mixture of valid and invalid samples.  This bug has been corrected;
+	thanks to Omar Abdala for a report that brought this problem to light.
+
+        A declaration for WFDB library function findsig() has been added
+        to wfdb.h.  Thanks to Thomas Heldt for reporting a warning
+        that resulted from its omission in previous versions.
+
+	Omar also found and corrected a bug in app/wabp.c that resulted in
+	premature termination of processing some variable-layout multisegment
+	records, and improved the autoselection of a default ABP signal.
+
 	An uninitialized variable in convert/mit2wav.c caused problems in
 	previous versions;  thanks to Greg Downs for the bug report and fix.
+
+	WFDB application 'wrann' from the previous two versions truncated
+	'aux' strings containing embedded whitespace;  this has been corrected.
+	Thanks to Mauro Villarroel for the bug report.
 
 10.4.21:
 	Changes in lib/Makefile.tpl were needed in order to pass configuration

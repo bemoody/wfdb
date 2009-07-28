@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   10 June 2009	wfdblib 10.4.22
+			Last revised:   12 June 2009	wfdblib 10.4.22
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -288,8 +288,7 @@ static int dsbi;		/* index to oldest sample in dsbuf (if < 0,
 				   dsbuf does not contain valid data) */
 static unsigned dsblen;		/* capacity of dsbuf, in samples */
 static unsigned framelen;	/* total number of samples per frame */
-static int gvmode = -1;		/* getvec mode (WFDB_HIGHRES or WFDB_LOWRES
-				   once initialized) */
+static int gvmode = DEFWFDBGVMODE;	/* getvec mode */
 static int gvpad;		/* getvec padding (if non-zero, replace invalid
 				   samples with previous valid samples) */
 static int gvc;			/* getvec sample-within-frame counter */
@@ -1770,8 +1769,8 @@ static int rgetvec(WFDB_Sample *vector)
     if (ispfmax < 2)	/* all signals at the same frequency */
 	return (getframe(vector));
 
-    if (gvmode != WFDB_HIGHRES) {/* return one sample per frame, decimating
-				   (by averaging) if necessary */
+    if ((gvmode & WFDB_HIGHRES) != WFDB_HIGHRES) {
+	/* return one sample per frame, decimating by averaging if necessary */
 	unsigned c;
 	long v;
 
@@ -1779,9 +1778,14 @@ static int rgetvec(WFDB_Sample *vector)
 	for (s = 0, tp = tvector; s < nvsig; s++) {
 	    int sf = vsd[s]->info.spf;
 
-	    for (c = v = 0; c < sf; c++)
+	    for (c = v = 0; c < sf && *tp != WFDB_INVALID_SAMPLE; c++) 
 		v += *tp++;
-	    *vector++ = v/sf;
+	    if (c == sf)
+		*vector++ = v/sf;
+	    else {
+		*vector++ = WFDB_INVALID_SAMPLE;
+		tp += sf - c;
+	    }
 	}
     }
     else {			/* return ispfmax samples per frame, using
@@ -2272,6 +2276,7 @@ FVOID setgvmode(int mode)
 
     if ((mode & WFDB_HIGHRES) == WFDB_HIGHRES) {
 	gvmode = WFDB_HIGHRES;
+	if (ispfmax == 0) ispfmax = 1;
 	sfreq = ffreq * ispfmax;
     }
     else {
@@ -2946,7 +2951,7 @@ FINT setsampfreq(WFDB_Frequency freq)
 {
     if (freq >= 0.) {
 	sfreq = ffreq = freq;
-	if (gvmode == WFDB_HIGHRES) sfreq *= ispfmax;
+	if ((gvmode & WFDB_HIGHRES) == WFDB_HIGHRES) sfreq *= ispfmax;
 	return (0);
     }
     wfdb_error("setsampfreq: sampling frequency must not be negative\n");
@@ -3104,11 +3109,11 @@ FSITIME strtim(char *string)
 			(WFDB_Time)((atof(string+1)-bcount)*f/cfreq) :
 			(WFDB_Time)atol(string+1));
       case 'e':	return ((in_msrec ? msnsamples : nsamples) * 
-		        ((gvmode == WFDB_HIGHRES) ? ispfmax : 1));
+		        (((gvmode&WFDB_HIGHRES) == WFDB_HIGHRES) ? ispfmax: 1));
       case 'f': return (WFDB_Time)(atol(string+1)*f/ffreq);
       case 'i':	return (WFDB_Time)(istime *
 			(ifreq > 0.0 ? (ifreq/sfreq) : 1.0) *
-			((gvmode == WFDB_HIGHRES) ? ispfmax : 1));
+			(((gvmode&WFDB_HIGHRES) == WFDB_HIGHRES) ? ispfmax: 1));
       case 'o':	return (ostime);
       case 's':	return ((WFDB_Time)atol(string+1));
       case '[':	  /* time of day, possibly with date or days since start */

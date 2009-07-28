@@ -1,5 +1,5 @@
 /* file wabp.c          Wei Zong       23 October 1998
-   			Last revised:  7 January 2009 (by G. Moody)
+   			Last revised:   12 June 2009 (by O. Abdala)
 -----------------------------------------------------------------------------
 wabp: beat detector for arterial blood presure (ABP) signal
 Copyright (C) 1998-2009 Wei Zong
@@ -73,6 +73,29 @@ int sig = -1;        /* signal number of signal to be analyzed (initial
 int Tm = TmDEF;		/* minimum threshold value */
 WFDB_Sample *lbuf = NULL;
 
+char *trim_whitespace(char *str)
+{
+    size_t len = 0;
+    char *frontp = str - 1;
+    char *endp = NULL;
+
+    if (str == NULL) return NULL;
+    if (str[0] == '\0') return str;
+    len = strlen(str);
+    endp = str + len;
+    while (isspace(*(++frontp)));
+    while (isspace(*(--endp)) && endp != frontp);
+    if (str + len - 1 != endp)
+        *(endp + 1) = '\0';
+    else if (frontp != str && endp == frontp)
+        *str = '\0';
+    endp = str;
+    if (frontp != str) {
+        while (*frontp) *endp++ = *frontp++;
+        *endp = '\0';
+    }
+    return str;
+}
 
 WFDB_Sample slpsamp(WFDB_Time t)
 {
@@ -99,7 +122,17 @@ WFDB_Sample slpsamp(WFDB_Time t)
     }
     while (t > tt) {
 	static int aet = 0, et;
-	dy = sample(sig, tt) - sample(sig, tt-1); 
+        int prevVal = 0;
+        int val1;
+        int val2;
+        val2 = sample(sig, tt - 1);
+        if (sample_valid() != 1)
+            val2 = prevVal;
+        val1 = sample(sig, tt);
+        if (sample_valid() != 1)
+            val1 = val2;
+        prevVal = val2;
+        dy = val1 - val2;
 	if (dy < 0) dy = 0;
 	et = ebuf[(++tt)&(BUFLN-1)] = dy; 
 	lbuf[(tt)&(BUFLN-1)] = aet += et - ebuf[(tt-SLPwindow)&(BUFLN-1)];
@@ -218,7 +251,7 @@ int main(int argc, char **argv)
     if (sig < 0 || sig >= nsig) {
 	/* Identify the lowest-numbered ABP, ART, or BP signal */
 	for (i = 0; i < nsig; i++)
-	    if (strcmp(s[i].desc, "ABP") == 0 ||
+	    if (strcmp(trim_whitespace(s[i].desc), "ABP") == 0 ||
 		strcmp(s[i].desc, "ART") == 0 ||
 		strcmp(s[i].desc, "BP") == 0)
 		break;
@@ -256,8 +289,7 @@ int main(int argc, char **argv)
     ExpectPeriod = sps * NDP;	  /* maximum expected RR interval */
     SLPwindow = sps * SLPW;       /* slope window size */
 
-    if (vflag) 
-    {
+    if (vflag) {
 	printf("\n------------------------------------------------------\n");
 	printf("Record Name:             %s\n", record);
 	printf("Total Signals:           %d  (", nsig);

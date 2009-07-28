@@ -1,5 +1,5 @@
 /* file: sig.c		G. Moody	 27 April 1990
-			Last revised:	  13 May 2009
+			Last revised:	  12 June 2009
 Signal display functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -345,7 +345,7 @@ long fdl_time;
        data. */
     if (nsamp > canvas_width) {
 	for (i = 1, x0 = 0; i < nsamp && getvec(v) > 0; i++) {
-	    for (c = 0; c < nsig; c++) {
+	    for (c = 0, vvalid[c] = 0; c < nsig; c++) {
 		if (v[c] != WFDB_INVALID_SAMPLE) {
 		    if (v[c] > vmax[c]) vmax[c] = v[c];
 		    if (v[c] < vmin[c]) vmin[c] = v[c];
@@ -364,7 +364,6 @@ long fdl_time;
 		    }
 		    else
 			lp->vlist[c][x0].y = WFDB_INVALID_SAMPLE;
-		    //	    vvalid[c] = 0;
 		}
 	    }
 	}

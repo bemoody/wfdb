@@ -510,6 +510,33 @@ guide in June, 1999.  See @file{NEWS}, in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
+@unnumberedsubsec Changes in version 10.4.22
+
+When reading multifrequency records in WFDB_LOWRES mode, invalid
+sample values occurring in signals that need to be decimated were not
+always handled properly in WFDB library function getvec(), resulting
+in spurious artifacts during intervals that contained a mixture of
+valid and invalid samples.  This bug has been corrected; thanks to
+Omar Abdala for a report that brought this problem to light.
+
+A declaration for WFDB library function findsig has been added to wfdb.h.
+Thanks to Thomas Heldt for reporting a warning that resulted from its
+omission in previous versions.
+
+@unnumberedsubsec Changes in version 10.4.21
+
+Changes in lib/Makefile.tpl were needed in order to pass configuration
+constants to the functions added to wfdbio.c in 10.4.20, but were
+omitted from that release; they have been included in this version.
+
+@unnumberedsubsec Changes in version 10.4.20
+
+Several new functions have been added to lib/wfdbio.c, to make
+configuration constants accessible at run time; these are needed by
+the WFDB Toolkit for Matlab.
+
+(WFDB library version 10.4.19 was identical to version 10.4.18.)
+
 @unnumberedsubsec Changes in version 10.4.18
 
 The WFDB library no longer reports spurious checksum errors when reading
@@ -3168,10 +3195,10 @@ Failure: EOF reached or improper seek
 
 @noindent
 This function resets the input signal file pointers so that the next
-samples read by @code{getvec} from each input annotation file will
-include the next valid sample of the specified signal @var{s}
-occurring at or after @var{t}.  Use @code{tnextvec} to skip lengthy
-gaps in a signal of interest efficiently.
+samples read by @code{getvec} will include the next valid sample of
+the specified signal @var{s} occurring at or after @var{t}.  Use
+@code{tnextvec} to skip lengthy gaps in a signal of interest
+efficiently.
 
 @c @group
 @node     iannsettime, sample, tnextvec, non-sequential
