@@ -1,4 +1,49 @@
-10.4.22:
+10.4.23 (10 August 2009):
+	Several changes in lib/signal.c eliminate unintended interactions that
+ 	occurred in previous versions between the input modes that can be
+ 	selected using setgvmode().  The effects of these interactions were
+ 	first observed in newly written code; existing WFDB applications were
+ 	apparently unaffected.
+
+	On Cygwin/Windows, the WFDB library is now installed in both /usr/bin
+	and /usr/lib, to simplify building user applications that use the WFDB
+	library and to simplify running compiled WFDB applications outside of
+	the Cygwin environment.
+	
+	In some cases, previous versions of WFDB application 'rxr' entered
+	an infinite loop and did not produce any output if one of the annotation
+	files being compared ended during an episode of atrial fibrillation.
+	Thanks to Mathias Gruber, who reported the problem and provided a test
+	case that made it possible to find and fix this bug.
+
+	WFDB application 'wrann' now handles input files containing annotation
+	mnemonics that it does not recognize by writing the corresponding
+	annotations as comment annotations, with the unrecognized mnemonics
+	inserted at the beginning of the 'aux' fields in the output annotations.
+	(Previous versions of 'wrann' discarded any such input annotations.)
+
+	WFDB application 'rdedfann' now preserves the full time resolution of
+	annotations it extracts from EDF+ input files, and it replaces any
+	whitespace in those annotations with underscores (_).  Coupled with
+	the changes in wrann described above, it is now possible to use these
+	two applications to create a WFDB-compatible annotation file from the
+	annotations in an EDF+ file without manual intervention.
+
+	Some recent X servers (including the Xorg 1.6.1 server included in
+	Fedora 11 and Ubuntu 9.04) are incompatible with the XView toolkit used
+	by WAVE.  The symptom of incompatibility is that the X server freezes
+	if any XView control is activated by a mouse click. (If this happens to
+	you, you may be able to regain control of your X session by killing the
+	XView client, for example by logging in remotely, or by switching to a
+	text console.) The cause of the problem appears to be a broken
+	interaction between the X server and the XView Notifier (event
+	dispatcher).  There are no work-arounds available at present; if you
+	wish to use WAVE, use an older X server.
+
+	Also note that texi2html-1.82 (included in Fedora 11) fails to format
+	the WFDB Programmer's Guide as HTML; texi2html-1.78 works, however.
+
+10.4.22 (28 July 2009):
 	When reading multifrequency records in WFDB_LOWRES mode, invalid
 	sample values occurring in signals that need to be decimated were
 	not always handled properly in WFDB library function getvec(),
@@ -21,7 +66,7 @@
 	'aux' strings containing embedded whitespace;  this has been corrected.
 	Thanks to Mauro Villarroel for the bug report.
 
-10.4.21:
+10.4.21 (14 May 2009):
 	Changes in lib/Makefile.tpl were needed in order to pass configuration
 	constants to the functions added to wfdbio.c in 10.4.20, but were
 	omitted from that release;  they have been included in this version.
@@ -31,7 +76,7 @@
 	more convenient access to variable-layout records such as those in the
 	MIMIC II Waveform Database.
 
-10.4.20:
+10.4.20 (4 May 2009):
 	WFDB application 'snip' can now create excerpts of multi-segment
 	records that preserve the segmentation of the original records.
 
@@ -47,7 +92,7 @@
 	by the WFDB Toolkit for Matlab.  wfdb-config.c has been rewritten to
 	use several of these functions, and has been moved from lib to app.
 
-10.4.19:
+10.4.19 (26 March 2009):
 	pschart and psfd now handle signal names in their command-line argument
 	lists (following the '-s' option).
 
@@ -55,21 +100,21 @@
  	of the expected size even if the input ends prematurely.  Thanks to
  	Weixiang Liu for a report that prompted this revision.
 
-10.4.18:
+10.4.18 (15 March 2009):
 	The WFDB library no longer reports spurious checksum errors when reading
 	EDF files, which don't have checksums.
 
 	WFDB application wfdb2mat now correctly handles EDF input records, so
 	it is now possible to use it to convert EDF to .mat format directly.
 
-10.4.17:
+10.4.17 (5 March 2009):
 	Internal WFDB library function wfdb_checkname() now allows hyphens
 	(-) within record and annotator names.
 
 	WFDB applications xform and wfdb2mat now properly handle variable-layout
 	multisegment input records.
 
-10.4.16:
+10.4.16 (3 March 2009):
 	WFDB library function strtim() now rounds rather than truncating when
 	the sampling frequency is not an integer.
 
@@ -79,7 +124,7 @@
 
 	Bug fixes in convert/wfdb2mat.
 
-10.4.15:
+10.4.15 (26 February 2009):
 	WFDB library function mstimstr() now outputs time to the nearest
 	millisecond, rather than truncating its calculation to the nearest
  	lower number of milliseconds.
@@ -91,7 +136,7 @@
 	a WFDB-compatible signal file into a Matlab-compatible .mat file that
 	remains readable by WFDB applications.
 
-10.4.14:
+10.4.14 (23 February 2009):
 	WFDB library function setwfdb() now exports the WFDB library
 	environment variables (WFDB, WFDBCAL, WFDBANNSORT, and WFDBGVMODE) on
 	all modern platforms, so that a process started by a WFDB application
@@ -106,7 +151,7 @@
 	A new WFDB application, wfdbtime, is convenient for use in scripts to
 	convert among absolute and elapsed times and times in sample intervals.
 
-10.4.13:
+10.4.13 (16 February 2009):
 	A new WFDB library function, tnextvec(), finds the next valid sample
 	from a chosen signal, occurring at or after a specified time.  This
 	function is particularly useful when reading variable-layout
@@ -132,7 +177,7 @@
 	tnextvec() function (see above) to search for valid samples of a
 	signal of interest.
 
-10.4.12:
+10.4.12 (20 January 2009):
 	The rule for sorting annotations within a file has been changed to
 	allow a much larger number of simultaneous annotations (i.e.,
 	annotations in a given annotation file with identical 'time' fields)
@@ -174,10 +219,10 @@
 	corrected in this release; thanks to Thomas Heldt for
 	reporting it and providing a reproducible example of it.
 	
-10.4.11:
+10.4.11 (19 November 2008):
 	Build process improvements, especially on Cygwin and MinGW targets.
 
-10.4.10:
+10.4.10 (31 October 2008):
 	EDF digital maximum and minimum values are now read properly in 64-bit
 	builds;  previous versions had a bug in edfparse (an internal WFDB
 	library function defined in lib/signal.c) that did not appear in
@@ -192,7 +237,7 @@
 	The "-f" option now works properly in ann2rr (previous versions
 	worked only if "-t" was also provided).
 
-10.4.9:
+10.4.9 (10 October 2008):
 	The "configure" script is now non-interactive by default.  A new
 	"-i" option selects interactive mode.
 
@@ -208,7 +253,7 @@
 	in wfdb_open (an internal WFDB library function defined in
 	lib/wfdbio.c).
 
-10.4.8:
+10.4.8 (31 July 2008):
 	New application convert/ahaecg2mit.c converts files from the AHA DB
 	DVD into WFDB records.  (ECRI, distributors of the AHA DB, recently
 	began shipping it on DVDs in a format incompatible with its previous
@@ -218,7 +263,7 @@
 	POSIX rand48() and srand48() to generate dither (the POSIX functions
 	are not universally available).
 
-10.4.7: 
+10.4.7 (15 July 2008): 
 	Yinqi Zhang reported and contributed a fix for a memory leak in
 	make_vsd() (an internal WFDB library function defined in signal.c).
 
@@ -228,7 +273,7 @@
 	Applications wrsamp and xform can now add dithering to their
 	inputs using a new -d option.
 
-10.4.6:
+10.4.6 (9 April 2008):
 	The WFDB functions setafreq() and getafreq() (for setting and getting
 	the time resolution of newly-created output annotation files in ticks
 	per second) were new in version 10.4.5, but were undocumented.  They
@@ -277,7 +322,7 @@
 	supplied an example that evoked this problem, which has now been
 	corrected.
 
-10.4.5:
+10.4.5 (6 February 2008):
 	Bob Farrell and Tony Ricke chased down and provided fixes for memory
 	leaks in several WFDB library functions, and also provided revisions
 	to permit additional type checking and to avoid type mismatch warnings.
@@ -329,14 +374,16 @@
 	in '.hea', it is assumed to be the record name of an EDF file of the
 	same name.
 
-10.4.4: Added 'collect.sh' script to 'conf', and 'collect' target to
+10.4.4 (12 May 2006):
+	Added 'collect.sh' script to 'conf', and 'collect' target to
 	'make' template files (Makefile.tpl) to simplify creation of
 	binary tarballs and RPMs.
 
-10.4.3: Updated wfdb.spec (used to generate WFDB RPMs) to account for
-	applications with compiled-in paths.
+10.4.3 (10 May 2006):
+        Updated wfdb.spec (used to generate WFDB RPMs) to account for
+       	applications with compiled-in paths.
 
-10.4.2:
+10.4.2 (4 May 2006):
 	Mathias Gruber reported a line in wfdbio.c that used void pointer
 	arithmetic (permitted as an extension by gcc but not allowed by
 	ANSI/ISO C or most other C compilers).  This operation has been
@@ -352,7 +399,7 @@
 
 	Many minor documentation updates.
 
-10.4.1: 
+10.4.1 (6 April 2006): 
 	A bug caused incorrect output from WFDB library function strtim()
 	when called with the argument "i", following use of setifreq() to
 	change the effective sampling frequency, resulting in incorrect output
@@ -364,7 +411,7 @@
 	partially fixed in this version, but the fix introduced another bug,
 	which was corrected in version 10.4.5.]
 
-10.4.0:
+10.4.0 (2 March 2006):
 	Version 10.4.0 and later versions of the WFDB library are intended to
 	be compiled using ANSI/ISO C (and C++) compilers only;  previous
 	versions also supported the use of traditional (K&R) C compilers.  The
@@ -433,7 +480,7 @@
 	Hardware recommendations for WAVE have been updated in the WAVE
 	User's Guide.
 
-10.3.17:
+10.3.17 (20 August 2005):
 	The WFDB library now supports reading variable-layout records
 	(multi-segment records in which the number, arrangement, gains,
 	and baselines of the signals may vary from one segment to the next;
@@ -494,7 +541,7 @@
 	and sets up the Makefiles appropriately (unless the '-m32' option
 	is used to force 32-bit mode).
 
-10.3.16:
+10.3.16 (13 June 2005):
 	Benjamin Moody has added an interface between the WFDB library and
 	libcurl as an alternative to the existing libwww interface, and has
 	updated 'configure' and conf/*.def to search for and use libcurl if
@@ -522,7 +569,7 @@
 	MS-DOS utilities and makefiles, have been removed from this version of
 	the WFDB Software Package.
 
-10.3.15:
+10.3.15 (31 January 2005):
 	Rules for generating the binary tarball for MS-Windows have been
 	fixed so that the Cygwin DLLs are now included with correct
 	permissions.
@@ -531,7 +578,7 @@
 	step if SELinux is enabled (as under Fedora Core 2 and later);  this
 	has been incorporated into conf/linux-slib.def.
 
-10.3.14:
+10.3.14 (29 December 2004):
 	Use rdann's new -v option to add column headings to its standard
 	output.
 
@@ -557,7 +604,7 @@
 	related to compiling the WFDB software package and building the
 	WFDB rpms.
 
-10.3.13:
+10.3.13 (5 May 2004):
 	Using an indirect WFDB path (i.e., setting the WFDB environment
 	variable to a value such as '@FILE', where FILE contains the
 	desired path) was broken in WFDB library versions 10.3.9 through
@@ -571,7 +618,7 @@
 	inputs.  Thanks to Joe Mietus for providing sample inputs that helped
 	in identifying and resolving these problems.
 
-10.3.12:
+10.3.12 (9 March 2004):
 	A beta release of the WFDB_tools package is now available for testing.
 	This package allows Matlab R13 users to use the WFDB library to read
 	and write digitized signals and annotations such as those available
@@ -641,7 +688,7 @@
 	The man page for xform (doc/wag-src/xform.1) now documents the -S
 	option (thanks to Lucy Gibson for pointing out the omission).
 
-10.3.11:
+10.3.11 (17 October 2003):
 	Isaac Henry provided a fix for 'configure' to avoid a problem that
 	may occur in a non-standard Cygwin installation. 
 
@@ -655,7 +702,7 @@
 	New signal types and units have been added to the WFDB calibration
 	database (data/wfdbcal).
 
-10.3.10:
+10.3.10 (3 August 2003):
 	In version 10.3.9, the functions setannstr, setanndesc, and setecgstr
 	(in lib/annot.c) did not contain necessary checks to avoid invoking
 	strcmp with a NULL argument.  These checks have been added in version
@@ -667,7 +714,7 @@
 	WAVE now incorporates a simplified method for synchronizing multiple
 	windows.  The WAVE version number has been changed from 6.6 to 6.7.
 
-10.3.9:
+10.3.9 (16 July 2003):
 	The WFDB library functions setwfdb, setannstr, setanndesc, and
 	setecgstr now copy their input string arguments, so that it is
 	no longer necessary for WFDB applications to keep these strings
@@ -682,7 +729,7 @@
 	corrected, and putinfo output is now flushed before putinfo returns.
 	Thanks to Jonas Carlson for reporting this problem.
 
-10.3.8:
+10.3.8 (12 July 2003):
 	The WFDB library function setbasetime (in lib/signal.c) now properly
 	accepts arguments specifying midnight (e.g., "0:0:0"), which previous
 	versions rejected, and the function setheader (also in lib/signal.c)
@@ -725,12 +772,12 @@
 	version 10.0.1 (!);  the programs should work properly again, if anyone
 	still needs to use them.
 
-10.3.7:
+10.3.7 (6 May 2003):
 	Fixed a bug in xform, introduced in 10.3.4, that prevented xform from
 	reading the output sampling frequency from the standard input.  Thanks
 	to Thomas Heldt for the bug report.
 
-10.3.6:
+10.3.6 (7 April 2003):
 	The fix applied in isigclose() in 10.3.5 was incomplete but is now
 	(really!) fixed.  Applications that use sample() should call wfdbquit()
 	to be certain that sample's buffer is freed before exiting.
@@ -745,26 +792,26 @@
 	within the WFDB NETFILES code has been improved substantially, but
 	there may be further room for improvement.
 
-10.3.5:
+10.3.5 (31 March 2003):
 	Fixed a bug in WFDB library function isigclose() (in lib/signal.c)
 	that had caused sample()'s buffer to be freed inappropriately when
 	switching segments in a multi-segment record.  Thanks to Dave
 	Schaffer for the bug report and for a test case that illustrated
 	the bug.
 
-10.3.4:
+10.3.4 (30 March 2003):
 	xform now handles input and output sampling frequencies that are not
 	exact multiples of 1 Hz.
 
 	Added SRCDIR definition in configure and conf/cygwin.def.
 
-10.3.3:
+10.3.3 (20 March 2003):
 	Fixed man page installation bug;  thanks to Joe Mietus for the bug
 	report.
 
 	Updated INSTALL (installation notes).
 
-10.3.2:
+10.3.2 (25 February 2003):
 	New applications wav2mit and mit2wav create WFDB-format records from
 	files in the widely-used .wav audio format and vice versa.
 
@@ -804,7 +851,7 @@
 	There are now separate wfdb, wfdb-devel, wfdb-app, wfdb-doc, and
 	wfdb-wave RPMs.
 
-10.3.1:
+10.3.1 (5 December 2002):
 	Added a -W option to ann2rr to create 2-column output containing
 	intervals in seconds and annotation mnemonics, and modified the
 	interval calculations to avoid accumulated roundoff error.
@@ -823,7 +870,7 @@
 	for continuous ABP signals, which has been added to the package
 	(see wabp).
 
-10.3.0:
+10.3.0 (26 November 2002):
 	The WFDB Software Package has been ported to MacOS/X (Darwin),
 	version 10.2 (the port should also work under 10.1 but this
 	has not been tested and will not be supported).	
@@ -876,7 +923,7 @@
 
 	Numerous updates in the WFDB Applications Guide.
 
-10.2.9:
+10.2.9 (27 October 2002):
 	Fixed a bug in example 9 in the WFDB Programmer's Guide (introduced
 	in version 10.2.0).
 
@@ -888,11 +935,11 @@
 	manuals for the desired page size, and added hyperlinks to the
 	PDF version of the WFDB Programmer's Guide.
 
-10.2.8:
+10.2.8 (14 October 2002):
 	Fixed a bug in WAVE that occasionally caused a crash when starting
 	up;  also repaired a broken link in WAVE's on-line help.
 
-10.2.7:
+10.2.7 (8 August 2002):
 	Added a workaround to wfdb_fclose() (in lib/wfdbio.c) so that
 	closing stdin after using freopen doesn't trigger a core dump.
 
@@ -911,7 +958,7 @@
 
 	Numerous updates and corrections in the WFDB Applications Guide.
 	
-10.2.6:
+10.2.6 (24 June 2002):
 	Added setifreq() and getifreq() to the WFDB library.  setifreq
 	allows the caller to resample an input record at any convenient
 	sampling frequency, using getvec() to perform xform's resampling
@@ -959,7 +1006,7 @@
 	with NETFILES and reporting any errors, but was not counting errors
 	in this test.
 
-10.2.5:
+10.2.5 (10 March 2002):
 	New output format options in 'ann2rr' and 'ihr'.
 
 	FreeBSD support in 'configure', new conf/freebsd* (thanks to
@@ -971,11 +1018,11 @@
 	Removed unneeded references to wfdb/wfdb.h from waverc/wave-remote.c
 	and waverc/wavescript.c (thanks again to Giuseppe Pagnoni).
 
-10.2.4:
+10.2.4 (20 December 2001):
 	Bug fixes in 'pschart' and 'psfd' (vbuf was not properly initialized
 	before its first use).
 
-10.2.3:
+10.2.3 (14 December 2001):
 	Portability fixes in 'configure', 'install.sh', 'wave/Makefile.tpl',
 	'psd/hr*', 'doc/*.sh', 'lib/wfdblib.h', and 'checkpkg/*check'.
 
@@ -997,7 +1044,7 @@
 	Added rules for creating WFDB source and binary RPMs to the top-level
 	Makefile.tpl.
 
-10.2.2:
+10.2.2 (29 November 2001):
 	WAVE can now be used to view and edit annotations for records that
 	have no signals.
 
@@ -1009,7 +1056,7 @@
 	some non-outlier data in the first few samples to be rejected
 	incorrectly.  This has now been fixed.
 
-10.2.1:
+10.2.1 (16 November 2001):
 	Most users will no longer need to set the WFDB path explicitly, as a
 	result of several minor changes in the default path and in the
 	installer for the WFDB Software Package.
@@ -1019,7 +1066,7 @@
 	Order' and 'Multi-Frequency Records', in the WFDB Programmer's Guide,
 	for details).
 
-10.2.0:
+10.2.0 (15 October 2001):
 	The 10.2 series differs from all earlier releases in that the WFDB
 	library no longer imposes any fixed limits on the numbers of annotators
 	or signals that can be open simultaneously.  There is also no

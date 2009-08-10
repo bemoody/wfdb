@@ -1,9 +1,9 @@
 /* file: rxr.c		G. Moody	16 August 1989
-			Last revised:    31 March 2008
+			Last revised:    7 August 2009
 
 -------------------------------------------------------------------------------
 rxr: ANSI/AAMI-standard run-by-run annotation file comparator
-Copyright (C) 1989-2008 George B. Moody
+Copyright (C) 1989-2009 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -260,7 +260,7 @@ int stat, type;
 	}
 	if (getann(a, &tempann) < 0) {
 	    if (run_length[a] > 0)
-		annot[a].anntyp = NORMAL;
+		annot[a].anntyp = UNKNOWN;
 	    else
 		goflag = 0;
 	}

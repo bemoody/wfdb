@@ -1,9 +1,9 @@
 /* file: rdedfann.c	G. Moody	 14 March 2008
-   			Last revised:	  4 April 2008
+   			Last revised:	 6 August 2009
 
 -------------------------------------------------------------------------------
 rdedfann: Print annotations from an EDF+ file
-Copyright (C) 2008 George B. Moody
+Copyright (C) 2009 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -45,7 +45,7 @@ main(int argc, char **argv)
 {
     char *record = NULL, *prog_name();
     int aindex = 0, alen = 0, framelen = 0;
-    int highres = 0, i, nsig, s, vflag = 0;
+    int  i, nsig, s, vflag = 0;
     WFDB_Sample *frame;
     WFDB_Siginfo *si;
     void help();
@@ -83,6 +83,7 @@ main(int argc, char **argv)
 	help();
 	exit(1);
     }
+    setgvmode(WFDB_HIGHRES);
     if ((nsig = isigopen(record, NULL, 0)) <= 0) exit(2);
     if ((si = malloc(nsig * sizeof(WFDB_Siginfo))) == NULL) {
 	(void)fprintf(stderr, "%s: insufficient memory\n", pname);
@@ -186,8 +187,12 @@ proc(int x)
 	case 4:		/* annot just ended, there may be another */
 	    if (text[0]) {	/* the annotation was not empty -- output it */
 		long t = (long)(atof(onset) * sfreq + 0.5);
-		printf("%s  %7ld%6s%5d%5d%5d",
-		       mstimstr(t), t, text, 0, 0, 0);
+
+		/* replace whitespace with '_' */
+		for (textp = text; *textp; textp++)
+		    if (*textp == ' ' || *textp == '\t') *textp = '_';
+		printf("%s  %7ld %5s%5d%5d%5d",
+		       t ? mstimstr(t) : "    0:00.000", t, text, 0, 0, 0);
 		if (duration[0]) printf("\tduration: %s", duration);
 		printf("\n");
 	    }

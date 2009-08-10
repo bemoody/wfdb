@@ -1,5 +1,5 @@
 /* file wrann.c		G. Moody	 6 July 1983
-			Last revised:   15 July 2009
+			Last revised:   6 August 2009
 
 -------------------------------------------------------------------------------
 wrann: Translate an ASCII file in 'rdann' output format to an annotation file
@@ -95,6 +95,8 @@ char *argv[];
 	exit(2);
     while (fgets(line, sizeof(line), stdin) != NULL) {
 	static char a[256], *ap;
+	int auxlen;
+
 	p = line+9;
 	if (line[0] == '[')
 	    while (*p != ']')
@@ -111,10 +113,27 @@ char *argv[];
 	else
 	    annot.time = tm;
 	annot.subtyp = sub; annot.chan = ch; annot.num = nm;
-	if (ap = strchr(p+1, '\t')) {	/* look for aux string after tab */
-	    strncpy(a+1, ap+1, sizeof(a)-2); /* leave room for count and null */
-	    *a = strlen(a+1) - 1;	/* set byte count (excluding newline) */
-	    a[*a+1] = '\0';		/* replace trailing newline with null */
+	/* If annstr does not contain a recognizable mnemonic, write a NOTE
+	   annotation and put annstr at the beginning of the aux field. */
+	if (annot.anntyp == NOTQRS)
+	    annot.anntyp = NOTE;
+	else
+	    *annstr = '\0';
+	if (ap = strchr(p+1, '\t')) {	/* check if auxinfo at end of line */
+		if (strlen(annstr) + strlen(ap) + 2 > sizeof(a))
+		ap[sizeof(a)-strlen(annstr)-3] = '\0';
+	    else
+		ap[strlen(ap)-1] = '\0';     /* else discard trailing newline */
+	}
+	/* Create an aux string if needed. */
+	if (*annstr || ap) {
+	    if (*annstr && ap)
+		sprintf(a+1, "%s %s\0", annstr, ap+1);
+	    else if (*annstr)
+		sprintf(a+1, "%s\0", annstr);
+	    else
+		sprintf(a+1, "%s\0", ap+1);
+	    *a = strlen(a+1);
 	    annot.aux = a;
 	}
 	else
