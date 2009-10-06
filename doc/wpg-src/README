@@ -11,7 +11,7 @@ them:
 WFDB Programmer's Guide
   printed copy	'make wpg-book'(requires troff, texi2dvi, dvips, and a printer)
   Windows help	'make wpg.hlp' (requires makertf and hcrtf)
-  HTML		'make wpg.html'(requires texi2html* and perl)
+  HTML		'make wpg.html'(requires texi2html and perl)
   info		'make wpg.info'(requires makeinfo or GNU emacs)
   PDF		'make wpg.pdf' (requires texi2dvi)
   PostScript	'make wpg.ps'  (requires texi2dvi and dvips)
@@ -19,7 +19,6 @@ WFDB Programmer's Guide
 All of these, with the exception of printed copies, can be downloaded from
 PhysioNet (look in http://www.physionet.org/physiotools/manuals.shtml).
 
-* texi2html-1.82 (included in Fedora 11) fails; texi2html-1.78 works.
 
 The following files will be found in this directory:
 

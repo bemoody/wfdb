@@ -1,8 +1,8 @@
 /* file: nst.c		G. Moody	8 December 1983
-			Last revised:  25 February 2006
+			Last revised:    6 October 2009
 -------------------------------------------------------------------------------
 nst: Noise stress test
-Copyright (C) 1983-2006 George B. Moody
+Copyright (C) 1983-2009 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -53,8 +53,8 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-    static char answer[10], buf[256], *wfdbp, irec[10], nrec[21], nnrec[20],
-        orec[10], refaname[10], *protocol, tfname[9], *p, *s;
+    static char answer[20], buf[256], *wfdbp, irec[10], nrec[21], nnrec[20],
+        orec[10], refaname[10], *protocol, tfname[20], *p, *s;
     double *anoise, *asig, *g, nsf = 0.0, nsr, *r, snr = -999999.0, ssf = 0.0;
     FILE *ifile;
     int i;
@@ -296,7 +296,7 @@ char *argv[];
 		(void)strcpy(answer, "30:0");
 	}
 	else
-	    (void)strcpy(answer, mstimstr(strtim("e")));
+	    (void)strncpy(answer, mstimstr(strtim("e")), sizeof(answer));
 	t0 = strtim("5:0");
 	dt = strtim("2:0");
 	tf = strtim(answer);
