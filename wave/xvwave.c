@@ -1,10 +1,10 @@
 /* file: xvwave.c	G. Moody	27 April 1990
-			Last revised:	 12 May 2006
+			Last revised:  28 October 2009
 XView support functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1990-2005 George B. Moody
+Copyright (C) 1990-2009 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -169,7 +169,9 @@ int *pargc;
 char *argv[];
 {
     char dfname[256], *resdir, *tmp, *getenv();
+    extern int fullscreendebug;
 
+    fullscreendebug = 1;  /* work around bug in Xorg 1.6+ by disabling grabs */
     xv_init(XV_INIT_ARGC_PTR_ARGV, pargc, argv, NULL);
 
     display = XOpenDisplay(NULL);

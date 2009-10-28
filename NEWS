@@ -1,13 +1,19 @@
-10.4.24 (6 October 2009):
+10.4.24 (28 October 2009):
 	A possible string overflow in nst.c has been corrected.  Thanks to
 	Virginia Faro-Maza for finding and reporting this problem.
 
+	Recent versions of the Xorg (X11 Window System) server freeze when
+	applications that use XView (such as WAVE) 'grab' the mouse pointer.
+	Thanks to Michael Buro, who supplied a run-time workaround for this
+	problem that can be used with any XView application to disable pointer
+	grabs.  Pointer grabs are now permanently disabled in WAVE. 
+
 10.4.23 (7 August 2009):
 	Several changes in lib/signal.c eliminate unintended interactions that
- 	occurred in previous versions between the input modes that can be
- 	selected using setgvmode().  The effects of these interactions were
- 	first observed in newly written code; existing WFDB applications were
- 	apparently unaffected.
+	occurred in previous versions between the input modes that can be
+	selected using setgvmode().  The effects of these interactions were
+	first observed in newly written code; existing WFDB applications were
+	apparently unaffected.
 
 	On Cygwin/Windows, the WFDB library is now installed in both /usr/bin
 	and /usr/lib, to simplify building user applications that use the WFDB
