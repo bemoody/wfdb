@@ -20,6 +20,8 @@ char *datstr(WFDB_Date \fId\fP)
 .br
 char *ecgstr(int \fIannotation_code\fP)
 .br
+int findsig(char *\fIsignal_name\fP)
+.br
 void flushcal(void)
 .br
 int getann(WFDB_Annotator \fIa\fP, WFDB_Annotation *\fIannotation\fP)
@@ -27,6 +29,8 @@ int getann(WFDB_Annotator \fIa\fP, WFDB_Annotation *\fIannotation\fP)
 double getbasecount(void)
 .br
 int getcal(char *\fIdescription\fP, char *\fIunits\fP, WFDB_Calinfo *\fIcal\fP)
+.br
+WFDB_Frequency getafreq(void)
 .br
 WFDB_Frequency getcfreq(void)
 .br
@@ -80,6 +84,8 @@ WFDB_Frequency sampfreq(char *\fIrecord\fP)
 .br
 WFDB_Sample sample(WFDB_Signal \fIs\fP, WFDB_Time \fIt\fP)
 .br
+void setafreq(WFDB_Frequency \fIannotation_clock_frequency\fP)
+.br
 int setanndesc(int \fIannotation_code\fP, char *\fIannotation_description\fP)
 .br
 int setannstr(int \fIannotation_code\fP, char *\fIannotation_mnemonic_string\fP)
@@ -118,6 +124,8 @@ WFDB_Time strtim(char *\fItime_string\fP)
 .br
 char *timstr(WFDB_Time \fIt\fP)
 .br
+WFDB_Time tnextvec(WFDB_Signal \fIs\fP, WFDB_Time \fIt\fP)
+.br
 int ungetann(WFDB_Annotator \fIa\fP, WFDB_Annotation *\fIannotation\fP)
 .br
 char *wfdberror(void)
@@ -132,6 +140,8 @@ long wfdbgetstart(WFDB_Signal \fIs\fP)
 .br
 int wfdbinit(char *\fIrecord\fP, WFDB_Anninfo *\fIaiarray\fP, unsigned int \fInann\fP,
                 WFDB_Siginfo *\fIsiarray\fP, unsigned int \fInsig\fP)
+.br
+int wfdbputprolog(char *\fIprolog\fP, long \fIbytes\fP, WFDB_Signal \fIs\fP)
 .br
 void wfdbquiet(void)
 .br

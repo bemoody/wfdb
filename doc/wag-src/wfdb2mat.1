@@ -1,4 +1,4 @@
-.TH WFDB2MAT 1  "26 February 2009" "WFDB 10.4.15" "WFDB Applications Guide"
+.TH WFDB2MAT 1  "28 October 2009" "WFDB 10.4.24" "WFDB Applications Guide"
 .SH NAME
 wfdb2mat \- convert WFDB-compatible signal file to Matlab .mat file
 .SH SYNOPSIS
@@ -31,6 +31,7 @@ number in the input record.  If this seems odd, transpose your matrix
 after reading it!
 .PP
 This program writes version 4 MAT-file format output files (see
+.br
 http://www.mathworks.com/access/helpdesk/help/pdf_doc/matlab/matfile_format.pdf
 for details).
 The samples are written as 16-bit signed integers in little-endian format, or
@@ -87,7 +88,15 @@ This works even if the input files have not been downloaded;  in this case,
 .PP
 The output files are \fBmitdb/200m.mat\fR and \fBmitdb/200m.hea\fR.  Note that
 if a subdirectory of the current directory named \fBmitdb\fR did not exist
-already, it would be created by \fBwfdb2mat\fR.
+already, it would be created by \fBwfdb2mat\fR.  In addition, if the standard
+output of \fBwfdb2mat\fR has been saved in a file named \fBmitdb/200m.info\fR,
+then the converted data can be read and plotted in Matlab or Octave from within
+the \fBmitdb\fR directory by running the command:
+.br
+	\fBplotATM('200m.mat', '200m.info')
+.br
+(Download \fBhttp://physionet.org/physiotools/matlab/plotATM.m\fR and install
+it in your Matlab or Octave environment first.)
 .SH ENVIRONMENT
 .PP
 It may be necessary to set and export the shell variable \fBWFDB\fR (see
@@ -96,9 +105,16 @@ It may be necessary to set and export the shell variable \fBWFDB\fR (see
 This program is provided in the \fIconvert\fR directory of the WFDB Software
 Package.  Run \fBmake\fR in that directory to compile and install it if it
 have not been installed already.
+.PP
+The PhysioNet ATM (http://physionet.org/cgi-bin/ATM) provides web access to
+\fBwfdb2mat\fR (select \fBExport signals as .mat\fR from the Toolbox). 
+
 .SH SEE ALSO
 \fBa2m\fR(1), \fBedf2mit\fR, \fBsnip\fR(1), \fBwav2mit\fR(1), \fBxform\fR(1),
 \fBwfdb\fR(3), \fBheader\fR(5)
+.br
+\fBhttp://physionet.org/physiotools/matlab/plotATM.m\fR
+
 .SH AUTHOR
 George B. Moody (george@mit.edu)
 .SH SOURCES

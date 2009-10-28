@@ -124,12 +124,10 @@ certainty the effects of algorithm modifications on performance.
 
 Standards EC38 and EC57 require the use of the following ECG
 databases:\footnote{Sources: ECRI, 5200 Butler Pike, Plymouth Meeting,
-PA 19462 USA (AHA DB); MIT-BIH Database Distribution, MIT Room
-E25-505A, 77 Massachusetts Avenue, Cambridge, MA 02139 USA (MIT, NST,
-and CU databases); CNR Institute of Clinical Physiology, Computer
-Laboratory, via Trieste, 41, 56100 Pisa, Italy (ESC DB).  Except for
-the AHA DB, all are available in whole or in part from PhysioNet
-({\tt http://www.\-physio\-net.\-org/}).}
+  PA 19462 USA (AHA DB); PhysioNet (http://physionet.org/) (MIT, NST,
+  CU DB; and ESC DB for non-commercial use); Alessandro Taddei, CNR
+  Institute of Clinical Physiology, G. Pasquinucci Heart Hospital, via
+  Aurelia Sud, 54100 Massa, Italy (ESC DB for commercial use).}
 \begin{itemize}
    \item {\bf AHA DB}: The American Heart Association Database for
 Evaluation of Ventricular Arrhythmia Detectors (80 records, 35 minutes
@@ -605,10 +603,10 @@ the test annotation file, and each mismatch is indicated by a {\tt
 NOTE} annotation, with the {\tt aux} field indicating the element of
 the confusion matrix in which the mismatch is tallied (e.g., ``{\tt Vn}''
 represents a beat called a VEB by the reference annotator and a normal
-beat by the test annotator).  Programs such as {\tt view},
-{\tt wave}, and {\tt wview}\footnote{
-{\tt view} (for MS-DOS),  {\tt wave} (for Linux, Solaris, and SunOS) and
-{\tt wview} (for MS Windows) are included in the WFDB Software Package.}
+beat by the test annotator).  Programs such as
+{\tt wave}\footnote{
+{\tt wave} (for FreeBSD, Linux, Mac OS X, Solaris, SunOS, and Windows)
+are included in the WFDB Software Package.}
 can be used to search for and display the waveforms associated with the
 mismatches.  To generate an output annotation file, add the {\tt -o} option to
 the {\tt bxb} command line, as in:

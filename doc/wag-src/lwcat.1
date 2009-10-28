@@ -1,4 +1,4 @@
-.TH LWCAT 1 "1 May 2003" "plt 2.3" "WFDB Applications Guide"
+.TH LWCAT 1 "28 October 2009" "plt 2.5" "WFDB Applications Guide"
 .SH NAME
 lwcat \- postprocess output of plt to make PostScript, EPS, PDF or PNG
 .SH SYNOPSIS
@@ -97,6 +97,23 @@ Plot in a 7.5x4.635 inch (191x118 mm) window, 0.5 inches (12.7 mm) from the
 left edge and 3.365 inches (85 mm) from the bottom edge of the page
 (the aspect ratio is approximately the "golden ratio",
 (1+sqrt(5))/2 = 1.61803 ...).
+.TP
+\fB-strip\fR
+Plot in an 8x0.8 inch (203x20 mm) window.
+.TP
+\fB-custom\fR \fIwidth height left-margin bottom-margin font_scale\fR
+Plot in a custom window. The \fB-custom\fR option reads up to 5
+arguments that follow it.  If one of the 5 arguments immediately
+following \fB-custom\fR begins with '\fB-\fR', it and any remaining
+arguments are treated as ordinary options, and default values are used
+for any missing options.  The units of width, height, and margins are
+inches, and the font scale is a dimensionless factor with a default
+value of 1 that can be used to enlarge or shrink any text in the plot.
+The defaults for \fIwidth\fR and \fIleft-margin\fR are 5 and 0 respectively,
+and the defaults for \fIheight\fR and \fIbottom-margin\fR are the values
+assigned to \fIwidth\fR and \fIleft-margin\fR (whether explicitly or
+by default).
+        
 .PP
 Other window options can be easily added;  see the source for \fBlwcat\fR
 for details.

@@ -91,19 +91,6 @@ directory, so be sure that the current directory is writeable (it
 should not be the DVD) and that has sufficient free space (roughly
 8 Mb per long version record, or 1.6 MB per short version record).
 
-If the DVD is accessible as \fB/media/dvd/\fR, the command
-.br
-        \fBahaecg2mit -s /media/dvd/*.ecg\fR
-.br
-makes a complete set of short-version records in the current directory.
-(Omit the \fB-s\fR to make a set of long-version records instead.)
-Under Windows, within a Cygwin window, the DVD is accessible as
-\fB/cygdrive/d/\fR (or \fB/cygdrive/e/\fR, etc., depending on the
-drive letter that Windows has assigned), so the same task can be done
-under Windows by
-.br
-         \fBahaecg2mit -s /cygdrive/d/*.ecg\fR
-
 .SH OLDER FORMATS 
 
 .SS ahaconvert
@@ -137,7 +124,9 @@ CD-ROM or floppy disk file).  Input files of types 1, 2, and 3 are assumed to
 contain annotation times in milliseconds, which are converted to
 sampling intervals based on an assumed sampling frequency of 250 Hz.  Default:
 type 3 is assumed if \fIahafile\fR ends with \fB.ANO\fR or \fB.ano\fR;  type
-0 is assumed otherwise..SS ad2m
+0 is assumed otherwise.
+
+.SS ad2m
 .PP
 Use \fBad2m\fR to convert AHA-format signal files from tapes, floppy disks,
 or CDs into WFDB format.  Options for \fBad2m\fR include:
@@ -184,7 +173,18 @@ It may be necessary to set and export the shell variable \fBWFDB\fR (see
 
 .SH EXAMPLES
 .SS "AHA Database DVD"
-See \fBahaecg2mit\fR above.
+If the DVD is accessible as \fB/media/dvd/\fR, the command
+.br
+        \fBahaecg2mit -s /media/dvd/*.ecg\fR
+.br
+makes a complete set of short-version records in the current directory.
+(Omit the \fB-s\fR to make a set of long-version records instead.)
+Under Windows, within a Cygwin window, the DVD is accessible as
+\fB/cygdrive/d/\fR (or \fB/cygdrive/e/\fR, etc., depending on the
+drive letter that Windows has assigned), so the same task can be done
+under Windows by
+.br
+         \fBahaecg2mit -s /cygdrive/d/*.ecg\fR
 
 .SS "AHA Database CD"
 AHA DB CDs contain both long and short versions of each record.  In

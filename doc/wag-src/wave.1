@@ -1,5 +1,5 @@
 '\" t
-.TH WAVE 1 "2 September 2005" "WFDB 10.3.18" "WFDB Applications Guide"
+.TH WAVE 1 "28 October 2009" "WFDB 10.4.24" "WFDB Applications Guide"
 .SH NAME
 wave \- waveform analyzer, viewer, and editor
 .SH SYNOPSIS
@@ -10,9 +10,9 @@ wave \- waveform analyzer, viewer, and editor
 records on any display controlled by an X11 server.  It includes
 facilities for interactive annotation editing.
 The keyboard and mouse are used to control the display interactively.
-First-time users should read the \fIWAVE User's Guide\fR.  (One way to do this
-is by pointing your Web browser to \fBfile:///usr/help/html/wug/wug.htm\fR,
-or to \fBhttp://www.physionet.org/physiotools/wug/\fR for the latest version.)
+First-time users should read the \fIWAVE User's Guide\fR, available at
+\fBhttp://physionet.org/physiotools/wug/\fR (or, while \fBwave\fR is running,
+choose \fIUser's Guide\fR from the \fIHelp\fR panel).
 .PP
 If you specify more than one \fIrecord\fR, a separate \fBwave\fR process is
 started for each record.  Note that all records to be opened must be listed in
@@ -22,7 +22,8 @@ below.
 .PP
 Use the left mouse button to make selections, and the right mouse button to
 open menus (indicated by triangular glyphs at the right end of some buttons).
-See the \fIGuide\fR or the on-line manual for notes on annotation editing.
+See the \fIGuide\fR or choose \fIAnnotation Editing\fR from the \fIHelp\fR
+panel).
 .PP
 \fIOptions\fR are:
 .TP
@@ -690,7 +691,16 @@ appears to occur only when all of the following are true: the X server is
 running on a multi-head display with Xinerama enabled, the user does not have
 root privileges, a \fB.Xdefaults\fR file exists, and \fBwave\fR or another
 XView application has run at least once since the X server was started.
-
+.PP
+A more serious incompatibility (which may be related to the subtle
+incompatibility noted above) appeared with the release in 2009 of the X.org
+version 1.6.3 X server, which freezes when any application that uses the XView
+library (such as \fBwave\fR) 'grabs' the mouse pointer.  By default, XView
+applications do so in response to a left button click on any XView control.
+'Grabs' can be disabled, and this behavior avoided, by using the \fB-Wfsdb\fR
+option available in \fBwave\fR and in other XView applications.  In \fBwave\fR
+version 6.10 and later versions, the default behavior of XView has been
+changed to disable 'grabs', and this problem does not occur.
 .SH SEE ALSO
 \fBpschart\fR(1), \fBxview\fR(7)
 .br
