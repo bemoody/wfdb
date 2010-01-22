@@ -1,16 +1,21 @@
-.TH RDSAMP 1 "28 October 2009" "WFDB 10.4.24" "WFDB Applications Guide"
+.TH RDSAMP 1 "6 November 2009" "WFDB 10.4.25" "WFDB Applications Guide"
 .SH NAME
 rdsamp \- read WFDB signal files
 .SH SYNOPSIS
 \fBrdsamp -r\fR \fIrecord\fR [ \fIoptions\fR ... ]
 .SH DESCRIPTION
-\fBrdsamp\fR reads signal files for the specified \fIrecord\fR and writes the
-samples as decimal numbers on the standard output.  If no \fIoptions\fR are
-provided, \fBrdsamp\fR starts at the beginning of the record and prints all
-samples.  Each line of output contains the sample number and samples from each
-signal, beginning with channel 0, separated by tabs.
+\fBrdsamp\fR reads signal files for the specified \fIrecord\fR and
+writes the samples as decimal numbers on the standard output.  If no
+\fIoptions\fR are provided, \fBrdsamp\fR starts at the beginning of
+the record and prints all samples.  By default, each line of output
+contains the sample number and samples from each signal, beginning
+with channel 0, separated by tabs.
 .PP
 \fIOptions\fR include:
+.TP
+\fB-c\fR
+Produce output in CSV (comma-separated value) format (default: write output in
+tab-separated columns). 
 .TP
 \fB-f\fR \fItime\fR
 Begin at the specified \fItime\fR.  By default, \fBrdsamp\fR starts at the

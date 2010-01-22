@@ -1,8 +1,9 @@
 /* file: wrsamp.c	G. Moody	10 August 1993
-			Last revised:   20 January 2009
+			Last revised:  21 January 2010
+
 -------------------------------------------------------------------------------
 wrsamp: Select fields or columns from a file and generate a WFDB record
-Copyright (C) 1993-2009 George B. Moody
+Copyright (C) 1993-2010 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -22,8 +23,6 @@ You may contact the author by e-mail (george@mit.edu) or postal mail
 please visit PhysioNet (http://www.physionet.org/).
 _______________________________________________________________________________
 
-Portions of this program were derived from the `field' utility described in
-"The UNIX System" by S.R. Bourne, pp. 227-9 (Addison-Wesley, 1983).
 */
 
 #include <stdio.h>
@@ -33,27 +32,208 @@ Portions of this program were derived from the `field' utility described in
 /* The following definition yields dither with a triangular PDF in (-1,1). */
 #define DITHER	        (((double)rand() + (double)rand())/RAND_MAX - 1.0)
 
-#define isfsep(c)	((fsep && ((c)==fsep)) || ((c)==' ' || (c)=='\t'))
+/* Dynamic memory allocation macros */
+#define MEMERR(P, N, S) \
+    { wfdb_error("WFDB: can't allocate (%ld*%ld) bytes for %s\n", \
+	     (size_t)N, (size_t)S, #P);			      \
+      exit(1); }
+#define SFREE(P) { if (P) { free (P); P = 0; } }
+#define SUALLOC(P, N, S) { if (!(P = calloc((N), (S)))) MEMERR(P, (N), (S)); }
+#define SALLOC(P, N, S) { SFREE(P); SUALLOC(P, (N), (S)) }
+#define SREALLOC(P, N, S) { if (!(P = realloc(P, (N)*(S)))) MEMERR(P,(N),(S)); }
+#define SSTRCPY(P, Q) { if (Q) { \
+	 SALLOC(P, (size_t)strlen(Q)+1,1); strcpy(P, Q); } }
 
 char *pname;
+
+char *read_line(FILE *ifile, char rsep)
+{
+    static char *buf;
+    int c;
+    static size_t i = 0, length = 0;
+
+    while ((c = getc(ifile)) != rsep) {
+	if (i >= length) {
+	    if (length == 0) length = 512;
+	    length *= 2;
+	    SREALLOC(buf, length+2, sizeof(char));
+	}
+ 	if (c == EOF) {
+	    free(buf);
+	    return (buf = NULL);
+	}
+	buf[i++] = c;
+    }
+    buf[i] = '\0';
+    i = 0;
+    return (buf);
+}
+
+int line_has_alpha(char *line)
+{
+    char *p;
+
+    for (p = line; *p; p++)
+    	if (('A' <= *p && *p <= 'Z') || ('a' <= *p && *p <= 'z'))
+	    return (1);
+    return (0);
+}
+
+int line_has_tab(char *line)
+{
+    char *p;
+
+    for (p = line; *p; p++)
+    	if (*p == '\t')
+	    return (1);
+    return (0);
+}
+
+struct parsemode {
+    char *delim;	/* characters that delimit tokens */
+    char collapse;	/* if non-zero, collapse consecutive delimiters */
+    char esc;		/* if non-zero, next character is literal unless null */
+    char *quotepair[];	/* pairs of characters that open and close tokens */
+};
+
+struct tokenarray {
+    int ntokens;	/* number of tokens */
+    int maxtokens;	/* number of allocated token pointers */
+    char *token[];	/* token pointers */
+};
+
+typedef struct parsemode Parsemode;
+typedef struct tokenarray Tokenarray;
+
+/* The function parseline() parses its first argument, a null-terminated string
+('line'), into a Tokenarray ('ta').  On return, the token pointers (ta->token[])
+address locations within 'line', and the character that immediately follows
+each token is replaced with a null.
+
+The second argument of parseline, ta, is a pointer to a Tokenarray (defined
+above).  If ta is NULL on entry, parseline allocates and returns a Tokenarray
+that is sufficiently large to accomodate all of the tokens in 'line'.
+Otherwise, parseline returns the number of tokens found in ta->ntokens, and the
+token array on return contains either ta->ntokens or ta->maxtokens valid
+elements, whichever is smaller.  If ta->ntokens > ta->maxtokens, the token
+array contains pointers to the first ta->maxtokens tokens.
+
+The third and final argument of parseline, pmode, is a pointer to a Parsemode
+(also defined above).  The caller can set up pmode to specify which characters
+in 'line' are token delimiters, which pairs of characters can be used to quote
+a token that may have embedded delimiters, whether to treat consecutive
+delimiters as if they surround an empty token or as a single delimiter, and
+which character acts as an escape (to cause the next character to be treated as
+a literal character in a token, rather than as a delimiter, quote, or escape
+character).
+
+If pmode is NULL, parseline behaves as if called with pmode = defpmode.  If
+pmode->delim is NULL, parseline sets pmode->delim = defpmode.delim.
+*/
+
+Parsemode defpmode = {
+  " \t\r\n,", /* delimiter characters can be space, tab, CR, LF, or comma */
+  1,	/* collapse consecutive delimiters */
+  '\\',	/* treat any character following a backslash as a literal */
+  { "''", "\"\"", "()", "[]", "{}", "<>", NULL } /* quote characters */
+};
+
+Tokenarray *parseline(char *line, Tokenarray *ta, Parsemode *pmode)
+{
+    int i, n = 0, state = 0;
+    char d, *p = line-1, *q = NULL;
+
+    if (ta == NULL) {
+	int m = (strlen(line) + 1)/2;
+	if (ta = (Tokenarray *)malloc(sizeof(int)*2 + sizeof(char *)*m))
+	    ta->maxtokens = m;
+	else
+	    return (NULL);
+    }
+
+    if (pmode == NULL)
+	pmode = &defpmode;
+    else if (pmode->delim == NULL)
+	pmode->delim = defpmode.delim;
+
+    while (*(++p)) {	/* for each character in the line */
+
+	/* is *p an escape character? */
+	if (pmode->esc && *p == pmode->esc) {
+	    if (*(p+1) == '\0')
+		break;
+	    if (state == 0) { /* start a new token */
+		state = 1;
+		ta->token[n++] = p;
+	    }
+	    p++;	/* include the next character in the token */
+	    continue;
+	}
+
+	/* is *p the character needed to complete a quoted string? */
+	if (q) {
+	    if (*p == *q) { *p = '\0'; q = NULL; }
+	    continue;
+	}
+
+	/* is *p a delimiter character? */
+	i = 0;
+        while (d = pmode->delim[i++]) {
+	    if (*p == d) {
+		*p = '\0';	/* replace delimiter with null */
+		if (state == 0) { /* not in a token */
+		    if (pmode->collapse == 0)
+			ta->token[n++] = p;	/* count an empty token */
+		}
+		state = 0;
+		break;
+	    }
+	}
+
+	/* is *p an open-quote character? */
+	i = 0;
+	while (q = pmode->quotepair[i++]) {  /* q is an open-quote character */
+	    if (*p == *q) { /* *p is first character of a quoted string */
+		if (state == 0) { /* start a new token */
+		    ta->token[n++] = p+1;
+		    state = 1;
+		}
+		q++; /* *q is now the matching close-quote character */
+		break;
+	    }
+	}
+
+	if (d == '\0' && q == NULL) { 	/* p must be part of a token */
+	    if (state == 0) {
+		ta->token[n++] = p;	/* start a new token */
+		state = 1;
+	    }
+	}
+    }
+
+    ta->ntokens = n;
+    return (ta);
+}
 
 main(argc, argv)
 int argc;
 char *argv[];
 {
-    char **ap, *cp, **desc, **fp = NULL, fsep = '\0', *ifname = "(stdin)",
-	*l = NULL, ofname[40], *p, *record = NULL, rsep = '\n', *prog_name();
-    char *gain = "", *scale = "";
+    char **ap, *cp, **desc, *gain = "", *ifname = "(stdin)",
+	*line = NULL, ofname[40], *p, *record = NULL, rsep = '\n',
+	*scale = "", sflag = 0, trim = 0, **units, *prog_name();
+    static char btime[25];
     double freq = WFDB_DEFFREQ, *scalef, v;
 #ifndef atof
     double atof();
 #endif
-    int c, cf = 0, dflag = 0, *fv = NULL, i, lmax = 1024, mf;
+    int c, cf = 0, dflag = 0, format = 16, *fv = NULL, i, labels, mf, zflag = 0;
     FILE *ifile = stdin;
     long t = 0L, t0 = 0L, t1 = 0L;
 #ifndef atol
     long atol();
 #endif
+    Tokenarray *ta;
     WFDB_Sample *vout;
     WFDB_Siginfo *si;
     unsigned int nf = 0;
@@ -113,11 +293,8 @@ char *argv[];
 	    ifname = argv[i];
 	    break;
 	  case 'l':
-	    if (++i >= argc || (lmax = atoi(argv[i])) < 1) {
-		(void)fprintf(stderr, "%s: max line length must follow -l\n",
-			      pname);
-		exit(1);
-	    }
+	    if (++i >= argc) --i;
+	    (void)fprintf(stderr, "%s: -l is obsolete, ignored\n", pname);
 	    break;
 	  case 'o':
 	    if (++i >= argc) {
@@ -126,6 +303,14 @@ char *argv[];
 		exit(1);
 	    }
 	    record = argv[i];
+	    break;
+	  case 'O':
+	    if (++i >= argc) {
+		(void)fprintf(stderr, "%s: output format must follow -O\n",
+			      pname);
+		exit(1);
+	    }
+	    format = atoi(argv[i]);
 	    break;
 	  case 'r':
 	    if (++i >= argc) {
@@ -137,11 +322,12 @@ char *argv[];
 	    break;
 	  case 's':
 	    if (++i >= argc) {
-		(void)fprintf(stderr, "%s: field separator must follow -s\n",
+		(void)fprintf(stderr, "%s: field separator(s) must follow -s\n",
 			      pname);
 		exit(1);
 	    }
-	    fsep = argv[i][0];
+	    sflag = 1;
+	    defpmode.delim = argv[i];
 	    break;
 	  case 't':
 	    if (++i >= argc || (t1 = atol(argv[i])) <= 0L) {
@@ -158,6 +344,9 @@ char *argv[];
 	    }
 	    scale = argv[i];
 	    break;
+          case 'z':	 /* ignore column 0 */
+	    zflag = 1;
+	    break;
 	  default:
 	    (void)fprintf(stderr, "%s: unrecognized option %s\n", pname,
 			  argv[i]);
@@ -165,59 +354,88 @@ char *argv[];
 	}
     }
 
-    /* allocate storage for arrays */
-#ifndef lint
-    l = calloc(lmax, sizeof(char));
-    fp = (char **)calloc(lmax, sizeof(char *));
-    fv = (int *)calloc(argc - i, sizeof(int));
-#endif
-    if (l == NULL || fv == NULL || fp == NULL) {
-	(void)fprintf(stderr, "%s: insufficient memory\n", pname);
+    /* read the first line of the input file */
+    if ((line = read_line(ifile, rsep)) == NULL) {
+	if (rsep != '\n') {
+	    if (record == NULL)
+		(void)fprintf(stderr,
+			      "%s: use -o to specify the output record name",
+			      pname);
+	    else
+		(void)fprintf(stderr,
+		  "%s: no record separators in input\n"
+		  "Try specifying a different separator after the -r option.\n",
+			      pname);
+	}
+	else
+	    (void)fprintf(stderr, "%s: no newlines in input\n", pname);
 	exit(3);
     }
+ 
+    /* unless -s was given, note if it contains any tab characters */
+    if (sflag == 0 && line_has_tab(line))
+	defpmode.delim = "\t";
 
-    /* read arguments into fv[...] */
-    while (i < argc) {
-	if (sscanf(argv[i++], "%d", &fv[nf]) != 1 ||
-	    fv[nf] < 0 || fv[nf] >= lmax) {
-	    (void)fprintf(stderr, "%s: unrecognized argument %s\n",
-			  pname, argv[--i]);
-	    exit(1);
+    /* note if it contains any alphabetic characters */
+    labels = line_has_alpha(line);
+
+    /* parse it into tokens */
+    ta = parseline(line, NULL, NULL);
+
+    /* read selected column numbers into fv[...] */
+    if (i < argc) {
+	SUALLOC(fv, argc - i, sizeof(int));
+	while (i < argc) {
+	    if (sscanf(argv[i++], "%d", &fv[nf]) != 1 ||
+		fv[nf] < 0 || fv[nf] >= ta->ntokens) {
+		(void)fprintf(stderr, "%s: unrecognized argument %s\n",
+			      pname, argv[--i]);
+		exit(1);
+	    }
+	    nf++;
 	}
-	nf++;
+    }
+    /* if no columns were specified, copy all columns (or all except 0) */
+    else {
+	int i, j;
+
+	nf = ta->ntokens - zflag;
+	SUALLOC(fv, nf, sizeof(int));
+	for (i = 0, j = zflag; j <= nf; i++, j++)
+	    fv[i] = j;
     }
 
-    if (nf < 1) {
-	help();
-	exit(1);
-    }
+    /* allocate arrays */
+    SUALLOC(vout, nf, sizeof(WFDB_Sample));
+    SUALLOC(si, nf, sizeof(WFDB_Siginfo));
+    SUALLOC(scalef, nf, sizeof(double));
 
-    if ((vout = malloc(nf * sizeof(WFDB_Sample))) == NULL ||
-	(si = malloc(nf * sizeof(WFDB_Siginfo))) == NULL ||
-	(desc = malloc(nf * sizeof(char *))) == NULL ||
-	(scalef = malloc(nf * sizeof(double))) == NULL) {
-	(void)fprintf(stderr, "%s: insufficient memory\n", pname);
-	exit(2);
-    }
-    /* open output file */
+     /* open the output record */
     if (record == NULL)
 	(void)sprintf(ofname, "-");
     else
 	(void)sprintf(ofname, "%s.dat", record);
     for (i = 0; i < nf; i++) {
 	si[i].fname = ofname;
-	if ((desc[i] = malloc((strlen(ifname)+20) * sizeof(char))) == NULL) {
-	    (void)fprintf(stderr, "%s: insufficient memory\n", pname);
-	    exit(2);
+	si[i].desc = NULL;
+	if (labels) { /* set the signal descriptions from the column headings */
+	    char *p = ta->token[fv[i]], *q;
+
+	    while (*p == ' ') p++;
+	    q = p + strlen(p);
+	    while (*(q-1) == ' ') q--;
+	    *q = '\0';
+	    SSTRCPY(si[i].desc, p);
 	}
-	if (ifile == stdin)
-	    (void)sprintf(desc[i], "column %d", fv[i]);
-	else
-	    (void)sprintf(desc[i], "%s, column %d", ifname, fv[i]);
-	si[i].desc = desc[i];
+	else {
+	    char tdesc[16];
+
+	    (void)sprintf(tdesc, "column %d", fv[i]);
+	    SSTRCPY(si[i].desc, tdesc);
+	}
 	si[i].units = "";
 	si[i].group = 0;
-	si[i].fmt = 16;
+	si[i].fmt = format;
 	si[i].spf = 1;
 	si[i].bsize = 0;
 	si[i].adcres = WFDB_DEFRES;
@@ -238,81 +456,86 @@ char *argv[];
 	    while (*scale != '\0' && *scale != ' ')
 		scale++;
     }
+
+    if (labels) {	/* read the second line of input */
+	if ((line = read_line(ifile, rsep)) == NULL) {
+	    (void)fprintf(stderr, "%s: no input data\n", pname);
+	    exit(4);
+	}
+	if (line_has_alpha(line)) {
+	    free(ta);
+	    ta = parseline(line, NULL, NULL);
+	    /* Copy units strings after trimming any surrounding spaces,
+	       parentheses, or brackets, and after replacing embedded spaces
+	       with underscores. */
+	    for (i = 0; i < nf; i++) {
+		char *p = ta->token[fv[i]], *q;
+
+		while (*p == ' ') p++;
+		if (*p == '(' || *p == '[') p++;
+		q = p + strlen(p);
+		while (*(q-1) == ' ') q--;
+		if (*(q-1) == ')' || *(q-1) == ']') q--;
+		*q = '\0';
+		while (--q > p)
+		    if (*q == ' ') *q = '_';
+		si[i].units = NULL;
+		SSTRCPY(si[i].units, p);
+	    }
+	    line = read_line(ifile, rsep);
+	}
+    }
+
+    /* discard any additional lines containing text */
+    while (line_has_alpha(line))
+	line = read_line(ifile, rsep);
+
     if (osigfopen(si, nf) < nf || setsampfreq(freq) < 0)
 	exit(2);
 
-    /* read and copy input */
-    nf--;
-    cp = l;
-    ap = fp;
-    *ap++ = cp;
-    do {
-	c = getc(ifile);
-	if (cp >= l + lmax) {
-	    (void)fprintf(stderr,
-			  "%s: line %ld truncated (> %d bytes)\n",
-			  pname, t, lmax);
-	    while (c != rsep && c!= EOF)
-		c = getc(ifile);
+    /* skip any unwanted samples at the beginning */
+    for (t = 0; t < t0; t++)
+	line = read_line(ifile, rsep);
+
+    /* pick up base time if it's there */
+    if (zflag) {
+	if (*line == '[') {
+	    strncpy(btime, line+1, 23);
+	    setbasetime(btime);
 	}
-	if (c == rsep || c == EOF) {
-	    if (cp == l && c == EOF) break;
-	    *cp++ = 0;
-	    mf = ap - fp;
-	    if (cf) {
-		if (cf < 0) cf = mf;
-		else if (cf != mf)
-		    (void)fprintf(stderr,
-				  "%s: line %ld has incorrect field count\n",
-				  pname, t);
-	    }
-	    if (t >= t0) {	/* write data from this line */
-		for (i = 0; i <= nf; i++) {
-		    if ((p = fp[fv[i]]) == NULL) {
-			(void)fprintf(stderr,
-				      "%s: line %ld, column %d missing\n",
-				      pname, t, fv[i]);
-			vout[i] = WFDB_INVALID_SAMPLE;
-		    }
-		    else if (sscanf(p, "%lf", &v) != 1) {
-			if (strcmp(p, "-") != 0)
-			    (void)fprintf(stderr,
-			      "%s: line %ld, column %d improperly formatted\n",
-				      pname, t, fv[i]);
-			vout[i] = WFDB_INVALID_SAMPLE;
-		    }
-		    else {
-			v *= scalef[i];
-			if (dflag) v += DITHER;
-			if (v >= 0) vout[i] = (WFDB_Sample)(v + 0.5);
-			else vout[i] = (WFDB_Sample)(v - 0.5);
-		    }
-		}
-		if (putvec(vout) < 0) break;
-		for (i = 0; i <= nf; i++)
-		    fp[fv[i]] = NULL;
-	    }
-	    if (c == EOF || (++t >= t1 && t1 > 0L)) break;
-	    cp = l;
-	    ap = fp;
-	    *ap++ = cp;
+	else if (*(line+1) == '[') {
+	    strncpy(btime, line+2, 23);
+	    setbasetime(btime);
 	}
-	else if (isfsep(c)) {
-	    if (cp > l) {
-		*cp++ = 0;
-		*ap++ = cp;
+    }
+
+    /* read and copy samples */
+    while (line != NULL && (t1 == 0L || t++ < t1)) {
+	free(ta);
+	ta = parseline(line, NULL, NULL);
+	for (i = 0; i < nf; i++) {
+	    double v;
+
+	    if (sscanf(ta->token[fv[i]], "%lf", &v) == 1) {
+		//	    if (strcmp(ta->token[fv[i]], "-")) {
+		v *= scalef[i];
+		if (dflag) v+= DITHER;
+		if (v >= 0) vout[i] = (WFDB_Sample)(v + 0.5);
+		else vout[i] = (WFDB_Sample)(v - 0.5);
 	    }
-	    do {
-		c = getc(ifile);
-	    } while (c != rsep && c != EOF && isfsep(c));
-	    (void)ungetc(c, ifile);
+	    else
+		vout[i] = WFDB_INVALID_SAMPLE;
 	}
-	else *cp++ = c;
-    } while (c != EOF);
+	if (putvec(vout) < 0) break;
+	line = read_line(ifile, rsep);
+    }
+
+    /* write the header */
+    (void)setsampfreq(freq);
     if (record != NULL)
 	(void)newheader(record);
     wfdbquit();
-    exit(0);	/*NOTREACHED*/
+    exit(0);
 }
 
 char *prog_name(s)
@@ -336,7 +559,7 @@ char *s;
 }
 
 static char *help_strings[] = {
- "usage: %s [OPTIONS ...] COLUMN [COLUMN ...]\n",
+ "usage: %s [OPTIONS ...] [COLUMN ...]\n",
  "where COLUMN selects a field to be copied (leftmost field is column 0),",
  "and OPTIONS may include:",
  " -c          check that each input line contains the same number of fields",
@@ -346,18 +569,34 @@ static char *help_strings[] = {
  " -G GAIN     specify gain(s) to be written to header file (default: 200)",
  " -h          print this usage summary",
  " -i FILE     read input from FILE (default: standard input)",
- " -l LEN      read up to LEN characters in each line (default: 1024)",
  " -o RECORD   save output in RECORD.dat, and generate a header file for",
  "              RECORD (default: write to standard output in format 16, do",
  "              not generate a header file)",
- " -r RSEP     interpret RSEP as the input line separator (default: \\n)",
- " -s FSEP     interpret FSEP as the input field separator (default: space",
- "              or tab)",
+ " -O FORMAT   save output in the specified FORMAT (default: 16)",
+ " -r RSEP     interpret RSEP as the input line separator (default: linefeed)",
+ " -s FSEP     interpret any character in FSEP as an input field separator",
+ "             (default: space, tab, carriage-return, or comma)  ",
  " -t N        stop copying at line N (default: end of input file)",
  " -x SCALE    multiply inputs by SCALE factor(s) (default: 1)",
+ " -z          don't copy column 0 unless explicitly specified",
+ "",
+ "The input is a text file with a sample of each signal on each line. Samples",
+ "can be separated by tabs, spaces, commas, or any combination of these.",
+ "Consecutive separators are equivalent to single separators.",
+ "",  
  "To specify different GAIN or SCALE values for each output signal, provide",
  "a quoted list of values, e.g., -G \"100 50\" defines the gain for signal 0",
  "as 100, and the gain for signal 1 (and any additional signals) as 50.",
+ "",
+ "If the first input line contains any alphabetic characters, it is assumed",
+ "to contain column headings, which are copied as signal descriptions into",
+ "RECORD.hea.  If the second input line also contains alphabetic characters,",
+ "it is assumed to specify the physical units for each column, which are",
+ "copied as units strings into RECORD.hea.  The first line containing samples",
+ "is line 0.",
+ "",
+ "If no COLUMN is specified, all fields are copied in order; column 0 can be",
+ "omitted in this case by using the '-z' option.",
 NULL
 };
 
@@ -366,6 +605,14 @@ void help()
     int i;
 
     (void)fprintf(stderr, help_strings[0], pname);
-    for (i = 1; help_strings[i] != NULL; i++)
+    for (i = 1; help_strings[i] != NULL; i++) {
 	(void)fprintf(stderr, "%s\n", help_strings[i]);
+	if (i % 23 == 0) {
+	    char b[5];
+	    (void)fprintf(stderr, "--More--");
+	    (void)fgets(b, 5, stdin);
+	    (void)fprintf(stderr, "\033[A\033[2K");  /* erase "--More--";
+						      assumes ANSI terminal */
+	}
+    }
 }

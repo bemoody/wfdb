@@ -1,6 +1,6 @@
 #!/bin/sh
 # file: appcheck		G. Moody       7 September 2001
-#                               Last revised:  27 December 2007
+#                               Last revised:  21 January 2010
 #
 # This script checks the basic functionality of most of the WFDB applications
 # in the 'app' directory.  These programs are not (yet) tested by this script:
@@ -111,7 +111,7 @@ TESTS=`expr $TESTS + 1`
 
 echo Testing wrsamp ...
 F=100w.dat
-wrsamp -o 100w -f 2 -F 360 -x 200 1 2 <wrsamp.in
+wrsamp -o 100w -F 360 -O 212 -x 200 1 2 <wrsamp.in
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`

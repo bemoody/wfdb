@@ -1,3 +1,24 @@
+10.4.25 (21 January 2010):
+	WFDB application 'rdsamp' can now write CSV (comma-separated value)
+	format output using its new '-c' option, and 'wrsamp' can read CSV
+	format input.  If no input columns are specified, 'wrsamp' converts
+        all of them.  If the input contains signal names, units, or timestamps,
+        'wrsamp' saves them in the header file it creates.  'wrsamp' also has
+        two new options ('-O', to select the output format, and '-z', to
+        suppress output of column 0).
+
+	WFDB application 'sigamp' has new options for printing individual
+	measurements.
+
+	The script 'install-wave32', used to build and install a 32-bit version
+        of WAVE on some 64-bit platforms, has been updated so that it can be
+	used on Fedora 12 (as well as on previously supported platforms).
+
+	In WFDB library versions 10.4.5 through 10.4.24, strtim("e") did not
+	work properly when the open input record was an EDF file and high
+	resolution input mode had not been selected.  This problem has been
+	corrected.
+
 10.4.24 (28 October 2009):
 	A possible string overflow in nst.c has been corrected.  Thanks to
 	Virginia Faro-Maza for finding and reporting this problem.

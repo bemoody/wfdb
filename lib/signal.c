@@ -1,10 +1,10 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   12 June 2009	wfdblib 10.4.22
+			Last revised:   19 January 2010	wfdblib 10.4.24
 WFDB library functions for signals
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1989-2009 George B. Moody
+Copyright (C) 1989-2010 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -749,7 +749,7 @@ static int edfparse(WFDB_FILE *ifile)
     cfreq = ffreq; /* set sampling and counter frequencies to match */
     sfreq = ffreq * ispfmax;
     if (getafreq() == 0.0) setafreq(sfreq);
-    gvmode &= WFDB_HIGHRES;
+    gvmode |= WFDB_HIGHRES;
     sprintf(buf, "%02d:%02d:%02d %02d/%02d/%04d",
 	    hour, minute, second, day, month, year);
     setbasetime(buf);

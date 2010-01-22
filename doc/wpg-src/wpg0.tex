@@ -510,6 +510,15 @@ guide in June, 1999.  See @file{NEWS}, in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
+@unnumberedsubsec Changes in version 10.4.25 (21 January 2009)
+
+In WFDB library versions 10.4.5 through 10.4.24, strtim("e") did not
+work properly when the open input record was an EDF file and high
+resolution input mode had not been selected.  This problem has been
+corrected.
+
+(WFDB library version 10.4.24 was identical to version 10.4.23.)
+
 @unnumberedsubsec Changes in version 10.4.23 (7 August 2009)
 
 Several changes in @file{lib/signal.c} eliminate unintended interactions that
