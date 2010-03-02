@@ -519,7 +519,7 @@ sample value.  If the WFDB software is compiled on a 16-bit platform
 (unusual except for embedded processors), the excess high bits of
 signals in these formats are not read on input, and they are replaced
 by zeroes on output, unless the @code{WFDB_Sample} data type has been
-redefined as @code{long{ (in @file{wfdb.h}).  This is not done by
+redefined as @code{long} (in @file{wfdb.h}).  This is not done by
 default since it would increase memory and computational requirements
 unnecessarily in embedded applications that do not require 24- or
 32-bit precision.

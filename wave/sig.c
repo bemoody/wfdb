@@ -1,10 +1,10 @@
 /* file: sig.c		G. Moody	 27 April 1990
-			Last revised:	  12 June 2009
+			Last revised:	  2 March 2010
 Signal display functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1990-2009 George B. Moody
+Copyright (C) 1990-2010 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -336,7 +336,7 @@ long fdl_time;
 	vmin[c] = vmax[c] = v0[c];
 	vvalid[c] = 0;
 	if (v0[c] == WFDB_INVALID_SAMPLE)
-	    lp->vlist[c][0].y = WFDB_INVALID_SAMPLE;
+	    lp->vlist[c][0].y = -1 << 15;
 	else
 	    lp->vlist[c][0].y = v0[c]*vscale[c];
     }
@@ -363,7 +363,7 @@ long fdl_time;
 			lp->vlist[c][x0].y = v0[c]*vscale[c];
 		    }
 		    else
-			lp->vlist[c][x0].y = WFDB_INVALID_SAMPLE;
+			lp->vlist[c][x0].y = -1 << 15;
 		}
 	    }
 	}
@@ -375,7 +375,7 @@ long fdl_time;
 	for (i = 1; i < nsamp && getvec(v) > 0; i++)
 	    for (c = 0; c < nsig; c++) {
 		if (v[c] == WFDB_INVALID_SAMPLE)
-		    lp->vlist[c][i].y = WFDB_INVALID_SAMPLE;
+		    lp->vlist[c][i].y = -1 << 15;
 		else
 		    lp->vlist[c][i].y = v[c]*vscale[c];
 	    }

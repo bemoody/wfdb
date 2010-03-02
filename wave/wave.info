@@ -692,13 +692,6 @@ This button clears the contents of the "Search for"
 field and opens the Search Template window.
 #
 
-:find.search_for_signal
-Specifies the name of a signal.  Changing this field
-causes an immediate forward search for the next valid
-samples of the specified signal.  To repeat the search,
-select the field and press Enter.
-#
-
 :>
 This button scrolls the signal window towards the end
 of the record, by an amount equal to half of the

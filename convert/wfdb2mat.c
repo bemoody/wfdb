@@ -73,18 +73,6 @@ wfdb2mat.
 #include <stdio.h>
 #include <wfdb/wfdb.h>
 
-/* Dynamic memory allocation macros. */
-#define MEMERR(P, N, S) \
-    { wfdb_error("%s: can't allocate (%ld*%ld) bytes for %s\n", \
-		 pname, (size_t)N, (size_t)S, #P);		\
-      exit(1); }
-#define SFREE(P) { if (P) { free (P); P = 0; } }
-#define SUALLOC(P, N, S) { if (!(P = calloc((N), (S)))) MEMERR(P, (N), (S)); }
-#define SALLOC(P, N, S) { SFREE(P); SUALLOC(P, (N), (S)) }
-#define SREALLOC(P, N, S) { if (!(P = realloc(P, (N)*(S)))) MEMERR(P,(N),(S)); }
-#define SSTRCPY(P, Q) { if (Q) { \
-	 SALLOC(P, (size_t)strlen(Q)+1,1); strcpy(P, Q); } }
-
 char *pname;
 
 main(argc, argv)
