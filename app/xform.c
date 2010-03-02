@@ -1,8 +1,8 @@
 /* file: xform.c	G. Moody        8 December 1983
-			Last revised:    4 March 2009
+			Last revised:   26 February 2010
 -------------------------------------------------------------------------------
 xform: Sampling frequency, amplitude, and format conversion for WFDB records
-Copyright (C) 1983-2009 George B. Moody
+Copyright (C) 1983-2010 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -393,10 +393,14 @@ char *argv[];
   "  310   3 10-bit amplitudes bit-packed in 15 LS bits of each of 2 words\n");
 	    (void)fprintf(stderr,
 	  "  311   3 10-bit amplitudes bit-packed in 30 LS bits of 4 bytes\n");
+	    (void)fprintf(stderr,
+	  "   24   24-bit two's complement amplitudes (LSB first)\n");
+	    (void)fprintf(stderr,
+	  "   32   32-bit two's complement amplitudes (LSB first)\n");
 	    do {
 		format = dfin[0].fmt;
 		(void)fprintf(stderr,
-		 "Choose an output format (8/16/61/80/160/212/310/311) [%d]: ",
+		 "Choose an output format (8/16/61/80/160/212/310/311/24/32) [%d]: ",
 			      format);
 		(void)fgets(answer, sizeof(answer), ttyin);
 		(void)sscanf(answer, "%d", &format);

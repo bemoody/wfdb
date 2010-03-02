@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   19 January 2010	wfdblib 10.4.24
+			Last revised:   26 February 2010	wfdblib 10.5.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -108,12 +108,12 @@ library functions defined elsewhere:
  wfdb_sigclose 	(closes signals and resets variables)
  wfdb_osflush	(flushes output signals)
 
-Two versions of r16() and w16() are provided here.  The default versions are
-implemented as macros for efficiency.  At least one C compiler (the Microport
-System V/AT `cc') is known to run out of space while attempting to compile
-these macros.  To avoid this problem, define the symbol BROKEN_CC when
-compiling this module, in order to obtain the alternate versions, which are
-implemented as functions.
+Two versions of r16(), r24(), r32(), w16(), w24(), and w32() are provided here.
+The default versions are implemented as macros for efficiency.  At least one
+C compiler (the Microport System V/AT `cc') is known to run out of space while
+attempting to compile r16() and w16().  To avoid this problem, define the
+symbol BROKEN_CC when compiling this module, in order to obtain the alternate
+versions, which are implemented as functions.
 
 The function setbasetime() uses the C library functions localtime() and time(),
 and definitions from <time.h>.  If these are not available, either find a
@@ -1312,6 +1312,10 @@ r61() in order to obtain proper sign extension. */
 #define w16(V,G)    (w8((V), (G)), w8(((V) >> 8), (G)))
 #define r61(G)      (_l = r8(G), ((int)((short)((r8(G) & 0xff) | (_l << 8)))))
 #define w61(V,G)    (w8(((V) >> 8), (G)), w8((V), (G)))
+#define r24(G)	    (_l = r16(G), ((int)((r8(G) << 16) | (_l & 0xffff))))
+#define w24(V,G)    (w16((V), (G)), w8(((V) >> 16), (G)))
+#define r32(G)	    (_l = r16(G), ((int)((r16(G) << 16) | (_l & 0xffff))))
+#define w32(V,G)    (w16((V), (G)), w16(((V) >> 16), (G)))
 #else
 
 static int r16(struct igdata *g)
@@ -1342,6 +1346,40 @@ static void w61(WFDB_Sample v, struct ogdata *g)
 {
     w8((v >> 8), g);
     w8(v, g);
+}
+
+/* r24: read and return the next sample from a format 24 signal file */
+static int r24(struct igdata *g)
+{
+    int l, h;
+
+    l = r16(g);
+    h = r8(g);
+    return ((int)((h << 16) | (l & 0xffff)));
+}
+
+/* w24: write the next sample to a format 24 signal file */
+static void w24(WFDB_Sample v, struct ogdata *g)
+{
+    w16(v, g);
+    w8((v >> 16), g);
+}
+
+/* r32: read and return the next sample from a format 32 signal file */
+static int r32(struct igdata *g)
+{
+    int l, h;
+
+    l = r16(g);
+    h = r16(g);
+    return ((int)((h << 16) | (l & 0xffff)));
+}
+
+/* w32: write the next sample to a format 32 signal file */
+static void w32(WFDB_Sample v, struct ogdata *g)
+{
+    w16(v, g);
+    w16((v >> 16), g);
 }
 #endif
 
@@ -1459,7 +1497,7 @@ static void w311(WFDB_Sample v, struct ogdata *g)
 		break;
     }
 }
-
+    
 static int isgsetframe(WFDB_Group g, WFDB_Time t)
 {
     int i, trem = 0;
@@ -1580,6 +1618,8 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
 	    return (0);
 	}		  
 	b = 4*nn; d = 3; break;
+      case 24: b = 3*nn; break;
+      case 32: b = 4*nn; break;
     }
 
     /* Seek to the beginning of the block which contains the desired sample.
@@ -1685,35 +1725,64 @@ static int getskewedframe(WFDB_Sample *vector)
 	      default:
 		*vector = v = is->samp += r8(ig); break;
 	      case 16:	/* 16-bit amplitudes */
-		*vector = v = r16(ig); break;
+		*vector = v = r16(ig);
+		if (v == -1 << 15)
+		    *vector = gvpad ? is->samp : WFDB_INVALID_SAMPLE;
+		else
+		    is->samp = *vector;
+		break;
 	      case 61:	/* 16-bit amplitudes, bytes swapped */
-		*vector = v = r61(ig); break;
+		*vector = v = r61(ig);
+		if (v == -1 << 15)
+		    *vector = gvpad ? is->samp : WFDB_INVALID_SAMPLE;
+		else
+		    is->samp = *vector;
+		break;
 	      case 80:	/* 8-bit offset binary amplitudes */
 		*vector = v = r80(ig);
-		if (v == -128)
+		if (v == 0)
 		    *vector = gvpad ? is->samp : WFDB_INVALID_SAMPLE;
 		else
 		    is->samp = *vector;
 		break;
 	      case 160:	/* 16-bit offset binary amplitudes */
-		*vector = v = r160(ig);	break;
+		*vector = v = r160(ig);
+		if (v == 0)
+		    *vector = gvpad ? is->samp : WFDB_INVALID_SAMPLE;
+		else
+		    is->samp = *vector;
+		break;
 	      case 212:	/* 2 12-bit amplitudes bit-packed in 3 bytes */
 		*vector = v = r212(ig);
-		if (v == -2048)
+		if (v == -1 << 11)
 		    *vector = gvpad ? is->samp : WFDB_INVALID_SAMPLE;
 		else
 		    is->samp = *vector;
 		break;
 	      case 310:	/* 3 10-bit amplitudes bit-packed in 4 bytes */
 		*vector = v = r310(ig);
-		if (v == -512)
+		if (v == -1 << 9)
 		    *vector = gvpad ? is->samp : WFDB_INVALID_SAMPLE;
 		else
 		    is->samp = *vector;
 		break;
 	      case 311:	/* 3 10-bit amplitudes bit-packed in 4 bytes */
 		*vector = v = r311(ig);
-		if (v == -512)
+		if (v == -1 << 9)
+		    *vector = gvpad ? is->samp : WFDB_INVALID_SAMPLE;
+		else
+		    is->samp = *vector;
+		break;
+	      case 24:	/* 24-bit amplitudes */
+		*vector = v = r24(ig);
+		if (v == -1 << 23)
+		    *vector = gvpad ? is->samp : WFDB_INVALID_SAMPLE;
+		else
+		    is->samp = *vector;
+		break;
+	      case 32:	/* 32-bit amplitudes */
+		*vector = v = r32(ig);
+		if (v == -1 << 31)
 		    *vector = gvpad ? is->samp : WFDB_INVALID_SAMPLE;
 		else
 		    is->samp = *vector;
@@ -2420,22 +2489,27 @@ FINT putvec(WFDB_Sample *vector)
 	if (os->info.nsamp++ == (WFDB_Time)0L)
 	    os->info.initval = os->samp = *vector;
 	for (c = 0; c < os->info.spf; c++, vector++) {
-	    if (*vector == WFDB_INVALID_SAMPLE)	/* use lowest possible value */
+	    /* Replace invalid samples with lowest possible value for format */
+	    if (*vector == WFDB_INVALID_SAMPLE)
 		switch (os->info.fmt) {
 		  case 0:
 		  case 8:
 		  case 16:
 		  case 61:
 		  default:
-		    break;
+		    *vector = -1 << 15; break;
 		  case 80:
 		  case 160:
 		    *vector = 0; break;
 		  case 212:
-		    *vector = -2048; break;
+		    *vector = -1 << 11; break;
 		  case 310:
 		  case 311:
-		    *vector = -512; break;
+		    *vector = -1 << 9; break;
+		  case 24:
+		    *vector = -1 << 23; break;
+		  case 32:
+		    *vector = -1 << 31; break;
 		}
 	    switch (os->info.fmt) {
 	      case 0:	/* null signal (do not write) */
@@ -2462,6 +2536,10 @@ FINT putvec(WFDB_Sample *vector)
 		w310(*vector, og); os->samp = *vector; break;
 	      case 311:	/* 3 10-bit amplitudes bit-packed in 4 bytes */
 		w311(*vector, og); os->samp = *vector; break;
+	      case 24: /* 24-bit amplitudes */
+	        w24(*vector, og); os->samp = *vector; break;
+	      case 32: /* 32-bit amplitudes */
+	        w32(*vector, og); os->samp = *vector; break;
 	    }
 	    if (wfdb_ferror(og->fp)) {
 		wfdb_error("putvec: write error in signal %d\n", s);

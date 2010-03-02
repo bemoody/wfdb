@@ -1,10 +1,10 @@
 /* file: mainpan.c	G. Moody	30 April 1990
-			Last revised:	15 February 2009
+			Last revised:	12 February 2010
 Functions for the main control panel of WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1990-2005 George B. Moody
+Copyright (C) 1990-2010 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -45,12 +45,13 @@ Panel print_setup_panel;     	/* File menu print setup window */
 /* Pulldown menus from "File", "Edit", and "Properties" menu buttons */
 Menu file_menu,	edit_menu, prop_menu;
 
-Panel_item desc_item,	/* Description field (from log file) */
-	   annot_item,	/* "Annotator:" field */
-           find_item,	/* "Search for:" field */
-	   record_item,	/* "Record:" field */
-	   time_item,	/* "Start time:" field */
-    	   time2_item,	/* "End time:" field */
+Panel_item desc_item,		/* Description field (from log file) */
+	   annot_item,		/* "Annotator:" field */
+           find_item,		/* "Search for:" field */
+           findsig_item,	/* "Find signal:" field */
+	   record_item,		/* "Record:" field */
+	   time_item,		/* "Start time:" field */
+    	   time2_item,		/* "End time:" field */
 	   wfdbpath_item,	/* "WFDB path:" field */
 	   wfdbcal_item,	/* "Calibration file:" field */
 	   psprint_item,	/* "PostScript print command:" field */
@@ -504,7 +505,7 @@ static void create_find_panel()
     find_item = xv_create(find_panel, PANEL_TEXT,
 	PANEL_NEXT_ROW, -1, 
 	XV_HELP_DATA, "wave:find.search_for",
-	PANEL_LABEL_STRING, "Search for: ",
+	PANEL_LABEL_STRING, "Search for annotation: ",
         PANEL_VALUE_DISPLAY_LENGTH, 6,
 	PANEL_NOTIFY_PROC, disp_proc,
         PANEL_CLIENT_DATA, (caddr_t) ']',
@@ -515,6 +516,14 @@ static void create_find_panel()
 	      XV_HELP_DATA, "wave:find.more_options",
 	      PANEL_NOTIFY_PROC, show_search_template,
 	      NULL);
+    findsig_item = xv_create(find_panel, PANEL_TEXT,
+	XV_HELP_DATA, "wave:find.search_for_signal",
+	PANEL_LABEL_STRING, "Find signal: ",
+        PANEL_VALUE_DISPLAY_LENGTH, 6,
+	PANEL_NOTIFY_PROC, disp_proc,
+        PANEL_CLIENT_DATA, (caddr_t) '}',
+	PANEL_VALUE, "",
+	0);				  
     window_fit(find_panel);
     window_fit(find_frame);
 }
@@ -754,10 +763,9 @@ Event *event;
 	    display_start_time = 0L;
 	cache_time = -1L;
 	break;
-      case ']':	/* Find next occurrence of specified annotation or signal. */
-      case '[':	/* Find previous occurrence of specified annotation. */
+      case '}': /* Find next occurrence of specified signal. */
 	if (1) {
-	    char *fp = (char *)xv_get(find_item, PANEL_VALUE);
+	    char *fp = (char *)xv_get(findsig_item, PANEL_VALUE);
 
 	    if ((i = findsig(fp)) >= 0) {
 		WFDB_Time tnext = tnextvec(i, display_start_time + nsamp);
@@ -784,6 +792,9 @@ Event *event;
 		}
 	    }
 	}
+        break;
+      case ']':	/* Find next occurrence of specified annotation. */
+      case '[':	/* Find previous occurrence of specified annotation. */
 	if (annotator[0]) {
 	    char *fp = (char *)xv_get(find_item, PANEL_VALUE);
 	    static char auxstr[256];
@@ -942,4 +953,5 @@ void set_find_item(s)
 char *s;
 {
     xv_set(find_item, PANEL_VALUE, s, NULL);
+    xv_set(findsig_item, PANEL_VALUE, s, NULL);
 }

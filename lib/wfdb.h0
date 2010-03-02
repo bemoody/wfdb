@@ -1,10 +1,10 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised:   28 July 2009	wfdblib 10.4.22
+			Last revised:   1 March 2010	wfdblib 10.5.0
 WFDB library type, constant, structure, and function interface definitions
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1983-2009 George B. Moody
+Copyright (C) 1983-2010 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -79,8 +79,13 @@ typedef unsigned int WFDB_Group;    /* signal group number */
 typedef unsigned int WFDB_Signal;   /* signal number */
 typedef unsigned int WFDB_Annotator;/* annotator number */
 
-#define WFDB_INVALID_SAMPLE (-32768) /* samples from getvec or getframe with
-				        this value are not valid */
+/* getvec and getframe return a sample with a value of WFDB_INVALID_SAMPLE
+   when the amplitude of a signal is undefined (e.g., the input is clipped or
+   the signal is not available) and padding is disabled (see WFDB_GVPAD, below).
+   WFDB_INVALID_SAMPLE is the minimum value for a WFDB_Sample (the most negative
+   number that can be represented). */
+#define WFDB_INVALID_SAMPLE (-1<<(8*sizeof(WFDB_Sample)-1))
+
 
 /* Array sizes
    Many older applications use the values of WFDB_MAXANN, WFDB_MAXSIG, and
@@ -113,9 +118,11 @@ the legal values for the format field in a WFDB_siginfo structure.
  212	2 12-bit amplitudes bit-packed in 3 bytes
  310	3 10-bit amplitudes bit-packed in 4 bytes
  311    3 10-bit amplitudes bit-packed in 4 bytes
+  24	24-bit 2's complement amplitudes, low byte first
+  32	32-bit 2's complement amplitudes, low byte first
 */
-#define WFDB_FMT_LIST {0, 8, 16, 61, 80, 160, 212, 310, 311}
-#define WFDB_NFMTS	  9    /* number of items in FMT_LIST */
+#define WFDB_FMT_LIST {0, 8, 16, 61, 80, 160, 212, 310, 311, 24, 32}
+#define WFDB_NFMTS	  11    /* number of items in WFDB_FMT_LIST */
 
 /* Default signal specifications */
 #define WFDB_DEFFREQ	250.0  /* default sampling frequency (Hz) */
@@ -186,6 +193,18 @@ typedef struct WFDB_siginfo WFDB_Siginfo;
 typedef struct WFDB_calinfo WFDB_Calinfo;
 typedef struct WFDB_anninfo WFDB_Anninfo;
 typedef struct WFDB_ann WFDB_Annotation;
+
+/* Dynamic memory allocation macros. */
+#define MEMERR(P, N, S) \
+    { wfdb_error("WFDB: can't allocate (%ld*%ld) bytes for %s\n", \
+	     (size_t)N, (size_t)S, #P);			      \
+      if (wfdb_me_fatal()) exit(1); }
+#define SFREE(P) { if (P) { free (P); P = 0; } }
+#define SUALLOC(P, N, S) { if (!(P = calloc((N), (S)))) MEMERR(P, (N), (S)); }
+#define SALLOC(P, N, S) { SFREE(P); SUALLOC(P, (N), (S)) }
+#define SREALLOC(P, N, S) { if (!(P = realloc(P, (N)*(S)))) MEMERR(P,(N),(S)); }
+#define SSTRCPY(P, Q) { if (Q) { \
+	 SALLOC(P, (size_t)strlen(Q)+1,1); strcpy(P, Q); } }
 
 /* Function types */
 #ifndef _WINDOWS	/* for everything *except* MS Windows applications */

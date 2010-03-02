@@ -510,7 +510,33 @@ guide in June, 1999.  See @file{NEWS}, in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
-@unnumberedsubsec Changes in version 10.4.25 (21 January 2009)
+@unnumberedsubsec Changes in version 10.5.0 (1 March 2010)
+
+The WFDB library now supports signals with 24 and 32 bits of
+precision, using new formats 24 and 32. Note that these formats,
+unlike all previously defined formats, require more than 16 bits per
+sample value.  If the WFDB software is compiled on a 16-bit platform
+(unusual except for embedded processors), the excess high bits of
+signals in these formats are not read on input, and they are replaced
+by zeroes on output, unless the @code{WFDB_Sample} data type has been
+redefined as @code{long{ (in @file{wfdb.h}).  This is not done by
+default since it would increase memory and computational requirements
+unnecessarily in embedded applications that do not require 24- or
+32-bit precision.
+
+Since support for extended precision samples cannot be introduced
+without this limitation in backward compatibility for 16-bit
+platforms, the minor version number of the library has been
+incremented to 5.  Most users will not be affected by this change,
+however, apart from the new functionality it provides.
+
+Memory allocation macros that have been defined previously in
+@file{wfdblib.h} have been moved to @file{wfdb.h} so they are
+accessible to WFDB applications, including user-written applications.
+For additional information about these macros (MEMERR, SFREE, SUALLOC,
+SALLOC, SREALLOC, and SSTRCPY), @pxref{Memory Allocation Macros}.
+
+@unnumberedsubsec Changes in version 10.4.25 (21 January 2010)
 
 In WFDB library versions 10.4.5 through 10.4.24, strtim("e") did not
 work properly when the open input record was an EDF file and high
@@ -4027,7 +4053,7 @@ memory that it occupied to the heap.  Note that @code{wfdbquit} does
 first introduced in WFDB library version 6.0.)
 
 @page
-@node    miscellaneous functions, , calibration, Functions
+@node    miscellaneous functions, memory allocation, calibration, Functions
 @section Miscellaneous WFDB Functions
 
 @menu
@@ -5163,6 +5189,144 @@ signal file for the specified output signal @var{s}, and invokes
 @code{wfdbsetstart(}@var{s, bytes}@code{)}.  (This function was first
 introduced in WFDB library version 10.4.15.)
 
+@page
+@node   memory allocation, , miscellaneous functions, Functions
+@section Memory Allocation Macros
+
+@menu
+* MEMERR::                      Handling a memory allocation error.
+* SFREE::                       Safely release allocated memory.
+* SUALLOC::                     Safely allocate memory using a new pointer.
+* SALLOC::                      Safely allocate memory, reusing a pointer.
+* SREALLOC::                    Safely expand a chunk of allocated memory.
+* SSTRCPY::                     Safely copy a string into a new buffer.
+
+@end menu
+
+@c @group
+@node     MEMERR, SFREE, memory allocation, memory allocation
+@unnumberedsubsec MEMERR
+@findex MEMERR (10.5.0)
+@cindex insufficient memory
+@cindex memory errors
+@cindex allocation errors
+
+@example
+MEMERR(@var{object_name}, size_t @var{n_elements}, size_t @var{element_size})
+@end example
+@c @end group
+
+@noindent
+This macro uses @code{wfdb_error} to send a short error message of the
+form @code{WFDB: can't allocate (@var{n_elements}*@var{element_size})
+bytes for @var{object_name})}.  Unless @code{wfdbmemerr(1)} has been
+invoked previously, the process that invoked @code{MEMERR} exits immediately.
+
+@c @group
+@node     SFREE, SUALLOC, MEMERR, memory allocation
+@unnumberedsubsec SFREE
+@findex SFREE (10.5.0)
+@cindex release allocated memory
+@cindex freeing allocated memory
+@cindex memory deallocation
+
+@example
+SFREE(@var{object} *@var{pointer})
+@end example
+@c @end group
+
+@noindent
+This macro releases memory previously allocated to the @var{object} addressed
+by the specified @var{pointer}, somewhat more safely than by invoking the
+standard @code{free()} function.  On completion, @var{pointer} is set to NULL.
+
+@code{SFREE} does nothing if @var{pointer} is initially NULL (unlike
+@code{free()}, which may cause the process to crash).  If @code{SFREE} receives
+a non-NULL pointer, it passes that pointer to @code{free()}, which may cause a
+crash if the pointer does not point to an allocated block of memory.
+
+@c @group
+@node     SUALLOC, SALLOC, SFREE, memory allocation
+@unnumberedsubsec SUALLOC
+@findex SUALLOC (10.5.0)
+@cindex allocating memory
+@cindex memory allocation
+
+@example
+SUALLOC(@var{object_name}, size_t @var{n_elements}, size_t @var{element_size})
+@end example
+@c @end group
+
+@noindent
+This macro allocates memory sufficient for @var{n_elements} items of
+@var{element_size} bytes each, and sets the pointer given by @var{object_name}
+to point to the allocated memory.  If there is not enough available memory,
+@code{SUALLOC} invokes @code{MEMERR} (above).
+
+@code{SUALLOC} does not check to see if @var{object_name} already points to
+allocated memory, which will lead to memory leaks if so.
+
+@c @group
+@node     SALLOC, SREALLOC, SUALLOC, memory allocation
+@unnumberedsubsec SALLOC
+@findex SALLOC (10.5.0)
+@cindex allocating memory
+@cindex memory allocation
+
+@example
+SALLOC(@var{object_name}, size_t @var{n_elements}, size_t @var{element_size})
+@end example
+@c @end group
+
+@noindent
+This macro allocates memory sufficient for @var{n_elements} items of
+@var{element_size} bytes each, and sets the pointer given by @var{object_name}
+to point to the allocated memory.  If there is not enough available memory,
+@code{SALLOC} invokes @code{MEMERR} (above).
+
+If @var{object_name} is initially non-NULL, @code{SALLOC} frees it using
+@code{SFREE} before allocating the requested memory.
+
+@c @group
+@node     SREALLOC, SSTRCPY, SALLOC, memory allocation
+@unnumberedsubsec SREALLOC
+@findex SREALLOC (10.5.0)
+@cindex allocating memory
+@cindex expanding allocated memory
+@cindex memory allocation
+@cindex reallocating memory
+
+@example
+SREALLOC(@var{object_name}, size_t @var{n_elements}, size_t @var{element_size})
+@end example
+@c @end group
+
+@noindent
+This macro allocates memory sufficient for @var{n_elements} items of
+@var{element_size} bytes each, and sets the pointer given by @var{object_name}
+to point to the allocated memory.  If there is not enough available memory,
+@code{SREALLOC} invokes @code{MEMERR} (above).
+
+@code{SREALLOC} attempts to reuse the memory previously allocated to
+@var{object_name} rather than releasing it and then making a new request.
+
+@c @group
+@node     SSTRCPY, , SREALLOC, memory allocation
+@unnumberedsubsec SSTRCPY
+@findex SSTRCPY (10.5.0)
+@cindex allocating strings
+@cindex string allocation
+
+@example
+SSTRCPY(char *destination, char *source)
+@end example
+@c @end group
+
+@noindent
+This macro copies the @var{source} string (including a trailing null character)
+into newly-allocated memory, and it sets @var{destination} to point to the copy.
+If @var{destination} is not NULL on entry, @code{SSTRCPY} uses @code{SFREE}
+to release the previously allocated memory.
 
 @node     Data Types, Annotation Codes, Functions, Top
 @chapter Data Types

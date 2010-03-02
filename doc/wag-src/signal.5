@@ -1,4 +1,4 @@
-.TH SIGNAL 5 "2 September 2005" "WFDB software 10.3.18" "WFDB Applications Guide"
+.TH SIGNAL 5 "1 March 2010" "WFDB software 10.5.0" "WFDB Applications Guide"
 .SH NAME
 signal \- WFDB signal file formats
 .SH DESCRIPTION
@@ -29,6 +29,14 @@ Any unused high-order bits are sign-extended from the most significant bit.
 Historically, the format used for MIT\-BIH and AHA database distribution
 9-track tapes was format 16, with the addition of a logical EOF (octal 0100000)
 and null-padding after the logical EOF.
+.SS Format 24
+.PP
+Each sample is represented by a 24-bit two's complement amplitude stored
+least significant byte first.
+.SS Format 32
+.PP
+Each sample is represented by a 32-bit two's complement amplitude stored
+least significant byte first.
 .SS Format 61
 .PP
 Each sample is represented by a 16-bit two's complement amplitude stored
@@ -76,6 +84,18 @@ is obtained from the next 10 bits, the third from the next 10 bits, and the two
 most significant bits are unused (note that these bits are set to zero when
 using the WFDB library to write a format 311 signal file).  This process is
 repeated for each successive set of three samples.
+
+.PP
+If the format specifies a number of bits per sample that exceeds the number of
+bits in a \fBWFDB_Sample\fR, the excess high bits are not read on input, and
+they are replaced by zeroes on output.  Currently, this can happen only when
+using formats 24 or 32 on a 16-bit platform (unusual except for embedded
+processors); in this case, the \fBWFDB_Sample\fR data type may be redefined as
+\fBlong\fR (in \fIwfdb/wfdb.h\fR) before compiling the WFDB library and
+applications, to enable full-precision processing of signals in all formats.
+This is not done by default since it would increase memory and computational
+requirements unnecessarily in embedded applications that do not require 24- or
+32-bit precision.
 
 .SH SEE ALSO
 \fBannot\fR(5), \fBheader\fR(5), \fBwfdbcal\fR(5)

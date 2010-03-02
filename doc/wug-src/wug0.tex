@@ -922,7 +922,7 @@ the pointer (obscuring part of the signal window).  If you wish, move the
 \index{insertion point|emph}
 \index{keyboard focus|emph}
 \end{latexonly}
-Within the {\sf Find} window are three text fields in which you may type.  Move
+Within the {\sf Find} window are four text fields in which you may type.  Move
 the pointer into the the part of the window below the title bar.  A black,
 upward-pointing triangle (the text cursor or \emph{insertion point}) should
 appear in one of the three fields.  (Once again, your window manager may
@@ -948,7 +948,7 @@ specifically, it need not be a multiple of 5 seconds.
 \index{search}\index{annotation!searching for}
 Using any of the controls you have seen so far, set the signal window so that
 it shows the segment of the record beginning at 0:22.  Now select the {\sf
-Search for} field, and enter `{\tt A}' (followed, as always, by
+Search for annotation} field, and enter `{\tt A}' (followed, as always, by
 \keycap{Enter}).  This action asks \WAVE{} to find the next occurrence of an
 `{\sf A}' (atrial premature beat) label, and to redraw the signal window
 roughly centered on that label.  As you may have noticed, the only `{\sf A}'
@@ -4439,7 +4439,7 @@ sample intervals from the beginning of the record.
 \index{annotation!mnemonic}
 \begin{description}
 \index{search}\index{annotation!searching for}
-\item[{\sf Search for}]
+\item[{\sf Search for annotation}]
 Specifies a target for  \button{{\tt <} Search} and \button{Search {\tt >}}.
 Changing this field causes an immediate forward search.  The contents
 of this field should match an annotation or marker mnemonic, signal quality
@@ -4461,6 +4461,13 @@ opens the
 {{\sf Search Template} window (see section~}
 {, page~\pageref{sec:search-template-window})}
 {sec:search-template-window}.
+
+\index{signal!searching for}\index{search}
+\item[{\sf Find signal}]
+Specifies the name of a signal.  Changing this field causes an
+immediate forward search for the next valid samples of the
+specified signal.  To repeat the search, select the field
+and press \keycap{Enter}.
 \end{description}
 
 \section{The {\sf Help Topics} window}

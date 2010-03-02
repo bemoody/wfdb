@@ -1,5 +1,5 @@
 /* file: wrsamp.c	G. Moody	10 August 1993
-			Last revised:  21 January 2010
+			Last revised:    1 March 2010
 
 -------------------------------------------------------------------------------
 wrsamp: Select fields or columns from a file and generate a WFDB record
@@ -32,18 +32,6 @@ _______________________________________________________________________________
 /* The following definition yields dither with a triangular PDF in (-1,1). */
 #define DITHER	        (((double)rand() + (double)rand())/RAND_MAX - 1.0)
 
-/* Dynamic memory allocation macros */
-#define MEMERR(P, N, S) \
-    { wfdb_error("WFDB: can't allocate (%ld*%ld) bytes for %s\n", \
-	     (size_t)N, (size_t)S, #P);			      \
-      exit(1); }
-#define SFREE(P) { if (P) { free (P); P = 0; } }
-#define SUALLOC(P, N, S) { if (!(P = calloc((N), (S)))) MEMERR(P, (N), (S)); }
-#define SALLOC(P, N, S) { SFREE(P); SUALLOC(P, (N), (S)) }
-#define SREALLOC(P, N, S) { if (!(P = realloc(P, (N)*(S)))) MEMERR(P,(N),(S)); }
-#define SSTRCPY(P, Q) { if (Q) { \
-	 SALLOC(P, (size_t)strlen(Q)+1,1); strcpy(P, Q); } }
-
 char *pname;
 
 char *read_line(FILE *ifile, char rsep)
@@ -59,7 +47,7 @@ char *read_line(FILE *ifile, char rsep)
 	    SREALLOC(buf, length+2, sizeof(char));
 	}
  	if (c == EOF) {
-	    free(buf);
+	    SFREE(buf);
 	    return (buf = NULL);
 	}
 	buf[i++] = c;
@@ -107,18 +95,14 @@ typedef struct tokenarray Tokenarray;
 
 /* The function parseline() parses its first argument, a null-terminated string
 ('line'), into a Tokenarray ('ta').  On return, the token pointers (ta->token[])
-address locations within 'line', and the character that immediately follows
-each token is replaced with a null.
+address null-terminated tokens copied from 'line'; 'line' is not altered.
 
-The second argument of parseline, ta, is a pointer to a Tokenarray (defined
-above).  If ta is NULL on entry, parseline allocates and returns a Tokenarray
-that is sufficiently large to accomodate all of the tokens in 'line'.
-Otherwise, parseline returns the number of tokens found in ta->ntokens, and the
+The function returns the number of tokens found in ta->ntokens, and the
 token array on return contains either ta->ntokens or ta->maxtokens valid
 elements, whichever is smaller.  If ta->ntokens > ta->maxtokens, the token
 array contains pointers to the first ta->maxtokens tokens.
 
-The third and final argument of parseline, pmode, is a pointer to a Parsemode
+The second argument of parseline, pmode, is a pointer to a Parsemode
 (also defined above).  The caller can set up pmode to specify which characters
 in 'line' are token delimiters, which pairs of characters can be used to quote
 a token that may have embedded delimiters, whether to treat consecutive
@@ -138,18 +122,18 @@ Parsemode defpmode = {
   { "''", "\"\"", "()", "[]", "{}", "<>", NULL } /* quote characters */
 };
 
-Tokenarray *parseline(char *line, Tokenarray *ta, Parsemode *pmode)
-{
-    int i, n = 0, state = 0;
-    char d, *p = line-1, *q = NULL;
+static char *tbuf;
+static Tokenarray *ta;
 
-    if (ta == NULL) {
-	int m = (strlen(line) + 1)/2;
-	if (ta = (Tokenarray *)malloc(sizeof(int)*2 + sizeof(char *)*m))
-	    ta->maxtokens = m;
-	else
-	    return (NULL);
-    }
+Tokenarray *parseline(char *line, Parsemode *pmode)
+{
+    int i, m = (strlen(line) + 1)/2, n = 0, state = 0;
+    char d, *p, *q = NULL;
+
+    SSTRCPY(tbuf, line);
+    p = tbuf-1;
+    SREALLOC(ta, sizeof(int)*2 + sizeof(char *)*m, 1);
+    ta->maxtokens = m;
 
     if (pmode == NULL)
 	pmode = &defpmode;
@@ -380,7 +364,7 @@ char *argv[];
     labels = line_has_alpha(line);
 
     /* parse it into tokens */
-    ta = parseline(line, NULL, NULL);
+    ta = parseline(line, NULL);
 
     /* read selected column numbers into fv[...] */
     if (i < argc) {
@@ -463,8 +447,7 @@ char *argv[];
 	    exit(4);
 	}
 	if (line_has_alpha(line)) {
-	    free(ta);
-	    ta = parseline(line, NULL, NULL);
+	    ta = parseline(line, NULL);
 	    /* Copy units strings after trimming any surrounding spaces,
 	       parentheses, or brackets, and after replacing embedded spaces
 	       with underscores. */
@@ -511,8 +494,7 @@ char *argv[];
 
     /* read and copy samples */
     while (line != NULL && (t1 == 0L || t++ < t1)) {
-	free(ta);
-	ta = parseline(line, NULL, NULL);
+	ta = parseline(line, NULL);
 	for (i = 0; i < nf; i++) {
 	    double v;
 
@@ -535,6 +517,12 @@ char *argv[];
     if (record != NULL)
 	(void)newheader(record);
     wfdbquit();
+    SFREE(fv);
+    SFREE(scalef);
+    SFREE(si);
+    SFREE(ta);
+    SFREE(tbuf);
+    SFREE(vout);
     exit(0);
 }
 

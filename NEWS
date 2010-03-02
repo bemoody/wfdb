@@ -1,3 +1,33 @@
+10.5.0 (1 March 2010):
+	The WFDB library now supports signals with 24 and 32 bits of precision,
+	using new formats 24 and 32. Note that these formats, unlike all
+	previously defined formats, require more than 16 bits per sample value.
+	If the WFDB software is compiled on a 16-bit platform (unusual except
+	for embedded processors), the excess high bits of signals in these
+	formats are not read on input, and they are replaced by zeroes on
+	output, unless the WFDB_Sample data type has been redefined as 'long'
+	(in wfdb.h).  This is not done by default since it would increase
+	memory and computational requirements unnecessarily in embedded
+	applications that do not require 24- or 32-bit precision.
+
+	Since support for extended precision samples cannot be introduced
+	without this limitation in backward compatibility for 16-bit platforms,
+	the minor version number of the library has been incremented to 5.
+	Most users will not be affected by this change, however, apart from the
+	new functionality it provides.
+
+	Memory allocation macros that have been defined previously in wfdblib.h
+ 	have been moved to wfdb.h so they are accessible to WFDB applications,
+	including user-written applications.  See the WFDB Programmer's Guide
+	for additional information about these macros (MEMERR, SFREE, SUALLOC,
+	SALLOC, SREALLOC, and SSTRCPY).
+
+	Some combinations of options caused the version of 'wrsamp' included
+	in version 10.4.25 to fail;  this has now been corrected.
+
+	WAVE's Find window now provides a means to search for the next valid
+	sample of a specified signal.
+
 10.4.25 (21 January 2010):
 	WFDB application 'rdsamp' can now write CSV (comma-separated value)
 	format output using its new '-c' option, and 'wrsamp' can read CSV
