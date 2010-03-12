@@ -1,26 +1,34 @@
-10.5.0 (1 March 2010):
+10.5.0 (12 March 2010):
 	The WFDB library now supports signals with 24 and 32 bits of precision,
-	using new formats 24 and 32. Note that these formats, unlike all
-	previously defined formats, require more than 16 bits per sample value.
-	If the WFDB software is compiled on a 16-bit platform (unusual except
-	for embedded processors), the excess high bits of signals in these
-	formats are not read on input, and they are replaced by zeroes on
-	output, unless the WFDB_Sample data type has been redefined as 'long'
-	(in wfdb.h).  This is not done by default since it would increase
-	memory and computational requirements unnecessarily in embedded
-	applications that do not require 24- or 32-bit precision.
+	using new formats 24 and 32, and WFDB applications 'wrsamp' and 'xform'
+	support user selection of 24- and 32-bit formats for output signal
+	files.
+
+	Note that these formats, unlike all previously defined formats, require
+	more than 16 bits per sample value.  If the WFDB software is compiled
+	on a 16-bit platform (unusual except for embedded processors), the
+	excess high bits of signals in these formats are not read on input, and
+	they are replaced by zeroes on output, unless the WFDB_Sample data type
+	has been redefined as 'long' (in wfdb.h).  This is not done by default
+	since it would increase memory and computational requirements
+	unnecessarily in embedded applications that do not require 24- or
+	32-bit precision.
 
 	Since support for extended precision samples cannot be introduced
 	without this limitation in backward compatibility for 16-bit platforms,
-	the minor version number of the library has been incremented to 5.
+	the minor version number of the WFDB library has been incremented to 5.
 	Most users will not be affected by this change, however, apart from the
 	new functionality it provides.
 
 	Memory allocation macros that have been defined previously in wfdblib.h
  	have been moved to wfdb.h so they are accessible to WFDB applications,
 	including user-written applications.  See the WFDB Programmer's Guide
-	for additional information about these macros (MEMERR, SFREE, SUALLOC,
+	for information about using these macros (MEMERR, SFREE, SUALLOC,
 	SALLOC, SREALLOC, and SSTRCPY).
+
+	A buffer overflow in the WFDB library's internal function edfparse()
+	(in lib/signal.c) has been corrected, thanks to a bug report and patch
+	from Joonas Paalasmaa.
 
 	Some combinations of options caused the version of 'wrsamp' included
 	in version 10.4.25 to fail;  this has now been corrected.

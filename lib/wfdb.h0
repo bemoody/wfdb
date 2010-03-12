@@ -1,5 +1,5 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised:   1 March 2010	wfdblib 10.5.0
+			Last revised:   12 March 2010	wfdblib 10.5.0
 WFDB library type, constant, structure, and function interface definitions
 
 _______________________________________________________________________________
@@ -82,10 +82,11 @@ typedef unsigned int WFDB_Annotator;/* annotator number */
 /* getvec and getframe return a sample with a value of WFDB_INVALID_SAMPLE
    when the amplitude of a signal is undefined (e.g., the input is clipped or
    the signal is not available) and padding is disabled (see WFDB_GVPAD, below).
-   WFDB_INVALID_SAMPLE is the minimum value for a WFDB_Sample (the most negative
-   number that can be represented). */
-#define WFDB_INVALID_SAMPLE (-1<<(8*sizeof(WFDB_Sample)-1))
-
+   WFDB_INVALID_SAMPLE is the minimum value for a 16-bit WFDB_Sample.  In
+   a format 24 or 32 signal, this value will be near mid-range, but it should
+   occur only rarely in such cases;  if this is a concern, WFDB_INVALID_SAMPLE
+   can be redefined and the WFDB library can be recompiled. */
+#define WFDB_INVALID_SAMPLE (-32768)
 
 /* Array sizes
    Many older applications use the values of WFDB_MAXANN, WFDB_MAXSIG, and

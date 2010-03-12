@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   26 February 2010	wfdblib 10.5.0
+			Last revised:   12 March 2010	wfdblib 10.5.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -607,7 +607,7 @@ static int sigmap(WFDB_Sample *vector)
 /* get header information from an EDF file */
 static int edfparse(WFDB_FILE *ifile)
 {
-    static char buf[9], junk[80], *edf_fname, *p;
+    static char buf[80], *edf_fname, *p;
     double *pmax, *pmin, spr;
     int i, s, nsig, offset, day, month, year, hour, minute, second;
     long adcrange, *dmax, *dmin, nframes;
@@ -623,8 +623,8 @@ static int edfparse(WFDB_FILE *ifile)
     }
 
     /* Read the remainder of the fixed-size section of the header. */
-    wfdb_fread(junk, 1, 80, ifile);	/* patient ID (ignored) */
-    wfdb_fread(junk, 1, 80, ifile);	/* recording ID (ignored) */
+    wfdb_fread(buf, 1, 80, ifile);	/* patient ID (ignored) */
+    wfdb_fread(buf, 1, 80, ifile);	/* recording ID (ignored) */
     wfdb_fread(buf, 1, 8, ifile);	/* recording date */
     sscanf(buf, "%d%*c%d%*c%d", &day, &month, &year);
     year += 1900;			/* EDF has only two-digit years */
@@ -633,7 +633,7 @@ static int edfparse(WFDB_FILE *ifile)
     sscanf(buf, "%d%*c%d%*c%d", &hour, &minute, &second);
     wfdb_fread(buf, 1, 8, ifile);	/* number of bytes in header */
     sscanf(buf, "%d", &offset);
-    wfdb_fread(junk, 1, 44, ifile);	/* free space (ignored) */
+    wfdb_fread(buf, 1, 44, ifile);	/* free space (ignored) */
     wfdb_fread(buf, 1, 8, ifile);	/* number of frames (EDF blocks) */
     sscanf(buf, "%ld", &nframes);
     nsamples = nframes;
@@ -678,15 +678,15 @@ static int edfparse(WFDB_FILE *ifile)
 	hsd[s]->info.fmt = 16;
 	hsd[s]->info.nsamp = nframes;
 
-	wfdb_fread(junk, 1, 16, ifile);	/* signal type */
-	junk[16] = ' ';
-	for (i = 16; i >= 0 && junk[i] == ' '; i--)
-	    junk[i] = '\0';
-	SSTRCPY(hsd[s]->info.desc, junk);
+	wfdb_fread(buf, 1, 16, ifile);	/* signal type */
+	buf[16] = ' ';
+	for (i = 16; i >= 0 && buf[i] == ' '; i--)
+	    buf[i] = '\0';
+	SSTRCPY(hsd[s]->info.desc, buf);
     }
 
     for (s = 0; s < nsig; s++)
-	wfdb_fread(junk, 1, 80, ifile); /* transducer type (ignored) */
+	wfdb_fread(buf, 1, 80, ifile); /* transducer type (ignored) */
 
     for (s = 0; s < nsig; s++) {
 	wfdb_fread(buf, 1, 8, ifile);	/* signal units */
@@ -727,7 +727,7 @@ static int edfparse(WFDB_FILE *ifile)
     }
 
     for (s = 0; s < nsig; s++)
-	wfdb_fread(junk, 1, 80, ifile);	/* filtering information (ignored) */
+	wfdb_fread(buf, 1, 80, ifile);	/* filtering information (ignored) */
 
     for (s = framelen = 0; s < nsig; s++) {
 	int n;
@@ -1291,6 +1291,7 @@ signal group pointer).  The output routines get two arguments (the value to be
 written and the signal group pointer). */
 
 static int _l;		    /* macro temporary storage for low byte of word */
+static int _L;		    /* macro temporary storage for low 16 bits of int */
 static int _n;		    /* macro temporary storage for byte count */
 
 #define r8(G)	((G->bp < G->be) ? *(G->bp++) : \
@@ -1312,9 +1313,9 @@ r61() in order to obtain proper sign extension. */
 #define w16(V,G)    (w8((V), (G)), w8(((V) >> 8), (G)))
 #define r61(G)      (_l = r8(G), ((int)((short)((r8(G) & 0xff) | (_l << 8)))))
 #define w61(V,G)    (w8(((V) >> 8), (G)), w8((V), (G)))
-#define r24(G)	    (_l = r16(G), ((int)((r8(G) << 16) | (_l & 0xffff))))
+#define r24(G)	    (_L = r16(G), ((int)((r8(G) << 16) | (_L & 0xffff))))
 #define w24(V,G)    (w16((V), (G)), w8(((V) >> 16), (G)))
-#define r32(G)	    (_l = r16(G), ((int)((r16(G) << 16) | (_l & 0xffff))))
+#define r32(G)	    (_L = r16(G), ((int)((r16(G) << 16) | (_L & 0xffff))))
 #define w32(V,G)    (w16((V), (G)), w16(((V) >> 16), (G)))
 #else
 

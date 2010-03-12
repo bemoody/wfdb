@@ -422,7 +422,15 @@ char *argv[];
 	si[i].fmt = format;
 	si[i].spf = 1;
 	si[i].bsize = 0;
-	si[i].adcres = WFDB_DEFRES;
+	switch (format) {
+	  case 80:  si[i].adcres = 8; break;
+	  case 310:
+	  case 311: si[i].adcres = 10; break;
+	  case 212: si[i].adcres = 12; break;
+	  case 24:  si[i].adcres = 24; break;
+	  case 32:  si[i].adcres = 32; break;
+	  default:  si[i].adcres = WFDB_DEFRES;
+	}
 	si[i].adczero = 0;
 	si[i].baseline = 0;
 	while (*gain == ' ')

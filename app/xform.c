@@ -1,5 +1,5 @@
 /* file: xform.c	G. Moody        8 December 1983
-			Last revised:   26 February 2010
+			Last revised:   12 March 2010
 -------------------------------------------------------------------------------
 xform: Sampling frequency, amplitude, and format conversion for WFDB records
 Copyright (C) 1983-2010 George B. Moody
@@ -469,13 +469,11 @@ char *argv[];
 		}
 		dfout[i].units = *units[i] ? units[i] : NULL;
 	    }
-	    do {
-		(void)fprintf(stderr, " Signal %d gain (adu/%s) [%g]: ",
-			      i, dfout[i].units ? dfout[i].units : "mV",
-			      dfout[i].gain);
-		(void)fgets(answer, sizeof(answer), ttyin);
-		(void)sscanf(answer, "%lf", &dfout[i].gain);
-	    } while (dfout[i].gain < 0.);
+	    (void)fprintf(stderr, " Signal %d gain (adu/%s) [%g]: ",
+			  i, dfout[i].units ? dfout[i].units : "mV",
+			  dfout[i].gain);
+	    (void)fgets(answer, sizeof(answer), ttyin);
+	    sscanf(answer, "%lf", &dfout[i].gain);
 	    do {
 		if (i > 0) dfout[i].adcres = dfout[i-1].adcres;
 		switch (dfout[i].fmt) {
@@ -490,17 +488,25 @@ char *argv[];
 		    if (dfout[i].adcres < 8 || dfout[i].adcres > 10)
 			dfout[i].adcres = 10;
 		    break;
+		  case 24:
+		    if (dfout[i].adcres < 8 || dfout[i].adcres > 24)
+			dfout[i].adcres = 24;
+		    break;
+		  case 32:
+		    if (dfout[i].adcres < 8 || dfout[i].adcres > 32)
+			dfout[i].adcres = 32;
+		    break;
 		  default:
 		    if (dfout[i].adcres < 8 || dfout[i].adcres > 16)
 			dfout[i].adcres = WFDB_DEFRES;
 		    break;
 		}
 		(void)fprintf(stderr,
-			" Signal %d ADC resolution in bits (8-16) [%d]: ", i,
+			" Signal %d ADC resolution in bits (8-32) [%d]: ", i,
 			      dfout[i].adcres);
 		(void)fgets(answer, sizeof(answer), ttyin);
 		(void)sscanf(answer, "%d", &dfout[i].adcres);
-	    } while (dfout[i].adcres < 8 || dfout[i].adcres > 16);
+	    } while (dfout[i].adcres < 8 || dfout[i].adcres > 32);
 	    (void)fprintf(stderr, " Signal %d ADC zero level (adu) [%d]: ",
 			  i, dfout[i].adczero);
 	    (void)fgets(answer, sizeof(answer), ttyin);
@@ -654,6 +660,12 @@ char *argv[];
 		  case 310:
 		    dfin[j].adcres = 10;
 		    break;
+		  case 24:
+		    dfin[j].adcres = 24;
+		    break;
+		  case 32:
+		    dfin[j].adcres = 32;
+		    break;
 		  default:
 		    dfin[j].adcres = WFDB_DEFRES;
 		    break;
@@ -719,7 +731,7 @@ char *argv[];
     /* Determine the legal range of sample values for each output signal. */
     for (i = 0; i < nosig; i++) {
 	vmax[i] = dfout[i].adczero + (1 << (dfout[i].adcres-1)) - 1;
-	vmin[i] = dfout[i].adczero - (1 << (dfout[i].adcres-1));
+	vmin[i] = dfout[i].adczero + (-1 << (dfout[i].adcres-1)) + 1;
     }
 
     /* If resampling is required, initialize the interpolation/decimation

@@ -510,7 +510,7 @@ guide in June, 1999.  See @file{NEWS}, in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
-@unnumberedsubsec Changes in version 10.5.0 (1 March 2010)
+@unnumberedsubsec Changes in version 10.5.0 (12 March 2010)
 
 The WFDB library now supports signals with 24 and 32 bits of
 precision, using new formats 24 and 32. Note that these formats,
@@ -533,8 +533,12 @@ however, apart from the new functionality it provides.
 Memory allocation macros that have been defined previously in
 @file{wfdblib.h} have been moved to @file{wfdb.h} so they are
 accessible to WFDB applications, including user-written applications.
-For additional information about these macros (MEMERR, SFREE, SUALLOC,
+For information about using these macros (MEMERR, SFREE, SUALLOC,
 SALLOC, SREALLOC, and SSTRCPY), @pxref{Memory Allocation Macros}.
+
+A buffer overflow in the WFDB library's internal function @code{edfparse()}
+(in @file{signal.c}) has been corrected, thanks to a bug report and patch
+from Joonas Paalasmaa.
 
 @unnumberedsubsec Changes in version 10.4.25 (21 January 2010)
 
