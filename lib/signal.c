@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   12 March 2010	wfdblib 10.5.0
+			Last revised:   13 March 2010	wfdblib 10.5.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -609,7 +609,7 @@ static int edfparse(WFDB_FILE *ifile)
 {
     static char buf[80], *edf_fname, *p;
     double *pmax, *pmin, spr;
-    int i, s, nsig, offset, day, month, year, hour, minute, second;
+    int format, i, s, nsig, offset, day, month, year, hour, minute, second;
     long adcrange, *dmax, *dmin, nframes;
  
     edf_fname = wfdbfile(NULL, NULL);
@@ -617,7 +617,11 @@ static int edfparse(WFDB_FILE *ifile)
     /* Read the first 8 bytes and check for the magic string.  (This might
        accept some non-EDF files.) */
     wfdb_fread(buf, 1, 8, ifile);
-    if (strncmp(buf, "0       ", 8)) {
+    if (strncmp(buf, "0       ", 8) == 0)
+	format = 16;	/* EDF or EDF+ */
+    else if (strncmp(buf+1, "BIOSEMI", 7) == 0)
+	format = 24;	/* BDF */
+    else {
 	wfdb_error("init: '%s' is not EDF or EDF+\n", edf_fname);
 	return (-2);
     }
@@ -675,7 +679,7 @@ static int edfparse(WFDB_FILE *ifile)
 	hsd[s]->skew = 0;
 	SSTRCPY(hsd[s]->info.fname, edf_fname);
 	hsd[s]->info.group = hsd[s]->info.bsize = hsd[s]->info.cksum = 0;
-	hsd[s]->info.fmt = 16;
+	hsd[s]->info.fmt = format;
 	hsd[s]->info.nsamp = nframes;
 
 	wfdb_fread(buf, 1, 16, ifile);	/* signal type */
