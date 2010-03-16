@@ -1,9 +1,9 @@
 /* file: rdsamp.c	G. Moody	 23 June 1983
-			Last revised:   6 November 2009
+			Last revised:   16 March 2010
 
 -------------------------------------------------------------------------------
 rdsamp: Print an arbitrary number of samples from each signal
-Copyright (C) 1983-2009 George B. Moody
+Copyright (C) 1983-2010 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -203,8 +203,8 @@ char *argv[];
     if (maxl && (to == 0L || to > from + maxl))
 	to = from + maxl;
 
-    /* Adjust timeunits if starting time is undefined. */
-    if (timeunits == TIMSTR || timeunits == HHMMSS) {
+    /* Adjust timeunits if starting time or date is undefined. */
+    if (timeunits == TIMSTR) {
 	char *p = timstr(0L);
 	if (*p != '[') timeunits = HHMMSS;
 	else if (strlen(p) < 16) timeunits = SHORTTIMSTR;

@@ -1,16 +1,19 @@
-10.5.0 (12 March 2010):
+10.5.0 (16 March 2010):
 	The WFDB library now supports signals with 24 and 32 bits of precision,
 	using new formats 24 and 32, and WFDB applications 'wrsamp' and 'xform'
 	support user selection of 24- and 32-bit formats for output signal
-	files.
+	files.  'wfdb2mat' automatically selects 32-bit .mat format when
+	exporting records that include format 24 or 32 signals.  WFDB
+	applications can now read BDF and BDF+ files (24-bit EDF and EDF+
+	variants).
 
-	Note that these formats, unlike all previously defined formats, require
-	more than 16 bits per sample value.  If the WFDB software is compiled
-	on a 16-bit platform (unusual except for embedded processors), the
-	excess high bits of signals in these formats are not read on input, and
-	they are replaced by zeroes on output, unless the WFDB_Sample data type
-	has been redefined as 'long' (in wfdb.h).  This is not done by default
-	since it would increase memory and computational requirements
+	Note that these formats, unlike all previously supported formats,
+	require more than 16 bits per sample value.  If the WFDB software is
+	compiled on a 16-bit platform (unusual except for embedded processors),
+	the excess high bits of signals in these formats are not read on input,
+	and they are replaced by zeroes on output, unless the WFDB_Sample data
+	type has been redefined as 'long' (in wfdb.h).  This is not done by
+	default since it would increase memory and computational requirements
 	unnecessarily in embedded applications that do not require 24- or
 	32-bit precision.
 
@@ -29,6 +32,10 @@
 	A buffer overflow in the WFDB library's internal function edfparse()
 	(in lib/signal.c) has been corrected, thanks to a bug report and patch
 	from Joonas Paalasmaa.
+
+	In previous versions of 'rdsamp', the '-pe' and '-Pe' options did not
+	force output of elapsed times if the selected record had a defined
+	starting time.  These options now work correctly in such cases.
 
 	Some combinations of options caused the version of 'wrsamp' included
 	in version 10.4.25 to fail;  this has now been corrected.

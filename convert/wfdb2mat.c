@@ -1,8 +1,8 @@
 /* file: wfdb2mat.c	G. Moody	26 February 2009
-			Last revised:	  25 March 2009
+			Last revised:	  16 March 2010
 -------------------------------------------------------------------------------
 wfdb2mat: Convert (all or part of) a WFDB signal file to Matlab .mat format
-Copyright (C) 2009 George B. Moody
+Copyright (C) 2009-2010 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -46,9 +46,11 @@ matrix after reading it!
 
 This program writes version 4 MAT-file format output files, as documented in
 http://www.mathworks.com/access/helpdesk/help/pdf_doc/matlab/matfile_format.pdf
-The samples are written as 16-bit signed integers in little-endian format
-(type=30 below), or as 8-bit unsigned integers (type=50) for records that
-contain only 8-bit unsigned samples.
+The samples are written as 32-bit signed integers (mattype=20 below) in
+little-endian format if the record contains any format 24 or format 32 signals,
+as 8-bit unsigned integers (mattype=50) if the record contains only format 80
+signals, or as 16-bit signed integers in little-endian format (mattype=30)
+otherwise.
 
 Although version 5 and newer versions of Matlab normally use a different (less
 compact and more complex) format, they can read these files without difficulty.
@@ -73,6 +75,12 @@ wfdb2mat.
 #include <stdio.h>
 #include <wfdb/wfdb.h>
 
+/* Output .mat file types (values of mattype), defined by the .mat format
+   specification, see above */
+#define MAT8	50	/* 8 bits per sample */
+#define MAT16	30	/* 16 bits per sample */
+#define	MAT32	20	/* 32 bits per sample */
+
 char *pname;
 
 main(argc, argv)
@@ -81,8 +89,8 @@ char *argv[];
 {
     char *matname, *orec, *p, *q, *record = NULL, *search = NULL, *prog_name();
     static char prolog[24];
-    int highres = 0, i, isiglist, nisig, nosig = 0, pflag = 0, s, *sig = NULL,
-        stat = 0, type = 50, vflag = 0;
+    int highres = 0, i, isiglist, mattype, nisig, nosig = 0, pflag = 0,
+	s, *sig = NULL, stat = 0, vflag = 0, wfdbtype;
     WFDB_Frequency freq;
     WFDB_Sample *vi, *vo;
     WFDB_Siginfo *si, *so;
@@ -246,16 +254,23 @@ char *argv[];
     for (p = matname + strlen(matname) - 5; p > matname && *p != '/'; p--)
 	if (*p == '.') *p = '_';
 
-    /* Determine if we can write 8-bit unsigned samples, or if 16 bits are
+    /* Determine if we can write 8-bit unsigned samples, or if 16 or 32 bits are
        needed per sample. */
+    mattype = MAT8;
+    wfdbtype = 80;
     for (i = 0; i < nosig; i++)
-	if (si[sig[i]].fmt != 80) { type = 30; break; }
+	switch (si[sig[i]].fmt) {
+	  case 24:
+	  case 32: mattype = MAT32; wfdbtype = 32; break;
+	  case 80: break;
+	default: if (mattype != MAT32) mattype = MAT16; wfdbtype = 16; break;
+	}
     for (i = 0; i < nosig; i++) {
 	so[i] = si[sig[i]];
 	so[i].fname = matname;
 	so[i].group = 0;
 	so[i].spf = 1;
-	so[i].fmt = (type == 30) ? 16 : 80;
+	so[i].fmt = wfdbtype;
 	if (so[i].units == NULL) SSTRCPY(so[i].units, "mV");
     }
 
@@ -267,8 +282,8 @@ char *argv[];
     
     /* Fill in the .mat file's prolog and write it. (Elements of prolog[]
        not set explicitly below are always zero.) */
-    prolog[ 0] = type & 0xff;				/* format */
-    prolog[ 1] = (type >> 8) & 0xff;
+    prolog[ 0] = mattype & 0xff;				/* format */
+    prolog[ 1] = (mattype >> 8) & 0xff;
     prolog[ 4] = nosig & 0xff;			/* number of rows */
     prolog[ 5] = (nosig >> 8) & 0xff;
     prolog[ 6] = (nosig >> 16) & 0xff;
