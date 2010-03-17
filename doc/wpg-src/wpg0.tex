@@ -21,7 +21,7 @@
 @center Harvard-MIT Division of Health Sciences and Technology
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1980 -- 2009 George B. Moody
+Copyright @copyright{} 1980 -- 2010 George B. Moody
 @sp 2
 The most recent versions of the software described in this guide may be
 downloaded from @uref{http://www.physionet.org/}.  For further
@@ -74,8 +74,6 @@ revisions for release VERSION of the WFDB library.
 
 @menu
 * Overview::			What is the WFDB library?
-* Recent changes::              New material, not included in the most
-                                recent printed edition of this guide.
 * Usage::			How to compile and run a program that uses
 				the WFDB library.
 * Functions::			Call and return syntax of each function, with
@@ -97,6 +95,8 @@ revisions for release VERSION of the WFDB library.
 				WFDB library.
 * Sources::			Where to get the WFDB software package, databases
 				of ECGs and other signals, and related items.
+* Recent changes::              New material, not included in the most
+                                recent printed edition of this guide.
 Indices
 
 * Concept Index::		An item for each concept.
@@ -106,7 +106,7 @@ Indices
                                 the terms for doing so.
 @end menu
 
-@node     Overview, Recent changes, Top, Top
+@node     Overview, Usage, Top, Top
 @comment  node-name,  next,  previous,  up
 @unnumbered Preface
 
@@ -425,7 +425,8 @@ MS-DOS users where differences exist), but others should find only minor
 differences.
 
 At the end of the guide is a list of sources for databases and other
-materials that may be useful to readers (@pxref{Sources}).
+materials that may be useful to readers (@pxref{Sources}), and a log
+of changes made to this library since 1999 (@pxref{Recent changes}).
 
 Many friends have contributed to the development of the WFDB library.
 Thanks to Paul Albrecht, Ted Baker, Phil Devlin, Scott Greenwald,
@@ -437,7 +438,8 @@ classic Mac OS and the MS 32-bit Windows environments, respectively.
 Jose Garcia Moros and Salvador Olmos contributed Matlab/Octave
 reimplementations of a useful subset of the WFDB library.  Jonas
 Carlson wrote, documented, and contributed a set of Matlab wrappers
-for the WFDB library.  Isaac Henry contributed SWIG wrappers that
+for the WFDB library, and Michael Craig created and contributed
+the WFDB Toolbox for Matlab.  Isaac Henry contributed SWIG wrappers that
 provide interfaces for a variety of scripting languages, as well as a
 set of translations of the C example programs in this guide into the
 languages supported by the SWIG wrappers.  Mike Dakin provided the
@@ -500,788 +502,7 @@ instructions on doing so).  You may obtain preformatted versions in PDF and
 PostScript formats from @uref{http://www.physionet.org/}.
 
 
-@node     Recent changes, Usage, Overview, Top
-@comment  node-name,  next,  previous,  up
-@unnumberedsec Recent changes
-
-This section contains a brief summary of changes to the WFDB library and
-to this guide since the first printing of the tenth edition of this
-guide in June, 1999.  See @file{NEWS}, in the top-level directory of the
-WFDB Software Package distribution, for information on any more recent
-changes that may not be described here.
-
-@unnumberedsubsec Changes in version 10.5.0 (12 March 2010)
-
-The WFDB library now supports signals with 24 and 32 bits of
-precision, using new formats 24 and 32, and WFDB applications can read
-BDF and BDF+ files (24-bit EDF and EDF+ variants).  Note that these
-formats, unlike all previously defined formats, require more than 16
-bits per sample value.  If the WFDB software is compiled on a 16-bit
-platform (unusual except for embedded processors), the excess high
-bits of signals in these formats are not read on input, and they are
-replaced by zeroes on output, unless the @code{WFDB_Sample} data type
-has been redefined as @code{long} (in @file{wfdb.h}).  This is not
-done by default since it would increase memory and computational
-requirements unnecessarily in embedded applications that do not
-require 24- or 32-bit precision.
-
-Since support for extended precision samples cannot be introduced
-without this limitation in backward compatibility for 16-bit
-platforms, the minor version number of the library has been
-incremented to 5.  Most users will not be affected by this change,
-however, apart from the new functionality it provides.
-
-Memory allocation macros that have been defined previously in
-@file{wfdblib.h} have been moved to @file{wfdb.h} so they are
-accessible to WFDB applications, including user-written applications.
-For information about using these macros (MEMERR, SFREE, SUALLOC,
-SALLOC, SREALLOC, and SSTRCPY), @pxref{Memory Allocation Macros}.
-
-A buffer overflow in the WFDB library's internal function @code{edfparse()}
-(in @file{signal.c}) has been corrected, thanks to a bug report and patch
-from Joonas Paalasmaa.
-
-@unnumberedsubsec Changes in version 10.4.25 (21 January 2010)
-
-In WFDB library versions 10.4.5 through 10.4.24, strtim("e") did not
-work properly when the open input record was an EDF file and high
-resolution input mode had not been selected.  This problem has been
-corrected.
-
-(WFDB library version 10.4.24 was identical to version 10.4.23.)
-
-@unnumberedsubsec Changes in version 10.4.23 (7 August 2009)
-
-Several changes in @file{lib/signal.c} eliminate unintended interactions that
-occurred in previous versions between the input modes that can be
-selected using @code{setgvmode()}.  The effects of these interactions were
-first observed in newly written code; existing WFDB applications were
-apparently unaffected.
-
-On Cygwin/Windows, the WFDB library is now installed in both @file{/usr/bin}
-and @file{/usr/lib}, to simplify building user applications that use the WFDB
-library and to simplify running compiled WFDB applications outside of
-the Cygwin environment.
-	
-@unnumberedsubsec Changes in version 10.4.22 (28 July 2009)
-
-When reading multifrequency records in WFDB_LOWRES mode, invalid
-sample values occurring in signals that need to be decimated were not
-always handled properly in WFDB library function @code{getvec()}, resulting
-in spurious artifacts during intervals that contained a mixture of
-valid and invalid samples.  This bug has been corrected; thanks to
-Omar Abdala for a report that brought this problem to light.
-
-A declaration for WFDB library function @code{findsig()} has been added
-to @file{wfdb.h}.  Thanks to Thomas Heldt for reporting a warning that
-resulted from its omission in previous versions.
-
-@unnumberedsubsec Changes in version 10.4.21 (14 May 2009)
-
-Changes in @file{lib/Makefile.tpl} were needed in order to pass configuration
-constants to the functions added to @file{lib/wfdbio.c} in 10.4.20, but were
-omitted from that release; they have been included in this version.
-
-@unnumberedsubsec Changes in version 10.4.20 (4 May 2009)
-
-Several new functions have been added to @file{lib/wfdbio.c}, to make
-configuration constants accessible at run time; these are needed by
-the WFDB Toolkit for Matlab.
-
-(WFDB library version 10.4.19 was identical to version 10.4.18.)
-
-@unnumberedsubsec Changes in version 10.4.18 (15 March 2009)
-
-The WFDB library no longer reports spurious checksum errors when reading
-EDF files, which don't have checksums.
-
-@unnumberedsubsec Changes in version 10.4.17 (5 March 2009)
-
-Internal WFDB library function @code{wfdb_checkname} now allows hyphens
-(@code{-}) within record and annotator names.
-
-@unnumberedsubsec Changes in version 10.4.16 (3 March 2009)
-
-WFDB library function @code{strtim} now rounds rather than truncating when
-the sampling frequency is not an integer.
-
-@unnumberedsubsec Changes in version 10.4.15 (26 February 2009)
-
-WFDB library function @code{mstimstr} now outputs time to the nearest
-millisecond, rather than truncating its calculation to the next lowest number
-of milliseconds.
-
-A new WFDB library function, @code{wfdbputprolog}, can write a prolog at the
-beginning of a signal file.  WFDB applications ignore embedded prologs.
-
-@unnumberedsubsec Changes in version 10.4.14 (23 February 2009)
-
-WFDB library function @code{setwfdb()} now exports the WFDB library
-environment variables (@code{WFDB}, @code{WFDBCAL},
-@code{WFDBANNSORT,} and @code{WFDBGVMODE}) on all modern platforms, so
-that a process started by a WFDB application inherits the WFDB
-environment of its parent.  (This is not possible on platforms that do
-not provide a working @code{putenv()} function, such as MacOS 9 and
-earlier, and 16-bit versions of MS-Windows.)  Some previous versions
-also included this capability, but the older implementation caused a
-memory leak, and it was disabled in version 10.4.6.  Thanks to Omar
-Abdala and Dan Scott for reporting the problem and help in identifying
-its cause.
-
-@unnumberedsubsec Changes in version 10.4.13 (16 February 2009)
-
-A new WFDB library function, @code{tnextvec()}, finds the next valid sample
-from a chosen signal, occurring at or after a specified time.  This
-function is particularly useful when reading variable-layout
-multi-segment records that may have lengthy gaps in signals of interest.
-
-For portability, the WFDB library has always stored parameters such as
-sampling frequency and gain as strings rather than as floating-point
-numbers.  Although the resultant loss of precision has been almost
-always negligible, it has been observable in the specific case of
-converting very large time intervals from sample intervals to seconds,
-when the sampling frequency in Hz cannot be represented exactly in
-binary (e.g., if the sampling frequency is once per minute, or 1/60
-Hz).  This situation cannot be wholly avoided, but it can be
-minimized.  Changes in this release, in @code{setheader()} and in functions
-that record time units in annotation files, increase the precision
-with which non-integer parameters are recorded, so that loss of
-precision as a result of converting them to and from strings should
-almost never be observable.
-
-@unnumberedsubsec Changes in version 10.4.12 (20 January 2009)
-
-The rule for sorting annotations within a file has been changed to allow a much
-larger number of simultaneous annotations (i.e., annotations in a given
-annotation file with identical @code{time} fields) than was previously
-possible.  Since version 6.1, the WFDB library sorts simultaneous annotations
-according to the value of their @code{chan} fields, allowing for 256
-simultaneous annotations at any given time.  Beginning in version 10.4.12, the
-library sorts simultaneous annotations according to their @code{num} fields,
-then sorts those with identical @code{num} fields according to their
-@code{chan} fields, allowing up to 65,536 simultaneous annotations at any given
-time.
-
-A new WFDB library function, @code{findsig}, returns the signal number of the
-input signal matching its string argument, or -1 if no such input signal
-exists.  If the string argument could be interpreted as an input signal number,
-it is taken as such; otherwise, the string argument must be an exact match to a
-signal name (@code{desc} field in the @code{siginfo} structure).
-
-Previous versions of WFDB library function @code{setifreq} entered an infinite
-loop if invoked (contrary to specifications) before opening an input record.
-@code{setifreq} now detects the error, emits an appropriate warning, and
-returns.
-
-If a WFDB application that uses WFDB library version 10.4.5 through 10.4.11
-attempted to read an annotation file before reading the sampling frequency of
-the associated record (for example, by invoking @code{isigopen} or
-@code{sampfreq}), the annotation times might all appear to be zero.  This may
-occur when reading annotations created using WFDB 10.4.5 or later.  The times
-supplied when creating the file are correctly written but may be incorrectly
-read in these cases.  This problem was corrected in this release; thanks to
-Thomas Heldt for reporting it and providing a reproducible example of it.
-
-(WFDB library version 10.4.11 was identical to version 10.4.10.)
-
-@unnumberedsubsec Changes in version 10.4.10 (31 October 2008)
-
-EDF digital maximum and minimum values are now read properly in 64-bit
-builds;  previous versions had a bug in @code{edfparse} (an internal WFDB
-library function defined in @file{lib/signal.c}) that did not appear in
-32-bit builds.	Thanks to Joe Mietus for reporting the problem.
-
-@unnumberedsubsec Changes in version 10.4.9 (10 October 2008)
-
-The WFDB library once again correctly interprets a hyphen (@code{-})
-(used in place of a record name, annotator name, signal file name,
-or calibration file name) as a reference to the standard input or
-output, for platforms that support POSIX standard I/O (@pxref{Standard I/O}).
-This feature was broken in 10.4.5 as a side effect of changes
-in @code{wfdb_open} (an internal WFDB library function defined in
-@file{lib/wfdbio.c}).
-
-(WFDB library version 10.4.8 was identical to version 10.4.7.)
-
-@unnumberedsubsec Changes in version 10.4.7 (15 July 2008)
-
-Yinqi Zhang reported and contributed a fix for a memory leak in
-@code{make_vsd()} (an internal WFDB library function defined in
-@file{signal.c}).
-
-@unnumberedsubsec Changes in version 10.4.6 (9 April 2008)
-
-The WFDB functions @code{setafreq()} and @code{getafreq()} (for
-setting and getting the time resolution of newly-created output
-annotation files in ticks per second) were new in version 10.4.5, but
-were undocumented.  They are now described in this Guide, and wrappers
-for these functions are now included in @file{fortran/wfdbf.c}.
-
-An important change in the WFDB library: memory allocation errors are
-now treated as fatal by default (in previous versions, the functions
-that encountered them returned error values that permitted the
-application to handle them).  These errors occur when there is
-insufficient memory available to the WFDB library. To obtain the old
-behavior, in which the calling function will continue execution if
-possible after a memory allocation error, invoke @code{wfdbmemerr(0)}.
-By default, however, such an error will cause the process to
-terminate.  In either case, the WFDB library emits an appropriate
-error message to aid in troubleshooting.
-
-New macros for handling dynamically allocated memory are defined in
-@file{lib/wfdblib.h} and used throughout the WFDB library, eliminating most
-known memory leaks.  Three known leaks remain (in @code{setecgstr()}, 
-@code{setannstr()}, and @code{setanndesc()});  these are documented and
-harmless in current applications.  Thanks to Yinqi Zhang for reporting a leak
-in @code{copysi()} (an internal WFDB library function defined in
-@file{signal.c}), which prompted the cleanup.
-	
-WFDB functions @code{strecg()}, @code{setecgstr()}, @code{strann()},
-@code{setannstr()}, and @code{setanndesc()} now handle NULL string inputs
-properly. (Previous versions passed NULL strings to @code{strcmp()}, with
-undesirable results.)
-
-@unnumberedsubsec Changes in version 10.4.5 (6 February 2008)
-
-Bob Farrell and Tony Ricke chased down and provided fixes for memory leaks
-in several WFDB library functions, and also provided revisions to permit
-additional type checking and to avoid type mismatch warnings.
-
-Changes in the build system make it easier to build WFDB using Cygwin
-gcc (with or without the Cygwin POSIX library).
-
-When creating annotation files, if the input sampling frequency differs
-from the frame rate of the input record (either because of using
-@code{WFDB_HIGHRES} mode while reading a multifrequency record, or because
-of having used @code{setifreq()} to modify the sampling frequency), a comment
-is written to the beginning of the annotation file indicating the
-resolution of the annotation times in ticks per second (thus allowing
-the application to store its annotations with whatever time resolution
-is desired).  When reading an annotation file, if such a resolution
-comment is found, getann adjusts the times of annotations to match the
-currently defined sampling frequency.  The resolutions are kept
-independently for each annotation file, so (for example) @code{bxb} can
-compare two annotation files written with different resolutions.
-
-The ability to set the time resolution of annotation files has required
-a minor change in the semantics of @code{setifreq()}.  It is now necessary
-to invoke @code{setifreq()} before creating an annotation file that will
-have a resolution matching the (modified) input sampling frequency.
-Since @code{setifreq()} must be invoked after opening the input signals,
-this implies that @code{wfdbinit()} cannot be used to open both input signals
-and output annotation files if @code{setifreq()} is to be used;  rather, the
-sequence should be @code{isigopen()}, @code{setifreq()}, and finally
-@code{annopen()}.
-
-If a string that includes a @samp{.} is supplied to a WFDB library function
-where a record name is expected, the WFDB library assumes that it is
-the name of a file located in the WFDB path. If the name ends in @samp{.hea},
-the file is assumed to be a WFDB-format header file, and its record name
-is assumed to be the first part of the string, exclusive of the @samp{.hea'}.
-
-This version also includes support for reading EDF files natively.
-If a string supplied as a record name contains a @samp{.} but does not end
-in @samp{.hea}, it is assumed to be the record name of an EDF file of the
-same name.
-
-(WFDB library versions 10.4.3 and 10.4.4 were identical to version 10.4.2.)
-
-@unnumberedsubsec Changes in version 10.4.2 (4 May 2006)
-
-Mathias Gruber reported a line in wfdbio.c that used void pointer arithmetic
-(permitted as an extension by gcc but not allowed by ANSI/ISO C or most other C
-compilers).  This operation has been replaced by ANSI/ISO C-conformant code.
-
-@unnumberedsubsec Changes in version 10.4.1 (6 April 2006)
-
-A bug caused incorrect output from WFDB library function strtim() when called
-with the argument "i", following use of setifreq() to change the effective
-sampling frequency, resulting in incorrect output from example 10 in the WFDB
-Programmer's Guide.  This has now been corrected.
-
-@unnumberedsubsec Changes in version 10.4.0 (2 March 2006)
-
-Version 10.4.0 and later versions of the WFDB library are intended to
-be compiled using ANSI/ISO C (and C++) compilers only;  previous
-versions also supported the use of traditional (K&R) C compilers.  The
-most obvious change resulting from this decision is in the use of
-prototypes in function declarations, an innovation of ANSI C that
-permits better error-checking by compilers.  The ANSI/ISO C standard is
-now more than 15 years old, and it has been over 10 years since a C
-compiler that does not support function prototypes was used for
-development of the WFDB library.  Code in @file{wfdbio.c} that provides
-limited support for compilers that do not provide an ANSI/ISO C library
-has been retained for now, and @file{wfdb.h} still includes a set of K&R C
-function declarations; both of these features are deprecated, however,
-and may be removed in future versions of the WFDB library.  Users who
-still need to use a K&R C compiler to compile the library itself may
-find 'unprotoize' (included in the GNU gcc distribution) to be helpful.
-
-The mapping of lowest expressible sample values to @code{WFDB_INVALID_SAMPLE}
-performed by @code{getframe()} (in @file{lib/signal.c}) did not work properly
-for signal formats 80 and 160 (in which samples are recorded as unsigned
-integers); this has now been corrected.
-
-The symbol @code{WFDB_GVPAD} is newly defined in @file{<wfdb/wfdb.h>}.
-It may be added to @code{WFDB_HIGHRES} or @code{WFDB_LOWRES} and given
-as input to @code{setgvmode()}.
-The effect of doing so is that missing samples, and samples recognized
-as invalid, are replaced by @code{getframe()}, @code{getvec()}, and
-@code{sample()} with the most recently read valid values rather than by
-the special value @code{WFDB_INVALID_SAMPLE}.
-This behavior allows applications such as digital filters to remain
-ignorant of missing data without significant performance penalties.
-
-@code{sample()} now checks that its signal number input
-is valid, and returns @code{WFDB_INVALID_SAMPLE} if not.  In previous
-versions, @code{sample} returned a sample from signal 0 if the requested
-signal was unavailable.
-
-@code{sample_valid()} now returns -1 in the case of a signal that becomes
-unavailable before the end of the record (previous versions returned 1 in this case).
-
-The FIR filter example (@pxref{Example 7}) now works properly.  The
-previous version always began processing the input at sample 0,
-regardless of start time specified in its argument list.
-
-@unnumberedsubsec Changes in version 10.3.17 (20 August 2005)
-
-This version is the first to support reading variable-layout records
-(multi-segment records in which the number, arrangement, gains, and baselines
-of the signals may vary from one segment to the next; @pxref{Multi-Segment
-Records}).
-
-Rounding errors in the WFDB library's @code{mstimstr} function have been
-reduced.  Previous versions did not always round appropriately when the
-sampling frequency was much less than 1 Hz.
-
-The maximum length for a record name (@code{WFDB_MAXRNL}, defined in
-@file{wfdb.h}) has been increased from 11 to 20.
-
-A new constant, @code{WFDB_INVALID_SAMPLE}, is now defined in @file{wfdb.h}.
-It is used to identify padding inserted to fill in for missing data.  When
-writing in any format that uses fewer than 16 bits per sample, @code{putvec}
-maps @code{WFDB_INVALID_SAMPLE} to the lowest (most negative) value expressible
-in that format; when reading a signal file in such a format, @code{getframe}
-performs the inverse mapping, so that missing data can be identified regardless
-of the data format.
-
-A side effect of this change is that (for example) any samples that had the
-most negative value (for example, -2048 in a format 212 signal file) are now
-flagged as invalid.  To treat such samples as invalid is reasonable, however,
-since these occur only when the input level falls below the working range of
-the analog-to-digital converter.
-
-@unnumberedsubsec Changes in version 10.3.16 (13 June 2005)
-
-Benjamin Moody has added an interface between the WFDB library and
-@code{libcurl} as an alternative to the existing @code{libwww} interface, and
-has updated @file{configure} and @file{conf/*.def} to search for and use
-@code{libcurl} if it is available.  The primary advantages of @code{libcurl}
-over @code{libwww} are that @code{libcurl} is smaller and faster, it supports
-access to password-protected files, and it is actively maintained.  Both
-libraries are freely available on all popular platforms.
-
-Isaac Henry has updated @code{configure} to support building a native
-MS-Windows version of the WFDB library using either Cygwin gcc or MinGW
-gcc.
-
-A number of minor changes, mostly involving conditional use of
-@file{malloc.h}, @file{stdlib.h}, and @file{string.h}, were made to
-eliminate warnings from gcc 4.x.
-
-@unnumberedsubsec Changes in version 10.3.15 (31 January 2005)
-
-Rules for generating the binary tarball for MS-Windows have been
-fixed so that the Cygwin DLLs are now included with correct
-permissions.
-
-Installation of shared libraries under GNU/Linux requires an extra
-step if SELinux is enabled (as under Fedora Core 2 and later);  this
-has been incorporated into @file{conf/linux-slib.def}.
-
-@unnumberedsubsec Changes in version 10.3.14 (29 December 2004)
-
-Guido Muesch reported that @code{getspf()} did not always
-return correct results if the frame frequency does not have an exact
-representation as a double precision floating point number.  This problem has
-now been corrected.
-
-@unnumberedsubsec Changes in version 10.3.13 (5 May 2004)
-
-Using an indirect WFDB path (i.e., setting the WFDB environment
-variable to a value such as @samp{@@FILE}, where @samp{FILE} contains the
-desired path) was broken in WFDB library versions 10.3.9 through
-10.3.12;  it now works again, thanks to a patch contributed by
-Fred Geheb.
-
-@unnumberedsubsec Changes in version 10.3.12 (9 March 2004)
-
-Okko Willeboordse pointed out an incompatibility between the native
-MS-Windows API and the ANSI/ISO C library function @code{mkdir}, which is
-used by the WFDB library.  This does not present a problem when
-compiling the WFDB library using the supported Cygwin/gcc compiler
-under MS-Windows, nor does any related problem occur on any other
-platform.  It should now be a little easier to compile the WFDB library
-using unsupported compilers, thanks to a new @code{MKDIR} macro that hides
-the incompatibility (see @file{lib/wfdblib.h0}).
-
-Piotr Wlodarek initiated a discussion about memory leaks in the WFDB
-library, citing as an example the 'trivial example program in C' from
-this Guide, which does not free memory it allocates in @code{isigopen()}
-when reading the signal specifications.  This problem can be avoided by
-invoking @code{wfdbquit()} in the example program, just before exiting.
-Further discussion of this point has been added to this Guide following
-the presentation of the 'trivial example', and in the description of
-@code{wfdbquit}.
-
-@unnumberedsubsec Changes in version 10.3.11 (17 October 2003)
-
-In @file{signal.c}, several bugs have been identified and fixed.  Thanks
-to Piotr Wlodarek, who found a buffer overrun in @code{isigopen}.  Also,
-@code{isgsettime} sometimes performed incorrect seeks on multifrequency
-records that had been opened in high-resolution mode;  this has been
-fixed, together with a related bug that caused the value returned by
-@code{strtim("e")} to be calculated incorrectly in some such cases.
-
-@unnumberedsubsec Changes in version 10.3.10 (3 August 2003)
-
-In version 10.3.9, the functions @code{setannstr}, @code{setanndesc},
-and @code{setecgstr} did not contain necessary checks to avoid invoking
-@code{strcmp} with a @code{NULL} argument.  These checks have been added in
-version 10.3.10.  Thanks to Thomas Heldt for reporting this problem.
-
-@unnumberedsubsec Changes in version 10.3.9 (16 July 2003)
-
-The WFDB library functions @code{setwfdb}, @code{setannstr},
-@code{setanndesc}, and @code{setecgstr} now copy their input string
-arguments, so that it is no longer necessary for WFDB applications to
-keep these strings valid.  If you have created applications that rely on
-being able to modify these strings, it will be necessary to invoke the
-corresponding functions again before such changes will take effect
-within the WFDB library.
-
-Previous versions of the WFDB library function @code{putinfo} did not
-flush their output until either a new header file was created (via
-@code{setheader} or @code{newheader}) or the process exited.  This has
-now been corrected, and putinfo output is now flushed before
-@code{putinfo} returns.  Thanks to Jonas Carlson for reporting this
-problem.
-
-@unnumberedsubsec Changes in version 10.3.8 (12 July 2003)
-
-The WFDB library function @code{setbasetime()} now properly
-accepts arguments specifying midnight (e.g., @samp{0:0:0}), which previous
-versions rejected, and the function @code{setheader()}
-records such times correctly in the @file{.hea} files it creates.
-
-(WFDB library version 10.3.7 was identical to 10.3.6.)
-
-@unnumberedsubsec Changes in version 10.3.6 (7 April 2003)
-
-The fix applied in @code{isigclose()} in 10.3.5 was incomplete but is now
-(really!) fixed.  Applications that use @code{sample()} should call 
-@code{wfdbquit()} to be certain that @code{sample}'s buffer is freed before
-exiting.
-
-Some long-standing problems in the code (in @file{lib/wfdbio.c}) that handles
-http range requests for NETFILES-enabled versions of the library have
-been partially addressed.  The underlying issue is that http servers
-do not always return the range of bytes requested;  when this happens,
-it is not difficult to determine that there is a problem, but it is
-tricky to figure out what to do about it.  Based on experiments with
-several different http servers, the strategy for handling such problems
-within the WFDB NETFILES code has been improved substantially, but
-there may be further room for improvement.
-
-@unnumberedsubsec Changes in version 10.3.5 (31 March 2003)
-
-Fixed a bug in WFDB library function @code{isigclose()} (in
-@file{lib/signal.c}) that had caused @code{sample()}'s buffer to be freed
-inappropriately when switching segments in a multi-segment record.
-Thanks to Dave Schaffer for the bug report and for a test case that
-illustrated the bug.
-
-(WFDB library versions 10.3.3 and 10.3.4 were identical to 10.3.2.)
-
-@unnumberedsubsec Changes in version 10.3.2 (25 February 2003)
-
-Fixed a WFDB library bug that caused annotation sorting to fail
-if a new header file had been written.  Thanks to Winton Baker for
-reporting this problem and for providing an example that illustrated
-the bug.
-
-(WFDB library version 10.3.1 was identical to 10.3.0.)
-
-@unnumberedsubsec Changes in version 10.3.0 (26 November 2002)
-
-Fixed bugs in @file{lib/signal.c} that caused improper accounting of signal
-group numbers when reading from two or more records at the same time (as in
-@file{nst}), a bug that caused a segfault in @file{nst}, and a bug that
-referenced uninitialized memory in @code{newheader} if @code{nsig} = 0.
-
-The WFDB Software Package has been ported to Mac OS X (Darwin),
-version 10.2 (the port should also work under 10.1 but this
-has not been tested and will not be supported).	
-
-It is now possible to generate a shared WFDB library (DLL)
-under MS-Windows using Cygwin/gcc.
-
-Added functions @code{sample} and @code{sample_valid} to the WFDB library
-(in @file{lib/signal.c}).  @code{sample(s, t)} returns the sample at
-time (sample number) @code{t} from signal @code{s}, handling all
-necessary buffering internally and allowing the caller to treat the
-signal file as a virtual array of randomly accessible samples.
-@code{sample_valid} can be invoked to check if the most recent value
-returned by @code{sample} was valid (e.g., to see if the end of the
-input was reached).  For an example of the use of these functions, see
-@file{app/wqrs.c}.
-
-@unnumberedsubsec Changes in version 10.2.9 (27 October 2002)
-
-Fixed a bug in example 9 in this guide (introduced in version 10.2.0).
-
-Updated @file{lib/wfdbdll.def} and the @file{Makefile.dos} files in several
-directories.  These have not been tested in recent years and may need further
-revisions; feedback is welcome.
-
-Corrected persistent problems with generating PDF versions of the manuals for
-the desired page size, and added hyperlinks to the PDF version of this guide.
-
-(WFDB library version 10.2.8 was identical to 10.2.7.)
-
-@unnumberedsubsec Changes in version 10.2.7 (14 October 2002)
-
-Added a workaround to @code{wfdb_fclose} (in @file{lib/wfdbio.c}) so that
-closing @code{stdin} after using @code{freopen} doesn't trigger a core dump.
-
-If out-of-order annotations were written and automatic annotation sorting was
-suppressed, the warning produced by @code{oannclose} (in @file{lib/annot.c})
-once again includes the correct @code{sortann} command needed to put the
-annotations into order.  (This feature was broken by a previous revision.)
-
-@unnumberedsubsec Changes in version 10.2.6 (24 June 2002)
-@findex setifreq (10.2.6)
-@findex getifreq (10.2.6)
-@cindex interpolation
-@cindex resampling
-
-The new functions @code{setifreq} and @code{getifreq} allow an
-application to choose any convenient sampling frequency for reading
-input signals.  Samples read from signal files using @code{getvec} are
-buffered, resampled, and delivered to the calling application as if the
-original signals had been sampled at the desired frequency.  Times
-expressed in sample intervals passed to or from other WFDB library
-functions (@code{getann}, @code{putann}, @code{mstimstr}, @code{timstr},
-and @code{strtim}) are rescaled as needed to match intervals
-corresponding to the chosen frequency.  Thanks to Pat Hamilton for the
-inspiration!
-
-The WFDB library now records the base time with millisecond precision
-(previous versions did so with one-second precision), and @file{xform}
-provides starting times to the library function @code{setbasetime} with
-millisecond precision.  Thanks to Allavatam Venugopal for providing
-examples that illustrated the need for these features.
-
-Fixed deskewing buffer initialization in @code{getframe}, broken by the
-10.2.0 update, which introduced an infinite loop when reading a record
-that requires skew correction starting at sample 0.  Thanks to Andrew
-Walsh for finding an example that triggered this bug.
-
-Fixed rounding errors in @code{adumuv}, @code{muvadu}, and @code{physadu}.
-Previous versions rounded negative values toward zero;  to obtain consistent
-conversions, however, it is necessary to round all values down (e.g., from
--1.5 to -2 rather than up to -1).
-
-Fixed a memory leak in @code{wfdb_fclose} (in @file{lib/wfdbio.h}).  Thanks to
-Ion Gazta@~naga.
-
-@unnumberedsubsec Changes in version 10.2.5 (10 March 2002)
-
-Additions and fixes in @file{wfdbf.c} (the Fortran wrappers for the WFDB
-library).
-
-@unnumberedsubsec Changes in version 10.2.4 (20 December 2001)
-
-Code in @file{wfdbio.c} that required the use of the string
-@code{header} to identify a header file has been revised so that the
-standard @code{hea} is now usable for this purpose in all cases.
-
-@unnumberedsubsec Changes in version 10.2.3 (14 December 2001)
-
-Portability fixes in @file{wfdblib.h}.  (WFDB library version 10.2.2 was
-identical to 10.2.1.)
-
-@unnumberedsubsec Changes in version 10.2.1 (16 November 2001)
-
-@cindex WFDB path
-Most users will no longer need to set the WFDB path explicitly, as a result
-of several minor changes in the default path and in the installer for the
-WFDB Software Package.
-
-The environment variable @code{WFDBNOSORT} was replaced by @code{WFDBANNSORT},
-and the environment variable @code{WFDBGVMODE} was introduced
-(@pxref{Annotation Order}, and @pxref{Multi-Frequency Records}, for details).
-
-@unnumberedsubsec Changes in version 10.2.0 (15 October 2001)
-
-There are no longer any fixed limits on the numbers of signals or annotation
-files that can be opened simultaneously, or on the number of samples per signal
-per frame.  In previous versions of the WFDB library, the symbols
-@code{WFDB_MAXSIG}, @code{WFDB_MAXANN}, and @code{WFDB_MAXSPF} (all defined in
-@file{<wfdb/wfdb.h>}) specified limits on these parameters that could be
-modified only by recompiling the WFDB library.  These symbols are still defined
-for compatibility with older applications that use them (typically to determine
-the size of static arrays).
-
-@cindex WFDB path
-Since version 10.1.1, record names may include path information (see the notes
-for version 10.1.1 below), but if such names are used to generate names of WFDB
-output files, the user has been required to ensure that the target directory
-exists.  This requirement is eliminated in version 10.2.0.  If an output file
-is specified to be located in a non-existent directory, the WFDB library will
-attempt to create the directory (including, if necessary, any non-existent
-parent directories).  This feature simplifies the use of record names that
-include directory information, as is common when reading data from a CDROM or
-a web server such as PhysioNet.  For example, using the WFDB path
-(@file{. http://@-www.@-physio@-net.@-org/@-physio@-bank/@-data@-base}), if the
-current directory, @file{.}, does not contain a subdirectory named
-@file{mitdb}, the command:
-
-@example
-sqrs -r mitdb/100
-@end example
-
-@noindent
-will read its input from
-@uref{http://@-www.@-physio@-net.@-org/@-physio@-bank/@-data@-base/@-mitdb/},
-will create a directory named @file{mitdb} within the current directory, and
-will write its output annotation file (@file{100.qrs}) into this newly-created
-directory.  If we then use the command:
-
-@example
-rdann -r mitdb/100 -a qrs
-@end example
-
-@noindent
-the header file is still read from the remote directory, but the annotation
-file is read from @file{./mitdb}.  (The programs @file{sqrs} and @file{rdann}
-are standard applications that use the WFDB library;  see the @cite{WFDB
-Applications Guide} for details.)
-
-Also new is the WFDB test suite (located in the @file{checkpkg} directory of
-the WFDB source tree, at the same level as the @file{lib} directory containing
-the WFDB library sources).  This set of programs can be used to help verify
-that a newly-installed version of the WFDB library behaves properly.
-
-@unnumberedsubsec Changes in version 10.1.6 (1 August 2001)
-
-The WFDB library requires that the record name specified in the first line
-of a header file must match the name of the record with which the header file
-is associated (this is done in order to detect corrupted or erroneously
-renamed header files).  Version 10.1.6 requires that only the final portion of
-the record name (stripped of any path information) must match.
-
-@unnumberedsubsec Changes in version 10.1.5 (11 June 2000)
-
-More changes in the @file{make} description files, for Cygwin compatibility.
-
-@unnumberedsubsec Changes in version 10.1.4 (6 June 2000)
-
-The symbol @code{WFDB_NETFILES} replaces the old @code{NETFILES}.
-
-@unnumberedsubsec Changes in version 10.1.3 (26 April 2000)
-
-More changes in the @file{make} description files, to support a configuration
-script.
-
-@unnumberedsubsec Changes in version 10.1.2 (11 March 2000)
-
-Changes in the @file{make} description files.
-
-@unnumberedsubsec Changes in version 10.1.1 (30 January 2000)
-
-@cindex WFDB path
-Record names may contain (absolute or relative) path information as a prefix,
-and if (as a result) an input file is found in a location that does not appear
-explicitly in the WFDB path, that location is appended to the end of the WFDB
-path.  For example, if the WFDB path is
-@file{. http://@-www.@-physio@-net.@-org/@-physio@-bank/@-data@-base}, and the
-record name @file{mitdb/100} is supplied to @code{wfdbinit}, the WFDB library
-will find the header file at
-@uref{http://@-www.@-physio@-net.@-org/@-physio@-bank/@-data@-base/@-mitdb/@-100.hea},
-and will then add @uref{http://@-www.@-physio@-net.@-org/@-physio@-bank/data@-base/@-mitdb/} to
-the end of the WFDB path so that the signal file (specified as @file{100.dat}
-in the header file) can be found.
-
-@unnumberedsubsec Changes in version 10.1.0 (15 January 2000)
-@cindex NETFILES
-
-Version 10.1.0 supports a new signal file format (311), and contains
-numerous minor changes in the NETFILES support code introduced in 10.0.1.
-
-@unnumberedsubsec Changes in version 10.0.1 (19 November 1999)
-@cindex NETFILES
-@cindex libwww
-@cindex W3C libwww
-
-Beginning with version 10.0.1, the WFDB library supports reading not only local
-files, but also remote files made available by web (HTTP) or FTP servers.  To
-make use of this feature, link your application with both the WFDB library and
-the @code{libwww} library (freely available for all versions of Unix, and for
-most recent versions of MS Windows, from @uref{http://www.w3.org/Library}, or
-from @uref{http://@-www.physio@-net.org/physio@-tools/libwww/}).  (In some
-cases, notably under GNU/Linux, @code{libwww} is linked together with the
-dynamically-loaded version of the WFDB library, so that you do not need to link
-@code{libwww} explicitly.)  All access to remote files is read-only.  If you do
-not wish to allow access to remote files, or if @code{libwww} is not available
-for your OS, simply do not define the symbol NETFILES when compiling the WFDB
-library.  For further details, see @file{wfdbio.c} in the WFDB library sources.
-
-@cindex WFDB path
-The WFDB environment variable may now contain whitespace (space, tab, or
-newline characters) as path component separators under any OS.  Multiple
-consecutive whitespace characters are treated as a single path component
-separator.  Use a @samp{.} to specify the current directory as a path component
-when using whitespace as a path component separator.  A semicolon (@samp{;}) is
-also acceptable as a path component separator under any OS.  A colon (@samp{:})
-is still acceptable as a path component separator under Unix (Linux, etc.),
-provided only that the colon is not immediately followed by @samp{//}.
-
-If the WFDB path includes components of the forms
-@file{http://somewhere.net/mydata} or @file{ftp://somewhere.else/yourdata}, the
-sequence @samp{://} is explicitly recognized as part of a URL prefix (under any
-OS), and the @samp{:} and @samp{/} characters within the @samp{://} are not
-interpreted further.  Note that the MS-DOS @samp{\} is @emph{not} acceptable as
-an alternative to @samp{/} in a URL prefix.  To make WFDB paths containing URL
-prefixes more easily (human) readable, use whitespace for path component
-separators.
-
-Previous versions of the WFDB library that were compiled for environments other
-than MS-DOS used file names in the format @var{type.record}.  This file
-name format is no longer supported.
-
-@unnumberedsubsec Changes in version 10.0.0 (25 June 1999)
-
-Beginning with version 10.0.0, the name of the library is WFDB.  All
-earlier versions were named DB.  All library symbols have been similarly
-renamed, with @code{WFDB} and @code{wfdb} replacing @code{DB} and @code{db}
-everywhere, in names of library functions, constants, type and structure
-definitions, library source file names, and names of environment variables
-(e.g., the DB environment variable is now the WFDB environment variable).
-
-Version 10.0.0 of the WFDB library is functionally identical with the
-final release (version 9.7.4) of the DB library, except for the name
-changes.  It should be possible to recompile existing applications
-written for DB library version 9.x without modification, and to link
-them with WFDB library version 10.0.0.  This is possible because two
-sets of @code{#include} files are provided with the WFDB library.  The
-first set, accessible via @code{#include <wfdb/...>}, works with
-applications written as described in this guide.  The alternate set,
-accessible via @code{#include <ecg/...>}, is compatible with DB 9.x
-applications as described in previous editions of this guide.
-
-@node     Usage, Functions, Recent changes, Top
+@node     Usage, Functions, Overview, Top
 @chapter Using the WFDB Library
 
 This chapter gives a brief overview of the steps needed to compile,
@@ -2016,6 +1237,7 @@ The remainder of the nodes in this section describe functions for:
 * conversion::			Time and other conversion functions.
 * calibration::			Calibrating signals.
 * miscellaneous functions::	Attribute-reading and other functions.
+* Memory Allocation Macros::    Memory allocation with error-checking.
 @end menu
 
 @node     introduction to functions, selecting, Functions, Functions
@@ -4058,7 +3280,7 @@ memory that it occupied to the heap.  Note that @code{wfdbquit} does
 first introduced in WFDB library version 6.0.)
 
 @page
-@node    miscellaneous functions, memory allocation, calibration, Functions
+@node miscellaneous functions, Memory Allocation Macros, calibration, Functions
 @section Miscellaneous WFDB Functions
 
 @menu
@@ -5195,7 +4417,7 @@ signal file for the specified output signal @var{s}, and invokes
 introduced in WFDB library version 10.4.15.)
 
 @page
-@node   memory allocation, , miscellaneous functions, Functions
+@node Memory Allocation Macros, , miscellaneous functions, Functions
 @section Memory Allocation Macros
 
 @menu
@@ -5207,6 +4429,17 @@ introduced in WFDB library version 10.4.15.)
 * SSTRCPY::                     Safely copy a string into a new buffer.
 
 @end menu
+
+These macros use the standard ANSI/ISO C functions @code{calloc()},
+@code{realloc()}, @code{free()}, @code{strlen()}, and @code{strcpy()} to handle
+dynamic memory allocation tasks for the WFDB library.  They can also be used by
+applications that include @file{wfdb/wfdb.h}, where they are defined.
+
+These macros provide safe handling of insufficient memory and double free
+errors (either condition results in a descriptive error message, which by
+default is followed by an @code{exit(1)} to end the process with a signal
+to the parent shell or other process).
+
 
 @c @group
 @node     MEMERR, SFREE, memory allocation, memory allocation
@@ -5222,10 +4455,10 @@ MEMERR(@var{object_name}, size_t @var{n_elements}, size_t @var{element_size})
 @c @end group
 
 @noindent
-This macro uses @code{wfdb_error} to send a short error message of the
-form @code{WFDB: can't allocate (@var{n_elements}*@var{element_size})
-bytes for @var{object_name})}.  Unless @code{wfdbmemerr(1)} has been
-invoked previously, the process that invoked @code{MEMERR} exits immediately.
+This macro uses @code{wfdb_error} to send a short error message of the form
+@code{WFDB: can't allocate (}@var{n_elements}*@var{element_size} @code{) bytes
+for }@var{object_name}@code{)}.  Unless @code{wfdbmemerr(1)} has been invoked
+previously, the process that invoked @code{MEMERR} exits immediately.
 
 @c @group
 @node     SFREE, SUALLOC, MEMERR, memory allocation
@@ -5248,7 +4481,9 @@ standard @code{free()} function.  On completion, @var{pointer} is set to NULL.
 @code{SFREE} does nothing if @var{pointer} is initially NULL (unlike
 @code{free()}, which may cause the process to crash).  If @code{SFREE} receives
 a non-NULL pointer, it passes that pointer to @code{free()}, which may cause a
-crash if the pointer does not point to an allocated block of memory.
+crash if the pointer does not point to a block of memory that was previously
+allocated using one of the macros below, or directly using @code{malloc()},
+@code{calloc()}, or @code{realloc()}.
 
 @c @group
 @node     SUALLOC, SALLOC, SFREE, memory allocation
@@ -5267,6 +4502,8 @@ This macro allocates memory sufficient for @var{n_elements} items of
 @var{element_size} bytes each, and sets the pointer given by @var{object_name}
 to point to the allocated memory.  If there is not enough available memory,
 @code{SUALLOC} invokes @code{MEMERR} (above).
+
+The newly allocated memory block is filled with zeroes.
 
 @code{SUALLOC} does not check to see if @var{object_name} already points to
 allocated memory, which will lead to memory leaks if so.
@@ -5289,7 +4526,9 @@ This macro allocates memory sufficient for @var{n_elements} items of
 to point to the allocated memory.  If there is not enough available memory,
 @code{SALLOC} invokes @code{MEMERR} (above).
 
-If @var{object_name} is initially non-NULL, @code{SALLOC} frees it using
+The newly allocated memory block is filled with zeroes.
+
+Unless @var{object_name} is initially NULL, @code{SALLOC} frees it using
 @code{SFREE} before allocating the requested memory.
 
 @c @group
@@ -5312,8 +4551,18 @@ This macro allocates memory sufficient for @var{n_elements} items of
 to point to the allocated memory.  If there is not enough available memory,
 @code{SREALLOC} invokes @code{MEMERR} (above).
 
-@code{SREALLOC} attempts to reuse the memory previously allocated to
-@var{object_name} rather than releasing it and then making a new request.
+Use @code{SREALLOC} to expand a previously allocated block of memory,
+preserving its contents.  @code{REALLOC} usually allocates a new block of the
+desired size, moving the contents of the previously allocated block into
+the beginning of the new block and then freeing the original block.  Pointers
+to locations in the original block will no longer be valid in this case.
+
+The portion of the newly allocated block that extends beyond the previous
+contents is uninitialized.
+
+If @var{object_name} is initially NULL, @code{SUALLOC}, @code{SALLOC}, and
+@code{REALLOC} are functionally equivalent, except that @code{REALLOC} does
+not fill the allocated block with zeroes.
 
 @c @group
 @node     SSTRCPY, , SREALLOC, memory allocation
@@ -9553,7 +8802,7 @@ WWW: @uref{http://www.opera.com/}
 @end display
 @end table
 
-@node     Answers, Concept Index, Sources, Top
+@node     Answers, Recent changes, Sources, Top
 @comment This node isn't in the top-level menu;  why make it too easy?
 @unnumbered Answers to Selected Exercises
 
@@ -9621,7 +8870,794 @@ the pipeline:
 
 @end table
 
-@node     Concept Index, Function and Macro Index, Answers, Top
+@node     Recent changes, Concept Index, Answers, Top
+@comment  node-name,  next,  previous,  up
+@unnumbered Recent changes
+
+This section contains a brief summary of changes to the WFDB library and
+to this guide since the first printing of the tenth edition of this
+guide in June, 1999.  See @file{NEWS}, in the top-level directory of the
+WFDB Software Package distribution, for information on any more recent
+changes that may not be described here.
+
+@unnumberedsec WFDB 10.5
+@unnumberedsubsec Changes in version 10.5.0 (16 March 2010)
+
+The WFDB library now supports signals with 24 and 32 bits of precision, using
+new formats 24 and 32, as well as BDF and BDF+ files (24-bit EDF and EDF+
+variants), so that WFDB applications can now read these formats.  Note that
+these formats, unlike all previously defined formats, require more than 16 bits
+per sample value.  If the WFDB software is compiled on a 16-bit platform
+(unusual except for embedded processors), the excess high bits of signals in
+these formats are not read on input, and they are replaced by zeroes on output,
+unless the @code{WFDB_Sample} data type has been redefined as @code{long} (in
+@file{wfdb.h}).  This is not done by default since it would increase memory and
+computational requirements unnecessarily in embedded applications that do not
+require 24- or 32-bit precision.
+
+Since support for extended precision samples cannot be introduced
+without this limitation in backward compatibility for 16-bit
+platforms, the minor version number of the library has been
+incremented to 5.  Most users will not be affected by this change,
+however, apart from the new functionality it provides.
+
+Memory allocation macros that have been defined previously in
+@file{wfdblib.h} have been moved to @file{wfdb.h} so they are
+accessible to WFDB applications, including user-written applications.
+For information about using these macros (MEMERR, SFREE, SUALLOC,
+SALLOC, SREALLOC, and SSTRCPY), @pxref{Memory Allocation Macros}.
+
+A buffer overflow in the WFDB library's internal function @code{edfparse()}
+(in @file{signal.c}) has been corrected, thanks to a bug report and patch
+from Joonas Paalasmaa.
+
+@unnumberedsec WFDB 10.4
+@unnumberedsubsec Changes in version 10.4.25 (21 January 2010)
+
+In WFDB library versions 10.4.5 through 10.4.24, @code{strtim("e")} did not
+work properly when the open input record was an EDF file and high
+resolution input mode had not been selected.  This problem has been
+corrected.
+
+(WFDB library version 10.4.24 was identical to version 10.4.23.)
+
+@unnumberedsubsec Changes in version 10.4.23 (7 August 2009)
+
+Several changes in @file{lib/signal.c} eliminate unintended interactions that
+occurred in previous versions between the input modes that can be
+selected using @code{setgvmode()}.  The effects of these interactions were
+first observed in newly written code; existing WFDB applications were
+apparently unaffected.
+
+On Cygwin/Windows, the WFDB library is now installed in both @file{/usr/bin}
+and @file{/usr/lib}, to simplify building user applications that use the WFDB
+library and to simplify running compiled WFDB applications outside of
+the Cygwin environment.
+	
+@unnumberedsubsec Changes in version 10.4.22 (28 July 2009)
+
+When reading multifrequency records in WFDB_LOWRES mode, invalid
+sample values occurring in signals that need to be decimated were not
+always handled properly in WFDB library function @code{getvec()}, resulting
+in spurious artifacts during intervals that contained a mixture of
+valid and invalid samples.  This bug has been corrected; thanks to
+Omar Abdala for a report that brought this problem to light.
+
+A declaration for WFDB library function @code{findsig()} has been added
+to @file{wfdb.h}.  Thanks to Thomas Heldt for reporting a warning that
+resulted from its omission in previous versions.
+
+@unnumberedsubsec Changes in version 10.4.21 (14 May 2009)
+
+Changes in @file{lib/Makefile.tpl} were needed in order to pass configuration
+constants to the functions added to @file{lib/wfdbio.c} in 10.4.20, but were
+omitted from that release; they have been included in this version.
+
+@unnumberedsubsec Changes in version 10.4.20 (4 May 2009)
+
+Several new functions have been added to @file{lib/wfdbio.c}, to make
+configuration constants accessible at run time; these are needed by
+the WFDB Toolkit for Matlab.
+
+(WFDB library version 10.4.19 was identical to version 10.4.18.)
+
+@unnumberedsubsec Changes in version 10.4.18 (15 March 2009)
+
+The WFDB library no longer reports spurious checksum errors when reading
+EDF files, which don't have checksums.
+
+@unnumberedsubsec Changes in version 10.4.17 (5 March 2009)
+
+Internal WFDB library function @code{wfdb_checkname} now allows hyphens
+(@code{-}) within record and annotator names.
+
+@unnumberedsubsec Changes in version 10.4.16 (3 March 2009)
+
+WFDB library function @code{strtim} now rounds rather than truncating when
+the sampling frequency is not an integer.
+
+@unnumberedsubsec Changes in version 10.4.15 (26 February 2009)
+
+WFDB library function @code{mstimstr} now outputs time to the nearest
+millisecond, rather than truncating its calculation to the next lowest number
+of milliseconds.
+
+A new WFDB library function, @code{wfdbputprolog}, can write a prolog at the
+beginning of a signal file.  WFDB applications ignore embedded prologs.
+
+@unnumberedsubsec Changes in version 10.4.14 (23 February 2009)
+
+WFDB library function @code{setwfdb()} now exports the WFDB library
+environment variables (@code{WFDB}, @code{WFDBCAL},
+@code{WFDBANNSORT,} and @code{WFDBGVMODE}) on all modern platforms, so
+that a process started by a WFDB application inherits the WFDB
+environment of its parent.  (This is not possible on platforms that do
+not provide a working @code{putenv()} function, such as MacOS 9 and
+earlier, and 16-bit versions of MS-Windows.)  Some previous versions
+also included this capability, but the older implementation caused a
+memory leak, and it was disabled in version 10.4.6.  Thanks to Omar
+Abdala and Dan Scott for reporting the problem and help in identifying
+its cause.
+
+@unnumberedsubsec Changes in version 10.4.13 (16 February 2009)
+
+A new WFDB library function, @code{tnextvec()}, finds the next valid sample
+from a chosen signal, occurring at or after a specified time.  This
+function is particularly useful when reading variable-layout
+multi-segment records that may have lengthy gaps in signals of interest.
+
+For portability, the WFDB library has always stored parameters such as
+sampling frequency and gain as strings rather than as floating-point
+numbers.  Although the resultant loss of precision has been almost
+always negligible, it has been observable in the specific case of
+converting very large time intervals from sample intervals to seconds,
+when the sampling frequency in Hz cannot be represented exactly in
+binary (e.g., if the sampling frequency is once per minute, or 1/60
+Hz).  This situation cannot be wholly avoided, but it can be
+minimized.  Changes in this release, in @code{setheader()} and in functions
+that record time units in annotation files, increase the precision
+with which non-integer parameters are recorded, so that loss of
+precision as a result of converting them to and from strings should
+almost never be observable.
+
+@unnumberedsubsec Changes in version 10.4.12 (20 January 2009)
+
+The rule for sorting annotations within a file has been changed to allow a much
+larger number of simultaneous annotations (i.e., annotations in a given
+annotation file with identical @code{time} fields) than was previously
+possible.  Since version 6.1, the WFDB library sorts simultaneous annotations
+according to the value of their @code{chan} fields, allowing for 256
+simultaneous annotations at any given time.  Beginning in version 10.4.12, the
+library sorts simultaneous annotations according to their @code{num} fields,
+then sorts those with identical @code{num} fields according to their
+@code{chan} fields, allowing up to 65,536 simultaneous annotations at any given
+time.
+
+A new WFDB library function, @code{findsig}, returns the signal number of the
+input signal matching its string argument, or -1 if no such input signal
+exists.  If the string argument could be interpreted as an input signal number,
+it is taken as such; otherwise, the string argument must be an exact match to a
+signal name (@code{desc} field in the @code{siginfo} structure).
+
+Previous versions of WFDB library function @code{setifreq} entered an infinite
+loop if invoked (contrary to specifications) before opening an input record.
+@code{setifreq} now detects the error, emits an appropriate warning, and
+returns.
+
+If a WFDB application that uses WFDB library version 10.4.5 through 10.4.11
+attempted to read an annotation file before reading the sampling frequency of
+the associated record (for example, by invoking @code{isigopen} or
+@code{sampfreq}), the annotation times might all appear to be zero.  This may
+occur when reading annotations created using WFDB 10.4.5 or later.  The times
+supplied when creating the file are correctly written but may be incorrectly
+read in these cases.  This problem was corrected in this release; thanks to
+Thomas Heldt for reporting it and providing a reproducible example of it.
+
+(WFDB library version 10.4.11 was identical to version 10.4.10.)
+
+@unnumberedsubsec Changes in version 10.4.10 (31 October 2008)
+
+EDF digital maximum and minimum values are now read properly in 64-bit
+builds;  previous versions had a bug in @code{edfparse} (an internal WFDB
+library function defined in @file{lib/signal.c}) that did not appear in
+32-bit builds.	Thanks to Joe Mietus for reporting the problem.
+
+@unnumberedsubsec Changes in version 10.4.9 (10 October 2008)
+
+The WFDB library once again correctly interprets a hyphen (@code{-})
+(used in place of a record name, annotator name, signal file name,
+or calibration file name) as a reference to the standard input or
+output, for platforms that support POSIX standard I/O (@pxref{Standard I/O}).
+This feature was broken in 10.4.5 as a side effect of changes
+in @code{wfdb_open} (an internal WFDB library function defined in
+@file{lib/wfdbio.c}).
+
+(WFDB library version 10.4.8 was identical to version 10.4.7.)
+
+@unnumberedsubsec Changes in version 10.4.7 (15 July 2008)
+
+Yinqi Zhang reported and contributed a fix for a memory leak in
+@code{make_vsd()} (an internal WFDB library function defined in
+@file{signal.c}).
+
+@unnumberedsubsec Changes in version 10.4.6 (9 April 2008)
+
+The WFDB functions @code{setafreq()} and @code{getafreq()} (for
+setting and getting the time resolution of newly-created output
+annotation files in ticks per second) were new in version 10.4.5, but
+were undocumented.  They are now described in this Guide, and wrappers
+for these functions are now included in @file{fortran/wfdbf.c}.
+
+An important change in the WFDB library: memory allocation errors are
+now treated as fatal by default (in previous versions, the functions
+that encountered them returned error values that permitted the
+application to handle them).  These errors occur when there is
+insufficient memory available to the WFDB library. To obtain the old
+behavior, in which the calling function will continue execution if
+possible after a memory allocation error, invoke @code{wfdbmemerr(0)}.
+By default, however, such an error will cause the process to
+terminate.  In either case, the WFDB library emits an appropriate
+error message to aid in troubleshooting.
+
+New macros for handling dynamically allocated memory are defined in
+@file{lib/wfdblib.h} and used throughout the WFDB library, eliminating most
+known memory leaks.  Three known leaks remain (in @code{setecgstr()}, 
+@code{setannstr()}, and @code{setanndesc()});  these are documented and
+harmless in current applications.  Thanks to Yinqi Zhang for reporting a leak
+in @code{copysi()} (an internal WFDB library function defined in
+@file{signal.c}), which prompted the cleanup.
+	
+WFDB functions @code{strecg()}, @code{setecgstr()}, @code{strann()},
+@code{setannstr()}, and @code{setanndesc()} now handle NULL string inputs
+properly. (Previous versions passed NULL strings to @code{strcmp()}, with
+undesirable results.)
+
+@unnumberedsubsec Changes in version 10.4.5 (6 February 2008)
+
+Bob Farrell and Tony Ricke chased down and provided fixes for memory leaks
+in several WFDB library functions, and also provided revisions to permit
+additional type checking and to avoid type mismatch warnings.
+
+Changes in the build system make it easier to build WFDB using Cygwin
+gcc (with or without the Cygwin POSIX library).
+
+When creating annotation files, if the input sampling frequency differs
+from the frame rate of the input record (either because of using
+@code{WFDB_HIGHRES} mode while reading a multifrequency record, or because
+of having used @code{setifreq()} to modify the sampling frequency), a comment
+is written to the beginning of the annotation file indicating the
+resolution of the annotation times in ticks per second (thus allowing
+the application to store its annotations with whatever time resolution
+is desired).  When reading an annotation file, if such a resolution
+comment is found, getann adjusts the times of annotations to match the
+currently defined sampling frequency.  The resolutions are kept
+independently for each annotation file, so (for example) @code{bxb} can
+compare two annotation files written with different resolutions.
+
+The ability to set the time resolution of annotation files has required
+a minor change in the semantics of @code{setifreq()}.  It is now necessary
+to invoke @code{setifreq()} before creating an annotation file that will
+have a resolution matching the (modified) input sampling frequency.
+Since @code{setifreq()} must be invoked after opening the input signals,
+this implies that @code{wfdbinit()} cannot be used to open both input signals
+and output annotation files if @code{setifreq()} is to be used;  rather, the
+sequence should be @code{isigopen()}, @code{setifreq()}, and finally
+@code{annopen()}.
+
+If a string that includes a @samp{.} is supplied to a WFDB library function
+where a record name is expected, the WFDB library assumes that it is
+the name of a file located in the WFDB path. If the name ends in @samp{.hea},
+the file is assumed to be a WFDB-format header file, and its record name
+is assumed to be the first part of the string, exclusive of the @samp{.hea'}.
+
+This version also includes support for reading EDF files natively.
+If a string supplied as a record name contains a @samp{.} but does not end
+in @samp{.hea}, it is assumed to be the record name of an EDF file of the
+same name.
+
+(WFDB library versions 10.4.3 and 10.4.4 were identical to version 10.4.2.)
+
+@unnumberedsubsec Changes in version 10.4.2 (4 May 2006)
+
+Mathias Gruber reported a line in wfdbio.c that used void pointer arithmetic
+(permitted as an extension by gcc but not allowed by ANSI/ISO C or most other C
+compilers).  This operation has been replaced by ANSI/ISO C-conformant code.
+
+@unnumberedsubsec Changes in version 10.4.1 (6 April 2006)
+
+A bug caused incorrect output from WFDB library function strtim() when called
+with the argument "i", following use of setifreq() to change the effective
+sampling frequency, resulting in incorrect output from example 10 in the WFDB
+Programmer's Guide.  This has now been corrected.
+
+@unnumberedsubsec Changes in version 10.4.0 (2 March 2006)
+
+Version 10.4.0 and later versions of the WFDB library are intended to
+be compiled using ANSI/ISO C (and C++) compilers only;  previous
+versions also supported the use of traditional (K&R) C compilers.  The
+most obvious change resulting from this decision is in the use of
+prototypes in function declarations, an innovation of ANSI C that
+permits better error-checking by compilers.  The ANSI/ISO C standard is
+now more than 15 years old, and it has been over 10 years since a C
+compiler that does not support function prototypes was used for
+development of the WFDB library.  Code in @file{wfdbio.c} that provides
+limited support for compilers that do not provide an ANSI/ISO C library
+has been retained for now, and @file{wfdb.h} still includes a set of K&R C
+function declarations; both of these features are deprecated, however,
+and may be removed in future versions of the WFDB library.  Users who
+still need to use a K&R C compiler to compile the library itself may
+find 'unprotoize' (included in the GNU gcc distribution) to be helpful.
+
+The mapping of lowest expressible sample values to @code{WFDB_INVALID_SAMPLE}
+performed by @code{getframe()} (in @file{lib/signal.c}) did not work properly
+for signal formats 80 and 160 (in which samples are recorded as unsigned
+integers); this has now been corrected.
+
+The symbol @code{WFDB_GVPAD} is newly defined in @file{<wfdb/wfdb.h>}.
+It may be added to @code{WFDB_HIGHRES} or @code{WFDB_LOWRES} and given
+as input to @code{setgvmode()}.
+The effect of doing so is that missing samples, and samples recognized
+as invalid, are replaced by @code{getframe()}, @code{getvec()}, and
+@code{sample()} with the most recently read valid values rather than by
+the special value @code{WFDB_INVALID_SAMPLE}.
+This behavior allows applications such as digital filters to remain
+ignorant of missing data without significant performance penalties.
+
+@code{sample()} now checks that its signal number input
+is valid, and returns @code{WFDB_INVALID_SAMPLE} if not.  In previous
+versions, @code{sample} returned a sample from signal 0 if the requested
+signal was unavailable.
+
+@code{sample_valid()} now returns -1 in the case of a signal that becomes
+unavailable before the end of the record (previous versions returned 1 in this case).
+
+The FIR filter example (@pxref{Example 7}) now works properly.  The
+previous version always began processing the input at sample 0,
+regardless of start time specified in its argument list.
+
+@unnumberedsec WFDB 10.3
+@unnumberedsubsec Changes in version 10.3.17 (20 August 2005)
+
+This version is the first to support reading variable-layout records
+(multi-segment records in which the number, arrangement, gains, and baselines
+of the signals may vary from one segment to the next; @pxref{Multi-Segment
+Records}).
+
+Rounding errors in the WFDB library's @code{mstimstr} function have been
+reduced.  Previous versions did not always round appropriately when the
+sampling frequency was much less than 1 Hz.
+
+The maximum length for a record name (@code{WFDB_MAXRNL}, defined in
+@file{wfdb.h}) has been increased from 11 to 20.
+
+A new constant, @code{WFDB_INVALID_SAMPLE}, is now defined in @file{wfdb.h}.
+It is used to identify padding inserted to fill in for missing data.  When
+writing in any format that uses fewer than 16 bits per sample, @code{putvec}
+maps @code{WFDB_INVALID_SAMPLE} to the lowest (most negative) value expressible
+in that format; when reading a signal file in such a format, @code{getframe}
+performs the inverse mapping, so that missing data can be identified regardless
+of the data format.
+
+A side effect of this change is that (for example) any samples that had the
+most negative value (for example, -2048 in a format 212 signal file) are now
+flagged as invalid.  To treat such samples as invalid is reasonable, however,
+since these occur only when the input level falls below the working range of
+the analog-to-digital converter.
+
+@unnumberedsubsec Changes in version 10.3.16 (13 June 2005)
+
+Benjamin Moody has added an interface between the WFDB library and
+@code{libcurl} as an alternative to the existing @code{libwww} interface, and
+has updated @file{configure} and @file{conf/*.def} to search for and use
+@code{libcurl} if it is available.  The primary advantages of @code{libcurl}
+over @code{libwww} are that @code{libcurl} is smaller and faster, it supports
+access to password-protected files, and it is actively maintained.  Both
+libraries are freely available on all popular platforms.
+
+Isaac Henry has updated @code{configure} to support building a native
+MS-Windows version of the WFDB library using either Cygwin gcc or MinGW
+gcc.
+
+A number of minor changes, mostly involving conditional use of
+@file{malloc.h}, @file{stdlib.h}, and @file{string.h}, were made to
+eliminate warnings from gcc 4.x.
+
+@unnumberedsubsec Changes in version 10.3.15 (31 January 2005)
+
+Rules for generating the binary tarball for MS-Windows have been
+fixed so that the Cygwin DLLs are now included with correct
+permissions.
+
+Installation of shared libraries under GNU/Linux requires an extra
+step if SELinux is enabled (as under Fedora Core 2 and later);  this
+has been incorporated into @file{conf/linux-slib.def}.
+
+@unnumberedsubsec Changes in version 10.3.14 (29 December 2004)
+
+Guido Muesch reported that @code{getspf()} did not always
+return correct results if the frame frequency does not have an exact
+representation as a double precision floating point number.  This problem has
+now been corrected.
+
+@unnumberedsubsec Changes in version 10.3.13 (5 May 2004)
+
+Using an indirect WFDB path (i.e., setting the WFDB environment
+variable to a value such as @samp{@@FILE}, where @samp{FILE} contains the
+desired path) was broken in WFDB library versions 10.3.9 through
+10.3.12;  it now works again, thanks to a patch contributed by
+Fred Geheb.
+
+@unnumberedsubsec Changes in version 10.3.12 (9 March 2004)
+
+Okko Willeboordse pointed out an incompatibility between the native
+MS-Windows API and the ANSI/ISO C library function @code{mkdir}, which is
+used by the WFDB library.  This does not present a problem when
+compiling the WFDB library using the supported Cygwin/gcc compiler
+under MS-Windows, nor does any related problem occur on any other
+platform.  It should now be a little easier to compile the WFDB library
+using unsupported compilers, thanks to a new @code{MKDIR} macro that hides
+the incompatibility (see @file{lib/wfdblib.h0}).
+
+Piotr Wlodarek initiated a discussion about memory leaks in the WFDB
+library, citing as an example the 'trivial example program in C' from
+this Guide, which does not free memory it allocates in @code{isigopen()}
+when reading the signal specifications.  This problem can be avoided by
+invoking @code{wfdbquit()} in the example program, just before exiting.
+Further discussion of this point has been added to this Guide following
+the presentation of the 'trivial example', and in the description of
+@code{wfdbquit}.
+
+@unnumberedsubsec Changes in version 10.3.11 (17 October 2003)
+
+In @file{signal.c}, several bugs have been identified and fixed.  Thanks
+to Piotr Wlodarek, who found a buffer overrun in @code{isigopen}.  Also,
+@code{isgsettime} sometimes performed incorrect seeks on multifrequency
+records that had been opened in high-resolution mode;  this has been
+fixed, together with a related bug that caused the value returned by
+@code{strtim("e")} to be calculated incorrectly in some such cases.
+
+@unnumberedsubsec Changes in version 10.3.10 (3 August 2003)
+
+In version 10.3.9, the functions @code{setannstr}, @code{setanndesc},
+and @code{setecgstr} did not contain necessary checks to avoid invoking
+@code{strcmp} with a @code{NULL} argument.  These checks have been added in
+version 10.3.10.  Thanks to Thomas Heldt for reporting this problem.
+
+@unnumberedsubsec Changes in version 10.3.9 (16 July 2003)
+
+The WFDB library functions @code{setwfdb}, @code{setannstr},
+@code{setanndesc}, and @code{setecgstr} now copy their input string
+arguments, so that it is no longer necessary for WFDB applications to
+keep these strings valid.  If you have created applications that rely on
+being able to modify these strings, it will be necessary to invoke the
+corresponding functions again before such changes will take effect
+within the WFDB library.
+
+Previous versions of the WFDB library function @code{putinfo} did not
+flush their output until either a new header file was created (via
+@code{setheader} or @code{newheader}) or the process exited.  This has
+now been corrected, and putinfo output is now flushed before
+@code{putinfo} returns.  Thanks to Jonas Carlson for reporting this
+problem.
+
+@unnumberedsubsec Changes in version 10.3.8 (12 July 2003)
+
+The WFDB library function @code{setbasetime()} now properly
+accepts arguments specifying midnight (e.g., @samp{0:0:0}), which previous
+versions rejected, and the function @code{setheader()}
+records such times correctly in the @file{.hea} files it creates.
+
+(WFDB library version 10.3.7 was identical to 10.3.6.)
+
+@unnumberedsubsec Changes in version 10.3.6 (7 April 2003)
+
+The fix applied in @code{isigclose()} in 10.3.5 was incomplete but is now
+(really!) fixed.  Applications that use @code{sample()} should call 
+@code{wfdbquit()} to be certain that @code{sample}'s buffer is freed before
+exiting.
+
+Some long-standing problems in the code (in @file{lib/wfdbio.c}) that handles
+http range requests for NETFILES-enabled versions of the library have
+been partially addressed.  The underlying issue is that http servers
+do not always return the range of bytes requested;  when this happens,
+it is not difficult to determine that there is a problem, but it is
+tricky to figure out what to do about it.  Based on experiments with
+several different http servers, the strategy for handling such problems
+within the WFDB NETFILES code has been improved substantially, but
+there may be further room for improvement.
+
+@unnumberedsubsec Changes in version 10.3.5 (31 March 2003)
+
+Fixed a bug in WFDB library function @code{isigclose()} (in
+@file{lib/signal.c}) that had caused @code{sample()}'s buffer to be freed
+inappropriately when switching segments in a multi-segment record.
+Thanks to Dave Schaffer for the bug report and for a test case that
+illustrated the bug.
+
+(WFDB library versions 10.3.3 and 10.3.4 were identical to 10.3.2.)
+
+@unnumberedsubsec Changes in version 10.3.2 (25 February 2003)
+
+Fixed a WFDB library bug that caused annotation sorting to fail
+if a new header file had been written.  Thanks to Winton Baker for
+reporting this problem and for providing an example that illustrated
+the bug.
+
+(WFDB library version 10.3.1 was identical to 10.3.0.)
+
+@unnumberedsubsec Changes in version 10.3.0 (26 November 2002)
+
+Fixed bugs in @file{lib/signal.c} that caused improper accounting of signal
+group numbers when reading from two or more records at the same time (as in
+@file{nst}), a bug that caused a segfault in @file{nst}, and a bug that
+referenced uninitialized memory in @code{newheader} if @code{nsig} = 0.
+
+The WFDB Software Package has been ported to Mac OS X (Darwin),
+version 10.2 (the port should also work under 10.1 but this
+has not been tested and will not be supported).	
+
+It is now possible to generate a shared WFDB library (DLL)
+under MS-Windows using Cygwin/gcc.
+
+Added functions @code{sample} and @code{sample_valid} to the WFDB library
+(in @file{lib/signal.c}).  @code{sample(s, t)} returns the sample at
+time (sample number) @code{t} from signal @code{s}, handling all
+necessary buffering internally and allowing the caller to treat the
+signal file as a virtual array of randomly accessible samples.
+@code{sample_valid} can be invoked to check if the most recent value
+returned by @code{sample} was valid (e.g., to see if the end of the
+input was reached).  For an example of the use of these functions, see
+@file{app/wqrs.c}.
+
+@unnumberedsec WFDB 10.2
+@unnumberedsubsec Changes in version 10.2.9 (27 October 2002)
+
+Fixed a bug in example 9 in this guide (introduced in version 10.2.0).
+
+Updated @file{lib/wfdbdll.def} and the @file{Makefile.dos} files in several
+directories.  These have not been tested in recent years and may need further
+revisions; feedback is welcome.
+
+Corrected persistent problems with generating PDF versions of the manuals for
+the desired page size, and added hyperlinks to the PDF version of this guide.
+
+(WFDB library version 10.2.8 was identical to 10.2.7.)
+
+@unnumberedsubsec Changes in version 10.2.7 (14 October 2002)
+
+Added a workaround to @code{wfdb_fclose} (in @file{lib/wfdbio.c}) so that
+closing @code{stdin} after using @code{freopen} doesn't trigger a core dump.
+
+If out-of-order annotations were written and automatic annotation sorting was
+suppressed, the warning produced by @code{oannclose} (in @file{lib/annot.c})
+once again includes the correct @code{sortann} command needed to put the
+annotations into order.  (This feature was broken by a previous revision.)
+
+@unnumberedsubsec Changes in version 10.2.6 (24 June 2002)
+@findex setifreq (10.2.6)
+@findex getifreq (10.2.6)
+@cindex interpolation
+@cindex resampling
+
+The new functions @code{setifreq} and @code{getifreq} allow an
+application to choose any convenient sampling frequency for reading
+input signals.  Samples read from signal files using @code{getvec} are
+buffered, resampled, and delivered to the calling application as if the
+original signals had been sampled at the desired frequency.  Times
+expressed in sample intervals passed to or from other WFDB library
+functions (@code{getann}, @code{putann}, @code{mstimstr}, @code{timstr},
+and @code{strtim}) are rescaled as needed to match intervals
+corresponding to the chosen frequency.  Thanks to Pat Hamilton for the
+inspiration!
+
+The WFDB library now records the base time with millisecond precision
+(previous versions did so with one-second precision), and @file{xform}
+provides starting times to the library function @code{setbasetime} with
+millisecond precision.  Thanks to Allavatam Venugopal for providing
+examples that illustrated the need for these features.
+
+Fixed deskewing buffer initialization in @code{getframe}, broken by the
+10.2.0 update, which introduced an infinite loop when reading a record
+that requires skew correction starting at sample 0.  Thanks to Andrew
+Walsh for finding an example that triggered this bug.
+
+Fixed rounding errors in @code{adumuv}, @code{muvadu}, and @code{physadu}.
+Previous versions rounded negative values toward zero;  to obtain consistent
+conversions, however, it is necessary to round all values down (e.g., from
+-1.5 to -2 rather than up to -1).
+
+Fixed a memory leak in @code{wfdb_fclose} (in @file{lib/wfdbio.h}).  Thanks to
+Ion Gazta@~naga.
+
+@unnumberedsubsec Changes in version 10.2.5 (10 March 2002)
+
+Additions and fixes in @file{wfdbf.c} (the Fortran wrappers for the WFDB
+library).
+
+@unnumberedsubsec Changes in version 10.2.4 (20 December 2001)
+
+Code in @file{wfdbio.c} that required the use of the string
+@code{header} to identify a header file has been revised so that the
+standard @code{hea} is now usable for this purpose in all cases.
+
+@unnumberedsubsec Changes in version 10.2.3 (14 December 2001)
+
+Portability fixes in @file{wfdblib.h}.  (WFDB library version 10.2.2 was
+identical to 10.2.1.)
+
+@unnumberedsubsec Changes in version 10.2.1 (16 November 2001)
+
+@cindex WFDB path
+Most users will no longer need to set the WFDB path explicitly, as a result
+of several minor changes in the default path and in the installer for the
+WFDB Software Package.
+
+The environment variable @code{WFDBNOSORT} was replaced by @code{WFDBANNSORT},
+and the environment variable @code{WFDBGVMODE} was introduced
+(@pxref{Annotation Order}, and @pxref{Multi-Frequency Records}, for details).
+
+@unnumberedsubsec Changes in version 10.2.0 (15 October 2001)
+
+There are no longer any fixed limits on the numbers of signals or annotation
+files that can be opened simultaneously, or on the number of samples per signal
+per frame.  In previous versions of the WFDB library, the symbols
+@code{WFDB_MAXSIG}, @code{WFDB_MAXANN}, and @code{WFDB_MAXSPF} (all defined in
+@file{<wfdb/wfdb.h>}) specified limits on these parameters that could be
+modified only by recompiling the WFDB library.  These symbols are still defined
+for compatibility with older applications that use them (typically to determine
+the size of static arrays).
+
+@cindex WFDB path
+Since version 10.1.1, record names may include path information (see the notes
+for version 10.1.1 below), but if such names are used to generate names of WFDB
+output files, the user has been required to ensure that the target directory
+exists.  This requirement is eliminated in version 10.2.0.  If an output file
+is specified to be located in a non-existent directory, the WFDB library will
+attempt to create the directory (including, if necessary, any non-existent
+parent directories).  This feature simplifies the use of record names that
+include directory information, as is common when reading data from a CDROM or
+a web server such as PhysioNet.  For example, using the WFDB path
+(@file{. http://@-www.@-physio@-net.@-org/@-physio@-bank/@-data@-base}), if the
+current directory, @file{.}, does not contain a subdirectory named
+@file{mitdb}, the command:
+
+@example
+sqrs -r mitdb/100
+@end example
+
+@noindent
+will read its input from
+@uref{http://@-www.@-physio@-net.@-org/@-physio@-bank/@-data@-base/@-mitdb/},
+will create a directory named @file{mitdb} within the current directory, and
+will write its output annotation file (@file{100.qrs}) into this newly-created
+directory.  If we then use the command:
+
+@example
+rdann -r mitdb/100 -a qrs
+@end example
+
+@noindent
+the header file is still read from the remote directory, but the annotation
+file is read from @file{./mitdb}.  (The programs @file{sqrs} and @file{rdann}
+are standard applications that use the WFDB library;  see the @cite{WFDB
+Applications Guide} for details.)
+
+Also new is the WFDB test suite (located in the @file{checkpkg} directory of
+the WFDB source tree, at the same level as the @file{lib} directory containing
+the WFDB library sources).  This set of programs can be used to help verify
+that a newly-installed version of the WFDB library behaves properly.
+
+@unnumberedsec WFDB 10.1
+@unnumberedsubsec Changes in version 10.1.6 (1 August 2001)
+
+The WFDB library requires that the record name specified in the first line
+of a header file must match the name of the record with which the header file
+is associated (this is done in order to detect corrupted or erroneously
+renamed header files).  Version 10.1.6 requires that only the final portion of
+the record name (stripped of any path information) must match.
+
+@unnumberedsubsec Changes in version 10.1.5 (11 June 2000)
+
+More changes in the @file{make} description files, for Cygwin compatibility.
+
+@unnumberedsubsec Changes in version 10.1.4 (6 June 2000)
+
+The symbol @code{WFDB_NETFILES} replaces the old @code{NETFILES}.
+
+@unnumberedsubsec Changes in version 10.1.3 (26 April 2000)
+
+More changes in the @file{make} description files, to support a configuration
+script.
+
+@unnumberedsubsec Changes in version 10.1.2 (11 March 2000)
+
+Changes in the @file{make} description files.
+
+@unnumberedsubsec Changes in version 10.1.1 (30 January 2000)
+
+@cindex WFDB path
+Record names may contain (absolute or relative) path information as a prefix,
+and if (as a result) an input file is found in a location that does not appear
+explicitly in the WFDB path, that location is appended to the end of the WFDB
+path.  For example, if the WFDB path is
+@file{. http://@-www.@-physio@-net.@-org/@-physio@-bank/@-data@-base}, and the
+record name @file{mitdb/100} is supplied to @code{wfdbinit}, the WFDB library
+will find the header file at
+@uref{http://@-www.@-physio@-net.@-org/@-physio@-bank/@-data@-base/@-mitdb/@-100.hea},
+and will then add @uref{http://@-www.@-physio@-net.@-org/@-physio@-bank/data@-base/@-mitdb/} to
+the end of the WFDB path so that the signal file (specified as @file{100.dat}
+in the header file) can be found.
+
+@unnumberedsubsec Changes in version 10.1.0 (15 January 2000)
+@cindex NETFILES
+
+Version 10.1.0 supports a new signal file format (311), and contains
+numerous minor changes in the NETFILES support code introduced in 10.0.1.
+
+@unnumberedsec WFDB 10.0
+@unnumberedsubsec Changes in version 10.0.1 (19 November 1999)
+@cindex NETFILES
+@cindex libwww
+@cindex W3C libwww
+
+Beginning with version 10.0.1, the WFDB library supports reading not only local
+files, but also remote files made available by web (HTTP) or FTP servers.  To
+make use of this feature, link your application with both the WFDB library and
+the @code{libwww} library (freely available for all versions of Unix, and for
+most recent versions of MS Windows, from @uref{http://www.w3.org/Library}, or
+from @uref{http://@-www.physio@-net.org/physio@-tools/libwww/}).  (In some
+cases, notably under GNU/Linux, @code{libwww} is linked together with the
+dynamically-loaded version of the WFDB library, so that you do not need to link
+@code{libwww} explicitly.)  All access to remote files is read-only.  If you do
+not wish to allow access to remote files, or if @code{libwww} is not available
+for your OS, simply do not define the symbol NETFILES when compiling the WFDB
+library.  For further details, see @file{wfdbio.c} in the WFDB library sources.
+
+@cindex WFDB path
+The WFDB environment variable may now contain whitespace (space, tab, or
+newline characters) as path component separators under any OS.  Multiple
+consecutive whitespace characters are treated as a single path component
+separator.  Use a @samp{.} to specify the current directory as a path component
+when using whitespace as a path component separator.  A semicolon (@samp{;}) is
+also acceptable as a path component separator under any OS.  A colon (@samp{:})
+is still acceptable as a path component separator under Unix (Linux, etc.),
+provided only that the colon is not immediately followed by @samp{//}.
+
+If the WFDB path includes components of the forms
+@file{http://somewhere.net/mydata} or @file{ftp://somewhere.else/yourdata}, the
+sequence @samp{://} is explicitly recognized as part of a URL prefix (under any
+OS), and the @samp{:} and @samp{/} characters within the @samp{://} are not
+interpreted further.  Note that the MS-DOS @samp{\} is @emph{not} acceptable as
+an alternative to @samp{/} in a URL prefix.  To make WFDB paths containing URL
+prefixes more easily (human) readable, use whitespace for path component
+separators.
+
+Previous versions of the WFDB library that were compiled for environments other
+than MS-DOS used file names in the format @var{type.record}.  This file
+name format is no longer supported.
+
+@unnumberedsubsec Changes in version 10.0.0 (25 June 1999)
+
+Beginning with version 10.0.0, the name of the library is WFDB.  All
+earlier versions were named DB.  All library symbols have been similarly
+renamed, with @code{WFDB} and @code{wfdb} replacing @code{DB} and @code{db}
+everywhere, in names of library functions, constants, type and structure
+definitions, library source file names, and names of environment variables
+(e.g., the DB environment variable is now the WFDB environment variable).
+
+Version 10.0.0 of the WFDB library is functionally identical with the
+final release (version 9.7.4) of the DB library, except for the name
+changes.  It should be possible to recompile existing applications
+written for DB library version 9.x without modification, and to link
+them with WFDB library version 10.0.0.  This is possible because two
+sets of @code{#include} files are provided with the WFDB library.  The
+first set, accessible via @code{#include <wfdb/...>}, works with
+applications written as described in this guide.  The alternate set,
+accessible via @code{#include <ecg/...>}, is compatible with DB 9.x
+applications as described in previous editions of this guide.
+
+
+@node     Concept Index, Function and Macro Index, Recent Changes, Top
 @unnumbered Concept Index
 
 @printindex cp

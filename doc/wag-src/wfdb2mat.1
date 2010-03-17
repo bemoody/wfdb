@@ -1,4 +1,4 @@
-.TH WFDB2MAT 1  "28 October 2009" "WFDB 10.4.24" "WFDB Applications Guide"
+.TH WFDB2MAT 1  "16 March 2010" "WFDB 10.5.0" "WFDB Applications Guide"
 .SH NAME
 wfdb2mat \- convert WFDB-compatible signal file to Matlab .mat file
 .SH SYNOPSIS
@@ -34,8 +34,10 @@ This program writes version 4 MAT-file format output files (see
 .br
 http://www.mathworks.com/access/helpdesk/help/pdf_doc/matlab/matfile_format.pdf
 for details).
-The samples are written as 16-bit signed integers in little-endian format, or
-as 8-bit unsigned integers for records that contain only 8-bit unsigned samples.
+The samples are written as 32-bit signed integers in little-endian format
+if the record contains any format 24 or format 32 signals, as 8-bit unsigned
+integers if the record contains only 8-bit unsigned samples, or as 16-bit
+signed integers in little-endian format otherwise.
 Although version 5 and newer versions of Matlab normally use a different (less
 compact and more complex) format, they can read these files without difficulty.
 The advantage of version 4 MAT-file format, apart from compactness and
