@@ -1745,14 +1745,14 @@ static int getskewedframe(WFDB_Sample *vector)
 		break;
 	      case 80:	/* 8-bit offset binary amplitudes */
 		*vector = v = r80(ig);
-		if (v == 0)
+		if (v == -1 << 7)
 		    *vector = gvpad ? is->samp : WFDB_INVALID_SAMPLE;
 		else
 		    is->samp = *vector;
 		break;
 	      case 160:	/* 16-bit offset binary amplitudes */
 		*vector = v = r160(ig);
-		if (v == 0)
+		if (v == -1 << 15)
 		    *vector = gvpad ? is->samp : WFDB_INVALID_SAMPLE;
 		else
 		    is->samp = *vector;

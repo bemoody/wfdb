@@ -1,3 +1,9 @@
+10.5.1 (19 March 2010):
+       In version 10.5.0, signals in formats 80 and 160 with amplitudes of 0
+       were incorrectly treated as invalid by getframe() and getvec().  Thanks
+       to Isaac Henry for reporting this problem, which has been corrected in
+       signal.c.
+
 10.5.0 (16 March 2010):
 	The WFDB library now supports signals with 24 and 32 bits of precision,
 	using new formats 24 and 32, and WFDB applications 'wrsamp' and 'xform'

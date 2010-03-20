@@ -8881,6 +8881,13 @@ WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
 @unnumberedsec WFDB 10.5
+@unnumberedsubsec Changes in version 10.5.1 (19 March 2010)
+
+In version 10.5.0, signals in formats 80 and 160 with amplitudes of 0 were
+incorrectly treated as invalid by @code{getframe()} and @code{getvec()}.
+Thanks to Isaac Henry for reporting this problem, which has been corrected in
+@file{lib/signal.c}.
+
 @unnumberedsubsec Changes in version 10.5.0 (16 March 2010)
 
 The WFDB library now supports signals with 24 and 32 bits of precision, using
