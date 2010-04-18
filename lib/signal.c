@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   13 March 2010	wfdblib 10.5.0
+			Last revised:    9 March 2010	wfdblib 10.5.2
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -1151,9 +1151,9 @@ static int readheader(const char *record)
 
 	/* Check that formats and block sizes match for signals belonging
 	   to the same group. */
-	if (s && hs->info.group == hp->info.group &&
+	if (s && (hp == NULL || (hs->info.group == hp->info.group &&
 	    (hs->info.fmt != hp->info.fmt ||
-	     hs->info.bsize != hp->info.bsize)) {
+	     hs->info.bsize != hp->info.bsize)))) {
 	    wfdb_error("init: error in specification of signal %d or %d\n",
 		       s-1, s);
 	    return (-2);
@@ -1800,12 +1800,13 @@ static int getskewedframe(WFDB_Sample *vector)
 		    wfdb_error("getvec: unexpected EOF in signal %d\n", s);
 		    stat = -3;
 		}
-		else if (in_msrec && segp < segend) {
+		else if (in_msrec && segp && segp < segend) {
 		    segp++;
 		    if (isigopen(segp->recname, NULL, (int)nvsig) < 0) {
 			wfdb_error("getvec: error opening segment %s\n",
 				   segp->recname);
 			stat = -3;
+			return (stat);  /* avoid looping if segment is bad */
 		    }
 		    else {
 			istime = segp->samp0;
@@ -1905,7 +1906,7 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
 	if (navail == 0 && segments) {	/* this is a multi-segment record */
 	    in_msrec = 1;
 	    /* Open the first segment to get signal information. */
-	    if ((navail = readheader(segp->recname)) >= 0) {
+	    if (segp && (navail = readheader(segp->recname)) >= 0) {
 		if (msbtime == 0L) msbtime = btime;
 		if (msbdate == (WFDB_Date)0) msbdate = bdate;
 	    }

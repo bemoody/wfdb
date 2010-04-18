@@ -1,8 +1,8 @@
 /* file: wqrs.c		Wei Zong      23 October 1998
-			Last revised:  7 January 2009 (by G. Moody)
+			Last revised:  9 April 2010 (by G. Moody)
 -----------------------------------------------------------------------------
 wqrs: Single-lead QRS detector based on length transform
-Copyright (C) 1998-2009 Wei Zong
+Copyright (C) 1998-2010 Wei Zong
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -83,7 +83,7 @@ int nsig;		/* number of input signals */
 int LPn, LP2n;          /* filter parameters (dependent on sampling rate) */
 int LTwindow;           /* LT window size */
 int PWFreq = PWFreqDEF;	/* power line (mains) frequency, in Hz */
-int sig = 0;	        /* signal number of signal to be analyzed */
+int sig = -1;	        /* signal number of signal to be analyzed */
 int Tm = TmDEF;		/* minimum threshold value */
 WFDB_Sample *lbuf = NULL;
 
@@ -222,7 +222,7 @@ main(int argc, char **argv)
 			      pname);
 		exit(1);
 	    }
-	    sig = findsig(argv[i]);
+	    sig = i;	/* remember the argument until the record is open */
 	    break;
 	  case 't':	/* end time */
 	    if (++i >= argc) {
@@ -271,6 +271,7 @@ main(int argc, char **argv)
 	setafreq(sampfreq((char *)NULL));
     a.name = "wqrs"; a.stat = WFDB_WRITE;
     if (annopen(record, &a, 1) < 0) exit(2);
+    if (sig >= 0) sig = findsig(argv[sig]);
     if (sig < 0 || sig >= nsig) sig = 0;
     if ((gain = s[sig].gain) == 0.0) gain = WFDB_DEFGAIN;
     if (Rflag) {

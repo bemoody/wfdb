@@ -1,9 +1,9 @@
 /* file: epicmp.c	G. Moody       3 March 1992
-			Last revised:  10 July 2003
+			Last revised: 17 April 2010
 
 -------------------------------------------------------------------------------
 epicmp: ANSI/AAMI-standard episode-by-episode annotation file comparator
-Copyright (C) 2003 George B. Moody
+Copyright (C) 1992-2010 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -614,9 +614,9 @@ int mode;	/* 0: signal 0 only, 1: signal 1 only, 2: both signals */
     else ofile = stdout;
 
     /* Check one reference ST measurement on each iteration. */
-    while (find_reference_extremum(mode)) {
+    while (find_reference_extremum(mode)) {		/* outer loop */
 	/* Find the first test beat annotation after tref. */
-	while ((stat = getann(1, &testann)) == 0) {
+	while ((stat = getann(1, &testann)) == 0) {	/* inner loop */
 	    /* Ignore non-beat annotations. */
 	    if (!isqrs(testann.anntyp)) continue;
 	    pst0 = st0;
@@ -629,6 +629,8 @@ int mode;	/* 0: signal 0 only, 1: signal 1 only, 2: both signals */
 		(void)sscanf(testann.aux+1, "%d%d", &st0, &st1);
 	    if (testann.time > tref)
 		break;
+	    pttest = testann.time; /* This statement was moved from the end of
+				      the outer loop in version 10.5.2. */
 	}
 	if (stat != 0 || tref - pttest >= testann.time - tref)
 	    sttest = sigref ? st1 : st0;   /* current annotation is closer */
@@ -639,7 +641,6 @@ int mode;	/* 0: signal 0 only, 1: signal 1 only, 2: both signals */
 	if (stref - sttest > 100 || sttest - stref > 100)
 	    (void)fprintf(ofile, " *");
 	(void)fprintf(ofile, "\n");
-	pttest = testann.time;
     }
 
     if (ofile != stdout)

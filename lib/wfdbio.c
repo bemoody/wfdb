@@ -1034,8 +1034,6 @@ void wfdb_setirec(const char *p)
 	else if (*r == ':') p = r+1;
 #endif
     len = strlen(p);
-    //    if (len > 4 && strcmp(p + len-4, ".hea") == 0)
-    //len -= 4;		/* final '.hea' is not part of record name */
     if (len > WFDB_MAXRNL)
 	len = WFDB_MAXRNL;
     if (strcmp(p, "-")) {       /* don't record '-' (stdin) as record name */

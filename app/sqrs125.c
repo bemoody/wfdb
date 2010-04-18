@@ -1,9 +1,9 @@
 /* file: sqrs125.c	G. Moody	27 October 1990
-			Last revised:	 7 January 2009
+			Last revised:	 9 April 2010
 
 -------------------------------------------------------------------------------
 sqrs125: Single-channel QRS detector for data sampled at 100 - 150 Hz
-Copyright (C) 1990-2009 George B. Moody
+Copyright (C) 1990-2010 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -93,7 +93,7 @@ char *argv[];
     int filter, i, minutes = 0, nsig, time = 0,
         slopecrit, sign, maxslope = 0, nslope = 0,
         qtime, maxtime, t0, t1, t2, t3, t4, t5,
-        ms160, ms200, s2, scmax, scmin = 250, signal = 0, *v;
+        ms160, ms200, s2, scmax, scmin = 250, signal = -1, *v;
     long from = 0L, next_minute, now, spm, to = 0L;
     WFDB_Anninfo a;
     WFDB_Annotation annot;
@@ -141,7 +141,7 @@ char *argv[];
 			      pname);
 		exit(1);
 	    }
-	    signal = findsig(argv[i]);
+	    signal = i;
 	    break;
 	  case 't':	/* end time */
 	    if (++i >= argc) {
@@ -201,6 +201,7 @@ char *argv[];
     }
     spm = strtim("1:0");
     next_minute = from + spm;
+    if (signal >= 0) signal = findsig(argv[signal]);
     if (signal < 0 || signal >= nsig) signal = 0;
     scmin = muvadu((unsigned)signal, scmin);
     if (scmin < 1) scmin = muvadu((unsigned)signal, 250);

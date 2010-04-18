@@ -518,7 +518,8 @@ are a few differences noted below.
 @menu
 * print samples::		A trivial example program.
 * compiling::			Compiling a C program with the WFDB library.
-* other languages::             Using the WFDB library with C++ or Fortran.
+* other languages::             Using the WFDB library with C++, Fortran,
+                                  Java, Perl, Python, C#, or Matlab.
 * WFDB path::			WFDB library environment variables.
 * running example::		Running the example program.
 * name restrictions::		Names to avoid when writing your programs.
@@ -782,45 +783,6 @@ information, refer to
 @uref{http://www.physionet.org/physiotools/wfdb/fortran/README,fortran/README}
 in the WFDB Software Package.
 
-@unnumberedsubsec Matlab wrappers
-@cindex Matlab bindings
-@cindex Octave bindings
-@cindex Scilab bindings
-@cindex wrappers for Matlab, Octave, or Scilab
-
-A set of wrappers for Matlab has been written and contributed by Jonas Carlson.
-These wrappers (@code{wfdb_tools}) provide access to almost all of the
-functionality of the WFDB library, including HTTP access to remote data files,
-to users of Matlab R13 (but not earlier versions) under GNU/Linux, Mac OS X,
-and MS-Windows; other platforms remain to be tested.  The wrappers, together
-with examples and a tutorial/reference guide, are available from
-@uref{http://www.@-physio@-net.@-org/@-physio@-tools/@-matlab/@-wfdb_tools/}.
-Using the @code{wfdb_tools} wrappers, the example program can be written in
-Matlab as:
-
-@example
-        S = WFDB_isigopen('100s')
-        DATA = WFDB_getvec(length(S), 10)
-@end example
-
-Note that @code{length(S)} is the number of available signals as determined
-by @code{WFDB_isigopen} (which becomes the number of columns in @code{DATA}).
-
-It should be possible to write a set of wrapper functions similar to
-@code{wfdb_tools} for use with Octave (a freely available open-source
-language that is compatible with Matlab, available from
-@uref{http://www.che.wisc.edu/octave/}) or Scilab (an open-source
-scientific software package for numerical computations, with a language
-similar to that of Matlab, available from
-@uref{http://www-rocq.@-inria.@-fr/@-scilab/}).
-Jesus Olivan Palacios has written a tutorial (available at
-@uref{http://www.@-neurotraces.@-com/@-scilab/@-sciteam/}) on using the WFDB
-Software Package with Scilab.
-
-Also available is a reimplementation of a useful subset of the WFDB
-library in native m-code (contributed by Jose Garcia Moros and Salvador Olmos)
-at @uref{http://www.@-physio@-net.@-org/@-physio@-tools/@-matlab/}.
-
 @unnumberedsubsec SWIG wrappers for Java, Perl, Python, and other languages
 @cindex SWIG wrappers
 @cindex Java wrappers
@@ -919,6 +881,45 @@ All SWIG wrappers for the WFDB library are generated using a single
 interface file, @file{wfdb.i}.  In principle, this file might be used
 to generate wrappers for other programming languages supported by SWIG,
 including several versions of LISP, Modula-3, PHP, Ruby, and Tcl.
+
+@unnumberedsubsec Matlab toolbox
+@cindex Matlab toolbox
+@cindex Toolbox for Matlab
+@cindex WFDB toolbox for Matlab
+
+The WFDB Toolbox for Matlab, contributed by Michael Craig and available from
+@uref{http://www.@-physionet.@-org/@-physiotools/@-matlab/@-wfdb-swig-matlab/},
+is a collection of WFDB applications implemented as functions in Matlab,
+built on the SWIG Java wrappers for the WFDB library.  For example, using it
+in Matlab, one can read and plot the first five seconds of the same signals
+as in the example program above, by:
+
+@example
+r = rdsamp('100s', 'maxt', ':5');
+plot(r(:,1), r(:,2));
+@end example
+
+The WFDB Toolbox for Matlab replaces the @code{wfdb_tools} library of wrapper
+functions contributed by Jonas Carlson, since current versions of Matlab are
+no longer compatible with the @code{wfdb_tools} library.
+
+The WFDB Software Package includes @code{wfdb2mat}, an application that
+converts all or any desired segment of a signal file into a @code{.mat}
+file that can be read directly by Matlab. 
+
+Jesus Olivan Palacios has written a tutorial (available at
+@uref{http://www.@-neurotraces.@-com/@-scilab/@-sciteam/}) that includes a
+detailed section on using the WFDB
+Software Package with Scilab (an open-source scientific software
+package for numerical computations, with a language similar to that of Matlab,
+available from @uref{http://@-www-rocq.inria.fr/@-scilab/}).  The methods
+described in this tutorial can also be adapted for use with GNU Octave
+(another free language that is mostly compatible with Matlab, available from
+@uref{http://@-www.gnu.org/@-software/@-octave/}).
+
+Also available is a reimplementation of a useful subset of the WFDB
+library in native m-code (contributed by Jose Garcia Moros and Salvador Olmos)
+at @uref{http://www.@-physio@-net.@-org/@-physio@-tools/@-matlab/}.
 
 @node     WFDB path, running example, other languages, Usage
 @comment  node-name,  next,  previous,  up
@@ -7917,11 +7918,10 @@ Package.  Download the @code{wfdb-swig} package from
 @code{wfdb-swig} home page on PhysioNet, and build and install the wrappers
 you need following the instructions on that page.
 
-The separate WFDB_tools package provides WFDB library wrappers for
-Matlab;  download it from
-@uref{http://physio@-net.org/physio@-tools/mat@-lab/wfdb_tools/}, the
-WFDB_tools home page on PhysioNet, and build and install it following the
-instructions on that page.
+The WFDB Toolbox for Matlab provides a set of WFDB applications for Matlab,
+based on the SWIG Java wrappers;  install it with one click from the link
+you will find on its home page, 
+@uref{http://@-physionet.org/@-physiotools/@-matlab/@-wfdb-swig-matlab/}.
 
 @node     WFDB Applications, Extensions, Installation, Top
 @appendix WFDB Application Programs
@@ -8881,6 +8881,18 @@ WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
 @unnumberedsec WFDB 10.5
+@unnumberedsubsec Changes in version 10.5.2 (18 April 2010)
+
+When reading annotations of multifrequency records opened in
+high-resolution mode, a time shift was introduced by @code{getann()} in
+WFDB library versions 10.4.5 to 10.5.1.  This problem has been
+corrected in 10.5.2.
+
+Certain malformed segment .hea files were able to cause null pointer
+errors in @code{isigopen()}.  This problem has been
+corrected.  Thanks to Mauro Villarroel for reporting this problem
+together with a test case.
+
 @unnumberedsubsec Changes in version 10.5.1 (19 March 2010)
 
 In version 10.5.0, signals in formats 80 and 160 with amplitudes of 0 were

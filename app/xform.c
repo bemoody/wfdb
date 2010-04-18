@@ -897,8 +897,8 @@ char *argv[];
 		    double vd = vt*gain[i] + deltav[i];
 
 		    if (dflag) vd += DITHER;
-		    if (vd >= 0) vout[i] = (int)(vd + 0.5);
-		    else vout[i] = (int)(vd - 0.5);
+		    if (vd >= 0) vout[j] = (int)(vd + 0.5);
+		    else vout[j] = (int)(vd - 0.5);
 		    if (vout[j] > vmax[i]) {
 			(void)fprintf(stderr, "v[%d] = %d (out of range)\n",
 				      i, vout[j]);

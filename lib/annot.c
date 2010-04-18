@@ -1,10 +1,10 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:    16 February 2009	wfdblib 10.4.13
+			Last revised:    18 April 2010	wfdblib 10.5.2
 WFDB library functions for annotations
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1989-2009 George B. Moody
+Copyright (C) 1989-2010 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -426,12 +426,15 @@ FINT getann(WFDB_Annotator n, WFDB_Annotation *annot)
     if (ia->pann.anntyp) {	/* an annotation was pushed back */
 	*annot = ia->pann;
       	ia->pann.anntyp = 0;
-	if (ia->ptmul) annot->time /= ia->ptmul;
-	ia->tmul = ia->ptmul = (ia->afreq) ? getifreq()/ia->afreq : getspf();
-	if (annot->time) {
-	    annot->time = (WFDB_Time)(annot->time * ia->tmul + 0.5);
-	    return (0);
+	if (ia->ptmul != ia->tmul) {
+	    ia->tmul = (ia->afreq) ? getifreq()/ia->afreq : getspf();
+	    if (ia->ptmul != ia->tmul) {
+		annot->time = (WFDB_Time)(annot->time*ia->tmul/ia->ptmul + 0.5);
+		ia->ptmul = ia->tmul;
+	    }
 	}
+	if (annot->time)
+	    return (0);
     }
 
     if (ia->ateof) {
@@ -452,7 +455,6 @@ FINT getann(WFDB_Annotator n, WFDB_Annotation *annot)
 	}
 	ia->tt += ia->word & DATA; /* annotation time */
 	if (ia->ptmul == 0.0) {
-	    if (ia->tmul) ia->tt = ia->tt / ia->tmul;
 	    ia->ptmul = ia->tmul;
 	    ia->tmul = (ia->afreq) ? getifreq()/ia->afreq :getspf();
 	}
@@ -519,8 +521,6 @@ FINT getann(WFDB_Annotator n, WFDB_Annotation *annot)
     }
     if (wfdb_feof(ia->file))
 	ia->ateof = -1;
-    //    if (ia->ann.time == 0 && ia->ann.anntyp == NOTQRS)
-    //	return (getann(n, annot));
     return (0);
 }
 

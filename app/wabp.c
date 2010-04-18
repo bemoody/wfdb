@@ -1,8 +1,8 @@
 /* file wabp.c          Wei Zong       23 October 1998
-   			Last revised:   12 June 2009 (by O. Abdala)
+   			Last revised:   9 April 2010 (by G. Moody)
 -----------------------------------------------------------------------------
 wabp: beat detector for arterial blood presure (ABP) signal
-Copyright (C) 1998-2009 Wei Zong
+Copyright (C) 1998-2010 Wei Zong
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -68,7 +68,7 @@ char *pname;		/* the name by which this program was invoked */
 int *ebuf;
 int nsig;		/* number of input signals */
 int SLPwindow;          /* Slope window size */
-int sig = -1;        /* signal number of signal to be analyzed (initial
+int sig = -1;	        /* signal number of signal to be analyzed (initial
 			   value forces search for ABP, ART, or BP signal) */
 int Tm = TmDEF;		/* minimum threshold value */
 WFDB_Sample *lbuf = NULL;
@@ -209,7 +209,7 @@ int main(int argc, char **argv)
 			      pname);
 		exit(1);
 	    }
-	    sig = findsig(argv[i]);
+	    sig = i;	/* remember argument until record is open */
 	    break;
 	  case 't':	/* end time */
 	    if (++i >= argc) {
@@ -248,6 +248,7 @@ int main(int argc, char **argv)
     }
     a.name = "wabp"; a.stat = WFDB_WRITE;
     if ((nsig = wfdbinit(record, &a, 1, s, nsig)) < 1) exit(2);
+    if (sig >= 0) sig = findsig(argv[sig]);
     if (sig < 0 || sig >= nsig) {
 	/* Identify the lowest-numbered ABP, ART, or BP signal */
 	for (i = 0; i < nsig; i++)
@@ -263,6 +264,7 @@ int main(int argc, char **argv)
 	}
 	sig = i;
     }
+    
     if (vflag)
 	fprintf(stderr, "%s: analyzing signal %d (%s)\n",
 		pname, sig, s[sig].desc);
