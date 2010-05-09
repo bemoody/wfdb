@@ -1,3 +1,16 @@
+10.5.3 (9 May 2010):
+        Tony Ricke reported that test builds (./configure; make) of recent
+	versions of the WFDB package fail on Cygwin.  This problem has been
+	corrected (in conf/cygwin-slib.def) in 10.5.3.
+
+	Tony also pointed out that current versions of the EC38 and EC57
+	standards no longer exclude episodes of atrial flutter from
+	evaluations of the positive predictivity of an atrial fibrillation
+	detector, as in previous versions of EC38.  The WFDB application
+	epicmp has been revised accordingly, so that atrial flutter episodes
+	are included in these evaluations unless the -x option is given
+	(to conform with EC38:1998 and earlier).
+
 10.5.2 (18 April 2010):
 	When reading annotations of multifrequency records opened in
 	high-resolution mode, a time shift was introduced by getann() in

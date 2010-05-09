@@ -1,5 +1,5 @@
 /* file: epicmp.c	G. Moody       3 March 1992
-			Last revised: 17 April 2010
+			Last revised:   9 May 2010
 
 -------------------------------------------------------------------------------
 epicmp: ANSI/AAMI-standard episode-by-episode annotation file comparator
@@ -57,10 +57,10 @@ understanding of algorithm errors.
 #define STE	4	/* ischemic ST in either signal */
 #define AFLE	5	/* atrial flutter */
 
-#define MAXEXCL	10	/* maximum number of intervals excluded from
+#define MAXEXCL	100	/* maximum number of intervals excluded from
 			   comparison */
 
-int aflag, sflag, s0flag, s1flag, vflag;
+int aflag, sflag, s0flag, s1flag, vflag, xflag;
 char *lzmstimstr(), *zmstimstr();
 
 main(argc, argv)
@@ -128,7 +128,10 @@ unsigned int stat, type;
     void find_episode(), find_exclusions();
 
     /* Find and mark any intervals to be excluded from the comparison. */
-    find_exclusions(stat, type);
+    if (xflag)
+	find_exclusions(stat, type);
+    else
+	nexcl = 0;
 
     /* Return to the beginning of the annotation files. */
     if (iannsettime(0L) < 0) exit(2);
@@ -921,6 +924,9 @@ char *argv[];
 	    vfname = argv[i];
 	    vflag = 1;
 	    break;
+	  case 'x':	/* exclude AFL from AFIB comparison, as in EC38:1998) */
+	    xflag = 1;
+	    break;
 	  default:
 	    (void)fprintf(stderr,
 			  "%s: unrecognized option %s\n", pname, argv[i]);
@@ -999,6 +1005,8 @@ static char *help_strings[] = {
  "                 if TIME is 0, the comparison ends when the end of either",
  "                 annotation file is reached)",
  " -V FILE        append VF reports to FILE",
+ " -x		  exclude reference AFL from AFIB +P comparison (EC38:1998)",
+ "                 default: no exclusions (EC38:2007, EC57)",
 NULL
 };
 

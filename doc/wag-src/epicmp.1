@@ -7,7 +7,7 @@ epicmp \- ANSI/AAMI-standard episode-by-episode annotation comparator
 .PP
 This program implements the VF, AF, and ST episode-by-episode
 comparison algorithms specified by the current American National
-Standard for ambulatory ECG analyzers (ANSI/AAMI EC38:1998).  \fBepicmp\fR
+Standard for ambulatory ECG analyzers (ANSI/AAMI EC38:2007).  \fBepicmp\fR
 is the reference implementation of these algorithms, and must be used
 to obtain the episode-by-episode performance statistics cited in EC38
 in order to be in compliance with the standard (see EC38, section 5.2.14).
@@ -62,6 +62,11 @@ reached).
 \fB-V\fR
 Append ventricular flutter and fibrillation detection reports to the specified
 \fIfile\fR.
+.TP
+\fB-x\fR
+Exclude periods of atrial fibrillation from calculations of atrial fibrillation
+positive predictivity, as required by EC38:1998 (default: include these periods,
+as required by EC38:2007).
 .PP
 The episode and duration statistics gathered by \fBepicmp\fR are based on tallies
 of overlapping episodes in the reference and test annotation files.
