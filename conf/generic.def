@@ -1,5 +1,5 @@
 # file: generic.def		G. Moody	31 May 2000
-#				Last revised:  7 August 2005
+#				Last revised:   13 May 2010
 # This file contains default 'make' definitions for compiling the WFDB Software
 # Package under versions of UNIX that are not otherwise recognized by
 # 'configure'.
@@ -31,7 +31,7 @@ WFDBROOT = /usr
 # read input from HTTP and FTP servers, in addition to the standard filesystem
 # support available without NETFILES).  The WFDB library can use either
 # libcurl (recommended) or libwww to provide NETFILES support.  To use libcurl,
-# set LC to `curl-config --cflags` (note the backquotes) and LN to
+# set LC to `curl-config --cflags` (note the backquotes) and LL to
 # `curl-config --libs`.  Otherwise, to use libwww, set LC to
 # `libwww-config --cflags` and LL to `libwww-config --libs`.  If neither
 # libcurl nor libwww is available, LC and LL should be empty (and NETFILES

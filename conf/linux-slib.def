@@ -1,5 +1,5 @@
 # file: linux-slib.def		G. Moody	31 May 2000
-#                               Last revised:    3 May 2009
+#                               Last revised:   13 May 2010
 # This section contains settings suitable for generating an ELF-format shared
 # library under Linux.
 
@@ -24,7 +24,7 @@ WFDBROOT = /usr
 # read input from HTTP and FTP servers, in addition to the standard filesystem
 # support available without NETFILES).  The WFDB library can use either
 # libcurl (recommended) or libwww to provide NETFILES support.  To use libcurl,
-# set LC to `curl-config --cflags` (note the backquotes) and LN to
+# set LC to `curl-config --cflags` (note the backquotes) and LL to
 # `curl-config --libs`.  Otherwise, to use libwww, set LC to
 # `libwww-config --cflags` and LL to `libwww-config --libs`.  If neither
 # libcurl nor libwww is available, LC and LL should be empty (and NETFILES

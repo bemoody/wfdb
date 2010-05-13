@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:    9 March 2010	wfdblib 10.5.2
+			Last revised:    11 May 2010	wfdblib 10.5.3
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -1295,7 +1295,7 @@ signal group pointer).  The output routines get two arguments (the value to be
 written and the signal group pointer). */
 
 static int _l;		    /* macro temporary storage for low byte of word */
-static int _L;		    /* macro temporary storage for low 16 bits of int */
+static int _lw;		    /* macro temporary storage for low 16 bits of int */
 static int _n;		    /* macro temporary storage for byte count */
 
 #define r8(G)	((G->bp < G->be) ? *(G->bp++) : \
@@ -1317,9 +1317,9 @@ r61() in order to obtain proper sign extension. */
 #define w16(V,G)    (w8((V), (G)), w8(((V) >> 8), (G)))
 #define r61(G)      (_l = r8(G), ((int)((short)((r8(G) & 0xff) | (_l << 8)))))
 #define w61(V,G)    (w8(((V) >> 8), (G)), w8((V), (G)))
-#define r24(G)	    (_L = r16(G), ((int)((r8(G) << 16) | (_L & 0xffff))))
+#define r24(G)	    (_lw = r16(G), ((int)((r8(G) << 16) | (_lw & 0xffff))))
 #define w24(V,G)    (w16((V), (G)), w8(((V) >> 16), (G)))
-#define r32(G)	    (_L = r16(G), ((int)((r16(G) << 16) | (_L & 0xffff))))
+#define r32(G)	    (_lw = r16(G), ((int)((r16(G) << 16) | (_lw & 0xffff))))
 #define w32(V,G)    (w16((V), (G)), w16(((V) >> 16), (G)))
 #else
 

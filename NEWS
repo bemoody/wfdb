@@ -1,4 +1,9 @@
 10.5.3 (9 May 2010):
+	A local variable (_L in lib/signal.c, introduced in 10.5.0) had
+	a name collision on Solaris with a predefined constant, so it has
+	been renamed as _lw.  A comment in each of the *.def files in conf,
+	now corrected, erroneously referred to LN, rather than LL.
+
         Tony Ricke reported that test builds (./configure; make) of recent
 	versions of the WFDB package fail on Cygwin.  This problem has been
 	corrected (in conf/cygwin-slib.def) in 10.5.3.
