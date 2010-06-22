@@ -1,9 +1,9 @@
 /* file rdann.c	    T. Baker and G. Moody	27 July 1981
-		    Last revised:	        26 April 2006
+		    Last revised:	         4 June 2010
 
 -------------------------------------------------------------------------------
 rdann: Print an annotation file in ASCII form
-Copyright (C) 1981-2006 George B. Moody
+Copyright (C) 1981-2010 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -56,7 +56,8 @@ char *argv[];
     signed char cflag = 0, chanmatch, nflag = 0, nummatch, sflag = 0, submatch;
     double sps, spm, sph;
     int eflag = 0, i, j, vflag = 0, xflag = 0;
-    long beat_number = 0L, from = 0L, to = 0L, atol();
+    long afrom = 0L, anum = 0L, ato = 0L, bfrom = 0L, bnum = 0L, bto = 0L,
+	from = 0L, to = 0L, atol();
     static char flag[ACMAX+1];
     static WFDB_Anninfo ai;
     WFDB_Annotation annot;
@@ -204,21 +205,43 @@ char *argv[];
 	exit(2);
 
     if (from) {
-	if (*argv[(int)from] == '#') {
-	    if ((beat_number = atol(argv[(int)from]+1)) < 0L) beat_number = 0L;
-	    while (beat_number > 0L && getann(0, &annot) == 0)
-		if (isqrs(annot.anntyp)) beat_number--;
-	    if (beat_number > 0L) exit(2);
+	if (*argv[(int)from] == 'a') {
+	    if ((afrom = atol(argv[(int)from]+1)) < 0L)
+		afrom = from = 0L;
+	    while (anum < afrom && getann(0, &annot) == 0) {
+		anum++;
+		if (isqrs(annot.anntyp)) bnum++;
+	    }
+	    if (anum < afrom) exit(2);
 	}
-	else if (iannsettime(strtim(argv[(int)from])) < 0) exit(2);
+	else if (*argv[(int)from] == 'b' || *argv[(int)from] == '#') {
+	    if ((bfrom = atol(argv[(int)from]+1)) < 0L)
+		bfrom = from = 0L;
+	    while (bnum < bfrom && getann(0, &annot) == 0) {
+		anum++;
+		if (isqrs(annot.anntyp)) bnum++;
+	    }
+	    if (bnum < bfrom) exit(2);
+	}
+	else if (iannsettime(strtim(argv[(int)from])) < 0)
+	    exit(2);
     }
     if (to) {
-	if (*argv[(int)to] == '#') {
-	    if ((beat_number = atol(argv[(int)to]+1)) <  1L) beat_number = 1L;
-	    to = (WFDB_Time)0;
+	if (*argv[(int)to] == 'a') {
+	    if ((ato = atol(argv[(int)to]+1)) <  0L) ato = 0L;
+	    bto = to = (WFDB_Time)0;
+	}
+	else if (*argv[(int)to] == 'b') {
+	    if ((bto = atol(argv[(int)to]+1)) <  0L) bto = 0L;
+	    ato = to = (WFDB_Time)0;
+	}
+	else if (*argv[(int)to] == '#') {
+	    if ((bto = atol(argv[(int)to]+1)) <  1L) bto = 1L;
+	    bto += bnum;
+	    ato = to = (WFDB_Time)0;
 	}
 	else {
-	    beat_number = -1L;
+	    ato = bto = 0L;
 	    to = strtim(argv[(int)to]);
 	    if (to < (WFDB_Time)0) to = -to;
 	}
@@ -255,8 +278,8 @@ char *argv[];
 	    if (annot.aux != NULL) (void)printf("\t%s", annot.aux + 1);
 	    (void)printf("\n");
 	}
-	if (beat_number > 0L && isqrs(annot.anntyp) && --beat_number == 0L)
-	    break;
+	if (ato && ++anum >= ato) break;
+	if (bto && isqrs(annot.anntyp) && ++bnum >= bto) break;
     }
     exit(0);	/*NOTREACHED*/
 }

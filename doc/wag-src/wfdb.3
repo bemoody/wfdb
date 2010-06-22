@@ -1,4 +1,4 @@
-.TH WFDB 3 "7 April 2003" "WFDB software 10.3.6" "WFDB Applications Guide"
+.TH WFDB 3 "22 June 2010" "WFDB software 10.5.3" "WFDB Applications Guide"
 .SH NAME
 wfdb \- Waveform Database library
 .SH SYNOPSIS
@@ -24,15 +24,17 @@ int findsig(char *\fIsignal_name\fP)
 .br
 void flushcal(void)
 .br
+WFDB_Frequency getafreq(void)
+.br
 int getann(WFDB_Annotator \fIa\fP, WFDB_Annotation *\fIannotation\fP)
 .br
 double getbasecount(void)
 .br
 int getcal(char *\fIdescription\fP, char *\fIunits\fP, WFDB_Calinfo *\fIcal\fP)
 .br
-WFDB_Frequency getafreq(void)
-.br
 WFDB_Frequency getcfreq(void)
+.br
+int getgvmode(void)
 .br
 WFDB_Frequency getifreq(void)
 .br
@@ -84,6 +86,8 @@ WFDB_Frequency sampfreq(char *\fIrecord\fP)
 .br
 WFDB_Sample sample(WFDB_Signal \fIs\fP, WFDB_Time \fIt\fP)
 .br
+int sample_valid(void)
+.br
 void setafreq(WFDB_Frequency \fIannotation_clock_frequency\fP)
 .br
 int setanndesc(int \fIannotation_code\fP, char *\fIannotation_description\fP)
@@ -128,6 +132,12 @@ WFDB_Time tnextvec(WFDB_Signal \fIs\fP, WFDB_Time \fIt\fP)
 .br
 int ungetann(WFDB_Annotator \fIa\fP, WFDB_Annotation *\fIannotation\fP)
 .br
+const char *wfdbcflags(void)
+.br
+const char *wfdbdefwfdb(void)
+.br
+const char *wfdbdefwfdbcal(void)
+.br
 char *wfdberror(void)
 .br
 char *wfdbfile(char *\fItype\fP, char *\fIrecord\fP)
@@ -141,6 +151,10 @@ long wfdbgetstart(WFDB_Signal \fIs\fP)
 int wfdbinit(char *\fIrecord\fP, WFDB_Anninfo *\fIaiarray\fP, unsigned int \fInann\fP,
                 WFDB_Siginfo *\fIsiarray\fP, unsigned int \fInsig\fP)
 .br
+const char *wfdbldflags(void)
+.br
+void wfdbmemerr(int exit_on_error)
+.br
 int wfdbputprolog(char *\fIprolog\fP, long \fIbytes\fP, WFDB_Signal \fIs\fP)
 .br
 void wfdbquiet(void)
@@ -152,6 +166,8 @@ void wfdbsetskew(WFDB_Signal \fIs\fP, int \fIskew\fP)
 void wfdbsetstart(WFDB_Signal \fIs\fP, long \fIbyte_offset\fP)
 .br
 void wfdbverbose(void)
+.br
+const char *wfdbversion(void)
 .SH DESCRIPTION
 Waveform databases (including the MIT-BIH Arrhythmia Database, the AHA Database
 for Evaluation of Ventricular Arrhythmia Detectors, and the European ST-T

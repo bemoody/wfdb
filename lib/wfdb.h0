@@ -1,7 +1,6 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised:   12 March 2010	wfdblib 10.5.0
+			Last revised:   22 June 2010	wfdblib 10.5.3
 WFDB library type, constant, structure, and function interface definitions
-
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
 Copyright (C) 1983-2010 George B. Moody
@@ -265,6 +264,7 @@ extern FINT wfdbinit(char *record,
 extern FINT findsig(char *signame);
 extern FINT getspf(void);
 extern FVOID setgvmode(int mode);
+extern FINT getgvmode(void);
 extern FINT setifreq(WFDB_Frequency freq);
 extern FFREQUENCY getifreq(void);
 extern FINT getvec(WFDB_Sample *vector);
@@ -345,11 +345,11 @@ extern FINT setobsize(int output_buffer_size);
 extern FSTRING wfdbfile(char *file_type, char *record);
 extern FVOID wfdbflush(void);
 extern FVOID wfdbmemerr(int exit_on_error);
-extern const FSTRING wfdbversion();
-extern const FSTRING wfdbldflags();
-extern const FSTRING wfdbcflags();
-extern const FSTRING wfdbdefwfdb();
-extern const FSTRING wfdbdefwfdbcal();
+extern const FSTRING wfdbversion(void);
+extern const FSTRING wfdbldflags(void);
+extern const FSTRING wfdbcflags(void);
+extern const FSTRING wfdbdefwfdb(void);
+extern const FSTRING wfdbdefwfdbcal(void);
 #endif
 
 #ifdef wfdb_CPP
@@ -358,11 +358,11 @@ extern const FSTRING wfdbdefwfdbcal();
 
 #ifdef wfdb_KRC	/* declare only function return types for K&R C compilers */
 extern FINT annopen(), isigopen(), osigopen(), wfdbinit(), findsig(), getspf(),
-    setifreq(), getvec(), getframe(), putvec(), getann(), ungetann(), putann(),
-    isigsettime(), isgsettime(), iannsettime(), strecg(), setecgstr(),
-    strann(), setannstr(), setanndesc(), wfdb_isann(), wfdb_isqrs(),
-    wfdb_setisqrs(), wfdb_map1(), wfdb_setmap1(), wfdb_map2(), wfdb_setmap2(),
-    wfdb_ammap(), wfdb_mamap(), wfdb_annpos(), wfdb_setannpos(),
+    setifreq(), getvec(), getframe(), getgvmode(), putvec(), getann(),
+    ungetann(), putann(), isigsettime(), isgsettime(), iannsettime(), strecg(),
+    setecgstr(), strann(), setannstr(), setanndesc(), wfdb_isann(),
+    wfdb_isqrs(), wfdb_setisqrs(), wfdb_map1(), wfdb_setmap1(), wfdb_map2(),
+    wfdb_setmap2(), wfdb_ammap(), wfdb_mamap(), wfdb_annpos(), wfdb_setannpos(),
     adumuv(), newheader(), setheader(), setmsheader(), wfdbputprolog(),
     setsampfreq(), setbasetime(), putinfo(), setibsize(), setobsize(),
     calopen(), getcal(), putcal(), newcal(), wfdbgetskew(), sample_valid();

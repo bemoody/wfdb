@@ -1,10 +1,10 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:	  3 March 2009       wfdblib 10.4.17
+                        Last revised:	  22 June 2010       wfdblib 10.5.3
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1988-2009 George B. Moody
+Copyright (C) 1988-2010 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -259,27 +259,27 @@ FVOID wfdbmemerr(int behavior)
 #define CFLAGS  "CFLAGS not defined"
 #endif
 
-const FSTRING wfdbversion()
+const FSTRING wfdbversion(void)
 {
    return VERSION;
 }
 
-const FSTRING wfdbldflags()
+const FSTRING wfdbldflags(void)
 {
    return LDFLAGS;
 }
 
-const FSTRING wfdbcflags()
+const FSTRING wfdbcflags(void)
 {
    return CFLAGS;
 }
 
-const FSTRING wfdbdefwfdb()
+const FSTRING wfdbdefwfdb(void)
 {
    return DEFWFDB;
 }
 
-const FSTRING wfdbdefwfdbcal()
+const FSTRING wfdbdefwfdbcal(void)
 {
    return DEFWFDBCAL;
 }

@@ -1,4 +1,4 @@
-.TH RDANN 1 "28 October 2009" "WFDB 10.4.24" "WFDB Applications Guide"
+.TH RDANN 1 "4 June 2010" "WFDB 10.5.3" "WFDB Applications Guide"
 .SH NAME
 rdann \- read a WFDB annotation file
 .SH SYNOPSIS
@@ -66,14 +66,20 @@ standard \fItime\fR (\fIhh:mm:ss\fR) format; see the description of
 \fIstrtim\fR in the \fIWFDB Programmer's Guide\fR, as well as the
 comments below, for other formats.
 .PP
-Beat numbers beginning with 0 are implicitly assigned by \fBrdann\fR to each
-QRS annotation in an annotation file.  If the argument of the \fB-f\fR option
-begins with `#', it is taken to be the beat number of the first QRS annotation
-to be printed (any non-QRS annotations that immediately precede this annotation
-are also printed).  If the argument of the \fB-t\fR option begins with `#', it
-is taken as the number of QRS annotations to be processed;  note that not all
-of those processed will necessarily be printed, if the \fB-p\fR option is used
-to select only a subset of annotation types to be printed.  
+Annotation numbers beginning with 0 are implicitly assigned by
+\fBrdann\fR to each annotation in an annotation file, and beat numbers
+beginning with 0 are assigned to each QRS annotation.  If the argument
+of the \fB-f\fR option begins with `a', it is taken to be the
+annotation number of the first annotation to be printed; if it begins
+with `b', it is taken to be the beat number of the first beat
+annotation to be printed (any non-QRS annotations that immediately
+precede this annotation are also printed).  Arguments of the \fB-t\fR
+option beginning with `a' or `b' similarly specify the annotation number
+or beat number following the last to be printed.  If the argument of the
+\fB-t\fR option begins with `#', it is taken as the number of QRS
+annotations to be processed; note that not all of those processed will
+necessarily be printed, if the \fB-p\fR option is used to select only
+a subset of annotation types to be printed.
 .PP
 Note that the \fB-e\fR and \fB-x\fR options are mutually exclusive;  if both
 are given, only the last one is effective.

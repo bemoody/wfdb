@@ -1750,7 +1750,8 @@ for methods of opening output signal files.
 * setifreq::			Setting the input sampling frequency.
 * getifreq::                    Determining the input sampling frequency.
 * setgvmode::                   Setting the resolution for a multifrequency
-                                record.
+                                record and how invalid samples are represented.
+* getgvmode::                   Determining the getvec operating mode.
 * getspf::                      Determining the number of samples per frame.
 * setafreq::			Setting the time resolution for output
                                 annotations.
@@ -1855,13 +1856,17 @@ the record (as would be returned by @code{sampfreq}, @pxref{sampfreq}),
 or the frequency chosen using a previous invocation of @code{setifreq}.
 
 @c @group
-@node     setgvmode, getspf, getifreq, special I/O modes
+@node     setgvmode, getgvmode, getifreq, special I/O modes
 @unnumberedsubsec setgvmode
 @findex setgvmode (9.0)
 @cindex interpolation
 @cindex decimation
 @cindex resampling
 @cindex multi-frequency records (reading)
+@cindex padding
+@cindex invalid samples
+@cindex missing samples
+@cindex samples (invalid or missing)
 
 @example
 void setgvmode(int *@var{mode})
@@ -1902,6 +1907,35 @@ however, these functions replicate the previous
 valid sample whenever they encounter an invalid or missing sample,
 which may simplify the design of applications such as digital filters.
 The constant @code{WFDB_GVPAD} is defined in @file{<wfdb/wfdb.h>}.
+
+@c @group
+@node     setgvmode, getspf, setgvmode, special I/O modes
+@unnumberedsubsec getgvmode
+@findex getgvmode (10.5.3)
+@cindex interpolation
+@cindex decimation
+@cindex resampling
+@cindex multi-frequency records (reading)
+@cindex padding
+@cindex invalid samples
+@cindex missing samples
+@cindex samples (invalid or missing)
+
+@example
+int setgvmode(void)
+@end example
+@noindent
+@c @end group
+
+@noindent
+This function returns the operating mode used by @code{getvec}.  If the
+returned value has the @code{WFDB_HIGHRES} bit set, @code{getvec} is operating
+in high-resolution mode;  if the returned value has the @code{WFDB_GVPAD} bit
+set, @code{getvec} replicates the previous valid sample whenever it encounters
+an invalid or missing sample, rather than returning the value
+@code{WFDB_INVALID_SAMPLE}.  The constants @code{WFDB_HIGHRES},
+@code{WFDB_GVPAD}, and @code{WFDB_INVALID_SAMPLE} are defined in
+@file{<wfdb/wfdb.h>}.
 
 @c @group
 @node     getspf, setafreq, setgvmode, special I/O modes
@@ -8881,6 +8915,11 @@ WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
 @unnumberedsec WFDB 10.5
+@unnumberedsubsec Changes in version 10.5.3 (22 June 2010)
+
+Function getgvmode() has been introduced in WFDB library version
+10.5.3, to allow querying the current operating mode of getvec().
+
 @unnumberedsubsec Changes in version 10.5.2 (18 April 2010)
 
 When reading annotations of multifrequency records opened in

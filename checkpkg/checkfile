@@ -7,7 +7,12 @@
 # If the -v option is used, 'checkfile' prints the differences if any were
 # found; otherwise it prints a message indicating that the files match.
 
-DIFF="diff --strip-trailing-cr"
+case `uname` in
+  HP-UX*)   DIFF=diff ;;
+  Solaris*) DIFF=diff ;;
+  SunOS*)   DIFF=diff ;;
+  *)        DIFF="diff --strip-trailing-cr" ;;
+esac
 
 case $# in
  1) ( $DIFF $1 expected/$1 >/dev/null 2>&1 ) && exit 0

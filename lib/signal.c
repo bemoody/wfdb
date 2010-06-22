@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:    11 May 2010	wfdblib 10.5.3
+			Last revised:    22 June 2010	wfdblib 10.5.3
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -58,6 +58,7 @@ This file also contains definitions of the following WFDB library functions:
  findsig [10.4.12] (find an input signal with a specified name)
  getspf [9.6]	(returns number of samples returned by getvec per frame)
  setgvmode [9.0](sets getvec operating mode)
+ getgvmode [10.5.3](returns getvec operating mode)
  setifreq [10.2.6](sets the getvec sampling frequency)
  getifreq [10.2.6](returns the getvec sampling frequency)
  getvec		(reads a (possibly resampled) sample from each input signal)
@@ -289,8 +290,6 @@ static int dsbi;		/* index to oldest sample in dsbuf (if < 0,
 static unsigned dsblen;		/* capacity of dsbuf, in samples */
 static unsigned framelen;	/* total number of samples per frame */
 static int gvmode = DEFWFDBGVMODE;	/* getvec mode */
-static int gvpad;		/* getvec padding (if non-zero, replace invalid
-				   samples with previous valid samples) */
 static int gvc;			/* getvec sample-within-frame counter */
 static int isedf;		/* if non-zero, record is stored as EDF/EDF+ */
 WFDB_Sample *sbuf = NULL;	/* buffer used by sample() */
@@ -630,6 +629,7 @@ static int edfparse(WFDB_FILE *ifile)
     wfdb_fread(buf, 1, 80, ifile);	/* patient ID (ignored) */
     wfdb_fread(buf, 1, 80, ifile);	/* recording ID (ignored) */
     wfdb_fread(buf, 1, 8, ifile);	/* recording date */
+    buf[8] = '\0';
     sscanf(buf, "%d%*c%d%*c%d", &day, &month, &year);
     year += 1900;			/* EDF has only two-digit years */
     if (year < 1985) year += 100;	/* fix this before 1/1/2085! */
@@ -639,6 +639,7 @@ static int edfparse(WFDB_FILE *ifile)
     sscanf(buf, "%d", &offset);
     wfdb_fread(buf, 1, 44, ifile);	/* free space (ignored) */
     wfdb_fread(buf, 1, 8, ifile);	/* number of frames (EDF blocks) */
+    buf[8] = '\0';
     sscanf(buf, "%ld", &nframes);
     nsamples = nframes;
     wfdb_fread(buf, 1, 8, ifile);	/* data record duration (seconds) */
@@ -1696,6 +1697,10 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
     return (0);
 }
 
+/* VFILL provides the value returned by getskewedframe() for a missing or
+   invalid sample */
+#define VFILL	((gvmode & WFDB_GVPAD) ? is->samp : WFDB_INVALID_SAMPLE)
+
 static int getskewedframe(WFDB_Sample *vector)
 {
     int c, stat;
@@ -1723,7 +1728,7 @@ static int getskewedframe(WFDB_Sample *vector)
 	for (c = 0; c < is->info.spf; c++, vector++) {
 	    switch (is->info.fmt) {
 	      case 0:	/* null signal: return sample tagged as invalid */
-		*vector = v = gvpad ? is->samp : WFDB_INVALID_SAMPLE;
+		  *vector = v = VFILL;
 		if (is->info.nsamp == 0) ig->stat = -1;
 		break;
 	      case 8:	/* 8-bit first differences */
@@ -1732,63 +1737,63 @@ static int getskewedframe(WFDB_Sample *vector)
 	      case 16:	/* 16-bit amplitudes */
 		*vector = v = r16(ig);
 		if (v == -1 << 15)
-		    *vector = gvpad ? is->samp : WFDB_INVALID_SAMPLE;
+		    *vector = VFILL;
 		else
 		    is->samp = *vector;
 		break;
 	      case 61:	/* 16-bit amplitudes, bytes swapped */
 		*vector = v = r61(ig);
 		if (v == -1 << 15)
-		    *vector = gvpad ? is->samp : WFDB_INVALID_SAMPLE;
+		    *vector = VFILL;
 		else
 		    is->samp = *vector;
 		break;
 	      case 80:	/* 8-bit offset binary amplitudes */
 		*vector = v = r80(ig);
 		if (v == -1 << 7)
-		    *vector = gvpad ? is->samp : WFDB_INVALID_SAMPLE;
+		    *vector = VFILL;
 		else
 		    is->samp = *vector;
 		break;
 	      case 160:	/* 16-bit offset binary amplitudes */
 		*vector = v = r160(ig);
 		if (v == -1 << 15)
-		    *vector = gvpad ? is->samp : WFDB_INVALID_SAMPLE;
+		    *vector = VFILL;
 		else
 		    is->samp = *vector;
 		break;
 	      case 212:	/* 2 12-bit amplitudes bit-packed in 3 bytes */
 		*vector = v = r212(ig);
 		if (v == -1 << 11)
-		    *vector = gvpad ? is->samp : WFDB_INVALID_SAMPLE;
+		    *vector = VFILL;
 		else
 		    is->samp = *vector;
 		break;
 	      case 310:	/* 3 10-bit amplitudes bit-packed in 4 bytes */
 		*vector = v = r310(ig);
 		if (v == -1 << 9)
-		    *vector = gvpad ? is->samp : WFDB_INVALID_SAMPLE;
+		    *vector = VFILL;
 		else
 		    is->samp = *vector;
 		break;
 	      case 311:	/* 3 10-bit amplitudes bit-packed in 4 bytes */
 		*vector = v = r311(ig);
 		if (v == -1 << 9)
-		    *vector = gvpad ? is->samp : WFDB_INVALID_SAMPLE;
+		    *vector = VFILL;
 		else
 		    is->samp = *vector;
 		break;
 	      case 24:	/* 24-bit amplitudes */
 		*vector = v = r24(ig);
 		if (v == -1 << 23)
-		    *vector = gvpad ? is->samp : WFDB_INVALID_SAMPLE;
+		    *vector = VFILL;
 		else
 		    is->samp = *vector;
 		break;
 	      case 32:	/* 32-bit amplitudes */
 		*vector = v = r32(ig);
 		if (v == -1 << 31)
-		    *vector = gvpad ? is->samp : WFDB_INVALID_SAMPLE;
+		    *vector = VFILL;
 		else
 		    is->samp = *vector;
 		break;
@@ -2350,18 +2355,19 @@ FVOID setgvmode(int mode)
     }
 
     if ((mode & WFDB_HIGHRES) == WFDB_HIGHRES) {
-	gvmode = WFDB_HIGHRES;
+	gvmode |= WFDB_HIGHRES;
 	if (ispfmax == 0) ispfmax = 1;
 	sfreq = ffreq * ispfmax;
     }
     else {
-	gvmode = WFDB_LOWRES;
+	gvmode &= ~(WFDB_HIGHRES);
 	sfreq = ffreq;
     }
-    if ((mode & WFDB_GVPAD) == WFDB_GVPAD)
-	gvpad = 1;
-    else
-	gvpad = 0;
+}
+
+FINT getgvmode(void)
+{
+    return (gvmode);
 }
 
 /* An application can specify the input sampling frequency it prefers by

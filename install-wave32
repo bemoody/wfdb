@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: install-wave32		G. Moody	7 October 2008
-#				Last revised:   7 January 2010 for Fedora 12
+#				Last revised:   1 June 2010 for Fedora 12
 # Build and install WAVE on 64-bit Linux
 #
 # *** Fedora 12 users: if this script fails, see the note at the end! ***
@@ -24,6 +24,21 @@
 # On other versions of Linux, you will need to install the first two groups of
 # prerequisites in some other way before running the final part of this script
 # as root, using the -q option.  See the notes below for hints.
+
+echo "This script builds and installs 'wave' as a 32-bit application on x86_64"
+echo "(AMD/Intel 64-bit) Fedora GNU/Linux.  It has been tested on Fedora 12 and"
+echo "will probably require modification on other platforms."
+echo
+
+if [ $UID != 0 ]
+then
+    echo "You do not have root (superuser) permissions, so this script may fail"
+    echo "if it needs to install missing libraries.  If this happens, rerun it"
+    echo "as root (e.g., using su or sudo)."
+fi
+
+echo
+echo "If this script fails, read it for troubleshooting hints."
 
 # The prerequisites needed in order to compile WAVE on 64-bit Fedora fall into
 # three groups:
@@ -63,7 +78,7 @@ then
     esac
     yum -y install libgcc.$X86 glibc-devel.$X86 libX11-devel.$X86 \
 	libXpm-devel.$X86 libcurl-devel.$X86
-    yum -y xorg-x11-fonts-misc \
+    yum -y install xorg-x11-fonts-misc \
 	xorg-x11-fonts-100dpi xorg-x11-fonts-ISO8859-1-100dpi \
 	xorg-x11-fonts-75dpi xorg-x11-fonts-ISO8859-1-75dpi
 fi
@@ -83,7 +98,7 @@ fi
 
 if [ "x$1" != "x-q" ]
 then
-    rpm -ivh http://physionet.org/physiotools/xview/i386-Fedora/xview-3.2p1.4-21.1.fc8.i386.rpm \
+    rpm -Uvh http://physionet.org/physiotools/xview/i386-Fedora/xview-3.2p1.4-21.1.fc8.i386.rpm \
 	http://physionet.org/physiotools/xview/i386-Fedora/xview-clients-3.2p1.4-21.1.fc8.i386.rpm \
 	http://physionet.org/physiotools/xview/i386-Fedora/xview-devel-3.2p1.4-21.1.fc8.i386.rpm
 fi
@@ -111,7 +126,6 @@ make install
 # Clean up intermediate binaries and other temporary files.
 cd ..
 make clean
-
 
 # ****************************************************************************
 #

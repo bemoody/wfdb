@@ -897,8 +897,7 @@ FINT setanndesc(int code, char *string)
 /*  setafreq: set time resolution for output annotation files */
 FVOID setafreq(WFDB_Frequency f)
 {
-    if (f > 0.0)
-	oafreq = f;
+    oafreq = f;
 }
 
 /* getafreq: return time resolution for output annotation files */

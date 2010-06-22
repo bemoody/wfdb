@@ -146,6 +146,9 @@ char *s;
        second per signal. */
     if (nsig < 0 || (freq = sampfreq(NULL)) <= 0.) freq = WFDB_DEFFREQ;
     setifreq(freq);
+    /* Inhibit the output of the 'time resolution' comment annotation unless
+       we are operating in high-resolution mode. */
+    if ((getgvmode() & WFDB_HIGHRES) == 0) setafreq(0.);
 
     /* Quit if isigopen failed. */
     if (nsig < 0)
