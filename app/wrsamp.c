@@ -1,5 +1,5 @@
 /* file: wrsamp.c	G. Moody	10 August 1993
-			Last revised:    1 March 2010
+			Last revised:    1 July 2010
 
 -------------------------------------------------------------------------------
 wrsamp: Select fields or columns from a file and generate a WFDB record
@@ -385,7 +385,7 @@ char *argv[];
 
 	nf = ta->ntokens - zflag;
 	SUALLOC(fv, nf, sizeof(int));
-	for (i = 0, j = zflag; j <= nf; i++, j++)
+	for (i = 0, j = zflag; i < nf; i++, j++)
 	    fv[i] = j;
     }
 
@@ -414,7 +414,7 @@ char *argv[];
 	else {
 	    char tdesc[16];
 
-	    (void)sprintf(tdesc, "column %d", fv[i]);
+	    (void)sprintf(tdesc, "olumn %d", fv[i]);
 	    SSTRCPY(si[i].desc, tdesc);
 	}
 	si[i].units = "";

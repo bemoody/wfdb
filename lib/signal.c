@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:    22 June 2010	wfdblib 10.5.3
+			Last revised:    29 June 2010	wfdblib 10.5.4
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -244,11 +244,8 @@ static int in_msrec;		/* current input record is: 0: a single-segment
 static long msbtime;		/* base time for multi-segment record */
 static WFDB_Date msbdate;	/* base date for multi-segment record */
 static WFDB_Time msnsamples;	/* duration of multi-segment record */
-static struct segrec {
-    char recname[WFDB_MAXRNL+1];/* segment name */
-    WFDB_Time nsamp;		/* number of samples in segment */
-    WFDB_Time samp0;		/* sample number of first sample in segment */
-} *segarray, *segp, *segend;	/* beginning, current segment, end pointers */
+static WFDB_Seginfo *segarray, *segp, *segend;
+				/* beginning, current segment, end pointers */
 
 /* These variables relate to open input signals. */
 static unsigned maxisig;	/* max number of input signals */
@@ -965,7 +962,7 @@ static int readheader(const char *record)
 	msbdate = bdate;
 	msnsamples = nsamples;
 	/* Read the names and lengths of the segment records. */
-	SALLOC(segarray, segments, sizeof(struct segrec));
+	SALLOC(segarray, segments, sizeof(WFDB_Seginfo));
 	segp = segarray;
 	for (i = 0, ns = (WFDB_Time)0L; i < segments; i++, segp++) {
 	    /* Get next segment spec, skip empty lines and comments. */
@@ -1532,7 +1529,7 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
     /* If the current record contains multiple segments, locate the segment
        containing the desired sample. */
     if (in_msrec) {
-	struct segrec *tseg = segp;
+	WFDB_Seginfo *tseg = segp;
 
 	if (t >= msnsamples) {
 	    wfdb_error("isigsettime: improper seek on signal group %d\n", g);
@@ -2799,6 +2796,12 @@ FINT setheader(char *record, WFDB_Siginfo *siarray, unsigned int nsig)
     return (0);
 }
 
+FINT getseginfo(WFDB_Seginfo **sarray)
+{
+    *sarray = segarray;
+    return (segments);
+}
+
 FINT setmsheader(char *record, char **segment_name, unsigned int nsegments)
 {
     WFDB_Frequency msfreq, mscfreq;
@@ -3303,7 +3306,7 @@ FSAMPLE muvadu(WFDB_Signal s, int v)
 
 FDOUBLE aduphys(WFDB_Signal s, WFDB_Sample a)
 {
-    int b;
+    double b;
     WFDB_Gain g;
 
     if (s < nvsig) {
@@ -3435,7 +3438,7 @@ void wfdb_sigclose(void)
 	int i;
 
 	SFREE(segarray);
-	segp = segend = (struct segrec *)NULL;
+	segp = segend = (WFDB_Seginfo *)NULL;
 	for (i = 0; i < maxisig; i++) {
 	    SFREE(isd[i]->info.fname);  /* missing before 10.4.6 */
 	    SFREE(isd[i]->info.desc);

@@ -1,4 +1,4 @@
-.TH WFDB 3 "22 June 2010" "WFDB software 10.5.3" "WFDB Applications Guide"
+.TH WFDB 3 "1 July 2010" "WFDB software 10.5.4" "WFDB Applications Guide"
 .SH NAME
 wfdb \- Waveform Database library
 .SH SYNOPSIS
@@ -37,6 +37,8 @@ WFDB_Frequency getcfreq(void)
 int getgvmode(void)
 .br
 WFDB_Frequency getifreq(void)
+.br
+int getseginfo(WFDB_Seginfo **segments)
 .br
 char *getwfdb(void)
 .br

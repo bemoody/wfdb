@@ -1,5 +1,5 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised:   22 June 2010	wfdblib 10.5.3
+			Last revised:   29 June 2010	wfdblib 10.5.4
 WFDB library type, constant, structure, and function interface definitions
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
@@ -188,11 +188,18 @@ struct WFDB_ann {	/* annotation structure */
     unsigned char *aux;	/* pointer to auxiliary information */
 };
 
+struct WFDB_seginfo {	/* segment record structure */
+    char recname[WFDB_MAXRNL+1];   /* segment name */
+    WFDB_Time nsamp;		   /* number of samples in segment */
+    WFDB_Time samp0;		   /* sample number of first sample */
+};
+
 /* Composite data types */
 typedef struct WFDB_siginfo WFDB_Siginfo;
 typedef struct WFDB_calinfo WFDB_Calinfo;
 typedef struct WFDB_anninfo WFDB_Anninfo;
 typedef struct WFDB_ann WFDB_Annotation;
+typedef struct WFDB_seginfo WFDB_Seginfo;
 
 /* Dynamic memory allocation macros. */
 #define MEMERR(P, N, S) \
@@ -321,6 +328,7 @@ extern FINT putinfo(char *info);
 extern FINT newheader(char *record);
 extern FINT setheader(char *record, WFDB_Siginfo *siarray, unsigned int nsig);
 extern FINT setmsheader(char *record, char **segnames, unsigned int nsegments);
+extern FINT getseginfo(WFDB_Seginfo **segments);
 extern FINT wfdbgetskew(WFDB_Signal s);
 extern FVOID wfdbsetiskew(WFDB_Signal s, int skew);
 extern FVOID wfdbsetskew(WFDB_Signal s, int skew);
@@ -363,9 +371,10 @@ extern FINT annopen(), isigopen(), osigopen(), wfdbinit(), findsig(), getspf(),
     setecgstr(), strann(), setannstr(), setanndesc(), wfdb_isann(),
     wfdb_isqrs(), wfdb_setisqrs(), wfdb_map1(), wfdb_setmap1(), wfdb_map2(),
     wfdb_setmap2(), wfdb_ammap(), wfdb_mamap(), wfdb_annpos(), wfdb_setannpos(),
-    adumuv(), newheader(), setheader(), setmsheader(), wfdbputprolog(),
-    setsampfreq(), setbasetime(), putinfo(), setibsize(), setobsize(),
-    calopen(), getcal(), putcal(), newcal(), wfdbgetskew(), sample_valid();
+    adumuv(), newheader(), setheader(), setmsheader(), getseginfo(),
+    wfdbputprolog(), setsampfreq(), setbasetime(), putinfo(), setibsize(),
+    setobsize(), calopen(), getcal(), putcal(), newcal(), wfdbgetskew(),
+    sample_valid();
 extern FLONGINT wfdbgetstart();
 extern FSAMPLE muvadu(), physadu(), sample();
 extern FSTRING ecgstr(), annstr(), anndesc(), timstr(), mstimstr(),

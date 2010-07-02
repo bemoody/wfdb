@@ -410,7 +410,7 @@ char *argv[];
 	    for (i = 0; i < nsig; i++) {
 		if (v[sig[i]] != WFDB_INVALID_SAMPLE)
 		    (void)printf(vfmt,
-		    (double)(v[sig[i]] - si[sig[i]].baseline)/si[sig[i]].gain);
+		     ((double)v[sig[i]] - si[sig[i]].baseline)/si[sig[i]].gain);
 		else
 		    (void)printf(invalid);
 	    }

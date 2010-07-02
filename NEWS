@@ -1,3 +1,21 @@
+L10.5.4 (1 July 2010)
+        Function getseginfo() has been introduced in WFDB library version
+	10.5.4, to allow applications to obtain information about the
+	segments belonging to the current (multi-segment) input record.
+
+	In previous versions, integer arithmetic overflow was possible when
+	converting format 32 samples using aduphys(), if the difference between
+	the baseline value and the sample to be converted exceeded the range of
+	signed 32-bit integers.  Although rdsamp does not use aduphys(),
+	similar code in rdsamp also exhibited this problem, which has now
+	been corrected; thanks to Ikaro Silva for reporting it and providing a
+	test case.
+
+	A wrsamp bug introduced in version 10.4.25 caused it to fail in
+	some cases if no columns were specified.  This has been corrected;
+	thanks to Tony Cacere for reporting this problem together with a
+	test case.
+ 
 10.5.3 (22 June 2010):
 	Function getgvmode() has been introduced in WFDB library version
 	10.5.3, to allow querying the current operating mode of getvec().

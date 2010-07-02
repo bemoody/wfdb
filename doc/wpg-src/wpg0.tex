@@ -3324,6 +3324,8 @@ first introduced in WFDB library version 6.0.)
 * setheader::			Creating or changing a @file{hea} file.
 * setmsheader::                 Creating a @file{hea} for a multi-segment
                                 record.
+* getseginfo::                 Get information about segments of a
+                                multi-segment record.
 * wfdbquit::			Closing WFDB files.
 * iannclose and oannclose::     Closing annotation files.
 * wfdbquiet and wfdbverbose::	Suppressing error messages from the WFDB library.
@@ -3463,7 +3465,7 @@ the @file{hea} file for record @file{old} must be copied explicitly;
 introduced in WFDB library version 5.0.)
 
 @c @group
-@node     setmsheader, wfdbquit, setheader, miscellaneous functions
+@node     setmsheader, getseginfo, setheader, miscellaneous functions
 @unnumberedsubsec setmsheader
 @findex setmsheader (9.1)
 @cindex header files (creating)
@@ -3508,7 +3510,37 @@ as required.  For an example of the use of @code{setmsheader}, see
 first introduced in WFDB library version 9.1.)
 
 @c @group
-@node     wfdbquit, iannclose and oannclose, setmsheader, miscellaneous functions
+@node     getseginfo, wfdbquit, setmsheader, miscellaneous functions
+@unnumberedsubsec getseginfo
+@findex getseginfo (10.5.4)
+@cindex multi-segment header (reading)
+@cindex segments (in multi-segment records)
+
+@example
+int getseginfo(WFDB_Segment **@var{psegarray})
+@end example
+@noindent
+@strong{Return:}
+@table @asis
+@item @t{(int)}
+number of segments belonging to the current input record
+@c @end group
+
+@noindent
+Invoking @code{getseginfo(@var{psegarray})}, where @var{psegarray} is
+declared to be of type @code{**WFDB_Seginfo}, sets @var{*psegarray} so
+that it points to an array of @code{WFDB_Seginfo} structures that
+describe the segments of the currently open (multi-segment) record.
+The return value indicates the number of segments (i.e., the number
+of valid @code{WFDB_Seginfo} structures in @var{*psegarray}.  If
+there is no current input record, or if the current input record is
+not a multi-segment record, this function returns 0 and does not modify
+@var{*psegarray}.
+
+contain the segments' names, lengths, and starting sample numbers.
+
+@c @group
+@node     wfdbquit, iannclose and oannclose, getseginfo, miscellaneous functions
 @unnumberedsubsec wfdbquit
 @findex wfdbquit
 @cindex closing WFDB files
@@ -4693,6 +4725,7 @@ given time.
 * WFDB_Calinfo structures::		Signal calibration specifications.
 * WFDB_Anninfo structures::		Annotator names and file types.
 * WFDB_Annotation structures::		Annotation contents.
+* WFDB_Seginfo structures::              Segment information.
 @end menu
 
 @node WFDB_Siginfo structures, WFDB_Calinfo structures, Data Types, Data Types
@@ -4994,7 +5027,7 @@ annotator 0 are distinct.  Annotator numbers are supplied to
 for an example of how to set the contents of an array of @code{WFDB_Anninfo}
 objects.
 
-@node WFDB_Annotation structures, , WFDB_Anninfo structures, Data Types
+@node WFDB_Annotation structures, WFDB_Seginfo structures, WFDB_Anninfo structures, Data Types
 @section Annotation Structures
 @cindex @code{WFDB_Annotation} structure (defined)
 @cindex annotation structure
@@ -5076,6 +5109,39 @@ allocated for each input annotator beginning with WFDB library version
 
 @xref{Example 3}, for a short program that examines the contents of a
 @code{WFDB_Annotation}.
+
+@node WFDB_Seginfo structures, , WFDB_Annotation structures, Data Types
+@section Segment Information Structures
+@cindex @code{WFDB_Seginfo} structure (defined)
+@cindex segment information structure
+@cindex structure (segment)
+
+Objects of type @code{WFDB_Seginfo} contain these fields:
+
+@table @code
+@item char recname[WFDB_MAXRNL+1]
+@cindex segment name
+
+Segment name (the name of the simple record corresponding
+to a segment of a multi-segment record), unless @code{recname}
+has the special value '@code{~}'.  In the latter case, the
+segment is a gap (i.e., it corresponds to an interval during
+which no signals are available).
+
+@item WFDB_Time nsamp
+@cindex segment length
+
+Segment length in samples.
+
+@item WFDB_Time samp0
+@cindex segment start
+
+Number of samples that precede the segment in the multi-segment record
+to which it belongs.  If the segment is opened as an individual
+record, its @code{n}th sample has sample number @code{n-1}, just as
+for any record.  If the record to which the segment belongs is opened,
+the @code{n}th sample in the segment has sample number @code{n-1+samp0}.
+@end table
 
 @node     Annotation Codes, Database Files, Data Types, Top
 @chapter Annotation Codes
@@ -8915,10 +8981,24 @@ WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
 @unnumberedsec WFDB 10.5
+@unnumberedsubsec Changes in version 10.5.4 (1 July 2010)
+
+Function @code{getseginfo()} has been introduced in WFDB library version
+10.5.4, to allow applications to obtain information about the
+segments belonging to the current (multi-segment) input record.
+
+In previous versions, integer arithmetic overflow was possible
+when converting format 32 samples using @code{aduphys()}, if the difference
+between the baseline value and the sample to be converted exceeded
+the range of signed 32-bit integers.  Although @code{rdsamp} does not
+use @code{aduphys()} similar code in @code{rdsamp} also exhibited this problem,
+which has now been corrected;  thanks to Ikaro Silva for
+reporting it and providing a test case.
+
 @unnumberedsubsec Changes in version 10.5.3 (22 June 2010)
 
-Function getgvmode() has been introduced in WFDB library version
-10.5.3, to allow querying the current operating mode of getvec().
+Function @code{getgvmode()} has been introduced in WFDB library version
+10.5.3, to allow querying the current operating mode of @code{getvec()}.
 
 @unnumberedsubsec Changes in version 10.5.2 (18 April 2010)
 
