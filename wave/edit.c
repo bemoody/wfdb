@@ -1,10 +1,10 @@
 /* file: edit.c		G. Moody	 1 May 1990
-			Last revised:	12 May 2009
+			Last revised:	12 July 2010
 Annotation-editing functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1990-2009 George B. Moody
+Copyright (C) 1990-2010 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -40,6 +40,7 @@ Panel_item level_mode_item, level_time_item;
 static char level_time_string[36];
 int bar_on, bar_x, bar_y;
 int level_mode, level_popup_active = -1;
+int selected = -1;
 
 void reset_ref()
 {
@@ -531,6 +532,42 @@ Notify_arg arg;
 	else if (e == ';') ann_template.anntyp = REF_MARK;
 	else if (e == '\r' && attached && attached->this.anntyp == LINK)
 	    parse_and_open_url(attached->this.aux);
+	else if (e == '+' && event_ctrl_is_down(event)) {
+	    /* Increase size of selected signal, if any */
+	    if (0 <= selected && selected < nsig)
+		vamp[selected] *= 1.1;
+	    /* or of all signals, otherwise */
+	    else
+		for (i = 0; i < nsig; i++)
+		    vamp[i] *= 1.1;
+	    vscale[0] = 0.0;
+	    calibrate();
+	    disp_proc(XV_NULL, (Event *) '.');
+	}
+	else if (e == '-' && event_ctrl_is_down(event)) {
+	    /* Decrease size of selected signal, if any */
+	    if (0 <= selected && selected < nsig)
+		vamp[selected] /= 1.1;
+	    /* or of all signals, otherwise */
+	    else
+		for (i = 0; i < nsig; i++)
+		    vamp[i] /= 1.1;
+	    vscale[0] = 0.0;
+	    calibrate();
+	    disp_proc(XV_NULL, (Event *) '.');
+	}
+	else if (e == '=' && event_ctrl_is_down(event)) {
+	    /* Reset size of selected signal, if any */
+	    if (0 <= selected && selected < nsig)
+		vamp[selected] = 1.0;
+	    /* or of all signals, otherwise */
+	    else
+		for (i = 0; i < nsig; i++)
+		    vamp[i] = 1.0;
+	    vscale[0] = 0.0;
+	    calibrate();
+	    disp_proc(XV_NULL, (Event *) '.');
+	}
 	else {
 	    static char es[2];
 
@@ -572,6 +609,7 @@ Notify_arg arg;
 	    else				/* <Find>: forward */
 		disp_proc(XV_NULL, (Event *) ']');
 	}
+	selected = -1;
 	break; 
 
       /* <F10> = +half-screen		<shift><F10> = -half_screen
@@ -595,6 +633,7 @@ Notify_arg arg;
 	}
 	if (event_is_down(event)) {
 	}
+	selected = -1;
 	break;
       case KEY_RIGHT(7):	/* home:
 				   Ignore key release events.
@@ -603,6 +642,7 @@ Notify_arg arg;
 				   the record. */
 	if (event_is_down(event))
 	    disp_proc(XV_NULL, (Event *) 'h');	/* strange but correct! */
+	selected = -1;
 	break;
       case KEY_RIGHT(13):	/* end:
 				   Ignore key release events.
@@ -611,6 +651,7 @@ Notify_arg arg;
 				   the record. */
 	if (event_is_down(event))
 	    disp_proc(XV_NULL, (Event *) 'e');
+	selected = -1;
 	break;
       case KEY_RIGHT(9):	/* page-up:
 				   Ignore key release events.
@@ -623,6 +664,7 @@ Notify_arg arg;
 	    else
 		disp_proc(XV_NULL, (Event *) '(');
 	}
+	selected = -1;
 	break;
       case KEY_RIGHT(15):	/* page-down:
 				   Ignore key release events.
@@ -635,6 +677,7 @@ Notify_arg arg;
 	    else
 		disp_proc(XV_NULL, (Event *) ')');
 	}
+	selected = -1;
 	break;
 
       case KEY_RIGHT(8):	/* up-arrow:
@@ -894,6 +937,8 @@ Notify_arg arg;
 		}
 		if (imin >= 0) {
 		    set_signal_choice(imin);
+		    if (selected == imin) selected = -1;
+		    else selected = imin;
 		    if (event_ctrl_is_down(event)) add_signal_choice();
 		    if (event_meta_is_down(event)) delete_signal_choice();
 		}

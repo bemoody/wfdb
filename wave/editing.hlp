@@ -163,3 +163,10 @@ keys (keys <2> and <8> on the numeric keypad; `Num Lock' must be off) to move
 it to the desired signal.  Hold down the <control> key during these operations
 to copy the annotation, rather than to move it (simultaneous annotations are
 permitted if their `chan' fields differ).
+
+It may be helpful to enlarge low-amplitude signals (or to reduce the size of
+very high-amplitude signals).  To do so, select the signal of interest by
+pointing to it, pressing the Shift key, and left-clicking.  Then enlarge or
+reduce the signal by pressing the Control key in combination with <+> or <->.
+If you have not selected a signal, these commands enlarge or reduce all signals.
+To reset the sizes to calibrated values, press Control and <=>.

@@ -4,7 +4,7 @@ Help panel functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 2002 George B. Moody
+Copyright (C) 1990-2010 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -239,7 +239,7 @@ void create_help_popup()
 	      0);
     xv_create(help_panel, PANEL_MESSAGE,
 	      PANEL_LABEL_STRING,
-	     "Copyright \251 1990-2001 George B. Moody.",
+	     "Copyright \251 1990-2010 George B. Moody.",
 	      0);
 
     xv_create(help_panel, PANEL_BUTTON,

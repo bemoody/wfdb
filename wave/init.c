@@ -1,10 +1,10 @@
 /* file: init.c		G. Moody	 1 May 1990
-			Last revised:   14 March 2008
+			Last revised:   12 July 2010
 Initialization functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1990-2008 George B. Moody
+Copyright (C) 1990-2010 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -74,6 +74,7 @@ int ns;
 	(level_units_string =
 		realloc(level_units_string, ns * sizeof(char **))) == NULL ||
 	(vscale = realloc(vscale, ns * sizeof(double))) == NULL ||
+	(vamp = realloc(vamp, ns * sizeof(double))) == NULL ||
 	(dc_coupled = realloc(dc_coupled, ns * sizeof(int))) == NULL ||
 	(sigbase = realloc(sigbase, ns * sizeof(int))) == NULL ||
 	(blabel = realloc(blabel, ns * sizeof(char *))) == NULL ||
@@ -90,7 +91,7 @@ int ns;
 	level_name[i] = level_value[i] = level_units[i] = (Panel_item)NULL;
 	dc_coupled[i] = scope_v[i] = vref[i] = level_v[i] = v[i] = v0[i] =
 	    vmax[i] = vmin[i] = 0;
-	vscale[i] = 1.0;
+	vscale[i] = vamp[i] = 1.0;
 	if ((level_name_string[i] = calloc(1, 12)) == NULL ||
 	    (level_value_string[i] = calloc(1, 12)) == NULL ||
 	    (level_units_string[i] = calloc(1, 12)) == NULL) {
@@ -283,7 +284,7 @@ void calibrate()
 	    calopen(cfname);
 
 	for (i = 0; i < nsig; i++) {
-	    vscale[i] = - millivolts(1) / df[i].gain;
+	    vscale[i] = - vamp[i] * millivolts(1) / df[i].gain;
 	    dc_coupled[i] = 0;
 	    if (getcal(df[i].desc, df[i].units, &ci) == 0 && ci.scale != 0.0) {
 		vscale[i] /= ci.scale;
