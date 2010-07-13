@@ -1,4 +1,4 @@
-10.5.4 (12 July 2010):
+10.5.4 (13 July 2010):
         Function getseginfo() has been introduced in WFDB library version
 	10.5.4, to allow applications to obtain information about the
 	segments belonging to the current (multi-segment) input record.
@@ -17,7 +17,8 @@
 	test case.
 
 	WAVE version 6.11, included in this release of the WFDB software
-	package, allows the user to resize signals independently, a frequently
+	package, allows the user to change display scales using keyboard
+        commands.  This allows one to resize signals independently, a frequently
  	requested feature.  For details, see "How can I enlarge or reduce the
  	size of individual signals?" in the WAVE FAQ (in WAVE, click on Help
 	and select "Frequently asked questions").

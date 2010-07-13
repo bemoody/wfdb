@@ -1,10 +1,10 @@
 /* file: search.c	G. Moody	17 October 1996
-			Last revised:    29 April 1999
+			Last revised:    13 July 2010
 Search template functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1999 George B. Moody
+Copyright (C) 1996-2010 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -135,7 +135,7 @@ static void match_selected_annotation()
     if (attached == NULL) return;
     xv_set(s_anntyp_item, PANEL_VALUE, attached->this.anntyp, NULL);
     xv_set(s_aux_item, PANEL_VALUE,
-	   attached->this.aux ? attached->this.aux+1 : "", NULL);
+	   attached->this.aux ? (char *)(attached->this.aux+1) : "", NULL);
     xv_set(s_subtyp_item, PANEL_VALUE, attached->this.subtyp, NULL);
     xv_set(s_chan_item, PANEL_VALUE, attached->this.chan, NULL);
     xv_set(s_num_item, PANEL_VALUE, attached->this.num, NULL);

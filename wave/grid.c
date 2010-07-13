@@ -1,10 +1,10 @@
 /* file: grid.c		G. Moody	 1 May 1990
-			Last revised:	10 June 2005
+			Last revised:	13 July 2010
 Grid drawing functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1990-2005 George B. Moody
+Copyright (C) 1990-2010 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -45,7 +45,7 @@ without redrawing it, by manipulating the color map. */
 void show_grid()
 {
     int i, ii, x, xx, y, yy;
-    double dx, dxfine, dy, dyfine;
+    double dx, dxfine, dy, dyfine, vm;
     static int oghf, ogvf, grid_hidden;
     static double odx, ody;
 
@@ -59,16 +59,20 @@ void show_grid()
     }
 
     /* Calculate the grid spacing in pixels */
+    if (tmag <= 0.0) tmag = 1.0;
     switch (gvflag) {
       case 0:
-      case 1: dx = seconds(0.2); break;
-      case 2: dx = seconds(0.2); dxfine = seconds(0.04); break;
-      case 3: dx = seconds(300.0); dxfine = seconds(60.0); break;
+      case 1: dx = tmag * seconds(0.2); break;
+      case 2: dx = tmag * seconds(0.2); dxfine = tmag * seconds(0.04); break;
+      case 3: dx = tmag * seconds(300.0); dxfine = tmag * seconds(60.0); break;
     }
+    if (vmag == NULL || vmag[0] == 0.0) vm = 1.0;
+    else vm = vmag[0];
     switch (ghflag) {
       case 0:
-      case 1: dy = millivolts(0.5); break;
-      case 2: dy = millivolts(0.5); dyfine = millivolts(0.1); break;
+      case 1: dy = vm * millivolts(0.5); break;
+      case 2: dy = vm * millivolts(0.5);
+	  dyfine = vm * millivolts(0.1); break;
     }
 
     /* The grid must be drawn if it has not been plotted already, if the grid

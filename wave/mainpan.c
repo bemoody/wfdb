@@ -1,5 +1,5 @@
 /* file: mainpan.c	G. Moody	30 April 1990
-			Last revised:	12 February 2010
+			Last revised:	13 July 2010
 Functions for the main control panel of WAVE
 
 -------------------------------------------------------------------------------
@@ -746,6 +746,9 @@ Event *event;
       case '!':		/* (from show_next_entry(), see logpan.c */
 	display_start_time = wstrtim((char *)xv_get(time_item, PANEL_VALUE));
 	if (display_start_time < 0L) display_start_time = -display_start_time;
+	cache_time = -1L;
+	break;
+      case '^':	/* Start at display_start_time. */
 	cache_time = -1L;
 	break;
       case ':':	/* End at time specified on panel. */

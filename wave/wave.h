@@ -1,5 +1,5 @@
 /* file: wave.h		G. Moody	26 April 1990
-			Last revised:   12 July 2010
+			Last revised:   13 July 2010
 Constants, macros, global variables, and function prototypes for WAVE
 
 -------------------------------------------------------------------------------
@@ -139,7 +139,7 @@ COMMON WFDB_Sample *vmax;
 COMMON WFDB_Sample *vmin;
 COMMON int *vvalid;
 
-COMMON double *vamp;			/* user-adjustable multiplier for
+COMMON double *vmag;			/* user-adjustable multiplier for
 					   resizing signal scales */
 COMMON double *vscale;			/* amplitude scales for each signal
 					   (pixels/adu) */
@@ -179,6 +179,8 @@ COMMON long ref_mark_time;		/* sample number of REF_MARK marker
 					   (or -1 if none) */
 COMMON double freq;			/* sampling frequency (Hz) */
 COMMON int atimeres;			/* annot time resolution in samples */
+COMMON double tmag;			/* user-adjustable multiplier for
+					   resizing time scale */
 COMMON double tscale;			/* time scale (pixels/samp interval) */
 COMMON double mmpermv;			/* amplitude scale for export */
 COMMON double mmpersec;			/* time scale for export */

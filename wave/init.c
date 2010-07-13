@@ -1,5 +1,5 @@
 /* file: init.c		G. Moody	 1 May 1990
-			Last revised:   12 July 2010
+			Last revised:   13 July 2010
 Initialization functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -74,7 +74,7 @@ int ns;
 	(level_units_string =
 		realloc(level_units_string, ns * sizeof(char **))) == NULL ||
 	(vscale = realloc(vscale, ns * sizeof(double))) == NULL ||
-	(vamp = realloc(vamp, ns * sizeof(double))) == NULL ||
+	(vmag = realloc(vmag, ns * sizeof(double))) == NULL ||
 	(dc_coupled = realloc(dc_coupled, ns * sizeof(int))) == NULL ||
 	(sigbase = realloc(sigbase, ns * sizeof(int))) == NULL ||
 	(blabel = realloc(blabel, ns * sizeof(char *))) == NULL ||
@@ -91,7 +91,7 @@ int ns;
 	level_name[i] = level_value[i] = level_units[i] = (Panel_item)NULL;
 	dc_coupled[i] = scope_v[i] = vref[i] = level_v[i] = v[i] = v0[i] =
 	    vmax[i] = vmin[i] = 0;
-	vscale[i] = vamp[i] = 1.0;
+	vscale[i] = vmag[i] = 1.0;
 	if ((level_name_string[i] = calloc(1, 12)) == NULL ||
 	    (level_value_string[i] = calloc(1, 12)) == NULL ||
 	    (level_units_string[i] = calloc(1, 12)) == NULL) {
@@ -230,6 +230,7 @@ char *s;
     /* Calculate the base levels (in display units) for each signal, and for
        annotation display. */
     set_baselines();
+    tmag = 1.0;
     vscale[0] = 0.;	/* force clear_cache() -- see calibrate() */
     calibrate();
 
@@ -284,7 +285,7 @@ void calibrate()
 	    calopen(cfname);
 
 	for (i = 0; i < nsig; i++) {
-	    vscale[i] = - vamp[i] * millivolts(1) / df[i].gain;
+	    vscale[i] = - vmag[i] * millivolts(1) / df[i].gain;
 	    dc_coupled[i] = 0;
 	    if (getcal(df[i].desc, df[i].units, &ci) == 0 && ci.scale != 0.0) {
 		vscale[i] /= ci.scale;
@@ -311,6 +312,7 @@ void calibrate()
     /* tscale is a multiplicative scale factor that converts sample intervals
        to window abscissas. */
     if (freq == 0.0) freq = WFDB_DEFFREQ;
-    nsamp = canvas_width_sec * freq;
-    tscale = seconds(1) / freq;
+    if (tmag <= 0.0) tmag = 1.0;
+    nsamp = canvas_width_sec * freq / tmag;
+    tscale = tmag * seconds(1) / freq;
 }

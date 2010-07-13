@@ -1,5 +1,5 @@
 /* file: edit.c		G. Moody	 1 May 1990
-			Last revised:	12 July 2010
+			Last revised:	13 July 2010
 Annotation-editing functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -535,11 +535,11 @@ Notify_arg arg;
 	else if (e == '+' && event_ctrl_is_down(event)) {
 	    /* Increase size of selected signal, if any */
 	    if (0 <= selected && selected < nsig)
-		vamp[selected] *= 1.1;
+		vmag[selected] *= 1.1;
 	    /* or of all signals, otherwise */
 	    else
 		for (i = 0; i < nsig; i++)
-		    vamp[i] *= 1.1;
+		    vmag[i] *= 1.1;
 	    vscale[0] = 0.0;
 	    calibrate();
 	    disp_proc(XV_NULL, (Event *) '.');
@@ -547,26 +547,67 @@ Notify_arg arg;
 	else if (e == '-' && event_ctrl_is_down(event)) {
 	    /* Decrease size of selected signal, if any */
 	    if (0 <= selected && selected < nsig)
-		vamp[selected] /= 1.1;
+		vmag[selected] /= 1.1;
 	    /* or of all signals, otherwise */
 	    else
 		for (i = 0; i < nsig; i++)
-		    vamp[i] /= 1.1;
+		    vmag[i] /= 1.1;
 	    vscale[0] = 0.0;
 	    calibrate();
 	    disp_proc(XV_NULL, (Event *) '.');
 	}
-	else if (e == '=' && event_ctrl_is_down(event)) {
-	    /* Reset size of selected signal, if any */
+	else if (e == '*' && event_ctrl_is_down(event)) {
+	    /* Invert selected signal, if any */
 	    if (0 <= selected && selected < nsig)
-		vamp[selected] = 1.0;
-	    /* or of all signals, otherwise */
+		vmag[selected] *= -1.0;
+	    /* or all signals, otherwise */
 	    else
 		for (i = 0; i < nsig; i++)
-		    vamp[i] = 1.0;
+		    vmag[i] *= -1.0;
 	    vscale[0] = 0.0;
 	    calibrate();
 	    disp_proc(XV_NULL, (Event *) '.');
+	}
+	else if (e == ')' && event_ctrl_is_down(event)) {
+	    /* Show more context, less detail (zoom out) */
+	    tmag /= 1.01;
+	    clear_cache();
+	    if (display_start_time < 0)
+		display_start_time = -display_start_time;
+	    display_start_time -= (nsamp + 100)/200;
+	    if (display_start_time < 0) display_start_time = 0;
+	    calibrate();
+	    disp_proc(XV_NULL, (Event *) '^');
+	}
+	else if (e == '(' && event_ctrl_is_down(event)) {
+	    /* Show less context, more detail (zoom in) */
+	    tmag *= 1.01;
+	    clear_cache();
+	    if (display_start_time < 0)
+		display_start_time = -display_start_time;
+	    display_start_time += (nsamp + 99)/198;
+	    calibrate();
+	    disp_proc(XV_NULL, (Event *) '^');
+	}
+	else if (e == '=' && event_ctrl_is_down(event)) {
+	    /* Reset size of selected signal, if any */
+	    if (0 <= selected && selected < nsig)
+		vmag[selected] = 1.0;
+	    /* or of all signals, otherwise */
+	    else
+		for (i = 0; i < nsig; i++)
+		    vmag[i] = 1.0;
+	    /* Reset time scale */
+	    tmag = 1.0;
+	    vscale[0] = 0.0;
+	    if (display_start_time < 0)
+		display_start_time = -display_start_time;
+	    display_start_time += nsamp/2;
+	    calibrate();
+	    display_start_time -= nsamp/2;
+	    if (display_start_time < 0)
+		display_start_time = 0;
+	    disp_proc(XV_NULL, (Event *) '^');
 	}
 	else {
 	    static char es[2];
@@ -599,9 +640,9 @@ Notify_arg arg;
       case KEY_TOP(9):		/* <F9>: same as <Find> */
 	if (event_is_down(event)) {
 	    if (event_shift_is_down(event)) {
-		if (event_ctrl_is_down(event))	/* <shift><Find>: end */
+		if (event_ctrl_is_down(event))	/* <ctrl><shift><Find>: home */
 		    disp_proc(XV_NULL, (Event *) 'h');
-		else				/* <ctrl><shift><Find>: home */
+		else				/* <shift><Find>: end */
 		    disp_proc(XV_NULL, (Event *) 'e');
 	    }
 	    else if (event_ctrl_is_down(event))	/* <ctrl>+<Find>: backward */

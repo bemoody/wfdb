@@ -164,9 +164,21 @@ it to the desired signal.  Hold down the <control> key during these operations
 to copy the annotation, rather than to move it (simultaneous annotations are
 permitted if their `chan' fields differ).
 
-It may be helpful to enlarge low-amplitude signals (or to reduce the size of
-very high-amplitude signals).  To do so, select the signal of interest by
-pointing to it, pressing the Shift key, and left-clicking.  Then enlarge or
-reduce the signal by pressing the Control key in combination with <+> or <->.
-If you have not selected a signal, these commands enlarge or reduce all signals.
-To reset the sizes to calibrated values, press Control and <=>.
+
+Changing the display scales ("zooming")
+---------------------------------------
+
+While editing, it may be helpful to change the time or amplitude scales.
+You may do so either using the controls on the View panel, or by using
+these keyboard commands while the focus is in the signal window:
+
+  <Ctrl>+<(>   Zoom in (show more detail by expanding the time axis)
+  <Ctrl>+<)>   Zoom out (show more context by compressing the time axis)
+  <Ctrl>+<+>   Increase the amplitude of the signal(s)
+  <Ctrl>+<->   Decrease the amplitude of the signal(s)
+  <Ctrl>+<*>   Invert the signal(s)
+  <Ctrl>+<=>   Restore the scales selected on the View panel
+
+If you have selected a signal (by <Shift>+<left click> near the signal of
+interest), amplitude changes will be applied to that signal only.  Otherwise,
+they will be applied to all signals.

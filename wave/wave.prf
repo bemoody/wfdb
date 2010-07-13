@@ -44,6 +44,7 @@ HELPDIR/html/wug/wug.ps on a PostScript printer.
 Summary of changes since version 6.0:
 
 - Resize signals by selecting them and using <ctrl>-<+> or <ctrl>-<->
+- Change time scale using <ctrl>-<(> and <ctrl>-<)>
 - Search for the next valid sample of a specified signal
 - XView full-screen pointer grab disabled for compatibility with recent X
   servers
