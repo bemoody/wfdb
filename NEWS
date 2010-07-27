@@ -1,3 +1,12 @@
+10.5.5 (27 July 2010):
+	Changes in conf/darwin.def and conf/darwin-slib.def allow creation
+	of multi-architecture (i386, x86_64, and ppc) binaries on Mac OS X.
+
+        Errors in the formatting of a variety of error and warning messages
+	have been corrected in app/ecgeval.c, app/psfd.c, app/rdsamp.c,
+	app/snip.c, app/sumstats.c, app/wrann.c, convert/mit2edf.c,
+	convert/mit2wav.c, convert/wfdb2mat.c, and psd/lomb.c.
+
 10.5.4 (13 July 2010):
         Function getseginfo() has been introduced in WFDB library version
 	10.5.4, to allow applications to obtain information about the

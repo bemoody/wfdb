@@ -1,8 +1,8 @@
 /* file: mit2wav.c	G. Moody	12 February 2003
-
+			Last revised:	  27 July 2010
 -------------------------------------------------------------------------------
 mit2wav: Convert WFDB format signal file(s) to .wav format
-Copyright (C) 2003 George B. Moody
+Copyright (C) 2003-2010 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -254,14 +254,15 @@ main(int argc, char **argv)
     (void)strcpy(tfname, "wavXXXXXX");
     (void)mkstemp(tfname);
     if ((ofile = fopen(tfname, "wb")) == NULL) {
-	(void)fprintf(stderr, "%s: can't create temporary file %s\n", tfname);
+	(void)fprintf(stderr, "%s: can't create temporary file %s\n",
+		      pname, tfname);
 	exit(1);
     }
     
     /* Write the header and format chunks, and the first 8 bytes of the
        data chunk, to the temporary file. */
     if (fwrite("RIFF", 1, 4, ofile) != 4) {
-	fprintf(stderr, "%s: can't write to %s\n", ofname);
+	fprintf(stderr, "%s: can't write to %s\n", pname, ofname);
 	exit(2);
     }
     out32(nsamp*framelen + 36);  /* nsamp*framelen sample bytes, and 36 more

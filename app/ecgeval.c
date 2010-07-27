@@ -1,9 +1,9 @@
 /* file: ecgeval.c	G. Moody	22 March 1992
-			Last revised:  30 November 2006
+			Last revised:   27 July 2010
 
 -------------------------------------------------------------------------------
 ecgeval: Generate and run a script of commands to compare sets of annotations
-Copyright (C) 1992-2006 George B. Moody
+Copyright (C) 1992-2010 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -384,17 +384,19 @@ main()
 	    getans(tans, 20);
 	    if (tans[0] == 'a') {
 		if ((sfile = fopen(scriptname, "a")) == NULL)
-		    (void)fprintf(stderr, "Sorry, I can't append to `%s'.\n");
+		    (void)fprintf(stderr, "Sorry, I can't append to `%s'.\n",
+				  scriptname);
 	    }
 	    else if (tans[0] == 'r') {
 		if ((sfile = fopen(scriptname, "w")) == NULL)
-		    (void)fprintf(stderr, "Sorry, I can't replace `%s'.\n");
+		    (void)fprintf(stderr, "Sorry, I can't replace `%s'.\n",
+				  scriptname);
 	    }
 	    else
 		sfile = NULL;
 	}
 	else if ((sfile = fopen(scriptname, "w")) == NULL)
-	    (void)fprintf(stderr, "Sorry, I can't create `%s'.\n");
+	    (void)fprintf(stderr, "Sorry, I can't create `%s'.\n", scriptname);
 
 	if (sfile == NULL)
 	    scriptname[0] = '\0';
@@ -424,17 +426,19 @@ main()
 	    getans(tans, 20);
 	    if (tans[0] == 'a') {
 		if ((rfile = fopen(reportname, "a")) == NULL)
-		    (void)fprintf(stderr, "Sorry, I can't append to `%s'.\n");
+		    (void)fprintf(stderr, "Sorry, I can't append to `%s'.\n",
+				  reportname);
 	    }
 	    else if (tans[0] == 'r') {
 		if ((rfile = fopen(reportname, "w")) == NULL)
-		    (void)fprintf(stderr, "Sorry, I can't replace `%s'.\n");
+		    (void)fprintf(stderr, "Sorry, I can't replace `%s'.\n",
+				  reportname);
 	    }
 	    else
 		rfile = NULL;
 	}
 	else if ((rfile = fopen(reportname, "w")) == NULL)
-	    (void)fprintf(stderr, "Sorry, I can't create `%s'.\n");
+	    (void)fprintf(stderr, "Sorry, I can't create `%s'.\n", reportname);
 
 	if (rfile == NULL)
 	    reportname[0] = '\0';

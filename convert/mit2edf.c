@@ -1,8 +1,8 @@
 /* file: mit2edf.c		G. Moody	2 November 2002
-				Last revised:    14 March 2009
+				Last revised:    27 July 2010
 -------------------------------------------------------------------------------
 Convert MIT format header and signal files to EDF (European Data Format) file
-Copyright (C) 2002-2009 George B. Moody
+Copyright (C) 2002-2010 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -328,7 +328,7 @@ char **argv;
 
     /* Number of samples per block. */
     for (i = 0; i < nsig; i++, p += 8) {
-	sprintf(buf, "%d", frames_per_block * si[i].spf);
+	sprintf(buf, "%ld", frames_per_block * si[i].spf);
 	strncpy(p, buf, strlen(buf));
     }
 
@@ -345,7 +345,7 @@ char **argv;
 	if (header[i] < 32 || header[i] > 126)
 	    fprintf(stderr,
 		    "WARNING (%s): output contains an invalid character, %d,"
-		    " at byte %ld\n", pname, header[i], i);
+		    " at byte %d\n", pname, header[i], i);
 
     /* In verbose mode, summarize what we've done so far. */
     if (vflag) {

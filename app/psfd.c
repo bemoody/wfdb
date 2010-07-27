@@ -1,9 +1,9 @@
 /* file: psfd.c		G. Moody         9 August 1988
-			Last revised:	  27 May 2009
+			Last revised:	  27 July 2010
 
 -------------------------------------------------------------------------------
 psfd: Produces annotated full-disclosure ECG plots on a PostScript device
-Copyright (C) 1988-2009 George B. Moody
+Copyright (C) 1988-2010 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -379,7 +379,7 @@ char *argv[];
 		if (Mflag < 0 || Mflag > 3) {
 		    (void)fprintf(stderr,
 			  "%s: incorrect format (%d) specified after -M\n",
-				  pname);
+				  pname, Mflag);
 		    exit(1);
 		}
 	    }

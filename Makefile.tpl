@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:    10 October 2008
+#				Last revised:    27 July 2010
 # This section of the Makefile should not need to be changed.
 
 # 'make' or 'make all': compile the WFDB applications without installing them
@@ -116,9 +116,11 @@ tarballs:	clean
 	rm -f ../$(PACKAGE)-MANIFEST ../$(PACKAGE).tar.gz \
 	  ../$(PACKAGE)-no-docs.tar.gz
 	cd lib; $(SETPERMISSIONS) *.h
-	cd ..; tar --create --file $(PACKAGE).tar.gz --verbose --gzip \
-          '--exclude=$(PACKAGE)/*CVS' $(PACKAGE) | sed s+${PACKAGE}/++ | \
-	  tee $(PACKAGE)-MANIFEST
+	cd ..; export COPYFILE_DISABLE=true; \
+	  tar --create --file $(PACKAGE).tar.gz --verbose --gzip \
+          '--exclude=$(PACKAGE)/*CVS' $(PACKAGE) 2>&1 | \
+	  sed "s+^a ++" | sed s+${PACKAGE}/++ | \
+          tee $(PACKAGE)-MANIFEST
 	cd ..; tar --create --file $(PACKAGE)-no-docs.tar.gz \
 	  --verbose --gzip \
           '--exclude=$(PACKAGE)/*doc' \

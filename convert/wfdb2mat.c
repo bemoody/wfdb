@@ -1,5 +1,5 @@
 /* file: wfdb2mat.c	G. Moody	26 February 2009
-			Last revised:	  16 March 2010
+			Last revised:	  27 July 2010
 -------------------------------------------------------------------------------
 wfdb2mat: Convert (all or part of) a WFDB signal file to Matlab .mat format
 Copyright (C) 2009-2010 George B. Moody
@@ -337,7 +337,7 @@ char *argv[];
 
     /* Summarize the contents of the .mat file. */
     printf("%s\n", p);
-    printf("val has %d row%s (signal%s) and %d column%s (sample%s/signal)\n",
+    printf("val has %d row%s (signal%s) and %ld column%s (sample%s/signal)\n",
 	   nosig, nosig == 1 ? "" : "s", nosig == 1 ? "" : "s",
 	   to-from, to == from+1 ? "" : "s", to == from+1 ? "" : "s");
     printf("Duration: %s\n", timstr(to-from));

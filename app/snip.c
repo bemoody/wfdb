@@ -1,8 +1,8 @@
 /* file: snip.c		G. Moody	30 July 1989
-			Last revised:	17 April 2009
+			Last revised:	27 July 2010
 -------------------------------------------------------------------------------
 snip: Copy an excerpt of a database record
-Copyright (C) 1989-2009 George B. Moody
+Copyright (C) 1989-2010 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -341,7 +341,7 @@ void copy_sig(char *nrec, char *irec, WFDB_Time from, WFDB_Time to, int recurse)
 	wfdb_fgets(buf, sizeof(buf), ihfile);
 
 	/* Start writing the master output header. */
-	fprintf(ohfile, "%s/%d %d %.12g %d", nrec, nseg, nsig, sfreq, to-from);
+	fprintf(ohfile, "%s/%d %d %.12g %ld", nrec, nseg, nsig, sfreq, to-from);
 	if (tstring[0]) fprintf(ohfile, " %s", tstring);
 	fprintf(ohfile, "\r\n");
 

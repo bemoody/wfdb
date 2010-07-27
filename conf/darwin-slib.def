@@ -1,5 +1,5 @@
 # file: darwin-slib.def	I. Henry and G. Moody	14 November 2002
-#				Last revised:	  13 May 2010
+#				Last revised:	  27 July 2010
 # Based on 'freebsd-slib.def'.
 
 # This section contains settings suitable for generating a shared library under
@@ -68,7 +68,7 @@ MFLAGS =
 
 # CFLAGS is the set of C compiler options used when compiling the shared
 # library.  CFLAGS should always include CCDEFS.
-CFLAGS = $(MFLAGS) -fPIC -fno-common -g -O $(CCDEFS) $(LC) -I$(INCDIR)
+CFLAGS = $(MFLAGS) -fPIC -fno-common -g -O $(CCDEFS) $(LC) -I$(INCDIR) -arch i386 -arch x86_64 -arch ppc
 
 # WFDBLIB_BASENAME is the name, without version numbers, of the alternate
 # library.  WFDBLIB_SONAME is the shared object name ("soname") of the
@@ -93,6 +93,7 @@ WFDBLIB = $(WFDBLIB_ROOT).$(MAJOR).$(MINOR).$(RELEASE).dylib
 # components have been compiled separately;  the list of *.o files that
 # make up the library will be appended to BUILDLIB.
 BUILDLIB = gcc $(MFLAGS) -dynamiclib \
+ -arch i386 -arch x86_64 -arch ppc \
  -install_name $(LIBDIR)/$(WFDBLIB_SONAME) \
  -compatibility_version $(MAJOR).$(MINOR) \
  -current_version $(MAJOR).$(MINOR).$(RELEASE) \

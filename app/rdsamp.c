@@ -1,5 +1,5 @@
-/* file: rdsamp.c	G. Moody	 23 June 1983
-			Last revised:   16 March 2010
+/* file: rdsamp.c	G. Moody	23 June 1983
+			Last revised:	27 July 2010
 
 -------------------------------------------------------------------------------
 rdsamp: Print an arbitrary number of samples from each signal
@@ -245,7 +245,6 @@ char *argv[];
 	}
 	else {	/* output in raw units */
 	    tnfmt = "'sample #'";
-	    //	    sprintf(tufmt, "'%g sec'", 1./freq);
 	    tfmt = "%ld";
 	    vfmt = ",%d";
 	}
@@ -298,7 +297,7 @@ char *argv[];
 	char *p, *t;
 	int j, l;
 
-	(void)printf(tnfmt);
+	(void)printf("%s", tnfmt);
 
 	for (i = 0; i < nsig; i++) {
 	    /* Check if a default signal description was provided by looking
@@ -338,7 +337,7 @@ char *argv[];
 	if (vflag) {
 	    char s[12];
 
-	    (void)printf(tufmt);
+	    (void)printf("%s", tufmt);
 
 	    for (i = 0; i < nsig; i++) {
 		p = si[sig[i]].units;
@@ -412,7 +411,7 @@ char *argv[];
 		    (void)printf(vfmt,
 		     ((double)v[sig[i]] - si[sig[i]].baseline)/si[sig[i]].gain);
 		else
-		    (void)printf(invalid);
+		    (void)printf("%s", invalid);
 	    }
 	    (void)printf("\n");
 	}

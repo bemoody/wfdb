@@ -1,9 +1,9 @@
 /* file: a2m.c		G. Moody        9 June 1983
-			Last revised:  24 July 2002
+			Last revised:  27 July 2010
 
 -------------------------------------------------------------------------------
 a2m: Convert an AHA format annotation file to MIT format
-Copyright (C) 2002 George B. Moody
+Copyright (C) 1983-2010 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -135,7 +135,8 @@ char *argv[];
 	    break;
 	  case 't':	/* file type follows */
 	    if (++i >= argc || (type = atoi(argv[i])) < 0 || type > 3) {
-		(void)fprintf(stderr, "%s: file type (0-3) must follow -t\n");
+		(void)fprintf(stderr, "%s: file type (0-3) must follow -t\n",
+			      pname);
 		exit(1);
 	    }
 	    break;

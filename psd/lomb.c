@@ -1,9 +1,8 @@
 /* file: lomb.c		G. Moody	12 February 1992
-			Last revised:	  10 June 2005
-
+			Last revised:	  27 July 2010
 -------------------------------------------------------------------------------
 lomb: Lomb periodogram of real data
-Copyright (C) 1992-2005 George B. Moody
+Copyright (C) 1992-2010 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -469,34 +468,34 @@ unsigned long input()
 
 	    if (64 * nmaxt * sizeof(float) < nmax) {
 		fprintf(stderr,
-		      "%s: insufficient memory, truncating input at row %d\n",
+		      "%s: insufficient memory, truncating input at row %lu\n",
 		      pname, npts);
 	        break;
 	    }
 	    if ((xt = (float *)realloc(x, nmaxt * sizeof(float))) == NULL) {
 		fprintf(stderr,
-		      "%s: insufficient memory, truncating input at row %d\n",
+		      "%s: insufficient memory, truncating input at row %lu\n",
 		      pname, npts);
 	        break;
 	    }
 	    x = xt;
 	    if ((yt = (float *)realloc(y, nmaxt * sizeof(float))) == NULL) {
 		fprintf(stderr,
-		      "%s: insufficient memory, truncating input at row %d\n",
+		      "%s: insufficient memory, truncating input at row %lu\n",
 		      pname, npts);
 	        break;
 	    }
 	    y = yt;
 	    if ((w1t = (float *)realloc(wk1,64*nmaxt*sizeof(float))) == NULL){
 		fprintf(stderr,
-		      "%s: insufficient memory, truncating input at row %d\n",
+		      "%s: insufficient memory, truncating input at row %lu\n",
 		      pname, npts);
 	        break;
 	    }
 	    wk1 = w1t;
 	    if ((w2t = (float *)realloc(wk2,64*nmaxt*sizeof(float))) == NULL){
 		fprintf(stderr,
-		      "%s: insufficient memory, truncating input at row %d\n",
+		      "%s: insufficient memory, truncating input at row %lu\n",
 		      pname, npts);
 	        break;
 	    }

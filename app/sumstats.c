@@ -1,8 +1,8 @@
 /* file: sumstats.c	G. Moody	17 August 1989
-   			Last revised:	19 August 2005
+   			Last revised:	 27 July 2010
 -------------------------------------------------------------------------------
 sumstats: Derive aggregate statistics from bxb, rxr, or epic line-format output
-Copyright (C) 1989-2005 George B. Moody
+Copyright (C) 1989-2010 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -287,7 +287,7 @@ char *s;
     static char rts[20], tts[20];
     static double rre, ds, dp, err, mref;
     static int cts, cfn, ctp, cfp, sts, sfn, stp, sfp, lts, lfn, ltp, lfp;
-    static int ets, efn, etp, efp;
+    static long ets, efn, etp, efp;
     static long nn, sn, vn, fn, on, ns, ss, vs, fs, os;
     static long nv, sv, vv, fv, ov, no, so, vo, fo;
     static long nx, sx, vx, fx, qx, st;
