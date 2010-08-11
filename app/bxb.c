@@ -1074,10 +1074,13 @@ int fflag;
     sstat("      F missed in shutdown", "%6.2f", Fx, Fn+Fs+Fv+Ff+Fq+Fo+Fx);
     if (fflag == 1 || fflag == 3 || fflag == 4 || fflag == 6)
 	(void)fprintf(sfile, "       Total shutdown time: ");
-    (void)fprintf(sfile, "%5ld seconds %ld %ld %ld %ld %ld\n", shut_down,
-		  Nn+Ns+Nv+Nf+Nq+No+Nx, Sn+Ss+Sv+Sf+Sq+So+Sx,
-		  Vn+Vs+Vv+Vf+Vq+Vo+Vx, Fn+Fs+Fv+Ff+Fq+Fo+Fx,
-		  Qn+Qs+Qv+Qf+Qq+Qo+Qx);
+    if (fflag != 2 && fflag != 5)
+        (void)fprintf(sfile, "%5ld seconds\n", shut_down);
+    else 
+        (void)fprintf(sfile, "%5ld seconds %ld %ld %ld %ld %ld\n", shut_down,
+		      Nn+Ns+Nv+Nf+Nq+No+Nx, Sn+Ss+Sv+Sf+Sq+So+Sx,
+		      Vn+Vs+Vv+Vf+Vq+Vo+Vx, Fn+Fs+Fv+Ff+Fq+Fo+Fx,
+		      Qn+Qs+Qv+Qf+Qq+Qo+Qx);
 }
 
 static char *help_strings[] = {
