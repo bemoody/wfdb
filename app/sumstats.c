@@ -1,5 +1,5 @@
 /* file: sumstats.c	G. Moody	17 August 1989
-   			Last revised:	 27 July 2010
+   			Last revised:	10 August 2010
 -------------------------------------------------------------------------------
 sumstats: Derive aggregate statistics from bxb, rxr, or epic line-format output
 Copyright (C) 1989-2010 George B. Moody
@@ -34,7 +34,8 @@ graphs" (ANSI/AAMI EC38:1998).  These standards are available from AAMI,
 #include <stdio.h>
 #include <wfdb/wfdb.h>
 
-static int nrec, NQS, NQP, NVS, NVP, NVF, NSVS, NSVP, NRRE;
+static int nrec, Nrec, Vrec, Frec;
+static int NQS, NQP, NVS, NVP, NVF, NSVS, NSVP, NRRE;
 static long Nn, Ns, Nv, No, Nx,
 	    Sn, Ss, Sv, So, Sx,
 	    Vn, Vs, Vv, Vo, Vx,
@@ -45,8 +46,9 @@ static long QTP, QFN, QFP, ST;
 static long CTS, CFN, CTP, CFP, STS, SFN, STP, SFP, LTS, LFN, LTP, LFP;
 static long ETS, EFN, ETP, EFP;
 static long NCS, NCP, NSS, NSP, NLS, NLP, NES, NEP, NDS, NDP;
+static long NT, VT, FT, QT;
 static long detected_episode_length, overlap, total_episode_length;
-static double CQS, CQP, CVS, CVP, CVF, CSVS, CSVP, CRRE;
+static double CQS, CQP, CVS, CVP, CVF, CSVS, CSVP, CRRE, CBM, CNM, CVM, CFM;
 static double CCS, CCP, CSS, CSP, CLS, CLP, CES, CEP, CDS, CDP, CERR, CMREF;
 char *pname;		/* name by which this program was invoked */
 
@@ -178,6 +180,18 @@ char *argv[];
 	(void)printf("______________\n");
 	(void)printf("Sum   %4ld %4ld %4ld %4ld", Nx, Vx, Fx, Qx);
 	(void)printf("                               %4ld seconds\n", ST);
+	(void)printf("Gross                    ");
+        pstat(" %6.2f", (double)Nx+Vx+Fx+Qx, (double)(NT+VT+FT+QT));
+	pstat(" %6.2f", (double)Nx, (double)(NT));
+	pstat(" %6.2f", (double)Vx, (double)(VT));
+	pstat(" %6.2f", (double)Fx, (double)(FT));
+	(void)printf("\n");
+	(void)printf("Average                  ");
+	pstat(" %6.2f", CBM, (double)nrec);
+	pstat(" %6.2f", CNM, (double)Nrec);
+	pstat(" %6.2f", CVM, (double)Vrec);
+	pstat(" %6.2f", CFM, (double)Frec);
+	(void)printf("\n");
 	break;
       case 3:	/* rxr VE run-by-run table */
       case 6:	/* rxr SVE run-by-run table */
@@ -287,6 +301,7 @@ char *s;
     static char rts[20], tts[20];
     static double rre, ds, dp, err, mref;
     static int cts, cfn, ctp, cfp, sts, sfn, stp, sfp, lts, lfn, ltp, lfp;
+    static int dummy, nt, vt, ft, qt;
     static long ets, efn, etp, efp;
     static long nn, sn, vn, fn, on, ns, ss, vs, fs, os;
     static long nv, sv, vv, fv, ov, no, so, vo, fo;
@@ -326,11 +341,19 @@ char *s;
 	return (1);
       case 2:	/* bxb -l shutdown report */
 	st = -1L;
-	(void)sscanf(s, "%s%ld%ld%ld%ld%s%s%s%s%ld", rec,
-	       &nx, &vx, &fx, &qx, mb, mn, mv, mf, &st);
+	(void)sscanf(s, "%s%ld%ld%ld%ld%s%s%s%s%ld seconds %ld%ld%ld%ld%ld",
+		     rec, &nx, &vx, &fx, &qx, mb, mn, mv, mf, &st,
+		     &nt, &dummy, &vt, &ft, &qt);
 	if (st < 0L) return (0);
 	Nx += nx; Vx += vx; Fx += fx; Qx += qx; ST += st;
-	nrec++;
+	NT += nt; VT += vt; FT += ft; QT += qt;
+	if (nt + vt + ft + qt) {
+	    CBM += (nx + vx + fx + qx)/(double)(nt + vt + ft + qt); nrec++;
+	    if (nt) { CNM += nx/(double)nt; Nrec++; NT += nt; }
+	    if (vt) { CVM += vx/(double)vt; Vrec++; VT += vt; }
+	    if (ft) { CFM += fx/(double)ft; Frec++; FT += ft; }
+	    QT += qt;
+	}
 	return (1);
       case 3:	/* rxr run-by-run report */
       case 6:

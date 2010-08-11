@@ -1,9 +1,9 @@
 /* file: bxb.c		G. Moody	14 December 1987
-			Last revised:	24 November 2002
+			Last revised:	 10 August 2010
 
 -------------------------------------------------------------------------------
 bxb: ANSI/AAMI-standard beat-by-beat annotation file comparator
-Copyright (C) 2002 George B. Moody
+Copyright (C) 2010 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -1074,7 +1074,10 @@ int fflag;
     sstat("      F missed in shutdown", "%6.2f", Fx, Fn+Fs+Fv+Ff+Fq+Fo+Fx);
     if (fflag == 1 || fflag == 3 || fflag == 4 || fflag == 6)
 	(void)fprintf(sfile, "       Total shutdown time: ");
-    (void)fprintf(sfile, "%5ld seconds\n", shut_down);
+    (void)fprintf(sfile, "%5ld seconds %ld %ld %ld %ld %ld\n", shut_down,
+		  Nn+Ns+Nv+Nf+Nq+No+Nx, Sn+Ss+Sv+Sf+Sq+So+Sx,
+		  Vn+Vs+Vv+Vf+Vq+Vo+Vx, Fn+Fs+Fv+Ff+Fq+Fo+Fx,
+		  Qn+Qs+Qv+Qf+Qq+Qo+Qx);
 }
 
 static char *help_strings[] = {

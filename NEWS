@@ -2,6 +2,12 @@
 	Changes in conf/darwin.def and conf/darwin-slib.def allow creation
 	of multi-architecture (i386, x86_64, and ppc) binaries on Mac OS X.
 
+	Virginia Faro-Maza pointed out that sumstats did not derive aggregate
+	shutdown statistics described in ANSI/AAMI EC57, and that bxb did not
+	preserve the raw data needed to derive these statistics.  Both bxb.c
+	and sumstats.c have been revised in this release to remedy these
+	omissions.
+
         Errors in the formatting of a variety of error and warning messages
 	have been corrected in app/ecgeval.c, app/psfd.c, app/rdsamp.c,
 	app/snip.c, app/sumstats.c, app/wrann.c, convert/mit2edf.c,
