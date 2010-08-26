@@ -1,4 +1,4 @@
-.TH RDSAMP 1 "6 November 2009" "WFDB 10.4.25" "WFDB Applications Guide"
+.TH RDSAMP 1 "25 August 2010" "WFDB 10.5.5" "WFDB Applications Guide"
 .SH NAME
 rdsamp \- read WFDB signal files
 .SH SYNOPSIS
@@ -91,6 +91,11 @@ related signals often differ only at the end, this helps to make the
 columns identifiable).  Names of units are shortened when necessary by
 omitting the final characters, since the initial characters are
 usually most important for distinguishing different units.
+.TP
+\fB-X\fR
+Produce output in WFDB-XML format (same as the CSV format produced using
+the \fB-c\fR option, but wrapped within an XML header and trailer).  This
+format is recognized and parsed automatically by \fBwrsamp\fR.
 
 .SH ENVIRONMENT
 .PP

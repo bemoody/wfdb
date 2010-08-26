@@ -1,5 +1,5 @@
 /* file: wrsamp.c	G. Moody	10 August 1993
-			Last revised:    1 July 2010
+			Last revised:   25 August 2010
 
 -------------------------------------------------------------------------------
 wrsamp: Select fields or columns from a file and generate a WFDB record
@@ -205,7 +205,7 @@ char *argv[];
 {
     char **ap, *cp, **desc, *gain = "", *ifname = "(stdin)",
 	*line = NULL, ofname[40], *p, *record = NULL, rsep = '\n',
-	*scale = "", sflag = 0, trim = 0, **units, *prog_name();
+	*scale = "", sflag = 0, trim = 0, Xflag = 0, **units, *prog_name();
     static char btime[25];
     double freq = WFDB_DEFFREQ, *scalef, v;
 #ifndef atof
@@ -355,6 +355,31 @@ char *argv[];
 	    (void)fprintf(stderr, "%s: no newlines in input\n", pname);
 	exit(3);
     }
+
+    /* Consume but do not interpret WFDB-XML prolog if present. */
+    if (strncmp(line, "<?xml ", 6) == 0) {
+	Xflag = zflag = 1; /* ignore column 0 */
+	do {
+	    if ((line = read_line(ifile, rsep)) == NULL) {
+		(void)fprintf(stderr,
+			      "%s: XML input, but no <wfdbsampleset> found\n",
+			      pname);
+		exit(1);
+	    }
+	} while (strcmp(line, "<wfdbsampleset>"));
+	do {
+	    if ((line = read_line(ifile, rsep)) == NULL) {
+		(void)fprintf(stderr, "%s: empty <wfdbsampleset>\n", pname);
+		exit(1);
+	    }
+	    if (strncmp(line, "<samplingfrequency>", 19) == 0)
+		sscanf(line+19, "%lf", &freq);
+	} while (strcmp(line, "<v>"));
+	if ((line = read_line(ifile, rsep)) == NULL) {
+	    (void)fprintf(stderr, "%s: empty <wfdbsampleset>\n", pname);
+	    exit(1);
+	}
+    }		 
  
     /* unless -s was given, note if it contains any tab characters */
     if (sflag == 0 && line_has_tab(line))
@@ -414,7 +439,7 @@ char *argv[];
 	else {
 	    char tdesc[16];
 
-	    (void)sprintf(tdesc, "olumn %d", fv[i]);
+	    (void)sprintf(tdesc, "col %d", fv[i]);
 	    SSTRCPY(si[i].desc, tdesc);
 	}
 	si[i].units = "";
@@ -518,6 +543,14 @@ char *argv[];
 	}
 	if (putvec(vout) < 0) break;
 	line = read_line(ifile, rsep);
+	if (line && Xflag && strncmp(line, "</v>", 4) == 0) {
+	    if (line = read_line(ifile, rsep))
+		if (strcmp(line, "</wfdbsampleset>")) {
+		    fprintf(stderr, 
+			  "%s: (warning) unexpected EOF in XML input\n", pname);
+		}
+	    break;
+	}
     }
 
     /* write the header */

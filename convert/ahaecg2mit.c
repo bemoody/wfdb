@@ -1,5 +1,5 @@
 /* file: ahaecg2mit.c		G. Moody		7 May 2008
-
+.				Last revised:	       24 August 2010
 Convert a *.ecg file from an AHA Database DVD to WFDB-compatible format
 */
 
@@ -10,7 +10,7 @@ Convert a *.ecg file from an AHA Database DVD to WFDB-compatible format
 main(int argc, char **argv)
 {
     char *p, *record;
-    int i, sflag;
+    int i, sflag = 0;
     FILE *ifile;
     void process(char *r, FILE *f);
 
@@ -84,6 +84,6 @@ void process(char *record, FILE *ifile)
     }
     (void)newheader(record);
     wfdbquit();
-    fprintf(stderr, "wrote %s.atr, $s.dat, and %s.hea\n", record,record,record);
+    fprintf(stderr, "wrote %s.atr, %s.dat, and %s.hea\n", record,record,record);
     return;
 }

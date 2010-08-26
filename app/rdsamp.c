@@ -1,5 +1,5 @@
-/* file: rdsamp.c	G. Moody	23 June 1983
-			Last revised:	27 July 2010
+/* file: rdsamp.c	G. Moody	 23 June 1983
+			Last revised:	25 August 2010
 
 -------------------------------------------------------------------------------
 rdsamp: Print an arbitrary number of samples from each signal
@@ -38,6 +38,12 @@ _______________________________________________________________________________
 #define HHMMSS	    7
 #define SAMPLES     8
 
+#define WFDBXMLPROLOG  "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" \
+ "<?xml-stylesheet type=\"text/xsl\"" \
+ " href=\"wfdb.xsl\"?>\n" \
+ "<!DOCTYPE wfdbsampleset PUBLIC \"-//PhysioNet//DTD WFDB 1.0//EN\"" \
+ " \"http://physionet.org/physiobank/database/XML/wfdb.dtd\">\n"
+
 char *pname;
 
 main(argc, argv)
@@ -47,7 +53,7 @@ char *argv[];
     char *record = NULL, *search = NULL, *escapify(), *prog_name();
     char *invalid, *snfmt, *tfmt, *tnfmt, *tufmt, *vfmt, speriod[16], tustr[16];
     int cflag = 0, highres = 0, i, isiglist, nsig, nosig = 0, pflag = 0, s,
-	*sig = NULL, timeunits = SECONDS, vflag = 0;
+	*sig = NULL, timeunits = SECONDS, vflag = 0, xflag = 0;
     WFDB_Frequency freq;
     WFDB_Sample *v;
     WFDB_Siginfo *si;
@@ -131,6 +137,9 @@ char *argv[];
 	    break;
 	  case 'v':	/* verbose output -- include column headings */
 	    vflag = 1;
+	    break;
+	  case 'X':	/* output in WFDB-XML format */
+	    xflag = cflag = 1;  /* format is CSV inside an XML wrapper */
 	    break;
 	  default:
 	    (void)fprintf(stderr, "%s: unrecognized option %s\n", pname,
@@ -292,6 +301,12 @@ char *argv[];
 	}
     }
 
+    /* Print WFDB-XML prolog if '-x' option selected. */
+    if (xflag) {
+	printf(WFDBXMLPROLOG);
+	printf("<wfdbsampleset>\n"
+	       "<samplingfrequency>%g</samplingfrequency>\n<v>\n", freq);
+    }
     /* Print column headers if '-v' option selected. */
     if (vflag) {
 	char *p, *t;
@@ -426,6 +441,9 @@ char *argv[];
 	}
     }
 
+    if (xflag)		/* print trailer if WFDB-XML output was selected */
+	printf("</v>\n</wfdbsampleset>\n");
+
     exit(0);
 }
 
@@ -493,6 +511,7 @@ static char *help_strings[] = {
  "		the time specified with -f, and begin printing then",
  " -t TIME     stop at specified time",
  " -v          print column headings",
+ " -X          output in WFDB-XML format",
 NULL
 };
 

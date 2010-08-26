@@ -1,4 +1,17 @@
-10.5.5 (27 July 2010):
+10.5.5 (25 August 2010):
+	WFDB-compatible signals can now be converted to a simple XML format
+	using rdsamp's new '-X' option, and XML files in this format can be
+	converted to WFDB-compatible format using wrsamp (which recognizes
+	this format automatically, requiring no special option).  A document
+	type description of this format, and of XML formats for annotation
+	and header files, is available at
+		http://physionet.org/physiobank/database/XML/wfdb.dtd
+	Applications that convert WFDB-compatible annotation and header files
+	to and from these XML formats are available at
+		http://physionet.org/physiotools/wfdb-xml/
+	These may be incorporated into a future version of the WFDB Software
+	Package.
+
 	Changes in conf/darwin.def and conf/darwin-slib.def allow creation
 	of multi-architecture (i386, x86_64, and ppc) binaries on Mac OS X.
 
@@ -7,6 +20,11 @@
 	preserve the raw data needed to derive these statistics.  Both bxb.c
 	and sumstats.c have been revised in this release to remedy these
 	omissions.
+
+	An uninitialized flag may have made ahaecg2mit behave as if its -s
+ 	option was always given, and an informational message contained
+	a formatting error;  both problems have been corrected, thanks to
+	a report from Isaac Henry.
 
         Errors in the formatting of a variety of error and warning messages
 	have been corrected in app/ecgeval.c, app/psfd.c, app/rdsamp.c,
