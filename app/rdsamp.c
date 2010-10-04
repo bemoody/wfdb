@@ -1,5 +1,5 @@
 /* file: rdsamp.c	G. Moody	 23 June 1983
-			Last revised:	25 August 2010
+			Last revised:	30 August 2010
 
 -------------------------------------------------------------------------------
 rdsamp: Print an arbitrary number of samples from each signal
@@ -139,7 +139,7 @@ char *argv[];
 	    vflag = 1;
 	    break;
 	  case 'X':	/* output in WFDB-XML format */
-	    xflag = cflag = 1;  /* format is CSV inside an XML wrapper */
+	    xflag = cflag = vflag = 1; /* format is CSV inside an XML wrapper */
 	    break;
 	  default:
 	    (void)fprintf(stderr, "%s: unrecognized option %s\n", pname,
@@ -305,7 +305,7 @@ char *argv[];
     if (xflag) {
 	printf(WFDBXMLPROLOG);
 	printf("<wfdbsampleset>\n"
-	       "<samplingfrequency>%g</samplingfrequency>\n<v>\n", freq);
+	       "<samplingfrequency>%g</samplingfrequency>\n<v>\n<names>", freq);
     }
     /* Print column headers if '-v' option selected. */
     if (vflag) {
@@ -339,7 +339,7 @@ char *argv[];
 		p = escapify(p);
 	    (void)printf(snfmt, p);
 	}
-    
+	if (xflag) (void)printf("</names>");
 	(void)printf("\n");
     }
 
@@ -352,6 +352,7 @@ char *argv[];
 	if (vflag) {
 	    char s[12];
 
+	    if (xflag) (void)printf("<units>");
 	    (void)printf("%s", tufmt);
 
 	    for (i = 0; i < nsig; i++) {
@@ -374,7 +375,7 @@ char *argv[];
 		    (void)printf(",'%s'", p);
 		}
 	    }
-
+	    if (xflag) (void)printf("</units>");
 	    (void)printf("\n");
 	}
 

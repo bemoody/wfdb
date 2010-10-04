@@ -1,8 +1,8 @@
 /* file sortann.c	G. Moody	 7 April 1997
-			Last revised:	4 February 2009
+			Last revised:	4 October 2010
 -------------------------------------------------------------------------------
 sortann: Rearrange annotations in canonical order
-Copyright (C) 1997-2009 George B. Moody
+Copyright (C) 1997-2010 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -162,9 +162,9 @@ char *argv[];
 	exit(1);
     }
 
-    /* By setting WFDBNOSORT, we ensure that wfdbquit won't invoke this program
+    /* By setting WFDBANNSORT, we ensure that wfdbquit won't invoke this program
        recursively if something goes wrong. */
-    putenv("WFDBNOSORT=1");
+    putenv("WFDBANNSORT=0");
 
     if ((sps = sampfreq(record)) < 0.)
 	(void)setsampfreq(sps = WFDB_DEFFREQ);
@@ -245,9 +245,12 @@ WFDB_Annotation *pa;
 	(newp->annotation).aux = p;
     }
     if (lastp == &annlist ||
-	pa->chan > (lastp->annotation).chan ||
-	pa->num > (lastp->annotation).num ||
-	pa->time > (lastp->annotation).time) {
+	pa->time > (lastp->annotation).time ||
+	(pa->time == (lastp->annotation).time &&
+	 pa->num > (lastp->annotation).num) ||
+	(pa->time == (lastp->annotation).time &&
+	 pa->num == (lastp->annotation).num &&
+	 pa->chan > (lastp->annotation).chan)) {
 	/* this annotation is in order -- add to end of list */
 	newp->prev = lastp;
 	lastp->next = newp;

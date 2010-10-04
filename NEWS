@@ -1,4 +1,4 @@
-10.5.5 (25 August 2010):
+10.5.5 (4 October 2010):
 	WFDB-compatible signals can now be converted to a simple XML format
 	using rdsamp's new '-X' option, and XML files in this format can be
 	converted to WFDB-compatible format using wrsamp (which recognizes
@@ -11,6 +11,11 @@
 		http://physionet.org/physiotools/wfdb-xml/
 	These may be incorporated into a future version of the WFDB Software
 	Package.
+
+	Since version 10.4.14, app/sortann has not properly sorted annotations
+        containing non-zero 'chan' or 'num' fields.  This bug has now been
+	fixed;  thanks to Jesus Maria Rodriguez Presedo for reporting it and
+	for providing a test case.
 
 	Changes in conf/darwin.def and conf/darwin-slib.def allow creation
 	of multi-architecture (i386, x86_64, and ppc) binaries on Mac OS X.
