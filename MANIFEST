@@ -576,3 +576,15 @@ wave/xview-patches
 wave/xvwave.c
 wave/xvwave.h
 wfdb.spec
+xml
+xml/annxml.c
+xml/heaxml.c
+xml/Makefile
+xml/Makefile.top
+xml/Makefile.tpl
+xml/README
+xml/wfdb.dtd
+xml/wfdb.xsl
+xml/xmlann.c
+xml/xmlhea.c
+xml/xmlproc.h

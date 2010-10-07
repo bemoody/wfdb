@@ -15,6 +15,9 @@ Requires: curl-devel >= 7.10
 BuildRoot: /var/tmp/%{name}-root
 
 %changelog
+* Wed Oct 6 2010 George B Moody <george@mit.edu>
+- added annxml, heaxml, xmlann, xmlhea
+
 * Sun May 3 2009 George B Moody <george@mit.edu>
 - moved wfdb-config from devel to apps
 
@@ -139,6 +142,7 @@ power spectrum estimation, and many others.
 %{_bindir}/ahaconvert
 %{_bindir}/ahaecg2mit
 %{_bindir}/ann2rr
+%{_bindir}/annxml
 %{_bindir}/bxb
 %{_bindir}/calsig
 %{_bindir}/coherence
@@ -148,6 +152,7 @@ power spectrum estimation, and many others.
 %{_bindir}/epicmp
 %{_bindir}/fft
 %{_bindir}/fir
+%{_bindir}/heaxml
 %{_bindir}/hrfft
 %{_bindir}/hrlomb
 %{_bindir}/hrmem
@@ -208,6 +213,8 @@ power spectrum estimation, and many others.
 %{_bindir}/wrann
 %{_bindir}/wrsamp
 %{_bindir}/xform
+%{_bindir}/xmlann
+%{_bindir}/xmlhea
 %{_libdir}/ps
 %{_mandir}
 

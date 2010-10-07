@@ -1,5 +1,5 @@
 /* file: wrsamp.c	G. Moody	10 August 1993
-			Last revised:   25 August 2010
+			Last revised:   6 October 2010
 
 -------------------------------------------------------------------------------
 wrsamp: Select fields or columns from a file and generate a WFDB record
@@ -33,6 +33,8 @@ _______________________________________________________________________________
 #define DITHER	        (((double)rand() + (double)rand())/RAND_MAX - 1.0)
 
 char *pname;
+unsigned int ncols = 0;
+unsigned int nosig = 0;
 
 char *read_line(FILE *ifile, char rsep)
 {
@@ -130,6 +132,8 @@ Tokenarray *parseline(char *line, Parsemode *pmode)
     int i, m = (strlen(line) + 1)/2, n = 0, state = 0;
     char d, *p, *q = NULL;
 
+    if (m < nosig) m = nosig;
+    if (m < ncols) m = ncols;
     SSTRCPY(tbuf, line);
     p = tbuf-1;
     SREALLOC(ta, sizeof(int)*2 + sizeof(char *)*m, 1);
@@ -206,12 +210,12 @@ char *argv[];
     char **ap, *cp, **desc, *gain = "", *ifname = "(stdin)",
 	*line = NULL, ofname[40], *p, *record = NULL, rsep = '\n',
 	*scale = "", sflag = 0, trim = 0, Xflag = 0, **units, *prog_name();
-    static char btime[25];
+    static char btime[25], **dstrings, **ustrings;
     double freq = WFDB_DEFFREQ, *scalef, v;
 #ifndef atof
     double atof();
 #endif
-    int c, cf = 0, dflag = 0, format = 16, *fv = NULL, i, labels, mf, zflag = 0;
+    int c, cf = 0, dflag = 0, format = 16, *fv = NULL, i, j, mf, zflag = 0;
     FILE *ifile = stdin;
     long t = 0L, t0 = 0L, t1 = 0L;
 #ifndef atol
@@ -220,7 +224,6 @@ char *argv[];
     Tokenarray *ta;
     WFDB_Sample *vout;
     WFDB_Siginfo *si;
-    unsigned int nf = 0;
     void help();
 
     pname = prog_name(argv[0]);
@@ -338,7 +341,11 @@ char *argv[];
 	}
     }
 
-    /* read the first line of the input file */
+    nosig = argc - i;	/* any remaining arguments are column numbers */
+
+    /* Determine the number of input columns, and (if present) the signal
+       names and the units for each signal.  Start by reading the first line
+       of the input file. */
     if ((line = read_line(ifile, rsep)) == NULL) {
 	if (rsep != '\n') {
 	    if (record == NULL)
@@ -355,8 +362,7 @@ char *argv[];
 	    (void)fprintf(stderr, "%s: no newlines in input\n", pname);
 	exit(3);
     }
-
-    /* Consume but do not interpret WFDB-XML prolog if present. */
+    /* Recognize WFDB-XML format if present. */
     if (strncmp(line, "<?xml ", 6) == 0) {
 	Xflag = zflag = 1; /* ignore column 0 */
 	do {
@@ -374,75 +380,112 @@ char *argv[];
 	    }
 	    if (strncmp(line, "<samplingfrequency>", 19) == 0)
 		sscanf(line+19, "%lf", &freq);
-	} while (strcmp(line, "<v>"));
+	    else if (strncmp(line, "<description>", 13) == 0) {
+		line[strlen(line)-14] = '\0';	/* strip </description> */
+		ta = parseline(line+13, NULL);	/* skip <description> */
+		SUALLOC(dstrings, ta->ntokens, sizeof(char *));
+		for (i = 0; i < ta->ntokens; i++)
+		    SSTRCPY(dstrings[i], ta->token[i]);
+		ncols = ta->ntokens;
+	    }
+	    else if (strncmp(line, "<units>", 7) == 0) {
+		line[strlen(line)-8] = '\0';	/* strip </units> */
+		ta = parseline(line+7, NULL);	/* skip <units> */
+		SUALLOC(ustrings, ta->ntokens, sizeof(char *));
+		for (i = 0; i < ta->ntokens; i++)
+		    SSTRCPY(ustrings[i], ta->token[i]);
+	    }
+	} while (strcmp(line, "<samplevectors>"));
 	if ((line = read_line(ifile, rsep)) == NULL) {
 	    (void)fprintf(stderr, "%s: empty <wfdbsampleset>\n", pname);
 	    exit(1);
 	}
     }		 
- 
-    /* unless -s was given, note if it contains any tab characters */
-    if (sflag == 0 && line_has_tab(line))
-	defpmode.delim = "\t";
 
-    /* note if it contains any alphabetic characters */
-    labels = line_has_alpha(line);
-
-    /* parse it into tokens */
-    ta = parseline(line, NULL);
-
-    /* read selected column numbers into fv[...] */
-    if (i < argc) {
-	SUALLOC(fv, argc - i, sizeof(int));
-	while (i < argc) {
-	    if (sscanf(argv[i++], "%d", &fv[nf]) != 1 ||
-		fv[nf] < 0 || fv[nf] >= ta->ntokens) {
-		(void)fprintf(stderr, "%s: unrecognized argument %s\n",
-			      pname, argv[--i]);
+    else {	/* non-XML input */
+	/* Unless -s was given, note if line 0 contains any tab characters. */
+	if (sflag == 0 && line_has_tab(line))
+	    defpmode.delim = "\t";
+	/* If it contains any alphabetic characters, save the signal names. */
+	if (line_has_alpha(line)) {
+	    ta = parseline(line, NULL);
+	    SALLOC(dstrings, ta->ntokens, sizeof(char *));
+	    for (i = 0; i < ta->ntokens; i++) {
+		while (*(ta->token[i]) == ' ')
+		    (ta->token[i])++;
+		SSTRCPY(dstrings[i], ta->token[i]);
+	    }
+	    ncols = ta->ntokens;
+	    /* Read the second line. */
+	    if ((line = read_line(ifile, rsep)) == NULL) {
+		(void)fprintf(stderr, "%s: no data\n", pname);
 		exit(1);
 	    }
-	    nf++;
+	    /* If it has any alphabetic characters, save the unit strings. */
+	    else if (line_has_alpha(line)) {
+		ta = parseline(line, NULL);
+		SALLOC(ustrings, ta->ntokens, sizeof(char *));
+		for (i = 0; i < ta->ntokens; i++) {
+		    while (*(ta->token[i]) == ' ')
+			(ta->token[i])++;
+		    if (*(ta->token[i]) == '(')
+		        (ta->token[i])++;
+		    SSTRCPY(ustrings[i], ta->token[i]);
+		}
+		/* Read the third line. */
+		if ((line = read_line(ifile, rsep)) == NULL) {
+		    (void)fprintf(stderr, "%s: no data\n", pname);
+		    exit(1);
+		}
+	    }
 	}
     }
-    /* if no columns were specified, copy all columns (or all except 0) */
-    else {
-	int i, j;
-
-	nf = ta->ntokens - zflag;
-	SUALLOC(fv, nf, sizeof(int));
-	for (i = 0, j = zflag; i < nf; i++, j++)
+ 
+    /* read selected column numbers into fv[...] */
+    if (nosig) {
+	SUALLOC(fv, nosig, sizeof(int));
+	for (i = argc - nosig, j = 0; i < argc; i++, j++) {
+	    if (sscanf(argv[i], "%d", &fv[j]) != 1 ||
+		fv[j] < 0 || fv[j] >= ncols) {
+		(void)fprintf(stderr, "%s: unrecognized argument %s\n",
+			      pname, argv[i]);
+		exit(1);
+	    }
+	}
+    }
+    else { /* copy all column numbers (or all except 0) into fv[...] */
+	nosig = ncols - zflag;
+	SUALLOC(fv, nosig, sizeof(int));
+	for (i = 0, j = zflag; i < nosig; i++, j++)
 	    fv[i] = j;
     }
 
-    /* allocate arrays */
-    SUALLOC(vout, nf, sizeof(WFDB_Sample));
-    SUALLOC(si, nf, sizeof(WFDB_Siginfo));
-    SUALLOC(scalef, nf, sizeof(double));
+    SUALLOC(vout, nosig, sizeof(WFDB_Sample));
+    SUALLOC(si, nosig, sizeof(WFDB_Siginfo));
+    SUALLOC(scalef, nosig, sizeof(double));
 
-     /* open the output record */
+    /* open the output record */
     if (record == NULL)
 	(void)sprintf(ofname, "-");
     else
 	(void)sprintf(ofname, "%s.dat", record);
-    for (i = 0; i < nf; i++) {
+ 
+    for (i = 0; i < nosig; i++) {
 	si[i].fname = ofname;
-	si[i].desc = NULL;
-	if (labels) { /* set the signal descriptions from the column headings */
-	    char *p = ta->token[fv[i]], *q;
-
-	    while (*p == ' ') p++;
-	    q = p + strlen(p);
-	    while (*(q-1) == ' ') q--;
-	    *q = '\0';
-	    SSTRCPY(si[i].desc, p);
+	if (dstrings) {
+	    SSTRCPY(si[i].desc, dstrings[fv[i]]);
 	}
 	else {
 	    char tdesc[16];
-
+	    
 	    (void)sprintf(tdesc, "col %d", fv[i]);
 	    SSTRCPY(si[i].desc, tdesc);
 	}
-	si[i].units = "";
+	if (ustrings) {
+	    SSTRCPY(si[i].units, ustrings[fv[i]]);
+	}
+	else
+	    si[i].units = "";
 	si[i].group = 0;
 	si[i].fmt = format;
 	si[i].spf = 1;
@@ -474,39 +517,11 @@ char *argv[];
 		scale++;
     }
 
-    if (labels) {	/* read the second line of input */
-	if ((line = read_line(ifile, rsep)) == NULL) {
-	    (void)fprintf(stderr, "%s: no input data\n", pname);
-	    exit(4);
-	}
-	if (line_has_alpha(line)) {
-	    ta = parseline(line, NULL);
-	    /* Copy units strings after trimming any surrounding spaces,
-	       parentheses, or brackets, and after replacing embedded spaces
-	       with underscores. */
-	    for (i = 0; i < nf; i++) {
-		char *p = ta->token[fv[i]], *q;
-
-		while (*p == ' ') p++;
-		if (*p == '(' || *p == '[') p++;
-		q = p + strlen(p);
-		while (*(q-1) == ' ') q--;
-		if (*(q-1) == ')' || *(q-1) == ']') q--;
-		*q = '\0';
-		while (--q > p)
-		    if (*q == ' ') *q = '_';
-		si[i].units = NULL;
-		SSTRCPY(si[i].units, p);
-	    }
-	    line = read_line(ifile, rsep);
-	}
-    }
-
     /* discard any additional lines containing text */
     while (line_has_alpha(line))
 	line = read_line(ifile, rsep);
 
-    if (osigfopen(si, nf) < nf || setsampfreq(freq) < 0)
+    if (osigfopen(si, nosig) < nosig || setsampfreq(freq) < 0)
 	exit(2);
 
     /* skip any unwanted samples at the beginning */
@@ -528,7 +543,8 @@ char *argv[];
     /* read and copy samples */
     while (line != NULL && (t1 == 0L || t++ < t1)) {
 	ta = parseline(line, NULL);
-	for (i = 0; i < nf; i++) {
+
+	for (i = 0; i < nosig; i++) {
 	    double v;
 
 	    if (sscanf(ta->token[fv[i]], "%lf", &v) == 1) {
@@ -542,8 +558,9 @@ char *argv[];
 		vout[i] = WFDB_INVALID_SAMPLE;
 	}
 	if (putvec(vout) < 0) break;
+
 	line = read_line(ifile, rsep);
-	if (line && Xflag && strncmp(line, "</v>", 4) == 0) {
+	if (line && Xflag && strncmp(line, "</samplevectors>", 16) == 0) {
 	    if (line = read_line(ifile, rsep))
 		if (strcmp(line, "</wfdbsampleset>")) {
 		    fprintf(stderr, 

@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:    27 July 2010
+#				Last revised:   6 October 2010
 # This section of the Makefile should not need to be changed.
 
 # 'make' or 'make all': compile the WFDB applications without installing them
@@ -16,6 +16,7 @@ install:	config.cache
 	cd psd;      $(MAKE) install
 	-( cd wave;  $(MAKE) install )
 	cd waverc;   $(MAKE) install
+	-( cd xml;   $(MAKE) install )
 	test -d doc && ( cd doc; $(MAKE) install )
 
 # 'make collect': collect the installed files into /tmp/wfdb/
@@ -28,6 +29,7 @@ collect:
 	cd psd;      $(MAKE) collect
 	-( cd wave;  $(MAKE) collect )
 	cd waverc;   $(MAKE) collect
+	-( cd xml;   $(MAKE) collect )
 	test -d doc && ( cd doc; $(MAKE) collect )
 
 uninstall:	config.cache
@@ -39,6 +41,7 @@ uninstall:	config.cache
 	cd psd;      $(MAKE) uninstall
 	cd wave;     $(MAKE) uninstall
 	cd waverc;   $(MAKE) uninstall
+	cd xml;      $(MAKE) uninstall
 	test -d doc && ( cd doc; $(MAKE) uninstall )
 	./uninstall.sh $(WFDBROOT)
 
@@ -54,6 +57,7 @@ clean:
 	cd psd;      $(MAKE) clean
 	cd wave;     $(MAKE) clean
 	cd waverc;   $(MAKE) clean
+	cd xml;	     $(MAKE) clean
 	test -d doc && ( cd doc; $(MAKE) clean )
 	cd conf; rm -f *~ prompt site.def site-slib.def
 	rm -f *~ config.cache */*.exe $(PACKAGE)-*.spec

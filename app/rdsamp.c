@@ -1,5 +1,5 @@
 /* file: rdsamp.c	G. Moody	 23 June 1983
-			Last revised:	30 August 2010
+			Last revised:	6 October 2010
 
 -------------------------------------------------------------------------------
 rdsamp: Print an arbitrary number of samples from each signal
@@ -305,7 +305,9 @@ char *argv[];
     if (xflag) {
 	printf(WFDBXMLPROLOG);
 	printf("<wfdbsampleset>\n"
-	       "<samplingfrequency>%g</samplingfrequency>\n<v>\n<names>", freq);
+	       "<samplingfrequency>%g</samplingfrequency>\n"
+	       "<signals>%d</signals>\n<description>",
+	       freq, nsig);
     }
     /* Print column headers if '-v' option selected. */
     if (vflag) {
@@ -339,7 +341,7 @@ char *argv[];
 		p = escapify(p);
 	    (void)printf(snfmt, p);
 	}
-	if (xflag) (void)printf("</names>");
+	if (xflag) (void)printf("</description>");
 	(void)printf("\n");
     }
 
@@ -379,6 +381,7 @@ char *argv[];
 	    (void)printf("\n");
 	}
 
+	if (xflag) (void)printf("<samplevectors>\n", nsig+1);
 	while ((to == 0L || from < to) && getvec(v) >= 0) {
 	    if (cflag == 0) {
 	      switch (timeunits) {
@@ -434,6 +437,7 @@ char *argv[];
     }
 
     else {	/* output in raw units */
+	if (xflag) (void)printf("<samplevectors>\n", nsig+1);
 	while ((to == 0L || from < to) && getvec(v) >= 0) {
 	    (void)printf(tfmt, from++);
 	    for (i = 0; i < nsig; i++)
@@ -443,7 +447,7 @@ char *argv[];
     }
 
     if (xflag)		/* print trailer if WFDB-XML output was selected */
-	printf("</v>\n</wfdbsampleset>\n");
+	printf("</samplevectors>\n</wfdbsampleset>\n");
 
     exit(0);
 }

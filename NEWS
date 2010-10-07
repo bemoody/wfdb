@@ -1,4 +1,4 @@
-10.5.5 (4 October 2010):
+10.5.5 (6 October 2010):
 	WFDB-compatible signals can now be converted to a simple XML format
 	using rdsamp's new '-X' option, and XML files in this format can be
 	converted to WFDB-compatible format using wrsamp (which recognizes
@@ -6,11 +6,10 @@
 	type description of this format, and of XML formats for annotation
 	and header files, is available at
 		http://physionet.org/physiobank/database/XML/wfdb.dtd
-	Applications that convert WFDB-compatible annotation and header files
-	to and from these XML formats are available at
-		http://physionet.org/physiotools/wfdb-xml/
-	These may be incorporated into a future version of the WFDB Software
-	Package.
+	This file, together with a set of applications (annxml, heaxml, xmlann,
+        and xmlhea) that convert WFDB-compatible annotation and header files
+	to and from these XML formats, are included in the 'xml' subdirectory
+	of this package.
 
 	Since version 10.4.14, app/sortann has not properly sorted annotations
         containing non-zero 'chan' or 'num' fields.  This bug has now been

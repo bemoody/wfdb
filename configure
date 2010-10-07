@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody         24 May 2000
-#                             Last revised:  19 November 2008
+#                             Last revised:   6 October 2010
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -474,7 +474,7 @@ else
     cat lib/Makefile.top conf/site.def lib/Makefile.tpl >lib/Makefile
 fi
 for D in app checkpkg convert data doc doc/wag-src doc/wpg-src doc/wug-src \
-         examples fortran psd wave waverc .
+         examples fortran psd wave waverc xml .
   do
   if [ -s $D/Makefile.top ]
       then
