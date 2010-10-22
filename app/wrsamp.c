@@ -406,16 +406,16 @@ char *argv[];
 	/* Unless -s was given, note if line 0 contains any tab characters. */
 	if (sflag == 0 && line_has_tab(line))
 	    defpmode.delim = "\t";
+	ta = parseline(line, NULL);
+	ncols = ta->ntokens;
 	/* If it contains any alphabetic characters, save the signal names. */
 	if (line_has_alpha(line)) {
-	    ta = parseline(line, NULL);
 	    SALLOC(dstrings, ta->ntokens, sizeof(char *));
 	    for (i = 0; i < ta->ntokens; i++) {
 		while (*(ta->token[i]) == ' ')
 		    (ta->token[i])++;
 		SSTRCPY(dstrings[i], ta->token[i]);
 	    }
-	    ncols = ta->ntokens;
 	    /* Read the second line. */
 	    if ((line = read_line(ifile, rsep)) == NULL) {
 		(void)fprintf(stderr, "%s: no data\n", pname);

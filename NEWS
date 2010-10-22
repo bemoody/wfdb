@@ -1,3 +1,9 @@
+10.5.6 (22 October 2010):
+	The previous version of wrsamp did not work if signal numbers were
+ 	specified, and the input did not include column headers.  Thanks to
+	Jesus Maria Rodriguez Presedo for reporting this problem, which has
+	been corrected in this release.
+
 10.5.5 (6 October 2010):
 	WFDB-compatible signals can now be converted to a simple XML format
 	using rdsamp's new '-X' option, and XML files in this format can be
