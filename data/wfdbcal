@@ -66,6 +66,9 @@ Atip	- - undefined 1 mV
 HVA	- - undefined 5 mV
 Vtip	- - undefined 10 mV
 
+# Intracardiac electrograms
+CS	- - undefined 1 mV
+
 # ECG from Non-Invasive Fetal ECG Database
 Thorax	- - undefined 2 mV
 Abdomen	- - undefined 200 uV

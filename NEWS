@@ -1,8 +1,18 @@
-10.5.6 (22 October 2010):
+10.5.6 (4 November 2010):
 	The previous version of wrsamp did not work if signal numbers were
- 	specified, and the input did not include column headers.  Thanks to
+	specified, and the input did not include column headers.  Thanks to
 	Jesus Maria Rodriguez Presedo for reporting this problem, which has
 	been corrected in this release.
+
+	If signals with a non-zero baseline were scaled using previous versions
+	of xform, baseline shifts were possible in the output.  This problem
+	has been corrected in this release.
+
+	This release includes 'wfdbmap', an application that can be used
+	together with other open-source software to create synoptic maps of
+        WFDB-compatible records, in the format of those presented by the
+	PhysioBank ATM.  'wfdbmap' is not compiled by default; see
+	wfdbmap/README for additional information.
 
 10.5.5 (6 October 2010):
 	WFDB-compatible signals can now be converted to a simple XML format
@@ -13,12 +23,12 @@
 	and header files, is available at
 		http://physionet.org/physiobank/database/XML/wfdb.dtd
 	This file, together with a set of applications (annxml, heaxml, xmlann,
-        and xmlhea) that convert WFDB-compatible annotation and header files
+	and xmlhea) that convert WFDB-compatible annotation and header files
 	to and from these XML formats, are included in the 'xml' subdirectory
 	of this package.
 
 	Since version 10.4.14, app/sortann has not properly sorted annotations
-        containing non-zero 'chan' or 'num' fields.  This bug has now been
+	containing non-zero 'chan' or 'num' fields.  This bug has now been
 	fixed;  thanks to Jesus Maria Rodriguez Presedo for reporting it and
 	for providing a test case.
 
@@ -36,13 +46,13 @@
 	a formatting error;  both problems have been corrected, thanks to
 	a report from Isaac Henry.
 
-        Errors in the formatting of a variety of error and warning messages
+	Errors in the formatting of a variety of error and warning messages
 	have been corrected in app/ecgeval.c, app/psfd.c, app/rdsamp.c,
 	app/snip.c, app/sumstats.c, app/wrann.c, convert/mit2edf.c,
 	convert/mit2wav.c, convert/wfdb2mat.c, and psd/lomb.c.
 
 10.5.4 (13 July 2010):
-        Function getseginfo() has been introduced in WFDB library version
+	Function getseginfo() has been introduced in WFDB library version
 	10.5.4, to allow applications to obtain information about the
 	segments belonging to the current (multi-segment) input record.
 
@@ -61,7 +71,7 @@
 
 	WAVE version 6.11, included in this release of the WFDB software
 	package, allows the user to change display scales using keyboard
-        commands.  This allows one to resize signals independently, a frequently
+	commands.  This allows one to resize signals independently, a frequently
  	requested feature.  For details, see "How can I enlarge or reduce the
  	size of individual signals?" in the WAVE FAQ (in WAVE, click on Help
 	and select "Frequently asked questions").
@@ -75,7 +85,7 @@
 	been renamed as _lw.  A comment in each of the *.def files in conf,
 	now corrected, erroneously referred to LN, rather than LL.
 
-        Tony Ricke reported that test builds (./configure; make) of recent
+	Tony Ricke reported that test builds (./configure; make) of recent
 	versions of the WFDB package fail on Cygwin.  This problem has been
 	corrected (in conf/cygwin-slib.def) in 10.5.3.
 
@@ -168,16 +178,16 @@
 	WFDB application 'rdsamp' can now write CSV (comma-separated value)
 	format output using its new '-c' option, and 'wrsamp' can read CSV
 	format input.  If no input columns are specified, 'wrsamp' converts
-        all of them.  If the input contains signal names, units, or timestamps,
-        'wrsamp' saves them in the header file it creates.  'wrsamp' also has
-        two new options ('-O', to select the output format, and '-z', to
-        suppress output of column 0).
+	all of them.  If the input contains signal names, units, or timestamps,
+	'wrsamp' saves them in the header file it creates.  'wrsamp' also has
+	two new options ('-O', to select the output format, and '-z', to
+	suppress output of column 0).
 
 	WFDB application 'sigamp' has new options for printing individual
 	measurements.
 
 	The script 'install-wave32', used to build and install a 32-bit version
-        of WAVE on some 64-bit platforms, has been updated so that it can be
+	of WAVE on some 64-bit platforms, has been updated so that it can be
 	used on Fedora 12 (as well as on previously supported platforms).
 
 	In WFDB library versions 10.4.5 through 10.4.24, strtim("e") did not
@@ -234,9 +244,9 @@
 	mixture of valid and invalid samples.  This bug has been corrected;
 	thanks to Omar Abdala for a report that brought this problem to light.
 
-        A declaration for WFDB library function findsig() has been added
-        to wfdb.h.  Thanks to Thomas Heldt for reporting a warning
-        that resulted from its omission in previous versions.
+	A declaration for WFDB library function findsig() has been added
+	to wfdb.h.  Thanks to Thomas Heldt for reporting a warning
+	that resulted from its omission in previous versions.
 
 	Omar also found and corrected a bug in app/wabp.c that resulted in
 	premature termination of processing some variable-layout multisegment
@@ -430,8 +440,8 @@
 	The WFDB library once again correctly interprets a hyphen ('-')
 	(used in place of a record name, annotator name, signal file name,
 	or calibration file name) as a reference to the standard input or
-        output, for platforms that support POSIX standard I/O;  see section
-        5.2, "Using Standard I/O for Database Files", in the WFDB Programmer's
+	output, for platforms that support POSIX standard I/O;  see section
+	5.2, "Using Standard I/O for Database Files", in the WFDB Programmer's
 	Guide.  This feature was broken in 10.4.5 as a side effect of changes
 	in wfdb_open (an internal WFDB library function defined in
 	lib/wfdbio.c).
@@ -468,11 +478,11 @@
 	that encountered them returned error values that permitted the
 	application to handle them).  These errors occur when there is
 	insufficient memory available to the WFDB library.  To obtain the
-        old behavior, in which the calling function will continue execution
-        if possible after a memory allocation error, invoke wfdbmemerr(0).
-        By default, however, such an error will cause the process to terminate.
-        In either case, the WFDB library emits an appropriate error message to
-        aid in troubleshooting.
+	old behavior, in which the calling function will continue execution
+	if possible after a memory allocation error, invoke wfdbmemerr(0).
+	By default, however, such an error will cause the process to terminate.
+	In either case, the WFDB library emits an appropriate error message to
+	aid in troubleshooting.
 
 	New macros for handling dynamically allocated memory are defined in
 	lib/wfdblib.h and used throughout the WFDB library, eliminating most
@@ -512,14 +522,14 @@
 
 	Alexander Khaustov reported a bug in convert/ad2m.c and provided a fix
 	for it.  The bug caused ad2m to truncate its output prematurely if the
-        "-f" option had been used.
+	"-f" option had been used.
 
 	Changes in the build system make it easier to build WFDB using Cygwin
 	gcc (with or without the Cygwin POSIX library).
 
 	Handle missing samples properly in pschart.c and psfd.c.
 
-        Removed unused variables from app/wapb.c (thanks to Thomas Heldt).
+	Removed unused variables from app/wapb.c (thanks to Thomas Heldt).
 
 	Corrected threshold update in app/wqrs.c, and added a check to avoid
 	problems when the sampling frequency is too low.

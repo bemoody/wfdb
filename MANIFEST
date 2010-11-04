@@ -575,6 +575,12 @@ wave/wave.xbm
 wave/xview-patches
 wave/xvwave.c
 wave/xvwave.h
+wfdbmap
+wfdbmap/Makefile
+wfdbmap/map-record
+wfdbmap/README
+wfdbmap/signal-colors.h
+wfdbmap/wfdbmap.c
 wfdb.spec
 xml
 xml/annxml.c

@@ -1,5 +1,5 @@
 /* file: xform.c	G. Moody        8 December 1983
-			Last revised:   12 March 2010
+			Last revised:   3 November 2010
 -------------------------------------------------------------------------------
 xform: Sampling frequency, amplitude, and format conversion for WFDB records
 Copyright (C) 1983-2010 George B. Moody
@@ -682,8 +682,10 @@ char *argv[];
 
 	if (gain[i] != 1.) gflag = 1;
         deltav[i] = dfout[i].adczero - gain[i] * dfin[j].adczero;
-	if (dfout[i].gain != dfin[j].gain * gain[i]) {
+	if (dfout[i].gain != dfin[j].gain * gain[i] ||
+	    dfout[i].baseline != dfin[j].baseline * gain[i]) {
 	    dfout[i].gain = dfin[j].gain * gain[i];
+	    dfout[i].baseline = dfin[j].baseline * gain[i];
 	    reopen = 1;
 	}
 	/* Note that dfout[i].gain is 0 (indicating that the signal is

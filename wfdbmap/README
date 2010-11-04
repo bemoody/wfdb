@@ -1,0 +1,38 @@
+file: README		G. Moody	30 July 2010
+
+Software for creating 'maps' of PhysioBank records
+
+To build and install the software in this directory, first install the
+WFDB and plt software packages from PhysioNet, ImageMagick (from
+www.imagemagick.org), then return to this directory and type 'make'.
+
+This directory contains 'wfdbmap', a program that reads a WFDB record,
+optionally including one or more associated annotation files, and generates a
+script containing embedded data.  When the script is run, it creates (using
+'plt' and 'lwcat', from the plt package) a PostScript-format 'map' of the WFDB
+record and its annotations.  The maps displayed by the PhysioBank ATM are
+created in this way.
+
+Also in this directory is 'map-record', a shell script that illustrates how
+'wfdbmap' and (indirectly) 'plt are used to create a map, and how to convert
+the PostScript map into a PNG-format map (using 'convert' from ImageMagick).
+For example, to make a map of mitdb/200 and its associated 'atr' annotations,
+run the command:
+    map-record mitdb/200 -a atr
+The outputs of this command are 200.ps and 200.png.  If other annotation files
+are available, their annotator names can be given as additional command-line
+arguments:
+    map-record RECORD -a ANN1 ANN2 ANN3 ...
+
+*** A MAJOR LIMITATION of this version of wfdbmap is that it cannot properly
+map segments of a variable-layout multisegment record unless all of the
+.hea files for that record are local (i.e., they can't be retrieved from a
+web server as needed).  For the ATM, this is not a limitation at all, since
+the ATM is mapping local records on physionet.org.  For general use, it's
+a serious limitation, since variable-layout multisegment records are often
+the records for which a map would be most useful.
+
+The symptoms of this problem are a warning message of the form:
+    wfdbmap: can't open http://physionet.org/physiobank/database/...
+and an output map that shows all signals as missing. (The annotations are
+mapped properly, however.)
