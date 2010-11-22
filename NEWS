@@ -1,8 +1,10 @@
-10.5.6 (4 November 2010):
+10.5.6 (22 November 2010):
 	The previous version of wrsamp did not work if signal numbers were
 	specified, and the input did not include column headers.  Thanks to
-	Jesus Maria Rodriguez Presedo for reporting this problem, which has
-	been corrected in this release.
+	Jesus Maria Rodriguez Presedo for reporting this problem.  Also,
+	the previous version of wrsamp did not copy initial samples represented
+	in E notation (e.g. 1.23e+02).  Both of these bugs are corrected in
+	this release. 
 
 	If signals with a non-zero baseline were scaled using previous versions
 	of xform, baseline shifts were possible in the output.  This problem

@@ -39,6 +39,7 @@ P	- - undefined 100 mmHg
 Atip	- - undefined 1 mV
 HVA	- - undefined 5 mV
 Vtip	- - undefined 10 mV
+CS	- - undefined 1 mV
 Thorax	- - undefined 2 mV
 Abdomen	- - undefined 200 uV
 F	- - undefined 100 uV

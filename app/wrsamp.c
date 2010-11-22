@@ -1,5 +1,5 @@
 /* file: wrsamp.c	G. Moody	10 August 1993
-			Last revised:   6 October 2010
+			Last revised:  22 November 2010
 
 -------------------------------------------------------------------------------
 wrsamp: Select fields or columns from a file and generate a WFDB record
@@ -63,9 +63,17 @@ int line_has_alpha(char *line)
 {
     char *p;
 
-    for (p = line; *p; p++)
-    	if (('A' <= *p && *p <= 'Z') || ('a' <= *p && *p <= 'z'))
-	    return (1);
+    if (line)
+	for (p = line; *p; p++) {
+	    if (*p == 'e' || *p == 'E') {
+		/* might be a number in printf %f form */
+		if (('0' <= *(p++) && *p <= '9') || *p == '-' || *p == '+')
+		    continue;
+		/* ignore 'e' or 'E' if followed by a digit or a sign */
+	    }
+	    if (('A' <= *p && *p <= 'Z') || ('a' <= *p && *p <= 'z'))
+		return (1);
+	}
     return (0);
 }
 
@@ -73,9 +81,10 @@ int line_has_tab(char *line)
 {
     char *p;
 
-    for (p = line; *p; p++)
-    	if (*p == '\t')
-	    return (1);
+    if (line) 
+	for (p = line; *p; p++)
+	    if (*p == '\t')
+		return (1);
     return (0);
 }
 
