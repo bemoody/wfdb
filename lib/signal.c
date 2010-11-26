@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:    29 June 2010	wfdblib 10.5.4
+			Last revised:  26 November 2010		wfdblib 10.5.6
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -862,13 +862,13 @@ static int readheader(const char *record)
 	   a directory separator (whether valid or not for this OS);  if so,
 	   compare only the final portion of the argument against the name in
 	   the header file. */
-	const char *r, *s;
+	const char *q, *r, *s;
 
-	for (r = record, s = r + strlen(r) - 1; r != s; s--)
+	for (r = record, q = s = r + strlen(r) - 1; r != s; s--)
 	    if (*s == '/' || *s == '\\' || *s == ':')
 		break;
 
-	if (r > s || strcmp(p, s+1) != 0) {
+	if (q > s && (r > s || strcmp(p, s+1) != 0)) {
 	    wfdb_error("init: record name in record %s header is incorrect\n",
 		       record);
 	    return (-2);

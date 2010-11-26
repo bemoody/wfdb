@@ -1,8 +1,8 @@
 /* file: lcheck.c	G. Moody       7 September 2001
-			Last revised:  26 November 2002
+			Last revised:  26 November 2010
 -------------------------------------------------------------------------------
 wfdbcheck: test WFDB library
-Copyright (C) 2002 George B. Moody
+Copyright (C) 2001-2010 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -113,7 +113,7 @@ char *argv[];
 
   /* *** setwfdb *** */
   dbpath = calloc(sizeof(char), strlen(defpath)+10);
-  sprintf(dbpath, "../data %s\n", defpath);
+  sprintf(dbpath, "data %s\n", defpath);
   setwfdb(dbpath);
   if ((p = getwfdb()) == NULL || strcmp(p, dbpath)) {
     printf("Error: Could not set WFDB path\n");

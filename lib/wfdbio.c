@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:	  22 June 2010       wfdblib 10.5.3
+                        Last revised:	26 November 2010       wfdblib 10.5.6
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -878,7 +878,8 @@ is no longer supported. */
 
 WFDB_FILE *wfdb_open(const char *s, const char *record, int mode)
 {
-    char *wfdb, *p;
+    char *wfdb, *p, *q, *r;
+    int rlen;
     struct wfdb_path_component *c0;
     WFDB_FILE *ifile;
 
@@ -910,11 +911,28 @@ WFDB_FILE *wfdb_open(const char *s, const char *record, int mode)
 	    return (&wfdb_stdout);
 	}
 
+    /* If the record name ends with '/', expand it by adding another copy of
+       the final element (e.g., 'abc/123/' becomes 'abc/123/123'). */
+    rlen = strlen(record);
+    p = (char *)(record + rlen - 1);
+    if (*p == '/') {
+	for (q = p-1; q > record; q--)
+	    if (*q == '/') { q++; break; }
+	if (q < p-1) {
+	    SUALLOC(r, rlen + p-q + 1, 1); /* p-q is length of final element */
+	    strcpy(r, record);
+	    strncpy(r + rlen, q, p-q);
+	}
+    }
+    else
+	SSTRCPY(r, record);
+
     /* If the file is to be opened for output, use the current directory.
        An output file can be opened in another directory if the path to
        that directory is the first part of 'record'. */
     if (mode == WFDB_WRITE) {
-	spr1(wfdb_filename, record, s);
+	spr1(wfdb_filename, r, s);
+	SFREE(r);
 	return (wfdb_fopen(wfdb_filename, WB));
     }
 
@@ -972,26 +990,29 @@ WFDB_FILE *wfdb_open(const char *s, const char *record, int mode)
 #endif
 		*p++ = DSEP;
 	}
-	if (p + strlen(record) + (s ? strlen(s) : 0) > wfdb_filename + MFNLEN-5)
+	if (p + strlen(r) + (s ? strlen(s) : 0) > wfdb_filename + MFNLEN-5)
 	    continue;	/* name too long -- skip */
-	spr1(p, record, s);
+	spr1(p, r, s);
 	if ((ifile = wfdb_fopen(wfdb_filename, RB)) != NULL) {
 	    /* Found it! Add its path info to the WFDB path. */
 	    wfdb_addtopath(wfdb_filename);
+	    SFREE(r);
 	    return (ifile);
 	}
 	/* Not found -- try again, using an alternate form of the name,
 	   provided that that form is distinct. */
 	strcpy(long_filename, wfdb_filename);
-	spr2(p, record, s);
+	spr2(p, r, s);
 	if (strcmp(wfdb_filename, long_filename) && 
 	    (ifile = wfdb_fopen(wfdb_filename, RB)) != NULL) {
 	    wfdb_addtopath(wfdb_filename);
+	    SFREE(r);
 	    return (ifile);
 	}
     }
     /* If the file was not found in any of the directories listed in wfdb,
        return a null file pointer to indicate failure. */
+    SFREE(r);
     return (NULL);
 }
 
@@ -1914,6 +1935,8 @@ WFDB_FILE *wfdb_fopen(char *fname, const char *mode)
     char *p = fname;
     WFDB_FILE *wp;
 
+    if (p == NULL || strstr(p, ".."))
+	return (NULL);
     SUALLOC(wp, 1, sizeof(WFDB_FILE));
     while (*p)
 	if (*p++ == ':' && *p++ == '/' && *p++ == '/') {

@@ -1,6 +1,6 @@
 #!/bin/sh
 # file: appcheck		G. Moody       7 September 2001
-#                               Last revised:  21 January 2010
+#                               Last revised:  26 November 2010
 #
 # This script checks the basic functionality of most of the WFDB applications
 # in the 'app' directory.  These programs are not (yet) tested by this script:
@@ -9,7 +9,9 @@
 # Suggestions for additional checks are welcome;  please send them to the
 # author (george@mit.edu).
 
-WFDB=". ../data http://www.physionet.org/physiobank/database"
+cp -pr ../data .
+
+WFDB=". data http://www.physionet.org/physiobank/database"
 export WFDB
 
 INCDIR=$1
@@ -491,6 +493,8 @@ then
   done 
 fi
 rm -f grep.out
+
+rm -rf data
 
 ( if [ $PASS = $TESTS ]
 then
