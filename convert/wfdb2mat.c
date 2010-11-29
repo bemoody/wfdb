@@ -1,5 +1,5 @@
 /* file: wfdb2mat.c	G. Moody	26 February 2009
-			Last revised:	  27 July 2010
+			Last revised:	29 November 2010
 -------------------------------------------------------------------------------
 wfdb2mat: Convert (all or part of) a WFDB signal file to Matlab .mat format
 Copyright (C) 2009-2010 George B. Moody
@@ -90,7 +90,7 @@ char *argv[];
     char *matname, *orec, *p, *q, *record = NULL, *search = NULL, *prog_name();
     static char prolog[24];
     int highres = 0, i, isiglist, mattype, nisig, nosig = 0, pflag = 0,
-	s, *sig = NULL, stat = 0, vflag = 0, wfdbtype;
+	s, sfname = 0, *sig = NULL, stat = 0, vflag = 0, wfdbtype;
     WFDB_Frequency freq;
     WFDB_Sample *vi, *vo;
     WFDB_Siginfo *si, *so;
@@ -240,19 +240,21 @@ char *argv[];
     }
 
     /* Generate the names for the output .mat file and the output record. */
-    SUALLOC(matname, strlen(record)+6, sizeof(char));
-    sprintf(matname, "%sm.mat", record);
-    SUALLOC(orec, strlen(record)+2, sizeof(char));
-    sprintf(orec, "%sm", record);
+    p = record + strlen(record) - 1;	/* *p = final char of record name */
+    if (*p == '/')	/* short form name ('rec/' rather than 'rec/rec') */
+	sfname = 1;
+    while (--p > record)
+	if (*p == '/') { p++; break; }  /* omit path components from orec */
+    SUALLOC(orec, strlen(p)+2, sizeof(char));
+    strncpy(orec, p, strlen(p) - sfname);
     /* If the input record is an EDF file, it will have a '.' in its name.
        The output record will not be an EDF file, so it may not have a '.'
        in its name.  Replace any '.' with '_' here. */
-    for (p = orec + strlen(orec) - 1; p > orec && *p != '/'; p--)
+    for (p = orec; *p; p++)
 	if (*p == '.') *p = '_';
-    /* To avoid confusion, also make this replacement in matname, but leave
-       the '.' just before 'mat' alone. */
-    for (p = matname + strlen(matname) - 5; p > matname && *p != '/'; p--)
-	if (*p == '.') *p = '_';
+    *p = 'm';	/* append 'm' to the output record name */
+    SUALLOC(matname, strlen(record)+6, sizeof(char));
+    sprintf(matname, "%s.mat", orec);
 
     /* Determine if we can write 8-bit unsigned samples, or if 16 or 32 bits are
        needed per sample. */

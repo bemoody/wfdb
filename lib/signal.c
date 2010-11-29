@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  26 November 2010		wfdblib 10.5.6
+			Last revised:  29 November 2010		wfdblib 10.5.6
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -2174,12 +2174,12 @@ FINT osigfopen(WFDB_Siginfo *siarray, unsigned int nsig)
     /* Prescan siarray to check the signal specifications and to determine
        the number of signal groups. */
     for (s = 0, si = siarray; s < nsig; s++, si++) {
-	/* The combined lengths of the fname and desc strings should be 80
+	/* The combined lengths of the fname and desc strings should be 200
 	   characters or less, the bsize field must not be negative, the
 	   format should be legal, group numbers should be the same if and
 	   only if file names are the same, and group numbers should begin
 	   at zero and increase in steps of 1. */
-	if (strlen(si->fname) + strlen(si->desc) > 80 ||
+	if (strlen(si->fname) + strlen(si->desc) > 200 ||
 	    si->bsize < 0 || !isfmt(si->fmt)) {
 	    wfdb_error("osigfopen: error in specification of signal %d\n",
 		       s);
@@ -2208,11 +2208,11 @@ FINT osigfopen(WFDB_Siginfo *siarray, unsigned int nsig)
 	op = os;
 	os = osd[nosig];
 	/* Check signal specifications.  The combined lengths of the fname
-	   and desc strings should be 80 characters or less, the bsize field
+	   and desc strings should be 200 characters or less, the bsize field
 	   must not be negative, the format should be legal, group numbers
 	   should be the same if and only if file names are the same, and
 	   group numbers should begin at zero and increase in steps of 1. */
-	if (strlen(siarray->fname) + strlen(siarray->desc) > 80 ||
+	if (strlen(siarray->fname) + strlen(siarray->desc) > 200 ||
 	    siarray->bsize < 0 || !isfmt(siarray->fmt)) {
 	    wfdb_error("osigfopen: error in specification of signal %d\n",
 		       nosig);

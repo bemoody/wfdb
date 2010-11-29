@@ -1,5 +1,5 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised:   29 June 2010	wfdblib 10.5.4
+			Last revised:   29 November 2010	wfdblib 10.5.6
 WFDB library type, constant, structure, and function interface definitions
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
@@ -95,9 +95,9 @@ typedef unsigned int WFDB_Annotator;/* annotator number */
 #define WFDB_MAXANN    2   /* maximum number of input or output annotators */
 #define	WFDB_MAXSIG   32   /* maximum number of input or output signals */
 #define WFDB_MAXSPF    4   /* maximum number of samples per signal per frame */
-#define WFDB_MAXRNL   20   /* maximum length of record name */
-#define WFDB_MAXUSL   20   /* maximum length of WFDB_siginfo `.units' string */
-#define WFDB_MAXDSL   60   /* maximum length of WFDB_siginfo `.desc' string */
+#define WFDB_MAXRNL   50   /* maximum length of record name */
+#define WFDB_MAXUSL   50   /* maximum length of WFDB_siginfo `.units' string */
+#define WFDB_MAXDSL  100   /* maximum length of WFDB_siginfo `.desc' string */
 
 /* WFDB_anninfo '.stat' values */
 #define WFDB_READ      0   /* standard input annotation file */
