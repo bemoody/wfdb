@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:	26 November 2010       wfdblib 10.5.6
+                        Last revised:	29 November 2010       wfdblib 10.5.6
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -211,7 +211,7 @@ FVOID wfdbverbose(void)
     error_print = 1;
 }
 
-#define MFNLEN	256	/* max length of WFDB filename, including '\0' */
+#define MFNLEN	1024	/* max length of WFDB filename, including '\0' */
 static char wfdb_filename[MFNLEN];
 
 /* wfdbfile returns the pathname or URL of a WFDB file. */
@@ -924,8 +924,10 @@ WFDB_FILE *wfdb_open(const char *s, const char *record, int mode)
 	    strncpy(r + rlen, q, p-q);
 	}
     }
-    else
-	SSTRCPY(r, record);
+    else {
+	SUALLOC(r, rlen + 1, 1);
+	strcpy(r, record);
+    }
 
     /* If the file is to be opened for output, use the current directory.
        An output file can be opened in another directory if the path to
@@ -942,7 +944,7 @@ WFDB_FILE *wfdb_open(const char *s, const char *record, int mode)
     if (wfdb_path_list == NULL) (void)getwfdb();
 
     for (c0 = wfdb_path_list; c0; c0 = c0->next) {
-	char long_filename[MFNLEN];
+	static char long_filename[MFNLEN];
 
         p = wfdb_filename;
 	wfdb = c0->prefix;

@@ -8982,6 +8982,21 @@ WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
 @unnumberedsec WFDB 10.5
+@unnumberedsubsec Changes in version 10.5.6 (29 November 2010)
+
+WFDB records with names of the form @file{nnn/nnn} can now be identified
+using the short form @file{nnn/} in applications built using the WFDB library
+(e.g., @code{rdsamp -r mimicdb/037/} and @code{rdsamp -r mimicdb/037/037} are
+now equivalent).
+
+In @file{<wfdb.h>}, the maximum lengths of record names, units strings, and
+signal description (@file{.desc}) strings have been increased (to 50, 50,
+and 100 characters respectively).  In @file{lib/wfdbio.c}, the maximum length
+of a WFDB file name (including path information) has been increased to
+1024 characters.
+
+(WFDB library version 10.5.5 was identical to version 10.5.4.)
+
 @unnumberedsubsec Changes in version 10.5.4 (13 July 2010)
 
 Function @code{getseginfo()} has been introduced in WFDB library version

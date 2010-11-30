@@ -1,8 +1,20 @@
-10.5.6 (26 November 2010):
+10.5.6 (29 November 2010):
 	WFDB records with names of the form 'nnn/nnn' can now be identified
 	using the short form 'nnn/' in applications built using the WFDB library
 	(e.g., 'rdsamp -r mimicdb/037/' and 'rdsamp -r mimicdb/037/037' are now
 	equivalent).
+
+	In <wfdb.h>, the maximum lengths of record names, units strings, and
+	signal description ('.desc') strings have been increased (to 50, 50,
+	and 100 characters respectively).  In lib/wfdbio.c, the maximum length
+	of a WFDB file name (including path information) has been increased to
+	1024 characters.
+
+	When given an input record with a name containing path information,
+	previous versions of wfdb2mat preserved the path information in the
+	output '.hea' file, which made it difficult to use (although the '.mat'
+	output file was not affected).  The current version strips the unneeded
+	path information.
 
 	The previous version of wrsamp did not work if signal numbers were
 	specified, and the input did not include column headers.  Thanks to
@@ -15,7 +27,7 @@
 	of xform, baseline shifts were possible in the output.  This problem
 	has been corrected in this release.
 
-	This release includes 'wfdbmap', an application that can be used
+	This release includes wfdbmap, an application that can be used
 	together with other open-source software to create synoptic maps of
         WFDB-compatible records, in the format of those presented by the
 	PhysioBank ATM.  'wfdbmap' is not compiled by default; see
