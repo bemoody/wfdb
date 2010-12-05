@@ -33,10 +33,16 @@ int argc;
 char **argv;
 {
     if (argc == 3 && strcmp(argv[1], "-H") == 0) {
-	setgvmode(WFDB_HIGHRES);
-	(void)isigopen(argv[2], NULL, 0);
-	printf("%g\n", sampfreq(NULL));
-	exit(0);
+	int nsig;
+	WFDB_Siginfo *si;
+
+	if ((nsig = isigopen(argv[2], NULL, 0)) > 0) {
+	    SUALLOC(si, nsig, sizeof(WFDB_Siginfo));
+	    isigopen(argv[2], si, nsig);
+	    setgvmode(WFDB_HIGHRES);
+	    printf("%g\n", sampfreq(NULL));
+	    exit(0);
+	}
     }
     else if (argc == 2) {
        printf("%g\n", sampfreq(argv[1]));

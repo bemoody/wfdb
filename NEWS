@@ -1,3 +1,7 @@
+10.5.7 (5 December 2010):
+        The -H option of app/sampfreq.c did not work in recent releases because
+	of changes in the WFDB library;  it works again in 10.5.7.
+
 10.5.6 (29 November 2010):
 	WFDB records with names of the form 'nnn/nnn' can now be identified
 	using the short form 'nnn/' in applications built using the WFDB library
