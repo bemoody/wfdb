@@ -3339,6 +3339,7 @@ first introduced in WFDB library version 6.0.)
 				conversion parameters.
 * setwfdb::			Dynamically changing the database path.
 * getwfdb::			Reading the database path.
+* resetwfdb::                   Restoring the initial database path.
 * wfdbfile::			Obtaining the pathname of a WFDB file.
 * wfdbflush::			Flushing buffered output annotations and
 				samples.
@@ -3560,6 +3561,8 @@ This function closes all open WFDB files and frees any memory allocated by
 other WFDB library functions.  It also resets the following:
 
 @itemize @bullet
+@item
+the WFDB path (in versions 10.5.7 and later)
 @item
 the factors used for converting between samples, seconds, and counter
 values (reset to 1), the base time (reset to 0, i.e., midnight), and the
@@ -4061,7 +4064,7 @@ version 8.0.)
 for an example of the use of @code{setwfdb}.
 
 @c @group
-@node     getwfdb, wfdbfile, setwfdb, miscellaneous functions
+@node     getwfdb, resetwfdb, setwfdb, miscellaneous functions
 @unnumberedsubsec getwfdb
 @findex getwfdb
 @cindex database path (reading)
@@ -4100,6 +4103,22 @@ adds the directory @samp{/usr/mydb} to the beginning of the database path.
 (The standard @samp{/} directory separator can be used, even under MS-DOS; if
 you elect to use the alternate @samp{\}, remember to quote it within a C string
 as @samp{\\}.)
+
+@c @group
+@node     resetwfdb, wfdbfile, getwfdb, miscellaneous functions
+@unnumberedsubsec resetwfdb
+@findex resetwfdb (10.5.7)
+@cindex WFDB path (resetting)
+
+@example
+void resetwfdb(void)
+@end example
+@noindent
+@c @end group
+
+@noindent
+This function restores the WFDB path to its initial value (either the
+first value returned by @code{getwfdb} in the current process, or @code{NULL}).
 
 @c @group
 @node     wfdbfile, wfdbflush, getwfdb, miscellaneous functions
@@ -8982,6 +9001,22 @@ WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
 @unnumberedsec WFDB 10.5
+
+@unnumberedsubsec Changes in version 10.5.6 (16 December 2010)
+
+When opening records with the same name in different directories successively
+within a single process, the persistence of WFDB path changes made by WFDB
+library function @code{wfdb_addtopath()} interfered with locating the correct
+files in the second and subsequent records.  The solution included addition of
+a new WFDB library function, @code{resetwfdb()}, which restores the WFDB path
+to the value returned by the first invocation of @code{getwfdb()} in the
+current process (or @code{NULL} if @code{getwfdb()} has not been invoked);
+library function @code{wfdbquit()} now invokes @code{resetwfdb()}.  In
+addition, the safe-string copy macro @code{SSTRCPY} (defined in @code{wfdb.h})
+now properly handles the case of copying null pointers.  Thanks to Benjamin
+Moody for identifying the problem, providing test inputs, and contributions to
+the solution.
+
 @unnumberedsubsec Changes in version 10.5.6 (29 November 2010)
 
 WFDB records with names of the form @file{nnn/nnn} can now be identified

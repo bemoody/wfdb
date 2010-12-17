@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:     14 May 2009
+#				Last revised:  12 December 2010
 # This section of the Makefile should not need to be changed.
 
 INCLUDES = $(INCDIR)/wfdb/wfdb.h $(INCDIR)/wfdb/wfdblib.h \
@@ -19,7 +19,7 @@ install:	$(INCLUDES) $(LIBDIR)
 	$(MAKE) all
 	cp $(WFDBLIB) $(LIBDIR) 
 	$(SETLPERMISSIONS) $(LIBDIR)/$(WFDBLIB)
-	$(MAKE) lib-post-install
+	$(MAKE) lib-post-install 2>/dev/null
 
 # 'make collect':  retrieve the installed WFDB library and headers
 collect:

@@ -85,7 +85,7 @@ s+>Evaluating ECG Analyzers<+><a href="eval.htm">Evaluating ECG Analyzers</a><+
 s+>WFDB Programmer's Guide<+><a href="../wpg/wpg.htm">WFDB Programmer's Guide</a><+
 s+>WFDB Applications Guide<+><a href="wag.htm">WFDB Applications Guide</a><+
 s+>WAVE User's Guide<+><a href="../wug/wug.htm">WAVE User's Guide</a><+
-s+>plt Tutorial and Cookbook<+><a href="../plt/html/">plt Tutorial and Cookbook</a><+
+s+>plt Tutorial and Cookbook<+><a href="../plt/plt/html/">plt Tutorial and Cookbook</a><+
 s+<A HREF="#toc">Table of Contents</A>+<table width=100%><tr><td align=left><b>Next:</b> NEXTPAGE <b>Up:</b> <a href="wag.htm">WFDB Applications Guide</a> <b>Previous:</b> PREVPAGE</td><td align=right><a href="#toc">On This Page</a></td></tr></table>+
 s+<a href='#toc'>Table of Contents</a>+<table width=100%><tr><td align=left><b>Next:</b> NEXTPAGE <b>Up:</b> <a href="wag.htm">WFDB Applications Guide</a> <b>Previous:</b> PREVPAGE</td><td align=right><a href="#toc">On This Page</a></td></tr></table>+
 s+</BODY>+<p><b>Up:</b> <a href="wag.htm">WFDB Applications Guide</a><hr><font size=-1><p>Please e-mail your comments and suggestions to <a href="mailto:webmaster@physionet.org?subject=PAGENAME"><tt>webmaster@physionet.org</tt></a>, or post them to:<p><address>PhysioNet<br>MIT Room E25-505A<br>77 Massachusetts Avenue<br>Cambridge, MA 02139 USA<br></address></i><p>Updated LONGDATE</font></BODY>+

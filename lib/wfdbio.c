@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:	29 November 2010       wfdblib 10.5.6
+                        Last revised:	16 December 2010       wfdblib 10.5.7
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -33,6 +33,7 @@ their names appear in these comments.
 This file contains definitions of the following WFDB library functions:
  getwfdb		(returns the database path string)
  setwfdb		(sets the database path string)
+ resetwfdb [10.5.7]	(restores the database path to its initial value)
  wfdbquiet		(suppresses WFDB library error messages)
  wfdbverbose [4.0]	(enables WFDB library error messages)
  wfdberror [4.5]	(returns the most recent WFDB library error message)
@@ -169,7 +170,16 @@ If WFDB or DEFWFDB is of the form '@FILE', getwfdb reads the WFDB path from the
 specified (local) FILE (using wfdb_getiwfdb); such files may be nested up to
 10 levels. */
 
-static char *wfdbpath = NULL;
+static char *wfdbpath = NULL, *wfdbpath_init = NULL;
+
+/* resetwfdb is called by wfdbquit, and can be called within an application,
+to restore the WFDB path to the value that was returned by the first call
+to getwfdb (or NULL if getwfdb was not called). */
+
+FVOID resetwfdb(void)
+{
+    SSTRCPY(wfdbpath, wfdbpath_init);
+}
 
 FSTRING getwfdb(void)
 {
@@ -178,6 +188,7 @@ FSTRING getwfdb(void)
 
 	if (p == NULL) p = DEFWFDB;
 	if (*p == '@') p = wfdb_getiwfdb(p);
+	SSTRCPY(wfdbpath_init, p);
 	setwfdb(p);
     }
     return (wfdbpath);

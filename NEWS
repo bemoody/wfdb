@@ -1,4 +1,17 @@
-10.5.7 (5 December 2010):
+10.5.7 (12 December 2010):
+	When opening records with the same name in different directories
+	successively within a single process, the persistence of WFDB path
+	changes made by WFDB library function wfdb_addtopath interfered with
+	locating the correct files in the second and subsequent records.
+	The solution included addition of a new WFDB library function,
+	resetwfdb, which restores the WFDB path to the value returned by
+	the first invocation of getwfdb in the current process (or NULL if
+	getwfdb has not been invoked);  library function wfdbquit now invokes
+	resetwfdb.  In addition, the safe-string copy macro SSTRCPY (defined
+	in wfdb.h) now properly handles the case of copying null pointers.
+	Thanks to Benjamin Moody for identifying the problem, providing test
+	inputs, and contributions to the solution.
+
         The -H option of app/sampfreq.c did not work in recent releases because
 	of changes in the WFDB library;  it works again in 10.5.7.
 

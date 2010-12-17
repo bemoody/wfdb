@@ -1,5 +1,5 @@
 # file: linux-slib.def		G. Moody	31 May 2000
-#                               Last revised:   13 May 2010
+#                               Last revised: 12 December 2010
 # This section contains settings suitable for generating an ELF-format shared
 # library under Linux.
 
@@ -126,11 +126,12 @@ make-all:	all
 lib-post-install:
 	-(cd $(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_SONAME))
 	-(cd $(LIBDIR); ln -sf $(WFDBLIB_SONAME) $(WFDBLIB_BASENAME))
-	-([ -x /usr/sbin/selinuxenabled ] && /usr/sbin/selinuxenabled && /sbin/restorecon $(LIBDIR)/$(WFDBLIB))
-	@$(LDCONFIG) || echo Warning: "$(LDCONFIG)" was unsuccessful
+	-([$EUID -eq 0 -a  -x /usr/sbin/selinuxenabled ] && /usr/sbin/selinuxenabled && /sbin/restorecon $(LIBDIR)/$(WFDBLIB))
+	-([$EUID -eq 0] && ($(LDCONFIG) 2>/dev/null || \
+	  echo Warning: "$(LDCONFIG)" was unsuccessful))
 
 lib-post-uninstall:
 	rm -f $(LIBDIR)/$(WFDBLIB_BASENAME)
 	rm -f $(LIBDIR)/$(WFDBLIB_SONAME)
-	@$(LDCONFIG) || echo Warning: "$(LDCONFIG)" was unsuccessful
+	-@$(LDCONFIG) || echo Warning: "$(LDCONFIG)" was unsuccessful
 #______________________________________________________________________________
