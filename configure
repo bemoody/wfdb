@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody         24 May 2000
-#                             Last revised:   6 October 2010
+#                             Last revised:  18 February 2011
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -496,24 +496,29 @@ else
     conf/prompt "Looking for the XView libraries ..."
     TEXTEDIT=`which textedit 2>&1`
     if [ "x$TEXTEDIT" = "x" ]
-	then
+    then
 	TEXTEDIT="no textedit"
     fi
     if [ -d /usr/openwin ]
-	then
+    then
 	WAVE=1;
     elif [ -d /usr/local/openwin ]
-	then
+    then
 	WAVE=1;
 	sed "s+/usr/openwin+/usr/local/openwin+" <wave/Makefile >tmp.$$
 	mv tmp.$$ wave/Makefile
     elif [ -d /opt/openwin ]
-	then
+    then
 	WAVE=1;
 	sed "s+/usr/openwin+/opt/openwin+" <wave/Makefile >tmp.$$
 	mv tmp.$$ wave/Makefile
+    elif [ -d /usr/include/xview ]
+    then
+	WAVE=1;
+	sed "s+/usr/openwin+/usr+" <wave/Makefile >tmp.$$
+	mv tmp.$$ wave/Makefile
     elif ( echo $TEXTEDIT | egrep "no |not " >textedit.t1 )
-	then
+    then
 	WAVE=0;
     else
 	WAVE=1;
