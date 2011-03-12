@@ -1,3 +1,29 @@
+10.5.8 (11 March 2011):
+	Previous versions of the WFDB library did not behave properly if
+	setbasetime() was invoked before setsampfreq().  Also, when dealing
+	with time-of-day strings, previous versions of mstimstr() and strtim()
+	round the base time to a number of samples since midnight, and do not
+	work correctly if the number of samples per day is not an integer.
+
+	Benjamin Moody contributed patches to lib/signal.c that remedy these
+	deficiencies.  The patches include three new internal functions
+	(fstrtim(), ftimstr(), and fmstimstr()) which are equivalent to the
+	WFDB library functions strtim(), timstr(), and mstimstr(), but take a
+	second argument specifying the sampling frequency.  These internal
+	functions are used by setbasetime() and setheader() to record the base
+	time with millisecond precision, independent of the actual sampling
+	frequency, and independent of the effects of setifreq(), if any.
+	Moreover, mstimstr() returns a string representation of the base time
+	plus the given number of sampling intervals, mstimstr(0) returns the
+	exact base time, and strtim() returns the sample number that is closest
+	to the given time.  In addition to being more precise, both functions
+	now work correctly even if the number of samples per day is not an
+	integer.  Applications using this version of the WFDB library may call
+	setbasetime() and setsampfreq() in either order.
+
+	'configure' now detects XView (if installed) on Ubuntu, so that 'wave'
+	can be built automatically by 'make install' on 32-bit Ubuntu.
+
 10.5.7 (12 December 2010):
 	When opening records with the same name in different directories
 	successively within a single process, the persistence of WFDB path

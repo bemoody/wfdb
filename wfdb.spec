@@ -12,9 +12,13 @@ Vendor: PhysioNet
 Packager: George Moody <george@mit.edu>
 Requires: curl >= 7.10
 Requires: curl-devel >= 7.10
+Requires: expat-devel
 BuildRoot: /var/tmp/%{name}-root
 
 %changelog
+* Sat Mar 12 2011 George B Moody <george@mit.edu>
+- install to /usr/local, added expat-devel dependency
+
 * Wed Oct 6 2010 George B Moody <george@mit.edu>
 - added annxml, heaxml, xmlann, xmlhea
 
@@ -63,7 +67,7 @@ BuildRoot: /var/tmp/%{name}-root
 # The 'make' commands below create HTML, PDF, and PostScript versions of the
 # WFDB Programmer's Guide, WFDB Applications Guide, and WAVE User's Guide.
 make clean
-PATH=$PATH:/usr/openwin/bin ./configure --prefix=/usr --dynamic --mandir=%{_mandir}
+PATH=$PATH:/usr/openwin/bin ./configure --prefix=/usr/local --dynamic --mandir=%{_mandir}
 cd doc/wpg-src; make
 cd ../wag-src; make
 cd ../wug-src; make
@@ -79,12 +83,7 @@ rm -rf $RPM_BUILD_ROOT
 make clean
 
 %post
-/sbin/ldconfig || \
- ( test -e /usr/lib/libwfdb.so.10 -a ! -e /usr/lib/libwfdb.so && \
-   ln -sf /usr/lib/libwfdb.so.10 /usr/lib/libwfdb.so )
-
 %postun
-/sbin/ldconfig || true
 
 # ---- wfdb [shared library] package ------------------------------------------
 

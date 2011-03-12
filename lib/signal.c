@@ -321,6 +321,10 @@ static int obsize;		/* default output buffer size */
 
 /* Local functions (not accessible outside this file). */
 
+static char *ftimstr(WFDB_Time t, WFDB_Frequency f);
+static char *fmstimstr(WFDB_Time t, WFDB_Frequency f);
+static WFDB_Time fstrtim(char *string, WFDB_Frequency f);
+
 /* Allocate workspace for up to n input signals. */
 static int allocisig(unsigned int n)
 {
@@ -2758,10 +2762,10 @@ FINT setheader(char *record, WFDB_Siginfo *siarray, unsigned int nsig)
 	    (void)wfdb_fprintf(oheader, " 0:00");
         else if (btime % 1000 == 0)
 	    (void)wfdb_fprintf(oheader, " %s",
-			   timstr((WFDB_Time)(btime*sfreq/1000.0)));
+			       ftimstr(btime, 1000.0));
 	else
 	    (void)wfdb_fprintf(oheader, " %s",
-			   mstimstr((WFDB_Time)(btime*sfreq/1000.0)));
+			       fmstimstr(btime, 1000.0));
     }
     if (bdate)
 	(void)wfdb_fprintf(oheader, "%s", datstr(bdate));
@@ -2901,10 +2905,10 @@ FINT setmsheader(char *record, char **segment_name, unsigned int nsegments)
     if (msbtime != 0L || msbdate != (WFDB_Date)0) {
         if (msbtime % 1000 == 0)
 	    (void)wfdb_fprintf(oheader, " %s",
-			   timstr((WFDB_Time)(msbtime*sfreq/1000.0)));
+			       ftimstr(msbtime, 1000.0));
 	else
 	    (void)wfdb_fprintf(oheader, " %s",
-			   mstimstr((WFDB_Time)(msbtime*sfreq/1000.0)));
+			       fmstimstr(msbtime, 1000.0));
     }
     if (msbdate)
 	(void)wfdb_fprintf(oheader, "%s", datstr(msbdate));
@@ -3076,29 +3080,30 @@ FINT setbasetime(char *string)
 	bdate = strdat(date_string);
 	(void)sprintf(time_string, "%d:%d:%d",
 		now->tm_hour, now->tm_min, now->tm_sec);
-	btime = (long)(strtim(time_string)*1000.0/sfreq);
+	btime = fstrtim(time_string, 1000.0);
 #endif
 	return (0);
     }
     while (*string == ' ') string++;
     if (p = strchr(string, ' '))
         *p++ = '\0';	/* split time and date components */
-    btime = strtim(string);
+    btime = fstrtim(string, 1000.0);
     bdate = p ? strdat(p) : (WFDB_Date)0;
     if (btime == 0L && bdate == (WFDB_Date)0 && *string != '[') {
 	if (p) *(--p) = ' ';
 	wfdb_error("setbasetime: incorrect time format, '%s'\n", string);
 	return (-1);
     }
-    btime = (long)(btime * 1000.0/sfreq);
     return (0);
 }
 
-FSTRING timstr(WFDB_Time t)
+/* Convert sample number to string, using the given sampling
+   frequency */
+static char *ftimstr(WFDB_Time t, WFDB_Frequency f)
 {
     char *p;
 
-    p = strtok(mstimstr(t), ".");		 /* discard msec field */
+    p = strtok(fmstimstr(t, f), ".");		 /* discard msec field */
     if (t <= 0L && (btime != 0L || bdate != (WFDB_Date)0)) { /* time of day */
 	(void)strcat(p, date_string);		  /* append dd/mm/yyyy */
 	(void)strcat(p, "]");
@@ -3106,18 +3111,27 @@ FSTRING timstr(WFDB_Time t)
     return (p);	
 }
 
-static WFDB_Date pdays = -1;
-
-FSTRING mstimstr(WFDB_Time t)
+FSTRING timstr(WFDB_Time t)
 {
     double f;
-    int hours, minutes, seconds, msec;
-    WFDB_Date days;
-    long s;
 
     if (ifreq > 0.) f = ifreq;
     else if (sfreq > 0.) f = sfreq;
     else f = 1.0;
+
+    return ftimstr(t, f);
+}
+
+static WFDB_Date pdays = -1;
+
+/* Convert sample number to string, using the given sampling
+   frequency */
+static char *fmstimstr(WFDB_Time t, WFDB_Frequency f)
+{
+    int hours, minutes, seconds, msec;
+    WFDB_Date days;
+    double tms;
+    long s;
 
     if (t > 0L || (btime == 0L && bdate == (WFDB_Date)0)) { /* time interval */
 	if (t < 0L) t = -t;
@@ -3138,11 +3152,11 @@ FSTRING mstimstr(WFDB_Time t)
 			  minutes, seconds, msec);
     }
     else {			/* time of day */
-	/* Convert to sample intervals since midnight. */
-	t = (WFDB_Time)(btime*sfreq/1000.0 + 0.5) - t;
-	/* Convert from sample intervals to seconds. */
-	s = (long)(t / f);
-	msec = (int)((t - s*f)*1000/f + 0.5);
+	/* Convert to milliseconds since midnight. */
+	tms = btime - (t * 1000.0 / f);
+	/* Convert to seconds. */
+	s = (long)(tms / 1000.0);
+	msec = (int)((tms - s*1000.0) + 0.5);
 	if (msec == 1000) { msec = 0; s++; }
 	t = s;
 	seconds = t % 60;
@@ -3165,6 +3179,17 @@ FSTRING mstimstr(WFDB_Time t)
     return (time_string);
 }
 
+FSTRING mstimstr(WFDB_Time t)
+{
+    double f;
+
+    if (ifreq > 0.) f = ifreq;
+    else if (sfreq > 0.) f = sfreq;
+    else f = 1.0;
+
+    return fmstimstr(t, f);
+}
+
 FFREQUENCY getcfreq(void)
 {
     return (cfreq > 0. ? cfreq : ffreq);
@@ -3185,16 +3210,15 @@ FVOID setbasecount(double counter)
     bcount = counter;
 }
 
-FSITIME strtim(char *string)
+/* Convert string to sample number, using the given sampling
+   frequency */
+static WFDB_Time fstrtim(char *string, WFDB_Frequency f)
 {
     char *p;
-    double f, x, y, z;
+    double x, y, z;
     WFDB_Date days = 0L;
     WFDB_Time t;
 
-    if (ifreq > 0.) f = ifreq;
-    else if (sfreq > 0.) f = sfreq;
-    else f = 1.0;
     while (*string==' ' || *string=='\t' || *string=='\n' || *string=='\r')
 	string++;
     switch (*string) {
@@ -3214,8 +3238,9 @@ FSITIME strtim(char *string)
 	    if (strchr(p, '/')) days = strdat(p) - bdate;
 	    else days = atol(p+1);
 	}
-	t = strtim(string+1) - (WFDB_Time)(btime*f/1000.0 + 0.5);
-	if (days > 0L) t += (WFDB_Time)(days*24*60*60*f);
+        x = fstrtim(string+1, 1000.0) - btime;
+        if (days > 0L) x += (days*(24*60*60*1000.0));
+        t = (x * f / 1000.0 + 0.5);
 	return (-t);
       default:
 	x = atof(string);
@@ -3225,6 +3250,17 @@ FSITIME strtim(char *string)
 	z = atof(++p);
 	return ((WFDB_Time)((3600.*x + 60.*y + z)*f + 0.5));
     }
+}
+
+FSITIME strtim(char *string)
+{
+    double f;
+
+    if (ifreq > 0.) f = ifreq;
+    else if (sfreq > 0.) f = sfreq;
+    else f = 1.0;
+
+    return fstrtim(string, f);
 }
 
 /* The functions datstr and strdat convert between Julian dates (used

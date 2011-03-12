@@ -21,22 +21,13 @@
 @center Harvard-MIT Division of Health Sciences and Technology
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1980 -- 2010 George B. Moody
+Copyright @copyright{} 1980 -- 2011 George B. Moody
 @sp 2
 The most recent versions of the software described in this guide may be
-downloaded from @uref{http://www.physionet.org/}.  For further
-information, write to:
-
-@display
-George B. Moody
-Massachusetts Institute of Technology
-77 Massachusetts Avenue, Room E25-505A
-Cambridge, MA 02139
-USA
-@end display
+downloaded from @uref{http://physionet.org/}.
 
 @ifnothtml
-See @uref{http://www.physio@-net.org/physio@-tools/@-wpg/}
+See @uref{http://physio@-net.org/physio@-tools/@-wpg/}
 for an HTML version of this guide.
 @end ifnothtml
 
@@ -95,7 +86,8 @@ revisions for release VERSION of the WFDB library.
 				WFDB library.
 * Sources::			Where to get the WFDB software package, databases
 				of ECGs and other signals, and related items.
-* Recent changes::              New material, not included in the most
+* Answers::                     Don't read them until you've done the exercises!
+* Recent Changes::              New material, not included in the most
                                 recent printed edition of this guide.
 Indices
 
@@ -300,7 +292,7 @@ Some typical uses of the WFDB library are these:
 @itemize @bullet
 @item
 A @emph{waveform editor}, such as @code{wave} (see the
-@uref{http://@-www.@-physionet.@-org/@-physio@-tools/@-wug/,
+@uref{http://@-physionet.@-org/@-physio@-tools/@-wug/,
 @cite{WAVE User's Guide}}), reads the
 digitized signals of a database record and displays them with
 annotations superimposed on the waveforms.  Such a program allows the
@@ -352,12 +344,12 @@ references in this guide include page numbers for the second edition.
 Newcomers to C should have a copy for ready reference while reading this
 guide.)  It may also be helpful to have a copy of a database directory,
 such as the
-@uref{http://@-www.@-physionet.@-org/@-physio@-bank/@-data@-base/@-html/@-mitdbdir/,
+@uref{http://@-physionet.@-org/@-physio@-bank/@-data@-base/@-html/@-mitdbdir/,
 @cite{MIT-BIH Arrhythmia Database Directory}}.  The 
-@uref{http://@-www.@-physionet.@-org/@-physio@-tools/@-wag/,
+@uref{http://@-physionet.@-org/@-physio@-tools/@-wag/,
 @cite{WFDB Applications Guide}} will be
 useful as a reference for existing WFDB library-based applications
-(available from PhysioNet, @uref{http://@-www.@-physio@-net.@-org/}).
+(available from PhysioNet, @uref{http://@-physio@-net.@-org/}).
 
 You should have access to a computer that has the WFDB library and at
 least one or two database records on-line, or access to the World Wide Web,
@@ -426,31 +418,32 @@ differences.
 
 At the end of the guide is a list of sources for databases and other
 materials that may be useful to readers (@pxref{Sources}), and a log
-of changes made to this library since 1999 (@pxref{Recent changes}).
+of changes made to this library since 1999 (@pxref{Recent Changes}).
 
-Many friends have contributed to the development of the WFDB library.
-Thanks to Paul Albrecht, Ted Baker, Phil Devlin, Scott Greenwald,
-Thomas Heldt, Isaac Henry, David Israel, Roger Mark, Joe Mietus,
-Warren Muldrow, Wei Zong, and especially to Paul Schluter, whose
-elegant 8080 assembly language functions inspired these (long live
-@code{getann}!).  Pat Hamilton and Bob Farrell contributed ports, to
-classic Mac OS and the MS 32-bit Windows environments, respectively.
-Jose Garcia Moros and Salvador Olmos contributed Matlab/Octave
-reimplementations of a useful subset of the WFDB library.  Jonas
-Carlson wrote, documented, and contributed a set of Matlab wrappers
-for the WFDB library, and Michael Craig created and contributed
-the WFDB Toolbox for Matlab.  Isaac Henry contributed SWIG wrappers that
-provide interfaces for a variety of scripting languages, as well as a
-set of translations of the C example programs in this guide into the
-languages supported by the SWIG wrappers.  Mike Dakin provided the
-first implementation of NETFILES (HTTP client support in the WFDB
-library) based on the W3C's @code{libwww}.  Following the W3C's
-decision to end development of @code{libwww}, Benjamin Moody
-reimplemented NETFILES using @code{libcurl}, and also implemented
-variable-layout records.  Thanks also to the many readers of earlier
-versions of this guide; if this edition answers your questions, it is
-because someone else has already asked them, and hounded the author
-until he produced comprehensible answers.
+Many friends have contributed to the development of the WFDB library.  Thanks
+to Paul Albrecht, Ted Baker, Phil Devlin, Scott Greenwald, Thomas Heldt, Isaac
+Henry, David Israel, Roger Mark, Joe Mietus, Warren Muldrow, Ikaro Silva, Wei
+Zong, and especially to Paul Schluter, whose elegant 8080 assembly language
+functions inspired these (long live @code{getann}!).  Pat Hamilton and Bob
+Farrell contributed ports, to classic Mac OS and the MS 32-bit Windows
+environments, respectively.  Jose Garcia Moros and Salvador Olmos contributed
+Matlab/Octave reimplementations of a useful subset of the WFDB library.  Jonas
+Carlson wrote, documented, and contributed a set of Matlab wrappers for the
+WFDB library, and Michael Craig created and contributed the WFDB Toolbox for
+Matlab.  Isaac Henry contributed SWIG wrappers that provide interfaces for a
+variety of scripting languages, as well as a set of translations of the C
+example programs in this guide into the languages supported by the SWIG
+wrappers.  Mike Dakin provided the first implementation of NETFILES (HTTP
+client support in the WFDB library) based on the W3C's @code{libwww}.
+Following the W3C's decision to end development of @code{libwww}, Benjamin
+Moody reimplemented NETFILES using @code{libcurl}, and also implemented
+variable-layout records.  Bug reports (and in some cases fixes) have been
+contributed by Omar Abdala, Winton Baker, Ion Gaztañaga, Fred Geheb, Mathias
+Gruber, Guido Muesch, Joonas Paalasmaa, Tony Ricke, Dave Schaffer, Dan Scott,
+Allavatam Venugopal, Mauro Villarroel, Andrew Walsh, Piotr Wlodarek, and Yinqi
+Zhang.  Thanks also to the many readers of earlier versions of this guide; if
+this edition answers your questions, it is because someone else has already
+asked them, and hounded the author until he produced comprehensible answers.
 
 Before May, 1999, and the release of version 10.0.0 of the library, the
 WFDB library was known as the DB library, and this guide was the @cite{ECG
@@ -492,14 +485,14 @@ information about obtaining GNU @code{emacs}).
 @ifnothtml
 An HTML version of this guide, suitable for viewing using any web browser,
 is included with the WFDB Software Package.  The latest version may always be
-viewed at @uref{http://@-www.@-physio@-net.@-org/@-physio@-tools/@-wpg/} using your web
+viewed at @uref{http://@-physio@-net.@-org/@-physio@-tools/@-wpg/} using your web
 browser.
 @end ifnothtml
 
 You can format and print copies of this guide using TeX if you have it (see
 @file{makefile} in the @file{doc} directory of the library distribution for
 instructions on doing so).  You may obtain preformatted versions in PDF and
-PostScript formats from @uref{http://www.physionet.org/}.
+PostScript formats from @uref{http://physionet.org/}.
 
 
 @node     Usage, Functions, Overview, Top
@@ -558,7 +551,7 @@ main()
 @end example
 
 @noindent
-(See @uref{http://www.physionet.org/physiotools/wfdb/examples/psamples.c}
+(See @uref{http://physionet.org/physiotools/wfdb/examples/psamples.c}
 for a copy of this program.)
 
 All programs that use the WFDB library @emph{must} include the
@@ -743,7 +736,7 @@ further information.
 @cindex wrappers for Fortran
 A set of wrapper functions is also available for those who wish to use the WFDB
 library together with applications written in Fortran.  These functions,
-defined in @uref{http://www.physionet.org/physiotools/wfdb/fortran/wfdbf.c,
+defined in @uref{http://physionet.org/physiotools/wfdb/fortran/wfdbf.c,
 @file{wfdbf.c}}, provide a thin `wrapper' around the WFDB library functions, by
 accepting Fortran-compatible arguments (there are no structures, and all
 arguments are passed by reference rather than by value).  For example, here is
@@ -762,10 +755,10 @@ the Fortran equivalent of the example program in the previous section:
 @end example
 
 @noindent
-(See @uref{http://www.physionet.org/physiotools/wfdb/fortran/fsamples.f}
+(See @uref{http://physionet.org/physiotools/wfdb/fortran/fsamples.f}
 for a copy of this program;  an extensively commented version of this program
 is also available, at
-@uref{http://www.physionet.org/physiotools/wfdb/fortran/example.f}.)
+@uref{http://physionet.org/physiotools/wfdb/fortran/example.f}.)
 
 @noindent
 To compile this program using @code{g77} (the GNU Fortran compiler), save it as
@@ -780,7 +773,7 @@ g77 -o fsamples -DFIXSTRINGS fsamples.f wfdbf.c -lwfdb
 @noindent
 The Fortran wrapper functions are not discussed in this guide; for further
 information, refer to
-@uref{http://www.physionet.org/physiotools/wfdb/fortran/README,fortran/README}
+@uref{http://physionet.org/physiotools/wfdb/fortran/README,fortran/README}
 in the WFDB Software Package.
 
 @unnumberedsubsec SWIG wrappers for Java, Perl, Python, and other languages
@@ -888,7 +881,7 @@ including several versions of LISP, Modula-3, PHP, Ruby, and Tcl.
 @cindex WFDB toolbox for Matlab
 
 The WFDB Toolbox for Matlab, contributed by Michael Craig and available from
-@uref{http://www.@-physionet.@-org/@-physiotools/@-matlab/@-wfdb-swig-matlab/},
+@uref{http://@-physionet.@-org/@-physiotools/@-matlab/@-wfdb-swig-matlab/},
 is a collection of WFDB applications implemented as functions in Matlab,
 built on the SWIG Java wrappers for the WFDB library.  For example, using it
 in Matlab, one can read and plot the first five seconds of the same signals
@@ -919,7 +912,7 @@ described in this tutorial can also be adapted for use with GNU Octave
 
 Also available is a reimplementation of a useful subset of the WFDB
 library in native m-code (contributed by Jose Garcia Moros and Salvador Olmos)
-at @uref{http://www.@-physio@-net.@-org/@-physio@-tools/@-matlab/}.
+at @uref{http://@-physio@-net.@-org/@-physio@-tools/@-matlab/}.
 
 @node     WFDB path, running example, other languages, Usage
 @comment  node-name,  next,  previous,  up
@@ -1062,7 +1055,7 @@ with a three-component default WFDB path; the first component is empty
 (i.e., it refers to the current directory), the second component names
 the @dfn{system-wide database directory} (which contains the sample WFDB
 files supplied with the WFDB software package), and the third component
-is @uref{http://www.physionet.org/physiobank/data@-base} (referring to the
+is @uref{http://physionet.org/physiobank/data@-base} (referring to the
 PhysioBank data archives).  Note that this default may be changed at the
 time the WFDB library is compiled.  Normally, however, this means that
 any record available from PhysioBank is readable by any WFDB application
@@ -1238,7 +1231,7 @@ The remainder of the nodes in this section describe functions for:
 * conversion::			Time and other conversion functions.
 * calibration::			Calibrating signals.
 * miscellaneous functions::	Attribute-reading and other functions.
-* Memory Allocation Macros::    Memory allocation with error-checking.
+* memory allocation macros::    Memory allocation with error-checking.
 @end menu
 
 @node     introduction to functions, selecting, Functions, Functions
@@ -1504,7 +1497,7 @@ main()
 @c @end group
 
 @noindent
-(See @uref{http://www.physionet.org/physiotools/wfdb/examples/pgain.c}
+(See @uref{http://physionet.org/physiotools/wfdb/examples/pgain.c}
 for a copy of this program.)
 
 @noindent
@@ -1825,7 +1818,7 @@ main(int argc, char **argv)
 @end example
 
 @noindent
-(See @uref{http://www.physionet.org/physiotools/wfdb/examples/psamplex.c} for a
+(See @uref{http://physionet.org/physiotools/wfdb/examples/psamplex.c} for a
 copy of this program.  Compile it as shown in the previous chapter, then run it
 using a command such as @samp{psamplex 100}.)  The QRS detector in chapter 6
 also illustrates the use of @code{setifreq} (@pxref{Example 10}).
@@ -1909,7 +1902,7 @@ which may simplify the design of applications such as digital filters.
 The constant @code{WFDB_GVPAD} is defined in @file{<wfdb/wfdb.h>}.
 
 @c @group
-@node     setgvmode, getspf, setgvmode, special I/O modes
+@node     getgvmode, getspf, setgvmode, special I/O modes
 @unnumberedsubsec getgvmode
 @findex getgvmode (10.5.3)
 @cindex interpolation
@@ -1938,7 +1931,7 @@ an invalid or missing sample, rather than returning the value
 @file{<wfdb/wfdb.h>}.
 
 @c @group
-@node     getspf, setafreq, setgvmode, special I/O modes
+@node     getspf, setafreq, getgvmode, special I/O modes
 @unnumberedsubsec getspf
 @findex getspf (9.6)
 @cindex interpolation
@@ -2093,7 +2086,7 @@ main()
 @end example
 
 @noindent
-(See @uref{http://www.physionet.org/physiotools/wfdb/examples/exgetvec.c}
+(See @uref{http://physionet.org/physiotools/wfdb/examples/exgetvec.c}
 for a copy of this program.)
 
 Notice how the value returned by the first invocation of @code{isigopen}
@@ -2232,7 +2225,7 @@ main()
 @end example
 
 @noindent
-(See @uref{http://www.physionet.org/physiotools/wfdb/examples/exputvec.c}
+(See @uref{http://physionet.org/physiotools/wfdb/examples/exputvec.c}
 for a copy of this program.)
 
 All programs that write signals or annotations @emph{must} invoke
@@ -2307,7 +2300,7 @@ main()
 @end example
 
 @noindent
-(See @uref{http://www.physionet.org/physiotools/wfdb/examples/exgetann.c}
+(See @uref{http://physionet.org/physiotools/wfdb/examples/exgetann.c}
 for a copy of this program.)
 
 @ifnotinfo
@@ -2696,7 +2689,7 @@ main()
 @end example
 
 @noindent
-(See @uref{http://www.physionet.org/physiotools/wfdb/examples/exannstr.c}
+(See @uref{http://physionet.org/physiotools/wfdb/examples/exannstr.c}
 for a copy of this program.)
 
 @code{ACMAX} is defined in @file{<wfdb/ecgcodes.h>}.  The range from 1
@@ -3315,7 +3308,7 @@ memory that it occupied to the heap.  Note that @code{wfdbquit} does
 first introduced in WFDB library version 6.0.)
 
 @page
-@node miscellaneous functions, Memory Allocation Macros, calibration, Functions
+@node miscellaneous functions, memory allocation macros, calibration, Functions
 @section Miscellaneous WFDB Functions
 
 @menu
@@ -3850,7 +3843,8 @@ ASCII string in @var{HH:MM:SS} format.  An optional base date in
 the date should be separated from the time by a space or tab character.  If
 @var{string} is empty or @code{NULL}, the current date and time are read
 from the system clock.  Use @code{setbasetime} after defining the sampling
-frequency and before creating a header file.
+frequency and before creating a header file.  (In versions 10.5.8 and later,
+it is not necessary to define the sampling frequency first.)
 @ifnotinfo
 (@pxref{newheader, , @code{newheader}}).
 @end ifnotinfo
@@ -4029,7 +4023,7 @@ locations where input files may be found.  These locations may be
 absolute directory names (such as @samp{/usr/local/database} under Unix,
 or @samp{d:/database} under MS-DOS), relative directory names (e.g.,
 @code{../mydata}), or URL prefixes (e.g.,
-@samp{http://www.physio@-net.org/physio@-bank/database}).  If NETFILES
+@samp{http://physio@-net.org/physio@-bank/database}).  If NETFILES
 support is unavailable, any URL prefixes in the string are ignored.  The
 special form @samp{.} refers to the current directory.  Entries in the
 list may be separated by whitespace or by semicolons; under Unix, colons
@@ -4504,8 +4498,8 @@ signal file for the specified output signal @var{s}, and invokes
 introduced in WFDB library version 10.4.15.)
 
 @page
-@node Memory Allocation Macros, , miscellaneous functions, Functions
-@section Memory Allocation Macros
+@node memory allocation macros, , miscellaneous functions, Functions
+@section memory allocation macros
 
 @menu
 * MEMERR::                      Handling a memory allocation error.
@@ -4529,7 +4523,7 @@ to the parent shell or other process).
 
 
 @c @group
-@node     MEMERR, SFREE, memory allocation, memory allocation
+@node     MEMERR, SFREE, memory allocation macros, memory allocation macros
 @unnumberedsubsec MEMERR
 @findex MEMERR (10.5.0)
 @cindex insufficient memory
@@ -4548,7 +4542,7 @@ for }@var{object_name}@code{)}.  Unless @code{wfdbmemerr(1)} has been invoked
 previously, the process that invoked @code{MEMERR} exits immediately.
 
 @c @group
-@node     SFREE, SUALLOC, MEMERR, memory allocation
+@node     SFREE, SUALLOC, MEMERR, memory allocation macros
 @unnumberedsubsec SFREE
 @findex SFREE (10.5.0)
 @cindex release allocated memory
@@ -4573,7 +4567,7 @@ allocated using one of the macros below, or directly using @code{malloc()},
 @code{calloc()}, or @code{realloc()}.
 
 @c @group
-@node     SUALLOC, SALLOC, SFREE, memory allocation
+@node     SUALLOC, SALLOC, SFREE, memory allocation macros
 @unnumberedsubsec SUALLOC
 @findex SUALLOC (10.5.0)
 @cindex allocating memory
@@ -4596,7 +4590,7 @@ The newly allocated memory block is filled with zeroes.
 allocated memory, which will lead to memory leaks if so.
 
 @c @group
-@node     SALLOC, SREALLOC, SUALLOC, memory allocation
+@node     SALLOC, SREALLOC, SUALLOC, memory allocation macros
 @unnumberedsubsec SALLOC
 @findex SALLOC (10.5.0)
 @cindex allocating memory
@@ -4619,7 +4613,7 @@ Unless @var{object_name} is initially NULL, @code{SALLOC} frees it using
 @code{SFREE} before allocating the requested memory.
 
 @c @group
-@node     SREALLOC, SSTRCPY, SALLOC, memory allocation
+@node     SREALLOC, SSTRCPY, SALLOC, memory allocation macros
 @unnumberedsubsec SREALLOC
 @findex SREALLOC (10.5.0)
 @cindex allocating memory
@@ -4652,7 +4646,7 @@ If @var{object_name} is initially NULL, @code{SUALLOC}, @code{SALLOC}, and
 not fill the allocated block with zeroes.
 
 @c @group
-@node     SSTRCPY, , SREALLOC, memory allocation
+@node     SSTRCPY, , SREALLOC, memory allocation macros
 @unnumberedsubsec SSTRCPY
 @findex SSTRCPY (10.5.0)
 @cindex allocating strings
@@ -5386,7 +5380,7 @@ Recall that a WFDB record is not a file; rather, it is an extensible
 example, record 100 of the MIT-BIH Arrhythmia Database consists of the files
 named @file{100.hea}, @file{100.dat}, and @file{100.atr} in the @file{mitdb}
 directory of the MIT-BIH Arrhythmia Database CDROM (or in PhysioBank, within
-@uref{http://@-www.@-physio@-net.@-org/@-physio@-bank/@-data@-base/@-mitdb/}),
+@uref{http://@-physio@-net.@-org/@-physio@-bank/@-data@-base/@-mitdb/}),
 together with any additional files in other directories that you may have
 associated with record 100 (such as your own annotation file).  All files
 associated with a given record include the record name as the first part of the
@@ -5904,13 +5898,13 @@ path.
 In current versions of the WFDB library, the default WFDB path (defined in the
 WFDB library source file @code{wfdblib.h}, and used as the WFDB path if the
 WFDB environment variable is undefined) is @samp{. /usr/database
-http://www.physio@-net.org/physio@-bank/data@-base}.  (The second component,
+http://physio@-net.org/physio@-bank/data@-base}.  (The second component,
 after the @samp{.} that specifies the current directory, may vary, depending on
 your platform and the choices made during installation.)  The third component
 is a URL prefix pointing to PhysioBank, an on-line archive for a wide variety
 of standard databases of physiologic signals.
 For example, the MIT-BIH Polysomnographic Database is kept in
-@uref{http://www.physio@-net.org/physio@-bank/data@-base/slpdb}, so it is
+@uref{http://physio@-net.org/physio@-bank/data@-base/slpdb}, so it is
 possible to read record @code{slp37} of that database directly from PhysioBank
 by passing @code{slpdb/slp37} as the @var{record} argument to @code{wfdbinit}
 (or @code{isigopen}, @code{annopen}, etc.).
@@ -6077,7 +6071,7 @@ to @code{NORMAL} and deleting all non-QRS annotations.
 @end example
 
 @noindent
-(See @uref{http://www.physionet.org/physiotools/wfdb/examples/example1.c}
+(See @uref{http://physionet.org/physiotools/wfdb/examples/example1.c}
 for a copy of this program.)
 
 @c @group
@@ -6186,7 +6180,7 @@ annotator name @file{aha}.
 @end example
 
 @noindent
-(See @uref{http://www.physionet.org/physiotools/wfdb/examples/example2.c}
+(See @uref{http://physionet.org/physiotools/wfdb/examples/example2.c}
 for a copy of this program.)
 
 @noindent
@@ -6262,7 +6256,7 @@ an annotator name, and its second argument is a record name.
 @end example
 
 @noindent
-(See @uref{http://www.physionet.org/physiotools/wfdb/examples/example3.c}
+(See @uref{http://physionet.org/physiotools/wfdb/examples/example3.c}
 for a copy of this program.)
 
 @noindent
@@ -6335,7 +6329,7 @@ histogram of them.
 @end example
 
 @noindent
-(See @uref{http://www.physionet.org/physiotools/wfdb/examples/example4.c}
+(See @uref{http://physionet.org/physiotools/wfdb/examples/example4.c}
 for a copy of this program.)
 
 @c @group
@@ -6430,7 +6424,7 @@ argument:
 @end example
 
 @noindent
-(See @uref{http://www.physionet.org/physiotools/wfdb/examples/example5.c}
+(See @uref{http://physionet.org/physiotools/wfdb/examples/example5.c}
 for a copy of this program.)
 
 @noindent
@@ -6530,7 +6524,7 @@ approach.
 @end example
 
 @noindent
-(See @uref{http://www.physionet.org/physiotools/wfdb/examples/example6.c}
+(See @uref{http://physionet.org/physiotools/wfdb/examples/example6.c}
 for a copy of this program.)
 
 @noindent
@@ -6667,7 +6661,7 @@ header file is created in the current directory.
 @end example
 
 @noindent
-(See @uref{http://www.physionet.org/physiotools/wfdb/examples/example7.c}
+(See @uref{http://physionet.org/physiotools/wfdb/examples/example7.c}
 for a copy of this program.)
 
 @noindent
@@ -6861,7 +6855,7 @@ data acquisition are hardware-dependent and are not shown here.
 @end example
 
 @noindent
-(See @uref{http://www.physionet.org/physiotools/wfdb/examples/example8.c}
+(See @uref{http://physionet.org/physiotools/wfdb/examples/example8.c}
 for a copy of this program.)
 
 @noindent
@@ -7018,7 +7012,7 @@ average normal QRS complex).
 @end example
 
 @noindent
-(See @uref{http://www.physionet.org/physiotools/wfdb/examples/example9.c}
+(See @uref{http://physionet.org/physiotools/wfdb/examples/example9.c}
 for a copy of this program.)
 
 @noindent
@@ -7192,7 +7186,7 @@ is based on a Pascal program written by W.A.H. Engelse and C. Zeelenberg,
 @end example
 
 @noindent
-(See @uref{http://www.physionet.org/physiotools/wfdb/examples/example10.c}
+(See @uref{http://physionet.org/physiotools/wfdb/examples/example10.c}
 for a copy of this program.)
 
 @noindent
@@ -7386,7 +7380,7 @@ data using @code{putvec} (@pxref{Example 7}, for a model program).
 Try it out on MIT DB record @file{122} (if you have a NETFILES-enabled
 WFDB library, use the default WFDB path, and open record
 @file{mitdb/122}; otherwise, download the record from
-@uref{http://www.physio@-net.org/physio@-bank/data@-base/mitdb/}.)
+@uref{http://physio@-net.org/physio@-bank/data@-base/mitdb/}.)
 Use your programs from the previous exercises to display your output
 and compare it with the original signals.
 
@@ -7400,7 +7394,7 @@ factor of 3 of the average values.  Run your detector on MIT-BIH
 Arrhythmia Database record @file{200}.  (If you have a
 NETFILES-enabled WFDB library, use the default WFDB path, and open
 record @file{mitdb/200}; otherwise, download the record from
-@uref{http://www.physio@-net.org/physio@-bank/data@-base/mitdb/}.)
+@uref{http://physio@-net.org/physio@-bank/data@-base/mitdb/}.)
 Read the documentation on the annotation comparator, @file{bxb}, and
 figure out how to use it to compare the annotation file produced by
 your program against the reference annotator @file{atr}.  How does
@@ -7778,9 +7772,9 @@ signal with units of mmHg is 0 mmHg.
 @cindex PhysioNet
 The home of the WFDB library, and a source for recorded physiologic signals and
 software for use with them.  All materials on PhysioNet are freely available.
-The main PhysioNet server is @uref{http://www.@-physio@-net.@-org/}, located at
+The main PhysioNet server is @uref{http://@-physio@-net.@-org/}, located at
 MIT in Cambridge, Massachusetts; PhysioNet mirror sites are located around the
-world (see @uref{http://www.@-physio@-net.@-org/@-mirrors/} for a list).
+world (see @uref{http://@-physio@-net.@-org/@-mirrors/} for a list).
 
 @item Piped record
 @cindex piped record (defined)
@@ -7972,7 +7966,7 @@ library and for a variety of applications (@pxref{WFDB Applications}) including
 the @cite{WAVE User's Guide}, and a one-minute sample record (@samp{100s}).
 
 The latest version of the WFDB Software Package can always be downloaded in
-source form from @uref{http://www.physio@-net.org/physio@-tools/@-wfdb.shtml},
+source form from @uref{http://physio@-net.org/physio@-tools/@-wfdb.shtml},
 the WFDB home page on PhysioNet.  Binaries for popular operating systems and
 development snapshots are also usually available there.
 
@@ -7999,7 +7993,7 @@ list recommended packages and where to find them.
 @emph{Download and unpack the WFDB Software Package.}  Versions for all
 platforms are built from a single package of portable sources;  the most
 recent package is always available at
-@uref{http://www.physio@-net.org/physio@-tools/wfdb.tar.gz}.
+@uref{http://physio@-net.org/physio@-tools/wfdb.tar.gz}.
 
 @item
 @emph{Configure the package for your system.}  The @code{configure} script
@@ -8078,7 +8072,7 @@ the directory in which they are kept in your search path.
 @cindex WFDB path
 To use any of these programs, you will need to set the database path first
 (@pxref{WFDB path}), unless the default database path
-(@samp{. /usr/database http://www.physio@-net.org/physio@-bank/data@-base})
+(@samp{. /usr/database http://physio@-net.org/physio@-bank/data@-base})
 is suitable. Programs that accept @emph{time} arguments or commands (usually
 shown as @var{from} and @var{to} below) use @code{strtim} to convert these
 strings into sample intervals; hence they accept any of the varieties of
@@ -8553,7 +8547,7 @@ corrections to the author (@email{george@@mit.edu}).
 @itemx XView toolkit (needed for WAVE)
 @sp 1
 @display
-WWW: @uref{http://www.physionet.org/}
+WWW: @uref{http://physionet.org/}
 @end display
 
 PhysioNet offers free access via the web to large collections of
@@ -8563,7 +8557,7 @@ funded by the National Institutes of Health's NIBIB and NIGMS.  The
 master PhysioNet web server is located at MIT in Cambridge,
 Massachusetts; about ten public mirrors are located elsewhere in the
 US and around the world (see
-@uref{http://@-www.@-physio@-net.@-org/@-mirrors/} for a list).
+@uref{http://@-physio@-net.@-org/@-mirrors/} for a list).
 
 @cindex CDROM
 @cindex ESC DB
@@ -8640,8 +8634,8 @@ culminating with research presentations and awards at CinC.  See
 @item Proceedings of Computers in Cardiology (ISSN 0276-6574)
 @sp 1
 
-CinC proceedings from 2006 to present are available on-line at
-@uref{http://cinc.mit.edu/archives/}.
+CinC proceedings from 2001 to present are available on-line at
+@uref{http://www.cinc.org/archives/}.
 
 IEEE members can find CinC proceedings from 1988 to the
 present using IEEEXplore (@uref{http://ieeexplore.ieee.org/}). Many
@@ -8897,20 +8891,15 @@ telefax: +1 425 453 3199
 @item Web browsers
 @sp 1
 
-The most popular Web browsers may be downloaded by anonymous FTP.
+The most popular Web browsers may be downloaded at these locations:
 
 @display
 Firefox
 FTP: @code{ftp.mozilla.org}
 WWW: @uref{http://www.mozilla.org/firefox/}
 
-Netscape
-FTP: @code{ftp.netscape.com}
-WWW: @uref{http://www.netscape.com/}
-
-Mozilla
-FTP: @code{ftp.mozilla.org}
-WWW: @uref{http://www.mozilla.org/}
+Google Chrome
+WWW: @uref{http://www.google.com/chrome/}
 
 MS Internet Explorer
 FTP: @code{ftp.microsoft.com}
@@ -8922,8 +8911,7 @@ WWW: @uref{http://www.opera.com/}
 @end display
 @end table
 
-@node     Answers, Recent changes, Sources, Top
-@comment This node isn't in the top-level menu;  why make it too easy?
+@node     Answers, Recent Changes, Sources, Top
 @unnumbered Answers to Selected Exercises
 
 @table @asis
@@ -8990,9 +8978,9 @@ the pipeline:
 
 @end table
 
-@node     Recent changes, Concept Index, Answers, Top
+@node     Recent Changes, Concept Index, Answers, Top
 @comment  node-name,  next,  previous,  up
-@unnumbered Recent changes
+@unnumbered Recent Changes
 
 This section contains a brief summary of changes to the WFDB library and
 to this guide since the first printing of the tenth edition of this
@@ -9002,7 +8990,31 @@ changes that may not be described here.
 
 @unnumberedsec WFDB 10.5
 
-@unnumberedsubsec Changes in version 10.5.6 (16 December 2010)
+@unnumberedsubsec Changes in version 10.5.8 (12 March 2011)
+
+Previous versions of the WFDB library did not behave properly if
+@code{setbasetime()} was invoked before @code{setsampfreq()}.  Also, when
+dealing with time-of-day strings, previous versions of @code{mstimstr()} and
+@code{strtim()} round the base time to a number of samples since midnight, and
+do not work correctly if the number of samples per day is not an integer.
+
+Benjamin Moody contributed patches to @file{lib/signal.c} that remedy these
+deficiencies.  The patches include three new internal functions
+(@code{fstrtim()}, @code{ftimstr()}, and @code{fmstimstr()}) which are
+equivalent to the WFDB library functions @code{strtim()}, @code{timstr()}, and
+@code{mstimstr()}, but take a second argument specifying the sampling
+frequency.  These internal functions are used by @code{setbasetime()} and
+@code{setheader()} to record the base time with millisecond precision,
+independent of the actual sampling frequency, and independent of the effects of
+@code{setifreq()}, if any.  Moreover, @code{mstimstr()} returns a string
+representation of the base time plus the given number of sampling intervals,
+@code{mstimstr(0)} returns the exact base time, and @code{strtim()} returns the
+sample number that is closest to the given time.  In addition to being more
+precise, both functions now work correctly even if the number of samples per
+day is not an integer.  Applications using this version of the WFDB library may
+call @code{setbasetime()} and @code{setsampfreq()} in either order.
+
+@unnumberedsubsec Changes in version 10.5.7 (16 December 2010)
 
 When opening records with the same name in different directories successively
 within a single process, the persistence of WFDB path changes made by WFDB
@@ -9094,7 +9106,7 @@ Memory allocation macros that have been defined previously in
 @file{wfdblib.h} have been moved to @file{wfdb.h} so they are
 accessible to WFDB applications, including user-written applications.
 For information about using these macros (MEMERR, SFREE, SUALLOC,
-SALLOC, SREALLOC, and SSTRCPY), @pxref{Memory Allocation Macros}.
+SALLOC, SREALLOC, and SSTRCPY), @pxref{memory allocation macros}.
 
 A buffer overflow in the WFDB library's internal function @code{edfparse()}
 (in @file{signal.c}) has been corrected, thanks to a bug report and patch
@@ -9706,7 +9718,7 @@ attempt to create the directory (including, if necessary, any non-existent
 parent directories).  This feature simplifies the use of record names that
 include directory information, as is common when reading data from a CDROM or
 a web server such as PhysioNet.  For example, using the WFDB path
-(@file{. http://@-www.@-physio@-net.@-org/@-physio@-bank/@-data@-base}), if the
+(@file{. http://@-physio@-net.@-org/@-physio@-bank/@-data@-base}), if the
 current directory, @file{.}, does not contain a subdirectory named
 @file{mitdb}, the command:
 
@@ -9716,7 +9728,7 @@ sqrs -r mitdb/100
 
 @noindent
 will read its input from
-@uref{http://@-www.@-physio@-net.@-org/@-physio@-bank/@-data@-base/@-mitdb/},
+@uref{http://@-physio@-net.@-org/@-physio@-bank/@-data@-base/@-mitdb/},
 will create a directory named @file{mitdb} within the current directory, and
 will write its output annotation file (@file{100.qrs}) into this newly-created
 directory.  If we then use the command:
@@ -9769,11 +9781,11 @@ Record names may contain (absolute or relative) path information as a prefix,
 and if (as a result) an input file is found in a location that does not appear
 explicitly in the WFDB path, that location is appended to the end of the WFDB
 path.  For example, if the WFDB path is
-@file{. http://@-www.@-physio@-net.@-org/@-physio@-bank/@-data@-base}, and the
+@file{. http://@-physio@-net.@-org/@-physio@-bank/@-data@-base}, and the
 record name @file{mitdb/100} is supplied to @code{wfdbinit}, the WFDB library
 will find the header file at
-@uref{http://@-www.@-physio@-net.@-org/@-physio@-bank/@-data@-base/@-mitdb/@-100.hea},
-and will then add @uref{http://@-www.@-physio@-net.@-org/@-physio@-bank/data@-base/@-mitdb/} to
+@uref{http://@-physio@-net.@-org/@-physio@-bank/@-data@-base/@-mitdb/@-100.hea},
+and will then add @uref{http://@-physio@-net.@-org/@-physio@-bank/data@-base/@-mitdb/} to
 the end of the WFDB path so that the signal file (specified as @file{100.dat}
 in the header file) can be found.
 
@@ -9871,7 +9883,7 @@ LONGDATE
 
 George B. Moody
 
-Copyright (C) 1989 -- 2006 George B. Moody
+Copyright (C) 1980 -- 2011 George B. Moody
 
 Permission is granted to make and distribute verbatim copies of this
 guide provided that the copyright notice and this permission notice are
