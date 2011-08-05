@@ -1,3 +1,28 @@
+10.5.9 (5 August 2011):
+        When an application passes an array containing WFDB_INVALID_SAMPLE
+        values to putvec(), the function translates these into the
+        corresponding invalid-sample sentinel values used by the file format.
+        (This is the inverse of the transformation done by getvec() and
+        getframe(), so the effect is that at the application level, invalid
+        samples are always represented by the value WFDB_INVALID_SAMPLE.)
+
+        Previous versions of the library did not perform this transformation
+        correctly for formats 80 and 160 (they used a value of zero rather than
+        -128 or -32768, respectively.)  This bug was mainly an issue for
+        programs such as 'snip' and 'xform' that read and modify existing data
+        files.
+
+	In multi-segment mode, 'snip' will attempt to copy the segment
+	structure of the input record.  In older versions, this was done by
+	parsing the master and layout headers by hand; this version uses the
+	library function getseginfo() instead, which should be more robust.
+
+	This version also fixes a bug that would cause snip to crash or produce
+	garbage output if asked to read past the end of a multi-segment record.
+
+	Thanks to Benjamin Moody for identifying these problems and providing
+	patches to remedy them.
+
 10.5.8 (11 March 2011):
 	Previous versions of the WFDB library did not behave properly if
 	setbasetime() was invoked before setsampfreq().  Also, when dealing

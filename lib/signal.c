@@ -2509,11 +2509,11 @@ FINT putvec(WFDB_Sample *vector)
 		  case 8:
 		  case 16:
 		  case 61:
+		  case 160:
 		  default:
 		    *vector = -1 << 15; break;
 		  case 80:
-		  case 160:
-		    *vector = 0; break;
+		    *vector = -1 << 7; break;
 		  case 212:
 		    *vector = -1 << 11; break;
 		  case 310:

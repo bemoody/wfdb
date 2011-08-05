@@ -225,11 +225,12 @@ void copy_ann(char *nrec, char *irec, WFDB_Time from, WFDB_Time to,
 void copy_sig(char *nrec, char *irec, WFDB_Time from, WFDB_Time to, int recurse)
 {
     char *ofname, *p, tstring[24];
-    int i, nsig;
+    int i, j, nsig, maxseg;
     long nsamp;
     WFDB_Sample *v;
     WFDB_Siginfo *si;
     WFDB_Time t, tf;
+    WFDB_Seginfo *seginfo;
 
     wfdbquit();
     if ((nsig = isigopen(irec, NULL, 0)) < 0) {
@@ -252,139 +253,116 @@ void copy_sig(char *nrec, char *irec, WFDB_Time from, WFDB_Time to, int recurse)
     }
 
     p = mstimstr(-from);
-    if (*p == '[') strncpy(tstring, mstimstr(-from)+1, 23);
+    if (*p == '[') {
+	strncpy(tstring, mstimstr(-from)+1, 23);
+	tstring[23] = 0;
+    }
     else tstring[0] = '\0';
 
-    if (recurse && (si[0].fmt == 0 || si[0].nsamp != 0) &&
-	si[0].nsamp != strtim("e")) {
+    if (recurse && (maxseg = getseginfo(&seginfo)) > 0) {
 	/* irec has multiple segments */
-	static char buf[256], *p, *ihfname, *ohfname;
-	static char *ihlfname, *olhfname, *orseg;
-	int i, first_seg, last_seg, maxseg, nseg;
+	char *ohfname, *orseg;
+	int first_seg, last_seg, nseg;
 	WFDB_Frequency sfreq = sampfreq(NULL);
-	WFDB_FILE *ihfile;
 	FILE *ohfile;
-	
-	p = wfdbfile("hea", irec);
-	ihfname = malloc(strlen(p)+1);
-	strcpy(ihfname, p);
-	ihfile = wfdb_fopen(ihfname, "rb");
+	WFDB_Seginfo *tmp;
+
+	SUALLOC(tmp, maxseg, sizeof(WFDB_Seginfo));
+	memcpy(tmp, seginfo, maxseg * sizeof(WFDB_Seginfo));
+	seginfo = tmp;
+
 	ohfname = malloc((strlen(nrec)+5) * sizeof(char));
 	sprintf(ohfname, "%s.hea", nrec);
 	ohfile = fopen(ohfname, "wb");
-	
-	/* read and parse the first line of the multi-segment header */
-	if (wfdb_fgets(buf, sizeof(buf), ihfile) == NULL) {
-	    fprintf(stderr, "%s: error reading %s\n", pname, ihfname);
+	if (ohfile == NULL) {
+	    fprintf(stderr, "%s: can't create master header\n", pname);
 	    exit(2);
 	}
-	for (p = buf; *p != '/'; p++)
-	    ;
-	maxseg = atoi(p+1);	/* number of segments in irec */
-	if (si[0].nsamp == 0) {	/* irec has variable layout */
-	    char *ilhfname, *olhfname;
-	    WFDB_FILE *ilhfile;
-	    FILE *olhfile;
-	    
-	    maxseg--;	/* don't count layout segment */
-	    wfdb_fgets(buf, sizeof(buf), ihfile); /* 2nd line of irec.hea */
-	    for (p = buf; *p != ' '; p++)
-		;
-	    *p = '\0';
-	    p = wfdbfile("hea", buf); /* irec_layout.hea */
-	    ilhfname = malloc(strlen(p) + 1);
-	    strcpy(ilhfname, p);
-	    ilhfile = wfdb_fopen(ilhfname, "rb");
-	    olhfname = malloc((strlen(nrec)+12) * sizeof(char));
-	    sprintf(olhfname, "%s_layout.hea", nrec);
-	    olhfile = fopen(olhfname, "wb");
-	    fprintf(olhfile, "%s_layout %d %.12g 0", nrec, nsig, sfreq);
-	    if (tstring[0]) fprintf(olhfile, " %s", tstring);
-	    fprintf(olhfile, "\r\n");
-	    wfdb_fgets(buf, sizeof(buf), ilhfile);
+
+	if (seginfo[0].nsamp == 0) { /* irec has variable layout */
+	    char *olrecname;
+
+	    SUALLOC(olrecname, strlen(nrec) + 8, sizeof(char));
+	    sprintf(olrecname, "%s_layout", nrec);
+
 	    for (i = 0; i < nsig; i++) {
-		wfdb_fgets(buf, sizeof(buf), ilhfile);
-		fputs(buf, olhfile);
+		si[i].fname = "~";
+		si[i].fmt = 0;
+		si[i].nsamp = 0;
+		si[i].cksum = 0;
 	    }
+
+	    if (tstring[0]) setbasetime(tstring);
+
+	    if (0 > setheader(olrecname, si, nsig)) {
+		fprintf(stderr, "%s: can't create layout header\n", pname);
+		exit(2);
+	    }
+
 	    if (sflag == 0) {
 		char *info;
 
 		wfdbquiet();  /* Suppress errors from the WFDB library. */
 		if (info = getinfo(irec))
 		    do {
-			fprintf(olhfile, "# %s\r\n", info);
+			putinfo(info);
 		    } while (info = getinfo((char *)NULL));
 		wfdbverbose();
 		sflag = 1;
 	    }
-	    fclose(olhfile);
-	    wfdb_fclose(ilhfile);
-	}		
+	}
 
 	/* Figure out which input segments contain data to be copied */
-	for (i = first_seg = 0, last_seg=maxseg, tf = 0L; i < maxseg; i++) {
-	    wfdb_fgets(buf, sizeof(buf), ihfile); /* read a segment def */
-	    for (p = buf; *p != ' '; p++)
-		;
-	    t = tf;
-	    tf = t + atol(p+1) + 1; /* first sample of next segment */
+	for (i = first_seg = 0, last_seg = maxseg - 1; i < maxseg; i++) {
+	    t = seginfo[i].samp0;
+	    tf = seginfo[i].samp0 + seginfo[i].nsamp;
 	    if (t <= from && from < tf) first_seg = i;
-	    if (t <= to && to < tf) { last_seg = i; break; }
+	    if (t <= to && to <= tf) { last_seg = i; break; }
 	}
 	nseg = last_seg - first_seg + 1;
-	if (si[0].nsamp == 0) nseg++;
+	if (seginfo[0].nsamp == 0) nseg++;
 	orseg = malloc((strlen(nrec)+6) * sizeof(char));
-	
-	/* Close and reopen the input header. */
-	wfdb_fclose(ihfile);
-	ihfile = wfdb_fopen(ihfname, "rb");
-	wfdb_fgets(buf, sizeof(buf), ihfile);
+
+	tf = seginfo[last_seg].samp0 + seginfo[last_seg].nsamp;
+	if (to > tf)
+	    to = tf;
 
 	/* Start writing the master output header. */
 	fprintf(ohfile, "%s/%d %d %.12g %ld", nrec, nseg, nsig, sfreq, to-from);
 	if (tstring[0]) fprintf(ohfile, " %s", tstring);
 	fprintf(ohfile, "\r\n");
 
-	if (si[0].nsamp == 0) {
-	    wfdb_fgets(buf, sizeof(buf), ihfile);
-	    fprintf(ohfile, "%s_layout 0\r\n", nrec); 
+	if (seginfo[0].nsamp == 0) {
+	    fprintf(ohfile, "%s_layout 0\r\n", nrec);
 	    nseg--;
 	}
 
-	for (i = 0, t = 0; t < to; ) {
+	for (i = 0, j = first_seg; j <= last_seg; j++) {
 	    long len;
 	    WFDB_Time start;
-	    
-	    wfdb_fgets(buf, sizeof(buf), ihfile);
-	    for (p = buf; *p != ' '; p++)
-		;
-	    *p = '\0';
-	    tf = t + atol(p+1); /* time of first sample of next segment */
+
+	    t = seginfo[j].samp0;
+	    tf = seginfo[j].samp0 + seginfo[j].nsamp;
 	    if (to < tf) /* this is the last segment with data to copy */
 		tf = to;
-	    if (from >= tf) {
-		t = tf;
-		continue;
-	    }
 	    if (from > t) {
 		start = from - t; len = tf - from;
 	    }
 	    else {
 		start = 0L; len = tf - t;
 	    }
-	    if (*buf == '~')
+	    if (!strcmp(seginfo[j].recname, "~"))
 		sprintf(orseg, "~");
 	    else {
 		sprintf(orseg, "%s_%04d", nrec, ++i);
-		copy_sig(orseg, buf, start, start + len, 0);
+		copy_sig(orseg, seginfo[j].recname, start, start + len, 0);
 	    }
 	    fprintf(ohfile, "%s %ld\r\n", orseg, len);
-	    t = tf;
 	}
 	fclose(ohfile);
 	return;
     }
-    
+
     /* Open the output signals. */
     (void)sprintf(ofname, "%s.dat", nrec);
     for (i = 0; i < nsig; i++) {
