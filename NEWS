@@ -1,4 +1,4 @@
-10.5.9 (5 August 2011):
+10.5.9 (10 September 2011):
         When an application passes an array containing WFDB_INVALID_SAMPLE
         values to putvec(), the function translates these into the
         corresponding invalid-sample sentinel values used by the file format.
