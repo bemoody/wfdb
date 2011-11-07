@@ -1,10 +1,10 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  29 November 2010		wfdblib 10.5.6
+			Last revised:  7 November 2011		wfdblib 10.5.10
 WFDB library functions for signals
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1989-2010 George B. Moody
+Copyright (C) 1989-2011 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -1890,6 +1890,7 @@ static int rgetvec(WFDB_Sample *vector)
 
 FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
 {
+    char *filename, *fullname, *p;
     int navail, ngroups, nn;
     struct hsdata *hs;
     struct isdata *is;
@@ -1935,6 +1936,17 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
 	in_msrec = 0;	/* necessary to avoid errors when reopening */
 	return (navail);
     }
+
+    /* Save any directory prefix in record name and use this when looking for
+       signal files. */
+    fullname = calloc(strlen(record)+strlen(getwfdb()+2), sizeof(char));
+    strcpy(fullname, record);
+    filename = p = fullname;
+    while (*p) {
+	while (*p && *p != '/') ++p;
+	if (*p) filename = ++p;
+    }
+    *filename = '\0' ;
 
     /* Determine how many new signals we should attempt to open.  The caller's
        upper limit on this number is nsig, and the upper limit defined by the
@@ -1986,7 +1998,8 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
 	if (hs->info.fmt == 0)
 	    ig->fp = NULL;	/* Don't open a file for a null signal. */
 	else { 
-	    ig->fp = wfdb_open(hs->info.fname, (char *)NULL, WFDB_READ);
+	    strcpy(filename, hs->info.fname);
+	    ig->fp = wfdb_open(fullname, (char *)NULL, WFDB_READ);
 	    /* Skip this group if the signal file can't be opened. */
 	    if (ig->fp == NULL) {
 	        SFREE(ig->buf);
@@ -2010,6 +2023,7 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
 	}
 	g++;
     }
+    free(fullname);
 
     /* Produce a warning message if none of the requested signals could be
        opened. */
@@ -2032,7 +2046,6 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
     gvc = ispfmax;	/* Initialize getvec's sample-within-frame counter. */
     nisig += s;		/* Update the count of open input signals. */
     nigroups += g;	/* Update the count of open input signal groups. */
-
     if (sigmap_init() < 0)
 	return (-1);
 

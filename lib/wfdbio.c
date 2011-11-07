@@ -1,10 +1,10 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:	16 December 2010       wfdblib 10.5.7
+                        Last revised:	 7 November 2011       wfdblib 10.5.10
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1988-2010 George B. Moody
+Copyright (C) 1988-2011 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -1214,6 +1214,10 @@ void wfdb_wwwquit(void)
 static void www_init(void)
 {
     if (!www_done_init) {
+	char *p, version[20];
+
+	if ((p = getenv("WFDB_PAGESIZE")) && *p) page_size = atol(p);
+
 #if WFDB_NETFILES_LIBCURL
 	/* Initialize the curl "easy" handle. */
 	curl_global_init(CURL_GLOBAL_ALL);
@@ -1233,8 +1237,6 @@ static void www_init(void)
 	   information from libcurl) */
 	/* curl_easy_setopt(curl_ua, CURLOPT_VERBOSE, 1L); */
 #else
-	char *p;
-	char version[20];
 
 #ifdef USEHTCACHE
 	char *cachedir = CACHEDIR;	/* root of the netfile data cache */
@@ -1245,7 +1247,6 @@ static void www_init(void)
 	if ((p = getenv("WFDB_CACHESIZE")) && *p) cachesize = atoi(p);
 	if ((p = getenv("WFDB_CACHEENTRYSIZE")) && *p) entrysize = atoi(p);
 #endif
-	if ((p = getenv("WFDB_PAGESIZE")) && *p) page_size = atol(p);
 	sprintf(version, "%d.%d.%d", WFDB_MAJOR, WFDB_MINOR, WFDB_RELEASE);
 	HTProfile_newPreemptiveClient("WFDB", version);
 	HTAlert_setInteractive(NO);

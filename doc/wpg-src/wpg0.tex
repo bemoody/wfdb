@@ -837,8 +837,8 @@ for ($i=0; $i < 10; $i++) @{
 import wfdb, sys
 
 def main(argv):
-    siarray = wfdb.WFDB_SiginfoArray(2)
-    if wfdb.isigopen("100s", siarray.cast(), 2) < 2: sys.exit(1)
+    siarray = wfdb.isigopen("100s")
+    if siarray.nsig < 2: sys.exit(1)
     v = wfdb.WFDB_SampleArray(2)
     for i in range(0,10):
         if wfdb.getvec(v.cast()) < 0: sys.exit(2)
@@ -8989,6 +8989,38 @@ WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
 @unnumberedsec WFDB 10.5
+
+@unnumberedsubsec Changes in version 10.5.10 (7 November 2011)
+
+The WFDB library function @code{isigopen()}, in @file{lib/signal.c}, searches
+each component of the WFDB path for the signal file(s) named in the associated
+header file, until a match is found.  Since signal files are usually located in
+the same directories as header files, they can be located most quickly by
+looking first in those directories.  Thanks to David Brooks for suggesting this
+optimization and for a sample implementation.
+
+Attempts to set the default size for HTTP range requests (using the environment
+variable @code{WFDB_PAGESIZE}) were ignored in previous versions of the WFDB
+library when compiled with libcurl.  Thanks again to David for noting this
+limitation, which has been eliminated in this release by a change in
+@code{www_init()} (in @file{lib/wfdbio.c}).
+
+@unnumberedsubsec Changes in version 10.5.9 (10 September 2011)
+
+When an application passes an array containing @code{WFDB_INVALID_SAMPLE}
+values to @code{putvec()}, the function translates these into the corresponding
+invalid-sample sentinel values used by the file format.  (This is the inverse
+of the transformation done by @code{getvec()} and @code{getframe()}, so the
+effect is that at the application level, invalid samples are always represented
+by the value @code{WFDB_INVALID_SAMPLE}.)
+
+Previous versions of the library did not perform this transformation correctly
+for formats 80 and 160 (they used a value of zero rather than -128 or -32768,
+respectively.)  This bug was mainly an issue for programs such as @file{snip}
+and @file{xform} that read and modify existing data files.
+
+Thanks to Benjamin Moody for identifying these problems and providing patches
+to remedy them.
 
 @unnumberedsubsec Changes in version 10.5.8 (12 March 2011)
 
