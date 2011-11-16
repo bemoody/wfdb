@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  23 May 2000
-#				Last revised:	  26 February 2009
+#				Last revised:	  16 November 2011
 # This section of the Makefile should not need to be changed.
 
 CFILES = ann2rr.c bxb.c calsig.c ecgeval.c epicmp.c fir.c ihr.c mfilt.c \
@@ -7,13 +7,14 @@ CFILES = ann2rr.c bxb.c calsig.c ecgeval.c epicmp.c fir.c ihr.c mfilt.c \
  rdsamp.c rr2ann.c rxr.c sampfreq.c sigamp.c sigavg.c signame.c signum.c \
  skewedit.c snip.c sortann.c sqrs.c sqrs125.c sumann.c sumstats.c tach.c \
  time2sec.c wabp.c wfdb-config.c wfdbcat.c wfdbcollate.c wfdbdesc.c \
- wfdbtime.c wfdbwhich.c wqrs.c wrann.c wrsamp.c xform.c
+ wfdbmap.c wfdbsignals.c wfdbtime.c wfdbwhich.c wqrs.c wrann.c wrsamp.c xform.c
+HFILES = signal-colors.h
 XFILES = ann2rr bxb calsig ecgeval epicmp fir ihr mfilt \
  mrgann mxm nguess nst plotstm pscgen pschart psfd rdann \
  rdsamp rr2ann rxr sampfreq sigamp sigavg signame signum \
  skewedit snip sortann sqrs sqrs125 sumann sumstats tach \
  time2sec wabp wfdb-config wfdbcat wfdbcollate wfdbdesc \
- wfdbtime wfdbwhich wqrs wrann wrsamp xform
+ wfdbmap wfdbsignals wfdbtime wfdbwhich wqrs wrann wrsamp xform
 SCRIPTS = cshsetwfdb setwfdb
 PSFILES = pschart.pro psfd.pro 12lead.pro
 MFILES = Makefile
@@ -66,7 +67,7 @@ clean:
 
 # `make listing':  print a listing of WFDB applications sources
 listing:
-	$(PRINT) README $(MFILES) $(CFILES) $(PSFILES)
+	$(PRINT) README $(MFILES) $(CFILES) $(HFILES) $(PSFILES)
 
 # Rules for compiling applications that require non-standard options
 
@@ -87,5 +88,7 @@ psfd:
 	$(CC) $(CFLAGS) -DPROLOG=\"$(PSPDIR)/psfd.pro\" psfd.c -o $@ $(LDFLAGS)
 sigamp:		sigamp.c
 	$(CC) $(CFLAGS) sigamp.c -o $@ $(LDFLAGS) -lm
+wfdbmap:      wfdbmap.c signal-colors.h
+	$(CC) $(CFLAGS) wfdbmap.c -o $@ $(LDFLAGS)
 wqrs:		wqrs.c
 	$(CC) $(CFLAGS) wqrs.c -o $@ $(LDFLAGS) -lm

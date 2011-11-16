@@ -1,9 +1,9 @@
 /* file: wfdbmap.c	G. Moody       	22 March 2009
-			Last revised:	30 March 2009
+			Last revised:	15 November 2011
 
 -------------------------------------------------------------------------------
 wfdbmap: generates a 'plt' script to make a PostScript map of a WFDB record
-Copyright (C) 2009 George B. Moody
+Copyright (C) 2009-2011 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -23,10 +23,12 @@ You may contact the author by e-mail (george@mit.edu) or postal mail
 please visit PhysioNet (http://www.physionet.org/).
 _______________________________________________________________________________
 
+The file signal-colors.h in this directory defines the colors used by wfdbmap.
 */
 
 #include <stdio.h>
 #include <wfdb/wfdb.h>
+#include <wfdb/wfdblib.h>
 #include <wfdb/ecgcodes.h>
 #include <wfdb/ecgmap.h>
 
@@ -224,12 +226,12 @@ void map_sig(char *record, WFDB_Siginfo *si, int nsig, int **map, int length)
     else {	/* variable-layout record */
 	char buf[256], *d, *p, *q, *r, *hfname, *shfname;
 	long m, m0, mf, spm = strtim("60"), t = 0, tf;
-	FILE *ifile, *sfile;
+	WFDB_FILE *ifile, *sfile;
 
 	p = wfdbfile("hea", record);
 	hfname = calloc(strlen(p) + 1, 1);
 	strcpy(hfname, p);
-	if ((ifile = fopen(hfname, "r")) == NULL) {
+	if ((ifile = wfdb_fopen(hfname, "r")) == NULL) {
 	    fprintf(stderr, "%s: can't open %s\n", pname, hfname);
 	    free(hfname);
 	    return;
@@ -242,11 +244,11 @@ void map_sig(char *record, WFDB_Siginfo *si, int nsig, int **map, int length)
 	shfname = calloc(strlen(hfname) + 16, 1);
 	strcpy(shfname, p);
 	d = shfname + strlen(shfname);   /* d points to first char after '/' */
-	fgets(buf, sizeof(buf), ifile);  /* read and ignore first two lines */
-	fgets(buf, sizeof(buf), ifile);
+	wfdb_fgets(buf, sizeof(buf), ifile);  /* read and ignore two lines */
+	wfdb_fgets(buf, sizeof(buf), ifile);
 
 	m0 = 0;
-	while (fgets(buf, sizeof(buf), ifile)) {/* read a segment descriptor */ 
+	while (wfdb_fgets(buf, sizeof(buf), ifile)) {/* read a segment desc */ 
 	    char *tp;
 
 	    if (buf[0] == '~') {  /* segment is null (all signals off) */
@@ -260,13 +262,14 @@ void map_sig(char *record, WFDB_Siginfo *si, int nsig, int **map, int length)
 	    tf = t + atol(tp+1);
 	    if ((mf = tf/spm) > length) mf = length;
 	    sprintf(d, "%s.hea", buf);
-	    if (sfile = fopen(shfname, "r")) {/* open the segment header file */
+	    if (sfile = wfdb_fopen(shfname, "r")) {/* open the segment header */
 		char sbuf[256];
 		int i;
 
-		fgets(sbuf, sizeof(sbuf), sfile);/* read & ignore first line */
+		wfdb_fgets(sbuf, sizeof(sbuf), sfile);/* read & ignore a line */
       
-		while ((p = fgets(sbuf, sizeof(sbuf), sfile)) && *sbuf != '#') {
+		while ((p = wfdb_fgets(sbuf, sizeof(sbuf), sfile)) &&
+		       *sbuf != '#') {
 		    /* signal description line */
 		    for (q = sbuf, i = 0; *q; q++)
 			if (*q == ' ' && ++i == 8) break;
@@ -277,12 +280,12 @@ void map_sig(char *record, WFDB_Siginfo *si, int nsig, int **map, int length)
 			    for (m = m0; m < mf; m++)
 				map[i][m] = 1;
 		}
-		fclose(sfile);
+		wfdb_fclose(sfile);
 		t = tf;
 		m0 = t/spm;
 	    }
 	}
-	fclose(ifile);
+	wfdb_fclose(ifile);
 	free(shfname);
 	free(hfname);
     }

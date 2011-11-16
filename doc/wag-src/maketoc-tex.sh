@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: maketoc-tex.sh		G. Moody	29 October 2002
-#
+#				Last revised:	16 November 2011
 # Generate the table of contents and appendices for the WFDB Applications Guide
 
 prep()
@@ -17,7 +17,7 @@ appendices()
 {
     P=`grep '%%Pages: ' <wag2.ps | cut -c 10-`
     case $P in
-      *[13579]) cat blankpage >>wag2.ps; P=`expr $P + 2`;;
+      *[13579]) cat wag2.ps blankpage >wag2b.ps; P=`expr $P + 2`;;
       *) P=`expr $P + 1`;;
     esac
     sed s/FIRSTPAGE/$P/ <install0.tex >install.tex
@@ -25,7 +25,7 @@ appendices()
     N=`grep '%%Pages: ' <wag3.ps | cut -c 10-`
     Q=`expr $P + $N`
     case $Q in
-      *[02468]) cat blankpage >>wag3.ps; Q=`expr $Q + 1`;;
+      *[02468]) cat wag3.ps blankpage >wag3b.ps; Q=`expr $Q + 1`;;
     esac
     sed s/FIRSTPAGE/$Q/ <eval0.tex >eval.tex
     make wag4.ps
@@ -45,6 +45,15 @@ N1=`ls *.1 | wc -l | tr -d " "`
 head -$N1 <toc.out | ./maketoclines
 
 appendices >>toc-log.$$ 2>&1
+if [ -e wag2b.ps ]
+then
+    mv -f wag2b.ps wag2.ps
+fi
+if [ -e wag3b.ps ]
+then
+    mv -f wag3b.ps wag3.ps
+fi
+
 
 cat <<EOF
 

@@ -1,4 +1,4 @@
-10.5.10 (7 November 2011):
+10.5.10 (15 November 2011):
 	The WFDB library function isigopen(), in lib/signal.c, searches each
 	component of the WFDB path for the signal file(s) named in the
 	associated header file, until a match is found.  Since signal files are
@@ -12,6 +12,17 @@
         of the WFDB library when compiled with libcurl.  Thanks again to David
         for noting this limitation, which has been eliminated in this release
 	by a change in www_init() (in lib/wfdbio.c).
+
+	'wfdbmap', which has been available in its own directory since release
+ 	10.5.6, is a now a standard application (app/wfdbmap.c).  'wfdbmap' is
+	used by the PhysioBank ATM to produce compact synoptic maps of WFDB-
+	compatible records.   Previous versions of 'wfdbmap' were unable to map
+	multi-segment records unless all segment headers were local;  this
+	limitation has been removed in this release.
+
+	This release also includes 'wfdbsignals' (app/wfdbsignals.c), used by
+	the PhysioBank ATM to list the signals in a WFDB record.  'wfdbsignals'
+	is  a stripped-down version of 'wfdbdesc'.
 
 10.5.9 (10 September 2011):
         When an application passes an array containing WFDB_INVALID_SAMPLE
