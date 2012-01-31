@@ -1,10 +1,10 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  7 November 2011		wfdblib 10.5.10
+			Last revised:  31 January 2012		wfdblib 10.5.11
 WFDB library functions for signals
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1989-2011 George B. Moody
+Copyright (C) 1989-2012 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -1006,9 +1006,9 @@ static int readheader(const char *record)
 	if (msnsamples == 0L)
 	    msnsamples = ns;
 	else if (ns != msnsamples) {
-	    wfdb_error("warning (init): sum of segment lengths (%ld)\n", ns);
-	    wfdb_error("   does not match stated record length (%ld)\n",
-		       msnsamples);
+	    wfdb_error("warning (init): in record %s, "
+		       "stated record length (%ld)\n", record, msnsamples);
+	    wfdb_error(" does not match sum of segment lengths (%ld)\n", ns);
 	}
 	return (0);
     }
