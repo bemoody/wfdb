@@ -1,5 +1,5 @@
 # file: wfdbcal		G. Moody	  June 1991
-#			Last revised:	14 March 2008
+#			Last revised:	5 February 2012
 # Default calibration database for WFDB library
 #
 # Format:
@@ -72,6 +72,9 @@ CS	- - undefined 1 mV
 # ECG from Non-Invasive Fetal ECG Database
 Thorax	- - undefined 2 mV
 Abdomen	- - undefined 200 uV
+
+# ECG from INCART database
+AV	- 1 square 1 mV
 
 # EEG
 F	- - undefined 100 uV
