@@ -1,5 +1,5 @@
 # file: wfdbcal		G. Moody	  June 1991
-#			Last revised:	5 February 2012
+#			Last revised:	9 March 2012
 # Default calibration database for WFDB library
 #
 # Format:
@@ -45,7 +45,8 @@ RESP	0 - undefined 50 bpm
 SpO2	0 - undefined 10 %
 Tblood	0 - undefined 1 degC
 Temp	0 - undefined 1 degC
-C.O.	0 - undefined 1 lpm
+C.O.	0 - undefined 5 lpm
+CO	0 - undefined 5 Lpm
 PAWP	0 - undefined 10 mmHg
 
 # Special definitions for MIMIC Database ECG signals with 2 mV peak-to-peak
