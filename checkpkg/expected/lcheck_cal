@@ -28,7 +28,8 @@ RESP	0 - undefined 50 bpm
 SpO2	0 - undefined 10 %
 Tblood	0 - undefined 1 degC
 Temp	0 - undefined 1 degC
-C.O.	0 - undefined 1 lpm
+C.O.	0 - undefined 5 lpm
+CO	0 - undefined 5 Lpm
 PAWP	0 - undefined 10 mmHg
 MCL	- 2 square 1 mV
 aV	- 2 square 1 mV
@@ -42,6 +43,7 @@ Vtip	- - undefined 10 mV
 CS	- - undefined 1 mV
 Thorax	- - undefined 2 mV
 Abdomen	- - undefined 200 uV
+AV	- 1 square 1 mV
 F	- - undefined 100 uV
 C	- - undefined 100 uV
 A	- - undefined 100 uV

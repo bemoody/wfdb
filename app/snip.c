@@ -1,8 +1,8 @@
 /* file: snip.c		G. Moody	30 July 1989
-			Last revised:	27 July 2010
+			Last revised:	20 March 2012
 -------------------------------------------------------------------------------
 snip: Copy an excerpt of a database record
-Copyright (C) 1989-2010 George B. Moody
+Copyright (C) 1989-2012 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -225,7 +225,7 @@ void copy_ann(char *nrec, char *irec, WFDB_Time from, WFDB_Time to,
 void copy_sig(char *nrec, char *irec, WFDB_Time from, WFDB_Time to, int recurse)
 {
     char *ofname, *p, tstring[24];
-    int i, j, nsig, maxseg;
+    int i, j, nsig, maxseg, maxres, fmt;
     long nsamp;
     WFDB_Sample *v;
     WFDB_Siginfo *si;
@@ -292,7 +292,11 @@ void copy_sig(char *nrec, char *irec, WFDB_Time from, WFDB_Time to, int recurse)
 		si[i].cksum = 0;
 	    }
 
-	    if (tstring[0]) setbasetime(tstring);
+	    if (tstring[0]) {
+		static char tstring_copy[24];
+		strcpy(tstring_copy, tstring);
+		setbasetime(tstring_copy);
+	    }
 
 	    if (0 > setheader(olrecname, si, nsig)) {
 		fprintf(stderr, "%s: can't create layout header\n", pname);
@@ -363,12 +367,37 @@ void copy_sig(char *nrec, char *irec, WFDB_Time from, WFDB_Time to, int recurse)
 	return;
     }
 
+    /* Choose an output format */
+    maxres = si[0].adcres;
+    fmt = si[0].fmt;
+    for (i = 1; i < nsig; i++) {
+	if (si[i].adcres > maxres)
+	    maxres = si[i].adcres;
+	if (si[i].fmt != fmt)
+	    fmt = 0;
+    }
+
+    if (fmt == 0) {
+	if (maxres > 24)
+	    fmt = 32;
+	else if (maxres > 16)
+	    fmt = 24;
+	else if (maxres > 12)
+	    fmt = 16;
+	else if (maxres > 10)
+	    fmt = 212;
+	else if (maxres > 8)
+	    fmt = 310;
+	else
+	    fmt = 80;
+    }
+
     /* Open the output signals. */
     (void)sprintf(ofname, "%s.dat", nrec);
     for (i = 0; i < nsig; i++) {
 	si[i].fname = ofname;
 	si[i].group = 0;
-	if (i > 0) si[i].fmt = si[0].fmt;
+	si[i].fmt = fmt;
     }
     if (osigfopen(si, (unsigned)nsig) != nsig) exit(2);
 

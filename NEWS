@@ -1,3 +1,18 @@
+10.5.11 (21 March 2012):
+	Virginia Faro-Maza identified and corrected a bug in WFDB library
+	function iannsettime() (in lib/annot.c) that caused some annotations
+	to be missed when two or more annotation files are open simultaneously.
+
+	WFDB library function isigopen(), in lib/signal.c, was reverted to that
+	of version 10.5.9.
+
+	Benjamin Moody contributed patches for app/snip.c to ensure that the
+	output will be written using a format that can accommodate the sample
+	range.
+
+	The signal calibration file, data/wfdbcal, has been updated with
+	new definitions.
+
 10.5.10 (15 November 2011):
 	The WFDB library function isigopen(), in lib/signal.c, searches each
 	component of the WFDB path for the signal file(s) named in the

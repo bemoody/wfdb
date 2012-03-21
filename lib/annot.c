@@ -1,10 +1,10 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:    18 April 2010	wfdblib 10.5.2
+			Last revised:    20 March 2012	wfdblib 10.5.11
 WFDB library functions for annotations
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1989-2010 George B. Moody
+Copyright (C) 1989-2012 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -649,7 +649,8 @@ FINT iannsettime(WFDB_Time t)
     /* Handle negative arguments as equivalent positive arguments. */
     if (t < 0L) t = -t;
 
-    for (i = 0; i < niaf && stat == 0; i++) {
+    /* Loop over all annotators.  Go to the next file on EOF (stat = -1). */
+    for (i = 0; i < niaf && stat > -2; i++) {
         struct iadata *ia;
 
 	ia = iad[i];
