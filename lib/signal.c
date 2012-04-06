@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  31 January 2012		wfdblib 10.5.11
+			Last revised:    6 April 2012		wfdblib 10.5.11
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -78,8 +78,9 @@ This file also contains definitions of the following WFDB library functions:
  wfdbgetstart [9.4](returns byte offset of sample 0 within signal file)
  wfdbsetstart [9.4](sets byte offset to be written by setheader)
  wfdbputprolog [10.4.15](writes a prolog to a signal file)
- getinfo [4.0]	(reads a line of info for a record)
+ setinfo [10.5.11] (creates a .info file for a record)
  putinfo [4.0]	(writes a line of info for a record)
+ getinfo [4.0]	(reads a line of info for a record)
  sampfreq	(returns the sampling frequency of the specified record)
  setsampfreq	(sets the putvec sampling frequency)
  setbasetime	(sets the base time and date)
@@ -108,6 +109,7 @@ library functions defined elsewhere:
  wfdb_sampquit  (frees memory allocated by sample() and sigmap_init())
  wfdb_sigclose 	(closes signals and resets variables)
  wfdb_osflush	(flushes output signals)
+ wfdb_freeinfo [10.5.11] (releases resources allocated for info string handling)
 
 Two versions of r16(), r24(), r32(), w16(), w24(), and w32() are provided here.
 The default versions are implemented as macros for efficiency.  At least one
@@ -299,6 +301,7 @@ static unsigned maxogroup;	/* max number of output signal groups */
 static unsigned nosig;		/* number of open output signals */
 static unsigned nogroups;	/* number of open output signal groups */
 static WFDB_FILE *oheader;	/* file pointer for output header file */
+static WFDB_FILE *outinfo;	/* file pointer for output info file */
 static struct osdata {		/* unique for each output signal */
     WFDB_Siginfo info;		/* output signal information */
     WFDB_Sample samp;		/* most recent sample written */
@@ -318,6 +321,11 @@ static struct ogdata {		/* shared by all signals in a group (file) */
 } **ogd;
 static WFDB_Time ostime;	/* time of next output sample */
 static int obsize;		/* default output buffer size */
+
+/* These variables relate to info strings. */
+static char **pinfo;	/* array of info string pointers */
+static int nimax;	/* number of info string pointers allocated */
+static int ninfo;	/* number of info strings read */
 
 /* Local functions (not accessible outside this file). */
 
@@ -1286,6 +1294,7 @@ static void osigclose(void)
     ostime = 0L;
     if (oheader) {
 	(void)wfdb_fclose(oheader);
+	if (outinfo == oheader) outinfo = NULL;
 	oheader = NULL;
     }
     if (nisig == 0 && maxhsig != 0)
@@ -2732,6 +2741,7 @@ FINT setheader(char *record, WFDB_Siginfo *siarray, unsigned int nsig)
     /* If another output header file was opened, close it. */
     if (oheader) {
 	(void)wfdb_fclose(oheader);
+	if (outinfo == oheader) outinfo = NULL;
 	oheader = NULL;
     }
 
@@ -2818,6 +2828,7 @@ FINT setmsheader(char *record, char **segment_name, unsigned int nsegments)
     /* If another output header file was opened, close it. */
     if (oheader) {
 	(void)wfdb_fclose(oheader);
+	if (outinfo == oheader) outinfo = NULL;
 	oheader = NULL;
     }
 
@@ -2978,47 +2989,121 @@ FINT wfdbputprolog(char *buf, long int size, WFDB_Signal s)
     return (n == size ? 0 : -1);
 }
 
-FSTRING getinfo(char *record)
+/* Create a .info file (or open it for appending) */
+FINT setinfo(char *record)
 {
-    char *p;
-    static char linebuf[256];
+    /* Close any previously opened output info file. */
+    if (outinfo && outinfo != oheader)
+	wfdb_fclose(outinfo);
+    outinfo = NULL;
+
+    /* Quit unless a record name has been specified. */
+    if (record == NULL) return (0);
 
     /* Remove trailing .hea, if any, from record name. */
     wfdb_striphea(record);
 
-    if (record != NULL && readheader(record) < 0) {
-	wfdb_error("getinfo: can't read record %s header\n", record);
-	return (NULL);
-    }
-    else if (record == NULL && hheader == NULL) {
-	if (isedf == 0)
-	    wfdb_error("getinfo: caller did not specify record name\n");
-	return (NULL);
-    }
+    /* Quit (with message from wfdb_checkname) if name is illegal. */
+    if (wfdb_checkname(record, "record"))
+	return (-1);
 
-    /* Find a line beginning with '#'. */
-    do {
-	if (hheader == NULL || wfdb_fgets(linebuf, 256, hheader) == NULL)
-	    return (NULL);
-    } while (linebuf[0] != '#');
-
-    /* Strip off trailing newline (and '\r' if present). */
-    p = linebuf + strlen(linebuf) - 1;
-    if (*p == '\n') *p-- = '\0';
-    if (*p == '\r') *p = '\0';
-    return (linebuf+1);
-}
-
-FINT putinfo(char *s)
-{
-    if (oheader == NULL) {
-	wfdb_error(
-                "putinfo: header not initialized (call `newheader' first)\n");
+    /* Try to create the .info file. */
+    if ((outinfo = wfdb_open("info", record, WFDB_APPEND)) == NULL) {
+	wfdb_error("setinfo: can't create info file for record %s\n", record);
 	return (-1);
     }
-    (void)wfdb_fprintf(oheader, "#%s\r\n", s);
-    (void)wfdb_fflush(oheader);
+
+    /* Success! */
     return (0);
+}
+
+/* Write an info string to the open output .hea or .info file */
+FINT putinfo(char *s)
+{
+    if (outinfo == NULL) {
+	if (oheader) outinfo = oheader;
+	else {
+	    wfdb_error("putinfo: caller has not specified a record name\n");
+	    return (-1);
+	}
+    }
+    (void)wfdb_fprintf(outinfo, "#%s\r\n", s);
+    (void)wfdb_fflush(outinfo);
+    return (0);
+}
+
+/* getinfo: On the first call, read all info strings from the .hea file and (if
+available) the .info file for the specified record, and return a pointer to the
+first one.  On subsequent calls, return a pointer to the next info string.
+Return NULL if there are no more info strings. */
+
+FSTRING getinfo(char *record)
+{
+    static char buf[256], *p;
+    static int i;
+    WFDB_FILE *ifile;
+
+    if (pinfo == NULL) {	/* info for record has not yet been read */
+	if (record == NULL) {
+	    wfdb_error("getinfo: caller did not specify record name\n");
+	    return (NULL);
+	}
+
+	if (ninfo) {
+	    wfdb_freeinfo();  /* free memory allocated previously to info */
+	    ninfo = 0;
+	}
+
+	i = 0;
+	nimax = 16;	       /* initial allotment of info string pointers */
+	SALLOC(pinfo, nimax, sizeof(char *));
+
+	/* Read info from the .hea file, if available (skip for EDF files) */
+	if (!isedf) {
+	    /* Remove trailing .hea, if any, from record name. */
+	    wfdb_striphea(record);
+	    if ((ifile = wfdb_open("hea", record, WFDB_READ))) {
+		while (wfdb_fgets(buf, 256, ifile))
+		    if (*buf != '#') break; /* skip initial comments, if any */
+		while (wfdb_fgets(buf, 256, ifile))
+		    if (*buf == '#') break; /* skip header content */
+		while (*buf == '#') {	/* read and save info */
+		    p = buf + strlen(buf) - 1;
+		    if (*p == '\n') *p-- = '\0';
+		    if (*p == '\r') *p = '\0';
+		    if (ninfo >= nimax) {
+			nimax += 16;
+			SREALLOC(pinfo, nimax, sizeof(char *));
+		    }
+		    SSTRCPY(pinfo[ninfo], buf+1);
+		    ninfo++;
+		    if (wfdb_fgets(buf, 256, ifile) == NULL) break;
+		}
+		wfdb_fclose(ifile);
+	    }
+	}
+	/* Read more info from the .info file, if available */
+	if ((ifile = wfdb_open("info", record, WFDB_READ))) {
+	    while (wfdb_fgets(buf, 256, ifile)) {
+		if (*buf == '#') {
+		    p = buf + strlen(buf) - 1;
+		    if (*p == '\n') *p-- = '\0';
+		    if (*p == '\r') *p = '\0';
+		    if (ninfo >= nimax) {
+			nimax += 16;
+			SREALLOC(pinfo, nimax, sizeof(char *));
+		    }
+		    SSTRCPY(pinfo[ninfo], buf+1);
+		    ninfo++;
+		}
+	    }
+	    wfdb_fclose(ifile);
+	}
+    }
+    if (i < ninfo)
+	return pinfo[i++];
+    else
+	return (NULL);
 }
 
 FFREQUENCY sampfreq(char *record)
@@ -3501,5 +3586,20 @@ void wfdb_osflush(void)
 	    og->bp = og->buf;
 	}
 	(void)wfdb_fflush(og->fp);
+    }
+}
+
+/* Release resources allocated for info string handling */
+void wfdb_freeinfo(void)
+{
+    int i;
+
+    for (i = 0; i < nimax; i++)
+	SFREE(pinfo[i]);
+    SFREE(pinfo);
+    nimax = ninfo = 0;
+    if (outinfo) {
+	wfdb_fclose(outinfo);
+	outinfo = NULL;
     }
 }

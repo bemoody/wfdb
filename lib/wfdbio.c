@@ -1,10 +1,10 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:	 7 November 2011       wfdblib 10.5.10
+                        Last revised:	  6 April 2012       wfdblib 10.5.11
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1988-2011 George B. Moody
+Copyright (C) 1988-2012 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -427,6 +427,7 @@ OS- and compiler-dependent definitions:
 #ifdef MSDOS
 #define DSEP	'\\'
 #define PSEP	';'
+#define AB	"ab"
 #define RB	"rb"
 #define WB	"wb"
 #else
@@ -441,6 +442,7 @@ OS- and compiler-dependent definitions:
 #define DSEP	'/'
 #define PSEP	':'
 #endif
+#define AB	"ab"
 #define RB	"rb"
 #define WB	"wb"
 
@@ -448,6 +450,7 @@ OS- and compiler-dependent definitions:
 # else
 #define DSEP	'/'
 #define PSEP	':'
+#define AB	"a"
 #define RB	"r"
 #define WB	"w"
 #endif
@@ -947,6 +950,11 @@ WFDB_FILE *wfdb_open(const char *s, const char *record, int mode)
 	spr1(wfdb_filename, r, s);
 	SFREE(r);
 	return (wfdb_fopen(wfdb_filename, WB));
+    }
+    else if (mode == WFDB_APPEND) {
+	spr1(wfdb_filename, r, s);
+	SFREE(r);
+	return (wfdb_fopen(wfdb_filename, AB));
     }
 
     /* If the file is to be opened for input, prepare to search the database
@@ -1722,7 +1730,7 @@ static netfile* nf_fopen(const char *url, const char *mode)
 
     if (!www_done_init)
 	www_init();
-    if (*mode == 'w')
+    if (*mode == 'w' || *mode == 'a')
 	errno = EROFS;	/* no support for output */
     else if (*mode != 'r')
 	errno = EINVAL;	/* invalid mode string */
@@ -1967,7 +1975,7 @@ WFDB_FILE *wfdb_fopen(char *fname, const char *mode)
 	wp->type = WFDB_LOCAL;
 	return (wp);
     }
-    if (strcmp(mode, WB) == 0) {
+    if (strcmp(mode, WB) == 0 || strcmp(mode, AB) == 0) {
         int stat = 1;
 
 	/* An attempt to create an output file failed.  Check to see if all

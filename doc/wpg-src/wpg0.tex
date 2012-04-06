@@ -21,7 +21,7 @@
 @center Harvard-MIT Division of Health Sciences and Technology
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1980 -- 2011 George B. Moody
+Copyright @copyright{} 1980 -- 2012 George B. Moody
 @sp 2
 The most recent versions of the software described in this guide may be
 downloaded from @uref{http://physionet.org/}.
@@ -3338,6 +3338,8 @@ first introduced in WFDB library version 6.0.)
 				samples.
 * getinfo::			Reading info strings from a @file{hea} file.
 * putinfo::			Writing info strings into a @file{hea} file.
+* setinfo::			Opening an info file for output.
+* wfdb_freeinfo::               Freeing memory allocated for info strings.
 * setibsize::			Setting the default input buffer size.
 * setobsize::			Setting the default output buffer size.
 * wfdbgetskew::                 Reading intersignal skew.
@@ -4224,7 +4226,7 @@ if (sps = sampfreq("100s")
 (This function was first introduced in WFDB library version 4.0.)
 
 @c @group
-@node     putinfo, setibsize, getinfo, miscellaneous functions
+@node     putinfo, setinfo, getinfo, miscellaneous functions
 @unnumberedsubsec putinfo
 @findex putinfo (4.0)
 @cindex header info (writing)
@@ -4255,7 +4257,47 @@ invocations of @code{putinfo}.  Note that @code{newheader} or
 first introduced in WFDB library version 4.0.)
 
 @c @group
-@node     setibsize, setobsize, putinfo, miscellaneous functions
+@node     setinfo, wfdb_freeinfo, putinfo, miscellaneous functions
+@unnumberedsubsec setinfo
+@findex setinfo (10.5.11)
+@cindex info file (creating)
+
+@example
+int setinfo(int @var{record})
+@end example
+@noindent
+@strong{Return:}
+@table @asis
+@item @t{0}
+Success
+@item @t{-1}
+Failure: illegal record name, or info file could not be opened
+@end table
+@c @end group
+
+@c @group
+@node     wfdb_freeinfo, setibsize, setinfo, miscellaneous functions
+@unnumberedsubsec wfdb_freeinfo
+@findex wfdb_freeinfo (10.5.11)
+@cindex info (memory deallocation)
+@cindex memory deallocation
+@cindex freeing memory
+
+@example
+void wfdb_freeinfo()
+@end example
+@c @end group
+
+@noindent
+This function releases memory allocated by @code{getinfo}, and closes
+the file opened by @code{setinfo}, if any.  After calling it, @code{getinfo}
+behaves as it does on its initial call, (re)reading the info for the specified
+record (or the currently open record, if no record is specified).
+@code{wfdb_freeinfo} is invoked by @code{wfdbquit}.
+(This function was first introduced in WFDB library version 10.5.11.)
+
+@c @group
+@node     setibsize, setobsize, wfdb_freeinfo, miscellaneous functions
 @unnumberedsubsec setibsize
 @findex setibsize (5.0)
 @cindex buffer size (setting)
@@ -8989,6 +9031,43 @@ WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
 @unnumberedsec WFDB 10.5
+
+@unnumberedsubsec Changes in version 10.5.11 (6 April 2012)
+
+This release of the WFDB library introduces support for @file{.info} files.
+These are files containing 'info' strings in the same format as those that can
+be stored in @file{.hea} files.  The @file{.info} file for a record named
+@file{record} is named @file{record.info}, and it may be located anywhere in
+the WFDB path.  Function @code{getinfo()}, as in previous releases, returns
+the first info string belonging to the record named as its argument, or the
+next info string belonging to the previously specified record if its argument
+is NULL.  Beginning with this release, successive calls to  @code{getinfo()}
+return the next info string contained in the record's @file{.info} file if it
+exists, and if there are no more in the record's @file{.hea} file.  Function
+@code{putinfo()} writes an info string to the currently open output @file{.hea}
+file, unless function @code{setinfo()} (new in this release) has been invoked,
+in which case the info string is appended to the record's @file{.info} file
+in the current directory.  @code{getinfo()} reads all of the record's info
+strings the first time it is invoked, returning them one at a time;
+@code{wfdb_freeinfo()} frees the memory allocated for @code{getinfo()}'s info
+strings and closes the @file{.info} file opened by @file{putinfo()}, if any.
+After invoking @code{wfdb_freeinfo()}, a subsequent call to @code{getinfo()}
+reads the info strings again (or those of a different record, if a new record
+has been opened).
+
+Virginia Faro-Maza identified and corrected a bug in WFDB library function
+@code{iannsettime()}, in file{lib/annot.c}, that caused some annotations to be
+missed when two or more annotation files are open simultaneously.
+
+WFDB library function @code{isigopen()}, in @file{lib/signal.c}, was reverted
+to that of version 10.5.9.
+
+Benjamin Moody contributed patches for @file{app/snip.c} to ensure that the
+output will be written using a format that can accommodate the sample
+range.
+
+The signal calibration file, @file{data/wfdbcal}, has been updated with
+new definitions.
 
 @unnumberedsubsec Changes in version 10.5.10 (15 November 2011)
 

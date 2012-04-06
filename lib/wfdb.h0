@@ -1,9 +1,9 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised:  16 December 2010		wfdblib 10.5.7
+			Last revised:   4 April 2012		wfdblib 10.5.11
 WFDB library type, constant, structure, and function interface definitions
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1983-2010 George B. Moody
+Copyright (C) 1983-2012 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -99,11 +99,12 @@ typedef unsigned int WFDB_Annotator;/* annotator number */
 #define WFDB_MAXUSL   50   /* maximum length of WFDB_siginfo `.units' string */
 #define WFDB_MAXDSL  100   /* maximum length of WFDB_siginfo `.desc' string */
 
-/* WFDB_anninfo '.stat' values */
+/* wfdb_fopen mode values (WFDB_anninfo '.stat' values) */
 #define WFDB_READ      0   /* standard input annotation file */
 #define WFDB_WRITE     1   /* standard output annotation file */
 #define WFDB_AHA_READ  2   /* AHA-format input annotation file */
 #define WFDB_AHA_WRITE 3   /* AHA-format output annotation file */
+#define WFDB_APPEND    4   /* for output info files */
 
 /* WFDB_siginfo '.fmt' values
 FMT_LIST is suitable as an initializer for a static array; it lists all of
@@ -325,6 +326,8 @@ extern FINT newcal(char *calibration_filename);
 extern FVOID flushcal(void);
 extern FSTRING getinfo(char *record);
 extern FINT putinfo(char *info);
+extern FINT setinfo(char *record);
+extern FVOID wfdb_freeinfo(void);
 extern FINT newheader(char *record);
 extern FINT setheader(char *record, WFDB_Siginfo *siarray, unsigned int nsig);
 extern FINT setmsheader(char *record, char **segnames, unsigned int nsegments);
@@ -373,17 +376,17 @@ extern FINT annopen(), isigopen(), osigopen(), wfdbinit(), findsig(), getspf(),
     wfdb_isqrs(), wfdb_setisqrs(), wfdb_map1(), wfdb_setmap1(), wfdb_map2(),
     wfdb_setmap2(), wfdb_ammap(), wfdb_mamap(), wfdb_annpos(), wfdb_setannpos(),
     adumuv(), newheader(), setheader(), setmsheader(), getseginfo(),
-    wfdbputprolog(), setsampfreq(), setbasetime(), putinfo(), setibsize(),
-    setobsize(), calopen(), getcal(), putcal(), newcal(), wfdbgetskew(),
-    sample_valid();
+    wfdbputprolog(), setsampfreq(), setbasetime(), putinfo(), setinfo(),
+    setibsize(), setobsize(), calopen(), getcal(), putcal(), newcal(),
+    wfdbgetskew(), sample_valid();
 extern FLONGINT wfdbgetstart();
 extern FSAMPLE muvadu(), physadu(), sample();
 extern FSTRING ecgstr(), annstr(), anndesc(), timstr(), mstimstr(),
     datstr(), getwfdb(), getinfo(), wfdberror(), wfdbfile();
 extern FSITIME strtim(), tnextvec();
 extern FDATE strdat();
-extern FVOID setafreq(), setgvmode(), wfdbquit(), wfdbquiet(), dbverbose(),
-    setdb(), wfdbflush(), setcfreq(), setbasecount(), flushcal(),
+extern FVOID setafreq(), setgvmode(), wfdb_freeinfo(), wfdbquit(), wfdbquiet(),
+    wfdbverbose(), setdb(), wfdbflush(), setcfreq(), setbasecount(), flushcal(),
     wfdbsetiskew(), wfdbsetskew(), wfdbsetstart(), wfdbmemerr();
 extern FFREQUENCY getafreq(), getifreq(), sampfreq(), getcfreq();
 extern FDOUBLE aduphys(), getbasecount();

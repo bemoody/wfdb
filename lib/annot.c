@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:    20 March 2012	wfdblib 10.5.11
+			Last revised:     6 April 2012	wfdblib 10.5.11
 WFDB library functions for annotations
 
 _______________________________________________________________________________
@@ -642,15 +642,15 @@ FINT putann(WFDB_Annotator n, WFDB_Annotation *annot)
    annotator, anntime >= t */
 FINT iannsettime(WFDB_Time t)
 {
-    int stat = 0;
+    int stat = 0, niavalid = niaf;
     WFDB_Annotation tempann;
     WFDB_Annotator i;
 
     /* Handle negative arguments as equivalent positive arguments. */
     if (t < 0L) t = -t;
 
-    /* Loop over all annotators.  Go to the next file on EOF (stat = -1). */
-    for (i = 0; i < niaf && stat > -2; i++) {
+    /* Loop over all annotators. */
+    for (i = 0; i < niaf; i++) {
         struct iadata *ia;
 
 	ia = iad[i];
@@ -672,8 +672,10 @@ FINT iannsettime(WFDB_Time t)
 	}
 	while (ia->ann.time < t && (stat = getann(i, &tempann)) == 0)
 	    ;
+	if (stat < 0) niavalid--;
     }
-    return (stat);
+    stat = (niavalid > 0) ? 0 : -1;
+    return (stat);	/* -1 if all inputs are invalid, 0 otherwise */
 }
 
 /* Functions for converting between anntyp values (annotation codes defined in

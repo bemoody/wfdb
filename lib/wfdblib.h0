@@ -1,10 +1,10 @@
 /* file: wfdblib.h	G. Moody	13 April 1989
-                        Last revised:	 1 March 2010       wfdblib 10.5.0
+                        Last revised:	 6 April 2012       wfdblib 10.5.11
 External definitions for WFDB library private functions
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1989-2010 George B. Moody
+Copyright (C) 1989-2012 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -343,6 +343,7 @@ extern void wfdb_wwwquit(void);
 extern void wfdb_sampquit(void);
 extern void wfdb_sigclose(void);
 extern void wfdb_osflush(void);
+extern void wfdb_freeinfo(void);
 
 /* These functions are defined in annot.c */
 extern void wfdb_anclose(void);

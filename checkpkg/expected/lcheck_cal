@@ -24,6 +24,7 @@ CVP	0 - square 10 mmHg
 HR	0 100 square 100 bpm
 PULSE	0 - undefined 100 bpm
 PR	0 - undefined 100 BPM
+Pulse	0 - undefined 100 1/min
 RESP	0 - undefined 50 bpm
 SpO2	0 - undefined 10 %
 Tblood	0 - undefined 1 degC

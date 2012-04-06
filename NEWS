@@ -1,4 +1,28 @@
-10.5.11 (21 March 2012):
+10.5.11 (6 April 2012):
+	This release of the WFDB library introduces support for '.info' files.
+	These are files containing 'info' strings in the same format as those
+	that can be stored in '.hea' files.  The '.info' file for a record
+	named 'record' is named 'record.info', and it may be located anywhere
+	in the WFDB path.  Function getinfo(), as in previous releases, returns
+	the first info string belonging to the record named as its argument, or
+	the next info string belonging to the previously specified record if
+	its argument is NULL.  Beginning with this release, successive calls to
+	getinfo() return the next info string contained in the record's '.info'
+	file if it exists, and if there are no more in the record's '.hea'
+	file.  Function putinfo() writes an info string to the currently open
+	output '.hea' file, unless function setinfo() (new in this release) has
+	been invoked, in which case the info string is appended to the record's
+	'.info' file in the current directory.  getinfo() reads all of the
+	record's info strings the first time it is invoked, returning them one
+	at a time; wfdb_freeinfo() frees the memory allocated for getinfo()'s
+	info strings and closes the '.info' file opened by putinfo(), if any.
+	After invoking wfdb_freeinfo(), a subsequent call to getinfo() reads
+	the info strings again (or those of a different record, if a new record
+	has been opened).
+
+	A new application, app/hrstats.c, collects and summarizes heart rate
+	statistics based on the contents of an annotation file.
+	
 	Virginia Faro-Maza identified and corrected a bug in WFDB library
 	function iannsettime() (in lib/annot.c) that caused some annotations
 	to be missed when two or more annotation files are open simultaneously.

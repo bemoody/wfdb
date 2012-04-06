@@ -7,6 +7,7 @@ app/cshsetwfdb
 app/ecgeval.c
 app/epicmp.c
 app/fir.c
+app/hrstats.c
 app/ihr.c
 app/Makefile
 app/Makefile.top
@@ -284,6 +285,7 @@ doc/wag-src/fixag.sh
 doc/wag-src/getpagenos.c
 doc/wag-src/header.5
 doc/wag-src/hrfft.1
+doc/wag-src/hrstats.1
 doc/wag-src/ihr.1
 doc/wag-src/imageplt.1
 doc/wag-src/install0.tex

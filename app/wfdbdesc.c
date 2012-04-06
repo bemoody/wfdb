@@ -1,9 +1,9 @@
 /* file: wfdbdesc.c		G. Moody	  June 1989
-				Last revised:   14 March 2009
+				Last revised:   6 April 2012
 
 -------------------------------------------------------------------------------
 wfdbdesc: Describe signal specifications
-Copyright (C) 1989-2009 George B. Moody
+Copyright (C) 1989-2012 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -76,7 +76,7 @@ char *argv[];
 	    (void)printf("----------------------------------------------");
 	}
     }
-    if (info = getinfo((char *)NULL)) {
+    if (info = getinfo(argv[1])) {
        (void)printf("\nNotes\n=====\n");
        do {
 	   puts(info);
