@@ -4186,14 +4186,17 @@ pointer to an ``info'' string, or @code{NULL}
 @c @end group
 
 @noindent
-This function reads an ``info'' string from the @file{hea} file for
-the specified @var{record}.  If @var{record} is @code{NULL}, then
-@code{getinfo} reads the next available info string for the currently
-open record.  Info strings are null-terminated and do not
-contain newline characters.  The @file{hea} files of some records may
-contain no info strings;  others may contain more than one info string.
-For example, the following code fragment may be used to read and print
-all of the info for record @file{100s}:
+If @var{record} is not @code{NULL}, @code{getinfo} reads the first ``info''
+string for @var{record}.  If @var{record} is @code{NULL}, then @code{getinfo}
+reads the next available info string for the currently open record.  Info
+strings are null-terminated and do not contain newline characters.  Some
+records may contain no info strings; others may contain more than one info
+string.  They may be stored within @file{hea} or @file{info} files; if any are
+contained in a record's @file{hea} file, they are returned first.
+
+@noindent
+For example, the following code fragment may be used to read and print all of
+the info for record @file{100s}:
 
 @example
 @dots{}
@@ -4246,15 +4249,16 @@ Failure: header not initialized
 @c @end group
 
 @noindent
-This function writes @var{s} as an ``info'' string into the
-@file{hea} file that was created by the most recent invocation of
-@code{newheader}.  The string argument, @var{s}, must be null-terminated
-and should not contain newline characters.  No more than 254 characters
-may be written in a single invocation of @code{putinfo}.  Two or more
-info strings may be written to the same header by successive
-invocations of @code{putinfo}.  Note that @code{newheader} or
-@code{setheader} must be used before @code{putinfo}.  (This function was
-first introduced in WFDB library version 4.0.)
+This function writes @var{s} as an ``info'' string associated with the current
+output record.  If @code{setinfo} has been called more recently than
+@code{newheader} or @code{setheader}, the info string is written to the
+@file{info} file; otherwise, it is written to the @file{hea} file, unless none
+of these three functions has been called (which results in an error).  The
+string argument, @var{s}, must be null-terminated and should not contain
+newline characters.  No more than 254 characters may be written in a single
+invocation of @code{putinfo}.  Two or more info strings may be written to the
+same header or info file by successive invocations of @code{putinfo}.
+(This function was first introduced in WFDB library version 4.0.)
 
 @c @group
 @node     setinfo, wfdb_freeinfo, putinfo, miscellaneous functions
@@ -4274,6 +4278,18 @@ Success
 Failure: illegal record name, or info file could not be opened
 @end table
 @c @end group
+
+@noindent
+This function opens the @file{info} file for the specified @var{record} for
+writing using @code{putinfo}.  If @var{record}.@code{info} does not exist in
+the current directory, it is created;  otherwise, it is opened for appending
+(i.e., so that anything @code{putinfo} writes is added at the end of the
+file rather than overwriting any existing contents).
+
+@noindent
+The file opened by @code{setinfo} can be used to store arbitrary information
+associated with @var{record}, without altering @var{record}'s header file.
+(@code{setinfo} was first introduced in WFDB library version 10.5.11.)
 
 @c @group
 @node     wfdb_freeinfo, setibsize, setinfo, miscellaneous functions
