@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:    6 April 2012		wfdblib 10.5.11
+			Last revised:   24 April 2012		wfdblib 10.5.12
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -3043,8 +3043,11 @@ FSTRING getinfo(char *record)
     static int i;
     WFDB_FILE *ifile;
 
+    if (record)
+	wfdb_freeinfo();
+
     if (pinfo == NULL) {	/* info for record has not yet been read */
-	if (record == NULL) {
+	if (record == NULL && (record = wfdb_getirec()) == NULL) {
 	    wfdb_error("getinfo: caller did not specify record name\n");
 	    return (NULL);
 	}

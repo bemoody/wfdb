@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:	  6 April 2012       wfdblib 10.5.11
+                        Last revised:	 24 April 2012       wfdblib 10.5.12
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -66,6 +66,7 @@ library functions defined elsewhere:
  wfdb_checkname		(checks record and annotator names for validity)
  wfdb_striphea [10.4.5] (removes trailing '.hea' from a record name, if present)
  wfdb_setirec [9.7]	(saves current record name)
+ wfdb_getirec [10.5.12]	(gets current record name)
 
 (Numbers in brackets in the lists above indicate the first version of the WFDB
 library that included the corresponding function.  Functions not so marked
@@ -1082,6 +1083,11 @@ void wfdb_setirec(const char *p)
 	strncpy(irec, p, len);
 	irec[len] = '\0';
     }
+}
+
+char *wfdb_getirec(void)
+{
+    return (*irec ? irec: NULL);
 }
 
 /* Remove trailing '.hea' from a record name, if present. */

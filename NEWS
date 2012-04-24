@@ -1,3 +1,8 @@
+10.5.12 (24 April 2012):
+	This version restores the behavior of WFDB library function getinfo()
+	in versions earlier than 10.5.10 when getinfo is invoked with a NULL
+	argument.  Thanks to Benjamin Moody for reporting the problem.
+
 10.5.11 (6 April 2012):
 	This release of the WFDB library introduces support for '.info' files.
 	These are files containing 'info' strings in the same format as those

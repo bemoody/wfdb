@@ -1,5 +1,5 @@
 /* file: wfdblib.h	G. Moody	13 April 1989
-                        Last revised:	 6 April 2012       wfdblib 10.5.11
+                        Last revised:	24 April 2012       wfdblib 10.5.12
 External definitions for WFDB library private functions
 
 _______________________________________________________________________________
@@ -323,6 +323,7 @@ extern void wfdb_error(char *format_string, ...);
 extern WFDB_FILE *wfdb_fopen(char *fname, const char *mode);
 extern int wfdb_fprintf(WFDB_FILE *fp, const char *format, ...);
 extern void wfdb_setirec(const char *record_name);
+extern char *wfdb_getirec(void);
 
 #if WFDB_NETFILES
 extern void wfdb_clearerr(WFDB_FILE *fp);
