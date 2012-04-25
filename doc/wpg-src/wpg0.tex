@@ -9049,6 +9049,13 @@ changes that may not be described here.
 
 @unnumberedsec WFDB 10.5
 
+@unnumberedsubsec Changes in version 10.5.12 (25 April 2012)
+
+When called with a NULL argument, getinfo() sometimes behaves differently in
+WFDB library version 10.5.11 than it does in previous versions.  This release
+restores the previous behavior.  Thanks to Benjamin Moody for reporting this
+issue.
+
 @unnumberedsubsec Changes in version 10.5.11 (6 April 2012)
 
 This release of the WFDB library introduces support for @file{.info} files.

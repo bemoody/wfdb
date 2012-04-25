@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: install-wave32		G. Moody	7 October 2008
-#				Last revised:   1 June 2010 for Fedora 12
+#				Last revised:   25 April 2012
 # Build and install WAVE on 64-bit Linux
 #
 # *** Fedora 12 users: if this script fails, see the note at the end! ***
@@ -109,7 +109,7 @@ fi
 #     commands:
 
 make clean
-./configure -m32
+./configure -m32 $*
 cd lib
 make install
 
