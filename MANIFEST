@@ -7,6 +7,10 @@ app/cshsetwfdb
 app/ecgeval.c
 app/epicmp.c
 app/fir.c
+app/gqfuse.c
+app/gqpost.c
+app/gqrs.c
+app/gqrs.conf
 app/hrstats.c
 app/ihr.c
 app/Makefile
@@ -283,6 +287,7 @@ doc/wag-src/fir.1
 doc/wag-src/fixag.sed
 doc/wag-src/fixag.sh
 doc/wag-src/getpagenos.c
+doc/wag-src/gqrs.1
 doc/wag-src/header.5
 doc/wag-src/hrfft.1
 doc/wag-src/hrstats.1

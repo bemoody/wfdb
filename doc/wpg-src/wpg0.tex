@@ -9049,6 +9049,14 @@ changes that may not be described here.
 
 @unnumberedsec WFDB 10.5
 
+@unnumberedsubsec Changes in version 10.5.13 (13 May 2012)
+
+Versions of the WFDB library up to 10.5.10 ignored embedded empty lines
+within the @code{info} sections of @file{.hea} files, but versions 10.5.10 and
+10.5.11 treat them as markers of the end of the @code{info} section.  This
+version restores the previous treatment of embedded empty lines.  Thanks
+to Justin Leo Cheang Loong for reporting this issue.
+
 @unnumberedsubsec Changes in version 10.5.12 (25 April 2012)
 
 When called with a NULL argument, getinfo() sometimes behaves differently in

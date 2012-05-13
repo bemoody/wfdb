@@ -1,3 +1,16 @@
+10.5.13 (13 May 2012):
+	A flexible high-sensitivity QRS detector for research (app/gqrs.c), and
+	a companion post-processor (app/gqpost.c) for improving its positive
+	predictivity with minimal loss of sensitivity, are included in this
+	release.  The algorithms employed in these applications are previously
+	unpublished.
+
+	Versions of the WFDB library up to 10.5.10 ignored embedded empty lines
+	within the 'info' sections of '.hea' files, but versions 10.5.10 and
+	10.5.11 treat them as markers of the end of the 'info' section.  This
+	version restores the previous treatment of embedded empty lines.  Thanks
+	to Justin Leo Cheang Loong for reporting this issue.
+
 10.5.12 (24 April 2012):
 
          When called with a NULL argument, getinfo() sometimes behaves

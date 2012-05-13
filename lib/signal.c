@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   24 April 2012		wfdblib 10.5.12
+			Last revised:     4 May 2012		wfdblib 10.5.13
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -3070,16 +3070,20 @@ FSTRING getinfo(char *record)
 		    if (*buf != '#') break; /* skip initial comments, if any */
 		while (wfdb_fgets(buf, 256, ifile))
 		    if (*buf == '#') break; /* skip header content */
-		while (*buf == '#') {	/* read and save info */
-		    p = buf + strlen(buf) - 1;
-		    if (*p == '\n') *p-- = '\0';
-		    if (*p == '\r') *p = '\0';
-		    if (ninfo >= nimax) {
-			nimax += 16;
-			SREALLOC(pinfo, nimax, sizeof(char *));
+		while (*buf) {	/* read and save info */
+		    if (*buf == '#') {	    /* skip anything that isn't info */
+			p = buf + strlen(buf) - 1;
+			if (*p == '\n') *p-- = '\0';
+			if (*p == '\r') *p = '\0';
+			if (ninfo >= nimax) {
+			    int j = nimax;
+			    nimax += 16;
+			    SREALLOC(pinfo, nimax, sizeof(char *));
+			    memset(pinfo + j, 0, (size_t)(16*sizeof(char *)));
+			}
+			SSTRCPY(pinfo[ninfo], buf+1);
+			ninfo++;
 		    }
-		    SSTRCPY(pinfo[ninfo], buf+1);
-		    ninfo++;
 		    if (wfdb_fgets(buf, 256, ifile) == NULL) break;
 		}
 		wfdb_fclose(ifile);
@@ -3093,8 +3097,10 @@ FSTRING getinfo(char *record)
 		    if (*p == '\n') *p-- = '\0';
 		    if (*p == '\r') *p = '\0';
 		    if (ninfo >= nimax) {
+			int j = nimax;
 			nimax += 16;
 			SREALLOC(pinfo, nimax, sizeof(char *));
+			memset(pinfo + j, 0, (size_t)(16*sizeof(char *)));
 		    }
 		    SSTRCPY(pinfo[ninfo], buf+1);
 		    ninfo++;

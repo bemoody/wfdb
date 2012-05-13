@@ -1,20 +1,23 @@
 # file: Makefile.tpl		G. Moody	  23 May 2000
-#				Last revised:	  6 April 2012
+#				Last revised:	   7 May 2012
 # This section of the Makefile should not need to be changed.
 
-CFILES = ann2rr.c bxb.c calsig.c ecgeval.c epicmp.c fir.c hrstats.c ihr.c \
- mfilt.c mrgann.c mxm.c nguess.c nst.c plotstm.c pscgen.c pschart.c psfd.c \
- rdann.c rdsamp.c rr2ann.c rxr.c sampfreq.c sigamp.c sigavg.c signame.c \
- signum.c skewedit.c snip.c sortann.c sqrs.c sqrs125.c sumann.c sumstats.c \
- tach.c time2sec.c wabp.c wfdb-config.c wfdbcat.c wfdbcollate.c wfdbdesc.c \
- wfdbmap.c wfdbsignals.c wfdbtime.c wfdbwhich.c wqrs.c wrann.c wrsamp.c xform.c
+CFILES = ann2rr.c bxb.c calsig.c ecgeval.c epicmp.c fir.c gqfuse.c gqpost.c \
+ gqrs.c hrstats.c ihr.c mfilt.c mrgann.c mxm.c nguess.c nst.c plotstm.c \
+ pscgen.c pschart.c psfd.c rdann.c rdsamp.c rr2ann.c rxr.c sampfreq.c sigamp.c \
+ sigavg.c signame.c signum.c skewedit.c snip.c sortann.c sqrs.c sqrs125.c \
+ sumann.c sumstats.c tach.c time2sec.c wabp.c wfdb-config.c wfdbcat.c \
+ wfdbcollate.c wfdbdesc.c wfdbmap.c wfdbsignals.c wfdbtime.c wfdbwhich.c \
+ wqrs.c wrann.c wrsamp.c xform.c
+CFFILES = gqrs.conf
 HFILES = signal-colors.h
-XFILES = ann2rr bxb calsig ecgeval epicmp fir hrstats ihr \
- mfilt mrgann mxm nguess nst plotstm pscgen pschart psfd \
- rdann rdsamp rr2ann rxr sampfreq sigamp sigavg signame \
- signum skewedit snip sortann sqrs sqrs125 sumann sumstats \
- tach time2sec wabp wfdb-config wfdbcat wfdbcollate wfdbdesc \
- wfdbmap wfdbsignals wfdbtime wfdbwhich wqrs wrann wrsamp xform
+XFILES = ann2rr bxb calsig ecgeval epicmp fir gqfuse gqpost \
+ gqrs hrstats ihr mfilt mrgann mxm nguess nst plotstm \
+ pscgen pschart psfd rdann rdsamp rr2ann rxr sampfreq sigamp \
+ sigavg signame signum skewedit snip sortann sqrs sqrs125 \
+ sumann sumstats tach time2sec wabp wfdb-config wfdbcat \
+ wfdbcollate wfdbdesc wfdbmap wfdbsignals wfdbtime wfdbwhich \
+ wqrs wrann wrsamp xform
 SCRIPTS = cshsetwfdb setwfdb
 PSFILES = pschart.pro psfd.pro 12lead.pro
 MFILES = Makefile
@@ -67,7 +70,7 @@ clean:
 
 # `make listing':  print a listing of WFDB applications sources
 listing:
-	$(PRINT) README $(MFILES) $(CFILES) $(HFILES) $(PSFILES)
+	$(PRINT) README $(MFILES) $(CFILES) $(HFILES) $(CFFILES) $(PSFILES)
 
 # Rules for compiling applications that require non-standard options
 
