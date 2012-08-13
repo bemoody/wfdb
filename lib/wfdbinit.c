@@ -1,5 +1,5 @@
 /* file: wfdbinit.c	G. Moody	 23 May 1983
-			Last revised:   6 April 2012		wfdblib 10.5.11
+			Last revised:   2 August 2012		wfdblib 10.5.14
 WFDB library functions wfdbinit, wfdbquit, and wfdbflush
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
@@ -49,9 +49,6 @@ FVOID wfdbquit(void)
     resetwfdb();	/* restore the WFDB path */
     wfdb_sampquit();	/* release sample data buffer */
     wfdb_freeinfo();	/* release info strings */
-#if WFDB_NETFILES
-    wfdb_wwwquit();	/* release resources allocated by libcurl or libwww */
-#endif
 }
 
 FVOID wfdbflush(void)	/* write all buffered output to files */

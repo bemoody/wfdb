@@ -1,5 +1,5 @@
 # file: wfdbcal		G. Moody	  June 1991
-#			Last revised:   21 March 2012
+#			Last revised:   31 July 2012
 # Default calibration database for WFDB library
 #
 # Format:
@@ -68,15 +68,17 @@ Atip	- - undefined 1 mV
 HVA	- - undefined 5 mV
 Vtip	- - undefined 10 mV
 
-# Intracardiac electrograms
-CS	- - undefined 1 mV
-
-# ECG from Non-Invasive Fetal ECG Database
-Thorax	- - undefined 2 mV
-Abdomen	- - undefined 200 uV
-
 # ECG from INCART database
 AV	- 1 square 1 mV
+
+# Fetal ECG
+Thorax	- - undefined 2 mV
+Abdomen	- - undefined 200 uV
+FECG	- - undefined 1 mV
+Direct	- - undefined 200 uV
+
+# Intracardiac electrograms
+CS	- - undefined 1 mV
 
 # EEG
 F	- - undefined 100 uV

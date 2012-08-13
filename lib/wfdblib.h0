@@ -1,5 +1,5 @@
 /* file: wfdblib.h	G. Moody	13 April 1989
-                        Last revised:	24 April 2012       wfdblib 10.5.12
+                        Last revised:	2 August 2012       wfdblib 10.5.14
 External definitions for WFDB library private functions
 
 _______________________________________________________________________________
@@ -337,7 +337,6 @@ extern long wfdb_ftell(WFDB_FILE *fp);
 extern size_t wfdb_fwrite(void *ptr, size_t size, size_t nmemb, WFDB_FILE *fp);
 extern int wfdb_getc(WFDB_FILE *fp);
 extern int wfdb_putc(int c, WFDB_FILE *fp);
-extern void wfdb_wwwquit(void);
 #endif
 
 /* These functions are defined in signal.c */
@@ -369,7 +368,7 @@ extern int wfdb_feof(), wfdb_ferror(), wfdb_fflush(), wfdb_fseek(),
     wfdb_getc(), wfdb_putc();
 extern long wfdb_ftell();
 extern size_t wfdb_fread(), wfdb_fwrite();
-extern void wfdb_clearerr(), wfdb_wwwquit();
+extern void wfdb_clearerr();
 # endif
 
 /* Some non-ANSI C libraries (e.g., version 7, BSD 4.2) lack an implementation

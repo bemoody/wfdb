@@ -41,10 +41,12 @@ P	- - undefined 100 mmHg
 Atip	- - undefined 1 mV
 HVA	- - undefined 5 mV
 Vtip	- - undefined 10 mV
-CS	- - undefined 1 mV
+AV	- 1 square 1 mV
 Thorax	- - undefined 2 mV
 Abdomen	- - undefined 200 uV
-AV	- 1 square 1 mV
+FECG	- - undefined 1 mV
+Direct	- - undefined 200 uV
+CS	- - undefined 1 mV
 F	- - undefined 100 uV
 C	- - undefined 100 uV
 A	- - undefined 100 uV

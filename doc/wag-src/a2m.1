@@ -1,11 +1,11 @@
-.TH A2M 1 "23 July 2008" "WFDB 10.4.8" "WFDB Applications Guide"
+.TH A2M 1 "2 August 2012" "WFDB 10.5.14" "WFDB Applications Guide"
 .SH NAME
 a2m, ad2m, ahaconvert, ahaecg2mit, m2a, md2a \- converting between AHA DB and WFDB formats
 .SH SYNOPSIS
 
 To read from an AHA DB DVD:
 .br
-    \fBahaecg2mit\fR [ \fB-s\fR ] \fIahafile\fB.ecg\fR ...
+    \fBahaecg2mit\fR [ \fB-s\fR ] \fIahafile\fB.*\fR ...
 .br
 To read from an AHA DB CD:
 .br
@@ -26,7 +26,12 @@ To convert a WFDB record to AHA tape format:
 .PP
 The AHA Database for Evaluation of Ventricular Arrhythmia Detectors (AHA DB)
 has been distributed since 1983 by ECRI (http://www.ecri.org), in
-at least three formats:
+at least four formats:
+.TP
+\fBsingle-file (.txt) format\fR
+Developed by ECRI for distributions of the AHA DB on DVDs (ca. 2012) as a
+successor to the earlier .ecg format (below);  this format can be read by
+\fBahaecg2mit\fR.
 .TP
 \fBsingle-file (.ecg) format\fR
 Developed by ECRI for distributions of the AHA DB on DVDs (ca. 2008);  this
@@ -77,7 +82,7 @@ more generally useful ways using \fBsnip\fR(1) or \fBxform\fR(1).
 .SH DVD FORMAT
 .SS ahaecg2mit
 .PP
-Use \fBahaecg2mit\fR to convert .ecg files from the AHA DB DVD into
+Use \fBahaecg2mit\fR to convert .txt or .ecg files from an AHA DB DVD into
 WFDB-compatible records.  One or more input filenames may be supplied as
 command-line arguments;  each specified input file is converted into
 a WFDB record, including a .hea (header) file, a .dat (signal) file,
@@ -85,7 +90,7 @@ and a .atr (reference annotation) file.  If the first command-line
 argument is \fB-s\fR, then \fBahaecg2mit\fR produces short-form records
 with the correct (n2nn or n3nn) record names.
 
-If the .ecg files are not in the current directory, give their
+If the .txt or .ecg files are not in the current directory, give their
 full pathnames.  The output files are always written to the current
 directory, so be sure that the current directory is writeable (it
 should not be the DVD) and that has sufficient free space (roughly
@@ -173,7 +178,11 @@ It may be necessary to set and export the shell variable \fBWFDB\fR (see
 
 .SH EXAMPLES
 .SS "AHA Database DVD"
-If the DVD is accessible as \fB/media/dvd/\fR, the command
+If the DVD is accessible as \fB/media/dvd/\fR, either
+.br
+        \fBahaecg2mit -s /media/dvd/*.txt\fR
+.br
+or (for DVDs written in the older format):
 .br
         \fBahaecg2mit -s /media/dvd/*.ecg\fR
 .br
@@ -184,7 +193,7 @@ Under Windows, within a Cygwin window, the DVD is accessible as
 drive letter that Windows has assigned), so the same task can be done
 under Windows by
 .br
-         \fBahaecg2mit -s /cygdrive/d/*.ecg\fR
+         \fBahaecg2mit -s /cygdrive/d/*.txt\fR
 
 .SS "AHA Database CD"
 AHA DB CDs contain both long and short versions of each record.  In

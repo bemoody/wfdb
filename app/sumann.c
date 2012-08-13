@@ -1,9 +1,9 @@
 /* file: sumann.c	G. Moody        5 February 1982
-			Last revised:  14 November 2002
+			Last revised:    2 August 2012
 
 -------------------------------------------------------------------------------
 sumann: Tabulates annotations
-Copyright (C) 2002 George B. Moody
+Copyright (C) 1982-2012 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -51,10 +51,11 @@ char *argv[];
 {
     static WFDB_Anninfo ai;
     WFDB_Annotation annot;
-    int i, rhythm = 0, noise = 2, qflag = 0;
-    static long tab[64], rtab[MAXR+1], ntab[6];
+    int i, j, rhythm = 0, noise = 2, qflag = 0;
+    static long tab[ACMAX+1], rtab[MAXR+1], ntab[6];
     static long rtime[MAXR+1], ntime[6], r0, n0, from_time, to_time;
     char *record = NULL, *prog_name();
+    FILE *bfile = NULL, *rfile = NULL;
     void help();
 
     pname = prog_name(argv[0]);
@@ -91,6 +92,58 @@ char *argv[];
 	    help();
 	    exit(0);
 	    break;
+	  case 'o':
+	    if (++i >= argc+1) {
+		(void)fprintf(stderr,
+			      "%s: beat and rhythm file names must follow -o\n",
+			      pname);
+		exit(1);
+	    }
+	    /* check if files exist already, create them as needed */
+	    if (bfile = fopen(argv[i], "r")) {
+		fclose(bfile);
+		if ((bfile = fopen(argv[i], "a")) == NULL) {
+		    (void)fprintf(stderr,
+				  "%s: can't append to %s\n", pname, argv[i]);
+		    exit(1);
+		}
+	    }
+	    else {
+		if ((bfile = fopen(argv[i], "w")) == NULL) {
+		    (void)fprintf(stderr,
+				  "%s: can't append to %s\n", pname, argv[i]);
+		    exit(1);
+		}
+		fprintf(bfile, "Record");
+		for (j = 1; j < ACMAX+1; j++)
+		    if (qflag == 0 || isqrs(j))
+			(void)fprintf(bfile, ",%s", annstr(j));
+		fprintf(bfile, "\n");
+	    }
+	    i++;
+	    if (rfile = fopen(argv[i], "r")) {
+		fclose(rfile);
+		if ((rfile = fopen(argv[i], "a")) == NULL) {
+		    (void)fprintf(stderr,
+				  "%s: can't append to %s\n", pname, argv[i]);
+		    fclose(bfile);
+		    exit(1);
+		}
+	    }
+	    else {
+		if ((rfile = fopen(argv[i], "w")) == NULL) {
+		    (void)fprintf(stderr,
+				  "%s: can't append to %s\n", pname, argv[i]);
+		    fclose(bfile);
+		    exit(1);
+		}
+		fprintf(rfile, "Record");
+		for (j = 1; j <= MAXR; j++)
+		    if (rstring[j])
+			(void)fprintf(rfile, ",%s", rstring[j]);
+		fprintf(rfile, "\n");
+	    }
+	    break;
 	  case 'q':       /* list only QRS annotations in event table */
 	    qflag = 1;
 	    break;
@@ -123,6 +176,8 @@ char *argv[];
     }
     if (record == NULL || ai.name == NULL) {
 	help();
+	if (bfile) fclose(bfile);
+	if (rfile) fclose(rfile);
 	exit(1);
     }
 
@@ -222,21 +277,56 @@ char *argv[];
 	ntab[noise]++;
 	ntime[noise] += to_time - n0;
     }
-    for (i = 0; i < 64; i++)
-      if (tab[i] != 0L && (qflag == 0 || isqrs(i)))
-	    (void)printf("%s\t%6ld\n", annstr(i), tab[i]);
-    (void)printf("\n");
-    for (i = 1; i <= MAXR; i++)
-	if (rtab[i] != 0L)
-	    (void)printf("%s\t%6ld episode%c %s\n",
-			rstring[i], rtab[i],
-			rtab[i] == 1L ? ' ' : 's', timstr(rtime[i]));
-    (void)printf("\n");
-    for (i = 1; i <= 5; i++)
-	if (ntab[i] != 0L)
-	    (void)printf("%s\t%6ld episode%c %s\n",
-			nstring[i], ntab[i],
-			ntab[i] == 1L ? ' ' : 's', timstr(ntime[i]));
+
+    if (bfile == NULL) {
+	for (i = 1; i < ACMAX+1; i++)
+	    if (tab[i] != 0L && (qflag == 0 || isqrs(i)))
+		(void)printf("%s\t%6ld\n", annstr(i), tab[i]);
+	(void)printf("\n");
+    }
+    else {
+	(void)fprintf(bfile, "%s", record);
+	tab[RHYTHM] = tab[NOISE] = 0;
+	for (i = 1; i < ACMAX+1; i++) {
+	    (void)fprintf(bfile, ",");
+	    if (tab[i] && (qflag == 0 || isqrs(i)))
+		(void)fprintf(bfile, "%ld", tab[i]);
+	}
+	(void)fprintf(bfile, "\n");
+	fclose(bfile);
+    }
+
+    if (rfile == NULL) {
+	for (i = 1; i <= MAXR; i++)
+	    if (rtab[i] != 0L)
+		(void)printf("%s\t%6ld episode%c %s\n",
+			     rstring[i], rtab[i],
+			     rtab[i] == 1L ? ' ' : 's', timstr(rtime[i]));
+	(void)printf("\n");
+    }
+    else {
+	(void)fprintf(rfile, "%s", record);
+	for (i = 1; i <= MAXR; i++) {
+	    if (rstring[i]) {
+		(void)fprintf(rfile, ",");
+		if (rtab[i]) {
+		    char *p = timstr(rtime[i]);
+		    while (*p == ' ') p++;
+		    (void)fprintf(rfile, "%ld (%s)", rtab[i], p);
+		}
+	    }
+	}
+	(void)fprintf(rfile, "\n");
+	fclose(rfile);
+    }
+
+    if (bfile == NULL) {
+	for (i = 1; i <= 5; i++)
+	    if (ntab[i] != 0L)
+		(void)printf("%s\t%6ld episode%c %s\n",
+			     nstring[i], ntab[i],
+			     ntab[i] == 1L ? ' ' : 's', timstr(ntime[i]));
+    }
     exit(0);	/*NOTREACHED*/
 }
 
@@ -263,10 +353,17 @@ char *s;
 static char *help_strings[] = {
  "usage: %s -r RECORD -a ANNOTATOR [OPTIONS ...]\n",
  "where RECORD and ANNOTATOR specify the input, and OPTIONS may include:",
- " -f TIME  start at specified TIME",
- " -h       print this usage summary",
- " -q       list only QRS annotations in the event table",
- " -t TIME  stop at specified TIME",
+ " -f TIME       start at specified TIME",
+ " -h            print this usage summary",
+ " -o BTAB RTAB  add summaries of beat and rhythm annotations to BTAB and RTAB",
+ " -q            list only QRS annotations in the event table",
+ " -t TIME       stop at specified TIME",
+ "If -o is not used, a readable summary is written to the standard output.",
+ "",
+ "Otherwise, BTAB and RTAB are names of files containing CSV-format tables.",
+ "If these files don't exist, they will be created, and the column headings",
+ "will be written in the first line of each.  If they do exist, this program's",
+ "output is appended to them.  Each line after the first summarizes 1 record.",
 NULL
 };
 

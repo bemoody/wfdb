@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  23 May 2000
-#				Last revised:	   7 May 2012
+#				Last revised:	 10 August 2012
 # This section of the Makefile should not need to be changed.
 
 CFILES = ann2rr.c bxb.c calsig.c ecgeval.c epicmp.c fir.c gqfuse.c gqpost.c \
@@ -18,7 +18,7 @@ XFILES = ann2rr bxb calsig ecgeval epicmp fir gqfuse gqpost \
  sumann sumstats tach time2sec wabp wfdb-config wfdbcat \
  wfdbcollate wfdbdesc wfdbmap wfdbsignals wfdbtime wfdbwhich \
  wqrs wrann wrsamp xform
-SCRIPTS = cshsetwfdb setwfdb
+SCRIPTS = cshsetwfdb setwfdb pnwlogin
 PSFILES = pschart.pro psfd.pro 12lead.pro
 MFILES = Makefile
 
@@ -51,7 +51,8 @@ collect:
 scripts:
 	sed s+/usr/local/database+$(DBDIR)+g <setwfdb >$(BINDIR)/setwfdb
 	sed s+/usr/local/database+$(DBDIR)+g <cshsetwfdb >$(BINDIR)/cshsetwfdb
-	$(SETPERMISSIONS) $(SCRIPTS)
+	sed s+/usr/local/database+$(DBDIR)+g <pnwlogin >$(BINDIR)/pnwlogin
+	cd $(BINDIR); $(SETPERMISSIONS) *setwfdb; $(SETXPERMISSIONS) pnwlogin
 
 uninstall:
 	../uninstall.sh $(PSPDIR) $(PSFILES)

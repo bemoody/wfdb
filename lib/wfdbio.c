@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:	 24 April 2012       wfdblib 10.5.12
+                        Last revised:	 13 August 2012       wfdblib 10.5.14
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -77,9 +77,9 @@ The next two groups of functions, which together enable input from remote
 Dakin.  Thanks, Mike!
 
 These functions, defined here if WFDB_NETFILES is non-zero, are intended only
-for the use of the functions in the next group below (except for wfdb_wwwquit,
-their definitions are not visible outside of this file):
- wfdb_wwwquit *		(shut down libcurl or libwww cleanly)
+for the use of the functions in the next group below (their definitions are not
+visible outside of this file):
+ wfdb_wwwquit		(shut down libcurl or libwww cleanly)
  www_init		(initialize libcurl or libwww)
  www_get_cont_len	(find length of data for a given url)
  www_get_url_range_chunk (get a block of data from a given url)
@@ -102,12 +102,6 @@ their definitions are not visible outside of this file):
  nf_fwrite		(emulates fwrite, for netfiles) [stub]
  nf_putc		(emulates putc, for netfiles) [stub]
  nf_vfprintf		(emulates fprintf, for netfiles) [stub]
-
-* wfdb_wwwquit is available outside of this file;  it is invoked by wfdbquit
-(defined in wfdbinit.c) to permit an application to release resources used
-by libcurl or libwww before exiting.  wfdb_wwwquit is also registered (by
-www_init) as a function to be invoked on exit from an application, so it is not
-necessary for applications to invoke wfdb_wwwquit (or wfdbquit) explicitly.
 
 In the current version of the WFDB library, output to remote files is not
 implemented;  for this reason, several of the functions listed above are
@@ -958,10 +952,24 @@ WFDB_FILE *wfdb_open(const char *s, const char *record, int mode)
 	return (wfdb_fopen(wfdb_filename, AB));
     }
 
-    /* If the file is to be opened for input, prepare to search the database
-       directories. */
-
+    /* Parse the WFDB path if not done previously. */
     if (wfdb_path_list == NULL) (void)getwfdb();
+
+    /* If the filename contains '://', or if it begins with a directory
+       separator, it's an absolute URL or pathname.  In this case, don't search
+       the WFDB path, but add its parent directory to the path if the file can
+       be read. */
+    if (strstr(r, "://") || *r == DSEP) {
+	if (strlen(r) + strlen(s) >= MFNLEN)
+	    return (NULL);  /* name too long */
+	spr1(wfdb_filename, r, s);
+	if ((ifile = wfdb_fopen(wfdb_filename, RB)) != NULL) {
+	    /* Found it! Add its path info to the WFDB path. */
+	    wfdb_addtopath(wfdb_filename);
+	    SFREE(r);
+	    return (ifile);
+	}
+    }
 
     for (c0 = wfdb_path_list; c0; c0 = c0->next) {
 	static char long_filename[MFNLEN];
@@ -1208,7 +1216,7 @@ typedef struct chunk CHUNK;
 #define chunk_putb HTChunk_putb
 #endif
 
-void wfdb_wwwquit(void)
+static void wfdb_wwwquit(void)
 {
     if (www_done_init) {
 #if WFDB_NETFILES_LIBCURL
@@ -1228,7 +1236,7 @@ void wfdb_wwwquit(void)
 static void www_init(void)
 {
     if (!www_done_init) {
-	char *p, version[20];
+	char *p, *u, version[20];
 
 	if ((p = getenv("WFDB_PAGESIZE")) && *p) page_size = atol(p);
 
@@ -1242,11 +1250,23 @@ static void www_init(void)
 	curl_easy_setopt(curl_ua, CURLOPT_FAILONERROR, 1L);
 	/* String to send as a User-Agent header */
 	curl_easy_setopt(curl_ua, CURLOPT_USERAGENT, curl_get_ua_string());
+#ifdef USE_NETRC
 	/* Search $HOME/.netrc for passwords */
 	curl_easy_setopt(curl_ua, CURLOPT_NETRC, CURL_NETRC_OPTIONAL);
+#endif
+	/* Get user name and password from the environment if available */
+	if ((u = getenv("PNWUSER")) && *u &&
+	    (p = getenv("PNWPASS")) && *p) {
+	    char *userpwd = (char *)malloc(strlen(u) + strlen(p) + 2);
+	    sprintf(userpwd, "%s:%s", u, p);
+	    curl_easy_setopt(curl_ua, CURLOPT_USERPWD, userpwd);
+	    for (p = userpwd; *p; p++)
+		*p = ' ';
+	    free(userpwd);
+	}
+
 	/* Use any available authentication method */
 	curl_easy_setopt(curl_ua, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
-
 	/* (Uncomment this line to enable tons of debugging
 	   information from libcurl) */
 	/* curl_easy_setopt(curl_ua, CURLOPT_VERBOSE, 1L); */

@@ -1,5 +1,5 @@
 file: README.NETFILES		G. Moody	14 September 1999
-				Last revised:	   27 May 2005
+				Last revised:	 13 August 2012
 
 WFDB software reads its input from files that can be located on local
 disks or (if NETFILES support is present) on remote web and FTP servers.
@@ -14,7 +14,7 @@ To use NETFILES once this software has been compiled and installed, the WFDB
 path should contain one or more components that refer to remote files available
 via http or ftp.  If NETFILES support is included, the default WFDB path
 (defined in lib/wfdblib.h) is
-	. /usr/database http://www.physionet.org/physiobank/database
+	. /usr/database http://physionet.org/physiobank/database
 (i.e., the first component is the current (local) directory, the second is
 /usr/database in the local file system, and the third component is the
 top-level PhysioBank database directory).  If you use a local PhysioBank
@@ -37,41 +37,34 @@ examples:
 				       own subdirectory of mimicdb, two levels
 				       of additional path information are
 				       necessary)
-
-If you have built the WFDB library using libcurl, version 7.12.0 or later,
-then WFDB applications can also read password-protected files.  The simplest
-way to use this feature is to create a text file named .netrc containing
-entries such as
-
-    machine www.physionet.org
-        login testuser
-        password PhysioNet
-
-If your .netrc contains the three lines as shown above, and your WFDB library
-was compiled with libcurl 7.12.0 or later, you can test this feature with a
-command such as:
-
-	rdann -r access-demo/100s -a atr
-
-which will read 'atr' annotations from a password-protected copy of the
-sample record (100s) on the master PhysioNet server.  Your browser can read the
-same files at http://physionet.org/physiobank/database/access-demo/ (enter
-"testuser" and "PhysioNet" respectively when prompted for a user name and
-a password).  This demo uses digest authentication (the password is transmitted
-in encrypted form, and compared against an encrypted copy on the server), but
-basic authentication (in which the password is transmitted in cleartext) is
-also supported.  Note, however that the data retrieved from the server travel
-across the net in cleartext. If you wish to provide restricted access to
-protected health information on your server to WFDB applications, we recommend
-seting up SSL on your server, and using the SSL-enabled version of libcurl;
-using SSL, the data travel in encrypted form across the net.
+	wave -r mimicdb/237/ -a al    (MIMIC Database, record 237, as above;
+	     		     	       allowed as a shortcut beginning in
+				       version 10.5.6, November 2010)
 
 NETFILES support was originally implemented by Michael Dakin as part of his
-summer 1999 UROP project at MIT.  Mike used the W3C's libwww in his original
-implementation.  The libwww maintainers last updated the library in June, 2002,
-and in January, 2004, the W3C formally announced that it would not continue
-development of libwww, although the library remains freely available.  In May,
-2005, Benjamin Moody reimplemented NETFILES using libcurl.  The primary
-advantages of libcurl over libwww are that libcurl is smaller and faster, it
-supports access to password-protected files, and it is actively maintained.
-Both libraries are freely available on all popular platforms.
+summer 1999 UROP project at MIT; version 10.0.1 of the WFDB library was the
+first release to include this feature, in November, 1999.  Mike used the W3C's
+libwww in his original implementation.  The libwww maintainers last updated the
+library in June, 2002, and in January, 2004, the W3C formally announced that it
+would not continue development of libwww, although the library remains freely
+available.  In May, 2005, Benjamin Moody reimplemented NETFILES using libcurl.
+The primary advantages of libcurl over libwww are that libcurl is smaller and
+faster, it supports access to password-protected files (see below), and it is
+actively maintained.  Both libraries are freely available on all popular
+platforms.
+
+
+Direct access from WFDB applications to password-protected files
+----------------------------------------------------------------
+
+If you have built the WFDB library using libcurl, version 7.12.0 or later,
+then WFDB applications can also read password-protected files, such as those
+within PhysioNetWorks shared or private projects.  The preferred way to do
+this is to set the PNWUSER and PNWPASS environment variables as is done by
+the pnwlogin script (see app/pnwlogin).  This method is usable with WFDB
+library version 10.5.14 (August 2012) and later.  Versions 10.3.16 (June 2005)
+through 10.5.13 can also provide access to password-protected files by use of
+a text file named .netrc, but this method is less secure than the newer method,
+which does not require the credentials to be kept in permanent storage.  The
+use of .netrc is described in previous versions of this file;  it is not
+recommended or supported in current installations.

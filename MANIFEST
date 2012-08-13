@@ -23,6 +23,7 @@ app/mxm.c
 app/nguess.c
 app/nst.c
 app/plotstm.c
+app/pnwlogin
 app/pscgen.c
 app/pschart.c
 app/pschart.pro
@@ -318,6 +319,7 @@ doc/wag-src/plotstm.1
 doc/wag-src/plt.1
 doc/wag-src/pltf.1
 doc/wag-src/pnnlist.1
+doc/wag-src/pnwlogin.1
 doc/wag-src/pschart.1
 doc/wag-src/psfd.1
 doc/wag-src/rdann.1

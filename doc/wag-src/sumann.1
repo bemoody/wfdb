@@ -1,4 +1,4 @@
-.TH SUMANN 1 "31 July 2002" "WFDB 10.2.7" "WFDB Applications Guide"
+.TH SUMANN 1 "2 August 2012" "WFDB 10.5.14" "WFDB Applications Guide"
 .SH NAME
 sumann \- summarize the contents of a WFDB annotation file
 .SH SYNOPSIS
@@ -16,6 +16,15 @@ Begin at the specified \fItime\fR.
 .TP
 \fB-h\fR
 Print a usage summary.
+.TP
+\fB-o\fR \fIbeat-table rhythm-table\fR
+Append summaries of beat and rhythm annotations to the specified
+\fIbeat-table\fR and \fIrhythm-table\fR files.
+The summaries for the specified \fIrecord\fR are written as a single line in
+CSV (comma-separated value) format in each file.  If either file does not
+exist, it is created, and a header line containing column names is written to
+it.  If the \fB-o\fR option is omitted, a more easily readable summary is
+written to the standard output instead.
 .TP
 \fB-q\fR
 Summarize QRS annotations only.

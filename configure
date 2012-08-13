@@ -38,6 +38,7 @@ do
 		        fi ;;
     --mandir=*)         MANDIR=`echo $i | sed 's/[-a-zA-Z0-9]*=//'` ;;
     --prefix=*)         DIR=`echo $i | sed 's/[-a-zA-Z0-9]*=//'` ;;
+    -q)			;; # ignored
     --shared)           LIBTYPE=dynamic ;;
     --static)           LIBTYPE=static ;;
     --static_only)      LIBTYPE=static

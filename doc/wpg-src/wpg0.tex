@@ -9049,6 +9049,17 @@ changes that may not be described here.
 
 @unnumberedsec WFDB 10.5
 
+@unnumberedsubsec Changes in version 10.5.14 (13 August 2012)
+
+WFDB applications can now read shared and private PhysioNetWorks projects
+securely, just as they have been able to read PhysioBank data since version
+10.0.1 (November 1999).  Low-level functions wfdb_open (in lib/wfdbio.c) and
+readheader (in lib/signal.c) incorporate changes to implement this new
+capability, as well as another new feature that allows record names to be
+specified using absolute pathnames or URLs.  As always, a final '.hea' is not
+considered to be part of a record name, but it may be included or omitted as
+desired.
+
 @unnumberedsubsec Changes in version 10.5.13 (13 May 2012)
 
 Versions of the WFDB library up to 10.5.10 ignored embedded empty lines
