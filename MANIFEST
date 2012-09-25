@@ -288,6 +288,7 @@ doc/wag-src/fir.1
 doc/wag-src/fixag.sed
 doc/wag-src/fixag.sh
 doc/wag-src/getpagenos.c
+doc/wag-src/gqfuse.1
 doc/wag-src/gqrs.1
 doc/wag-src/header.5
 doc/wag-src/hrfft.1

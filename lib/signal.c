@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   13 August 2012		wfdblib 10.5.14
+			Last revised:   25 September 2012	wfdblib 10.5.15
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -806,16 +806,16 @@ static int readheader(const char *record)
 
     /* If the final component of the record name includes a '.', assume it is a
        file name. */
-    q = record + strlen(record) - 1;
-    while (p > q && *q != '.' && *q != '/' && *q != ':' && *q != '\\')
+    q = (char *)record + strlen(record) - 1;
+    while (q > record && *q != '.' && *q != '/' && *q != ':' && *q != '\\')
 	q--;
     if (*q == '.') {
-	if (strcmp(q+1, "hea"))	/* assume EDF if suffix is not '.hea' */
-	    return (edfparse(hheader));
-	else if ((hheader = wfdb_open(NULL, record, WFDB_READ)) == NULL) {
+	if ((hheader = wfdb_open(NULL, record, WFDB_READ)) == NULL) {
 	    wfdb_error("init: can't open %s\n", record);
 	    return (-1);
 	}
+	else if (strcmp(q+1, "hea"))	/* assume EDF if suffix is not '.hea' */
+	    return (edfparse(hheader));
     }
 
     /* Otherwise, assume the file name is record.hea. */

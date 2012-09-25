@@ -1,5 +1,5 @@
 /* file: gqfuse.c		G. Moody	6 May 2012
-				Last revised:	7 May 2012
+				Last revised:  25 September 2012
 -------------------------------------------------------------------------------
 gqfuse: combine QRS annotation files
 Copyright (C) 2012 George B. Moody
@@ -260,23 +260,13 @@ char *prog_name(char *s)
    A more detailed summary is in the man page (gqpost.1). */
 
 static char *help_strings[] = {
- "usage: %s -r RECORD [OPTIONS ...]\n",
- "where RECORD is the name of the record to be analyzed, and OPTIONS may",
- "include any of:",
- " -a ANNOTATOR read annotations from the specified ANNOTATOR (default: qrs)",
- " -c FILE     initialize parameters from the specified configuration FILE",
- " -f TIME     begin processing at specified time",
- " -h          print this usage summary",
- " -H          read multifrequency signals in high resolution mode",
- " -m THRESH   set interpolated event acceptance threshold to THRESH",
- "              (default: 1)",
- " -o ANNOTATOR write annotations to the specified ANNOTATOR (default: gqp)",
- " -t TIME     stop processing at specified time",
- "If too many true beats are rejected, decrease THRESH;  if too many false",
- "detections are accepted, increase THRESH.",
- "Note that the output is a complete copy of the input (with rejected events",
- "flagged as ARFCT).  The -f and -t options only limit the interval during",
- "which events may be rejected.",
+ "usage: %s -r RECORD -a ANNOTATOR ANNOTATOR ... [OPTIONS ...]\n",
+ "where RECORD is the name of the record to be analyzed, two or more",
+ "ANNOTATOR arguments specify annotation sets to be read and fused, and",
+ "OPTIONS may include any of:",
+ " -c FILE       initialize parameters from the specified configuration FILE",
+ " -h            print this usage summary",
+ " -o ANNOTATOR  write annotations to the specified ANNOTATOR (default: gqf)",
 NULL
 };
 

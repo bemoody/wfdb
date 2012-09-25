@@ -1,4 +1,12 @@
-10.5.14 (2 August 2012):
+10.5.15 (25 September 2012):
+	A new application (app/gqfuse.c) for combining two or more beat
+        annotation files is included in this release.
+
+	Changes to the internal function readheader() in WFDB library version
+	10.5.14 made the library unable to open EDF files.  This bug has been
+	fixed.	
+
+10.5.14 (13 August 2012):
 	WFDB applications can now read shared and private PhysioNetWorks
 	projects securely, just as they have been able to read PhysioBank
 	data since version 10.0.1 (November 1999).  A new shell script
@@ -31,7 +39,6 @@
 	to Justin Leo Cheang Loong for reporting this issue.
 
 10.5.12 (24 April 2012):
-
          When called with a NULL argument, getinfo() sometimes behaves
          differently in WFDB library version 10.5.11 than it does in previous
          versions.  This release restores the previous behavior.  Thanks to
