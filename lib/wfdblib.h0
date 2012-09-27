@@ -1,5 +1,5 @@
 /* file: wfdblib.h	G. Moody	13 April 1989
-                        Last revised:	2 August 2012       wfdblib 10.5.14
+                        Last revised: 27 September 2012       wfdblib 10.5.16
 External definitions for WFDB library private functions
 
 _______________________________________________________________________________
@@ -344,6 +344,7 @@ extern void wfdb_sampquit(void);
 extern void wfdb_sigclose(void);
 extern void wfdb_osflush(void);
 extern void wfdb_freeinfo(void);
+extern void wfdb_oinfoclose(void);
 
 /* These functions are defined in annot.c */
 extern void wfdb_anclose(void);
@@ -355,12 +356,15 @@ extern void wfdb_oaflush(void);
 
 #else        /* declare only function return types for non-ANSI C compilers */
 
-extern WFDB_FILE *wfdb_open(), *wfdb_fopen();
-extern int wfdb_checkname(), wfdb_g16(), wfdb_parse_path();
+extern char *wfdb_getirec();
+extern int wfdb_fclose(), wfdb_checkname(), wfdb_g16(), wfdb_parse_path(),
+    wfdb_fprintf();
 extern long wfdb_g32();
 extern void wfdb_striphea(), wfdb_p16(), wfdb_p32(), wfdb_addtopath(),
     wfdb_error(), wfdb_setirec(), wfdb_sampquit(), wfdb_sigclose(),
-    wfdb_anclose(), wfdb_osflush(), wfdb_oaflush();
+    wfdb_osflush(), wfdb_freeinfo(), wfdb_oinfoclose(),
+    wfdb_anclose(), wfdb_oaflush();
+extern WFDB_FILE *wfdb_open(), *wfdb_fopen();
 
 # if WFDB_NETFILES
 extern char *wfdb_fgets();

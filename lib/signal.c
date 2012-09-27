@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   25 September 2012	wfdblib 10.5.15
+			Last revised:   27 September 2012	wfdblib 10.5.1
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -1254,7 +1254,6 @@ static void osigclose(void)
     struct osdata *os;
     struct ogdata *og;
 
-    if (nosig == 0) return;
     if (osd) {
 	while (nosig)
 	    if (os = osd[--nosig]) {
@@ -2997,9 +2996,7 @@ FINT wfdbputprolog(char *buf, long int size, WFDB_Signal s)
 FINT setinfo(char *record)
 {
     /* Close any previously opened output info file. */
-    if (outinfo && outinfo != oheader)
-	wfdb_fclose(outinfo);
-    outinfo = NULL;
+    wfdb_oinfoclose();
 
     /* Quit unless a record name has been specified. */
     if (record == NULL) return (0);
@@ -3611,8 +3608,12 @@ void wfdb_freeinfo(void)
 	SFREE(pinfo[i]);
     SFREE(pinfo);
     nimax = ninfo = 0;
-    if (outinfo) {
+}
+
+/* Close any previously opened output info file. */
+void wfdb_oinfoclose(void)
+{
+    if (outinfo && outinfo != oheader)
 	wfdb_fclose(outinfo);
-	outinfo = NULL;
-    }
+    outinfo = NULL;
 }

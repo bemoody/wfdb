@@ -438,12 +438,14 @@ client support in the WFDB library) based on the W3C's @code{libwww}.
 Following the W3C's decision to end development of @code{libwww}, Benjamin
 Moody reimplemented NETFILES using @code{libcurl}, and also implemented
 variable-layout records.  Bug reports (and in some cases fixes) have been
-contributed by Omar Abdala, Winton Baker, Ion Gaztañaga, Fred Geheb, Mathias
-Gruber, Guido Muesch, Joonas Paalasmaa, Tony Ricke, Dave Schaffer, Dan Scott,
-Allavatam Venugopal, Mauro Villarroel, Andrew Walsh, Piotr Wlodarek, and Yinqi
-Zhang.  Thanks also to the many readers of earlier versions of this guide; if
-this edition answers your questions, it is because someone else has already
-asked them, and hounded the author until he produced comprehensible answers.
+contributed by Omar Abdala, Winton Baker, David Brooks, Bob Farrell, Virginia
+Faro-Maza, Ion Gazta@~naga, Fred Geheb, Mathias Gruber, Thomas Heldt, Isaac
+Henry, Justin Leo Chang Loong, Benjamin Moody, Guido Muesch, Joonas Paalasmaa,
+Tony Ricke, Dave Schaffer, Dan Scott, Allavatam Venugopal, Mauro Villarroel,
+Andrew Walsh, Piotr Wlodarek, and Yinqi Zhang.  Thanks also to the many readers
+of earlier versions of this guide; if this edition answers your questions, it
+is because someone else has already asked them, and hounded the author until he
+produced comprehensible answers.
 
 Before May, 1999, and the release of version 10.0.0 of the library, the
 WFDB library was known as the DB library, and this guide was the @cite{ECG
@@ -9049,9 +9051,16 @@ changes that may not be described here.
 
 @unnumberedsec WFDB 10.5
 
+@unnumberedsubsec Changes in version 10.5.16 (27 September 2012)
+
+A bug in WFDB library versions 10.5.11 through 10.5.15 resulted in an attempt
+to close an already-closed header file after invoking @code{putinfo()}.  Thanks
+to Benjamin Moody for identifying the bug and contributing code to correct it
+(in @file{lib/signal.c} and @file{lib/wfdbinit.c}).
+
 @unnumberedsubsec Changes in version 10.5.15 (25 September 2012)
 
-Changes to the internal function readheader() in WFDB library version
+Changes to the internal function @code{readheader()} in WFDB library version
 10.5.14 made the library unable to open EDF files.  This bug has been
 fixed.
 
@@ -9059,12 +9068,12 @@ fixed.
 
 WFDB applications can now read shared and private PhysioNetWorks projects
 securely, just as they have been able to read PhysioBank data since version
-10.0.1 (November 1999).  Low-level functions wfdb_open (in lib/wfdbio.c) and
-readheader (in lib/signal.c) incorporate changes to implement this new
-capability, as well as another new feature that allows record names to be
-specified using absolute pathnames or URLs.  As always, a final '.hea' is not
-considered to be part of a record name, but it may be included or omitted as
-desired.
+10.0.1 (November 1999).  Low-level functions @code{wfdb_open()} (in
+@file{lib/wfdbio.c}) and @code{readheader()} (in @file{lib/signal.c})
+incorporate changes to implement this new capability, as well as another new
+feature that allows record names to be specified using absolute pathnames or
+URLs.  As always, a final @file{.hea} is not considered to be part of a record
+name, but it may be included or omitted as desired.
 
 @unnumberedsubsec Changes in version 10.5.13 (13 May 2012)
 
@@ -9076,28 +9085,28 @@ to Justin Leo Cheang Loong for reporting this issue.
 
 @unnumberedsubsec Changes in version 10.5.12 (25 April 2012)
 
-When called with a NULL argument, getinfo() sometimes behaves differently in
-WFDB library version 10.5.11 than it does in previous versions.  This release
-restores the previous behavior.  Thanks to Benjamin Moody for reporting this
-issue.
+When called with a NULL argument, @code{getinfo()} sometimes behaves
+differently in WFDB library version 10.5.11 than it does in previous versions.
+This release restores the previous behavior.  Thanks to Benjamin Moody for
+reporting this issue.
 
 @unnumberedsubsec Changes in version 10.5.11 (6 April 2012)
 
 This release of the WFDB library introduces support for @file{.info} files.
-These are files containing 'info' strings in the same format as those that can
-be stored in @file{.hea} files.  The @file{.info} file for a record named
+These are files containing @code{info} strings in the same format as those that
+can be stored in @file{.hea} files.  The @file{.info} file for a record named
 @file{record} is named @file{record.info}, and it may be located anywhere in
-the WFDB path.  Function @code{getinfo()}, as in previous releases, returns
-the first info string belonging to the record named as its argument, or the
-next info string belonging to the previously specified record if its argument
-is NULL.  Beginning with this release, successive calls to  @code{getinfo()}
-return the next info string contained in the record's @file{.info} file if it
-exists, and if there are no more in the record's @file{.hea} file.  Function
+the WFDB path.  Function @code{getinfo()}, as in previous releases, returns the
+first info string belonging to the record named as its argument, or the next
+info string belonging to the previously specified record if its argument is
+NULL.  Beginning with this release, successive calls to @code{getinfo()} return
+the next info string contained in the record's @file{.info} file if it exists,
+and if there are no more in the record's @file{.hea} file.  Function
 @code{putinfo()} writes an info string to the currently open output @file{.hea}
 file, unless function @code{setinfo()} (new in this release) has been invoked,
-in which case the info string is appended to the record's @file{.info} file
-in the current directory.  @code{getinfo()} reads all of the record's info
-strings the first time it is invoked, returning them one at a time;
+in which case the info string is appended to the record's @file{.info} file in
+the current directory.  @code{getinfo()} reads all of the record's info strings
+the first time it is invoked, returning them one at a time;
 @code{wfdb_freeinfo()} frees the memory allocated for @code{getinfo()}'s info
 strings and closes the @file{.info} file opened by @file{putinfo()}, if any.
 After invoking @code{wfdb_freeinfo()}, a subsequent call to @code{getinfo()}

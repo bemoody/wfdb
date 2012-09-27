@@ -1,3 +1,9 @@
+10.5.16 (27 September 2012):
+	A bug in WFDB library versions 10.5.13 through 10.5.15 resulted in
+        an attempt to close an already-closed header file after invoking
+	putinfo().  Thanks to Benjamin Moody for identifying the bug and
+	contributing code to correct it (in lib/signal.c and lib/wfdbinit.c).
+
 10.5.15 (25 September 2012):
 	A new application (app/gqfuse.c) for combining two or more beat
         annotation files is included in this release.
