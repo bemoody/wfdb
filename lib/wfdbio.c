@@ -1,10 +1,10 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:	 13 August 2012       wfdblib 10.5.14
+                        Last revised:	 2 January 2013       wfdblib 10.5.17
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1988-2012 George B. Moody
+Copyright (C) 1988-2013 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -347,7 +347,7 @@ void wfdb_p32(long x, WFDB_FILE *fp)
 
 struct wfdb_path_component {
     char *prefix;
-    struct wfdb_path_component *next;
+    struct wfdb_path_component *next, *prev;
     int type;		/* WFDB_LOCAL or WFDB_NET */
 };
 static struct wfdb_path_component *wfdb_path_list;
@@ -509,6 +509,7 @@ int wfdb_parse_path(char *p)
 	SALLOC(c1->prefix, q-p+1, sizeof(char));
 	memcpy(c1->prefix, p, q-p);
 	c1->type = current_type;
+	c1->prev = c0;
 	if (c0) c0->next = c1;
 	else wfdb_path_list = c1;
 	c0 = c1;
@@ -609,24 +610,31 @@ void wfdb_export_config(void)
 }
 #endif
 
-/* wfdb_addtopath appends the path component of its string argument (i.e.
-everything except the file name itself) to the end of the WFDB path, provided
-that the WFDB path does not already contain this component.  This function is
-invoked by readheader() (in signal.c) for each signal file name read.
+/* wfdb_addtopath adds the path component of its string argument (i.e.
+everything except the file name itself) to the WFDB path, inserting it
+there if it is not already in the path.  If the first component of the WFDB
+path is '.' (the current directory), the new component is moved to the second
+position; otherwise, it is moved to the first position.
 
-The intent is to permit the use of a relatively short WFDB path, even when
-using many databases.  If header files are collected into a few directories,
-and absolute pathnames for the signal files are entered within them, annotation
-files stored in the same directories as the signal files will also be
-accessible even if those directories are not listed explicitly in the WFDB
-path.  This feature may be particularly useful to MS-DOS users because of that
-system's limit on the length of environment variables. */
+wfdb_open calls this function whenever it finds and opens a file.
+
+Since the files comprising a given record are most often kept in the
+same directory, this strategy improves the likelihood that subsequent
+files to be opened will be found in the first or second location wfdb_open
+checks.
+
+If the current directory (.) is at the head of the WFDB path, it remains there,
+so that wfdb_open will continue to find the user's own files in preference to
+like-named files elsewhere in the path.  If this behavior is not desired, the
+current directory should not be specified initially as the first component of
+the WFDB path.
+ */
 
 void wfdb_addtopath(char *s)
 {
     char *p, *t;
     int i, len;
-    struct wfdb_path_component *c0;
+    struct wfdb_path_component *c0, *c1;
 
     if (s == NULL || *s == '\0') return;
 
@@ -641,27 +649,44 @@ void wfdb_addtopath(char *s)
        included in the path component, but in this case there is nothing
        else to include. */
 
-    if (p == s && (*p == '/' || *p == '\\' || *p == ';')) p++;
+    if (p == s && (*p == '/' || *p == '\\' || *p == ':')) p++;
 
     if (p < s) return;		/* argument did not contain a path component */
 
     /* If p > s, then p points to the first character following the path
        component of s. Search the current WFDB path for this path component. */
     if (wfdbpath == NULL) (void)getwfdb();
-    for (c0 = wfdb_path_list, i = p-s; c0; c0 = c0->next)
-	if (strncmp(c0->prefix, s, i) == 0)
-	    return;	/* path component of s is already in WFDB path */
-
-    /* If we've come this far, the path component of s was not found in the
-       current WFDB path;  now append it. */
-    len = strlen(wfdbpath); 	/* wfdbpath set by getwfdb() -- see above */
-    SUALLOC(t, 1, len + i + 2);
-    (void)strcpy(t, wfdbpath);
-    t[len++] = PSEP;		/* append a path separator */
-    (void)strncpy(t+len, s, i); 	/* append the new path component */
-    t[len+i] = '\0';
-    setwfdb(t);
-    SFREE(t);
+    for (c0 = c1 = wfdb_path_list, i = p-s; c1; c1 = c1->next) {
+	if (strncmp(c1->prefix, s, i) == 0) {
+	    if (c0 == c1 || (c1->prev == c0 && strcmp(c0->prefix, ".") == 0))
+		return; /* no changes needed, quit */
+	    /* path component of s is already in WFDB path -- unlink its node */
+	    if (c1->next) (c1->next)->prev = c1->prev;
+	    if (c1->prev) (c1->prev)->next = c1->next;
+	    break;
+	}
+    }
+    if (!c1) {
+	/* path component of s not in WFDB path -- make a new node for it */
+ 	SUALLOC(c1, 1, sizeof(struct wfdb_path_component));
+	SALLOC(c1->prefix, p-s+1, sizeof(char));
+	memcpy(c1->prefix, s, p-s);
+	if (strstr(c1->prefix, "://")) c1->type = WFDB_NET;
+	else c1->type = WFDB_LOCAL;
+    }
+    /* (Re)link the unlinked node. */
+    if (strcmp(c0->prefix, ".") == 0) {  /* skip initial "." if present */
+	c1->prev = c0;
+	c1->next = c0->next;
+	(c1->next)->prev = c0->next = c1;
+    }	
+    else { /* no initial ".";  insert the node at the head of the path */ 
+	wfdb_path_list = c1;
+	c1->prev = NULL;
+	c1->next = c0;
+	c0->prev = c1;
+    }
+    return;
 }
 
 /* The wfdb_error function handles error messages, normally by printing them

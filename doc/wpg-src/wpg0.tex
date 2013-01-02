@@ -21,7 +21,7 @@
 @center Harvard-MIT Division of Health Sciences and Technology
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1980 -- 2012 George B. Moody
+Copyright @copyright{} 1980 -- 2013 George B. Moody
 @sp 2
 The most recent versions of the software described in this guide may be
 downloaded from @uref{http://physionet.org/}.
@@ -9050,6 +9050,24 @@ WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
 @unnumberedsec WFDB 10.5
+
+@unnumberedsubsec Changes in version 10.5.17 (2 January 2013)
+
+The WFDB library internal function @code{wfdb_addtopath()} (in
+@file{lib/wfdbio.c}) adds the path component of its string argument (i.e.,
+everything except the file name itself) to the WFDB path, inserting it there if
+it is not already in the path.  This function is called by another WFDB library
+internal function, @code{wfdb_open()}, which finds and opens files for all
+other WFDB library functions that open files; @code{wfdb_open()} passes the
+paths of files it successfully opens to @code{wfdb_addtopath()}, permitting
+other files in the same locations to be found.  In previous releases,
+@code{wfdb_addtopath()} appended the new path component to the end of the WFDB
+path.  As originally noted by David Brooks, this is suboptimal since the files
+comprising a given record are most often kept in the same directory.  In this
+release, the new component is inserted at the head of the path, or as the
+second path component if @code{"."} (the current directory) is the first
+component, thus improving the likelihood that subsequent files to be opened
+will be found in the first or second location @code{wfdb_open()} checks.
 
 @unnumberedsubsec Changes in version 10.5.16 (27 September 2012)
 

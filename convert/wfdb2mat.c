@@ -1,8 +1,8 @@
 /* file: wfdb2mat.c	G. Moody	26 February 2009
-			Last revised:	29 November 2010
+			Last revised:	 2 January 2013
 -------------------------------------------------------------------------------
 wfdb2mat: Convert (all or part of) a WFDB signal file to Matlab .mat format
-Copyright (C) 2009-2010 George B. Moody
+Copyright (C) 2009-2013 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -219,7 +219,6 @@ char *argv[];
 	(void)fprintf(stderr, "%s: can't read signal '%s'\n", pname, search);
 	exit(2);
     }
-
     /* Reset 'to' if a duration limit was specified. */
     if (maxl > 0L && (maxl = strtim(argv[maxl])) < 0L)
 	maxl = -maxl;
@@ -318,7 +317,9 @@ char *argv[];
     }
 
     /* Create the new header file. */
+    setbasetime(mstimstr(-from)+1);
     newheader(orec);
+
     /* Copy info from the old record, if any */
     if (p = getinfo(NULL))
 	do {
@@ -329,7 +330,7 @@ char *argv[];
     (void)sprintf(p, "Creator: %s", pname);
     (void)putinfo(p);
     (void)sprintf(p, "Source: record %s", record);
-    q = mstimstr(-from);
+    q = mstimstr(0);
     while (*q == ' ') q++;
     if (from != 0 || *q == '[') {
 	strcat(p, "  Start: ");

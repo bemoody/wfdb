@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody         24 May 2000
-#                             Last revised:  18 February 2011
+#                             Last revised:   2 January 2013
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -456,9 +456,8 @@ sed "s/WFDB_NETFILES 1/WFDB_NETFILES $NETFILES/" < ../lib/wfdb.h0 | \
     sed "s/WFDBRELEASE/$RELEASE/" | \
     sed "s/WFDB_NETFILES_LIBCURL 1/WFDB_NETFILES_LIBCURL $NETFILES_LIBCURL/" \
       >../lib/wfdb.h
-if [ $LIBTYPE = "static" -a $NETLIB != "none" ]
+if [ $NETLIB != "none" ]
     then
-    LL = "$LL $LL $LL"
     sed "s/LC =/LC = $LC/" <site.def | sed "s/LL =/LL = $LL/" >site.tmp
     mv site.tmp site.def
 fi

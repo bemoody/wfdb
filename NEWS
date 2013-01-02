@@ -1,3 +1,34 @@
+10.5.17 (2 January 2013):
+	A small change in the 'configure' script works around a problem
+	in building WFDB applications on recent versions of Debian and
+	Ubuntu GNU/Linux.  The solution was first described in conf/linux.def
+	(version 10.3.17, August 2005, and in all later versions) but it was
+	not implemented by default since it was not needed at the time, and
+	because it complicated the process of building 32-bit applications on
+	64-bit platforms. 
+
+	In previous releases, wfdb2mat did not correctly report the time of the
+	beginning of its output unless the conversion started at the beginning
+	of its input.  This problem has been fixed in this release; thanks to
+	Mayela Zamora for reporting the problem.
+
+	The WFDB library internal function wfdb_addtopath() (in lib/wfdbio.c)
+	adds the path component of its string argument (i.e., everything except
+	the file name itself) to the WFDB path, inserting it there if it is not
+	already in the path.  This function is called by another WFDB library
+	internal function, wfdb_open(), which finds and opens files for all
+	other WFDB library functions that open files; wfdb_open() passes the
+	paths of files it successfully opens to wfdb_addtopath(), permitting
+	other files in the same locations to be found.  In previous releases,
+	wfdb_addtopath() appended the new path component to the end of the WFDB
+	path.  As originally noted by David Brooks, this is suboptimal since
+	the files comprising a given record are most often kept in the same
+	directory.  In this release, the new component is inserted at the head
+	of the path, or as the second path component if "." (the current
+	directory) is the first component, thus improving the likelihood that
+	subsequent files to be opened will be found in the first or second
+	location wfdb_open() checks.
+
 10.5.16 (27 September 2012):
 	A bug in WFDB library versions 10.5.13 through 10.5.15 resulted in
         an attempt to close an already-closed header file after invoking
