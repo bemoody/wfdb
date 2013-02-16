@@ -1,3 +1,7 @@
+10.5.18 (16 February 2013):
+	wfdb_addtopath now works properly if the path contained only one
+	component on entry.
+
 10.5.17 (2 January 2013):
 	A small change in the 'configure' script works around a problem
 	in building WFDB applications on recent versions of Debian and

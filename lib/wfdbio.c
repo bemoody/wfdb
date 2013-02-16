@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:	 2 January 2013       wfdblib 10.5.17
+                        Last revised:	16 February 2013       wfdblib 10.5.18
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -677,8 +677,9 @@ void wfdb_addtopath(char *s)
     /* (Re)link the unlinked node. */
     if (strcmp(c0->prefix, ".") == 0) {  /* skip initial "." if present */
 	c1->prev = c0;
-	c1->next = c0->next;
-	(c1->next)->prev = c0->next = c1;
+	if ((c1->next = c0->next) != NULL)
+	    (c1->next)->prev = c1;
+	c0->next = c1;
     }	
     else { /* no initial ".";  insert the node at the head of the path */ 
 	wfdb_path_list = c1;
