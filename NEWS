@@ -1,5 +1,11 @@
+10.5.19 (21 July 2013):
+	This release includes fixes in lib/signal.c for several bugs that
+	sometimes caused findsig(), getvec(), and sample() to return incorrect
+	values when reading variable-layout multi-segment records with missing
+	signals.
+
 10.5.18 (16 February 2013):
-	wfdb_addtopath now works properly if the path contained only one
+	wfdb_addtopath() now works properly if the path contained only one
 	component on entry.
 
 10.5.17 (2 January 2013):

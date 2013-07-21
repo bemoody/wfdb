@@ -1,5 +1,5 @@
 file: INSTALL			G. Moody	30 January 2000
-				Last revised:	  2 March 2006
+				Last revised:	  21 July 2013
 WFDB Software Package installation notes
 
 These notes are infrequently updated, but are included here for those who may
@@ -38,10 +38,11 @@ software available for all popular platforms:
        (all included in current Mac OS X CD sets)
 
      + MS-Windows: Install Cygwin, including (at least) the following optional
-       packages: bc, curl-devel, gcc, gcc-mingw, gv, ImageMagick, make,
-       sunrpc, and xorg-x11-devel.  (Other required packages will be installed
-       automatically if those listed are selected.)  Detailed instructions
-       are available at
+       packages: ImageMagick, X-start-menu-icons, bc, curl, cygutils-extra,
+       diffutils, gcc, gcc-fortran, gv, libX11-devel, libcurl-devel,
+       libexpat1-devel, make, sunrpc, twm, and xview-devel.  (Other required
+       packages will be installed automatically if those listed are selected.)
+       Detailed instructions are available at
 	    http://physionet.org/physiotools/cygwin/
 
  * An HTTP client library, either libcurl (preferred) or libwww
@@ -61,7 +62,9 @@ software available for all popular platforms:
 
  * The XView libraries and *.h files
 
-     All platforms: free from http://physionet.org/physiotools/xview/
+     + MS-Windows: install xview-devel from Cygwin (see above)
+
+     + Other platforms: free from http://physionet.org/physiotools/xview/
 
 Detailed instructions for obtaining and installing these prerequisites are
 included in the WFDB quick-start guides for the popular platforms (see above).
@@ -76,15 +79,18 @@ process is the same on all platforms:
 1. Open a terminal emulator window and navigate to the top-level directory
    of the WFDB sources (the directory that contains this file).
 
-2. In this directory, build and install the WFDB Software Package by typing:
+2. Configure the package by typing:
 	./configure
-	make install
-   Except under MS-Windows, you will normally need root permissions to run
-   'make install'.  If you don't have root permissions, set WFDBROOT to the
-   name of a directory in which you have permission to write (you will be
-   given a chance to do this when running 'configure').
+   You will normally need root permissions (on MS-Windows, administrator
+   permissions) to run 'make install'.  If you don't have root/administrator
+   permissions, use configure's --prefix option to specify a directory
+   in which you have permission to write, like this:
+        ./configure --prefix=/some/writable/directory
 
-3. In this directory, test the installation by typing:
+3. Build and install the WFDB library and applications by typing:
+	make install
+
+4. Test the installation by typing:
 	make check
    If there are any errors, look in the checkpkg directory for details.
 

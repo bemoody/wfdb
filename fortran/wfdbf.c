@@ -1,9 +1,9 @@
 /* file: wfdbf.c	G. Moody	 23 August 1995
-			Last revised:     14 July 2008		wfdblib 10.4.7
+			Last revised:     21 July 2013		wfdblib 10.5.19
 
 _______________________________________________________________________________
 wfdbf: Fortran wrappers for the WFDB library functions
-Copyright (C) 1995-2008 George B. Moody
+Copyright (C) 1995-2013 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -212,10 +212,9 @@ long wfdbinit_(char *record, long int *nann, long int *nsig)
 		     sinfo, (unsigned int)(*nsig)));
 }
 
-long setgvmode_(long int *mode)
+long findsig_(char *signame)
 {
-    setgvmode((int)(*mode));
-    return (0L);
+    return (findsig(fcstring(signame)));
 }
 
 long getspf_(long int *dummy)
@@ -223,25 +222,25 @@ long getspf_(long int *dummy)
     return (getspf());
 }
 
+long setgvmode_(long int *mode)
+{
+    setgvmode((int)(*mode));
+    return (0L);
+}
+
+long getgvmode_(long int *dummy)
+{
+    return (getgvmode());
+}
+
 long setifreq_(double *freq)
 {
-    return (setifreq(*freq));
+    return (setifreq((WFDB_Frequency)*freq));
 }
 
 double getifreq_(long int *dummy)
 {
     return (getifreq());
-}
-
-long setafreq_(double *freq)
-{
-    setafreq(*freq);
-    return (0L);
-}
-
-double getafreq_(long int *dummy)
-{
-    return (getafreq());
 }
 
 long getvec_(long int *long_vector)
@@ -353,6 +352,11 @@ long isgsettime_(long int *group, long int *time)
     return (isgsettime((WFDB_Group)(*group), (WFDB_Time)(*time)));
 }
 
+long tnextvec_(long int *signal, long int *time)
+{
+    return (tnextvec((WFDB_Signal)(*signal), (WFDB_Time)(*time)));
+} 
+
 long iannsettime_(long int *time)
 {
     return (iannsettime((WFDB_Time)(*time)));
@@ -404,6 +408,17 @@ long setanndesc_(long int *code, char *string)
     return (setanndesc((int)(*code), fcstring(string)));
 }
 
+long setafreq_(double *freq)
+{
+    setafreq(*freq);
+    return (0L);
+}
+
+double getafreq_(long int *dummy)
+{
+    return (getafreq());
+}
+
 long iannclose_(long int *annotator)
 {
     iannclose((WFDB_Annotator)(*annotator));
@@ -413,6 +428,68 @@ long iannclose_(long int *annotator)
 long oannclose_(long int *annotator)
 {
     oannclose((WFDB_Annotator)(*annotator));
+    return (0L);
+}
+
+/* The functions below can be used in place of the macros defined in
+   <wfdb/ecgmap.h>. */
+
+long isann_(long int *anntyp)
+{   
+    return (wfdb_isann((int)*anntyp));
+}
+
+long isqrs_(long int *anntyp)
+{   
+    return (wfdb_isqrs((int)*anntyp));
+}
+
+long setisqrs_(long int *anntyp, long int *value)
+{   
+    wfdb_setisqrs((int)*anntyp, (int)*value);
+    return (0L);
+}
+
+long map1_(long int *anntyp)
+{   
+    return (wfdb_map1((int)*anntyp));
+}
+
+long setmap1_(long int *anntyp, long int *value)
+{   
+    wfdb_setmap1((int)*anntyp, (int)*value);
+    return (0L);
+}
+
+long map2_(long int *anntyp)
+{   
+    return (wfdb_map2((int)*anntyp));
+}
+
+long setmap2_(long int *anntyp, long int *value)
+{   
+    wfdb_setmap2((int)*anntyp, (int)*value);
+    return (0L);
+}
+
+long ammap_(long int *anntyp)
+{   
+    return (wfdb_ammap((int)*anntyp));
+}
+
+long mamap_(long int *anntyp, long int *subtyp)
+{   
+    return (wfdb_mamap((int)*anntyp, (int)*subtyp));
+}
+
+long annpos_(long int *anntyp)
+{   
+    return (wfdb_annpos((int)*anntyp));
+}
+
+long setannpos_(long int *anntyp, long int *value)
+{   
+    wfdb_setannpos((int)*anntyp, (int)*value);
     return (0L);
 }
 
@@ -529,6 +606,17 @@ long putinfo_(char *string)
     return (putinfo(fcstring(string)));
 }
 
+long setinfo_(char *record)
+{
+    return (setinfo(fcstring(record)));
+}
+
+long wfdb_freeinfo_(long int *dummy)
+{
+    wfdb_freeinfo();
+    return (0L);
+}
+
 long newheader_(char *record)
 {
     return (newheader(fcstring(record)));
@@ -541,7 +629,7 @@ long setheader_(char *record, long int *nsig)
     return (setheader(fcstring(record), sinfo, (unsigned int)(*nsig)));
 }
 
-/* No wrapper is provided for setmsheader. */
+/* No wrappers are provided for setmsheader or getseginfo. */
 
 long wfdbgetskew_(long int *s)
 {
@@ -569,6 +657,11 @@ long wfdbsetstart_(long int *s, long int *bytes)
 {
     wfdbsetstart((WFDB_Signal)(*s), *bytes);
     return (0L);
+}
+
+long wfdbputprolog_(char *prolog, long int *bytes, long int *signal)
+{
+    return (wfdbputprolog(fcstring(prolog), (long)*bytes,(WFDB_Signal)*signal));
 }
 
 long wfdbquit_(long int *dummy)
@@ -646,6 +739,12 @@ long getwfdb_(char *string)
     return (0L);
 }
 
+long resetwfdb_(long int *dummy)
+{
+    resetwfdb();
+    return (0L);
+}
+
 long setibsize_(long int *input_buffer_size)
 {
     return (setibsize((int)(*input_buffer_size)));
@@ -663,76 +762,49 @@ long wfdbfile_(char *file_type, char *record, char *pathname)
     return (0L);
 }
 
-long wfdbmemerr_(long int *exit_if_error)
-{
-    wfdbmemerr((int)(*exit_if_error));
-    return (0L);
-}
-
 long wfdbflush_(long int *dummy)
 {
     wfdbflush();
     return (0L);
 }
 
-/* The functions below can be used in place of the macros defined in
-   <wfdb/ecgmap.h>. */
-
-long isann_(long int *anntyp)
-{   
-    return ((long)(isann(*anntyp)));
-}
-
-long isqrs_(long int *anntyp)
-{   
-    return ((long)(isqrs(*anntyp)));
-}
-
-long setisqrs_(long int *anntyp, long int *value)
-{   
-    setisqrs(*anntyp, *value);
+long wfdbmemerr_(long int *exit_if_error)
+{
+    wfdbmemerr((int)(*exit_if_error));
     return (0L);
 }
 
-long map1_(long int *anntyp)
-{   
-    return ((long)(map1(*anntyp)));
-}
-
-long setmap1_(long int *anntyp, long int *value)
-{   
-    setmap1(*anntyp, *value);
+long wfdbversion_(char *version)
+{
+    strcpy(version, wfdbversion());
+    cfstring(version);
     return (0L);
 }
 
-long map2_(long int *anntyp)
-{   
-    return ((long)(map1(*anntyp)));
-}
-
-long setmap2_(long int *anntyp, long int *value)
-{   
-    setmap1(*anntyp, *value);
+long wfdbldflags_(char *ldflags)
+{
+    strcpy(ldflags, wfdbldflags());
+    cfstring(ldflags);
     return (0L);
 }
 
-long ammap_(long int *anntyp)
-{   
-    return ((long)(ammap(*anntyp)));
+long wfdbcflags_(char *cflags)
+{
+    strcpy(cflags, wfdbcflags());
+    cfstring(cflags);
+    return (0L);
 }
 
-long mamap_(long int *anntyp, long int *subtyp)
-{   
-    return ((long)(mamap(*anntyp, *subtyp)));
+long wfdbdefwfdb_(char *defwfdb)
+{
+    strcpy(defwfdb, wfdbdefwfdb());
+    cfstring(defwfdb);
+    return (0L);
 }
 
-long annpos_(long int *anntyp)
-{   
-    return ((long)(annpos(*anntyp)));
-}
-
-long setannpos_(long int *anntyp, long int *value)
-{   
-    setannpos(*anntyp, *value);
+long wfdbdefwfdbcal_(char *defwfdbcal)
+{
+    strcpy(defwfdbcal, wfdbdefwfdbcal());
+    cfstring(defwfdbcal);
     return (0L);
 }

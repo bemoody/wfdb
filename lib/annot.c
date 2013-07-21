@@ -960,7 +960,7 @@ FVOID oannclose(WFDB_Annotator n)
 		    (void)sprintf(cmdbuf, "sortann -r %s -a %s",
 				  oa->rname, oa->info.name);
 		    if (system(cmdbuf) == 0) {
-			wfdb_error("done!");
+			wfdb_error("done!\n");
 			oa->out_of_order = 0;
 		    }
 		    else

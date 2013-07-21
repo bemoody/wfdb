@@ -1,132 +1,134 @@
-file: README.WINDOWS		G. Moody		 8 June 2005
-				Last revised:		29 April 2006
+file: README.WINDOWS		G. Moody	   8 June 2005
+				Last revised:	  21 July 2013
 
-This file contains additional notes about how to build the WFDB Software
-Package under MS-Windows in various non-standard and unsupported ways.
-We strongly recommend that all users follow the procedure described in
-'INSTALL' in order to build a complete and compatible set of WFDB Software,
-including WAVE, which is possible to build under MS-Windows only in this
-way.
+Making a native Windows version of the WFDB library
 
-There are two specific cases in which you might need another version of the
-WFDB library binary under MS-Windows:
+On MS-Windows, the procedure described in 'INSTALL' generates a WFDB library
+that depends upon Cygwin's POSIX emulation library (cygwin1.dll) to provide a
+Unix-like operating environment, thus assuring that WFDB applications will
+behave on MS-Windows as much as possible like they do on other platforms. It is
+also possible, though not generally recommended, to make a WFDB library that
+depends only on the native libraries provided with MS-Windows. You might need a
+native Windows version of the WFDB library if you wish to link it to other code
+that must also be linked with Windows native libraries.
 
- * if you need to use the WFDB_tools wrappers with Matlab R14 (but not R13)
+The method outlined below will allow you to create a Windows native version of
+the WFDB library that does not depend on Cygwin's POSIX emulation library or any
+third party libraries other than those provided with MS-Windows, and
+(optionally) curl, which the WFDB library uses for reading data directly from
+web servers. It uses MinGW, a minimalist development environment for native
+MS-Windows libraries and applications.
 
- * if you wish to link the WFDB library to other code that must also be linked
-   with Windows native libraries.
+1. Install MinGW and MSYS using the automated installer tool (mingw-get-inst,
+   also called the "Graphical User Interface Installer" or the "GUI first time
+   installer tool") following the instructions at
+      http://mingw.org/wiki/Getting_Started
+   Be sure to select the option to use the latest available packages. Use the
+   default installation directory (c:\mingw), and choose all of the optional
+   components.
 
-In these cases, either of the two methods outlined below will allow you to
-create a Windows native version of the WFDB library that does not depend on
-Cygwin's POSIX emulation library.  These methods also create a mostly complete
-set of WFDB applications (except for WAVE) that are used to test the WFDB
-library;  use them at your own risk, since they may not behave in exactly the
-same way as the standard versions of the same applications.
+2. Download the most recent curl source tarball from
+      http://curl.haxx.se/download.html
+   As of June 2013, the most recent version was curl-7.31.0.tar.gz. Save it in
+   your MinGW home directory (by default, c:\MinGW\msys\1.0\home\User).
 
-Please note that these methods, and any others that do not use an ANSI/ISO
-C compiler such as gcc, are UNSUPPORTED.  Your feedback is welcome, but we
-do not use any commercial compilers and cannot help you learn how to use them.
+3. Download the most recent WFDB source tarball from
+      http://physionet.org/physiotools/wfdb.tar.gz
+   and save it in your MinGW home directory.
 
-...............................................................................
+4. Open a MinGW terminal window by clicking on Start -> Programs -> MinGW ->
+   MinGW Shell.  Perform the remaining steps of the installation by typing into
+   this window.
 
-Creating MinGW (Windows native) binaries
+5. Unpack the tarballs using these commands:
+      tar xfvz curl*.tar.gz
+      tar xfvz wfdb.tar.gz
+   These commands will create two directories, named curl-7.x.y and wfdb-10.m.n,
+   where x, y, m and n will depend on the version numbers of the packages you
+   have downloaded.
 
-The "Minimalist GNU for Windows" project (MinGW, http://www.mingw.org/) is "a
-collection of freely available and freely distributable Windows specific header
-files and import libraries combined with GNU toolsets that allow one to produce
-native Windows programs that do not rely on any 3rd-party C runtime DLLs."  You
-can build the WFDB software with the MinGW gcc provided by Cygwin, or with the
-minimal MSYS environment.
+6. Compile and install the curl package first:
+      cd curl-7.y.z
+      ./configure --prefix=/usr
+      make
+      make install
+   The ./configure and make commands may require several minutes each.
 
-Method A: (easy)
+7. Compile and install the WFDB Software Package after installing curl:
+      cd ../wfdb-10.m.n
+      ./configure --prefix=/usr
+      make
+      make install
 
-  Use a Cygwin (terminal emulator) window throughout the installation
-  below.  We do not recommend attempting to build and install native
-  Windows binaries of the WFDB Software Package using a DOS window
-  (Windows Command Prompt).
+Notes:
 
-  1. First perform a standard WFDB installation from sources using Cygwin,
-     following the instructions in 'INSTALL'.
-  
-  2. Select a location to install the MingGW WFDB binaries.  We recommend
-     keeping them separate from the standard Cygwin paths to avoid confusion.
-     A good choice is '/opt/wfdb'.
+1. The native Windows libraries created by this procedure are installed in
+   c:\MinGW\msys\1.0\usr\bin; their names are libcurl-4.dll and wfdb-10.5.dll.
 
-  3. Install a native Windows version of libcurl:
+2. A mostly complete set of WFDB applications (except for WAVE) is also
+   installed in the same directory.  Use them at your own risk, since they may
+   not behave in exactly the same way as the standard versions of the same
+   applications.  You can test the compiled WFDB library and applications using
+      make check
+   (either before or after 'make install').  A handful of the tests performed by
+   'make check' will fail because they generate text files with MSDOS-style line
+   terminators that don't match the POSIX-style line terminators that
+   'make check' expects; this is normal and is not an indication of problems.
 
-   a. Download the no-SSL libcurl binary package for Win32 from
-	http://curl.haxx.se/download/
-      and move the zip file into your (Cygwin) home directory. 
-      As of 29 April 2006, the most recent version of this file was:
-	libcurl-7.15.3-win32-nossl.zip
-      (The SSL and SSL+SSPI enabled versions of libcurl should also work if
-      the additional libraries they need are installed, but this has not been
-      tested.  The WFDB library does not require SSL or SSPI support.) 
+3. Copy the libraries and applications to a directory in your Windows PATH if
+   you want to run them using cmd.exe (as, for example, in a DOS box). Avoid
+   installing them in any location that has a space in its pathname.
 
-   b. Create a directory for the native Windows binaries:
-	mkdir -p /opt/wfdb/bin
-      This command also creates /opt and /opt/wfdb if necessary.
+4. If you don't want your compiled WFDB library to be able to read data via
+   HTTP, you can skip steps 2 and 6 above, and add --without-netfiles to the
+   configure command in step 7.
 
-   c. Unpack libcurl into /opt:
-	cd /opt
-	unzip ~/libcurl-*nossl.zip
-      The libcurl files will unpack into a version-numbered directory under
-      /opt, such as /opt/libcurl-7.15.3.  Copy the needed files into /opt/wfdb:
-	cd /opt/libcurl-7.15.3
-	cp -p bin/curl-config /opt/wfdb/bin
-	cp -p lib/* /opt/wfdb/bin
-	cp -pr include /opt/wfdb
-
-   d. Edit /opt/wfdb/bin/curl-config, replacing
-	prefix=/usr/local
-      with
-	prefix=/opt/wfdb
-      and changing
-	echo -L$(exec_prefix)/lib -lcurl -L/home/dast/src/win32 ...
-      to
-	echo -L$(exec_prefix)/bin -lcurl
-      (deleting the remainder of the line following '-lcurl').
-
-  4. Add /opt/wfdb/bin to the beginning of your PATH:
-	export PATH="/opt/wfdb/bin:$PATH"
-     replacing '/opt/wfdb' with your install path, if different.  See
-     README.NETFILES for further information.
-
-     Repeat this step whenever you start a new Cygwin window and wish to
-     use the native Windows WFDB binaries.
-
-  5. Use 'cd' to return to this directory (the top-level directory of the
-     WFDB Software Package, containing the file you are now reading), and type:
-	  ./configure --no-cygwin --prefix=/opt/wfdb
-	  make install
-     replacing '/opt/wfdb' with your install path, if different.
-
-   Note: If you run
-	make check
-   many of the checks will fail because text files written by the WFDB
-   applications will be in DOS format (with CR+LF line terminators).  This
-   is normal and is not an indication of problems.
+5. You may optionally install OpenSSL (http://openssl.org/) before configuring
+   and compiling curl (step 6) if you wish to use the compiled library or
+   applications to read data via HTTPS (for example, directly from your
+   PhysioNetWorks projects). OpenSSL is not required by WFDB applications for
+   reading data from local files or from web servers via HTTP. See
+      http://curl.haxx.se/docs/libs.html
+   for details on OpenSSL and other optional libraries.
 
 
-Method B: (experts only)
+Using a compiler other than gcc
 
-  1. If you have not already done so, install the MinGW compiler and the MSYS
-     shell environment (freely available from http://www.mingw.org/).  These
-     include MinGW/gcc and an assortment of other GNU utilities ported
-     to MS-Windows. Accept the defaults suggested by the installer.
+The procedure in the previous section uses MinGW's gcc to produce WFDB and curl
+DLLs in Windows native format. You can use any other compiler that is compatible
+with Windows DLLs to compile application code and link it to these WFDB and curl
+DLLs, and to other third-party DLLs if you wish.
 
-  2. Open a MSYS terminal window (the MSYS installer will have added this to
-     your MS-Windows start menu).  Check that 'which' and 'gcc' are accessible
-     by typing the command:
-          which gcc
-     The output of this command should be:
-          /mingw/bin/gcc
-     If you don't see this output, rerun the MinGW and MSYS installers.
+It is not possible to compile or use WAVE under MS-Windows except by using
+Cygwin gcc and the Cygwin X11 and XView libraries.
 
-  3. Install libcurl (see steps 2-4 above).
-  
-  4. In this directory (the top-level directory of the WFDB software package,
-     containing the file you are now reading), type:
-          ./configure
-          make install
+Compiling the WFDB library with a compiler other than gcc is unsupported. gcc is
+free, is of very high quality, and is supported; if you use another compiler,
+you are on your own. Your feedback is welcome, but we do not use any commercial
+compilers and cannot help you learn how to use them.
+
+If you do not use gcc, you must do one of the following:
+
+  * Use your compiler in ANSI/ISO C mode if this is supported (see your compiler
+    documentation), or
+
+  * Define the symbol MSDOS (to any value) when compiling the WFDB Software
+    Package.
+
+If you do neither of these steps, your compiler will generate a defective WFDB
+DLL that assumes that files are always opened in so-called text mode, resulting
+in errors when reading and writing signal and annotation files (which are binary
+files). You can check to see if this has happened by running the command
+
+    rdsamp -r 100s
+
+which should yield 21600 numbered lines of output, ending with
+
+     21596	  982	  995
+     21597	  978	  989
+     21598	  975	  988
+     21599	  975	  989
+
+If the output ends after 940 lines, you have a defective WFDB DLL and you will
+need to follow the instructions above to correct the problem.
 

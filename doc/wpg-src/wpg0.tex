@@ -9051,7 +9051,14 @@ changes that may not be described here.
 
 @unnumberedsec WFDB 10.5
 
-@unnumberedsubsec Changes in version 10.5.18 (22 February 2013)
+@unnumberedsubsec Changes in version 10.5.19 (21 July 2013)
+
+This release includes fixes in lib/signal.c for several bugs that sometimes
+caused @code{findsig()}, @code{getvec()}, and @code{sample()} to return
+incorrect values when reading variable-layout multi-segment records with
+missing signals.
+
+@unnumberedsubsec Changes in version 10.5.18 (16 February 2013)
 
 Function @code{wfdb_addtopath} now works properly if the path contained
 only one component on entry.

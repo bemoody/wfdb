@@ -1,4 +1,4 @@
-.TH GQRS 1 "5 May 2012" "WFDB 10.5.13" "WFDB Applications Guide"
+.TH GQRS 1 "21 July 2013" "WFDB 10.5.19" "WFDB Applications Guide"
 .SH NAME
 gqrs, gqpost \- QRS detector and post-processor
 .SH SYNOPSIS
@@ -7,22 +7,26 @@ gqrs, gqpost \- QRS detector and post-processor
 \fBgqpost -r\fR \fIrecord\fR [ \fIoptions\fR ... ]
 .SH DESCRIPTION
 .PP
-\fBgqrs\fR attempts to locate QRS complexes in an ECG signal in the
-specified \fIrecord\fR.  The detector algorithm is new and as yet
-unpublished.  The output of \fBgqrs\fR is an annotation file (with
-annotator name \fBqrs\fR) in which all detected beats are labelled
-normal ("N").
+\fBgqrs\fR attempts to locate QRS complexes in an ECG signal in the specified
+\fIrecord\fR.  The detector algorithm is new and as yet unpublished.  The
+output of \fBgqrs\fR is an annotation file (with annotator name \fBqrs\fR) in
+which all detected beats are labelled normal ("N").  The \fIsubtyp\fR,
+\fIchan\fR, and \fInum\fR fields of each annotation respectively indicate the
+detection pass (0 or 1) during which the QRS complex was detected, the signal
+number on which it was detected, and the peak amplitude of the detector's
+matched filter during the QRS complex.
 .PP
 As a QRS detector for research, \fBgqrs\fR has been optimized for sensitivity.
 \fBgqpost\fR can post-process \fBgqrs\fR's output annotation file to improve
-positive predictivity, at a cost of reduced sensitivity.  It does this by
-copying its input annotation file, changing N annotations into artifact
-("!") annotations if they are likely to be erroneous.
+positive predictivity, generally at a cost of reduced sensitivity.  It does
+this by copying its input annotation file, changing N annotations into artifact
+("|") annotations if they are likely to be erroneous.
 .PP
-A shared configuration file can be used to describe some of the expected
-characteristics of the ECG signal.  This is unnecessary when processing
-adult human ECGs, but an appropriately constructed configuration file allows
-\fBgqrs\fR to analyze fetal, pediatric, and animal ECGs.
+A configuration file shared by \fBgqrs\fR and \fBgqpost\fR can be used to
+describe some of the expected characteristics of the ECG signal.  This is
+unnecessary when processing adult human ECGs, but an appropriately constructed
+configuration file allows \fBgqrs\fR to analyze fetal, pediatric, and animal ECGs.  A sample configuration file is available (see SOURCES, below);  it contains
+details about all configurable parameters.
 .PP
 \fIOptions\fR include:
 .TP
@@ -101,4 +105,5 @@ http://www.physionet.org/physiotools/wfdb/app/gqrs.c
 .br
 http://www.physionet.org/physiotools/wfdb/app/gqpost.c
 .br
-http://www.physionet.org/physiotools/wfdb/app/gqrs.conf
+http://www.physionet.org/physiotools/wfdb/app/gqrs.conf (sample configuration
+file)

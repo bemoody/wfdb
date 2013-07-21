@@ -1,10 +1,10 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   27 September 2012	wfdblib 10.5.1
+			Last revised:   21 July 2013		wfdblib 10.5.19
 WFDB library functions for signals
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1989-2012 George B. Moody
+Copyright (C) 1989-2013 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
@@ -253,7 +253,7 @@ static WFDB_Seginfo *segarray, *segp, *segend;
 static unsigned maxisig;	/* max number of input signals */
 static unsigned maxigroup;	/* max number of input signal groups */
 static unsigned nisig;		/* number of open input signals */
-static unsigned nigroups;	/* number of open input signal groups */
+static unsigned nigroup;	/* number of open input signal groups */
 static unsigned maxspf;		/* max allowed value for ispfmax */
 static unsigned ispfmax;	/* max number of samples of any open signal
 				   per input frame */
@@ -299,7 +299,7 @@ static int sample_vflag;	/* if non-zero, last value returned by sample()
 static unsigned maxosig;	/* max number of output signals */
 static unsigned maxogroup;	/* max number of output signal groups */
 static unsigned nosig;		/* number of open output signals */
-static unsigned nogroups;	/* number of open output signal groups */
+static unsigned nogroup;	/* number of open output signal groups */
 static WFDB_FILE *oheader;	/* file pointer for output header file */
 static WFDB_FILE *outinfo;	/* file pointer for output info file */
 static struct osdata {		/* unique for each output signal */
@@ -1207,14 +1207,13 @@ static void isigclose(void)
     struct isdata *is;
     struct igdata *ig;
 
-    /* if (nisig == 0) return; */
     if (sbuf && !in_msrec) {
 	SFREE(sbuf);
 	sample_vflag = 0;
     }
     if (isd) {
-	while (nisig)
-	    if (is = isd[--nisig]) {
+	while (maxisig)
+	    if (is = isd[--maxisig]) {
 		SFREE(is->info.fname);
 		SFREE(is->info.units);
 		SFREE(is->info.desc);
@@ -1222,22 +1221,18 @@ static void isigclose(void)
 	    }
 	SFREE(isd);
     }
-    else
-	nisig = 0;
-    maxisig = 0;
+    maxisig = nisig = 0;
 
     if (igd) {
-	while (nigroups)
-	    if (ig = igd[--nigroups]) {
+	while (maxigroup)
+	    if (ig = igd[--maxigroup]) {
 		if (ig->fp) (void)wfdb_fclose(ig->fp);
 		SFREE(ig->buf);
 		SFREE(ig);
 	    }
 	SFREE(igd);
     }
-    else
-	nigroups = 0;
-    maxigroup = 0;
+    maxigroup = nigroup = 0;
 
     istime = 0L;
     gvc = ispfmax = 1;
@@ -1255,8 +1250,8 @@ static void osigclose(void)
     struct ogdata *og;
 
     if (osd) {
-	while (nosig)
-	    if (os = osd[--nosig]) {
+	while (maxosig)
+	    if (os = osd[--maxosig]) {
 		SFREE(os->info.fname);
 		SFREE(os->info.units);
 		SFREE(os->info.desc);
@@ -1264,13 +1259,11 @@ static void osigclose(void)
 	    }
 	SFREE(osd);
     }
-    else
-	nosig = 0;
-    maxosig = 0;
+    nosig = 0;
 
     if (ogd) {
-	while (nogroups)
-	    if (og = ogd[--nogroups]) {
+	while (maxogroup)
+	    if (og = ogd[--maxogroup]) {
 		if (og->fp) {
 		    /* If a block size has been defined, null-pad the buffer */
 		    if (og->bsize)
@@ -1290,9 +1283,7 @@ static void osigclose(void)
 	    }
 	SFREE(ogd);
     }
-    else
-	nogroups = 0;
-    maxogroup = 0;
+    maxogroup = nogroup = 0;
 
     ostime = 0L;
     if (oheader) {
@@ -1527,7 +1518,7 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
 
     /* Do nothing if there is no more than one input signal group and
        the input pointer is correct already. */
-    if (nigroups < 2 && istime == (in_msrec ? t + segp->samp0 : t) &&
+    if (nigroup < 2 && istime == (in_msrec ? t + segp->samp0 : t) &&
 	igd[g]->start == 0)
 	return (0);
 
@@ -1727,7 +1718,7 @@ static int getskewedframe(WFDB_Sample *vector)
     if (istime == 0L) {
 	for (s = 0; s < nisig; s++)
 	    isd[s]->samp = isd[s]->info.initval;
-	for (g = nigroups; g; ) {
+	for (g = nigroup; g; ) {
 	    /* Go through groups in reverse order since seeking on group 0
 	       should always be done last. */
 	    if (--g == 0 || igd[g]->start > 0L)
@@ -1959,7 +1950,7 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
 	return (-1);	/* failed, nisig is unchanged, allocisig emits error */
     else
 	nsig = nn;
-    nn = nigroups + hsd[nsig-nisig-1]->info.group + 1;
+    nn = nigroup + hsd[nsig-nisig-1]->info.group + 1;
     if (allocigroup(nn) != nn)
 	return (-1);	/* failed, allocigroup emits error */
     else
@@ -1974,7 +1965,7 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
     for (g = si = s = 0; si < navail && s < nsig; si = sj) {
         hs = hsd[si];
 	is = isd[nisig+s];
-	ig = igd[nigroups+g];
+	ig = igd[nigroup+g];
 
 	/* Find out how many signals are in this group. */
         for (sj = si + 1; sj < navail; sj++)
@@ -2012,7 +2003,7 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
 	ig->stat = 1;
 	while (si < sj && s < nsig) {
 	    copysi(&is->info, &hs->info);
-	    is->info.group = nigroups + g;
+	    is->info.group = nigroup + g;
 	    is->skew = hs->skew;
 	    ++s;
 	    if (++si < sj) {
@@ -2043,7 +2034,7 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
     setgvmode(gvmode);	/* Reset sfreq if appropriate. */
     gvc = ispfmax;	/* Initialize getvec's sample-within-frame counter. */
     nisig += s;		/* Update the count of open input signals. */
-    nigroups += g;	/* Update the count of open input signal groups. */
+    nigroup += g;	/* Update the count of open input signal groups. */
     if (sigmap_init() < 0)
 	return (-1);
 
@@ -2102,7 +2093,7 @@ FINT osigopen(char *record, WFDB_Siginfo *siarray, unsigned int nsig)
     /* Allocate workspace for output signals. */
     if (allocosig(nosig + nsig) < 0) return (-3);
     /* Allocate workspace for output signal groups. */
-    if (allocogroup(nogroups + hsd[nsig-1]->info.group + 1) < 0) return (-3);
+    if (allocogroup(nogroup + hsd[nsig-1]->info.group + 1) < 0) return (-3);
 
     /* Initialize local variables. */
     if (obsize <= 0) obsize = BUFSIZ;
@@ -2110,7 +2101,7 @@ FINT osigopen(char *record, WFDB_Siginfo *siarray, unsigned int nsig)
     /* Set the group number adjustment.  This quantity is added to the group
        numbers of signals which are opened below;  it accounts for any output
        signals which were left open from previous calls. */
-    ga = nogroups;
+    ga = nogroup;
 
     /* Open the signal files.  One signal is handled per iteration. */
     for (s = 0, os = osd[nosig]; s < nsig; s++, nosig++, siarray++) {
@@ -2155,7 +2146,7 @@ FINT osigopen(char *record, WFDB_Siginfo *siarray, unsigned int nsig)
 		    return (-3);
 		}
 	    }
-	    nogroups++;
+	    nogroup++;
 	}
 	else {
 	    /* This signal belongs to the same group as the previous signal. */
@@ -2281,7 +2272,7 @@ FINT osigfopen(WFDB_Siginfo *siarray, unsigned int nsig)
 		    return (-3);
 		}
 	    }
-	    nogroups++;
+	    nogroup++;
 	}
 	else {
 	    /* This signal belongs to the same group as the previous signal. */
@@ -2314,7 +2305,7 @@ int findsig(char *p)
       q++;
   if (*q == 0) {	/* all digits, probably a signal number */
       s = atoi(p);
-      if (s < nisig) return (s);
+      if (s < nisig || s < nvsig) return (s);
   }
   /* Otherwise, p is either an integer too large to be a signal number or a
      string containing a non-digit character.  Assume it's a signal name. */
@@ -2442,7 +2433,7 @@ FFREQUENCY getifreq(void)
 
 FINT getvec(WFDB_Sample *vector)
 {
-    int i;
+    int i, nsig;
 
     if (ifreq == 0.0 || ifreq == sfreq)	/* no resampling necessary */
 	return (rgetvec(vector));
@@ -2452,13 +2443,14 @@ FINT getvec(WFDB_Sample *vector)
 	rgvtime -= mnticks;
 	gvtime  -= mnticks;
     }
+    nsig = (nvsig > nisig) ? nvsig : nisig;
     while (gvtime > rgvtime) {
-	for (i = 0; i < nisig; i++)
+	for (i = 0; i < nsig; i++)
 	    gv0[i] = gv1[i];
 	rgvstat = rgetvec(gv1);
 	rgvtime += nticks;
     }
-    for (i = 0; i < nisig; i++) {
+    for (i = 0; i < nsig; i++) {
 	vector[i] = gv0[i] + (gvtime%nticks)*(gv1[i]-gv0[i])/nticks;
         gv0[i] = gv1[i];
     }
@@ -2471,7 +2463,7 @@ FINT getframe(WFDB_Sample *vector)
     int stat;
 
     if (dsbuf) {	/* signals must be deskewed */
-	int c, i, j, s;
+	int c, i, j, nsig, s;
 
 	/* First, obtain the samples needed. */
 	if (dsbi < 0) {	/* dsbuf contents are invalid -- refill dsbuf */
@@ -2484,7 +2476,8 @@ FINT getframe(WFDB_Sample *vector)
 	    if ((dsbi += framelen) >= dsblen) dsbi = 0;
 	}
 	/* Assemble the deskewed frame from the data in dsbuf. */
-	for (j = s = 0; s < nisig; s++) {
+	nsig = (nvsig > nisig) ? nvsig : nisig;
+	for (j = s = 0; s < nsig; s++) {
 	    if ((i = j + dsbi + isd[s]->skew*framelen) >= dsblen) i -= dsblen;
 	    for (c = 0; c < isd[s]->info.spf; c++)
 		vector[j++] = dsbuf[i++];
@@ -2585,7 +2578,7 @@ FINT isigsettime(WFDB_Time t)
     /* Return immediately if no seek is needed. */
     if (t == istime || nisig == 0) return (0);
 
-    for (g = 1; g < nigroups; g++)
+    for (g = 1; g < nigroup; g++)
         if ((stat = isgsettime(g, t)) < 0) break;
     /* Seek on signal group 0 last (since doing so updates istime and would
        confuse isgsettime if done first). */
@@ -3487,17 +3480,18 @@ FSAMPLE sample(WFDB_Signal s, WFDB_Time t)
 {
     static WFDB_Sample v;
     static WFDB_Time tt;
+    int nsig = (nvsig > nisig) ? nvsig : nisig;
 
     /* Allocate the sample buffer on the first call. */
     if (sbuf == NULL) {
-	SALLOC(sbuf, nisig, BUFLN*sizeof(WFDB_Sample));
+	SALLOC(sbuf, nsig, BUFLN*sizeof(WFDB_Sample));
 	tt = (WFDB_Time)-1L;
     }
 
     /* If the caller requested a sample from an unavailable signal, return
        an invalid value.  Note that sample_vflag is not cleared in this
        case.  */
-    if (s < 0 || s >= nisig) {
+    if (s < 0 || s >= nsig) {
         sample_vflag = -1;
 	return (WFDB_INVALID_SAMPLE);
     }
@@ -3522,15 +3516,15 @@ FSAMPLE sample(WFDB_Signal s, WFDB_Time t)
        more samples.  If we reach the end of the record, clear sample_vflag
        and return the last valid value. */
     while (t > tt)
-        if (getvec(sbuf + nisig * ((++tt)&(BUFLN-1))) < 0) {
+        if (getvec(sbuf + nsig * ((++tt)&(BUFLN-1))) < 0) {
 	    --tt;
 	    sample_vflag = 0;
-	    return (*(sbuf + nisig * (tt&(BUFLN-1)) + s));
+	    return (*(sbuf + nsig * (tt&(BUFLN-1)) + s));
 	}
 
     /* The requested sample is in the buffer.  Set sample_vflag and
        return the requested sample. */
-    if ((v = *(sbuf + nisig * (t&(BUFLN-1)) + s)) == WFDB_INVALID_SAMPLE)
+    if ((v = *(sbuf + nsig * (t&(BUFLN-1)) + s)) == WFDB_INVALID_SAMPLE)
         sample_vflag = -1;
     else
         sample_vflag = 1;
@@ -3589,7 +3583,7 @@ void wfdb_osflush(void)
     WFDB_Group g;
     struct ogdata *og;
 
-    for (g = 0; g < nogroups; g++) {
+    for (g = 0; g < nogroup; g++) {
 	og = ogd[g];
 	if (og->bsize == 0 && og->bp != og->buf) {
 	    (void)wfdb_fwrite(og->buf, 1, og->bp - og->buf, og->fp);

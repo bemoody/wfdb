@@ -1,8 +1,8 @@
 /* file: gqrs.c			G. Moody		16 November 2006
-				Last revised:		  23 April 2012   
+				Last revised:		  21 July 2013   
 -------------------------------------------------------------------------------
 gqrs: A QRS detector
-Copyright (C) 2006-2012 George B. Moody
+Copyright (C) 2006-2013 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -701,7 +701,7 @@ static char *help_strings[] = {
  " -h          print this usage summary",
  " -H          read multifrequency signals in high resolution mode",
  " -m THRESH   set detector threshold to THRESH (default: 1.00)",
- " -o RECORD   save filtered signals in a new RECORD", 
+ " -o ANN      save annotations as annotator ANN (default: qrs)", 
  " -s SIGNAL   analyze specified SIGNAL (default: 0)",
  "                (Note: SIGNAL may be specified by number or name.)",
  " -t TIME     stop at specified time",
