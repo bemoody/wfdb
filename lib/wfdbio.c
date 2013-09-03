@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:	16 February 2013       wfdblib 10.5.18
+                        Last revised:   2 September 2013       wfdblib 10.5.20
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -981,11 +981,10 @@ WFDB_FILE *wfdb_open(const char *s, const char *record, int mode)
     /* Parse the WFDB path if not done previously. */
     if (wfdb_path_list == NULL) (void)getwfdb();
 
-    /* If the filename contains '://', or if it begins with a directory
-       separator, it's an absolute URL or pathname.  In this case, don't search
-       the WFDB path, but add its parent directory to the path if the file can
-       be read. */
-    if (strstr(r, "://") || *r == DSEP) {
+    /* If the filename begins with 'http://' or 'https://', it's a URL.  In
+       this case, don't search the WFDB path, but add its parent directory
+       to the path if the file can be read. */
+    if (strncmp(r, "http://", 7) == 0 || strncmp(r, "https://", 8) == 0) {
 	if (strlen(r) + strlen(s) >= MFNLEN)
 	    return (NULL);  /* name too long */
 	spr1(wfdb_filename, r, s);

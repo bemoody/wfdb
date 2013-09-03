@@ -1,3 +1,7 @@
+10.5.20 (2 September 2013):
+	Absolute pathnames are not tested in wfdb_open() unless the WFDB
+	path contains an empty component.
+
 10.5.19 (21 July 2013):
 	This release includes fixes in lib/signal.c for several bugs that
 	sometimes caused findsig(), getvec(), and sample() to return incorrect
