@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody         24 May 2000
-#                             Last revised:   2 January 2013
+#                             Last revised:  19 November 2013
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -77,9 +77,6 @@ done
 echo "Checking the operating system type ..."
 CPUOS=`uname -m`-`uname -s`
 ARCH=`echo $CPUOS | tr -d " "`
-case $OS in
- mingw*) 
-esac
 case `uname` in
   Linux*)    case `uname -m` in
 	        x86_64) OS=Linux-64 ;;
@@ -187,7 +184,8 @@ case $OS in
 	LIB=bin
 	WAVE=0
 	sed 's/NOCYGWIN//' site.def mingw-slib.def >site-slib.def
-	sed 's/NOCYGWIN//' mingw.def >>site.def ;;
+	sed 's/NOCYGWIN//' mingw.def >>site.def
+        ( cd ../checkpkg; ./dosify ) ;;
   mingw-compat)
 	LIB=bin
 	OS=mingw

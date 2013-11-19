@@ -1,5 +1,5 @@
-# file: mingw-slib.def	I. Henry and G. Moody	11 February 2005
-#				Last revised:	  13 May 2010
+# file: mingw-slib.def		I. Henry and G. Moody	    11 February 2005
+#				Last revised:		    19 November 2013
 #
 # This section contains settings suitable for generating a DLL (shared library)
 # under MS Windows using the free gcc ANSI C compiler.
@@ -55,7 +55,7 @@ CC = gcc NOCYGWIN
 # CCDEFS is the set of C compiler options needed to set preprocessor variables
 # while compiling the WFDB Software Package.  CCDEFS should always include
 # VDEFS.
-CCDEFS = $(VDEFS) -DNOVALUES_H -DNOMKSTEMP
+CCDEFS = $(VDEFS) -DMSDOS -DNOVALUES_H -DNOMKSTEMP
 
 # MFLAGS is the set of architecture-dependent (-m*) compiler options, which
 # is usually empty.  See the gcc manual for information about gcc's -m options.
@@ -78,6 +78,9 @@ WFDBLIB_SONAME = $(WFDBLIB_BASENAME).$(MAJOR)
 WFDBLIB = $(WFDBLIB_SONAME).$(MINOR)
 # For a shared library, the soname is significant for proper run-time binding.
 # If you change function interfaces in the library, change its soname by
+
+
+
 # incrementing the major version number;  when you do this, set the minor
 # version number to zero.  If you change the library without changing the
 # function interfaces, increment the minor version number; this allows existing

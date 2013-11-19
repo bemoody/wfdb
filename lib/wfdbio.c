@@ -1081,7 +1081,7 @@ int wfdb_checkname(char *p, char *s)
 	if (('0' <= *p && *p <= '9') || *p == '_' || *p == '~' || *p== '-' ||
 	    *p == DSEP ||
 #ifdef MSDOS
-	    *p == ':' ||
+	    *p == ':' || *p == '/' ||
 #endif
 	    ('a' <= *p && *p <= 'z') || ('A' <= *p && *p <= 'Z'))
 	    p++;

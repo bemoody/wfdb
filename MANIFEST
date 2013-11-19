@@ -67,6 +67,7 @@ check-manifest
 checkpkg
 checkpkg/appcheck
 checkpkg/checkfile
+checkpkg/dosify
 checkpkg/expected
 checkpkg/expected/100a.nguess
 checkpkg/expected/100s.a2r
@@ -83,6 +84,7 @@ checkpkg/expected/100x.dat
 checkpkg/expected/100x.hea
 checkpkg/expected/100z.hea
 checkpkg/expected/ann2rr.out
+checkpkg/expected/bxb.err
 checkpkg/expected/bxb.out
 checkpkg/expected/ecgeval.out
 checkpkg/expected/fir.dat
@@ -97,6 +99,7 @@ checkpkg/expected/pschart.ps
 checkpkg/expected/psfd.ps
 checkpkg/expected/rdann.out
 checkpkg/expected/rdsamp.out
+checkpkg/expected/rxr.err
 checkpkg/expected/rxr.out
 checkpkg/expected/sampfreq.out
 checkpkg/expected/sigamp.out

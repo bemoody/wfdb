@@ -951,7 +951,7 @@ long t0, t1;
 	x0 = mm(s_left);
 	if (lflag) setitalic(fs_label);
 	for (i = 0; i < nosig; i++) {
-	    int last_sample_valid, sig = siglist[i];
+	    int last_sample_valid = 0, sig = siglist[i];
 	    static WFDB_Calinfo ci;
 	    
 	    setrgbcolor(&lc);

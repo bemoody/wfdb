@@ -1,9 +1,9 @@
 /* file: ecgeval.c	G. Moody	22 March 1992
-			Last revised:   27 July 2010
+			Last revised:  19 November 2013		wfdb 10.5.21
 
 -------------------------------------------------------------------------------
 ecgeval: Generate and run a script of commands to compare sets of annotations
-Copyright (C) 1992-2010 George B. Moody
+Copyright (C) 1992-2013 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,10 @@ You may contact the author by e-mail (george@mit.edu) or postal mail
 please visit PhysioNet (http://www.physionet.org/).
 _______________________________________________________________________________
 
+Note: versions prior to 10.5.21 included code that was conditionally compiled
+if MSDOS was defined.  This code truncated file names to 8.3 format.  If you
+need to run ecgeval on an ancient OS that cannot handle longer filenames, use
+an archived version (available on PhysioNet).
 */
 
 #include <stdio.h>
@@ -30,14 +34,7 @@ _______________________________________________________________________________
 #include <wfdb/wfdb.h>
 
 #define NDBMAX	50	/* maximum number of databases in `dblist' */
-
-#ifdef MSDOS
-#define RNLMAX	8	/* maximum length of a record name */
-#define ECHONOTHING	"echo . >>%s\n"	/* closest simple approximation */
-#else
-#define RNLMAX	20
 #define ECHONOTHING "echo >>%s\n"
-#endif
 
 char buf[256];
 
@@ -220,13 +217,8 @@ main()
 		  dbname[dbi]);
     (void)fprintf(stderr,
  "are identified by the test annotator name (the part of the file name\n");
-#ifdef MSDOS
-    (void)fprintf(stderr,
- "that follows the record name and `.'; three characters or less).\n");
-#else
     (void)fprintf(stderr,
  "that precedes the `.' and the record name).\n");
-#endif
     (void)fprintf(stderr,
  "If you don't yet have a set of test annotation files, you can add the\n");
     (void)fprintf(stderr,
@@ -237,9 +229,6 @@ main()
 	(void)fprintf(stderr, "What is the test annotator name? ");
 	if (tname[0]) (void)fprintf(stderr, "[%s]: ", tname);
 	getans(tname, 20);
-#ifdef MSDOS
-	if ((int)strlen(tname) > 3) tname[0] = '\0';
-#endif
     } while (tname[0] == '\0');
 
     (void)fprintf(stderr, "\n");
@@ -260,9 +249,6 @@ main()
 		      "What is the reference heart rate annotator name? ");
 	if (rhrname[0]) (void)fprintf(stderr, "[%s]: ", rhrname);
 	getans(rhrname, 20);
-#ifdef MSDOS
-	if ((int)strlen(rhrname) > 3) rhrname[0] = '\0';
-#endif
     } while (rhrname[0] == '\0');
 
     (void)fprintf(stderr, "\n");
@@ -342,13 +328,8 @@ main()
 	else
 	    dbtn[i] = dbname[dbi][i];
     }
-#ifdef MSDOS
-    (void)sprintf(scriptname, "%s-%s.bat", tname, dbtn);
-    (void)sprintf(reportname, "%s-%s.out", tname, dbtn);
-#else
     (void)sprintf(scriptname, "eval-%s-%s", tname, dbtn);
     (void)sprintf(reportname, "%s-%s-evaluation", tname, dbtn);
-#endif
 
     while (sfile == NULL) {
 	do {
@@ -356,18 +337,8 @@ main()
 	    if (scriptname[0])
 		(void)fprintf(stderr, " [%s]", scriptname);
 	    (void)fprintf(stderr, ": ");
-#ifdef MSDOS
-	    getans(scriptname, 9);
-#else
 	    getans(scriptname, 20);
-#endif
 	} while (scriptname[0] == '\0');
-
-#ifdef MSDOS
-	i = strlen(scriptname) - 4;
-	if (i <= 0 || strcmp(scriptname+i, ".bat"))
-	    (void)strcat(scriptname, ".bat");
-#endif
 
 	if (sfile = fopen(scriptname, "r")) {
 	    (void)fclose(sfile);
@@ -547,9 +518,6 @@ main()
 	(void)strcat(epicmpcommand, "\n");
     }
 
-#ifdef MSDOS
-    (void)fprintf(sfile, "@echo off\n");
-#endif
     (void)fprintf(sfile, ": file: %s\tecgeval\t\t%d %s %d\n", scriptname,
 	    now->tm_mday, month_name[now->tm_mon], now->tm_year+1900);
     (void)fprintf(sfile,
@@ -564,7 +532,7 @@ main()
 	record = strtok(buf, " \t\n\r");
 	if (*record == '#' || *record == '\0')
 	    continue;	/* comment or empty line -- ignore */
-	if ((int)strlen(record) > RNLMAX) {
+	if ((int)strlen(record) > WFDB_MAXRNL) {
 	    (void)fprintf(stderr,
 		    "Illegal record name, `%s', found in `%s' (ignored).\n",
 			  record, dbfn);
@@ -663,19 +631,9 @@ main()
 	(void)fprintf(sfile,
 		      "echo to get the results.\n");
 
-#ifdef MSDOS
-    (void)fprintf(sfile, "@echo on\n");
-#endif
     (void)fclose(sfile);
     (void)fprintf(stderr, " done\n\n");
-
-#ifdef MSDOS
-    strncpy(evalcommand, scriptname, strlen(scriptname) - 4);
-	/* The command need not include the final `.bat'. */
-#else
     (void)sprintf(evalcommand, "sh ./%s", scriptname);
-#endif
-
     (void)fprintf(stderr,
 	    "Do you wish to run the evaluation script now? [y]: ");
     tans[0] = 'y';

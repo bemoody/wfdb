@@ -1,5 +1,5 @@
 # file: mingw.def		I. Henry and G. Moody       11 February 2005 
-#				Last revised:		      13 May 2010
+#				Last revised:		    19 November 2013
 #
 # This file contains default 'make' definitions for compiling the WFDB Software
 # Package under MS Windows using the free Mininmalist GNU for Windows (MinGW) 
@@ -76,6 +76,8 @@ CC = gcc NOCYGWIN
 # by spaces if you use more than one):
 #   -DISPRINTF	  if you do not have `stdlib.h' and your `sprintf' returns an
 #		   int (see wfdblib.h)
+#   -DMSDOS	  if the target platform is MS-DOS or MS-Windows without a
+#   		   POSIX compatibility layer such as Cygwin
 #   -DNETFILES	  if you have libwww and want to be able to access WFDB files
 #		   remotely via http or ftp (as well as local files)
 #   -DNOSTRTOK	  if your standard C library does not include function `strtok'
@@ -85,7 +87,7 @@ CC = gcc NOCYGWIN
 #   -DOLDC	  if you have neither `stdarg.h' nor `varargs.h' (see wfdbio.c)
 # If your C compiler fails to compile `signal.c', add -DBROKEN_CC to CCDEFS
 # and try again (see signal.c).
-CCDEFS = $(VDEFS) -DNOVALUES_H -DNOMKSTEMP
+CCDEFS = $(VDEFS) -DMSDOS -DNOVALUES_H -DNOMKSTEMP
 
 # MFLAGS is the set of architecture-dependent (-m*) compiler options, which
 # is usually empty.  See the gcc manual for information about gcc's -m options.

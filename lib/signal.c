@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   21 July 2013		wfdblib 10.5.19
+			Last revised:  18 November 2013		wfdblib 10.5.21
 WFDB library functions for signals
 
 _______________________________________________________________________________

@@ -58,15 +58,15 @@ Choose a name for the evaluation script [eval-qrs-mit]:
 Choose a name for the evaluation report [qrs-mit-evaluation]: The next group of questions refers to the names of files in which
 intermediate summary statistics are to be written.  If any of these exist
 already, new statistics will be appended, and the aggregate statistics
-in `qrs-mit-evaluation' will be based on the entire contents of these files.
+in `qrs-mit.out' will be based on the entire contents of these files.
 Beat detection and classification file [bxb.out]: Analysis shutdown file [sd.out]: Ventricular ectopic run file [vruns.out]: Supraventricular ectopic run file [sruns.out]: Ventricular fibrillation file [vf.out]: Atrial fibrillation file [af.out]: ST analysis file [st.out]: ST measurement file [stm.out]: PostScript scatter plot of ST measurements [stm.ps]: The name given for the heart rate measurement file must contain `%d',
 which is replaced by the measurement number.
 Heart rate measurement file [hr%d.out]: 
 Do you wish to change any of these answers? [y]: 
-Generating `eval-qrs-mit' ... done
+Generating `qrs-mit.bat' ... done
 
-Do you wish to run the evaluation script now? [y]: Inspect and edit `eval-qrs-mit' as necessary, then type
-   sh ./eval-qrs-mit
+Do you wish to run the evaluation script now? [y]: Inspect and edit `qrs-mit.bat' as necessary, then type
+   sh ./qrs-mit.bat
 to run the evaluation.
 :
 : Evaluate test annotator qrs on the MIT DB
@@ -363,41 +363,41 @@ mxm -r 234 -a thr qrs -L hr0.out -m 0
 epicmp -r 234 -a atr qrs -L -A af.out -V vf.out -S st.out stm.out
 
 : Generate summary report
-echo Beat detection and classification performance >>qrs-mit-evaluation
-echo >>qrs-mit-evaluation
-sumstats bxb.out >>qrs-mit-evaluation
-echo >>qrs-mit-evaluation
-echo Analysis shutdowns >>qrs-mit-evaluation
-echo >>qrs-mit-evaluation
-sumstats sd.out >>qrs-mit-evaluation
-echo >>qrs-mit-evaluation
-echo Ventricular ectopic run detection performance >>qrs-mit-evaluation
-echo >>qrs-mit-evaluation
-sumstats vruns.out >>qrs-mit-evaluation
-echo >>qrs-mit-evaluation
-echo Supraventricular ectopic run detection performance >>qrs-mit-evaluation
-echo >>qrs-mit-evaluation
-sumstats sruns.out >>qrs-mit-evaluation
-echo >>qrs-mit-evaluation
-echo Heart rate measurement number 0 performance >>qrs-mit-evaluation
-echo >>qrs-mit-evaluation
-sumstats hr0.out >>qrs-mit-evaluation
-echo >>qrs-mit-evaluation
-echo Ventricular fibrillation detection performance >>qrs-mit-evaluation
-echo >>qrs-mit-evaluation
-sumstats vf.out >>qrs-mit-evaluation
-echo >>qrs-mit-evaluation
-echo Atrial fibrillation detection performance >>qrs-mit-evaluation
-echo >>qrs-mit-evaluation
-sumstats af.out >>qrs-mit-evaluation
-echo >>qrs-mit-evaluation
-echo Ischemic ST detection performance >>qrs-mit-evaluation
-echo >>qrs-mit-evaluation
-sumstats st.out >>qrs-mit-evaluation
-echo >>qrs-mit-evaluation
+echo Beat detection and classification performance >>qrs-mit.out
+echo >>qrs-mit.out
+sumstats bxb.out >>qrs-mit.out
+echo >>qrs-mit.out
+echo Analysis shutdowns >>qrs-mit.out
+echo >>qrs-mit.out
+sumstats sd.out >>qrs-mit.out
+echo >>qrs-mit.out
+echo Ventricular ectopic run detection performance >>qrs-mit.out
+echo >>qrs-mit.out
+sumstats vruns.out >>qrs-mit.out
+echo >>qrs-mit.out
+echo Supraventricular ectopic run detection performance >>qrs-mit.out
+echo >>qrs-mit.out
+sumstats sruns.out >>qrs-mit.out
+echo >>qrs-mit.out
+echo Heart rate measurement number 0 performance >>qrs-mit.out
+echo >>qrs-mit.out
+sumstats hr0.out >>qrs-mit.out
+echo >>qrs-mit.out
+echo Ventricular fibrillation detection performance >>qrs-mit.out
+echo >>qrs-mit.out
+sumstats vf.out >>qrs-mit.out
+echo >>qrs-mit.out
+echo Atrial fibrillation detection performance >>qrs-mit.out
+echo >>qrs-mit.out
+sumstats af.out >>qrs-mit.out
+echo >>qrs-mit.out
+echo Ischemic ST detection performance >>qrs-mit.out
+echo >>qrs-mit.out
+sumstats st.out >>qrs-mit.out
+echo >>qrs-mit.out
 : Generate PostScript scatter plot of ST measurements
 plotstm stm.out >stm.ps
-echo The evaluation is complete.  Print text file qrs-mit-evaluation
+echo The evaluation is complete.  Print text file qrs-mit.out
 echo and PostScript file stm.ps to get the results.
 Evaluation of `qrs' on the MIT-BIH Arrhythmia Database
 

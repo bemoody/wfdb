@@ -176,14 +176,14 @@ TESTS=`expr $TESTS + 1`
 
 echo Testing ecgeval ...
 F=ecgeval.out
-rm -f eval-qrs-mit qrs-mit-evaluation
+rm -f qrs-mit.bat qrs-mit.out
 ecgeval <input/ecgeval >$F 2>&1
-grep -v file: eval-qrs-mit >>$F
-grep -v file: qrs-mit-evaluation >>$F
+grep -v file: qrs-mit.bat >>$F
+grep -v file: qrs-mit.out >>$F
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
-    rm -f $F eval-qrs-mit qrs-mit-evaluation bxb.out sd.out
+    rm -f $F qrs-mit.bat qrs-mit.out bxb.out sd.out
 else
     FAIL=`expr $FAIL + 1`
 fi
@@ -191,7 +191,8 @@ TESTS=`expr $TESTS + 1`
 
 echo Testing bxb ...
 F=bxb.out
-bxb -r 100s -a atr ann -f 0 >$F 2>&1
+E=bxb.err
+bxb -r 100s -a atr ann -f 0 >$F 2>$E
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
@@ -199,11 +200,19 @@ then
 else
     FAIL=`expr $FAIL + 1`
 fi
-TESTS=`expr $TESTS + 1`
+if ( ./checkfile $E )
+then
+    PASS=`expr $PASS + 1`
+    rm -f $E
+else
+    FAIL=`expr $FAIL + 1`
+fi
+TESTS=`expr $TESTS + 2`
 
 echo Testing rxr ...
 F=rxr.out
-rxr -r 100s -a atr ann -f 0 >$F 2>&1
+E=rxr.err
+rxr -r 100s -a atr ann -f 0 >$F 2>$E
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
@@ -211,7 +220,14 @@ then
 else
     FAIL=`expr $FAIL + 1`
 fi
-TESTS=`expr $TESTS + 1`
+if ( ./checkfile $E )
+then
+    PASS=`expr $PASS + 1`
+    rm -f $E
+else
+    FAIL=`expr $FAIL + 1`
+fi
+TESTS=`expr $TESTS + 2`
 rm 100s.ann
 
 echo Testing fir ...

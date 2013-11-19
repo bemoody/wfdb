@@ -1,7 +1,17 @@
-10.5.21 (18 November 2013):
+10.5.21 (19 November 2013):
+	This release includes changes in 'configure', 'conf/mingw.def',
+	'conf/mingw-slib.def', 'lib/wfdbio.c', 'app/ecgeval.c',
+	'checkpkg/appcheck', and several of the test output references in
+	'checkpkg/expected/', as well as a new script ('checkpkg/dosify'),
+	to support building more of the WFDB Software Package using MinGW on
+	MS-Windows.	
+
 	In previous releases, WFDB library function strtim did not always
 	handle bracketed string inputs properly.  Thanks to Benjamin Moody,
-	who reported the problem and provided a patch to fix it.
+	who reported the problem and provided a patch to fix it.  Prompted
+	by this fix, the deprecated atoi(), atof(), and atol() functions
+	have been replaced throughout the WFDB library by strtol() and
+	strtod().
 
 	rdedfann (convert/rdedfann.c) now accepts a -F option to specify
 	the implied sampling frequency for the output it generates
@@ -12,6 +22,7 @@
 	misbehavior and providing a patch.  Benjamin also provided a working
 	set of instructions for compiling WAVE as a 32-bit application on
 	64-bit Debian Wheezy or Ubuntu 12.04;  see 'install-wave32'.
+
 
 10.5.20 (2 September 2013):
 	Absolute pathnames are not tested in wfdb_open() unless the WFDB
