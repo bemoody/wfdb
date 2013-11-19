@@ -10,6 +10,9 @@ This program prints the annotations from an EDF+ file in the same format as
 .PP
 Options include:
 .TP
+\fB-F\fI frequency\fR
+Set the sampling frequency to \fIfrequency\fR (in Hz).
+.TP
 \fB-h\fR
 Print a brief usage summary.
 .TP
@@ -19,13 +22,19 @@ Verbose mode (print column headings).
 .PP
 Note that the annotation mnemonics in EDF+ files do not in general
 match those used in WFDB-compatible annotation files, so that it will
-usually be necessary to translate those that come from EDF+ file
-before the text can be converted by \fBwrann\fR.  For example, this
+often be desirable to translate those that come from EDF+ file
+before converting the text with \fBwrann\fR.  For example, this
 command can be used to extract annotations from \fBfoo.edf\fR, change
 the EDF+ annotation type "QRS" to the WFDB type "N", and then produce
 a WFDB-compatible annotation file \fBfoo.edf.qrs\fR:
 .br
         \fBrdedfann -r foo.edf | sed "s/QRS/ N" | wrann -r foo.edf -a qrs\fR
+
+.PP
+Recent versions of \fBwrann\fR copy unrecognized mnemonics into
+the \fBaux\fR field, setting the annotation type to \fBNOTE\fR, so it
+is no longer essential to translate mnemonics as described above before
+processing \fBrdedfann\fR's output with \fBwrann\fR.
 
 .SH ENVIRONMENT
 .PP
@@ -36,7 +45,7 @@ This program is provided in the \fIconvert\fR directory of the WFDB Software
 Package.  Run \fBmake\fR in that directory to compile and install it if it
 has not been installed already.
 .SH SEE ALSO
-\fBedftomit\fR(1)
+\fBedf2mit\fR(1)
 .HP
 http://www.edfplus.info/spscs/edfplus.html
 Full specification of EDF+, by Bob Kemp and Jesus Olivan.

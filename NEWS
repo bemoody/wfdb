@@ -1,3 +1,18 @@
+10.5.21 (18 November 2013):
+	In previous releases, WFDB library function strtim did not always
+	handle bracketed string inputs properly.  Thanks to Benjamin Moody,
+	who reported the problem and provided a patch to fix it.
+
+	rdedfann (convert/rdedfann.c) now accepts a -F option to specify
+	the implied sampling frequency for the output it generates
+	from input that contains EDF annotations only.
+
+	WAVE works correctly when started with the option -VS 2 (to display
+	valid signals only.  Thanks to Benjamin Moody for reporting the
+	misbehavior and providing a patch.  Benjamin also provided a working
+	set of instructions for compiling WAVE as a 32-bit application on
+	64-bit Debian Wheezy or Ubuntu 12.04;  see 'install-wave32'.
+
 10.5.20 (2 September 2013):
 	Absolute pathnames are not tested in wfdb_open() unless the WFDB
 	path contains an empty component.

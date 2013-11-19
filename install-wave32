@@ -1,9 +1,10 @@
 #! /bin/sh
 # file: install-wave32		G. Moody	7 October 2008
-#				Last revised:   25 April 2012
+#				Last revised:  18 November 2013
 # Build and install WAVE on 64-bit Linux
 #
-# *** Fedora 12 users: if this script fails, see the note at the end! ***
+# *** Debian and Ubuntu users, see the notes at the end! ***
+# *** Fedora 12 users: if this script fails, see the notes near the end! ***
 #
 # WAVE must be compiled as a 32-bit application, because it depends on the
 # XView toolkit, which does not support 64-bit mode (and most likely, never
@@ -26,8 +27,8 @@
 # as root, using the -q option.  See the notes below for hints.
 
 echo "This script builds and installs 'wave' as a 32-bit application on x86_64"
-echo "(AMD/Intel 64-bit) Fedora GNU/Linux.  It has been tested on Fedora 12 and"
-echo "will probably require modification on other platforms."
+echo "(AMD/Intel 64-bit) Fedora GNU/Linux.  It has been tested on Fedora 12,"
+echo "14, and 18;  it will probably require modification on other platforms."
 echo
 
 if [ $UID != 0 ]
@@ -156,3 +157,46 @@ make clean
 #    yum -y install nss.i686 nss-softokn.i686 openldap.i686
 #    rpm -ivh --force libcurl-7.19.7-2.fc12.i686.rpm 
 #    rpm -ivh --force libcurl-devel-7.19.7-2.fc12.i686.rpm 
+#
+# ****************************************************************************
+#
+# Notes for Debian Wheezy and Ubuntu 12.04, from Benjamin Moody:
+#
+# 1. Get the latest updates (needed on Wheezy, a good idea otherwise):
+#      apt-get update
+#
+# 2. Ensure that i386 is enabled in dpkg configuration.  Apparently this
+#    is not needed on Ubuntu; on Debian:
+#      dpkg --add-architecture i386
+#
+# 3. On Ubuntu 12.10 or earlier, or Debian Wheezy, you will need to
+#    upgrade the 'xbitmaps' package to version 1.1.1-2 manually (older
+#    versions aren't marked as multiarch-safe):
+#      wget http://archive.ubuntu.com/ubuntu/pool/main/x/xbitmaps/xbitmaps_1.1.1-2_all.deb
+#      dpkg -i xbitmaps_1.1.1-2_all.deb
+#    (Debian users can safely install the package from Ubuntu.)
+#
+# 4. On Ubuntu, ensure that 'universe' section is enabled:
+#      sed '/^deb/{/universe/!s/ main/ main universe/}' -i /etc/apt/sources.list
+#      apt-get update
+#
+# 5. Install the XView library and developer packages:
+#      apt-get install xviewg-dev:i386
+#    On Debian Wheezy, this won't work if you skipped step 1!
+#
+# 6. Install the 32-bit libcurl library and developer packages:
+#      apt-get install libcurl4-gnutls-dev:i386
+#    This can coexist with libcurl4-gnutls-dev:amd64 on Debian, not tested
+#    on Ubuntu (please send feedback if you try it).
+#
+# 7. Install the remaining 32-bit compatibility tools and libraries:
+#      apt-get install build-essential gcc-multilib
+#
+# 8. Compile and install the WFDB Software Package as usual, using configure's
+#    -m32 option.  For example, to install in /usr/local, begin with:
+#      ./configure -m32 --prefix=/usr/local
+#      make install
+#    You will need to set and export LD_LIBRARY_PATH if you use --prefix as
+#    above:
+#      LD_LIBRARY_PATH=/usr/local/lib
+#      export LD_LIBRARY_PATH

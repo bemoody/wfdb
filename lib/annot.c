@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:     6 April 2012	wfdblib 10.5.11
+			Last revised:  18 November 2013		wfdblib 10.5.21
 WFDB library functions for annotations
 
 _______________________________________________________________________________
@@ -183,7 +183,7 @@ static int get_ann_table(WFDB_Annotator i)
 	    continue;
 	}
 	    p1 = strtok((char *)annot.aux+1, " \t");
-	a = atoi(p1);
+	    a = strtol(p1, NULL, 10);
 	if (0 <= a && a <= ACMAX && (p1 = strtok((char *)NULL, " \t"))) {
 	    SSTRCPY(s1, p1);
 	    (void)setannstr(a, s1);
@@ -951,7 +951,7 @@ FVOID oannclose(WFDB_Annotator n)
 	    int dosort = DEFWFDBANNSORT;
 	    char *p = getenv("WFDBANNSORT");
 
-	    if (p) dosort = atoi(p);
+	    if (p) dosort = strtol(p, NULL, 10);
 	    if (dosort) {
 		if (system(NULL) != 0) {
 		    wfdb_error(

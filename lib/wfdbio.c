@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:   2 September 2013       wfdblib 10.5.20
+                        Last revised:   18 November 2013       wfdblib 10.5.21
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -1263,7 +1263,8 @@ static void www_init(void)
     if (!www_done_init) {
 	char *p, *u, version[20];
 
-	if ((p = getenv("WFDB_PAGESIZE")) && *p) page_size = atol(p);
+	if ((p = getenv("WFDB_PAGESIZE")) && *p)
+	    page_size = strtol(p, NULL, 10);
 
 #if WFDB_NETFILES_LIBCURL
 	/* Initialize the curl "easy" handle. */
@@ -1302,9 +1303,12 @@ static void www_init(void)
 	int cachesize = CACHESIZE;	/* maximum size of the cache in MB */
 	int entrysize = ENTRYSIZE;	/* maximum cache entry size in MB */
 
-	if ((p = getenv("WFDB_CACHEDIR")) && *p) cachedir = p;
-	if ((p = getenv("WFDB_CACHESIZE")) && *p) cachesize = atoi(p);
-	if ((p = getenv("WFDB_CACHEENTRYSIZE")) && *p) entrysize = atoi(p);
+	if ((p = getenv("WFDB_CACHEDIR")) && *p)
+	    cachedir = p;
+	if ((p = getenv("WFDB_CACHESIZE")) && *p)
+	    cachesize = strtol(p, NULL, 10);
+	if ((p = getenv("WFDB_CACHEENTRYSIZE")) && *p)
+	    entrysize = strtol(p, NULL, 10);
 #endif
 	sprintf(version, "%d.%d.%d", WFDB_MAJOR, WFDB_MINOR, WFDB_RELEASE);
 	HTProfile_newPreemptiveClient("WFDB", version);
@@ -1380,7 +1384,7 @@ static long www_get_cont_len(const char *url)
 	if ((a = HTRequest_anchor(request)) && (headers = HTAnchor_header(a)))
 	    while ((pres = (HTAssoc *)HTAssocList_nextObject(headers)))
 		if (HTStrCaseMatch("Content-Length", HTAssoc_name(pres)))
-		    length = atol(HTAssoc_value(pres));
+		    length = strtol(HTAssoc_value(pres), NULL, 10);
 	HTRequest_delete(request);  
     }
     return (length);

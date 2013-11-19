@@ -863,7 +863,7 @@ static int readheader(const char *record)
 		     record);
 	    return (-2);
 	}
-	segments = atoi(q+1);
+	segments = strtol(q+1, NULL, 10);
 	*q = '\0';
     }
 
@@ -903,11 +903,11 @@ static int readheader(const char *record)
 
     /* The file appears to be a new-style header file.  The second token
        specifies the number of signals. */
-    nsig = (unsigned)atoi(p);
+    nsig = (unsigned)strtol(p, NULL, 10);
 
     /* Determine the frame rate, if present and not set already. */
     if (p = strtok((char *)NULL, sep)) {
-	if ((f = (WFDB_Frequency)atof(p)) <= (WFDB_Frequency)0.) {
+	if ((f = (WFDB_Frequency)strtod(p, NULL)) <= (WFDB_Frequency)0.) {
 	    wfdb_error(
 		 "init: sampling frequency in record %s header is incorrect\n",
 		 record);
@@ -935,11 +935,11 @@ static int readheader(const char *record)
 	for ( ; *p && *p != '/'; p++)
 	    ;
 	if (*p == '/') {
-	    cfreq = atof(++p);
+	    cfreq = strtod(++p, NULL);
 	    for ( ; *p && *p != '('; p++)
 		;
 	    if (*p == '(')
-		bcount = atof(++p);
+		bcount = strtod(++p, NULL);
 	}
     }
     if (cfreq <= 0.0) cfreq = ffreq;
@@ -947,7 +947,7 @@ static int readheader(const char *record)
     /* Determine the number of samples per signal, if present and not
        set already. */
     if (p = strtok((char *)NULL, sep)) {
-	if ((ns = (WFDB_Time)atol(p)) < 0L) {
+	if ((ns = (WFDB_Time)strtol(p, NULL, 10)) < 0L) {
 	    wfdb_error(
 		"init: number of samples in record %s header is incorrect\n",
 		record);
@@ -1002,7 +1002,7 @@ static int readheader(const char *record)
 	    }
 	    (void)strcpy(segp->recname, p);
 	    if ((p = strtok((char *)NULL, sep)) == NULL ||
-		(segp->nsamp = (WFDB_Time)atol(p)) < 0L) {
+		(segp->nsamp = (WFDB_Time)strtol(p, NULL, 10)) < 0L) {
 		wfdb_error(
 		"init: length must be specified for segment %s in record %s\n",
 		           segp->recname, record);
@@ -1076,7 +1076,7 @@ static int readheader(const char *record)
 
 	/* Determine the signal format. */
 	if ((p = strtok((char *)NULL, sep)) == NULL ||
-	    !isfmt(hs->info.fmt = atoi(p))) {
+	    !isfmt(hs->info.fmt = strtol(p, NULL, 10))) {
 	    wfdb_error("init: illegal format for signal %d, record %s\n",
 		       s, record);
 	    return (-2);
@@ -1086,11 +1086,11 @@ static int readheader(const char *record)
 	hs->start = 0L;
 	while (*(++p)) {
 	    if (*p == 'x' && *(++p))
-		if ((hs->info.spf = atoi(p)) < 1) hs->info.spf = 1;
+		if ((hs->info.spf = strtol(p, NULL, 10)) < 1) hs->info.spf = 1;
 	    if (*p == ':' && *(++p))
-		if ((hs->skew = atoi(p)) < 0) hs->skew = 0;
+		if ((hs->skew = strtol(p, NULL, 10)) < 0) hs->skew = 0;
 	    if (*p == '+' && *(++p))
-		if ((hs->start = atol(p)) < 0L) hs->start = 0L;
+		if ((hs->start = strtol(p, NULL, 10)) < 0L) hs->start = 0L;
 	}
 	/* The resolution for deskewing is one frame.  The skew in samples
 	   (given in the header) is converted to skew in frames here. */
@@ -1099,7 +1099,7 @@ static int readheader(const char *record)
 	/* Determine the gain in ADC units per physical unit.  This number
 	   may be zero or missing;  if so, the signal is uncalibrated. */
 	if (p = strtok((char *)NULL, sep))
-	    hs->info.gain = (WFDB_Gain)atof(p);
+	    hs->info.gain = (WFDB_Gain)strtod(p, NULL);
 	else
 	    hs->info.gain = (WFDB_Gain)0.;
 
@@ -1110,7 +1110,7 @@ static int readheader(const char *record)
 	    for ( ; *p && *p != '(' && *p != '/'; p++)
 		;
 	    if (*p == '(') {
-		hs->info.baseline = atoi(++p);
+		hs->info.baseline = strtol(++p, NULL, 10);
 		nobaseline = 0;
 	    }
 	    while (*p)
@@ -1128,7 +1128,7 @@ static int readheader(const char *record)
 	   missing and cannot be inferred from the format, the default
 	   value (from wfdb.h) is filled in. */
 	if (p = strtok((char *)NULL, sep))
-	    i = (unsigned)atoi(p);
+	    i = (unsigned)strtol(p, NULL, 10);
 	else switch (hs->info.fmt) {
 	  case 80: i = 8; break;
 	  case 160: i = 16; break;
@@ -1140,7 +1140,7 @@ static int readheader(const char *record)
 	hs->info.adcres = i;
 
 	/* Determine the ADC zero (assumed to be zero if missing). */
-	hs->info.adczero = (p = strtok((char *)NULL, sep)) ? atoi(p) : 0;
+	hs->info.adczero = (p=strtok((char *)NULL,sep)) ? strtol(p,NULL,10) : 0;
 	    
 	/* Set the baseline to adczero if no baseline field was found. */
 	if (nobaseline) hs->info.baseline = hs->info.adczero;
@@ -1148,11 +1148,11 @@ static int readheader(const char *record)
 	/* Determine the initial value (assumed to be equal to the ADC 
 	   zero if missing). */
 	hs->info.initval = (p = strtok((char *)NULL, sep)) ?
-	    atoi(p) : hs->info.adczero;
+	    strtol(p, NULL, 10) : hs->info.adczero;
 
 	/* Determine the checksum (assumed to be zero if missing). */
 	if (p = strtok((char *)NULL, sep)) {
-	    hs->info.cksum = atoi(p);
+	    hs->info.cksum = strtol(p, NULL, 10);
 	    hs->info.nsamp = ns;
 	}
 	else {
@@ -1161,7 +1161,7 @@ static int readheader(const char *record)
 	}
 
 	/* Determine the block size (assumed to be zero if missing). */
-	hs->info.bsize = (p = strtok((char *)NULL, sep)) ? atoi(p) : 0;
+	hs->info.bsize = (p = strtok((char *)NULL,sep)) ? strtol(p,NULL,10) : 0;
 
 	/* Check that formats and block sizes match for signals belonging
 	   to the same group. */
@@ -2304,7 +2304,7 @@ int findsig(char *p)
   while ('0' <= *q && *q <= '9')
       q++;
   if (*q == 0) {	/* all digits, probably a signal number */
-      s = atoi(p);
+      s = strtol(p, NULL, 10);
       if (s < nisig || s < nvsig) return (s);
   }
   /* Otherwise, p is either an integer too large to be a signal number or a
@@ -2352,7 +2352,7 @@ FVOID setgvmode(int mode)
 	char *p;
 
         if (p = getenv("WFDBGVMODE"))
-	    mode = atoi(p);
+	    mode = strtol(p, NULL, 10);
 	else
 	    mode = DEFWFDBGVMODE;
     }
@@ -3301,40 +3301,44 @@ FVOID setbasecount(double counter)
    frequency */
 static WFDB_Time fstrtim(char *string, WFDB_Frequency f)
 {
-    char *p;
+    char *p, *q, *r;
     double x, y, z;
-    WFDB_Date days = 0L;
+    WFDB_Date days;
     WFDB_Time t;
 
     while (*string==' ' || *string=='\t' || *string=='\n' || *string=='\r')
 	string++;
     switch (*string) {
       case 'c': return (cfreq > 0. ?
-			(WFDB_Time)((atof(string+1)-bcount)*f/cfreq) :
-			(WFDB_Time)atol(string+1));
+			(WFDB_Time)((strtod(string+1, NULL)-bcount)*f/cfreq) :
+			(WFDB_Time)(strtol(string+1, NULL, 10)));
       case 'e':	return ((in_msrec ? msnsamples : nsamples) * 
 		        (((gvmode&WFDB_HIGHRES) == WFDB_HIGHRES) ? ispfmax: 1));
-      case 'f': return (WFDB_Time)(atol(string+1)*f/ffreq);
+      case 'f': return (WFDB_Time)(strtol(string+1, NULL, 10)*f/ffreq);
       case 'i':	return (WFDB_Time)(istime *
 			(ifreq > 0.0 ? (ifreq/sfreq) : 1.0) *
 			(((gvmode&WFDB_HIGHRES) == WFDB_HIGHRES) ? ispfmax: 1));
       case 'o':	return (ostime);
-      case 's':	return ((WFDB_Time)atol(string+1));
+	  case 's':	return ((WFDB_Time)strtol(string+1, NULL, 10));
       case '[':	  /* time of day, possibly with date or days since start */
-	if (p = strchr(string, ' ')) {
-	    if (strchr(p, '/')) days = strdat(p) - bdate;
-	    else days = atol(p+1);
-	}
-        x = fstrtim(string+1, 1000.0) - btime;
+	if ((q = strchr(++string, ']')) == NULL)
+	    return ((WFDB_Time)0);	/* '[...': malformed time string */
+	if ((p = strchr(string, ' ')) == NULL || p > q)
+	    days = (WFDB_Date)0;/* '[hh:mm:ss.sss]': time since midnight only */
+	else if ((r = strchr(p+1, '/')) == NULL || r > q)
+	    days = (WFDB_Date)strtol(p+1, NULL, 10); /* '[hh:mm:ss.sss d]' */
+	else
+	    days = strdat(p+1) - bdate; /* '[hh:mm:ss.sss dd/mm/yyyy]' */
+        x = fstrtim(string, 1000.0) - btime;
         if (days > 0L) x += (days*(24*60*60*1000.0));
-        t = (x * f / 1000.0 + 0.5);
+        t = (WFDB_Time)(x * f / 1000.0 + 0.5);
 	return (-t);
       default:
-	x = atof(string);
+	x = strtod(string, NULL);
 	if ((p = strchr(string, ':')) == NULL) return ((long)(x*f + 0.5));
-	y = atof(++p);
+	y = strtod(++p, NULL);
 	if ((p = strchr(p, ':')) == NULL) return ((long)((60.*x + y)*f + 0.5));
-	z = atof(++p);
+	z = strtod(++p, NULL);
 	return ((WFDB_Time)((3600.*x + 60.*y + z)*f + 0.5));
     }
 }
@@ -3386,8 +3390,9 @@ FDATE strdat(char *string)
     WFDB_Date date;
 
     if ((mp = strchr(string,'/')) == NULL || (yp = strchr(mp+1,'/')) == NULL ||
-	(d = atoi(string)) < 1 || d > 31 || (m = atoi(mp+1)) < 1 || m > 12 ||
-	(y = atoi(yp+1)) == 0)
+	(d = strtol(string, NULL, 10)) < 1 || d > 31 ||
+	(m = strtol(mp+1, NULL, 10)) < 1 || m > 12 ||
+	(y = strtol(yp+1, NULL, 10)) == 0)
 	return (0L);
     if (m > 2) { jy = y; jm = m + 1; }
     else { jy = y - 1; 	jm = m + 13; }

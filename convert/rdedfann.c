@@ -1,9 +1,9 @@
 /* file: rdedfann.c	G. Moody	 14 March 2008
-   			Last revised:	 6 August 2009
+   			Last revised:	22 October 2013
 
 -------------------------------------------------------------------------------
 rdedfann: Print annotations from an EDF+ file
-Copyright (C) 2009 George B. Moody
+Copyright (C) 2008-2013 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -38,7 +38,7 @@ and then produce a WFDB-compatible annotation file 'foo.edf.qrs':
 #include <wfdb/wfdb.h>
 
 char *pname;
-double sfreq;
+double sfreq = 0.0;
 int state;
 
 main(int argc, char **argv)
@@ -53,6 +53,15 @@ main(int argc, char **argv)
     pname = prog_name(argv[0]);
     for (i = 1; i < argc; i++) {
 	if (*argv[i] == '-') switch (*(argv[i]+1)) {
+	  case 'F':
+	    if (++i >= argc) {
+		(void)fprintf(stderr, "%s: sampling frequency must follow -F\n",
+			      pname);
+		exit(1);
+	    }
+	    sscanf(argv[i], "%lf", &sfreq);
+	    if (sfreq <= 0.0) sfreq = 1.0;
+	    break;
 	  case 'h':	/* help requested */
 	    help();
 	    exit(0);
@@ -111,7 +120,13 @@ main(int argc, char **argv)
 	exit(2);
     }
 
-    sfreq = sampfreq(NULL);
+    if (sfreq > 0.0) {
+	setgvmode(WFDB_LOWRES);
+	setsampfreq(sfreq);
+    }
+    else 
+	sfreq = sampfreq(NULL);
+	
 
     /* Print column headers if '-v' option selected. */
     if (vflag)	
@@ -230,9 +245,8 @@ char *s;
 static char *help_strings[] = {
  "usage: %s -r RECORD [OPTIONS ...]\n",
  "where RECORD is the name of the input EDF+ record, and OPTIONS may include:",
- " -f TIME     begin at specified time",
+ " -F FREQ     set the sampling frequency to FREQ Hz\n",
  " -h          print this usage summary",
- " -t TIME     stop at specified time",
  " -v          print column headings",
 NULL
 };

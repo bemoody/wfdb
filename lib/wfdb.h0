@@ -1,5 +1,5 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised:   4 April 2012		wfdblib 10.5.11
+			Last revised: 18 November 2013		wfdblib 10.5.21
 WFDB library type, constant, structure, and function interface definitions
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
@@ -416,8 +416,6 @@ extern FDOUBLE aduphys(), getbasecount();
 #if defined(__STDC__) || defined(_WINDOWS)
 # include <stdlib.h>
 #else
-extern double atof();
-extern long atol();
 extern char *getenv();
 extern void exit();
 typedef long time_t;

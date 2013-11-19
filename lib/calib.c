@@ -1,5 +1,5 @@
 /* file: calib.c	G. Moody	  4 July 1991
-			Last revised:	  8 April 2008		wfdblib 10.4.6
+			Last revised:  18 November 2013		wfdblib 10.5.21
 WFDB library functions for signal calibration
 
 _______________________________________________________________________________
@@ -115,12 +115,12 @@ FINT calopen(char *cfname)
 	}
 	else {
 	    this_cle->caltype = WFDB_DC_COUPLED;
-	    this_cle->low = atof(p2);
+	    this_cle->low = strtod(p2, NULL);
 	}
 	if (strcmp(p3, "-") == 0)
 	    this_cle->high = this_cle->low = 0.0;
 	else
-	    this_cle->high = atof(p3);
+	    this_cle->high = strtod(p3, NULL);
 	if (strcmp(p4, "square") == 0)
 	    this_cle->caltype |= WFDB_CAL_SQUARE;
 	else if (strcmp(p4, "sine") == 0)
@@ -128,7 +128,7 @@ FINT calopen(char *cfname)
 	else if (strcmp(p4, "sawtooth") == 0)
 	    this_cle->caltype |= WFDB_CAL_SAWTOOTH;
 	/* otherwise pulse shape is undefined */
-	this_cle->scale = atof(p5);
+	this_cle->scale = strtod(p5, NULL);
 	SSTRCPY(this_cle->units, p6);
 	this_cle->next = NULL;
 

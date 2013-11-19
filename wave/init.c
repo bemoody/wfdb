@@ -1,5 +1,5 @@
 /* file: init.c		G. Moody	 1 May 1990
-			Last revised:   13 July 2010
+			Last revised: 18 Novemeber 2013
 Initialization functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -254,7 +254,7 @@ void set_baselines()
     else
 	for (i = 0; i < siglistlen; i++)
 	    base[i] = canvas_height*(2*i+1.)/(2.*siglistlen);
-    if (nsig > 1)
+    if (i > 1)
 	abase = (base[i/2] + base[i/2-1])/2;
     else if (nsig > 0)
 	abase = canvas_height*4/5;
