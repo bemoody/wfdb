@@ -1,10 +1,10 @@
 /* file: init.c		G. Moody	 1 May 1990
-			Last revised: 18 Novemeber 2013
+			Last revised: 18 November 2013
 Initialization functions for WAVE
 
 -------------------------------------------------------------------------------
 WAVE: Waveform analyzer, viewer, and editor
-Copyright (C) 1990-2010 George B. Moody
+Copyright (C) 1990-2013 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software

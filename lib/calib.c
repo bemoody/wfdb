@@ -4,7 +4,7 @@ WFDB library functions for signal calibration
 
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
-Copyright (C) 1991-2008 George B. Moody
+Copyright (C) 1991-2013 George B. Moody
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free

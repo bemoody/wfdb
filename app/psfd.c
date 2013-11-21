@@ -1,9 +1,9 @@
 /* file: psfd.c		G. Moody         9 August 1988
-			Last revised:	  27 July 2010
+			Last revised:	21 November 2013
 
 -------------------------------------------------------------------------------
 psfd: Produces annotated full-disclosure ECG plots on a PostScript device
-Copyright (C) 1988-2010 George B. Moody
+Copyright (C) 1988-2013 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -776,7 +776,7 @@ long t0, t1;
     /* Allocate buffers for the samples to be plotted, and initialize the
        range and filter variables. */
     for (i = 0; i < nosig; i++) {
-	accept[i] = 0;
+	accept[i] = vn[i] = 0;
 	vmax[i] = vmin[i] = WFDB_INVALID_SAMPLE; vs[i] = 0L; vsum[i] = 0L;
 	if (nosamp > buflen[i]) {
 	    if ((vbuf[i] = realloc(vbuf[i], nosamp * sizeof(int))) == NULL) {
@@ -851,7 +851,7 @@ long t0, t1;
 	    else	/* no valid samples in this trace */
 		vbase[i] = 0;
 	}
-	
+
 	/* Determine the width and height of the strip. */
 	s_width = j*tscale/sps;
 	/* The calculation of nstrips allots roughly t_hideal (7.5 by default)
