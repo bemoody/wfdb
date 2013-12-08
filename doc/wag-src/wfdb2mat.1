@@ -1,4 +1,4 @@
-.TH WFDB2MAT 1  "16 March 2010" "WFDB 10.5.0" "WFDB Applications Guide"
+.TH WFDB2MAT 1  "8 December 2013" "WFDB 10.5.22" "WFDB Applications Guide"
 .SH NAME
 wfdb2mat \- convert WFDB-compatible signal file to Matlab .mat file
 .SH SYNOPSIS
@@ -98,6 +98,13 @@ the \fBmitdb\fR directory by running the command:
 .br
 (Download \fBhttp://physionet.org/physiotools/matlab/plotATM.m\fR and install
 it in your Matlab or Octave environment first.)
+.PP
+Note that when EDF (or EDF+, BDF, or BDF+) files are used as input, they may
+have empty 'physical dimension' (units) fields, which imply that the associated
+signals are dimensionless (for example, they may be event markers or categorical
+variables).  In such cases, \fBwfdb2mat\fR records the signal units as \fBnd\fR
+(no dimension).
+
 .SH ENVIRONMENT
 .PP
 It may be necessary to set and export the shell variable \fBWFDB\fR (see

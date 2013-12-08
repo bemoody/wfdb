@@ -1,4 +1,4 @@
-.TH SNIP 1 "17 Aril 2009" "WFDB 10.4.20" "WFDB Applications Guide"
+.TH SNIP 1 "1 December 2013" "WFDB 10.5.21" "WFDB Applications Guide"
 .SH NAME
 snip \- copy an excerpt of a WFDB record
 .SH SYNOPSIS
@@ -12,7 +12,7 @@ below) to specify the segment to be copied.
 .PP
 The program \fBxform\fR(1) can also perform this task, but offers additional
 flexibility (it can scale the signals, resample them at a different frequency,
-rearrange them, select subsets of them, or reformat them);  \fIsnip\fR is
+rearrange them, select subsets of them, or reformat them);  \fBsnip\fR is
 faster than \fBxform\fR, however.
 .PP
 \fIOptions\fR are:
@@ -38,6 +38,11 @@ overrides \fB-t\fR if given).
 \fB-m\fR
 Preserve segments of multi-segment input, if possible.
 .TP
+\fB-O\fR \fIformat\fR
+Write output in the specified \fIformat\fR.  See \fBheader\fR(5) for a list of
+available formats (16, 80, 212, ...).  If this option is omitted, \fBsnip\fR
+uses a format that best fits the ADC resolution of the samples.
+.TP
 \fB-s\fR
 Suppress output of info strings in the output header file.
 .TP
@@ -59,7 +64,7 @@ output signal file
 \fInew-record\fR.hea
 output header file
 .SH SEE ALSO
-\fBsetwfdb\fR(1), \fBxform\fR(1)
+\fBsetwfdb\fR(1), \fBxform\fR(1), \fBheader\fR(5)
 .SH AUTHOR
 George B. Moody (george@mit.edu)
 .SH SOURCE

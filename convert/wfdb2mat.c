@@ -1,5 +1,5 @@
 /* file: wfdb2mat.c	G. Moody	26 February 2009
-			Last revised:	 2 January 2013
+			Last revised:	 8 December 2013
 -------------------------------------------------------------------------------
 wfdb2mat: Convert (all or part of) a WFDB signal file to Matlab .mat format
 Copyright (C) 2009-2013 George B. Moody
@@ -272,7 +272,16 @@ char *argv[];
 	so[i].group = 0;
 	so[i].spf = 1;
 	so[i].fmt = wfdbtype;
-	if (so[i].units == NULL) SSTRCPY(so[i].units, "mV");
+	/* handle possibly missing units strings */
+	if (so[i].units == NULL) {
+	    /* in a .hea file, missing units can be assumed to be millivolts */
+	    SSTRCPY(so[i].units, "mV");
+	}
+	else if (strlen(so[i].units) == 0) {
+	    /* this can happen only in an EDF file; in this case, the signal
+	       is dimensionless (nd => "no dimension") */
+	    SSTRCPY(so[i].units, "nd");
+	}
     }
 
     /* Create an empty .mat file. */

@@ -1,8 +1,8 @@
 /* file: snip.c		G. Moody	30 July 1989
-			Last revised:	20 March 2012
+			Last revised:  1 December 2013
 -------------------------------------------------------------------------------
 snip: Copy an excerpt of a database record
-Copyright (C) 1989-2012 George B. Moody
+Copyright (C) 1989-2013 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -29,6 +29,7 @@ _______________________________________________________________________________
 #include <wfdb/wfdblib.h>
 
 char *pname;
+int fmt = 0;	/* use specified output format if fmt > 0 */
 int mflag = 0;	/* try to preserve segments if non-zero */
 int sflag = 0;	/* suppress copying info if non-zero */
 
@@ -87,6 +88,10 @@ char *argv[];
 	    irec = argv[i];
 	    break;
 	  case 'l':	/* length of snip */
+	    if (++i >= argc) {
+		(void)fprintf(stderr, "%s: duration must follow -l\n", pname);
+		exit(1);
+	    }
 	    length = argv[i];
 	    break;
 	  case 'm':  /* preserve segments of multisegment input, if possible */
@@ -100,6 +105,15 @@ char *argv[];
 	    }
 	    nrec = argv[i];
 	    break;
+	  case 'O':	/* output format */
+	    if (++i >= argc) {
+		(void)fprintf(stderr, "%s: output format must follow -O\n",
+			      pname);
+		exit(1);
+	    }
+	    fmt = strtol(argv[i], NULL, 10);
+	    break;
+	    
 	  case 's':	/* suppress copying of info */
 	    sflag = 1;
 	    break;
@@ -225,7 +239,7 @@ void copy_ann(char *nrec, char *irec, WFDB_Time from, WFDB_Time to,
 void copy_sig(char *nrec, char *irec, WFDB_Time from, WFDB_Time to, int recurse)
 {
     char *ofname, *p, tstring[24];
-    int i, j, nsig, maxseg, maxres, fmt;
+    int i, j, nsig, maxseg, maxres;
     long nsamp;
     WFDB_Sample *v;
     WFDB_Siginfo *si;
@@ -367,29 +381,29 @@ void copy_sig(char *nrec, char *irec, WFDB_Time from, WFDB_Time to, int recurse)
 	return;
     }
 
-    /* Choose an output format */
-    maxres = si[0].adcres;
-    fmt = si[0].fmt;
-    for (i = 1; i < nsig; i++) {
-	if (si[i].adcres > maxres)
-	    maxres = si[i].adcres;
-	if (si[i].fmt != fmt)
-	    fmt = 0;
-    }
-
-    if (fmt == 0) {
-	if (maxres > 24)
-	    fmt = 32;
-	else if (maxres > 16)
-	    fmt = 24;
-	else if (maxres > 12)
-	    fmt = 16;
-	else if (maxres > 10)
-	    fmt = 212;
-	else if (maxres > 8)
-	    fmt = 310;
-	else
-	    fmt = 80;
+    if (fmt <= 0) { /* no -O option, choose format based on ADC resolution */
+	maxres = si[0].adcres;
+	fmt = si[0].fmt;
+	for (i = 1; i < nsig; i++) {
+	    if (si[i].adcres > maxres)
+		maxres = si[i].adcres;
+	    if (si[i].fmt != fmt)
+		fmt = 0;
+	}
+	if (fmt == 0) {
+	    if (maxres > 24)
+		fmt = 32;
+	    else if (maxres > 16)
+		fmt = 24;
+	    else if (maxres > 12)
+		fmt = 16;
+	    else if (maxres > 10)
+		fmt = 212;
+	    else if (maxres > 8)
+		fmt = 310;
+	    else
+		fmt = 80;
+	}
     }
 
     /* Open the output signals. */
@@ -473,9 +487,11 @@ static char *help_strings[] = {
  " -h          print this usage summary",
  " -l DURATION snip only DURATION (hh:mm:ss or sNNNN; overrides -t)",    
  " -m          preserve segments of multsegment input, if possible",
+ " -O FORMAT   save output in the specified FORMAT (default: use best fit",
+ "              to ADC resolution)",
  " -s          suppress output of info strings in header",
  " -t TIME     stop at specified time",
- "To change the sampling frequency, gain, or storage format, to select a",
+ "To change the sampling frequency, zero level, or gain, to select a",
  "subset of signals, or to re-order signals, use `xform'.",
 NULL
 };

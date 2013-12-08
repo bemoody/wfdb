@@ -1,3 +1,11 @@
+10.5.22 (8 December 2013):
+	'snip' has a new '-O' option to select the output format, and the '-l'
+	option to specify the duration now works properly.
+
+	wfdb2mat (convert/wfdb2mat.c) now ensures that all output signals have
+	non-empty units strings (previous versions did not check for this
+	possibility when the input was an EDF or EDF+ file).
+
 10.5.21 (21 November 2013):
 	This release is the first to pass all tests performed by 'make check'
 	when compiled on MS-Windows using MinGW.  Changes in 'configure',
