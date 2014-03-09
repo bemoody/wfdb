@@ -1,9 +1,9 @@
 /* file: rdedfann.c	G. Moody	 14 March 2008
-   			Last revised:	22 October 2013
+   			Last revised:	  5 March 2014
 
 -------------------------------------------------------------------------------
 rdedfann: Print annotations from an EDF+ file
-Copyright (C) 2008-2013 George B. Moody
+Copyright (C) 2008-2014 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -44,8 +44,7 @@ int state;
 main(int argc, char **argv)
 {
     char *record = NULL, *prog_name();
-    int aindex = 0, alen = 0, framelen = 0;
-    int  i, nsig, s, vflag = 0;
+    int aindex = 0, alen = 0, framelen = 0, i, nsig, s, vflag = 0, xflag = 0;
     WFDB_Sample *frame;
     WFDB_Siginfo *si;
     void help();
@@ -76,6 +75,9 @@ main(int argc, char **argv)
 	    break;
 	  case 'v':	/* verbose output -- include column headings */
 	    vflag = 1;
+	    break;
+	  case 'x':	/* save EDF annotation text in aux rather than anntyp */
+	    xflag = 1;
 	    break;
 	  default:
 	    (void)fprintf(stderr, "%s: unrecognized option %s\n", pname,
@@ -137,9 +139,9 @@ main(int argc, char **argv)
 
 	state = 0;
 	for (i = 0, p = (frame + aindex); i < alen; i++, p++) {
-	    if (*p) {
-		proc(*p);
-		proc(*p >> 8);
+	    if (*p || state) {
+		proc(*p, xflag);
+		proc(*p >> 8, xflag);
 	    }
 	    else
 		break;
@@ -152,7 +154,7 @@ main(int argc, char **argv)
     exit(0);	/*NOTREACHED*/
 }
 
-proc(int x)
+proc(int x, int xflag)
 {
     static char onset[1024], duration[1024], text[1024];
     static char *onsetp, *durationp, *textp;
@@ -206,10 +208,12 @@ proc(int x)
 		/* replace whitespace with '_' */
 		for (textp = text; *textp; textp++)
 		    if (*textp == ' ' || *textp == '\t') *textp = '_';
-		printf("%s  %7ld %5s%5d%5d%5d",
-		       t ? mstimstr(t) : "    0:00.000", t, text, 0, 0, 0);
-		if (duration[0]) printf("\tduration: %s", duration);
-		printf("\n");
+		printf("%s  %7ld %5s%5d%5d%5d\t%s",
+		       t ? mstimstr(t) : "    0:00.000", t,
+		       xflag ? "\"" : text, 0, 0, 0, xflag ? text : "");
+		if (duration[0])
+		    printf("%cduration: %s", xflag ? ' ' : '\t', duration);
+ 		printf("\n");
 	    }
 	    if (x) {
 		text[0] = x;
@@ -248,6 +252,7 @@ static char *help_strings[] = {
  " -F FREQ     set the sampling frequency to FREQ Hz\n",
  " -h          print this usage summary",
  " -v          print column headings",
+ " -x          print EDF+ annotation text in aux (default: print in anntyp)",
 NULL
 };
 

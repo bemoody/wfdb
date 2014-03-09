@@ -1,6 +1,6 @@
 #!/bin/sh
 # file: appcheck		G. Moody       7 September 2001
-#                               Last revised:  26 November 2010
+#                               Last revised:    8 March 2014
 #
 # This script checks the basic functionality of most of the WFDB applications
 # in the 'app' directory.  These programs are not (yet) tested by this script:
@@ -476,6 +476,20 @@ else
     FAIL=`expr $FAIL + 1`
 fi
 TESTS=`expr $TESTS + 1`
+
+echo Testing parsescp ...
+parsescp -o test -w <input/test.scp
+for F in test.dat test.des test.ecg test.hea test.key
+do
+  if ( ./checkfile $F )
+  then
+    PASS=`expr $PASS + 1`
+    rm -f $F
+  else
+    FAIL=`expr $FAIL + 1`
+  fi
+  TESTS=`expr $TESTS + 1`
+done
 
 echo Testing xform ...
 xform -i 100s -a atr -n 100x -o input/100x >xform-1.out 2>&1

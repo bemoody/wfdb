@@ -1,9 +1,9 @@
 /* file: wrsamp.c	G. Moody	10 August 1993
-			Last revised:  22 November 2010
+			Last revised:  27 February 2014
 
 -------------------------------------------------------------------------------
 wrsamp: Select fields or columns from a file and generate a WFDB record
-Copyright (C) 1993-2010 George B. Moody
+Copyright (C) 1993-2014 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -92,7 +92,6 @@ struct parsemode {
     char *delim;	/* characters that delimit tokens */
     char collapse;	/* if non-zero, collapse consecutive delimiters */
     char esc;		/* if non-zero, next character is literal unless null */
-    char *quotepair[];	/* pairs of characters that open and close tokens */
 };
 
 struct tokenarray {
@@ -130,7 +129,6 @@ Parsemode defpmode = {
   " \t\r\n,", /* delimiter characters can be space, tab, CR, LF, or comma */
   1,	/* collapse consecutive delimiters */
   '\\',	/* treat any character following a backslash as a literal */
-  { "''", "\"\"", "()", "[]", "{}", "<>", NULL } /* quote characters */
 };
 
 static char *tbuf;
@@ -139,12 +137,12 @@ static Tokenarray *ta;
 Tokenarray *parseline(char *line, Parsemode *pmode)
 {
     int i, m = (strlen(line) + 1)/2, n = 0, state = 0;
-    char d, *p, *q = NULL;
+    char d, *p, q = '\0';
 
     if (m < nosig) m = nosig;
     if (m < ncols) m = ncols;
     SSTRCPY(tbuf, line);
-    p = tbuf-1;
+    p = tbuf;
     SREALLOC(ta, sizeof(int)*2 + sizeof(char *)*m, 1);
     ta->maxtokens = m;
 
@@ -153,58 +151,35 @@ Tokenarray *parseline(char *line, Parsemode *pmode)
     else if (pmode->delim == NULL)
 	pmode->delim = defpmode.delim;
 
-    while (*(++p)) {	/* for each character in the line */
+    while (*p) {	/* for each character in the line */
+	/* is *p a field or record separator? */
+	while (strchr(pmode->delim, *p)) {
+	    *p = '\0';	/* replace delimiter with null */
+	    if (pmode->collapse == 0)
+		ta->token[n++] = p;	/* count an empty token */
+	    p++;
+	}
 
-	/* is *p an escape character? */
-	if (pmode->esc && *p == pmode->esc) {
-	    if (*(p+1) == '\0')
-		break;
-	    if (state == 0) { /* start a new token */
-		state = 1;
-		ta->token[n++] = p;
+	/* at start of the next token */
+	if (*p == '"' || *p == '\'')
+	    q = *p++;   /* if token is quoted, skip and save quote char */
+	else if (*p == '<') { p++; q = '>'; }
+	ta->token[n++] = p;
+
+	/* search for the end of the token */
+	while (q || !strchr(pmode->delim, *p)) {
+	    /* is *p an escape character? */
+	    if (pmode->esc && *p == pmode->esc) {
+		if (*(p+1) == '\0')  /* escape at end of line -- ignore */
+		    break;
+		for (i = 0; *(p+i); i++)
+		    *(p+i) = *(p+i+1); /* skip esc, next char is literal */
 	    }
-	    p++;	/* include the next character in the token */
-	    continue;
-	}
-
-	/* is *p the character needed to complete a quoted string? */
-	if (q) {
-	    if (*p == *q) { *p = '\0'; q = NULL; }
-	    continue;
-	}
-
-	/* is *p a delimiter character? */
-	i = 0;
-        while (d = pmode->delim[i++]) {
-	    if (*p == d) {
-		*p = '\0';	/* replace delimiter with null */
-		if (state == 0) { /* not in a token */
-		    if (pmode->collapse == 0)
-			ta->token[n++] = p;	/* count an empty token */
-		}
-		state = 0;
+	    else if (*p == q) {  /* found the closing quote */
+		*p++ = q = '\0';
 		break;
 	    }
-	}
-
-	/* is *p an open-quote character? */
-	i = 0;
-	while (q = pmode->quotepair[i++]) {  /* q is an open-quote character */
-	    if (*p == *q) { /* *p is first character of a quoted string */
-		if (state == 0) { /* start a new token */
-		    ta->token[n++] = p+1;
-		    state = 1;
-		}
-		q++; /* *q is now the matching close-quote character */
-		break;
-	    }
-	}
-
-	if (d == '\0' && q == NULL) { 	/* p must be part of a token */
-	    if (state == 0) {
-		ta->token[n++] = p;	/* start a new token */
-		state = 1;
-	    }
+	    p++;
 	}
     }
 
@@ -437,8 +412,11 @@ char *argv[];
 		for (i = 0; i < ta->ntokens; i++) {
 		    while (*(ta->token[i]) == ' ')
 			(ta->token[i])++;
-		    if (*(ta->token[i]) == '(')
+		    if (*(ta->token[i]) == '(') {
+			p = ta->token[i] + strlen(ta->token[i]) - 1;
 		        (ta->token[i])++;
+			if (*p == ')') *p = '\0';
+		    }
 		    SSTRCPY(ustrings[i], ta->token[i]);
 		}
 		/* Read the third line. */
@@ -504,6 +482,9 @@ char *argv[];
 	  case 310:
 	  case 311: si[i].adcres = 10; break;
 	  case 212: si[i].adcres = 12; break;
+	  case 16:
+	  case 160:
+	  case 61:  si[i].adcres = 16; break;
 	  case 24:  si[i].adcres = 24; break;
 	  case 32:  si[i].adcres = 32; break;
 	  default:  si[i].adcres = WFDB_DEFRES;
@@ -557,7 +538,6 @@ char *argv[];
 	    double v;
 
 	    if (sscanf(ta->token[fv[i]], "%lf", &v) == 1) {
-		//	    if (strcmp(ta->token[fv[i]], "-")) {
 		v *= scalef[i];
 		if (dflag) v+= DITHER;
 		if (v >= 0) vout[i] = (WFDB_Sample)(v + 0.5);

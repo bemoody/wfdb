@@ -1,5 +1,5 @@
 # file: linux-slib.def		G. Moody	31 May 2000
-#                               Last revised: 12 December 2010
+#                               Last revised:   1 March 2014
 # This section contains settings suitable for generating an ELF-format shared
 # library under Linux.
 
@@ -57,17 +57,26 @@ CC = gcc
 
 # CCDEFS is the set of C compiler options needed to set preprocessor variables
 # while compiling the WFDB Software Package.  CCDEFS should always include
-# VDEFS (the version definitions).  Under Linux, -fno-stack-protector is needed
-# when compiling the WFDB Toolkit for Matlab;  it's harmless otherwise.
-CCDEFS = $(VDEFS) -fno-stack-protector
+# VDEFS (the version definitions).  Under Linux, add -fno-stack-protector
+# when compiling the original (SWIG-based) WFDB Toolkit for Matlab.
+CCDEFS = $(VDEFS)
 
 # MFLAGS is the set of architecture-dependent (-m*) compiler options, which
 # is usually empty.  See the gcc manual for information about gcc's -m options.
 MFLAGS =
 
+# CWLOPT is a set of options for CC to pass to the linker.  Recent versions of
+# gcc/ld do not load shared libraries named on the command line if they are
+# needed only by other shared libraries, unless these options include
+# '-Wl,--no-as-needed';  this is needed to force loading of libcurl or libwww
+# with WFDB applications if the WFDB library was compiled with NETFILES support.
+# Older versions of gcc/ld do not recognize this option, however;  remove it
+# here and in linux-slib.def if your CC doesn't support it.
+CWLOPT = -Wl,--no-as-needed -Wl,-rpath,$(LIBDIR)
+
 # CFLAGS is the set of C compiler options used when compiling the shared
 # library.  CFLAGS should always include CCDEFS.
-CFLAGS = $(MFLAGS) -fpic -g -O $(CCDEFS) $(LC) -I$(INCDIR) -fno-stack-protector
+CFLAGS = $(MFLAGS) -fpic -g -O $(CCDEFS) $(LC) -I$(INCDIR)
 
 # WFDBLIB_BASENAME is the name, without version numbers, of the alternate
 # library.  WFDBLIB_SONAME is the shared object name ("soname") of the
@@ -90,12 +99,12 @@ WFDBLIB = $(WFDBLIB_SONAME).$(MINOR)
 # BUILDLIB is the command that creates the shared WFDB library once its
 # components have been compiled separately;  the list of *.o files that
 # make up the library will be appended to BUILDLIB.
-BUILDLIB = gcc $(MFLAGS) -shared -Wl,-soname,$(WFDBLIB_SONAME) $(LL) \
+BUILDLIB = gcc $(MFLAGS) -shared -Wl,-soname,$(WFDBLIB_SONAME) \
  -o $(WFDBLIB)
 
 # BUILDLIB_LDFLAGS is a list of arguments appended to BUILDLIB following
-# the list of *.o files (for most platforms, BUILDLIB_LDFLAGS is empty).
-BUILDLIB_LDFLAGS =
+# the list of *.o files.
+BUILDLIB_LDFLAGS = $(LL)
 
 # LDCONFIG is the name of the program needed to refresh the system's cached
 # index of shared libraries.

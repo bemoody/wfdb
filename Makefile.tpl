@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:   6 October 2010
+#				Last revised:   9 March 2014
 # This section of the Makefile should not need to be changed.
 
 # 'make' or 'make all': compile the WFDB applications without installing them
@@ -8,16 +8,16 @@ all:		config.cache
 
 # 'make install': compile and install the WFDB software package
 install:	config.cache
-	cd lib;	     $(MAKE) install
-	cd app;      $(MAKE) install
-	cd convert;  $(MAKE) install
-	cd data;     $(MAKE) install
-	cd fortran;  $(MAKE) install
-	cd psd;      $(MAKE) install
-	-( cd wave;  $(MAKE) install )
-	cd waverc;   $(MAKE) install
-	-( cd xml;   $(MAKE) install )
-	test -d doc && ( cd doc; $(MAKE) install )
+	cd lib;	     $(MAKE) clean install
+	cd app;      $(MAKE) clean install
+	cd convert;  $(MAKE) clean install
+	cd data;     $(MAKE) clean install
+	cd fortran;  $(MAKE) clean install
+	cd psd;      $(MAKE) clean install
+	-( cd wave;  $(MAKE) clean install )
+	cd waverc;   $(MAKE) clean install
+	-( cd xml;   $(MAKE) clean install )
+	test -d doc && ( cd doc; $(MAKE) clean install )
 
 # 'make collect': collect the installed files into /tmp/wfdb/
 collect:
@@ -112,11 +112,13 @@ $(HOME)/wfdb-test/lib:		$(HOME)/wfdb-test
 	mkdir -p $(HOME)/wfdb-test/lib; \
 	 $(SETDPERMISSIONS) $(HOME)/wfdb-test/lib
 
-# 'make tarballs': clean up the source directories, then make a pair of gzipped
-# tar source archives of the WFDB software package (with and without the
-# documentation), and check that the MANIFEST (list of files in the package)
-# is correct.
+# 'make tarballs': clean up the source directories, run ./configure with
+# default settings, then make a pair of gzipped tar source archives of the WFDB
+# software package (with and without the documentation), and check that the
+# MANIFEST (list of files in the package) is correct.
 tarballs:	clean
+	./configure
+	$(MAKE) clean
 	rm -f ../$(PACKAGE)-MANIFEST ../$(PACKAGE).tar.gz \
 	  ../$(PACKAGE)-no-docs.tar.gz
 	cd lib; $(SETPERMISSIONS) *.h

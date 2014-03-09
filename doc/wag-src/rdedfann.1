@@ -1,4 +1,4 @@
-.TH RDEDFANN 1  "9 April 2008" "WFDB 10.4.6" "WFDB Applications Guide"
+.TH RDEDFANN 1  "5 March 2014" "WFDB 10.5.23" "WFDB Applications Guide"
 .SH NAME
 rdedfann \- extract annotations from an EDF+ file
 .SH SYNOPSIS
@@ -18,17 +18,20 @@ Print a brief usage summary.
 .TP
 \fB-v\fR
 Verbose mode (print column headings).
+.TP
+\fB-x\fR
+Print EDF+ annotation text in 'aux' rather than 'anntyp' column.
 
 .PP
 Note that the annotation mnemonics in EDF+ files do not in general
 match those used in WFDB-compatible annotation files, so that it will
-often be desirable to translate those that come from EDF+ file
+often be desirable to translate those that come from EDF+ files
 before converting the text with \fBwrann\fR.  For example, this
 command can be used to extract annotations from \fBfoo.edf\fR, change
 the EDF+ annotation type "QRS" to the WFDB type "N", and then produce
 a WFDB-compatible annotation file \fBfoo.edf.qrs\fR:
 .br
-        \fBrdedfann -r foo.edf | sed "s/QRS/ N" | wrann -r foo.edf -a qrs\fR
+        \fBrdedfann -r foo.edf | sed s/QRS/N/ | wrann -r foo.edf -a qrs\fR
 
 .PP
 Recent versions of \fBwrann\fR copy unrecognized mnemonics into
@@ -53,4 +56,3 @@ Full specification of EDF+, by Bob Kemp and Jesus Olivan.
 George B. Moody (george@mit.edu)
 .SH SOURCES
 http://www.physionet.org/physiotools/wfdb/convert/rdedfann.c
-

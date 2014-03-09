@@ -1,3 +1,26 @@
+10.5.23 (9 March 2014):
+
+        Changes in 'configure', 'Makefile.tpl', 'conf/linux.def', and
+	'conf/linux-slib.def' simplify installation of shared WFDB libraries
+	and the applications that use them on Linux platforms.
+
+	A new application, 'stepdet' (app/stepdet.c), detects and annotates
+	transitions in (possibly noisy) two-level signals.
+
+	The parser in 'wrsamp' has been rewritten in this release to accept a
+	wider range of non-standard CSV input formats.
+
+	Another application, 'parsescp', has been added to the set of data
+	importers in 'convert/'. 'parsescp' converts some types of SCP-ECG
+	files to PhysioNet-compatible format.
+
+	Luca Citi contributed a bug fix and a new feature to 'rdedfann'.
+	Previous versions did not properly handle input in which the last
+	annotation in a frame ends with a \024 byte in an even position.  The
+	new '-x' option causes the input EDF+ annotation text to be copied to
+	the 'aux' position in the output, rather than the 'anntyp' position
+	(the default).
+
 10.5.22 (8 December 2013):
 	'snip' has a new '-O' option to select the output format, and the '-l'
 	option to specify the duration now works properly.

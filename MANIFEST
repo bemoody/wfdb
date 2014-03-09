@@ -46,6 +46,7 @@ app/snip.c
 app/sortann.c
 app/sqrs125.c
 app/sqrs.c
+app/stepdet.c
 app/sumann.c
 app/sumstats.c
 app/tach.c
@@ -109,6 +110,11 @@ checkpkg/expected/snip.hea
 checkpkg/expected/sumann.out
 checkpkg/expected/sumstats.out
 checkpkg/expected/tach.out
+checkpkg/expected/test.dat
+checkpkg/expected/test.des
+checkpkg/expected/test.ecg
+checkpkg/expected/test.hea
+checkpkg/expected/test.key
 checkpkg/expected/udb
 checkpkg/expected/udb/100z.hea
 checkpkg/expected/wfd00001.dat
@@ -129,6 +135,7 @@ checkpkg/input
 checkpkg/input/100x.hea
 checkpkg/input/ecgeval
 checkpkg/input/sumstats
+checkpkg/input/test.scp
 checkpkg/input/xform
 checkpkg/lcheck.c
 checkpkg/libcheck
@@ -176,6 +183,7 @@ convert/makeid.c
 convert/md2a.c
 convert/mit2edf.c
 convert/mit2wav.c
+convert/parsescp.c
 convert/rdedfann.c
 convert/readid.c
 convert/README
@@ -318,6 +326,7 @@ doc/wag-src/mrgann.1
 doc/wag-src/mxm.1
 doc/wag-src/nguess.1
 doc/wag-src/nst.1
+doc/wag-src/parsescp.1
 doc/wag-src/plot2d.1
 doc/wag-src/plotstm.1
 doc/wag-src/plt.1
@@ -342,6 +351,7 @@ doc/wag-src/skewedit.1
 doc/wag-src/snip.1
 doc/wag-src/sortann.1
 doc/wag-src/sqrs.1
+doc/wag-src/stepdet.1
 doc/wag-src/sumann.1
 doc/wag-src/sumstats.1
 doc/wag-src/tach.1

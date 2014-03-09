@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody         24 May 2000
-#                             Last revised:  19 November 2013
+#                             Last revised:    6 March 2014
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -15,7 +15,7 @@
 # Defaults (overridden by --interactive):
 INTERACTIVE=no
 LIBTYPE=dynamic
-DIR=/usr
+DIR=/usr/local
 MANDIR=unknown
 
 NETLIB=unknown
@@ -141,6 +141,7 @@ echo "PACKAGE = $PACKAGE" >>site.def
 echo "SRCDIR = \"$SRCDIR\"" >>site.def
 echo LONGDATE = `date '+%e %B %Y'` >>site.def
 echo SHORTDATE = `date '+%B %Y' | tr a-z A-Z` >>site.def
+echo YEAR = `date '+%Y'` >>site.def
 echo "ARCH = $ARCH" >>site.def
 
 echo "# _____________________________________________________________________________" >>site.def
