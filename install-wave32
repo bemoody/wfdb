@@ -1,202 +1,54 @@
 #! /bin/sh
 # file: install-wave32		G. Moody	7 October 2008
-#				Last revised:  18 November 2013
-# Build and install WAVE on 64-bit Linux
+#				Last revised:	12 March 2014  
+# Build and install WAVE on 64-bit GNU/Linux platforms
+
+# *****************************************************************************
+# This script builds and installs 'wave' as a 32-bit application on x86_64
+# (AMD/Intel 64-bit) Fedora GNU/Linux.  It has been tested on Fedora 12, 14, 16,
+# and 18; it will probably require modification on other platforms.
 #
-# *** Debian and Ubuntu users, see the notes at the end! ***
-# *** Fedora 12 users: if this script fails, see the notes near the end! ***
+# Part 1 of this script automates installation of prerequisite 32-bit libraries
+# and *.h files on Fedora GNU/Linux and compatible platforms such as Red Hat,
+# Scientific Linux, and Centos.  It is harmless to rerun this script if some or
+# all of these prerequisites have been installed already.
 #
-# WAVE must be compiled as a 32-bit application, because it depends on the
-# XView toolkit, which does not support 64-bit mode (and most likely, never
-# will), and 64-bit applications cannot use the 32-bit XView libraries.
-# Furthermore, 32-bit applications cannot use 64-bit libraries, so it is
-# necessary to install 32-bit versions of all of the libraries needed by WAVE,
-# as well as the .h ("include") files associated with these libraries.
-
-# This script automates the process of building a 32-bit WAVE binary.  On
-# Fedora Linux, it should be able to install all of the prerequisites (beyond
-# those already installed in order to compile the rest of the WFDB package in
-# 64-bit mode) before compiling and installing WAVE.  To do this, it should be
-# sufficient to run this script with root (superuser) permissions from within
-# the top-level WFDB source directory (the directory that also contains the
-# 'configure' script).  It is harmless to rerun this script if the
-# prerequisites have been installed already.
-
-# On other versions of Linux, you will need to install the first two groups of
-# prerequisites in some other way before running the final part of this script
-# as root, using the -q option.  See the notes below for hints.
-
-echo "This script builds and installs 'wave' as a 32-bit application on x86_64"
-echo "(AMD/Intel 64-bit) Fedora GNU/Linux.  It has been tested on Fedora 12,"
-echo "14, and 18;  it will probably require modification on other platforms."
-echo
-
-if [ $UID != 0 ]
-then
-    echo "You do not have root (superuser) permissions, so this script may fail"
-    echo "if it needs to install missing libraries.  If this happens, rerun it"
-    echo "as root (e.g., using su or sudo)."
-fi
+# If you use another GNU/Linux platform such as Debian, Ubuntu, or Mint:
+# You will need to install these prerequisites in some other way before running
+# part 2 of this script using the -q option; see
+#    http://physionet.org/physiotools/wave-installation.shtml
+# for details.
+# *****************************************************************************
 
 echo
 echo "If this script fails, read it for troubleshooting hints."
 
-# The prerequisites needed in order to compile WAVE on 64-bit Fedora fall into
-# three groups:
-#
-#  1. 32-bit libraries and font packages available from Fedora repositories
-#
-#     These include the standard C library, the X11 client libraries, the X11
-#     pixmap libraries, the libcurl (HTTP client) libraries, and their
-#     respective developer's toolkits.  The easiest way to install these on
-#     Fedora is using the yum commands below.  These packages may have different
-#     names in other Linux distributions, and "yum" itself may not be available
-#     as a package manager in some distributions.  These commands are safe to
-#     run even if any or all of these packages are already installed.
-#
-#     If you use a Debian-based Linux, such as Ubuntu, it can be difficult to
-#     force apt-get to install 32-bit packages, especially if like-named 64-bit
-#     packages have been installed already.  Google on "getlibs" for an
-#     alternative.
+# Part 1: install prerequisites (unless skipped using -q option)
+if [ "x$1" != "x-q" ]; then
+  if [ $UID != 0 ]; then
+    echo "You do not have root (superuser) permissions, so this script may fail"
+    echo "if it needs to install missing libraries.  If this happens, rerun it"
+    echo "as root (e.g., using su or sudo)."
+  fi
 
-if [ "x$1" != "x-q" ]
-then
-
-#     The next several lines attempt to determine if this script is being run
-#     under Fedora 12 or a later version, in order to determine the names of
-#     the 32-bit packages to be installed.  This code has not been tested on
-#     other Linux distributions, but it will assume that the Fedora 12 package
-#     names are the correct ones unless it recognizes Fedora 7, 8, 9, 10, or
-#     11.  Until Fedora 12, 32-bit packages are named with 'i386' suffixes
-#     (although in some cases they have been compiled for i586 or i686
-#     architectures).  In Fedora 12, 32-bit packages are compiled and named as
-#     i686 packages.
-
-    FV=`cat /etc/fedora-release | cut -d " " -f 3`
-    case $FV in
-	7|8|9|10|11) X86=i386 ;;
-	*) X86=i686 ;;
-    esac
-    yum -y install libgcc.$X86 glibc-devel.$X86 libX11-devel.$X86 \
-	libXpm-devel.$X86 libcurl-devel.$X86
-    yum -y install xorg-x11-fonts-misc \
+  # Install fonts and 32-bit libraries available from Fedora repositories
+  yum -y install libgcc.i686 glibc-devel.i686 libX11-devel.i686 \
+	libXpm-devel.i686 libcurl-devel.i686 xorg-x11-fonts-misc \
 	xorg-x11-fonts-100dpi xorg-x11-fonts-ISO8859-1-100dpi \
 	xorg-x11-fonts-75dpi xorg-x11-fonts-ISO8859-1-75dpi
-fi
 
-#  2. XView libraries available from PhysioNet
-#
-#     These are available as RPMs for Fedora and other RPM-based distributions,
-#     and in binary and source tarballs for other distributions.  By far the
-#     easiest way to install them on Fedora is using the RPM command below.
-#     Again, this command is safe even if any or all of these are already
-#     installed.
-#
-#     On Debian or Ubuntu, simply run
-#          apt-get install xviewg-dev
-#     instead of the rpm commands below (since 32-bit XView is in the Debian
-#     repositories).
-
-if [ "x$1" != "x-q" ]
-then
-    rpm -Uvh http://physionet.org/physiotools/xview/i386-Fedora/xview-3.2p1.4-21.1.fc8.i386.rpm \
+  # Install XView libraries and development toolkit available from PhysioNet
+  rpm -Uvh http://physionet.org/physiotools/xview/i386-Fedora/xview-3.2p1.4-21.1.fc8.i386.rpm \
 	http://physionet.org/physiotools/xview/i386-Fedora/xview-clients-3.2p1.4-21.1.fc8.i386.rpm \
 	http://physionet.org/physiotools/xview/i386-Fedora/xview-devel-3.2p1.4-21.1.fc8.i386.rpm
 fi
 
-#  3. The 32-bit version of the WFDB library
-#
-#     This is easily compiled and installed on any platform by the following
-#     commands:
-
+# Part 2: compile and install 32-bit WFDB library and WAVE
 make clean
 ./configure -m32 $*
-cd lib
-make install
-
-# Now all of the prerequisites are in place, and we can compile and install
-# WAVE itself:
-
-cd ../wave
-make install
-
-# Compile and install applications for remote control of WAVE.
-cd ../waverc
-make install
-
-# Clean up intermediate binaries and other temporary files.
-cd ..
-make clean
-
-# ****************************************************************************
-#
-# On Fedora 12, at the time this script was written, the most recent 32-bit
-# version of libcurl-devel was older than the most recent 64-bit version.
-# In this situation (and presumably in similar situations in which a 32-bit
-# package is "stale") the first yum command above fails.  This is a bug
-# in yum that may be fixed in a future release;  and it is also likely that
-# libcurl-devel.i686 will be updated in the future, so you may not encounter
-# this problem.  If you do, here's the work-around:
-#
-# 1. Download the 32-bit rpm that yum refuses to install.
-#
-# 2. Attempt to install it using a command of the form
-#      rpm -ivh --force *.i686.rpm
-#    If this is successful, rerun this script.
-#
-# 3. If rpm complained that one or more dependencies were missing, use yum to
-#    install them, then repeat step 2.
-#
-# Iterate until successful.  In the case of libcurl-devel, it was necessary
-# to use these commands (the yum commands could have been combined into one):
-#
-#    yum -y install libgcc.i686 libX11-devel.i686 install glibc-devel.i686
-#    yum -y install libXpm-devel.i686
-#    yum -y install cyrus-sasl-lib.i686 keyutils-libs.i686 krb5-libs.i686
-#    yum -y install libidn.i686 libssh2.i686 ncurses-libs.i686 nspr.i686
-#    yum -y install nss.i686 nss-softokn.i686 openldap.i686
-#    rpm -ivh --force libcurl-7.19.7-2.fc12.i686.rpm 
-#    rpm -ivh --force libcurl-devel-7.19.7-2.fc12.i686.rpm 
-#
-# ****************************************************************************
-#
-# Notes for Debian Wheezy and Ubuntu 12.04, from Benjamin Moody:
-#
-# 1. Get the latest updates (needed on Wheezy, a good idea otherwise):
-#      apt-get update
-#
-# 2. Ensure that i386 is enabled in dpkg configuration.  Apparently this
-#    is not needed on Ubuntu; on Debian:
-#      dpkg --add-architecture i386
-#
-# 3. On Ubuntu 12.10 or earlier, or Debian Wheezy, you will need to
-#    upgrade the 'xbitmaps' package to version 1.1.1-2 manually (older
-#    versions aren't marked as multiarch-safe):
-#      wget http://archive.ubuntu.com/ubuntu/pool/main/x/xbitmaps/xbitmaps_1.1.1-2_all.deb
-#      dpkg -i xbitmaps_1.1.1-2_all.deb
-#    (Debian users can safely install the package from Ubuntu.)
-#
-# 4. On Ubuntu, ensure that 'universe' section is enabled:
-#      sed '/^deb/{/universe/!s/ main/ main universe/}' -i /etc/apt/sources.list
-#      apt-get update
-#
-# 5. Install the XView library and developer packages:
-#      apt-get install xviewg-dev:i386
-#    On Debian Wheezy, this won't work if you skipped step 1!
-#
-# 6. Install the 32-bit libcurl library and developer packages:
-#      apt-get install libcurl4-gnutls-dev:i386
-#    This can coexist with libcurl4-gnutls-dev:amd64 on Debian, not tested
-#    on Ubuntu (please send feedback if you try it).
-#
-# 7. Install the remaining 32-bit compatibility tools and libraries:
-#      apt-get install build-essential gcc-multilib
-#
-# 8. Compile and install the WFDB Software Package as usual, using configure's
-#    -m32 option.  For example, to install in /usr/local, begin with:
-#      ./configure -m32 --prefix=/usr/local
-#      make install
-#    You will need to set and export LD_LIBRARY_PATH if you use --prefix as
-#    above:
-#      LD_LIBRARY_PATH=/usr/local/lib
-#      export LD_LIBRARY_PATH
+cd lib;
+ make install
+cd ../wave;
+ make install
+cd ..;
+ make clean

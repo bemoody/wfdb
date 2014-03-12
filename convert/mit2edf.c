@@ -1,8 +1,8 @@
 /* file: mit2edf.c		G. Moody	2 November 2002
-				Last revised:    27 July 2010
+				Last revised:    12 March 2014
 -------------------------------------------------------------------------------
 Convert MIT format header and signal files to EDF (European Data Format) file
-Copyright (C) 2002-2010 George B. Moody
+Copyright (C) 2002-2014 George B. Moody
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -138,10 +138,9 @@ char **argv;
 	year = 1985;		/* beginning of EDF epoch */
     }
 
-    /* Calculate block duration.  (In the EDF spec, blocks are called
-       "records" or "data records", but this would be confusing here
-       since "record" refers to the entire recording -- so here we say
-       "blocks". */
+    /* Calculate block duration.  (In the EDF spec, blocks are called "records"
+       or "data records", but this would be confusing here since "record"
+       refers to the entire recording -- so here we say "blocks".) */
     for (i = samples_per_frame = 0; i < nsig; i++)
 	samples_per_frame += si[i].spf;
     frames_per_second = strtim("1:0")/60.0;	/* i.e., the number of frames
@@ -169,7 +168,8 @@ char **argv;
  " EDF blocks cannot be larger than %d bytes, but each input frame requires\n",
 		EDFMAXBLOCK);
 	fprintf(stderr,
- " %d bytes.  Use the -s option to select a subset of the input signals.\n",
+ " %d bytes.  Use 'snip' to select a subset of the input signals, or use\n"
+		" 'xform' to reduce the sampling frequency.\n",
 		samples_per_frame * 2);
 	exit(5);
     }
@@ -202,6 +202,17 @@ char **argv;
 
     /* Calculate physical and digital extrema. */
     for (i = 0; i < nsig; i++) {
+	if (si[i].adcres < 1) {	/* invalid ADC resolution in input .hea file */
+	    switch (si[i].fmt) { /* guess ADC resolution based on format */
+	      case 24: si[i].adcres = 24; break;
+	      case 32: si[i].adcres = 32; break;
+	      case 80: si[i].adcres = 8; break;
+	      case 212: si[i].adcres = 12; break;
+	      case 310:
+	      case 311: si[i].adcres = 10; break;
+	      default: si[i].adcres = 16; break;
+	    }
+	}
 	dmax[i] = si[i].adczero + (1 << (si[i].adcres - 1)) - 1;
 	dmin[i] = si[i].adczero - (1 << (si[i].adcres - 1));
 	pmax[i] = aduphys(i, dmax[i]);

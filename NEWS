@@ -1,20 +1,28 @@
-10.5.23 (9 March 2014):
+10.5.23 (12 March 2014):
 
-        Changes in 'configure', 'Makefile.tpl', 'conf/linux.def', and
+	Changes in 'configure', 'Makefile.tpl', 'conf/linux.def', and
 	'conf/linux-slib.def' simplify installation of shared WFDB libraries
 	and the applications that use them on Linux platforms.
 
-	A new application, 'stepdet' (app/stepdet.c), detects and annotates
-	transitions in (possibly noisy) two-level signals.
+	Two new applications are included in this release. 'stepdet'
+	(app/stepdet.c), detects and annotates 	transitions in (possibly noisy)
+	two-level signals. 'parsescp' (convert/parsescp.c) converts some types
+	of SCP-ECG files to PhysioNet-compatible format.
 
 	The parser in 'wrsamp' has been rewritten in this release to accept a
 	wider range of non-standard CSV input formats.
 
-	Another application, 'parsescp', has been added to the set of data
-	importers in 'convert/'. 'parsescp' converts some types of SCP-ECG
-	files to PhysioNet-compatible format.
+	The application that converts PhysioBank-compatible records to EDF
+	files, 'convert/mit2edf', did not properly calculate the range of
+	signals if the ADC resolution was specified to be 0 in the input .hea
+	file.  In this release, 'mit2edf' guesses the ADC resolution based on
+	the storage format if necessary, allowing it to produce correct EDF
+	output given this type of incorrect input in most cases.
 
-	Luca Citi contributed a bug fix and a new feature to 'rdedfann'.
+	Another application, 'parsescp', has been added to the set of data
+	importers in 'convert/'. 
+
+	Luca Citi contributed a bug fix and a new feature to 'convert/rdedfann'.
 	Previous versions did not properly handle input in which the last
 	annotation in a frame ends with a \024 byte in an even position.  The
 	new '-x' option causes the input EDF+ annotation text to be copied to
@@ -101,29 +109,29 @@
 
 10.5.16 (27 September 2012):
 	A bug in WFDB library versions 10.5.13 through 10.5.15 resulted in
-        an attempt to close an already-closed header file after invoking
+	an attempt to close an already-closed header file after invoking
 	putinfo().  Thanks to Benjamin Moody for identifying the bug and
 	contributing code to correct it (in lib/signal.c and lib/wfdbinit.c).
 
 10.5.15 (25 September 2012):
 	A new application (app/gqfuse.c) for combining two or more beat
-        annotation files is included in this release.
+	annotation files is included in this release.
 
 	Changes to the internal function readheader() in WFDB library version
 	10.5.14 made the library unable to open EDF files.  This bug has been
-	fixed.	
+	fixed.
 
 10.5.14 (13 August 2012):
 	WFDB applications can now read shared and private PhysioNetWorks
 	projects securely, just as they have been able to read PhysioBank
 	data since version 10.0.1 (November 1999).  A new shell script
-        (app/pnwlogin) simplifies access to PhysioNetWorks projects.  Low-level
-        functions wfdb_open (in lib/wfdbio.c) and readheader (in lib/signal.c)
+	(app/pnwlogin) simplifies access to PhysioNetWorks projects.  Low-level
+	functions wfdb_open (in lib/wfdbio.c) and readheader (in lib/signal.c)
 	incorporate changes to implement this new capability, as well as
 	another new feature that allows record names to be specified using
 	absolute pathnames or URLs.  As always, a final '.hea' is not
-        considered to be part of a record name, but it may be included or
-        omitted as desired.
+	considered to be part of a record name, but it may be included or
+	omitted as desired.
 
 	WFDB library function wfdbquit() no longer frees resources allocated
 	by libcurl or libwww, in order to avoid doing so more than once in
@@ -146,10 +154,10 @@
 	to Justin Leo Cheang Loong for reporting this issue.
 
 10.5.12 (24 April 2012):
-         When called with a NULL argument, getinfo() sometimes behaves
-         differently in WFDB library version 10.5.11 than it does in previous
-         versions.  This release restores the previous behavior.  Thanks to
-         Benjamin Moody for reporting this issue.
+	When called with a NULL argument, getinfo() sometimes behaves
+	differently in WFDB library version 10.5.11 than it does in previous
+	versions.  This release restores the previous behavior.  Thanks to
+	Benjamin Moody for reporting this issue.
 
 10.5.11 (6 April 2012):
 	This release of the WFDB library introduces support for '.info' files.
@@ -201,12 +209,12 @@
 
 	Attempts to set the default size for HTTP range requests (using the
 	environment variable WFDB_PAGESIZE) were ignored in previous versions
-        of the WFDB library when compiled with libcurl.  Thanks again to David
-        for noting this limitation, which has been eliminated in this release
+	of the WFDB library when compiled with libcurl.  Thanks again to David
+	for noting this limitation, which has been eliminated in this release
 	by a change in www_init() (in lib/wfdbio.c).
 
 	'wfdbmap', which has been available in its own directory since release
- 	10.5.6, is a now a standard application (app/wfdbmap.c).  'wfdbmap' is
+	10.5.6, is a now a standard application (app/wfdbmap.c).  'wfdbmap' is
 	used by the PhysioBank ATM to produce compact synoptic maps of WFDB-
 	compatible records.   Previous versions of 'wfdbmap' were unable to map
 	multi-segment records unless all segment headers were local;  this
@@ -217,18 +225,18 @@
 	is  a stripped-down version of 'wfdbdesc'.
 
 10.5.9 (10 September 2011):
-        When an application passes an array containing WFDB_INVALID_SAMPLE
-        values to putvec(), the function translates these into the
-        corresponding invalid-sample sentinel values used by the file format.
-        (This is the inverse of the transformation done by getvec() and
-        getframe(), so the effect is that at the application level, invalid
-        samples are always represented by the value WFDB_INVALID_SAMPLE.)
+	When an application passes an array containing WFDB_INVALID_SAMPLE
+	values to putvec(), the function translates these into the
+	corresponding invalid-sample sentinel values used by the file format.
+	(This is the inverse of the transformation done by getvec() and
+	getframe(), so the effect is that at the application level, invalid
+	samples are always represented by the value WFDB_INVALID_SAMPLE.)
 
-        Previous versions of the library did not perform this transformation
-        correctly for formats 80 and 160 (they used a value of zero rather than
-        -128 or -32768, respectively.)  This bug was mainly an issue for
-        programs such as 'snip' and 'xform' that read and modify existing data
-        files.
+	Previous versions of the library did not perform this transformation
+	correctly for formats 80 and 160 (they used a value of zero rather than
+	-128 or -32768, respectively.)  This bug was mainly an issue for
+	programs such as 'snip' and 'xform' that read and modify existing data
+	files.
 
 	In multi-segment mode, 'snip' will attempt to copy the segment
 	structure of the input record.  In older versions, this was done by
@@ -281,7 +289,7 @@
 	Thanks to Benjamin Moody for identifying the problem, providing test
 	inputs, and contributions to the solution.
 
-        The -H option of app/sampfreq.c did not work in recent releases because
+	The -H option of app/sampfreq.c did not work in recent releases because
 	of changes in the WFDB library;  it works again in 10.5.7.
 
 10.5.6 (29 November 2010):
@@ -315,7 +323,7 @@
 
 	This release includes wfdbmap, an application that can be used
 	together with other open-source software to create synoptic maps of
-        WFDB-compatible records, in the format of those presented by the
+	WFDB-compatible records, in the format of those presented by the
 	PhysioBank ATM.  'wfdbmap' is not compiled by default; see
 	wfdbmap/README for additional information.
 
@@ -347,7 +355,7 @@
 	omissions.
 
 	An uninitialized flag may have made ahaecg2mit behave as if its -s
- 	option was always given, and an informational message contained
+	option was always given, and an informational message contained
 	a formatting error;  both problems have been corrected, thanks to
 	a report from Isaac Henry.
 
@@ -377,10 +385,10 @@
 	WAVE version 6.11, included in this release of the WFDB software
 	package, allows the user to change display scales using keyboard
 	commands.  This allows one to resize signals independently, a frequently
- 	requested feature.  For details, see "How can I enlarge or reduce the
- 	size of individual signals?" in the WAVE FAQ (in WAVE, click on Help
+	requested feature.  For details, see "How can I enlarge or reduce the
+	size of individual signals?" in the WAVE FAQ (in WAVE, click on Help
 	and select "Frequently asked questions").
- 
+
 10.5.3 (22 June 2010):
 	Function getgvmode() has been introduced in WFDB library version
 	10.5.3, to allow querying the current operating mode of getvec().
@@ -411,7 +419,7 @@
 	Certain malformed segment .hea files were able to cause null pointer
 	errors in WFDB library function isigopen.  This problem has been
 	corrected.  Thanks to Mauro Villarroel for reporting this problem
- 	together with a test case.
+	together with a test case.
 
 	The -s option of WFDB applications sqrs, sqrs125, wqrs, and wabp now
 	works properly.  A bug common to all four applications was introduced
@@ -460,7 +468,7 @@
 	new functionality it provides.
 
 	Memory allocation macros that have been defined previously in wfdblib.h
- 	have been moved to wfdb.h so they are accessible to WFDB applications,
+	have been moved to wfdb.h so they are accessible to WFDB applications,
 	including user-written applications.  See the WFDB Programmer's Guide
 	for information about using these macros (MEMERR, SFREE, SUALLOC,
 	SALLOC, SREALLOC, and SSTRCPY).
@@ -594,9 +602,9 @@
 	pschart and psfd now handle signal names in their command-line argument
 	lists (following the '-s' option).
 
- 	The version of wfdb2mat included in this release generates a .mat file
- 	of the expected size even if the input ends prematurely.  Thanks to
- 	Weixiang Liu for a report that prompted this revision.
+	The version of wfdb2mat included in this release generates a .mat file
+	of the expected size even if the input ends prematurely.  Thanks to
+	Weixiang Liu for a report that prompted this revision.
 
 10.4.18 (15 March 2009):
 	The WFDB library no longer reports spurious checksum errors when reading
@@ -625,7 +633,7 @@
 10.4.15 (26 February 2009):
 	WFDB library function mstimstr() now outputs time to the nearest
 	millisecond, rather than truncating its calculation to the nearest
- 	lower number of milliseconds.
+	lower number of milliseconds.
 
 	A new WFDB library function, wfdbputprolog(), can write a prolog at the
 	beginning of a signal file.  WFDB applications ignore embedded prologs.
