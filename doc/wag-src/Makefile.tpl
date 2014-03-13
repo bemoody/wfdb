@@ -1,5 +1,5 @@
-# file: Makefile.tpl		G. Moody	24 May 2000
-#				Last revised:	23 July 2008
+# file: Makefile.tpl		G. Moody	 24 May 2000
+#				Last revised:	13 March 2014
 # Change the settings below as appropriate for your setup.
 
 # D2PARGS is a list of options for dvips.  Uncomment one of these to set the
@@ -38,7 +38,7 @@ MAN7 = $(MANDIR)/man7
 # sufficient to use a non-PostScript dvi translator such as dvilj).
 PSPRINT = lpr
 
-# TROFF is the name of the program that prints UNIX troff files (needed to
+# TROFF is the name of the program that formats UNIX troff files (needed to
 # 'make ag' and for the covers of the guides).  Use 'groff' if you have
 # GNU groff (the preferred formatter).
 TROFF = groff
@@ -57,40 +57,20 @@ TROFF = groff
 # of each page.
 TMAN = -rC1 -rD1 -man
 
-# WAGPSREQ is the target that must be made in order to make the PostScript
-# version of the manual (wag.ps), and MAKEWAGPS is the command that must be
-# run in order to do this.  The process is a bit convoluted, because the
-# simple PostScript version (wag0.ps) is concatenated from several PostScript
-# files and thus lacks DSCs (document structuring comments).  wag0.ps can be
-# printed or viewed directly, but most (perhaps all) viewers are incapable of
-# allowing the user to jump to a random page in a PostScript file that lacks
-# DSCs, and it's not easy to select a subset of pages to print in such a
-# file.  If you have ghostscript version 7.x or later (earlier versions will
-# not work properly), ps2pdf (included with ghostscript) and acroread (or
-# pdftops), you can translate wag0.ps into PDF (adding the DSCs in the
-# process), and then translate the PDF file back into PostScript with DSCs.
-# A disadvantage of this is that the PDF version is roughly 25% larger than
-# wag0.ps, and the final PostScript version is nearly twice as large as
-# wag0.ps, and takes longer to render as a result.  To enable creation of
-# PostScript with DSCs in this way, uncomment the next two lines:
-WAGPSREQ = wag.pdf
-# The latest versions of acroread no longer support the -level1 and -fast
-# options used in previous versions of this Makefile (level 2 is the default).
-MAKEWAGPS = acroread -toPostScript wag.pdf
-# You can use pdftops instead of acroread by commenting out the previous line
-# and uncommenting the next one.
-# MAKEWAGPS = pdftops wag.pdf
-# Otherwise, uncomment the next two lines instead:
-# WAGPSREQ = wag0.ps
-# MAKEWAGPS = cp wag0.ps wag.ps
+# PDFPS converts a PDF file to a PostScript file.  Use either of these:
+# PDFPS = pdf2ps
+PDFPS = pdftops
+
+# PSPDF converts a PostScript file to a PDF file.
+PSPDF = ps2pdf
 
 # It should not be necessary to modify anything below this line.
 # -----------------------------------------------------------------------------
 
 .IGNORE:
 
-all:	wag.html wag.ps wag.pdf
-	cp -p wag.ps wag.pdf ../wag
+all:	wag.html wag.pdf
+	cp -p wag.pdf ../wag
 
 install:	wag.man
 
@@ -107,13 +87,13 @@ uninstall:
 	rm -f ../wag/*
 
 # 'make wag-book': print a copy of the WFDB Applications Guide
-wag-book:	wag0.ps
+wag-book:	wag.ps
 	cp wag.cover wagcover
 	echo $(SHORTDATE) >>wagcover
 	echo .bp >>wagcover
 	$(TROFF) wagcover >wagcover.ps
 	$(PSPRINT) wagcover.ps
-	$(PSPRINT) wag0.ps
+	$(PSPRINT) wag.ps
 
 # 'make wag.html': format the WFDB Applications Guide as HTML
 wag.html:
@@ -158,47 +138,38 @@ wag.man:
 	cd $(MAN1); $(LN) setwfdb.1 cshsetwfdb.1
 	cd $(MAN1); $(LN) wav2mit.1 mit2wav.1
 
+# 'make wag.ps': format the WFDB Applications Guide as PostScript
+wag.ps:		 wag.pdf
+	$(PDFPS) wag.pdf
+
 # 'make wag.pdf': format the WFDB Applications Guide as PDF
-wag.pdf:	wag0.ps
-	ps2pdf wag0.ps wag.pdf
+wag.pdf:	wag.tex
+	$(MAKE) wag1.pdf  # also makes wag2.pdf, wag3.pdf, wag4.pdf
+	pdftk wag[1234].pdf cat output wag.pdf	# concatenate sections
 	$(SETPERMISSIONS) wag.pdf
 
-# 'make wag.ps': format the WFDB Applications Guide as PostScript
-wag.ps:		$(WAGPSREQ)
-	$(MAKEWAGPS)
-	$(SETPERMISSIONS) wag.ps
-
-wag0.ps:	wag.tex
-	$(MAKE) wag2.ps
-	$(MAKE) wag1.toc
+wag1.pdf:	wag2.pdf
+	$(MAKE) getpagenos maketoclines
+	./maketoc-tex.sh >wag1.toc		# TOC, wag3.pdf, wag4.pdf
 	sed 's/VERSION/$(VERSION)/' <wag.tex | \
 	  sed 's/LONGDATE/$(LONGDATE)/' >wag1.tex
-	latex wag1					# front matter
-	dvips $(D2PARGS) -o wag1.ps wag1
-	cat wag[1234].ps | grep -v '^%%' >wag0.ps	# concatenate sections
+	pdflatex wag1				# front matter
 
-wag1.toc:	wag2.ps
-	$(MAKE) getpagenos maketoclines
-	./maketoc-tex.sh >wag1.toc			# TOC and appendices
-
-wag2.ps:
+wag2.pdf:
 	tbl *.1 *.3 *.5 | $(TROFF) $(TMAN) >wag2.ps	# man pages
+	$(PSPDF) wag2.ps wag2.pdf
 
-install.tex:	wag1.toc
-wag3.ps:	install.tex
+wag3.pdf:	install.tex
 	sed "s/LONGDATE/$(LONGDATE)/" <install.tex | \
 	  sed "s/VERSION/$(VERSION)/" >wag3.tex
-	latex wag3
-	dvips $(D2PARGS) -o wag3.ps wag3.dvi
+	pdflatex wag3
 
-eval.tex:	wag1.toc
-wag4.ps:	eval.tex
+wag4.pdf:	eval.tex
 	sed "s/LONGDATE/$(LONGDATE)/" <eval.tex | \
 	  sed "s/VERSION/$(VERSION)/" >wag4.tex
-	latex wag4
-	dvips $(D2PARGS) -o wag4.ps wag4.dvi
+	pdflatex wag4
 
 # 'make clean': remove intermediate and backup files
 clean:
-	rm -f *.aux *.dvi *.log *.ps *.toc intro.htm faq.htm wag.pdf wagcover \
+	rm -f *.aux *.dvi *.log *.ps *.toc intro.htm faq.htm wag*pdf wagcover \
 	      eval.tex install.tex wag[1234].tex *~

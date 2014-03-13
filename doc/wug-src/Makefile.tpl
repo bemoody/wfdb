@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:	27 February 2006
+#				Last revised:	 13 March 2014
 # Change the settings below as appropriate for your setup.
 
 # Set COLORS to 'color' if you have a color printer and would like to print
@@ -43,8 +43,8 @@ TROFF = groff
 
 .IGNORE:
 
-all:	wug.html wug.ps wug.pdf
-	cp -p wug.ps wug.pdf ../wug
+all:	wug.html wug.pdf
+	cp -p wug.pdf ../wug
 
 install:
 	@echo Nothing to install in wug-src.

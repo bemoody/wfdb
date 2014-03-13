@@ -1,4 +1,4 @@
-10.5.23 (12 March 2014):
+10.5.23 (13 March 2014):
 
 	Changes in 'configure', 'Makefile.tpl', 'conf/linux.def', and
 	'conf/linux-slib.def' simplify installation of shared WFDB libraries

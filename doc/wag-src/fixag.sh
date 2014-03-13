@@ -56,7 +56,7 @@ do
      sed "s+>\\(ann[1-3]\\)\\([ <]\\)+><a href=\"intro.htm#annotator\">\\1</a>\\2+g" |
      sed "s+>time+><a href=\"intro.htm#time\">time</a>+g" |
      sed "s+>signal-list+><a href=\"intro.htm#signal-list\">signal-list</a>+g" |
-     sed "s+>signal+><a href=\"intro.htm#signal\">signal</a>+g" |
+     sed "s+>signal</i+><a href=\"intro.htm#signal\">signal</a></i+g" |
      sed "s+PREVPAGE+<a href=$PREVU>$PREVT</a>+" >tmp.$$
   fi
   mv tmp.$$ $THISU

@@ -1,5 +1,5 @@
 # file: linux-slib.def		G. Moody	31 May 2000
-#                               Last revised:   1 March 2014
+#                               Last revised:  13 March 2014
 # This section contains settings suitable for generating an ELF-format shared
 # library under Linux.
 
@@ -50,7 +50,7 @@ LIBDIR = $(WFDBROOT)/lib
 
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.
-LDFLAGS = -L$(LIBDIR) -lwfdb $(LL)
+LDFLAGS = -lwfdb $(LL)
 
 # CC is the name of your C compiler.
 CC = gcc
@@ -72,7 +72,7 @@ MFLAGS =
 # with WFDB applications if the WFDB library was compiled with NETFILES support.
 # Older versions of gcc/ld do not recognize this option, however;  remove it
 # here and in linux-slib.def if your CC doesn't support it.
-CWLOPT = -Wl,--no-as-needed -Wl,-rpath,$(LIBDIR)
+CWLOPT = -Wl,--no-as-needed,-rpath,$(LIBDIR)
 
 # CFLAGS is the set of C compiler options used when compiling the shared
 # library.  CFLAGS should always include CCDEFS.

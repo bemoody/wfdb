@@ -45,18 +45,18 @@ at the end of each page, which provides a URL where you may find the current
 version of the source(s) for each application.
 
 <P>
-Under GNU/Linux or UNIX, if the WFDB Software Package has been installed
-on your system, you can also access the information contained in the
-main sections of this guide using <TT>man</TT> and related programs.  For
-example, to see the manual page for <TT>rdsamp</TT>, run the command
+Under GNU/Linux, Mac OS X, or UNIX, if the WFDB Software Package has been
+installed on your system, you can also access the information contained in the
+main sections of this guide using <B>man</B> and related programs.  For
+example, to see the manual page for <B>rdsamp</B>, run the command
 <PRE>
 	man rdsamp
 </PRE>
 (This also works under MS-Windows if you have installed the
-Cygwin package, which includes the <TT>man</TT> utility for formatting
+Cygwin package, which includes the <B>man</B> utility for formatting
 and reading manual pages.)  In some cases you may need to add
-<TT>/usr/local/man</TT> to your <TT>MANPATH</TT> environment variable, in
-order to make these pages accessible to <TT>man</TT>.
+<B>/usr/local/man</B> to your <B>MANPATH</B> environment variable, in
+order to make these pages accessible to <B>man</B>.
 
 <H2>Using WFDB Applications</H2>
 <P>
@@ -66,6 +66,7 @@ input files.  See <A HREF="setwfd-1.htm">setwfdb(1)</A> for information about
 doing this;  a more detailed discussion may be found in the first chapter of
 the <A HREF="../wpg/wpg.htm"><I>WFDB Programmer's Guide</I></A>, in
 the section about <A HREF="../wpg/database-path.htm">the database path</A>.
+Most users will not need to do this, however.
 
 <P>
 Certain types of command arguments are used by many of the applications
@@ -98,7 +99,7 @@ Guide</I></A> for further details on <A HREF="../wpg/records.htm">record
 names</A>.
 
 <P>
-Each PhysioBank database directory includes a text file named <TT>RECORDS</TT>,
+Each PhysioBank database directory includes a text file named <B>RECORDS</B>,
 which lists the record names for all records in that directory.
 
 <a name="annotator">
@@ -135,23 +136,23 @@ standard time format:
 
 <a name="signal">
 <DT><I>signal</I></a>
-<DD>Where this appears, substitute a signal number.  Signal numbers
-are integers; the first signal in each record is signal 0.  In printed
-documentation for the databases, signals always appear with signal 0
-at the top, signal 1 beneath, etc.
+<DD>Where this appears, substitute a signal number or (in most cases) a signal
+name.  Signal numbers are integers; the first signal in each record is signal 0.
+In printed documentation for the databases, signals always appear with signal 0
+at the top, signal 1 beneath, etc.  Signal names are the strings printed by
+<B>signame</B>(1).
 
 <a name="signal-list">
 <DT><I>signal-list</I></a>
-<DD>Where this (or <I>signal ...</I>) appears, you may specify more
-than one signal number in any desired order; separate
-the signal numbers using spaces.  Unless otherwise noted, a signal may
-appear more than once, or not at all, in a signal list.  In most cases,
-the end of the signal list is unambiguous (since signal numbers are never
-negative, an option argument beginning with '-' is a reliable indicator).
-In unusual cases, you may need to arrange options so that the signal list
-is at the end of the command, or so that it is followed by an argument that
-cannot be interpreted as a signal number.
-
+<DD>Where this (or <I>signal ...</I>) appears, you may specify more than one
+signal number in any desired order; separate the signal numbers or names using
+spaces.  Unless otherwise noted, a signal may appear more than once, or not at
+all, in a signal list.  In most cases, the end of the signal list is
+unambiguous (since signal numbers are never negative, and signal names rarely
+if ever begin with '-', an option argument beginning with '-' is a reliable
+indicator).  In unusual cases, you may need to arrange options so that the
+signal list is at the end of the command, or so that it is followed by an
+argument that cannot be interpreted as a signal number.
 </DL>
 
 <BR> <HR>

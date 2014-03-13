@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:    11 May 2006
+#				Last revised:   12 March 2014
 # Change the settings below as appropriate for your setup.
 
 # Set COLORS to 'color' if you have a color printer and would like to print
@@ -151,7 +151,7 @@ wag.man:
 wag.pdf:
 	cd wag-src; $(MAKE) wag.pdf
 	
-# 'make ag.ps': format the WFDB Applications Guide as PostScript
+# 'make wag.ps': format the WFDB Applications Guide as PostScript
 wag.ps:
 	cd wag-src; $(MAKE) wag.ps
 

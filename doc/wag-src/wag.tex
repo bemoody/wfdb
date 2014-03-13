@@ -36,7 +36,7 @@ Harvard-MIT Division of Health Sciences and Technology}
 \pagestyle{empty}
 \vspace*{\fill}
 \noindent
-Copyright \copyright 1980 -- 2013 George B. Moody
+Copyright \copyright 1980 -- 2014 George B. Moody
 
 \vspace{1 in}
 \noindent
@@ -130,10 +130,11 @@ at that time.  An old date and version number do not mean that the page is
 out-of-date;  rather they mean that the material described on that page
 remains current.
 
-Under GNU/Linux or Unix, if the WFDB Software Package has been installed
-on your system, you can also access the information contained in the
-main sections of this guide using \textbf{man} and related programs.  For
-example, to see the manual page for \textbf{rdsamp}, run the command
+Under GNU/Linux, Mac OS X, or Unix, if the WFDB Software Package has
+been installed on your system, you can also access the information
+contained in the main sections of this guide using \textbf{man} and
+related programs.  For example, to see the manual page for
+\textbf{rdsamp}, run the command
 \begin{quote}
 	\textbf{man rdsamp}
 \end{quote}
@@ -153,7 +154,7 @@ your environment properly so that WFDB applications can find their
 input files.  See \textbf{setwfdb}(1) in this guide for information about
 doing this; a more detailed discussion may be found in the first chapter
 of the \textit{WFDB Programmer's Guide}, in the section about the database
-path.
+path.  Most users will not need to do this, however.
 
 Certain types of command-line arguments are used by many of the applications
 described in this guide.  These include:
@@ -221,21 +222,23 @@ e & time of the end of the record \\
 
 \item{\textit{signal}}
 
-Where this appears, substitute a signal number.  Signal numbers are integers;
-the first signal in each record is signal 0.  In printed documentation for
-the databases, signals always appear with signal 0 at the top, signal 1
-beneath, etc.
+Where this appears, substitute a signal number or (in most cases) a signal name.
+Signal numbers are integers;  the first signal in each record is signal 0.
+In printed documentation for the databases, signals always appear with signal 0
+at the top, signal 1 beneath, etc.  Signal names are the strings printed by
+\textbf{signame}(1).
 
 \item{\textit{signal-list}}
 
 Where this (or `\textit{signal ...}') appears, you may specify more than one
-signal in any desired order;  separate the signal numbers using spaces.
-Unless otherwise noted, a signal may appear more than once, or not at all,
-in a signal list. In most cases, the end of the signal list is unambiguous
-(since signal numbers are never negative, an option argument beginning
-with '-' is a reliable indicator). In unusual cases, you may need to arrange
-options so that the signal list is at the end of the command, or so that it
-is followed by an argument that cannot be interpreted as a signal number. 
+signal in any desired order; separate the signal numbers or names using spaces.
+Unless otherwise noted, a signal may appear more than once, or not at all, in a
+signal list. In most cases, the end of the signal list is unambiguous (since
+signal numbers are never negative, and signal names rarely if ever begin with
+'-', an option argument beginning with '-' is a reliable indicator). In unusual
+cases, you may need to arrange options so that the signal list is at the end of
+the command, or so that it is followed by an argument that cannot be
+interpreted as a signal number.
 \end{description}
 
 \chapter*{Frequently Asked Questions\\(and Frequently Exclaimed Exclamations)}

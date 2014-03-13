@@ -1,5 +1,5 @@
 # file: linux.def		G. Moody	31 May 2000
-#				Last revised:   1 March 2014
+#				Last revised:  13 March 2014
 # 'make' definitions for compiling the WFDB Software Package under Linux
 
 # Choose a value for WFDBROOT to determine where the WFDB Software Package will
@@ -78,7 +78,7 @@ MFLAGS =
 # with WFDB applications if the WFDB library was compiled with NETFILES support.
 # Older versions of gcc/ld do not recognize this option, however;  remove it
 # here and in linux-slib.def if your CC doesn't support it.
-CWLOPT = -Wl,--no-as-needed -Wl,-rpath,$(LIBDIR)
+CWLOPT = -Wl,--no-as-needed,-rpath,$(LIBDIR)
 
 # CFLAGS is the set of C compiler options.  CFLAGS should always include
 # CCDEFS.

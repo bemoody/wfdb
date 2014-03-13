@@ -1,5 +1,5 @@
-# file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:    2 March 2006
+# file: Makefile.tpl		G. Moody	  24 May 2000
+#				Last revised:    13 March 2014
 # Change the settings below as appropriate for your setup.
 
 # D2PARGS is a list of options for dvips.  Uncomment one of these to set the
@@ -32,7 +32,7 @@ LN = ln -sf
 # them.  If you have GNU 'makeinfo' and 'install-info' (preferred),
 # uncomment the next two lines.
 MAKEINFO = makeinfo --force --no-warn
-INSTALLINFO = /sbin/install-info --info-dir=$(INFODIR) $(INFODIR)/wpg
+INSTALLINFO = /usr/sbin/install-info --info-dir=$(INFODIR) $(INFODIR)/wpg
 
 # Otherwise, you can use GNU emacs to do the formatting, and standard utilities
 # to install the info files, by uncommenting the next two lines.
@@ -62,9 +62,9 @@ TROFF = groff
 
 .IGNORE:
 
-all:	wpg.html wpg.ps wpg.pdf
+all:	wpg.html wpg.pdf
 	$(MAKE) INFODIR=../wpg/info INSTALLINFO=: wpg.info
-	cp -p wpg.ps wpg.pdf ../wpg
+	cp -p wpg.pdf ../wpg
 
 install:
 	@echo Nothing to install in wpg-src.
