@@ -14,9 +14,10 @@ all:	setup $(OFILES)
 	$(BUILDLIB) $(OFILES) $(BUILDLIB_LDFLAGS)
 
 # `make install':  install the WFDB library and headers
-install:	$(INCLUDES) $(LIBDIR)
+install:
 	$(MAKE) clean	    # force recompilation since config may have changed
 	$(MAKE) all
+	$(MAKE) $(INCLUDES) $(LIBDIR)
 	cp $(WFDBLIB) $(LIBDIR) 
 	$(SETLPERMISSIONS) $(LIBDIR)/$(WFDBLIB)
 	$(MAKE) lib-post-install 2>/dev/null
