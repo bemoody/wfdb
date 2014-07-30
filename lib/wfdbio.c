@@ -79,6 +79,8 @@ Dakin.  Thanks, Mike!
 These functions, defined here if WFDB_NETFILES is non-zero, are intended only
 for the use of the functions in the next group below (their definitions are not
 visible outside of this file):
+ www_parse_passwords	(load username/password information)
+ www_userpwd		(get username/password for a given url)
  wfdb_wwwquit		(shut down libcurl or libwww cleanly)
  www_init		(initialize libcurl or libwww)
  www_get_cont_len	(find length of data for a given url)
@@ -1241,8 +1243,77 @@ typedef struct chunk CHUNK;
 #define chunk_putb HTChunk_putb
 #endif
 
+static char **passwords;
+
+/* www_parse_passwords parses the WFDBPASSWORD environment variable.
+This environment variable contains a list of URL prefixes and
+corresponding usernames/passwords.  Alternatively, the environment
+variable may contain '@' followed by the name of a file containing
+password information.
+
+Each item in the list consists of a URL prefix, followed by a space,
+then the username and password separated by a colon.  For example,
+setting WFDBPASSWORD to "https://example.org john:letmein" would use
+the username "john" and the password "letmein" for all HTTPS requests
+to example.org.
+
+If there are multiple items in the list, they must be separated by
+end-of-line or tab characters. */
+static void www_parse_passwords(const char *str)
+{
+    static char sep[] = "\t\n\r";
+    char *xstr = NULL, *p, *q;
+    int n;
+
+    SSTRCPY(xstr, str);
+    if (!xstr)
+	return;
+    if (*xstr == '@')
+	xstr = wfdb_getiwfdb(xstr);
+
+    SALLOC(passwords, 1, sizeof(char *));
+    n = 0;
+    for (p = strtok(xstr, sep); p; p = strtok(NULL, sep)) {
+	if (!(q = strchr(p, ' ')) || !strchr(q, ':'))
+	    continue;
+	SREALLOC(passwords, n + 2, sizeof(char *));
+	if (!passwords)
+	    return;
+	SSTRCPY(passwords[n], p);
+	n++;
+    }
+    passwords[n] = NULL;
+
+    SFREE(xstr);
+}
+
+/* www_userpwd determines which username/password should be used for a
+given URL.  It returns a string of the form "username:password" if one
+is defined, or returns NULL if no login information is required for
+that URL. */
+static const char *www_userpwd(const char *url)
+{
+    int i, n;
+    const char *p;
+
+    for (i = 0; passwords && passwords[i]; i++) {
+	p = strchr(passwords[i], ' ');
+	if (!p || p == passwords[i])
+	    continue;
+
+	n = p - passwords[i];
+	if (strncmp(passwords[i], url, n) == 0 &&
+	    (url[n] == 0 || url[n] == '/' || url[n - 1] == '/')) {
+	    return &passwords[i][n + 1];
+	}
+    }
+
+    return NULL;
+}
+
 static void wfdb_wwwquit(void)
 {
+    int i;
     if (www_done_init) {
 #if WFDB_NETFILES_LIBCURL
 	curl_easy_cleanup(curl_ua);
@@ -1255,13 +1326,16 @@ static void wfdb_wwwquit(void)
 	HTProfile_delete();
 #endif
 	www_done_init = FALSE;
+	for (i = 0; passwords && passwords[i]; i++)
+	    SFREE(passwords[i]);
+	SFREE(passwords);
     }
 }
 
 static void www_init(void)
 {
     if (!www_done_init) {
-	char *p, *u, version[20];
+	char *p, version[20];
 
 	if ((p = getenv("WFDB_PAGESIZE")) && *p)
 	    page_size = strtol(p, NULL, 10);
@@ -1280,16 +1354,9 @@ static void www_init(void)
 	/* Search $HOME/.netrc for passwords */
 	curl_easy_setopt(curl_ua, CURLOPT_NETRC, CURL_NETRC_OPTIONAL);
 #endif
-	/* Get user name and password from the environment if available */
-	if ((u = getenv("PNWUSER")) && *u &&
-	    (p = getenv("PNWPASS")) && *p) {
-	    char *userpwd = (char *)malloc(strlen(u) + strlen(p) + 2);
-	    sprintf(userpwd, "%s:%s", u, p);
-	    curl_easy_setopt(curl_ua, CURLOPT_USERPWD, userpwd);
-	    for (p = userpwd; *p; p++)
-		*p = ' ';
-	    free(userpwd);
-	}
+	/* Get password information from the environment if available */
+	if ((p = getenv("WFDBPASSWORD")) && *p)
+            www_parse_passwords(p);
 
 	/* Use any available authentication method */
 	curl_easy_setopt(curl_ua, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
@@ -1355,6 +1422,9 @@ static long www_get_cont_len(const char *url)
 	curl_try(curl_easy_setopt(curl_ua, CURLOPT_NOBODY, 1L))
 	/* Set the URL to retrieve */
 	|| curl_try(curl_easy_setopt(curl_ua, CURLOPT_URL, url))
+	/* Set username/password */
+	|| curl_try(curl_easy_setopt(curl_ua, CURLOPT_USERPWD,
+	                             www_userpwd(url)))
 	/* Don't send a range request */
 	|| curl_try(curl_easy_setopt(curl_ua, CURLOPT_RANGE, NULL))
 	/* If any body data is received, ignore it */
@@ -1467,6 +1537,9 @@ static CHUNK *www_get_url_range_chunk(const char *url, long startb, long len)
 	    || curl_try(curl_easy_setopt(curl_ua, CURLOPT_HTTPGET, 1L))
 	    /* URL to retrieve */
 	    || curl_try(curl_easy_setopt(curl_ua, CURLOPT_URL, url))
+	    /* Set username/password */
+	    || curl_try(curl_easy_setopt(curl_ua, CURLOPT_USERPWD,
+	                                 www_userpwd(url)))
 	    /* Range request */
 	    || curl_try(curl_easy_setopt(curl_ua, CURLOPT_RANGE,
 					 range_req_str))
