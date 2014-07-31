@@ -4,7 +4,7 @@
 
 # 'make' or 'make all': compile the WFDB applications without installing them
 all:		config.cache
-	$(MAKE) WFDBROOT=`pwd`/build install check
+	$(MAKE) WFDBROOT=`pwd`/build LIBDIR=`pwd`/build/lib install check
 
 # 'make install': compile and install the WFDB software package
 install:	config.cache

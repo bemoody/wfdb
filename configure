@@ -17,6 +17,7 @@ INTERACTIVE=no
 LIBTYPE=dynamic
 DIR=/usr/local
 MANDIR=unknown
+LIBDIR=unknown
 
 NETLIB=unknown
 WAVE=unknown
@@ -38,6 +39,7 @@ do
 		        fi ;;
     --mandir=*)         MANDIR=`echo $i | sed 's/[-a-zA-Z0-9]*=//'` ;;
     --prefix=*)         DIR=`echo $i | sed 's/[-a-zA-Z0-9]*=//'` ;;
+    --libdir=*)         LIBDIR=`echo $i | sed 's/[-a-zA-Z0-9]*=//'` ;;
     -q)			;; # ignored
     --shared)           LIBTYPE=dynamic ;;
     --static)           LIBTYPE=static ;;
@@ -165,8 +167,8 @@ case $OS in
 	else
 	    LIB=lib64
             WAVE=0
-	    cat site.def linux-slib.def | sed s+/lib\$+/lib64+g >site-slib.def
-	    cat linux.def | sed s+/lib\$+/lib64+g >>site.def
+	    cat site.def linux-slib.def >site-slib.def
+	    cat linux.def >>site.def
 	fi ;;
   FreeBSD)
 	cat site.def freebsd-slib.def >site-slib.def
@@ -337,6 +339,16 @@ case $DIR in
 esac
 
 echo  "The WFDB software will be installed in '$DIR'."
+
+if [ x$LIBDIR = xunknown ]
+then
+    LIBDIR="\$(WFDBROOT)/$LIB"
+fi
+sed "s+^LIBDIR = .*+LIBDIR = $LIBDIR+" <site.def >site.tmp
+mv site.tmp site.def
+sed "s+^LIBDIR = .*+LIBDIR = $LIBDIR+" <site-slib.def >site.tmp
+mv site.tmp site-slib.def
+xlibdir=`echo "$LIBDIR" | sed 's+$(WFDBROOT)+'"$DIR"+`
 
 MANTMP=`grep "MANDIR =" site.def |sed 's+$(WFDBROOT)/++' |cut -d " " -f 3`
 MANDEF=$DIR/$MANTMP
@@ -603,7 +615,7 @@ Summary:
 
 $PACKAGE-$OS is now ready to be compiled using '$CC'.
 The WFDB library will be compiled as a $LIBTYPE library $WITHNF NETFILES
- access${VIANF}, and it will be installed in '$DIR/$LIB'.
+ access${VIANF}, and it will be installed in '$xlibdir'.
 The WFDB library .h files will be installed in '$DIR/include/wfdb'.
 The WFDB applications will be linked to $SYSLIBS system libraries, and
  they will be installed in '$DIR/bin'.
