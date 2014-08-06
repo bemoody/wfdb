@@ -53,7 +53,7 @@ LIBDIR = $(WFDBROOT)/bin
 
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.
-LDFLAGS = -L$(LIBDIR) -lwfdb $(LL)
+LDFLAGS = -L$(LIBDIR) -lwfdb
 
 # CC is the name of your C compiler.
 CC = gcc

@@ -52,7 +52,7 @@ LIBDIR = $(WFDBROOT)/lib
 
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.
-LDFLAGS = -L$(LIBDIR) -lwfdb $(LL)
+LDFLAGS = -L$(LIBDIR) -lwfdb
 
 # CC is the name of your C compiler.
 CC = gcc
@@ -91,12 +91,12 @@ WFDBLIB = $(WFDBLIB_SONAME).$(MINOR)
 # BUILDLIB is the command that creates the shared WFDB library once its
 # components have been compiled separately;  the list of *.o files that
 # make up the library will be appended to BUILDLIB.
-BUILDLIB = gcc $(MFLAGS) -shared -Wl,-soname,$(WFDBLIB_SONAME) $(LL) \
+BUILDLIB = gcc $(MFLAGS) -shared -Wl,-soname,$(WFDBLIB_SONAME) \
  -o $(WFDBLIB)
 
 # BUILDLIB_LDFLAGS is a list of arguments appended to BUILDLIB following
 # the list of *.o files (for most platforms, BUILDLIB_LDFLAGS is empty).
-BUILDLIB_LDFLAGS =
+BUILDLIB_LDFLAGS = $(LL)
 
 # LDCONFIG is the name of the program needed to refresh the system's cached
 # index of shared libraries.

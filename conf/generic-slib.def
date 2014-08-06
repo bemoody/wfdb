@@ -112,12 +112,12 @@ WFDBLIB = $(WFDBLIB_SONAME).$(MINOR)
 # make up the library will be appended to BUILDLIB.  This command varies
 # considerably depending on the operating system;  the setting here works
 # if gcc and the GNU binutils are installed.
-BUILDLIB = gcc $(MFLAGS) -shared -Wl,-soname,$(SWFDBLIB_SONAME) $(LL) \
+BUILDLIB = gcc $(MFLAGS) -shared -Wl,-soname,$(SWFDBLIB_SONAME) \
  -o $(SWFDBLIB)
 
 # BUILDLIB_LDFLAGS is a list of arguments appended to BUILDLIB following
 # the list of *.o files (for most platforms, BUILDLIB_LDFLAGS is empty).
-BUILDLIB_LDFLAGS =
+BUILDLIB_LDFLAGS = $(LL)
 
 # PRINT is the name of the program used to produce listings (including any
 # options for the desired formatting).

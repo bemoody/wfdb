@@ -90,7 +90,7 @@ CFLAGS = $(MFLAGS) -g -O $(CCDEFS) $(LC) -I$(INCDIR)
 
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.
-LDFLAGS = -L$(LIBDIR) -lwfdb $(LDLIBWWW) $(LDLIBCURL)
+LDFLAGS = -L$(LIBDIR) -lwfdb $(LL)
 
 # WFDBLIB is the name of the standard WFDB library.  In order to access it via
 # `-lwfdb', WFDBLIB should be `libwfdb.a'.
