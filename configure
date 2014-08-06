@@ -261,6 +261,12 @@ then
     esac
 else
     SYSLIBS=dynamic
+
+    dynamic_ldflags=`sed -n '/^LDFLAGS =/{s/LDFLAGS = *//;p}' <site-slib.def`
+    if [ "x$dynamic_ldflags" != "x" ]; then
+        sed "s|^LDFLAGS =.*|LDFLAGS = $dynamic_ldflags|" <site.def >site.tmp
+        mv site.tmp site.def
+    fi
 fi
 
 echo
