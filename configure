@@ -22,6 +22,9 @@ LIBDIR=unknown
 NETLIB=unknown
 WAVE=unknown
 
+LC_ALL=C
+export LC_ALL
+
 # Read and process command-line arguments
 for i in $*
 do
@@ -348,6 +351,24 @@ echo  "The WFDB software will be installed in '$DIR'."
 
 if [ x$LIBDIR = xunknown ]
 then
+    case $OS in
+      Linux*)
+            cpu=`uname -m`
+            nativelibdirs=`$CC -print-search-dirs | sed -n '/^libraries:/{s/^[^=]*=//; s/:/\n/g; p}' | sed ':LP; s+/[^/]*/\.\./+/+; tLP; s+/$++'`
+            if [ "$cpu" = "x86_64" ] && echo "$nativelibdirs" | grep -q "^$DIR/lib64"; then
+                if [ "x$MFLAGS" = "x-m32" ]; then
+                    LIB=lib
+                else
+                    LIB=lib64
+                fi
+            else
+                if [ "x$MFLAGS" = "x-m32" ]; then
+                    LIB=lib32
+                else
+                    LIB=lib
+                fi
+            fi ;;
+    esac
     LIBDIR="\$(WFDBROOT)/$LIB"
 fi
 sed "s+^LIBDIR = .*+LIBDIR = $LIBDIR+" <site.def >site.tmp
