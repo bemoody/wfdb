@@ -89,6 +89,11 @@ MFLAGS =
 # `gcc' users may comment out the previous line, and uncomment the next one.
 CFLAGS = $(MFLAGS) -g -O $(CCDEFS) $(LC) -I$(INCDIR)
 
+# RPATHFLAGS is a set of C compiler options that cause the program to
+# search for shared libraries in a non-standard location at run-time.
+# These options are not needed or useful when using a static library.
+RPATHFLAGS = -Wl,+b -Wl,$(LIBDIR)
+
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.
 LDFLAGS = -L$(LIBDIR) -lwfdb $(LL)

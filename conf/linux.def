@@ -71,18 +71,14 @@ CCDEFS = $(VDEFS)
 # is usually empty.  See the gcc manual for information about gcc's -m options.
 MFLAGS =
 
-# CWLOPT is a set of options for CC to pass to the linker.  Recent versions of
-# gcc/ld do not load shared libraries named on the command line if they are
-# needed only by other shared libraries, unless these options include
-# '-Wl,--no-as-needed';  this is needed to force loading of libcurl or libwww
-# with WFDB applications if the WFDB library was compiled with NETFILES support.
-# Older versions of gcc/ld do not recognize this option, however;  remove it
-# here and in linux-slib.def if your CC doesn't support it.
-CWLOPT = -Wl,--no-as-needed,-rpath,$(LIBDIR)
-
 # CFLAGS is the set of C compiler options.  CFLAGS should always include
 # CCDEFS.
-CFLAGS = $(MFLAGS) -g -O $(CCDEFS) $(LC) -I$(INCDIR) $(CWLOPT)
+CFLAGS = $(MFLAGS) -g -O $(CCDEFS) $(LC) -I$(INCDIR)
+
+# RPATHFLAGS is a set of C compiler options that cause the program to
+# search for shared libraries in a non-standard location at run-time.
+# These options are not needed or useful when using a static library.
+RPATHFLAGS = -Wl,--enable-new-dtags,-rpath,$(LIBDIR)
 
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.
