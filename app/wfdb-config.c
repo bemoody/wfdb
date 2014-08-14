@@ -32,6 +32,18 @@ extern void exit();
 
 #include <wfdb/wfdb.h>
 
+/* Expand command substitutions in VAR; needed if libcurl is included
+   in LDFLAGS, so that we invoke the curl-config program rather than
+   simply printing "`curl-config --libs`". */
+static void expand_var(const char *var)
+{
+    char *buffer;
+    SUALLOC(buffer, strlen(var) + 6, 1);
+    sprintf(buffer, "echo %s", var);
+    system(buffer);
+    SFREE(buffer);
+}
+
 char *pname;
 
 main(int argc, char **argv)
@@ -50,9 +62,9 @@ main(int argc, char **argv)
 	if (strcmp(argv[i], "--version") == 0)
 	    printf("%s\n", wfdbversion());
 	else if (strcmp(argv[i], "--libs") == 0)
-	    printf("%s\n", wfdbldflags());
+	    expand_var(wfdbldflags());
 	else if (strcmp(argv[i], "--cflags") == 0)
-	    printf("%s\n", wfdbcflags());
+	    expand_var(wfdbcflags());
 	else
 	    help();
     }

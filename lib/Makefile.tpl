@@ -72,4 +72,4 @@ signal.o:	wfdb.h wfdblib.h signal.c
 calib.o:	wfdb.h wfdblib.h calib.c
 wfdbio.o:	wfdb.h wfdblib.h wfdbio.c
 	$(CC) $(CFLAGS) -DVERSION='"$(VERSION)"' -DCFLAGS='"-I$(INCDIR)"' \
-	  -DLDFLAGS='"-L$(LIBDIR) -lwfdb $(CWLOPT) $(LL)"' -c wfdbio.c
+	  -DLDFLAGS='"$(LDFLAGS)"' -c wfdbio.c
