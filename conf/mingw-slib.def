@@ -132,6 +132,7 @@ make-all:	all
 lib-post-install:
 	cd $(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_BASENAME)
 	cd $(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_SONAME)
+	mkdir -p $(BINDIR); $(SETDPERMISSIONS) $(BINDIR)
 	cp $(WFDBLIB_DLLNAME) $(BINDIR)
 
 lib-post-uninstall:
