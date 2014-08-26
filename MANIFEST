@@ -142,7 +142,6 @@ checkpkg/libcheck
 checkpkg/Makefile
 checkpkg/Makefile.top
 checkpkg/Makefile.tpl
-checkpkg/mitdb
 conf
 conf/archname
 conf/collect.sh

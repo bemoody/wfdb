@@ -124,13 +124,13 @@ tarballs:	clean
 	cd lib; $(SETPERMISSIONS) *.h
 	cd ..; export COPYFILE_DISABLE=true; \
 	  tar --create --file $(PACKAGE).tar.gz --verbose --gzip \
-          '--exclude=$(PACKAGE)/*CVS' $(PACKAGE) 2>&1 | \
+          '--exclude=.git*' $(PACKAGE) 2>&1 | \
 	  sed "s+^a ++" | sed s+${PACKAGE}/++ | \
           tee $(PACKAGE)-MANIFEST
 	cd ..; tar --create --file $(PACKAGE)-no-docs.tar.gz \
 	  --verbose --gzip \
           '--exclude=$(PACKAGE)/*doc' \
-	  '--exclude=$(PACKAGE)/*CVS' $(PACKAGE)
+	  '--exclude=.git*' $(PACKAGE)
 	./check-manifest $(PACKAGE)
 
 # 'make bin-tarball': make a gzipped tar archive of the WFDB software package

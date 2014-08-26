@@ -5,7 +5,7 @@
 
 PACKAGE=$1
 sort -f <MANIFEST | grep . | grep -v ${PACKAGE} >../expected-MANIFEST
-sort -f <../${PACKAGE}-MANIFEST | grep . | sed 's+/$++' | \
+sed 's+/$++' <../${PACKAGE}-MANIFEST | sort -f | grep . | \
  grep -v ${PACKAGE} >../sort.$$
 mv ../sort.$$ ../${PACKAGE}-MANIFEST
 if diff ../expected-MANIFEST ../${PACKAGE}-MANIFEST
