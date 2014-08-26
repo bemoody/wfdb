@@ -1,5 +1,5 @@
 # file: mingw-slib.def		I. Henry and G. Moody	    11 February 2005
-#				Last revised:		    19 November 2013
+#				Last revised:		    18 August 2014
 #
 # This section contains settings suitable for generating a DLL (shared library)
 # under MS Windows using the free gcc ANSI C compiler.

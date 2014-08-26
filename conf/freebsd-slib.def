@@ -1,5 +1,5 @@
 # file: freebsd-slib.def	G. Moody	5 March 2002
-#				Last revised:   13 May 2010
+#				Last revised:  13 August 2014
 # Based on 'linux-slib.def'.
 
 # This section contains settings suitable for generating an ELF-format shared

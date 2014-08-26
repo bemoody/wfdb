@@ -1,5 +1,5 @@
 # file: darwin-slib.def	I. Henry and G. Moody	14 November 2002
-#				Last revised:	  27 July 2010
+#				Last revised:	 6 August 2014
 # Based on 'freebsd-slib.def'.
 
 # This section contains settings suitable for generating a shared library under

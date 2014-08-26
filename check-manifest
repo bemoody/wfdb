@@ -1,6 +1,6 @@
 #!/bin/sh
 # file: check-manifest		G. Moody	14 December 2001
-#				Last revised:     27 July 2010
+#				Last revised:    26 August 2014
 # Verify tarball contents
 
 PACKAGE=$1

@@ -1,5 +1,5 @@
 # file: generic-slib.def	G. Moody	31 May 2000
-#				Last revised:   13 May 2010
+#				Last revised:  13 August 2014
 # This section contains settings suitable for compiling a shared version of the
 # WFDB library under versions of UNIX that are not otherwise recognized by
 # 'configure'.  Not all versions of UNIX support shared libraries, so you may

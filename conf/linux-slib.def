@@ -1,5 +1,5 @@
 # file: linux-slib.def		G. Moody	31 May 2000
-#                               Last revised:  13 March 2014
+#                               Last revised:  13 August 2014
 # This section contains settings suitable for generating an ELF-format shared
 # library under Linux.
 

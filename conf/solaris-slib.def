@@ -1,5 +1,5 @@
 # file: solaris-slib.def	G. Moody	31 May 2000
-#				Last revised:   13 May 2010
+#				Last revised:  13 August 2014
 # This section contains settings suitable for generating a shared library under
 # Solaris.
 

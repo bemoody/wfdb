@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:     1 March 2014
+#				Last revised:    14 August 2014
 # This section of the Makefile should not need to be changed.
 
 INCLUDES = $(INCDIR)/wfdb/wfdb.h $(INCDIR)/wfdb/wfdblib.h \

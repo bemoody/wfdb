@@ -1,5 +1,5 @@
 /* file: wfdb-config.c	G. Moody	27 April 2002
-			Last revised:	 3 May 2009	wfdblib 10.4.20
+			Last revised:	14 August 2014	wfdblib 10.5.24
 
 -------------------------------------------------------------------------------
 wfdb-config: Print WFDB library version and linking information

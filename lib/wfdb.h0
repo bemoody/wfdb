@@ -1,5 +1,5 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised: 18 November 2013		wfdblib 10.5.21
+			Last revised:  18 August 2014		wfdblib 10.5.24
 WFDB library type, constant, structure, and function interface definitions
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)

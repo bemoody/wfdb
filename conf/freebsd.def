@@ -1,5 +1,5 @@
 # file: freebsd.def		G. Moody	5 March 2002
-#				Last revised:   13 May 2010
+#				Last revised:  13 August 2014
 # 'make' definitions for compiling the WFDB Software Package under FreeBSD
 #
 # Based on 'linux.def', with edits for FreeBSD thanks to Giuseppe Pagnoni.
