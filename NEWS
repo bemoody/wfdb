@@ -1,3 +1,28 @@
+10.5.24 (26 August 2014):
+	A security flaw was found in the 'pnwlogin' script used to access
+	PhysioNetWorks projects, owing to a combination of bugs in WFDB and
+	libcurl.  Previous versions of the WFDB library would unconditionally
+	set the username and password for every HTTP or HTTPS request, which
+	caused them to be sent over the network unencrypted.  This bug has now
+	been fixed; note, however, that the old version of 'pnwlogin' is now
+	blocked at the server side, and the new version of 'pnwlogin' is (by
+	design) incompatible with older, insecure versions of the WFDB library.
+	In order to use 'pnwlogin', be sure that you are using the latest
+	version of the library (both 32-bit and 64-bit, if necessary.)
+
+	On most platforms, the WFDB library will now be installed in
+	/usr/local/lib by default, or /usr/local/lib32 if you are building a
+	32-bit library on an x86_64 system.  You can specify the --libdir option
+	to 'configure' to change the installation directory if you wish.
+
+	The 'wfdb-config' program used by external packages to compile and link
+	programs with the WFDB library was broken in version 10.5.23, in that if
+	libcurl was used, it would output the string "`curl-config --libs`",
+	rather than actually invoking curl-config.  This has now been fixed for
+	the case of a static WFDB library.  In the case of a dynamic WFDB
+	library, the curl flags were unnecessary in the first place, so they are
+	now omitted.
+
 10.5.23 (13 March 2014):
 
 	Changes in 'configure', 'Makefile.tpl', 'conf/linux.def', and
