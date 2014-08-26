@@ -521,6 +521,12 @@ for D in app checkpkg convert data doc doc/wag-src doc/wpg-src doc/wug-src \
   fi
 done
 
+# Create output directories for documentation
+for D in doc/wag doc/wpg doc/wug
+do
+    [ -d $D ] || mkdir $D
+done
+
 echo rm conf/site.def conf/site-slib.def
 
 if [ "x$WAVE" = "x0" ]
