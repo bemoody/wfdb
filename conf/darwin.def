@@ -1,5 +1,5 @@
 # file: darwin.def	G. Moody and I. Henry	14 November 2002
-#				Last revised: 	  27 July 2010
+#				Last revised: 	17 September 2014
 # 'make' definitions for compiling the WFDB Software Package under Darwin
 #
 # Based on 'freebsd.def'.
@@ -74,7 +74,7 @@ MFLAGS =
 
 # CFLAGS is the set of C compiler options.  CFLAGS should always include
 # CCDEFS.
-CFLAGS = $(MFLAGS) -g -O $(CCDEFS) $(LC) -I$(INCDIR) -arch i386 -arch x86_64 -arch ppc
+CFLAGS = $(MFLAGS) -g -O $(CCDEFS) $(LC) -I$(INCDIR)
 
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.
@@ -145,8 +145,12 @@ XINCDIR = $(XHOME)/include
 # XLIBDIR is the directory in which the X11 libraries are found.
 XLIBDIR = $(XHOME)/lib
 
+# WMFLAGS is the set of architecture-dependend compiler options to use
+# when compiling WAVE.
+WMFLAGS =
+
 # WCFLAGS is the set of C compiler options to use when compiling WAVE.
-WCFLAGS = $(CFLAGS) -I$(OWINCDIR) -I$(XINCDIR) -arch i386
+WCFLAGS = $(WMFLAGS) -g -O $(CCDEFS) $(LC) -I$(INCDIR) -I$(OWINCDIR) -I$(XINCDIR)
 
 # HELPOBJ can be set to "help.o" if you wish to recompile the XView spot help
 # functions in "wave/help.c" (recommended under Linux).

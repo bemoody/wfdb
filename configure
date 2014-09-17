@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody         24 May 2000
-#                             Last revised:   26 August 2014
+#                             Last revised: 17 September 2014
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -18,6 +18,7 @@ LIBTYPE=dynamic
 DIR=/usr/local
 MANDIR=unknown
 LIBDIR=unknown
+MFLAGS=
 
 NETLIB=unknown
 WAVE=unknown
@@ -205,8 +206,18 @@ case $OS in
 	    echo "Building static libraries is not supported on Darwin."
 	    LIBTYPE=dynamic
 	fi
-	cat site.def darwin-slib.def >site-slib.def
-	cat darwin.def >>site.def ;;
+        case `uname -m` in
+          x86_64) MFLAGS="$MFLAGS -arch i386 -arch x86_64"
+                  WMFLAGS="$MFLAGS -arch i386" ;;
+          i386)   MFLAGS="$MFLAGS -arch i386"
+                  WMFLAGS="$MFLAGS -arch i386" ;;
+          *)      MFLAGS="$MFLAGS"
+                  WMFLAGS="$MFLAGS" ;;
+        esac
+	cat site.def darwin-slib.def | \
+	    sed "s+^MFLAGS =+MFLAGS = $MFLAGS+" >site-slib.def
+	cat darwin.def | \
+	    sed "s+^MFLAGS =+MFLAGS = $MFLAGS+;s+^WMFLAGS =+WMFLAGS = $WMFLAGS+" >>site.def ;;
   *)    OS=generic
 	cat site.def generic-slib.def >site-slib.def
 	cat generic.def >>site.def
