@@ -326,7 +326,9 @@ char *argv[];
     }
 
     /* Create the new header file. */
-    setbasetime(mstimstr(-from)+1);
+    p = mstimstr(-from);
+    if (p && *p == '[')
+	setbasetime(p+1);
     newheader(orec);
 
     /* Copy info from the old record, if any */
