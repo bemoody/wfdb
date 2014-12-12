@@ -122,7 +122,7 @@ long *qfv, *smv;		/* filter buffers allocated by gqrs_init() */
 main(int argc, char **argv)
 {
     char *p;
-    int gvmode = 0, i, isiglist = 0, j, nisig, s;
+    int gvmode = 0, i, isiglist = 0, j, nisig;
     WFDB_Anninfo a;
 
     pname = prog_name(argv[0]);
@@ -246,8 +246,8 @@ main(int argc, char **argv)
 	int i = findsig(argv[sig]);
 	if (i < 0) {
 	    (void)fprintf(stderr,
-			  "%s: (warning) no signal %d in record %s\n",
-			  pname, s, record);
+			  "%s: (warning) no signal %s in record %s\n",
+			  pname, argv[sig], record);
 	    cleanup(4);
 	}
 	sig = i;
