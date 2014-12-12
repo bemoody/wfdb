@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:     30 July 2014         wfdblib 10.5.24
+                        Last revised:   12 December 2014       wfdblib 10.5.24
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -1357,6 +1357,10 @@ static void www_init(void)
 	/* Get password information from the environment if available */
 	if ((p = getenv("WFDBPASSWORD")) && *p)
             www_parse_passwords(p);
+
+	/* Get the name of the CA bundle file */
+	if ((p = getenv("CURL_CA_BUNDLE")) && *p)
+	    curl_easy_setopt(curl_ua, CURLOPT_CAINFO, p);
 
 	/* Use any available authentication method */
 	curl_easy_setopt(curl_ua, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
