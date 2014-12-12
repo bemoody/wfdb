@@ -746,7 +746,7 @@ void wfdb_error(char *format, ...)
     va_list arguments;
 
     va_start(arguments, format);
-#ifndef _WINDOWS		/* standard variant: use stderr output */
+#if 1				/* standard variant: use stderr output */
     (void)vsprintf(error_message, format, arguments);
     if (error_print) {
 	(void)fprintf(stderr, "%s", error_message);
