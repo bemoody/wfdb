@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:  18 November 2013		wfdblib 10.5.21
+			Last revised:   1 January 2015  	wfdblib 10.5.24
 WFDB library functions for annotations
 
 _______________________________________________________________________________
@@ -228,24 +228,6 @@ static int put_ann_table(WFDB_Annotator i)
     annot.anntyp = NOTE;
     annot.subtyp = annot.chan = annot.num = 0;
     annot.aux = (unsigned char *)buf;
-    for (a = 0; a <= ACMAX; a++)
-	if (modified[a]) {
-	    if (flag == 0) { /* mark the beginning of the table */
-		(void)sprintf(buf+1, "## annotation type definitions");
-		buf[0] = strlen(buf+1);
-		if (putann(i, &annot) < 0) return (-1);
-	    }
-	    (void)sprintf(buf+1, "%d %s %s", a, annstr(a), anndesc(a));
-	    buf[0] = strlen(buf+1);
-	    if (putann(i, &annot) < 0) return (-1);
-	    flag = 1;
-	}
-    if (flag) {	/* if a table was written, mark its end */
-	(void)sprintf(buf+1, "## end of definitions");
-	buf[0] = strlen(buf+1);
-	if (putann(i, &annot) < 0) return (-1);
-    }
-
     if (oafreq != oad[i]->afreq && oafreq > 0.) {
 	(void)sprintf(buf+1, "## time resolution: %.12g", oafreq);
 	buf[0] = strlen(buf+1);
@@ -253,6 +235,24 @@ static int put_ann_table(WFDB_Annotator i)
 	if (putann(i, &annot) < 0) return (-1);
 	flag = 1;
     }
+    for (a = 0; a <= ACMAX; a++)
+	if (modified[a]) {
+	    if (flag < 2) { /* mark the beginning of the table */
+		(void)sprintf(buf+1, "## annotation type definitions");
+		buf[0] = strlen(buf+1);
+		if (putann(i, &annot) < 0) return (-1);
+	    }
+	    (void)sprintf(buf+1, "%d %s %s", a, annstr(a), anndesc(a));
+	    buf[0] = strlen(buf+1);
+	    if (putann(i, &annot) < 0) return (-1);
+	    flag = 2;
+	}
+    if (flag == 2) {	/* if a table was written, mark its end */
+	(void)sprintf(buf+1, "## end of definitions");
+	buf[0] = strlen(buf+1);
+	if (putann(i, &annot) < 0) return (-1);
+    }
+
     if (flag) {	/* if a table was written, mark its end */
 	annot.anntyp = 0;
 	annot.aux = NULL;
