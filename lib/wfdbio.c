@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:   12 December 2014       wfdblib 10.5.24
+                        Last revised:   23 March 2015       wfdblib 10.5.24
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -1364,9 +1364,10 @@ static void www_init(void)
 
 	/* Use any available authentication method */
 	curl_easy_setopt(curl_ua, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
-	/* (Uncomment this line to enable tons of debugging
-	   information from libcurl) */
-	/* curl_easy_setopt(curl_ua, CURLOPT_VERBOSE, 1L); */
+
+	/* Show details of URL requests if WFDB_NET_DEBUG is set */
+	if ((p = getenv("WFDB_NET_DEBUG")) && *p)
+	    curl_easy_setopt(curl_ua, CURLOPT_VERBOSE, 1L);
 #else
 
 #ifdef USEHTCACHE
