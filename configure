@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody         24 May 2000
-#                             Last revised: 17 September 2014
+#                             Last revised:   23 March 2015
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -207,17 +207,17 @@ case $OS in
 	    LIBTYPE=dynamic
 	fi
         case `uname -m` in
-          x86_64) MFLAGS="$MFLAGS -arch i386 -arch x86_64"
+          x86_64) LMFLAGS="$MFLAGS -arch i386 -arch x86_64"
                   WMFLAGS="$MFLAGS -arch i386" ;;
-          i386)   MFLAGS="$MFLAGS -arch i386"
+          i386)   LMFLAGS="$MFLAGS -arch i386"
                   WMFLAGS="$MFLAGS -arch i386" ;;
-          *)      MFLAGS="$MFLAGS"
+          *)      LMFLAGS="$MFLAGS"
                   WMFLAGS="$MFLAGS" ;;
         esac
 	cat site.def darwin-slib.def | \
-	    sed "s+^MFLAGS =+MFLAGS = $MFLAGS+" >site-slib.def
+	    sed "s+^MFLAGS =+MFLAGS = $LMFLAGS+" >site-slib.def
 	cat darwin.def | \
-	    sed "s+^MFLAGS =+MFLAGS = $MFLAGS+;s+^WMFLAGS =+WMFLAGS = $WMFLAGS+" >>site.def ;;
+	    sed "s+^MFLAGS =+MFLAGS = $LMFLAGS+;s+^WMFLAGS =+WMFLAGS = $WMFLAGS+" >>site.def ;;
   *)    OS=generic
 	cat site.def generic-slib.def >site-slib.def
 	cat generic.def >>site.def
