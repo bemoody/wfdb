@@ -1,5 +1,5 @@
 # file: wfdbcal		G. Moody	  June 1991
-#			Last revised:   31 July 2012
+#			Last revised:  21 January 2014
 # Default calibration database for WFDB library
 #
 # Format:
@@ -60,9 +60,6 @@ I	- 2 square 1 mV
 V	- 2 square 1 mV
 PLETH	- - undefined 1 mV
 
-# Miscellaneous pressure signals in the MIMIC Database
-P	- - undefined 100 mmHg
-
 # ECG from implanted devices
 Atip	- - undefined 1 mV
 HVA	- - undefined 5 mV
@@ -76,9 +73,16 @@ Thorax	- - undefined 2 mV
 Abdomen	- - undefined 200 uV
 FECG	- - undefined 1 mV
 Direct	- - undefined 200 uV
+FHR	0 - undefined 20 bpm
+
+# Uterine contractions
+UC	- - undefined 50 nd
 
 # Intracardiac electrograms
 CS	- - undefined 1 mV
+
+# Phonocardiogram
+PCG	- - undefined 10000 mV
 
 # EEG
 F	- - undefined 100 uV
@@ -88,6 +92,9 @@ T	- - undefined 100 uV
 P	- - undefined 100 uV
 O	- - undefined 100 uV
 I	- - undefined 100 uV
+
+# Miscellaneous pressure signals in the MIMIC Database
+P	- - undefined 100 mmHg
 
 # Definitions for nameless signals with defined units
 record	- - undefined 1 mV
