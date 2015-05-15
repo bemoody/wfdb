@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:	 13 March 2014
+#				Last revised:	   8 May 2015
 # Change the settings below as appropriate for your setup.
 
 # Set COLORS to 'color' if you have a color printer and would like to print
@@ -94,21 +94,21 @@ wug.pdf:	wug.tex
 	# convert does not do a great job on them, but the results are
 	# at least recognizable!
 	rm -f wug.aux wug.idx wug.ind wug.toc
-	pdflatex wug
+	pdflatex '\nonstopmode\input{wug}'
 	makeindex wug.idx
-	pdflatex wug
+	pdflatex '\nonstopmode\input{wug}'
 	makeindex wug.idx
-	pdflatex wug
+	pdflatex '\nonstopmode\input{wug}'
 
 # 'make wug.ps': format the WAVE User's Guide as PostScript
 wug.ps:		wug.tex
 	wave/scripts/wugfigures -$(COLORS)	# get a set of figures
 	rm -f wug.aux wug.idx wug.ind wug.toc
-	latex wug
+	latex '\nonstopmode\input{wug}'
 	makeindex wug.idx
-	latex wug
+	latex '\nonstopmode\input{wug}'
 	makeindex wug.idx
-	latex wug
+	latex '\nonstopmode\input{wug}'
 	dvips $(D2PARGS) -o wug.ps wug.dvi
 
 # 'wug.aux' is created by 'latex wug' or 'pdflatex wug' (which make slightly

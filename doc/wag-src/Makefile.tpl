@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:	13 March 2014
+#				Last revised:	  8 May 2015
 # Change the settings below as appropriate for your setup.
 
 # D2PARGS is a list of options for dvips.  Uncomment one of these to set the
@@ -153,7 +153,7 @@ wag1.pdf:	wag2.pdf
 	./maketoc-tex.sh >wag1.toc		# TOC, wag3.pdf, wag4.pdf
 	sed 's/VERSION/$(VERSION)/' <wag.tex | \
 	  sed 's/LONGDATE/$(LONGDATE)/' >wag1.tex
-	pdflatex wag1				# front matter
+	pdflatex '\nonstopmode\input{wag1}'	# front matter
 
 wag2.pdf:
 	tbl *.1 *.3 *.5 | $(TROFF) $(TMAN) >wag2.ps	# man pages
@@ -162,12 +162,12 @@ wag2.pdf:
 wag3.pdf:	install.tex
 	sed "s/LONGDATE/$(LONGDATE)/" <install.tex | \
 	  sed "s/VERSION/$(VERSION)/" >wag3.tex
-	pdflatex wag3
+	pdflatex '\nonstopmode\input{wag3}'
 
 wag4.pdf:	eval.tex
 	sed "s/LONGDATE/$(LONGDATE)/" <eval.tex | \
 	  sed "s/VERSION/$(VERSION)/" >wag4.tex
-	pdflatex wag4
+	pdflatex '\nonstopmode\input{wag4}'
 
 # 'make clean': remove intermediate and backup files
 clean:
