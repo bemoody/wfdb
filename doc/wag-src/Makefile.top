@@ -52,9 +52,9 @@
 # formats from the sources in in this directory.  Here is a brief list of
 # available formats and the commands needed to produce them:
 
-# printed copy	'make wag-book'(requires troff, tbl, latex, dvips, & a printer)
 # HTML		'make wag.html'(requires rman, latex2html, and perl)
 # man pages	'make wag.man'
-# PDF		'make wag.pdf' (requires troff, tbl, latex, dvips, and ps2pdf)
-# PostScript	'make wag.ps'  (requires troff, tbl, latex, and dvips)
+# PDF		'make wag.pdf' (requires troff, tbl, pdflatex, ps2pdf, pdftk)
+# PostScript	'make wag.ps'  (requires the above tools plus pdftops)
+# printed copy	'make wag-book'(requires the above tools plus a printer)
 # _____________________________________________________________________________
