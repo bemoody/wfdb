@@ -1,5 +1,5 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised:  18 August 2014		wfdblib 10.5.24
+			Last revised:    21 May 2015 		wfdblib 10.5.24
 WFDB library type, constant, structure, and function interface definitions
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
@@ -216,6 +216,7 @@ typedef struct WFDB_seginfo WFDB_Seginfo;
 /* Function types */
 #ifndef _WINDLL	/* for everything *except* MS Windows applications */
 typedef char *FSTRING;
+typedef const char *FCONSTSTRING;
 typedef WFDB_Date FDATE;
 typedef double FDOUBLE;
 typedef WFDB_Frequency FFREQUENCY;
@@ -228,6 +229,7 @@ typedef void FVOID;
 #ifndef _WIN32	/* for 16-bit MS Windows applications using the WFDB DLL */
   /* typedefs don't work properly with _far or _pascal -- must use #defines */
 #define FSTRING char _far * _pascal
+#define FCONSTSTRING const char _far * _pascal
 #define FDATE WFDB_Date _far _pascal
 #define FDOUBLE double _far _pascal
 #define FFREQUENCY WFDB_Frequency _far _pascal
@@ -241,6 +243,7 @@ typedef void FVOID;
 #define CALLBACK __stdcall	/* from windef.h */
 #endif
 #define FSTRING __declspec (dllexport) char * CALLBACK
+#define FCONSTSTRING __declspec (dllexport) const char * CALLBACK
 #define FDATE __declspec (dllexport) WFDB_Date CALLBACK
 #define FDOUBLE __declspec (dllexport) double CALLBACK
 #define FFREQUENCY __declspec (dllexport) WFDB_Frequency CALLBACK
@@ -356,11 +359,11 @@ extern FINT setobsize(int output_buffer_size);
 extern FSTRING wfdbfile(char *file_type, char *record);
 extern FVOID wfdbflush(void);
 extern FVOID wfdbmemerr(int exit_on_error);
-extern const FSTRING wfdbversion(void);
-extern const FSTRING wfdbldflags(void);
-extern const FSTRING wfdbcflags(void);
-extern const FSTRING wfdbdefwfdb(void);
-extern const FSTRING wfdbdefwfdbcal(void);
+extern FCONSTSTRING wfdbversion(void);
+extern FCONSTSTRING wfdbldflags(void);
+extern FCONSTSTRING wfdbcflags(void);
+extern FCONSTSTRING wfdbdefwfdb(void);
+extern FCONSTSTRING wfdbdefwfdbcal(void);
 #endif
 
 #ifdef wfdb_CPP

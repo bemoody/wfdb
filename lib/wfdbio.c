@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:   23 March 2015       wfdblib 10.5.24
+                        Last revised:   21 May 2015       wfdblib 10.5.24
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -267,27 +267,27 @@ FVOID wfdbmemerr(int behavior)
 #define CFLAGS  "CFLAGS not defined"
 #endif
 
-const FSTRING wfdbversion(void)
+FCONSTSTRING wfdbversion(void)
 {
    return VERSION;
 }
 
-const FSTRING wfdbldflags(void)
+FCONSTSTRING wfdbldflags(void)
 {
    return LDFLAGS;
 }
 
-const FSTRING wfdbcflags(void)
+FCONSTSTRING wfdbcflags(void)
 {
    return CFLAGS;
 }
 
-const FSTRING wfdbdefwfdb(void)
+FCONSTSTRING wfdbdefwfdb(void)
 {
    return DEFWFDB;
 }
 
-const FSTRING wfdbdefwfdbcal(void)
+FCONSTSTRING wfdbdefwfdbcal(void)
 {
    return DEFWFDBCAL;
 }
