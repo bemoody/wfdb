@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:   21 May 2015       wfdblib 10.5.24
+                        Last revised:   22 May 2015       wfdblib 10.5.24
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -1316,9 +1316,11 @@ static void wfdb_wwwquit(void)
     int i;
     if (www_done_init) {
 #if WFDB_NETFILES_LIBCURL
+# ifndef _WINDOWS
 	curl_easy_cleanup(curl_ua);
 	curl_ua = NULL;
 	curl_global_cleanup();
+# endif
 #else
 #ifdef USEHTCACHE
 	HTCacheTerminate();
