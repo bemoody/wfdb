@@ -37,7 +37,6 @@ aV	- 2 square 1 mV
 I	- 2 square 1 mV
 V	- 2 square 1 mV
 PLETH	- - undefined 1 mV
-P	- - undefined 100 mmHg
 Atip	- - undefined 1 mV
 HVA	- - undefined 5 mV
 Vtip	- - undefined 10 mV
@@ -46,7 +45,10 @@ Thorax	- - undefined 2 mV
 Abdomen	- - undefined 200 uV
 FECG	- - undefined 1 mV
 Direct	- - undefined 200 uV
+FHR	0 - undefined 20 bpm
+UC	- - undefined 50 nd
 CS	- - undefined 1 mV
+PCG	- - undefined 10000 mV
 F	- - undefined 100 uV
 C	- - undefined 100 uV
 A	- - undefined 100 uV
@@ -54,6 +56,7 @@ T	- - undefined 100 uV
 P	- - undefined 100 uV
 O	- - undefined 100 uV
 I	- - undefined 100 uV
+P	- - undefined 100 mmHg
 record	- - undefined 1 mV
 record	- - undefined 10 V
 record	- - undefined 100 mmHg
