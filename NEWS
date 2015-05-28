@@ -1,4 +1,4 @@
-10.5.24 (26 August 2014):
+10.5.24 (28 May 2015):
 	A security flaw was found in the 'pnwlogin' script used to access
 	PhysioNetWorks projects, owing to a combination of bugs in WFDB and
 	libcurl.  Previous versions of the WFDB library would unconditionally
@@ -22,6 +22,17 @@
 	the case of a static WFDB library.  In the case of a dynamic WFDB
 	library, the curl flags were unnecessary in the first place, so they are
 	now omitted.
+
+	On MinGW, error messages will now be printed to standard error, rather
+	than being displayed in a popup message box.
+
+	When using libcurl, the environment variable CURL_CA_BUNDLE can be set
+	to the name of a file containing the trusted root certificate
+	authorities.  (Note that this does not currently work with the 'winssl'
+	version of libcurl, which uses the system certificate database instead.)
+
+	If the environment variable WFDB_NET_DEBUG is set, detailed information
+	about HTTP transfers will be printed to standard error.
 
 10.5.23 (13 March 2014):
 
