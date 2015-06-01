@@ -496,7 +496,7 @@ int check(char *record, char *orec)
 
   /* *** aduphys, physadu *** */
   x = aduphys((WFDB_Signal)0, (WFDB_Sample)1000);
-  if (x != -0.12) {
+  if (x > -0.119999999 || x < -0.120000001) {
     printf("Error: aduphys returned %g (should have been -0.12)\n", x);
     errors++;
   }
