@@ -1,5 +1,5 @@
 # file: linux-slib.def		G. Moody	31 May 2000
-#                               Last revised:  13 August 2014
+#                               Last revised:  5 October 2015
 # This section contains settings suitable for generating an ELF-format shared
 # library under Linux.
 
@@ -95,7 +95,7 @@ WFDBLIB = $(WFDBLIB_SONAME).$(MINOR)
 # BUILDLIB is the command that creates the shared WFDB library once its
 # components have been compiled separately;  the list of *.o files that
 # make up the library will be appended to BUILDLIB.
-BUILDLIB = gcc $(MFLAGS) -shared -Wl,-soname,$(WFDBLIB_SONAME) \
+BUILDLIB = $(CC) $(MFLAGS) -shared -Wl,-soname,$(WFDBLIB_SONAME) \
  -o $(WFDBLIB)
 
 # BUILDLIB_LDFLAGS is a list of arguments appended to BUILDLIB following

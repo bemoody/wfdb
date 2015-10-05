@@ -1,5 +1,5 @@
 # file: darwin-slib.def	I. Henry and G. Moody	14 November 2002
-#				Last revised:	17 September 2014
+#				Last revised:	 5 October 2015
 # Based on 'freebsd-slib.def'.
 
 # This section contains settings suitable for generating a shared library under
@@ -92,7 +92,7 @@ WFDBLIB = $(WFDBLIB_ROOT).$(MAJOR).$(MINOR).$(RELEASE).dylib
 # BUILDLIB is the command that creates the shared WFDB library once its
 # components have been compiled separately;  the list of *.o files that
 # make up the library will be appended to BUILDLIB.
-BUILDLIB = gcc $(MFLAGS) -dynamiclib \
+BUILDLIB = $(CC) $(MFLAGS) -dynamiclib \
  -install_name $(LIBDIR)/$(WFDBLIB_SONAME) \
  -compatibility_version $(MAJOR).$(MINOR) \
  -current_version $(MAJOR).$(MINOR).$(RELEASE) \

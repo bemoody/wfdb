@@ -1,5 +1,5 @@
 # file: mingw-slib.def		I. Henry and G. Moody	    11 February 2005
-#				Last revised:		    18 August 2014
+#				Last revised:		     5 October 2015
 #
 # This section contains settings suitable for generating a DLL (shared library)
 # under MS Windows using the free gcc ANSI C compiler.
@@ -94,7 +94,7 @@ WFDBLIB = $(WFDBLIB_SONAME).$(MINOR)
 # BUILDLIB is the command that creates the shared WFDB library once its
 # components have been compiled separately;  the list of *.o files that
 # make up the library will be appended to BUILDLIB.
-BUILDLIB = gcc NOCYGWIN -shared -o $(WFDBLIB_DLLNAME) \
+BUILDLIB = $(CC) NOCYGWIN -shared -o $(WFDBLIB_DLLNAME) \
   -Wl,--out-implib=$(WFDBLIB) \
   -Wl,--export-all-symbols \
   -Wl,--enable-auto-import
