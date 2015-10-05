@@ -585,29 +585,40 @@ void wfdb_free_config(void)
 void wfdb_export_config(void)
 {
     static int first_call = 1;
+    char *envstr = NULL;
 
     /* Register the cleanup function so that it is invoked on exit. */
     if (first_call) {
 	atexit(wfdb_free_config);
 	first_call = 0;
     }
-    SALLOC(p_wfdb, 1, strlen(wfdbpath)+6);
-    sprintf(p_wfdb, "WFDB=%s", wfdbpath);
-    putenv(p_wfdb);
+    SALLOC(envstr, 1, strlen(wfdbpath)+6);
+    if (envstr) {
+	sprintf(envstr, "WFDB=%s", wfdbpath);
+	putenv(envstr);
+	SFREE(p_wfdb);
+	p_wfdb = envstr;
+    }
     if (getenv("WFDBCAL") == NULL) {
 	SALLOC(p_wfdbcal, 1, strlen(DEFWFDBCAL)+9);
-	sprintf(p_wfdbcal, "WFDBCAL=%s", DEFWFDBCAL);
-	putenv(p_wfdbcal);
+	if (p_wfdbcal) {
+	    sprintf(p_wfdbcal, "WFDBCAL=%s", DEFWFDBCAL);
+	    putenv(p_wfdbcal);
+	}
     }
     if (getenv("WFDBANNSORT") == NULL) {
 	SALLOC(p_wfdbannsort, 1, 14);
-	sprintf(p_wfdbannsort, "WFDBANNSORT=%d", DEFWFDBANNSORT == 0 ? 0 : 1);
-	putenv(p_wfdbannsort);
+	if (p_wfdbannsort) {
+	    sprintf(p_wfdbannsort, "WFDBANNSORT=%d", DEFWFDBANNSORT == 0 ? 0 : 1);
+	    putenv(p_wfdbannsort);
+	}
     }
     if (getenv("WFDBGVMODE") == NULL) {
 	SALLOC(p_wfdbgvmode, 1, 13);
-	sprintf(p_wfdbgvmode, "WFDBGVMODE=%d", DEFWFDBGVMODE == 0 ? 0 : 1);
-	putenv(p_wfdbgvmode);
+	if (p_wfdbgvmode) {
+	    sprintf(p_wfdbgvmode, "WFDBGVMODE=%d", DEFWFDBGVMODE == 0 ? 0 : 1);
+	    putenv(p_wfdbgvmode);
+	}
     }
 }
 #endif
