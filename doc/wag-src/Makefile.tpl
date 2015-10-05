@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:	  8 May 2015
+#				Last revised:	5 October 2015
 # Change the settings below as appropriate for your setup.
 
 # D2PARGS is a list of options for dvips.  Uncomment one of these to set the
@@ -130,6 +130,7 @@ wag.man:
 	cd $(MAN1); $(LN) a2m.1 md2a.1
 	cd $(MAN1); $(LN) ann2rr.1 rr2ann.1
 	cd $(MAN1); $(LN) edf2mit.1 mit2edf.1
+	cd $(MAN1); $(LN) gqrs.1 gqpost.1
 	cd $(MAN1); $(LN) hrfft.1 hrlomb.1
 	cd $(MAN1); $(LN) hrfft.1 hrmem.1
 	cd $(MAN1); $(LN) hrfft.1 hrplot.1
