@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: install-wave32		G. Moody	7 October 2008
-#				Last revised:	12 March 2014  
+#				Last revised:	23 October 2015
 # Build and install WAVE on 64-bit GNU/Linux platforms
 
 # *****************************************************************************
@@ -20,6 +20,8 @@
 # for details.
 # *****************************************************************************
 
+set -e
+
 echo
 echo "If this script fails, read it for troubleshooting hints."
 
@@ -32,18 +34,34 @@ if [ "x$1" != "x-q" ]; then
   fi
 
   # Install fonts and 32-bit libraries available from Fedora repositories
-  yum -y install libgcc.i686 glibc-devel.i686 libX11-devel.i686 \
-	libXpm-devel.i686 libcurl-devel.i686 xorg-x11-fonts-misc \
+  yum -y install make gcc glibc-devel \
+        libgcc.i686 glibc-devel.i686 libX11-devel.i686 \
+	libXpm-devel.i686 libcurl.i686 libcurl-devel.i686 \
 	xorg-x11-fonts-100dpi xorg-x11-fonts-ISO8859-1-100dpi \
-	xorg-x11-fonts-75dpi xorg-x11-fonts-ISO8859-1-75dpi
+	xorg-x11-fonts-75dpi xorg-x11-fonts-ISO8859-1-75dpi \
+	xorg-x11-fonts-misc
 
   # Install XView libraries and development toolkit available from PhysioNet
-  rpm -Uvh http://physionet.org/physiotools/xview/i386-Fedora/xview-3.2p1.4-21.1.fc8.i386.rpm \
-	http://physionet.org/physiotools/xview/i386-Fedora/xview-clients-3.2p1.4-21.1.fc8.i386.rpm \
-	http://physionet.org/physiotools/xview/i386-Fedora/xview-devel-3.2p1.4-21.1.fc8.i386.rpm
+  PACKAGES='xview-3.2p1.4-21.1.fc8.i386.rpm
+            xview-clients-3.2p1.4-21.1.fc8.i386.rpm
+            xview-devel-3.2p1.4-21.1.fc8.i386.rpm'
+  for pkg in $PACKAGES; do
+    wget -O $pkg http://physionet.org/physiotools/xview/i386-Fedora/$pkg
+  done
+  if ! sha256sum -c - <<EOF
+0af569dbef5fc244159e20728e43ad693be49c828595a12baebb6b0d6ec42e24  xview-3.2p1.4-21.1.fc8.i386.rpm
+ae7cd665be7ffa4557df4bdcf44e381da391c8e7996512d8d718437b09e09d07  xview-clients-3.2p1.4-21.1.fc8.i386.rpm
+b0900d75a8a75223f2ab3aeaa7fa9c14f814c59a576557892298a6fdc257e96a  xview-devel-3.2p1.4-21.1.fc8.i386.rpm
+EOF
+  then
+    echo "Unable to download/verify XView package(s)."
+    exit 1
+  fi
+  rpm -Uvh --replacepkgs $PACKAGES
 fi
 
 # Part 2: compile and install 32-bit WFDB library and WAVE
+export PKG_CONFIG_PATH=/usr/lib/pkgconfig
 make clean
 ./configure -m32 $*
 cd lib;
