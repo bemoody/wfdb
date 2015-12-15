@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: install-wave32		G. Moody	7 October 2008
-#				Last revised:	23 October 2015
+#				Last revised:	15 December 2015
 # Build and install WAVE on 64-bit GNU/Linux platforms
 
 # *****************************************************************************
@@ -67,6 +67,8 @@ make clean
 cd lib;
  make install
 cd ../wave;
+ make install
+cd ../waverc;
  make install
 cd ..;
  make clean
