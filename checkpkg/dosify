@@ -1,6 +1,6 @@
 #! /bin/bash
 # file: dosify		G. Moody		19 November 2013
-#			Last revised:		  8 March 2014
+#			Last revised:		23 December 2015
 # Convert expected test results to MS-DOS/MS-Windows format for MinGW, using
 # mv, sed, u2d, and bash builtins.
 
@@ -8,16 +8,15 @@ cd expected
 if [ ! -e wfdbwhich.out.orig ]
 then
     mv wfdbwhich.out wfdbwhich.out.orig
-    sed s+/+\\\\+ <wfdbwhich.out.orig >wfdbwhich.out
-    u2d wfdbwhich.out
+    sed 's+/+\\+;s+\r*$+\r+' <wfdbwhich.out.orig >wfdbwhich.out
 fi
 
 for F in lcheck.log-NETFILES lcheck.log-no-NETFILES bxb.out rxr.out psfd.ps test.des test.key
 do
     if [ ! -e $F.orig ]
     then
-    	cp $F $F.orig
-	u2d $F
+       mv $F $F.orig
+       sed 's+\r*$+\r+' < $F.orig > $F
     fi
 done
 

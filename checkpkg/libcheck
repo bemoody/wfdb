@@ -1,6 +1,6 @@
 #!/bin/sh
 # file: libcheck		G. Moody       8 September 2001
-#                               Last revised:  26 November 2010
+#                               Last revised:  23 December 2015
 #
 # This script checks the functionality of the WFDB library by comparing the
 # outputs of 'lcheck' with expected outputs.  See 'lcheck.c' for details of
@@ -36,29 +36,29 @@ esac
 DBDIR=$1
 LIBDIR=$2
 
-case `uname` in
-    Darwin*)
-	if [ "x$DYLD_LIBRARY_PATH" != x ]
-	    then
-	    DYLD_LIBRARY_PATH=$LIBDIR:$DYLD_LIBRARY_PATH
-	else
-	    DYLD_LIBRARY_PATH=$LIBDIR
-	fi
-	export DYLD_LIBRARY_PATH
-	;;
-    CYGWIN*|MINGW*)
-	export PATH=.:$LIBDIR/../bin:$PATH
-	;;
-    *)
-	if [ "x$LD_LIBRARY_PATH" != x ]
-	    then
-	    LD_LIBRARY_PATH=$LIBDIR:$LD_LIBRARY_PATH
-	else
-	    LD_LIBRARY_PATH=$LIBDIR
-	fi
-	export LD_LIBRARY_PATH
-	;;
-esac
+## Darwin
+if [ "x$DYLD_LIBRARY_PATH" != x ]
+then
+    DYLD_LIBRARY_PATH=$LIBDIR:$DYLD_LIBRARY_PATH
+else
+    DYLD_LIBRARY_PATH=$LIBDIR
+fi
+export DYLD_LIBRARY_PATH
+
+## Windows (Cygwin/MinGW) and Wine
+PATH=.:$LIBDIR/../bin:$PATH
+export PATH
+WINEPATH=$LIBDIR/../bin\;$WINEPATH
+export WINEPATH
+
+## Other *nix
+if [ "x$LD_LIBRARY_PATH" != x ]
+then
+    LD_LIBRARY_PATH=$LIBDIR:$LD_LIBRARY_PATH
+else
+    LD_LIBRARY_PATH=$LIBDIR
+fi
+export LD_LIBRARY_PATH
 
 test -s Makefile || ( cd ..; ./configure )
 test -s lcheck || make lcheck
