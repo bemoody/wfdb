@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody         24 May 2000
-#                             Last revised:    19 May 2015
+#                             Last revised:    23 December 2015
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -18,6 +18,7 @@ LIBTYPE=dynamic
 DIR=/usr/local
 MANDIR=unknown
 LIBDIR=unknown
+HOST=
 MFLAGS=
 
 NETLIB=unknown
@@ -41,12 +42,14 @@ do
 		        else
 		            MFLAGS="$MFLAGS $i"
 		        fi ;;
+    --host=*)           HOST=`echo $i | sed 's/[-a-zA-Z0-9]*=//'` ;;
     --mandir=*)         MANDIR=`echo $i | sed 's/[-a-zA-Z0-9]*=//'` ;;
     --prefix=*)         DIR=`echo $i | sed 's/[-a-zA-Z0-9]*=//'` ;;
     --libdir=*)         LIBDIR=`echo $i | sed 's/[-a-zA-Z0-9]*=//'` ;;
     -q)			;; # ignored
     --shared)           LIBTYPE=dynamic ;;
-    --static)           LIBTYPE=static ;;
+    --static)           LIBTYPE=static
+                        SYSLIBS=dynamic ;;
     --static_only)      LIBTYPE=static
 		        SYSLIBS=static ;;
     --without-cygwin)   NOCYGWIN=yes ;;
@@ -81,18 +84,31 @@ EOF
 done
 
 echo "Checking the operating system type ..."
-CPUOS=`uname -m`-`uname -s`
-ARCH=`echo $CPUOS | tr -d " "`
-case `uname` in
-  Linux*)    case `uname -m` in
+case x$HOST in
+ x)        MACHINE=`uname -m | tr -d " "`
+           KERNEL=`uname -s | tr -d " "`
+           ;;
+ x*-*-*)   MACHINE=`echo $HOST | cut -d- -f1`
+           KERNEL=`echo $HOST | cut -d- -f3-`
+           ;;
+ x*-*)     MACHINE=`echo $HOST | cut -d- -f1`
+           KERNEL=`echo $HOST | cut -d- -f2-`
+           ;;
+ x*)       MACHINE=unknown
+           KERNEL=$HOST
+           ;;
+esac
+ARCH=$MACHINE-$KERNEL
+case `echo $KERNEL | tr A-Z a-z` in
+  linux*)    case $MACHINE in
 	        x86_64) OS=Linux-64 ;;
                 *) OS=Linux ;;
              esac ;;
-  FreeBSD*)  OS=FreeBSD ;;
-  Solaris*)  OS=Solaris ;;
-  SunOS*)    OS=Solaris ;;
-  HP-UX*)    OS=HPUX ;;
-  CYGWIN*)   if [ "x$NOCYGWIN" = "xyes" ]
+  freebsd*)  OS=FreeBSD ;;
+  solaris*)  OS=Solaris ;;
+  sunos*)    OS=Solaris ;;
+  hp-ux*)    OS=HPUX ;;
+  cygwin*)   if [ "x$NOCYGWIN" = "xyes" ]
              then
 	         OS=mingw-compat
 		 T=`echo $ARCH | sed s/CYGWIN/MINGW/`
@@ -100,10 +116,10 @@ case `uname` in
              else
 	         OS=cygwin
              fi ;;
-  MINGW*)    OS=mingw
+  mingw*)    OS=mingw
              T=`echo $ARCH | sed s/CYGWIN/MINGW/`
              ARCH=$T ;;
-  Darwin*)   OS=Darwin ;;
+  darwin*)   OS=Darwin ;;
   *)         OS=generic ;;
 esac
 echo "Configuring the WFDB software package for $OS."
@@ -206,7 +222,7 @@ case $OS in
 	    echo "Building static libraries is not supported on Darwin."
 	    LIBTYPE=dynamic
 	fi
-        case `uname -m` in
+        case $MACHINE in
           x86_64) LMFLAGS="$MFLAGS -arch i386 -arch x86_64"
                   WMFLAGS="$MFLAGS -arch i386" ;;
           i386)   LMFLAGS="$MFLAGS -arch i386"
@@ -285,14 +301,18 @@ fi
 
 echo
 ./prompt "Looking for the C compiler ..."
-WCC=`which gcc 2>&1`
+if [ "x$HOST" != "x" ]
+then
+    CROSS_COMPILE=$HOST-
+fi
+WCC=`which ${CROSS_COMPILE}gcc 2>&1`
 if [ "x$WCC" = "x" ]
 then
     WCC="no gcc"
 fi
 if ( echo $WCC | egrep "no |not |unknown " >wcc.t1 )
 then
-    WCC=`which cc 2>&1`
+    WCC=`which ${CROSS_COMPILE}cc 2>&1`
     if [ "x$WCC" = "x" ]
     then
         WCC="no cc"
@@ -304,21 +324,44 @@ then
         echo "The WFDB software cannot be compiled, because there does not"
         echo "appear to be a C compiler installed on this system.  Please"
         echo "install one, be sure that it is in your PATH, and that it is"
-	echo "accessible as either 'cc' or 'gcc', then run ./configure again."
+	echo "accessible as either '${CROSS_COMPILE}cc' or '${CROSS_COMPILE}gcc', then run ./configure again."
 	cd ..
 	exit
     else
-        sed "s/CC = gcc/CC = cc/" <site.def >site.tmp
-	mv site.tmp site.def
-        sed "s/CC = gcc/CC = cc/" <site-slib.def >site.tmp
-	mv site.tmp site-slib.def
-	CC=cc
+	CC=${CROSS_COMPILE}cc
     fi
 else
-    CC=gcc
+    CC=${CROSS_COMPILE}gcc
 fi
 echo "$CC"
+sed "s|CC = gcc|CC = $CC|" <site.def >site.tmp
+mv site.tmp site.def
+sed "s|CC = gcc|CC = $CC|" <site-slib.def >site.tmp
+mv site.tmp site-slib.def
 rm -f wcc.t1 wcc.t2
+
+./prompt "Looking for the command to strip debugging metadata ..."
+WSTRIP=`which ${CROSS_COMPILE}strip 2>&1`
+if [ "x$WSTRIP" = "x" ]
+then
+    WSTRIP="no strip"
+fi
+if ( echo $WSTRIP | egrep "no |not |unknown " >wstrip.t1 )
+then
+    STRIP=:
+    echo "not found"
+else
+    STRIP=${CROSS_COMPILE}strip
+    echo "$STRIP"
+fi
+rm -f wstrip.t1
+if [ "x$STRIP" != "xstrip" ]
+then
+    sed "s|^STRIP = .*|STRIP = $STRIP|" <site.def >site.tmp
+    mv site.tmp site.def
+    sed "s|^STRIP = .*|STRIP = $STRIP|" <site-slib.def >site.tmp
+    mv site.tmp site-slib.def
+fi
 
 if [ x$DIR = x ]
 then
@@ -364,9 +407,8 @@ if [ x$LIBDIR = xunknown ]
 then
     case $OS in
       Linux*)
-            cpu=`uname -m`
             nativelibdirs=`$CC -print-search-dirs | sed -n '/^libraries:/{s/^[^=]*=//; s/:/\n/g; p}' | sed ':LP; s+/[^/]*/\.\./+/+; tLP; s+/$++'`
-            if [ "$cpu" = "x86_64" ] && echo "$nativelibdirs" | grep -q "^$DIR/lib64"; then
+            if [ "$MACHINE" = "x86_64" ] && echo "$nativelibdirs" | grep -q "^$DIR/lib64"; then
                 if [ "x$MFLAGS" = "x-m32" ]; then
                     LIB=lib
                 else
