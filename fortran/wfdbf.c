@@ -1,5 +1,5 @@
 /* file: wfdbf.c	G. Moody	 23 August 1995
-			Last revised:     21 July 2013		wfdblib 10.5.19
+			Last revised:    11 January 2016	wfdblib 10.5.25
 
 _______________________________________________________________________________
 wfdbf: Fortran wrappers for the WFDB library functions
@@ -32,7 +32,7 @@ to see how the wrappers are used.
 
 Include the statements
 	implicit integer(a-z)
-	real aduphys, getbasecount, getcfreq, sampfreq
+	double precision aduphys, getbasecount, getcfreq, sampfreq
 (or the equivalent for your dialect of Fortran) in your Fortran program to
 ensure that these functions (except for the four listed in the second
 statement) will be understood to return integer*4 values (equivalent to C
@@ -64,11 +64,15 @@ you are on your own.
 # include <strings.h>
 #endif
 
-/* If a WFDB_Sample is the same size as a long (true except for MS-DOS PCs and
-   a few less common systems), considerable efficiency gains are possible.
-   Otherwise, define REPACK below to compile the code needed to repack arrays
-   of DB_Samples into long arrays. */
-/* #define REPACK */
+/* Define the C types equivalent to the corresponding Fortran types.
+   The below definitions should be correct for modern systems; some
+   older Fortran compilers may use different types. */
+#ifndef INTEGER
+#define INTEGER int
+#endif
+#ifndef DOUBLE_PRECISION
+#define DOUBLE_PRECISION double
+#endif
 
 /* If Fortran strings are terminated by spaces rather than by null characters,
    define FIXSTRINGS. */
@@ -121,7 +125,7 @@ static WFDB_Anninfo ainfo[WFDB_MAXANN*2];
    needed in the C library.
 */
 
-long setanninfo_(long int *a, char *name, long int *stat)
+INTEGER setanninfo_(INTEGER *a, char *name, INTEGER *stat)
 {
     if (0 <= *a && *a < WFDB_MAXANN*2) {
 	ainfo[*a].name = fcstring(name);
@@ -132,7 +136,7 @@ long setanninfo_(long int *a, char *name, long int *stat)
 	return (-1L);
 }
 
-long getsiginfo_(long int *s, char *fname, char *desc, char *units, double *gain, long int *initval, long int *group, long int *fmt, long int *spf, long int *bsize, long int *adcres, long int *adczero, long int *baseline, long int *nsamp, long int *cksum)
+INTEGER getsiginfo_(INTEGER *s, char *fname, char *desc, char *units, DOUBLE_PRECISION *gain, INTEGER *initval, INTEGER *group, INTEGER *fmt, INTEGER *spf, INTEGER *bsize, INTEGER *adcres, INTEGER *adczero, INTEGER *baseline, INTEGER *nsamp, INTEGER *cksum)
 {
     if (0 <= *s && *s < WFDB_MAXSIG) {
 	fname = sinfo[*s].fname;
@@ -155,7 +159,7 @@ long getsiginfo_(long int *s, char *fname, char *desc, char *units, double *gain
 	return (-1L);
 }
 
-long setsiginfo_(long int *s, char *fname, char *desc, char *units, double *gain, long int *initval, long int *group, long int *fmt, long int *spf, long int *bsize, long int *adcres, long int *adczero, long int *baseline, long int *nsamp, long int *cksum)
+INTEGER setsiginfo_(INTEGER *s, char *fname, char *desc, char *units, DOUBLE_PRECISION *gain, INTEGER *initval, INTEGER *group, INTEGER *fmt, INTEGER *spf, INTEGER *bsize, INTEGER *adcres, INTEGER *adczero, INTEGER *baseline, INTEGER *nsamp, INTEGER *cksum)
 {
     if (0 <= *s && *s < WFDB_MAXSIG) {
 	sinfo[*s].fname = fname;
@@ -180,115 +184,118 @@ long setsiginfo_(long int *s, char *fname, char *desc, char *units, double *gain
 
 /* Before using annopen_, set up the annotation information structures using
    setanninfo_. */
-long annopen_(char *record, long int *nann)
+INTEGER annopen_(char *record, INTEGER *nann)
 {
     return (annopen(fcstring(record), ainfo, (unsigned int)(*nann)));
 }
 
 /* After using isigopen_ or osigopen_, use getsiginfo_ to obtain the contents
    of the signal information structures if necessary. */
-long isigopen_(char *record, long int *nsig)
+INTEGER isigopen_(char *record, INTEGER *nsig)
 {
     return (isigopen(fcstring(record), sinfo, (unsigned int)(*nsig)));
 }
 
-long osigopen_(char *record, long int *nsig)
+INTEGER osigopen_(char *record, INTEGER *nsig)
 {
     return (osigopen(fcstring(record), sinfo, (unsigned int)(*nsig)));
 }
 
 /* Before using osigfopen_, use setsiginfo_ to set the contents of the signal
    information structures. */
-long osigfopen_(long int *nsig)
+INTEGER osigfopen_(INTEGER *nsig)
 {
     return (osigfopen(sinfo, (unsigned int)(*nsig)));
 }
 
 /* Before using wfdbinit_, use setanninfo_ and setsiginfo_ to set the contents
    of the annotation and signal information structures. */
-long wfdbinit_(char *record, long int *nann, long int *nsig)
+INTEGER wfdbinit_(char *record, INTEGER *nann, INTEGER *nsig)
 {
     return (wfdbinit(fcstring(record), ainfo, (unsigned int)(*nann),
 		     sinfo, (unsigned int)(*nsig)));
 }
 
-long findsig_(char *signame)
+INTEGER findsig_(char *signame)
 {
     return (findsig(fcstring(signame)));
 }
 
-long getspf_(long int *dummy)
+INTEGER getspf_(INTEGER *dummy)
 {
     return (getspf());
 }
 
-long setgvmode_(long int *mode)
+INTEGER setgvmode_(INTEGER *mode)
 {
     setgvmode((int)(*mode));
     return (0L);
 }
 
-long getgvmode_(long int *dummy)
+INTEGER getgvmode_(INTEGER *dummy)
 {
     return (getgvmode());
 }
 
-long setifreq_(double *freq)
+INTEGER setifreq_(DOUBLE_PRECISION *freq)
 {
     return (setifreq((WFDB_Frequency)*freq));
 }
 
-double getifreq_(long int *dummy)
+DOUBLE_PRECISION getifreq_(INTEGER *dummy)
 {
     return (getifreq());
 }
 
-long getvec_(long int *long_vector)
+INTEGER getvec_(INTEGER *long_vector)
 {
-#ifndef REPACK
-    return (getvec((WFDB_Sample *)long_vector));
-#else
-    WFDB_Sample v[WFDB_MAXSIG];
-    int i, j;
+    if (sizeof(WFDB_Sample) == sizeof(INTEGER)) {
+	return (getvec((WFDB_Sample *)long_vector));
+    }
+    else {
+	WFDB_Sample v[WFDB_MAXSIG];
+	int i, j;
 
-    i = getvec(v);
-    for (j = 0; j < i; j++)
-	long_vector[i] = v[i];
-    return (i);
-#endif
+	i = getvec(v);
+	for (j = 0; j < i; j++)
+	    long_vector[i] = v[i];
+	return (i);
+    }
 }
 
-long getframe_(long int *long_vector)
+INTEGER getframe_(INTEGER *long_vector)
 {
-#ifndef REPACK
-    return (getframe((WFDB_Sample *)long_vector));
-#else
-    WFDB_Sample v[WFDB_MAXSIG*WFDB_MAXSPF];
-    int i, j, k;
+    if (sizeof(WFDB_Sample) == sizeof(INTEGER)) {
+	return (getframe((WFDB_Sample *)long_vector));
+    }
+    else {
+	WFDB_Sample v[WFDB_MAXSIG*WFDB_MAXSPF];
+	int i, j, k;
 
-    i = getframe(v);
-    for (j = 0; j < i; j += k)
-	for (k = 0; k < sinfo[i].spf; k++)
-	    long_vector[j+k] = v[j+k];
-    return (i);
-#endif
+	i = getframe(v);
+	for (j = 0; j < i; j += k)
+	    for (k = 0; k < sinfo[i].spf; k++)
+		long_vector[j+k] = v[j+k];
+	return (i);
+    }
 }
 
-long putvec_(long int *long_vector)
+INTEGER putvec_(INTEGER *long_vector)
 {
-#ifndef REPACK
-    return (putvec((WFDB_Sample *)long_vector));
-#else
-    WFDB_Sample v[WFDB_MAXSIG*WFDB_MAXSPF];
-    int i;
+    if (sizeof(WFDB_Sample) == sizeof(INTEGER)) {
+	return (putvec((WFDB_Sample *)long_vector));
+    }
+    else {
+	WFDB_Sample v[WFDB_MAXSIG*WFDB_MAXSPF];
+	int i;
 
-    for (i = 0; i < WFDB_MAXSIG*WFDB_MAXSPF; i++)
-	v[i] = long_vector[i];
-    return (putvec(v));
-#endif
+	for (i = 0; i < WFDB_MAXSIG*WFDB_MAXSPF; i++)
+	    v[i] = long_vector[i];
+	return (putvec(v));
+    }
 }
 
-long getann_(long int *annotator, long int *time, long int *anntyp, long int *subtyp, long int *chan, long int *num, char *aux)
+INTEGER getann_(INTEGER *annotator, INTEGER *time, INTEGER *anntyp, INTEGER *subtyp, INTEGER *chan, INTEGER *num, char *aux)
 {
     static WFDB_Annotation iann;
     int i, j;
@@ -305,7 +312,7 @@ long getann_(long int *annotator, long int *time, long int *anntyp, long int *su
     return (i);
 }
 
-long ungetann_(long int *annotator, long int *time, long int *anntyp, long int *subtyp, long int *chan, long int *num, char *aux)
+INTEGER ungetann_(INTEGER *annotator, INTEGER *time, INTEGER *anntyp, INTEGER *subtyp, INTEGER *chan, INTEGER *num, char *aux)
 {
     static WFDB_Annotation oann;
     int i, j;
@@ -319,7 +326,7 @@ long ungetann_(long int *annotator, long int *time, long int *anntyp, long int *
     return (ungetann((WFDB_Annotator)(*annotator), &oann));
 }
 
-long putann_(long int *annotator, long int *time, long int *anntyp, long int *subtyp, long int *chan, long int *num, char *aux)
+INTEGER putann_(INTEGER *annotator, INTEGER *time, INTEGER *anntyp, INTEGER *subtyp, INTEGER *chan, INTEGER *num, char *aux)
 {
     static WFDB_Annotation oann;
     int i, j;
@@ -342,90 +349,90 @@ long putann_(long int *annotator, long int *time, long int *anntyp, long int *su
     return (i);
 }
 
-long isigsettime_(long int *time)
+INTEGER isigsettime_(INTEGER *time)
 {
     return (isigsettime((WFDB_Time)(*time)));
 }
 
-long isgsettime_(long int *group, long int *time)
+INTEGER isgsettime_(INTEGER *group, INTEGER *time)
 {
     return (isgsettime((WFDB_Group)(*group), (WFDB_Time)(*time)));
 }
 
-long tnextvec_(long int *signal, long int *time)
+INTEGER tnextvec_(INTEGER *signal, INTEGER *time)
 {
     return (tnextvec((WFDB_Signal)(*signal), (WFDB_Time)(*time)));
 } 
 
-long iannsettime_(long int *time)
+INTEGER iannsettime_(INTEGER *time)
 {
     return (iannsettime((WFDB_Time)(*time)));
 }
 
-long ecgstr_(long int *code, char *string)
+INTEGER ecgstr_(INTEGER *code, char *string)
 {
     strcpy(string, ecgstr((int)(*code)));
     cfstring(string);
     return (0L);
 }
 
-long strecg_(char *string)
+INTEGER strecg_(char *string)
 {
     return (strecg(fcstring(string)));
 }
 
-long setecgstr_(long int *code, char *string)
+INTEGER setecgstr_(INTEGER *code, char *string)
 {
     return (setecgstr((int)(*code), fcstring(string)));
 }
 
-long annstr_(long int *code, char *string)
+INTEGER annstr_(INTEGER *code, char *string)
 {
     strcpy(string, annstr((int)(*code)));
     cfstring(string);
     return (0L);
 }
 
-long strann_(char *string)
+INTEGER strann_(char *string)
 {
     return (strann(fcstring(string)));
 }
 
-long setannstr_(long int *code, char *string)
+INTEGER setannstr_(INTEGER *code, char *string)
 {
     return (setannstr((int)(*code), fcstring(string)));
 }
 
-long anndesc_(long int *code, char *string)
+INTEGER anndesc_(INTEGER *code, char *string)
 {
     strcpy(string, anndesc((int)(*code)));
     cfstring(string);
     return (0L);
 }
 
-long setanndesc_(long int *code, char *string)
+INTEGER setanndesc_(INTEGER *code, char *string)
 {
     return (setanndesc((int)(*code), fcstring(string)));
 }
 
-long setafreq_(double *freq)
+INTEGER setafreq_(DOUBLE_PRECISION *freq)
 {
     setafreq(*freq);
     return (0L);
 }
 
-double getafreq_(long int *dummy)
+DOUBLE_PRECISION getafreq_(INTEGER *dummy)
 {
     return (getafreq());
 }
 
-long iannclose_(long int *annotator)
+INTEGER iannclose_(INTEGER *annotator)
 {
     iannclose((WFDB_Annotator)(*annotator));
     return (0L);
 }
 
-long oannclose_(long int *annotator)
+INTEGER oannclose_(INTEGER *annotator)
 {
     oannclose((WFDB_Annotator)(*annotator));
     return (0L);
@@ -434,132 +441,132 @@ long oannclose_(long int *annotator)
 /* The functions below can be used in place of the macros defined in
    <wfdb/ecgmap.h>. */
 
-long isann_(long int *anntyp)
+INTEGER isann_(INTEGER *anntyp)
 {   
     return (wfdb_isann((int)*anntyp));
 }
 
-long isqrs_(long int *anntyp)
+INTEGER isqrs_(INTEGER *anntyp)
 {   
     return (wfdb_isqrs((int)*anntyp));
 }
 
-long setisqrs_(long int *anntyp, long int *value)
+INTEGER setisqrs_(INTEGER *anntyp, INTEGER *value)
 {   
     wfdb_setisqrs((int)*anntyp, (int)*value);
     return (0L);
 }
 
-long map1_(long int *anntyp)
+INTEGER map1_(INTEGER *anntyp)
 {   
     return (wfdb_map1((int)*anntyp));
 }
 
-long setmap1_(long int *anntyp, long int *value)
+INTEGER setmap1_(INTEGER *anntyp, INTEGER *value)
 {   
     wfdb_setmap1((int)*anntyp, (int)*value);
     return (0L);
 }
 
-long map2_(long int *anntyp)
+INTEGER map2_(INTEGER *anntyp)
 {   
     return (wfdb_map2((int)*anntyp));
 }
 
-long setmap2_(long int *anntyp, long int *value)
+INTEGER setmap2_(INTEGER *anntyp, INTEGER *value)
 {   
     wfdb_setmap2((int)*anntyp, (int)*value);
     return (0L);
 }
 
-long ammap_(long int *anntyp)
+INTEGER ammap_(INTEGER *anntyp)
 {   
     return (wfdb_ammap((int)*anntyp));
 }
 
-long mamap_(long int *anntyp, long int *subtyp)
+INTEGER mamap_(INTEGER *anntyp, INTEGER *subtyp)
 {   
     return (wfdb_mamap((int)*anntyp, (int)*subtyp));
 }
 
-long annpos_(long int *anntyp)
+INTEGER annpos_(INTEGER *anntyp)
 {   
     return (wfdb_annpos((int)*anntyp));
 }
 
-long setannpos_(long int *anntyp, long int *value)
+INTEGER setannpos_(INTEGER *anntyp, INTEGER *value)
 {   
     wfdb_setannpos((int)*anntyp, (int)*value);
     return (0L);
 }
 
-long timstr_(long int *time, char *string)
+INTEGER timstr_(INTEGER *time, char *string)
 {
     strcpy(string, timstr((WFDB_Time)(*time)));
     cfstring(string);
     return (0L);
 }
 
-long mstimstr_(long int *time, char *string)
+INTEGER mstimstr_(INTEGER *time, char *string)
 {
     strcpy(string, mstimstr((WFDB_Time)(*time)));
     cfstring(string);
     return (0L);
 }
 
-long strtim_(char *string)
+INTEGER strtim_(char *string)
 {
     return (strtim(fcstring(string)));
 }
 
-long datstr_(long int *date, char *string)
+INTEGER datstr_(INTEGER *date, char *string)
 {
     strcpy(string, datstr((WFDB_Date)(*date)));
     cfstring(string);
     return (0L);
 }
 
-long strdat_(char *string)
+INTEGER strdat_(char *string)
 {
     return (strdat(fcstring(string)));
 }
 
-long adumuv_(long int *signal, long int *ampl)
+INTEGER adumuv_(INTEGER *signal, INTEGER *ampl)
 {
     return (adumuv((WFDB_Signal)(*signal), (WFDB_Sample)(*ampl)));
 }
 
-long muvadu_(long int *signal, long int *microvolts)
+INTEGER muvadu_(INTEGER *signal, INTEGER *microvolts)
 {
     return (muvadu((WFDB_Signal)(*signal), (int)(*microvolts)));
 }
 
-double aduphys_(long int *signal, long int *ampl)
+DOUBLE_PRECISION aduphys_(INTEGER *signal, INTEGER *ampl)
 {
     return (aduphys((WFDB_Signal)(*signal), (WFDB_Sample)(*ampl)));
 }
 
-long physadu_(long int *signal, double *v)
+INTEGER physadu_(INTEGER *signal, DOUBLE_PRECISION *v)
 {
     return (physadu((WFDB_Signal)(*signal), *v));
 }
 
-long sample_(long int *signal, long int *t)
+INTEGER sample_(INTEGER *signal, INTEGER *t)
 {
     return (sample((WFDB_Signal)(*signal), (WFDB_Time)(*t)));
 }
 
-long sample_valid_(long int *dummy)
+INTEGER sample_valid_(INTEGER *dummy)
 {
     return (sample_valid());
 }
 
-long calopen_(char *calibration_filename)
+INTEGER calopen_(char *calibration_filename)
 {
     return (calopen(fcstring(calibration_filename)));
 }
 
-long getcal_(char *description, char *units, double *low, double *high, double *scale, long int *caltype)
+INTEGER getcal_(char *description, char *units, DOUBLE_PRECISION *low, DOUBLE_PRECISION *high, DOUBLE_PRECISION *scale, INTEGER *caltype)
 {
     if (getcal(fcstring(description), fcstring(units), &cinfo) == 0) {
 	*low = cinfo.low;
@@ -572,7 +579,7 @@ long getcal_(char *description, char *units, double *low, double *high, double *
 	return (-1L);
 }
 
-long putcal_(char *description, char *units, double *low, double *high, double *scale, long int *caltype)
+INTEGER putcal_(char *description, char *units, DOUBLE_PRECISION *low, DOUBLE_PRECISION *high, DOUBLE_PRECISION *scale, INTEGER *caltype)
 {
     cinfo.sigtype = fcstring(description);
     cinfo.units = fcstring(units);
@@ -583,226 +590,226 @@ long putcal_(char *description, char *units, double *low, double *high, double *
     return (putcal(&cinfo));
 }
 
-long newcal_(char *calibration_filename)
+INTEGER newcal_(char *calibration_filename)
 {
     return (newcal(fcstring(calibration_filename)));
 }
 
-long flushcal_(long int *dummy)
+INTEGER flushcal_(INTEGER *dummy)
 {
     flushcal();
     return (0L);
 }
 
-long getinfo_(char *record, char *string)
+INTEGER getinfo_(char *record, char *string)
 {
     strcpy(string, getinfo(fcstring(record)));
     cfstring(string);
     return (0L);
 }
 
-long putinfo_(char *string)
+INTEGER putinfo_(char *string)
 {
     return (putinfo(fcstring(string)));
 }
 
-long setinfo_(char *record)
+INTEGER setinfo_(char *record)
 {
     return (setinfo(fcstring(record)));
 }
 
-long wfdb_freeinfo_(long int *dummy)
+INTEGER wfdb_freeinfo_(INTEGER *dummy)
 {
     wfdb_freeinfo();
     return (0L);
 }
 
-long newheader_(char *record)
+INTEGER newheader_(char *record)
 {
     return (newheader(fcstring(record)));
 }
 
 /* Before using setheader_, use setsiginfo to set the contents of the signal
    information structures. */
-long setheader_(char *record, long int *nsig)
+INTEGER setheader_(char *record, INTEGER *nsig)
 {
     return (setheader(fcstring(record), sinfo, (unsigned int)(*nsig)));
 }
 
 /* No wrappers are provided for setmsheader or getseginfo. */
 
-long wfdbgetskew_(long int *s)
+INTEGER wfdbgetskew_(INTEGER *s)
 {
     return (wfdbgetskew((WFDB_Signal)(*s)));
 }
 
-long wfdbsetiskew_(long int *s, long int *skew)
+INTEGER wfdbsetiskew_(INTEGER *s, INTEGER *skew)
 {
     wfdbsetiskew((WFDB_Signal)(*s), (int)(*skew));
     return (0L);
 }
 
-long wfdbsetskew_(long int *s, long int *skew)
+INTEGER wfdbsetskew_(INTEGER *s, INTEGER *skew)
 {
     wfdbsetskew((WFDB_Signal)(*s), (int)(*skew));
     return (0L);
 }
 
-long wfdbgetstart_(long int *s)
+INTEGER wfdbgetstart_(INTEGER *s)
 {
     return (wfdbgetstart((WFDB_Signal)(*s)));
 }
 
-long wfdbsetstart_(long int *s, long int *bytes)
+INTEGER wfdbsetstart_(INTEGER *s, INTEGER *bytes)
 {
     wfdbsetstart((WFDB_Signal)(*s), *bytes);
     return (0L);
 }
 
-long wfdbputprolog_(char *prolog, long int *bytes, long int *signal)
+INTEGER wfdbputprolog_(char *prolog, INTEGER *bytes, INTEGER *signal)
 {
     return (wfdbputprolog(fcstring(prolog), (long)*bytes,(WFDB_Signal)*signal));
 }
 
-long wfdbquit_(long int *dummy)
+INTEGER wfdbquit_(INTEGER *dummy)
 {
     wfdbquit();
     return (0L);
 }
 
-double sampfreq_(char *record)
+DOUBLE_PRECISION sampfreq_(char *record)
 {
     return (sampfreq(fcstring(record)));
 }
 
-long setsampfreq_(double *frequency)
+INTEGER setsampfreq_(DOUBLE_PRECISION *frequency)
 {
     return (setsampfreq((WFDB_Frequency)(*frequency)));
 }
 
-double getcfreq_(long int *dummy)
+DOUBLE_PRECISION getcfreq_(INTEGER *dummy)
 {
     return (getcfreq());
 }
 
-long setcfreq_(double *frequency)
+INTEGER setcfreq_(DOUBLE_PRECISION *frequency)
 {
     setcfreq((WFDB_Frequency)(*frequency));
     return (0L);
 }
 
-double getbasecount_(long int *dummy)
+DOUBLE_PRECISION getbasecount_(INTEGER *dummy)
 {
     return (getbasecount());
 }
 
-long setbasecount_(double *count)
+INTEGER setbasecount_(DOUBLE_PRECISION *count)
 {
     setbasecount(*count);
     return (0L);
 }
 
-long setbasetime_(char *string)
+INTEGER setbasetime_(char *string)
 {
     return (setbasetime(fcstring(string)));
 }
 
-long wfdbquiet_(long int *dummy)
+INTEGER wfdbquiet_(INTEGER *dummy)
 {
     wfdbquiet();
     return (0L);
 }
 
-long wfdbverbose_(long int *dummy)
+INTEGER wfdbverbose_(INTEGER *dummy)
 {
     wfdbverbose();
     return (0L);
 }
 
-long wfdberror_(char *string)
+INTEGER wfdberror_(char *string)
 {
     strcpy(string, wfdberror());
     cfstring(string);
     return (0L);
 }
 
-long setwfdb_(char *string)
+INTEGER setwfdb_(char *string)
 {
     setwfdb(fcstring(string));
     return (0L);
 }
 
-long getwfdb_(char *string)
+INTEGER getwfdb_(char *string)
 {
     strcpy(string, getwfdb());
     cfstring(string);
     return (0L);
 }
 
-long resetwfdb_(long int *dummy)
+INTEGER resetwfdb_(INTEGER *dummy)
 {
     resetwfdb();
     return (0L);
 }
 
-long setibsize_(long int *input_buffer_size)
+INTEGER setibsize_(INTEGER *input_buffer_size)
 {
     return (setibsize((int)(*input_buffer_size)));
 }
 
-long setobsize_(long int *output_buffer_size)
+INTEGER setobsize_(INTEGER *output_buffer_size)
 {
     return (setobsize((int)(*output_buffer_size)));
 }
 
-long wfdbfile_(char *file_type, char *record, char *pathname)
+INTEGER wfdbfile_(char *file_type, char *record, char *pathname)
 {
     strcpy(pathname, wfdbfile(fcstring(file_type), fcstring(record)));
     cfstring(pathname);
     return (0L);
 }
 
-long wfdbflush_(long int *dummy)
+INTEGER wfdbflush_(INTEGER *dummy)
 {
     wfdbflush();
     return (0L);
 }
 
-long wfdbmemerr_(long int *exit_if_error)
+INTEGER wfdbmemerr_(INTEGER *exit_if_error)
 {
     wfdbmemerr((int)(*exit_if_error));
     return (0L);
 }
 
-long wfdbversion_(char *version)
+INTEGER wfdbversion_(char *version)
 {
     strcpy(version, wfdbversion());
     cfstring(version);
     return (0L);
 }
 
-long wfdbldflags_(char *ldflags)
+INTEGER wfdbldflags_(char *ldflags)
 {
     strcpy(ldflags, wfdbldflags());
     cfstring(ldflags);
     return (0L);
 }
 
-long wfdbcflags_(char *cflags)
+INTEGER wfdbcflags_(char *cflags)
 {
     strcpy(cflags, wfdbcflags());
     cfstring(cflags);
     return (0L);
 }
 
-long wfdbdefwfdb_(char *defwfdb)
+INTEGER wfdbdefwfdb_(char *defwfdb)
 {
     strcpy(defwfdb, wfdbdefwfdb());
     cfstring(defwfdb);
     return (0L);
 }
 
-long wfdbdefwfdbcal_(char *defwfdbcal)
+INTEGER wfdbdefwfdbcal_(char *defwfdbcal)
 {
     strcpy(defwfdbcal, wfdbdefwfdbcal());
     cfstring(defwfdbcal);
