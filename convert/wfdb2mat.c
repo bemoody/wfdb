@@ -1,5 +1,5 @@
 /* file: wfdb2mat.c	G. Moody	26 February 2009
-			Last revised:	 8 December 2013
+			Last revised:	 22 January 2016
 -------------------------------------------------------------------------------
 wfdb2mat: Convert (all or part of) a WFDB signal file to Matlab .mat format
 Copyright (C) 2009-2013 George B. Moody
@@ -90,7 +90,7 @@ char *argv[];
     char *matname, *orec, *p, *q, *record = NULL, *search = NULL, *prog_name();
     static char prolog[24];
     int highres = 0, i, isiglist, mattype, nisig, nosig = 0, pflag = 0,
-	s, sfname = 0, *sig = NULL, stat = 0, vflag = 0, wfdbtype;
+	s, sfname = 0, *sig = NULL, stat = 0, vflag = 0, wfdbtype, offset;
     WFDB_Frequency freq;
     WFDB_Sample *vi, *vo;
     WFDB_Siginfo *si, *so;
@@ -349,6 +349,13 @@ char *argv[];
     }
     (void)putinfo(p);
 
+    /* Determine offset between sample values and the raw byte/word
+       values as interpreted by Matlab/Octave. */
+    if (wfdbtype == 80)
+	offset = 128;
+    else
+	offset = 0;
+
     /* Summarize the contents of the .mat file. */
     printf("%s\n", p);
     printf("val has %d row%s (signal%s) and %ld column%s (sample%s/signal)\n",
@@ -360,7 +367,7 @@ char *argv[];
     printf("Row\tSignal\tGain\tBase\tUnits\n");
     for (i = 0; i < nosig; i++)
 	printf("%d\t%s\t%.12g\t%d\t%s\n", i+1, so[i].desc, so[i].gain,
-	       so[i].baseline, so[i].units);
+	       so[i].baseline + offset, so[i].units);
     printf("\nTo convert from raw units to the physical units shown\n"
 	   "above, subtract 'base' and divide by 'gain'.\n");
 
