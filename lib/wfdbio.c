@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:   22 May 2015       wfdblib 10.5.24
+                        Last revised:   27 January 2016       wfdblib 10.5.25
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -81,8 +81,8 @@ for the use of the functions in the next group below (their definitions are not
 visible outside of this file):
  www_parse_passwords	(load username/password information)
  www_userpwd		(get username/password for a given url)
- wfdb_wwwquit		(shut down libcurl or libwww cleanly)
- www_init		(initialize libcurl or libwww)
+ wfdb_wwwquit		(shut down libcurl cleanly)
+ www_init		(initialize libcurl)
  www_get_cont_len	(find length of data for a given url)
  www_get_url_range_chunk (get a block of data from a given url)
  www_get_url_chunk	(get all data from a given url)
@@ -110,13 +110,13 @@ implemented;  for this reason, several of the functions listed above are
 stubs (placeholders) only, as noted.
 
 These functions, also defined here, are compiled only if WFDB_NETFILES is non-
-zero; they permit access to remote files via http or ftp (using libcurl or
-libwww) as well as to local files (using the standard C I/O functions).  The
-functions in this group are intended primarily for use by other WFDB library
-functions, but may also be called directly by WFDB applications that need to
-read remote files. Unlike other private functions in the WFDB library, the
-interfaces to these are not likely to change, since they are designed to
-emulate the similarly-named ANSI/ISO C standard I/O functions:
+zero; they permit access to remote files via http or ftp (using libcurl) as
+well as to local files (using the standard C I/O functions).  The functions in
+this group are intended primarily for use by other WFDB library functions, but
+may also be called directly by WFDB applications that need to read remote
+files. Unlike other private functions in the WFDB library, the interfaces to
+these are not likely to change, since they are designed to emulate the
+similarly-named ANSI/ISO C standard I/O functions:
  wfdb_clearerr		(emulates clearerr)
  wfdb_feof		(emulates feof)
  wfdb_ferror		(emulates ferror)
@@ -1151,20 +1151,18 @@ void wfdb_striphea(char *p)
 /* WFDB file I/O functions
 
 The WFDB library normally reads and writes local files.  If libcurl
-(http://curl.haxx.se/) or libwww (http://www.w3.org/Library) is available,
-the WFDB library can also read files from any accessible World Wide Web (HTTP)
-or FTP server.  (Writing files to a remote WWW or FTP server may be
-supported in the future.)
+(http://curl.haxx.se/) is available, the WFDB library can also read files from
+any accessible World Wide Web (HTTP) or FTP server.  (Writing files to a remote
+WWW or FTP server may be supported in the future.)
 
-If you do not wish to allow access to remote files, or if neither libcurl nor
-libwww is available, simply define the symbol WFDB_NETFILES as 0 when compiling
-the WFDB library.  If the symbol WFDB_NETFILES is zero, wfdblib.h defines
-wfdb_fread as fread, wfdb_fwrite as fwrite, etc.;  thus in this case, the
-I/O is performed using the standard C I/O functions, and the function
-definitions in the next section are not compiled.  This behavior exactly
-mimics that of versions of the WFDB library earlier than version 10.0.1
-(which did not support remote file access), with no additional run-time
-overhead.
+If you do not wish to allow access to remote files, or if libcurl is not
+available, simply define the symbol WFDB_NETFILES as 0 when compiling the WFDB
+library.  If the symbol WFDB_NETFILES is zero, wfdblib.h defines wfdb_fread as
+fread, wfdb_fwrite as fwrite, etc.;  thus in this case, the I/O is performed
+using the standard C I/O functions, and the function definitions in the next
+section are not compiled.  This behavior exactly mimics that of versions of the
+WFDB library earlier than version 10.0.1 (which did not support remote file
+access), with no additional run-time overhead.
 
 If WFDB_NETFILES is non-zero, however, these functions are compiled.  The
 WFDB_FILE pointers that are among the arguments to these functions point to
@@ -1173,7 +1171,7 @@ handles, depending on the value of the 'type' member of the WFDB_FILE object.
 All access to local files is handled by passing the 'fp' member of the
 WFDB_FILE object to the appropriate standard C I/O function.  Access to remote
 files via http or ftp is handled by passing the 'netfp' member of the WFDB_FILE
-object to the appropriate libcurl or libwww function(s).
+object to the appropriate libcurl function(s).
 
 In order to read remote files, the WFDB environment variable should include
 one or more components that specify http:// or ftp:// URL prefixes.  These
@@ -1194,10 +1192,8 @@ to set the search order in any way you wish, as in this example.
 static int nf_open_files = 0;		/* number of open netfiles */
 static long page_size = NF_PAGE_SIZE;	/* bytes per range request (0: disable
 					   range requests) */
-static int www_done_init = FALSE;	/* TRUE once libcurl or libwww is
-					   initialized */
+static int www_done_init = FALSE;	/* TRUE once libcurl is initialized */
 
-#if WFDB_NETFILES_LIBCURL
 static CURL *curl_ua = NULL;
 
 /* Construct the User-Agent string to be sent with HTTP requests. */
@@ -1245,14 +1241,6 @@ typedef struct chunk CHUNK;
 #define chunk_new curl_chunk_new
 #define chunk_delete curl_chunk_delete
 #define chunk_putb curl_chunk_putb
-#else
-#define CHUNK HTChunk
-#define chunk_size HTChunk_size
-#define chunk_data HTChunk_data
-#define chunk_new HTChunk_new
-#define chunk_delete HTChunk_delete
-#define chunk_putb HTChunk_putb
-#endif
 
 static char **passwords;
 
@@ -1326,17 +1314,10 @@ static void wfdb_wwwquit(void)
 {
     int i;
     if (www_done_init) {
-#if WFDB_NETFILES_LIBCURL
-# ifndef _WINDOWS
+#ifndef _WINDOWS
 	curl_easy_cleanup(curl_ua);
 	curl_ua = NULL;
 	curl_global_cleanup();
-# endif
-#else
-#ifdef USEHTCACHE
-	HTCacheTerminate();
-#endif
-	HTProfile_delete();
 #endif
 	www_done_init = FALSE;
 	for (i = 0; passwords && passwords[i]; i++)
@@ -1353,7 +1334,6 @@ static void www_init(void)
 	if ((p = getenv("WFDB_PAGESIZE")) && *p)
 	    page_size = strtol(p, NULL, 10);
 
-#if WFDB_NETFILES_LIBCURL
 	/* Initialize the curl "easy" handle. */
 	curl_global_init(CURL_GLOBAL_ALL);
 	curl_ua = curl_easy_init();
@@ -1381,38 +1361,12 @@ static void www_init(void)
 	/* Show details of URL requests if WFDB_NET_DEBUG is set */
 	if ((p = getenv("WFDB_NET_DEBUG")) && *p)
 	    curl_easy_setopt(curl_ua, CURLOPT_VERBOSE, 1L);
-#else
 
-#ifdef USEHTCACHE
-	char *cachedir = CACHEDIR;	/* root of the netfile data cache */
-	int cachesize = CACHESIZE;	/* maximum size of the cache in MB */
-	int entrysize = ENTRYSIZE;	/* maximum cache entry size in MB */
-
-	if ((p = getenv("WFDB_CACHEDIR")) && *p)
-	    cachedir = p;
-	if ((p = getenv("WFDB_CACHESIZE")) && *p)
-	    cachesize = strtol(p, NULL, 10);
-	if ((p = getenv("WFDB_CACHEENTRYSIZE")) && *p)
-	    entrysize = strtol(p, NULL, 10);
-#endif
-	sprintf(version, "%d.%d.%d", WFDB_MAJOR, WFDB_MINOR, WFDB_RELEASE);
-	HTProfile_newPreemptiveClient("WFDB", version);
-	HTAlert_setInteractive(NO);
-#ifdef USEHTCACHE
-	HTLib_setSecure(TRUE);
-	HTCacheInit(cachedir, cachesize);
-	HTCacheMode_setMaxCacheEntrySize(entrysize);
-#endif
-	/*	HTHost_setMaxPipelinedRequests(1);	*/
-	HTEventInit();	/* added 19 July 2001 -- necessary for use with
-			   WINSOCK, seems to be harmless otherwise */
-#endif
 	atexit(wfdb_wwwquit);
 	www_done_init = TRUE;
     }
 }
 
-#if WFDB_NETFILES_LIBCURL
 /* This function is called when a header is received.  ptr points to
    the string received; size*nmemb is the number of bytes, and stream
    is the pointer specified as CURLOPT_WRITEHEADER. */
@@ -1427,11 +1381,9 @@ static size_t curl_header_length_write(void *ptr, size_t size, size_t nmemb,
     }
     return size*nmemb;
 }
-#endif
 
 static long www_get_cont_len(const char *url)
 {
-#if WFDB_NETFILES_LIBCURL
     static double length;
 
     length = 0;
@@ -1460,26 +1412,8 @@ static long www_get_cont_len(const char *url)
 	return 0;
 
     return (long) length;
-#else
-    HTRequest *request = NULL;
-    HTParentAnchor *a = NULL;
-    HTAssocList *headers = NULL;
-    HTAssoc *pres = NULL;
-    long length = 0L;
-
-    if (url && *url && (request = HTRequest_new())) {
-	HTHeadAbsolute(url, request);
-	if ((a = HTRequest_anchor(request)) && (headers = HTAnchor_header(a)))
-	    while ((pres = (HTAssoc *)HTAssocList_nextObject(headers)))
-		if (HTStrCaseMatch("Content-Length", HTAssoc_name(pres)))
-		    length = strtol(HTAssoc_value(pres), NULL, 10);
-	HTRequest_delete(request);  
-    }
-    return (length);
-#endif
 }
 
-#if WFDB_NETFILES_LIBCURL
 /* Create a new, empty chunk. */
 static CHUNK *curl_chunk_new(long len)
 {
@@ -1532,21 +1466,14 @@ static void curl_chunk_putb(struct chunk *chunk, char *data, size_t len)
 {
     curl_chunk_write(data, 1, len, chunk);
 }
-#endif
 
 static CHUNK *www_get_url_range_chunk(const char *url, long startb, long len)
 {
-#if !WFDB_NETFILES_LIBCURL
-    HTRequest *request = NULL;
-    HTList *request_err = NULL;
-    HTError *err = NULL;
-#endif
     CHUNK *chunk = NULL, *extra_chunk = NULL;
     char range_req_str[6*sizeof(long) + 2];
 
     if (url && *url) {
 	sprintf(range_req_str, "%ld-%ld", startb, startb+len-1);
-#if WFDB_NETFILES_LIBCURL
 	chunk = chunk_new(len);
 
 	if (/* In this case we want to send a GET request rather than
@@ -1576,25 +1503,6 @@ static CHUNK *www_get_url_range_chunk(const char *url, long startb, long len)
 	    return NULL;
 	}
 
-#else
-	request = HTRequest_new();
-	HTRequest_addRange(request, "bytes", range_req_str);
-	HTRequest_setOutputFormat(request, WWW_SOURCE);
-	HTRequest_setPreemptive(request, YES);
-	chunk = HTLoadToChunk(url, request);
-	request_err = HTRequest_error(request);
-	while ((err = (HTError *) HTList_nextObject(request_err)) != NULL) {
-	    if (HTError_severity(err) == ERR_FATAL) {
-		wfdb_error(
-		  "www_get_url_range_chunk: fatal error requesting %s (%s)\n",
-		  url, range_req_str);
-		if (chunk) {
-		    chunk_delete(chunk);
-		    chunk = NULL;
-		}
-	    }
-	}
-#endif
 	if (chunk && (chunk_size(chunk) > len)) {
 	    /* We received a larger chunk than requested. */
 	    if (chunk_size(chunk) >= startb + len) {
@@ -1626,9 +1534,6 @@ static CHUNK *www_get_url_range_chunk(const char *url, long startb, long len)
 
 		if (retry) {
 		    retry = 0;
-#if !WFDB_NETFILES_LIBCURL
-		    HTRequest_delete(request);
-#endif
 		    fflush(stderr);
 		    chunk = www_get_url_range_chunk(url, startb, len);
 		    retry = 1;
@@ -1648,9 +1553,6 @@ static CHUNK *www_get_url_range_chunk(const char *url, long startb, long len)
 		}
 	    }
 	}
-#if !WFDB_NETFILES_LIBCURL
-	HTRequest_delete(request);
-#endif
     }
     return (chunk);
 }
@@ -1659,7 +1561,6 @@ static CHUNK *www_get_url_chunk(const char *url)
 {
     CHUNK *chunk = NULL;
 
-#if WFDB_NETFILES_LIBCURL
     chunk = chunk_new(1024);
 
     if (/* Send a GET request */
@@ -1684,31 +1585,6 @@ static CHUNK *www_get_url_chunk(const char *url)
 	return NULL;
     }
 
-#else
-    HTRequest *request = NULL;
-    HTList *request_err = NULL;
-    HTError *err = NULL;
-
-    if (url && *url) {
-	request = HTRequest_new();
-	HTRequest_setOutputFormat(request, WWW_SOURCE);
-	HTRequest_setPreemptive(request, YES);
-	chunk = HTLoadToChunk(url, request);
-	request_err = HTRequest_error(request);
-	while ((err = (HTError *) HTList_nextObject(request_err)) != NULL) {
-	    if (HTError_severity(err) == ERR_FATAL) {
-		/* This occurs if the remote file doesn't exist.  This happens
-		   routinely while searching the WFDB path, so it's not flagged
-		   as a WFDB library error. */
-		if (chunk) {
-		    chunk_delete(chunk);
-		    chunk = NULL;
-		}
-	    }
-	}
-	HTRequest_delete(request);
-    }
-#endif
     return (chunk);
 }
 

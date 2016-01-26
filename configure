@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody         24 May 2000
-#                             Last revised:    23 December 2015
+#                             Last revised:    27 January 2016
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -55,7 +55,6 @@ do
     --without-cygwin)   NOCYGWIN=yes ;;
     --without-netfiles) NETLIB=none ;;
     --with-libcurl)     NETLIB=libcurl ;;
-    --with-libwww)      NETLIB=libwww ;;
     *)                  cat <<EOF
 usage: $0 [options]
 Options:
@@ -75,9 +74,8 @@ Options:
 		         only)
     --without-cygwin    on Cygwin, compile binaries that do not link to the
                          Cygwin DLL. WAVE will not be built.
-    --without-netfiles  disable NETFILES even if libcurl or libwww is available
+    --without-netfiles  disable NETFILES even if libcurl is available
     --with-libcurl      enable NETFILES via libcurl [default]
-    --with-libwww       enable NETFILES via libwww
 EOF
                         exit ;;
   esac
@@ -486,26 +484,11 @@ if [ x$NETLIB = xunknown ]
     if ( echo $WHICH | egrep "no |not |unknown " >which.t1 )
 	then
 	echo "not found"
-	./prompt "Looking for libwww ..."
-	WHICH=`which libwww-config 2>&1`
-	if [ "x$WHICH" = "x" ]
-	    then
-	    WHICH="no libwww-config"
-	fi
-	if ( echo $WHICH | egrep "no |not |unknown " >which.t2 )
-	    then
-	    echo "not found"
-	    echo "The WFDB software will be compiled without NETFILES"
-	    echo "access, because neither libcurl nor libwww appears to"
-	    echo "be installed on this system.  To add NETFILES access,"
-	    echo "install libcurl or libwww and run ./configure again."
-	    NETLIB=none
-	else
-	    echo "found"
-	    echo "The WFDB software will be compiled with NETFILES access"
-	    echo "using libwww."
-	    NETLIB=libwww
-	fi
+	echo "The WFDB software will be compiled without NETFILES"
+	echo "access, because libcurl does not appear to be"
+	echo "installed on this system.  To add NETFILES access,"
+	echo "install libcurl and run ./configure again."
+	NETLIB=none
     else
 	echo "found"
 	echo "The WFDB software will be compiled with NETFILES access"
@@ -521,13 +504,6 @@ case $NETLIB in
 	   NETFILES=1
 	   NETFILES_LIBCURL=1
 	   VIANF=" via libcurl"
-	   WITHNF=with
-	   ;;
-  libwww)  LC="\`libwww-config --cflags\`"
-	   LL="\`libwww-config --libs\`"
-	   NETFILES=1
-	   NETFILES_LIBCURL=0
-	   VIANF=" via libwww"
 	   WITHNF=with
 	   ;;
   none)    LC=""
