@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:   27 January 2016       wfdblib 10.5.25
+                        Last revised:     26 May 2016         wfdblib 10.5.25
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -1329,7 +1329,7 @@ static void wfdb_wwwquit(void)
 static void www_init(void)
 {
     if (!www_done_init) {
-	char *p, version[20];
+	char *p;
 
 	if ((p = getenv("WFDB_PAGESIZE")) && *p)
 	    page_size = strtol(p, NULL, 10);
