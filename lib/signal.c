@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  18 November 2013		wfdblib 10.5.21
+			Last revised:    26 May 2016		wfdblib 10.5.25
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -254,7 +254,6 @@ static unsigned maxisig;	/* max number of input signals */
 static unsigned maxigroup;	/* max number of input signal groups */
 static unsigned nisig;		/* number of open input signals */
 static unsigned nigroup;	/* number of open input signal groups */
-static unsigned maxspf;		/* max allowed value for ispfmax */
 static unsigned ispfmax;	/* max number of samples of any open signal
 				   per input frame */
 static struct isdata {		/* unique for each input signal */
