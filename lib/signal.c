@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:    26 May 2016		wfdblib 10.5.25
+			Last revised:  1 November 2016		wfdblib 10.5.25
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -615,7 +615,7 @@ static int sigmap(WFDB_Sample *vector)
 static int edfparse(WFDB_FILE *ifile)
 {
     static char buf[80], *edf_fname, *p;
-    double *pmax, *pmin, spr;
+    double *pmax, *pmin, spr, baseline;
     int format, i, s, nsig, offset, day, month, year, hour, minute, second;
     long adcrange, *dmax, *dmin, nframes;
  
@@ -733,7 +733,11 @@ static int edfparse(WFDB_FILE *ifile)
 	hsd[s]->info.adcres = i;
 	if (pmax[s] != pmin[s]) {
 	    hsd[s]->info.gain = (dmax[s] - dmin[s])/(pmax[s] - pmin[s]);
-	    hsd[s]->info.baseline = dmax[s] - pmax[s] * hsd[s]->info.gain + 0.5;
+	    baseline = dmax[s] - pmax[s] * hsd[s]->info.gain;
+	    if (baseline >= 0.0)
+		hsd[s]->info.baseline = baseline + 0.5;
+	    else
+		hsd[s]->info.baseline = baseline - 0.5;
 	}
 	else			/* gain is undefined */
 	    hsd[s]->info.gain = hsd[s]->info.baseline = 0;
