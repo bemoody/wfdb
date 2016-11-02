@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # file: pnwlogin	G. Moody	12 August 2012
-#			Last revised:   30 July 2014
+#			Last revised:	2 November 2016
 #
 # Log in to PhysioNetWorks
 #
@@ -42,7 +42,7 @@ fi
 rm -f .pnwhome
 if [ -z "${WFDB+xxx}" ]
 then
-    WFDB=". /usr/local/database http://physionet.org/physiobank/database"
+    WFDB=". /usr/local/database https://physionet.org/physiobank/database"
 fi
 WFDB="$WFDB https://physionet.org/works/\
  https://physionet.org/users/$PNWUSER/works/"
