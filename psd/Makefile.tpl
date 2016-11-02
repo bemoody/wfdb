@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:	  11 May 2006
+#				Last revised:	2 November 2016
 # This section of the Makefile should not need to be changed.
 
 # Programs to be compiled.
@@ -22,7 +22,7 @@ collect:
 	../conf/collect.sh $(BINDIR) $(XFILES) $(SCRIPTS)
 
 # `make scripts': customize and install scripts
-scripts:
+scripts: $(BINDIR)
 	sed s+BINDIR+$(BINDIR)+g <hrfft >$(BINDIR)/hrfft
 	sed s+BINDIR+$(BINDIR)+g <hrlomb >$(BINDIR)/hrlomb
 	sed s+BINDIR+$(BINDIR)+g <hrmem >$(BINDIR)/hrmem
