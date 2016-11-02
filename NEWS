@@ -1,3 +1,37 @@
+10.5.25 (2 November 2016):
+	Changes in 'configure' and the various '.def' files make it simpler to
+	cross-compile WFDB using the GNU toolchain.
+
+	Support for using libwww to read remote files has been removed.  libwww
+	support was introduced with version 10.0.1 in 2000, and was still
+	supported as an alternative after libcurl support was added in version
+	10.3.16.  However, libwww has not been actively developed for many
+	years; we don't recommend its use anymore, and removing support is
+	necessary in order to simplify and add new features to WFDB in the
+	future.
+
+	When reading a signal from an EDF file in which the minimum
+	representable value is greater than zero (corresponding to a negative
+	baseline), the baseline reported to the application will now be
+	correctly rounded to the nearest integer.  In previous versions, the
+	baseline would be off by 1, causing applications to calculate an
+	incorrect physical value.
+
+	The 'install-wave32' script has been updated to work on current versions
+	of Fedora and Scientific Linux.
+
+	'wfdb2mat' will display the correct instructions for computing physical
+	values, in the case of an 8-bit data file.
+
+	The Fortran wrapper functions in 'fortran/wfdbf.c' have been updated for
+	compatibility with modern Fortran compilers on 64-bit systems.
+
+	Now that all of PhysioNet is accessible using secure HTTPS, the
+	'pnwlogin' script has been updated to use HTTPS for all remote file
+	access (PhysioBank as well as PhysioNetWorks.)  This prevents the
+	possibility of disclosing private metadata (such as the names of records
+	that the application is attempting to read) to a network attacker.
+
 10.5.24 (28 May 2015):
 	A security flaw was found in the 'pnwlogin' script used to access
 	PhysioNetWorks projects, owing to a combination of bugs in WFDB and
