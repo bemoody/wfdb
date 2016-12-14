@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody         24 May 2000
-#                             Last revised:    27 January 2016
+#                             Last revised:    14 December 2016
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -23,6 +23,7 @@ MFLAGS=
 
 NETLIB=unknown
 WAVE=unknown
+OWHOME=/usr/openwin
 
 LC_ALL=C
 export LC_ALL
@@ -55,6 +56,9 @@ do
     --without-cygwin)   NOCYGWIN=yes ;;
     --without-netfiles) NETLIB=none ;;
     --with-libcurl)     NETLIB=libcurl ;;
+    --without-xview)    WAVE=0 ;;
+    --with-xview=*)     OWHOME=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+			WAVE=1 ;;
     *)                  cat <<EOF
 usage: $0 [options]
 Options:
@@ -76,10 +80,26 @@ Options:
                          Cygwin DLL. WAVE will not be built.
     --without-netfiles  disable NETFILES even if libcurl is available
     --with-libcurl      enable NETFILES via libcurl [default]
+    --without-xview     disable WAVE even if XView is available
+    --with-xview=PREFIX use XView libraries and headers installed in PREFIX
 EOF
                         exit ;;
   esac
 done
+
+# If cross-compiling, don't search for libraries automatically; only
+# use curl and/or xview if specified on the command line.
+if [ "x$HOST" != "x" ]
+then
+    if [ "x$NETLIB" = "xunknown" ]
+    then
+        NETLIB=none
+    fi
+    if [ "x$WAVE" = "xunknown" ]
+    then
+        WAVE=0
+    fi
+fi
 
 echo "Checking the operating system type ..."
 case x$HOST in
@@ -558,13 +578,8 @@ done
 
 echo rm conf/site.def conf/site-slib.def
 
-if [ "x$WAVE" = "x0" ]
+if [ "x$WAVE" = "xunknown" ]
     then
-    cp -p wave/nomake wave/Makefile
-    cp -p wave/nomake waverc/Makefile
-    echo "WAVE=0" >>config.cache
-    WAVECOMP="WAVE will not be compiled."
-else
     echo
     conf/prompt "Looking for the XView libraries ..."
     TEXTEDIT=`which textedit 2>&1`
@@ -572,24 +587,21 @@ else
     then
 	TEXTEDIT="no textedit"
     fi
-    if [ -d /usr/openwin ]
+    if [ -d $OWHOME ]
     then
 	WAVE=1;
     elif [ -d /usr/local/openwin ]
     then
 	WAVE=1;
-	sed "s+/usr/openwin+/usr/local/openwin+" <wave/Makefile >tmp.$$
-	mv tmp.$$ wave/Makefile
+	OWHOME=/usr/local/openwin
     elif [ -d /opt/openwin ]
     then
 	WAVE=1;
-	sed "s+/usr/openwin+/opt/openwin+" <wave/Makefile >tmp.$$
-	mv tmp.$$ wave/Makefile
+	OWHOME=/opt/openwin
     elif [ -d /usr/include/xview ]
     then
 	WAVE=1;
-	sed "s+/usr/openwin+/usr+" <wave/Makefile >tmp.$$
-	mv tmp.$$ wave/Makefile
+	OWHOME=/usr
     elif ( echo $TEXTEDIT | egrep "no |not |unknown " >textedit.t1 )
     then
 	WAVE=0;
@@ -597,8 +609,6 @@ else
 	WAVE=1;
 	TEDIR=`dirname $TEXTEDIT`;
 	OWHOME=`dirname $TEDIR`;
-	sed "s+/usr/openwin+$OWHOME+" <wave/Makefile >tmp.$$
-	mv tmp.$$ wave/Makefile
     fi
     rm -f textedit.t1
     if [ $WAVE = 0 ]
@@ -608,15 +618,22 @@ else
 	echo "appear to be installed on this system."
 	echo "To compile WAVE, install XView, add the directory containing the"
 	echo "XView textedit application to your PATH, and run ./configure again."
-	cp -p wave/nomake wave/Makefile
-	cp -p wave/nomake waverc/Makefile
-	echo "WAVE=0" >>config.cache
-	WAVECOMP="WAVE will not be compiled."
     else
 	echo "found"
-	WAVECOMP="WAVE will be compiled and installed in '$DIR/bin'."
-	echo "WAVE=1" >>config.cache
     fi
+fi
+
+if [ "x$WAVE" = "x1" ]
+    then
+    sed "s+/usr/openwin+$OWHOME+" <wave/Makefile >tmp.$$
+    mv tmp.$$ wave/Makefile
+    WAVECOMP="WAVE will be compiled and installed in '$DIR/bin'."
+    echo "WAVE=1" >>config.cache
+else
+    cp -p wave/nomake wave/Makefile
+    cp -p wave/nomake waverc/Makefile
+    echo "WAVE=0" >>config.cache
+    WAVECOMP="WAVE will not be compiled."
 fi
 
 # Clean up old *.o files in lib, to avoid possibly using binaries intended
