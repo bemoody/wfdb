@@ -1,5 +1,5 @@
 /* file: xvwave.c	G. Moody	27 April 1990
-			Last revised:  28 October 2009
+			Last revised:  15 December 2016
 XView support functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -33,6 +33,8 @@ _______________________________________________________________________________
 #include <pwd.h>		/* for struct passwd definition */
 #include <signal.h>		/* for SIGUSR1 definition */
 #include <unistd.h>		/* for getpid definition */
+#include <sys/resource.h>	/* for setrlimit definition */
+#include <sys/select.h>		/* for FD_SETSIZE definition */
 #include <xview/canvas.h>
 #include <xview/cms.h>		/* for Xv_singlecolor definition */
 #include <xview/cursor.h>
@@ -168,8 +170,13 @@ void strip_x_args(pargc, argv)
 int *pargc;
 char *argv[];
 {
+    struct rlimit limit;
     char dfname[256], *resdir, *tmp, *getenv();
     extern int fullscreendebug;
+
+    /* work around an xview bug (debian bug #784918) */
+    limit.rlim_cur = limit.rlim_max = FD_SETSIZE;
+    setrlimit(RLIMIT_NOFILE, &limit);
 
     fullscreendebug = 1;  /* work around bug in Xorg 1.6+ by disabling grabs */
     xv_init(XV_INIT_ARGC_PTR_ARGV, pargc, argv, NULL);
