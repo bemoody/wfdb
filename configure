@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody         24 May 2000
-#                             Last revised:    14 December 2016
+#                             Last revised:    15 December 2016
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -310,7 +310,7 @@ then
 else
     SYSLIBS=dynamic
 
-    dynamic_ldflags=`sed -n '/^LDFLAGS =/{s/LDFLAGS = *//;p}' <site-slib.def`
+    dynamic_ldflags=`grep '^LDFLAGS =' site-slib.def | sed 's/LDFLAGS = *//'`
     if [ "x$dynamic_ldflags" != "x" ]; then
         sed "s|^LDFLAGS =.*|LDFLAGS = $dynamic_ldflags|" <site.def >site.tmp
         mv site.tmp site.def
