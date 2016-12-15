@@ -5,6 +5,9 @@ all:
 	@./appcheck $(INCDIR) $(BINDIR) $(LIBDIR)
 	@echo
 	@cat libcheck.out appcheck.out
+	@grep 'all .* tests passed' libcheck.out > grep.out
+	@grep 'all .* tests passed' appcheck.out > grep.out
+	@rm -f grep.out
 
 lcheck:	lcheck.c
 	@echo Compiling WFDB library test application ...
