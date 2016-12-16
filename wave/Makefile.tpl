@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	31 May 2000
-#				Last revised:   21 February 2009
+#				Last revised:   16 December 2016
 # Change the settings below as appropriate for your setup.
 
 # Choose directories in which to install WAVE and its ancillary files by
@@ -97,7 +97,7 @@ wave-static:	$(OFILES)
 	$(CC) $(WCFLAGS) -o wave-static $(OFILES) -static $(LDFLAGS)
 
 soelim:		soelim.c
-	$(CC) -o soelim -O soelim.c
+	$(BUILD_CC) -o soelim -O soelim.c
 
 wave.hlp:	soelim wave.hl0 $(HELPFILES)
 	./soelim wave.hl0 >wave.hlp
@@ -107,7 +107,7 @@ news.hlp:
 	 sed "s%HELPDIR%$(HELPDIR)%" >news.hlp
 
 # `make manual': print the on-line manual
-manual:
+manual:		soelim
 	./soelim wave.hl0 | $(PRINT)
 
 # `make guide': print the WAVE User's Guide

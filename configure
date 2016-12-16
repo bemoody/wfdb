@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody         24 May 2000
-#                             Last revised:    15 December 2016
+#                             Last revised:    16 December 2016
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -183,6 +183,13 @@ echo LONGDATE = `date '+%e %B %Y'` >>site.def
 echo SHORTDATE = `date '+%B %Y' | tr a-z A-Z` >>site.def
 echo YEAR = `date '+%Y'` >>site.def
 echo "ARCH = $ARCH" >>site.def
+
+if [ "x$HOST" = "x" ]
+then
+    echo "BUILD_CC = \$(CC)" >> site.def
+else
+    echo "BUILD_CC = cc" >> site.def
+fi
 
 echo "# _____________________________________________________________________________" >>site.def
 echo >>site.def
