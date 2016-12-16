@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody		24 May 2000
-#				Last revised:		11 May 2006
+#				Last revised:		16 December 2016
 # Change the settings below as appropriate for your setup.
 
 # `make all' creates wavescript and wave-remote without installing them.
@@ -24,18 +24,18 @@ uninstall:
 
 # `wavescript' reads commands from a named file and passes them to WAVE.
 wavescript:	wavescript.c
-	$(CC) -o wavescript -DBINDIR=$(BINDIR) -O wavescript.c
+	$(CC) $(MFLAGS) -o wavescript -DBINDIR=$(BINDIR) -O wavescript.c
 
 # `wave-remote' passes its command-line arguments as commands to WAVE.
 wave-remote:	wave-remote.c
-	$(CC) -o wave-remote -O wave-remote.c
+	$(CC) $(MFLAGS) -o wave-remote -O wave-remote.c
 
 # `wave-remote-test' looks like WAVE to `wavescript' and `wave-remote', and
 # can be used to verify their proper operation.  Start `wave-remote-test'
 # before starting `wavescript' or `wave-remote';  the commands these programs
 # send to WAVE should appear on the standard output of `wave-remote-test.
 wave-remote-test:	wave-remote-test.c
-	$(CC) -o wave-remote-test -O wave-remote-test.c
+	$(CC) $(MFLAGS) -o wave-remote-test -O wave-remote-test.c
 
 # `make clean':  remove intermediate and backup files
 clean:
