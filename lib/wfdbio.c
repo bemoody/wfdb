@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:     26 May 2016         wfdblib 10.5.25
+                        Last revised:   16 December 2016      wfdblib 10.5.25
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -1568,6 +1568,9 @@ static CHUNK *www_get_url_chunk(const char *url)
 	|| curl_try(curl_easy_setopt(curl_ua, CURLOPT_HTTPGET, 1L))
 	/* URL to retrieve */
 	|| curl_try(curl_easy_setopt(curl_ua, CURLOPT_URL, url))
+	/* Set username/password */
+	|| curl_try(curl_easy_setopt(curl_ua, CURLOPT_USERPWD,
+				     www_userpwd(url)))
 	/* No range request */
 	|| curl_try(curl_easy_setopt(curl_ua, CURLOPT_RANGE, NULL))
 	/* Write to the chunk specified ... */
