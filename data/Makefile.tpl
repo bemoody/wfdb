@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  23 May 2000
-#				Last revised:	23 February 2003
+#				Last revised:	16 December 2016
 # This section of the Makefile should not need to be changed.
 
 DBFILES = 100a.atr 100s.atr 100s.dat *.hea *list wfdbcal
@@ -27,9 +27,9 @@ uninstall:
 
 $(DBDIR):
 	mkdir $(DBDIR); $(SETDPERMISSIONS) $(DBDIR)
-$(DBDIR)/pipe:
+$(DBDIR)/pipe: $(DBDIR)
 	mkdir $(DBDIR)/pipe; $(SETDPERMISSIONS) $(DBDIR)/pipe
-$(DBDIR)/tape:
+$(DBDIR)/tape: $(DBDIR)
 	mkdir $(DBDIR)/tape; $(SETDPERMISSIONS) $(DBDIR)/tape
 
 listing:

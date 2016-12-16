@@ -1,10 +1,11 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:  14 December 2016
+#				Last revised:  16 December 2016
 # This section of the Makefile should not need to be changed.
 
 # 'make' or 'make all': compile the WFDB applications without installing them
 all:		config.cache
-	$(MAKE) WFDBROOT=`pwd`/build LIBDIR=`pwd`/build/lib install check
+	$(MAKE) WFDBROOT=`pwd`/build LIBDIR=`pwd`/build/lib install
+	$(MAKE) WFDBROOT=`pwd`/build LIBDIR=`pwd`/build/lib check
 
 # 'make install': compile and install the WFDB software package
 install:	config.cache

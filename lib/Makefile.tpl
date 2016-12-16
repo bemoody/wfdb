@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:    14 August 2014
+#				Last revised:   16 December 2016
 # This section of the Makefile should not need to be changed.
 
 INCLUDES = $(INCDIR)/wfdb/wfdb.h $(INCDIR)/wfdb/wfdblib.h \
@@ -10,7 +10,9 @@ OFILES = wfdbinit.o annot.o signal.o calib.o wfdbio.o
 MFILES = Makefile Makefile.dos
 
 # `make' or `make all':  build the WFDB library
-all:	setup $(OFILES)
+all:
+	$(MAKE) setup
+	$(MAKE) $(OFILES)
 	$(BUILDLIB) $(OFILES) $(BUILDLIB_LDFLAGS)
 
 # `make install':  install the WFDB library and headers

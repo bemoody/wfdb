@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  23 May 2000
-#				Last revised:	28 February 2014
+#				Last revised:	16 December 2016
 # This section of the Makefile should not need to be changed.
 
 CFILES = ann2rr.c bxb.c calsig.c ecgeval.c epicmp.c fir.c gqfuse.c gqpost.c \
@@ -48,7 +48,7 @@ collect:
 	../conf/collect.sh $(PSPDIR) $(PSFILES)
 
 # `make scripts': install customized scripts for setting WFDB path
-scripts:
+scripts: $(BINDIR)
 	sed s+/usr/local/database+$(DBDIR)+g <setwfdb >$(BINDIR)/setwfdb
 	sed s+/usr/local/database+$(DBDIR)+g <cshsetwfdb >$(BINDIR)/cshsetwfdb
 	sed s+/usr/local/database+$(DBDIR)+g <pnwlogin >$(BINDIR)/pnwlogin
