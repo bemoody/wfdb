@@ -1,5 +1,5 @@
 /* file: parsescp.c	G. Moody and E. Moody	 10 January 2000
-			Last revised:		   8 March 2014
+			Last revised:		 16 December 2016
 -------------------------------------------------------------------------------
 parsescp: parse an SCP-ECG file (read from the standard input)
 Copyright (C) 2000-2014 George B. Moody and Edna S. Moody
@@ -241,6 +241,10 @@ _______________________________________________________________________________
 
 #ifndef NOWFDB
 #include <wfdb/wfdb.h>
+#endif
+#ifdef _WINDOWS
+#include <io.h>
+#include <fcntl.h>
 #endif
 
 #define VERSION_STRING	"#ECG/1.0"
@@ -905,6 +909,11 @@ main(int argc, char **argv)
 	    exit(1);
 	}
     }
+
+#ifdef _WINDOWS
+    _setmode(_fileno(stdin), _O_BINARY);
+    if (aflag) _setmode(_fileno(stdout), _O_BINARY);
+#endif
 
     bytesread = fread(header, 1, 6, stdin);
     if (bytesread != 6) {
