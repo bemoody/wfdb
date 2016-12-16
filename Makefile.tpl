@@ -9,16 +9,16 @@ all:		config.cache
 
 # 'make install': compile and install the WFDB software package
 install:	config.cache
-	cd lib;	     $(MAKE) clean install
-	cd app;      $(MAKE) clean install
-	cd convert;  $(MAKE) clean install
-	cd data;     $(MAKE) clean install
-	cd fortran;  $(MAKE) clean install
-	cd psd;      $(MAKE) clean install
-	cd wave;     $(MAKE) clean install
-	cd waverc;   $(MAKE) clean install
-	-( cd xml;   $(MAKE) clean install )
-	test -d doc && ( cd doc; $(MAKE) clean install )
+	cd lib;	     $(MAKE) clean; $(MAKE) install
+	cd app;      $(MAKE) clean; $(MAKE) install
+	cd convert;  $(MAKE) clean; $(MAKE) install
+	cd data;     $(MAKE) clean; $(MAKE) install
+	cd fortran;  $(MAKE) clean; $(MAKE) install
+	cd psd;      $(MAKE) clean; $(MAKE) install
+	cd wave;     $(MAKE) clean; $(MAKE) install
+	cd waverc;   $(MAKE) clean; $(MAKE) install
+	-( cd xml;   $(MAKE) clean; $(MAKE) install )
+	test -d doc && ( cd doc; $(MAKE) clean; $(MAKE) install )
 
 # 'make collect': collect the installed files into /tmp/wfdb/
 collect:
