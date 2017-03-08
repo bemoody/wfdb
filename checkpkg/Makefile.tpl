@@ -2,7 +2,7 @@ all:
 	@rm -f lcheck
 	@make lcheck	
 	-@./libcheck $(DESTDIR)$(DBDIR) $(DESTDIR)$(LIBDIR) >libcheck.out
-	@./appcheck $(DESTDIR)$(INCDIR) $(DESTDIR)$(BINDIR) $(DESTDIR)$(LIBDIR)
+	@./appcheck $(DESTDIR)$(INCDIR) $(DESTDIR)$(BINDIR) $(DESTDIR)$(LIBDIR) $(DESTDIR)$(PSPDIR)
 	@echo
 	@cat libcheck.out appcheck.out
 	@grep 'all .* tests passed' libcheck.out > grep.out
