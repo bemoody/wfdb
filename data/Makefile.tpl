@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  23 May 2000
-#				Last revised:	16 December 2016
+#				Last revised:	  8 March 2017
 # This section of the Makefile should not need to be changed.
 
 DBFILES = 100a.atr 100s.atr 100s.dat *.hea *list wfdbcal
@@ -7,14 +7,14 @@ DBFILES = 100a.atr 100s.atr 100s.dat *.hea *list wfdbcal
 all:
 	@echo Nothing to be made in `pwd`.
 
-install:	$(DBDIR) $(DBDIR)/pipe $(DBDIR)/tape
-	cp $(DBFILES) $(DBDIR)
-	cp pipe/* $(DBDIR)/pipe
-	cp tape/* $(DBDIR)/tape
-	-cd $(DBDIR); $(SETPERMISSIONS) $(DBFILES)
-	-cd $(DBDIR); ln -sf wfdbcal dbcal
-	-cd $(DBDIR)/pipe; $(SETPERMISSIONS) *
-	-cd $(DBDIR)/tape; $(SETPERMISSIONS) *
+install: $(DESTDIR)$(DBDIR) $(DESTDIR)$(DBDIR)/pipe $(DESTDIR)$(DBDIR)/tape
+	cp $(DBFILES) $(DESTDIR)$(DBDIR)
+	cp pipe/* $(DESTDIR)$(DBDIR)/pipe
+	cp tape/* $(DESTDIR)$(DBDIR)/tape
+	-cd $(DESTDIR)$(DBDIR); $(SETPERMISSIONS) $(DBFILES)
+	-cd $(DESTDIR)$(DBDIR); ln -sf wfdbcal dbcal
+	-cd $(DESTDIR)$(DBDIR)/pipe; $(SETPERMISSIONS) *
+	-cd $(DESTDIR)$(DBDIR)/tape; $(SETPERMISSIONS) *
 
 # 'make collect': retrieve the installed files
 collect:
@@ -23,14 +23,17 @@ collect:
 	cd tape; ../../conf/collect.sh $(DBDIR)/tape *
 	
 uninstall:
-	../uninstall.sh $(DBDIR) $(DBFILES) dbcal
+	../uninstall.sh $(DESTDIR)$(DBDIR) $(DBFILES) dbcal
 
-$(DBDIR):
-	mkdir $(DBDIR); $(SETDPERMISSIONS) $(DBDIR)
-$(DBDIR)/pipe: $(DBDIR)
-	mkdir $(DBDIR)/pipe; $(SETDPERMISSIONS) $(DBDIR)/pipe
-$(DBDIR)/tape: $(DBDIR)
-	mkdir $(DBDIR)/tape; $(SETDPERMISSIONS) $(DBDIR)/tape
+$(DESTDIR)$(DBDIR):
+	mkdir -p $(DESTDIR)$(DBDIR)
+	$(SETDPERMISSIONS) $(DESTDIR)$(DBDIR)
+$(DESTDIR)$(DBDIR)/pipe: $(DESTDIR)$(DBDIR)
+	mkdir -p $(DESTDIR)$(DBDIR)/pipe
+	$(SETDPERMISSIONS) $(DESTDIR)$(DBDIR)/pipe
+$(DESTDIR)$(DBDIR)/tape: $(DESTDIR)$(DBDIR)
+	mkdir -p $(DESTDIR)$(DBDIR)/tape
+	$(SETDPERMISSIONS) $(DESTDIR)$(DBDIR)/tape
 
 listing:
 	$(PRINT) README Makefile makefile.dos

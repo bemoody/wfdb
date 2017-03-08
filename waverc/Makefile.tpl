@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody		24 May 2000
-#				Last revised:		16 December 2016
+#				Last revised:		8 March 2017
 # Change the settings below as appropriate for your setup.
 
 # `make all' creates wavescript and wave-remote without installing them.
@@ -8,19 +8,19 @@ all:	wavescript wave-remote
 # `make install' installs `url_view', `wavescript', and `wave-remote'.  See
 # the WAVE User's Guide for instructions on setting up `wavescript' as a helper
 # application for  your Web browser.
-install:	$(BINDIR) wave-remote
+install:	$(DESTDIR)$(BINDIR) wave-remote
 	rm -f wavescript wavescript.exe
 	$(MAKE) wavescript	# make sure wavescript has the correct BINDIR
 	$(STRIP) wavescript wave-remote
 	$(SETXPERMISSIONS) url_view wavescript wave-remote
-	../install.sh $(BINDIR) url_view wavescript wave-remote
+	../install.sh $(DESTDIR)$(BINDIR) url_view wavescript wave-remote
 
 # 'make collect': retrieve the installed applications
 collect:
 	../conf/collect.sh $(BINDIR) url_view wavescript wave-remote
 
 uninstall:
-	../uninstall.sh $(BINDIR) url_view wavescript wave-remote
+	../uninstall.sh $(DESTDIR)$(BINDIR) url_view wavescript wave-remote
 
 # `wavescript' reads commands from a named file and passes them to WAVE.
 wavescript:	wavescript.c
@@ -42,5 +42,6 @@ clean:
 	rm -f wavescript wave-remote wave-remote-test *~
 
 # Create directory for installation if necessary.
-$(BINDIR):
-	mkdir -p $(BINDIR); $(SETDPERMISSIONS) $(BINDIR)
+$(DESTDIR)$(BINDIR):
+	mkdir -p $(DESTDIR)$(BINDIR)
+	$(SETDPERMISSIONS) $(DESTDIR)$(BINDIR)

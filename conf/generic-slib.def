@@ -1,5 +1,5 @@
 # file: generic-slib.def	G. Moody	31 May 2000
-#				Last revised:  5 October 2015
+#				Last revised:   8 March 2017
 # This section contains settings suitable for compiling a shared version of the
 # WFDB library under versions of UNIX that are not otherwise recognized by
 # 'configure'.  Not all versions of UNIX support shared libraries, so you may
@@ -63,7 +63,7 @@ RPATHFLAGS = -Wl,-rpath -Wl,$(LIBDIR)
 
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.
-LDFLAGS = -L$(LIBDIR) -lwfdb $(RPATHFLAGS) $(LL)
+LDFLAGS = -L$(DESTDIR)$(LIBDIR) -lwfdb $(RPATHFLAGS) $(LL)
 
 # CC is the name of your C compiler.
 CC = gcc
@@ -92,7 +92,7 @@ MFLAGS =
 
 # CFLAGS is the set of C compiler options used when compiling the shared
 # library.  CFLAGS should always include CCDEFS.
-CFLAGS = $(MFLAGS) -fpic -g -O $(CCDEFS) $(LC) -I$(INCDIR)
+CFLAGS = $(MFLAGS) -fpic -g -O $(CCDEFS) $(LC) -I$(DESTDIR)$(INCDIR)
 
 # WFDBLIB_BASENAME is the name, without version numbers, of the alternate
 # library.  WFDBLIB_SONAME is the shared object name ("soname") of the
@@ -160,13 +160,13 @@ make-all:	all
 
 # `make lib-post-install' should be run after installing the WFDB library.
 lib-post-install:
-	cd $(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_BASENAME)
-	cd $(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_SONAME)
-	$(RANLIB) $(LIBDIR)/$(WFDBLIB)
+	cd $(DESTDIR)$(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_BASENAME)
+	cd $(DESTDIR)$(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_SONAME)
+	$(RANLIB) $(DESTDIR)$(LIBDIR)/$(WFDBLIB)
 	@$(LDCONFIG) || echo Warning: "$(LDCONFIG)" was unsuccessful
 
 lib-post-uninstall:
-	rm -f $(LIBDIR)/$(WFDBLIB_BASENAME)
-	rm -f $(LIBDIR)/$(WFDBLIB_SONAME)
+	rm -f $(DESTDIR)$(LIBDIR)/$(WFDBLIB_BASENAME)
+	rm -f $(DESTDIR)$(LIBDIR)/$(WFDBLIB_SONAME)
 	@$(LDCONFIG) || echo Warning: "$(LDCONFIG)" was unsuccessful
 #______________________________________________________________________________

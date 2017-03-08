@@ -1,5 +1,5 @@
 # file: darwin-slib.def	I. Henry and G. Moody	14 November 2002
-#				Last revised:	 5 October 2015
+#				Last revised:	  8 March 2017
 # Based on 'freebsd-slib.def'.
 
 # This section contains settings suitable for generating a shared library under
@@ -52,7 +52,7 @@ LIBDIR = $(WFDBROOT)/lib
 
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.
-LDFLAGS = -L$(LIBDIR) -lwfdb
+LDFLAGS = -L$(DESTDIR)$(LIBDIR) -lwfdb
 
 # CC is the name of your C compiler.
 CC = gcc
@@ -68,7 +68,7 @@ MFLAGS =
 
 # CFLAGS is the set of C compiler options used when compiling the shared
 # library.  CFLAGS should always include CCDEFS.
-CFLAGS = $(MFLAGS) -fPIC -fno-common -g -O $(CCDEFS) $(LC) -I$(INCDIR)
+CFLAGS = $(MFLAGS) -fPIC -fno-common -g -O $(CCDEFS) $(LC) -I$(DESTDIR)$(INCDIR)
 
 # WFDBLIB_BASENAME is the name, without version numbers, of the alternate
 # library.  WFDBLIB_SONAME is the shared object name ("soname") of the
@@ -125,11 +125,11 @@ make-all:	all
 
 # `make lib-post-install' should be run after installing the WFDB library.
 lib-post-install:
-	cd $(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_BASENAME)
-	cd $(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_SONAME)
+	cd $(DESTDIR)$(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_BASENAME)
+	cd $(DESTDIR)$(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_SONAME)
 
 lib-post-uninstall:
-	rm -f $(LIBDIR)/$(WFDBLIB_BASENAME)
-	rm -f $(LIBDIR)/$(WFDBLIB_SONAME)
+	rm -f $(DESTDIR)$(LIBDIR)/$(WFDBLIB_BASENAME)
+	rm -f $(DESTDIR)$(LIBDIR)/$(WFDBLIB_SONAME)
 
 #______________________________________________________________________________

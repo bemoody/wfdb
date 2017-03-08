@@ -1,5 +1,5 @@
 # file: cygwin.def		G. Moody	6 June 2000
-#				Last revised:   13 May 2010
+#				Last revised:   8 March 2017
 #
 # This file contains default 'make' definitions for compiling the WFDB Software
 # Package under MS Windows using the free Cygwin/gcc ANSI C compiler, available
@@ -97,11 +97,11 @@ MFLAGS =
 #   -O		  if you trust your C compiler's optimizer
 # With the exception of `gcc', most C compilers do not allow you to use -g and
 # -O simultaneously.
-CFLAGS = $(MFLAGS) -g -O $(CCDEFS) $(LC) -I$(INCDIR)
+CFLAGS = $(MFLAGS) -g -O $(CCDEFS) $(LC) -I$(DESTDIR)$(INCDIR)
 
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.
-LDFLAGS = -L$(LIBDIR) -lwfdb $(LL)
+LDFLAGS = -L$(DESTDIR)$(LIBDIR) -lwfdb $(LL)
 
 # WFDBLIB is the name of the standard WFDB library.  In order to access it via
 # `-lwfdb', WFDBLIB should be `libwfdb.a'.

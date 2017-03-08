@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  23 May 2000
-#				Last revised:	16 December 2016
+#				Last revised:	  8 March 2017
 # This section of the Makefile should not need to be changed.
 
 CFILES = ann2rr.c bxb.c calsig.c ecgeval.c epicmp.c fir.c gqfuse.c gqpost.c \
@@ -33,14 +33,14 @@ all:	$(XFILES)
 	$(STRIP) $(XFILES)
 
 # `make' or `make install':  build and install applications
-install:	all $(BINDIR) $(PSPDIR) scripts
+install:	all $(DESTDIR)$(BINDIR) $(DESTDIR)$(PSPDIR) scripts
 	rm -f pschart psfd pschart.exe psfd.exe
 	$(MAKE) pschart psfd	# be sure compiled-in paths are up-to-date
 	$(STRIP) pschart psfd
 	$(SETXPERMISSIONS) $(XFILES)
-	../install.sh $(BINDIR) $(XFILES)
-	cp $(PSFILES) $(PSPDIR)
-	cd $(PSPDIR); $(SETPERMISSIONS) $(PSFILES)
+	../install.sh $(DESTDIR)$(BINDIR) $(XFILES)
+	cp $(PSFILES) $(DESTDIR)$(PSPDIR)
+	cd $(DESTDIR)$(PSPDIR); $(SETPERMISSIONS) $(PSFILES)
 
 # 'make collect': retrieve the installed applications
 collect:
@@ -48,22 +48,24 @@ collect:
 	../conf/collect.sh $(PSPDIR) $(PSFILES)
 
 # `make scripts': install customized scripts for setting WFDB path
-scripts: $(BINDIR)
-	sed s+/usr/local/database+$(DBDIR)+g <setwfdb >$(BINDIR)/setwfdb
-	sed s+/usr/local/database+$(DBDIR)+g <cshsetwfdb >$(BINDIR)/cshsetwfdb
-	sed s+/usr/local/database+$(DBDIR)+g <pnwlogin >$(BINDIR)/pnwlogin
-	cd $(BINDIR); $(SETPERMISSIONS) *setwfdb; $(SETXPERMISSIONS) pnwlogin
+scripts: $(DESTDIR)$(BINDIR)
+	sed s+/usr/local/database+$(DBDIR)+g <setwfdb >$(DESTDIR)$(BINDIR)/setwfdb
+	sed s+/usr/local/database+$(DBDIR)+g <cshsetwfdb >$(DESTDIR)$(BINDIR)/cshsetwfdb
+	sed s+/usr/local/database+$(DBDIR)+g <pnwlogin >$(DESTDIR)$(BINDIR)/pnwlogin
+	cd $(DESTDIR)$(BINDIR); $(SETPERMISSIONS) *setwfdb; $(SETXPERMISSIONS) pnwlogin
 
 uninstall:
-	../uninstall.sh $(PSPDIR) $(PSFILES)
-	../uninstall.sh $(BINDIR) $(XFILES) $(SCRIPTS)
-	../uninstall.sh $(LIBDIR)
+	../uninstall.sh $(DESTDIR)$(PSPDIR) $(PSFILES)
+	../uninstall.sh $(DESTDIR)$(BINDIR) $(XFILES) $(SCRIPTS)
+	../uninstall.sh $(DESTDIR)$(LIBDIR)
 
 # Create directories for installation if necessary.
-$(BINDIR):
-	mkdir -p $(BINDIR); $(SETDPERMISSIONS) $(BINDIR)
-$(PSPDIR):
-	mkdir -p $(PSPDIR); $(SETDPERMISSIONS) $(PSPDIR)
+$(DESTDIR)$(BINDIR):
+	mkdir -p $(DESTDIR)$(BINDIR)
+	$(SETDPERMISSIONS) $(DESTDIR)$(BINDIR)
+$(DESTDIR)$(PSPDIR):
+	mkdir -p $(DESTDIR)$(PSPDIR)
+	$(SETDPERMISSIONS) $(DESTDIR)$(PSPDIR)
 
 # `make clean':  remove intermediate and backup files
 clean:

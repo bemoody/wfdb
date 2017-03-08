@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	24 May 2000
-#				Last revised:	5 March 2014
+#				Last revised:	8 March 2017
 # This section of the Makefile should not need to be changed.
 
 CFILES = a2m.c ad2m.c ahaecg2mit.c m2a.c md2a.c readid.c makeid.c edf2mit.c \
@@ -20,16 +20,16 @@ all:	$(XFILES)
 	$(STRIP) $(XFILES)
 
 # `make' or `make install':  build and install applications
-install:	$(BINDIR) all $(SCRIPTS)
+install:	$(DESTDIR)$(BINDIR) all $(SCRIPTS)
 	$(SETXPERMISSIONS) $(XFILES) $(SCRIPTS)
-	../install.sh $(BINDIR) $(XFILES) $(SCRIPTS)
+	../install.sh $(DESTDIR)$(BINDIR) $(XFILES) $(SCRIPTS)
 
 # 'make collect': retrieve the installed applications
 collect:
 	../conf/collect.sh $(BINDIR) $(XFILES) $(SCRIPTS)
 
 uninstall:
-	../uninstall.sh $(BINDIR) $(XFILES) $(SCRIPTS)
+	../uninstall.sh $(DESTDIR)$(BINDIR) $(XFILES) $(SCRIPTS)
 
 # `make clean':  remove intermediate and backup files
 clean:
@@ -40,5 +40,6 @@ listing:
 	$(PRINT) README $(MFILES) $(CFILES)
 
 # Create directory for installation if necessary.
-$(BINDIR):
-	mkdir -p $(BINDIR); $(SETDPERMISSIONS) $(BINDIR)
+$(DESTDIR)$(BINDIR):
+	mkdir -p $(DESTDIR)$(BINDIR)
+	$(SETDPERMISSIONS) $(DESTDIR)$(BINDIR)

@@ -1,5 +1,5 @@
 # file: hpux-slib.def	G. Moody	31 May 2000
-#			Last revised:  13 August 2014
+#			Last revised:   8 March 2017
 # This section contains settings suitable for generating a shared library under
 # HP-UX.
 
@@ -59,7 +59,7 @@ RPATHFLAGS = -Wl,+b -Wl,$(LIBDIR)
 
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.
-LDFLAGS = -L$(LIBDIR) -lwfdb $(RPATHFLAGS) $(LL)
+LDFLAGS = -L$(DESTDIR)$(LIBDIR) -lwfdb $(RPATHFLAGS) $(LL)
 
 # CC is the name of your C compiler.
 CC = gcc
@@ -75,7 +75,7 @@ MFLAGS =
 
 # CFLAGS is the set of C compiler options used when compiling the shared
 # library.  CFLAGS should always include CCDEFS.
-CFLAGS = $(MFLAGS) -fpic -g -O $(CCDEFS) $(LC) -I$(INCDIR)
+CFLAGS = $(MFLAGS) -fpic -g -O $(CCDEFS) $(LC) -I$(DESTDIR)$(INCDIR)
 
 # WFDBLIB_BASENAME is the name, without version numbers, of the alternate
 # library.  WFDBLIB_SONAME is the shared object name ("soname") of the
@@ -127,10 +127,10 @@ make-all:	all
 
 # `make lib-post-install' should be run after installing the WFDB library.
 lib-post-install:
-	cd $(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_BASENAME)
-	cd $(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_SONAME)
+	cd $(DESTDIR)$(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_BASENAME)
+	cd $(DESTDIR)$(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_SONAME)
 
 lib-post-uninstall:
-	rm -f $(LIBDIR)/$(WFDBLIB_BASENAME)
-	rm -f $(LIBDIR)/$(WFDBLIB_SONAME)
+	rm -f $(DESTDIR)$(LIBDIR)/$(WFDBLIB_BASENAME)
+	rm -f $(DESTDIR)$(LIBDIR)/$(WFDBLIB_SONAME)
 #______________________________________________________________________________

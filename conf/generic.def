@@ -1,5 +1,5 @@
 # file: generic.def		G. Moody	31 May 2000
-#				Last revised:  13 August 2014
+#				Last revised:   8 March 2017
 # This file contains default 'make' definitions for compiling the WFDB Software
 # Package under versions of UNIX that are not otherwise recognized by
 # 'configure'.
@@ -112,7 +112,7 @@ MFLAGS =
 # -O simultaneously.
 # CFLAGS = -g $(CCDEFS) $(LC) -I$(INCDIR)
 # `gcc' users may comment out the previous line, and uncomment the next one.
-CFLAGS = $(MFLAGS) -g -O $(CCDEFS) $(LC) -I$(INCDIR)
+CFLAGS = $(MFLAGS) -g -O $(CCDEFS) $(LC) -I$(DESTDIR)$(INCDIR)
 
 # RPATHFLAGS is a set of C compiler options that cause the program to
 # search for shared libraries in a non-standard location at run-time.
@@ -121,7 +121,7 @@ RPATHFLAGS = -Wl,-rpath -Wl,$(LIBDIR)
 
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.
-LDFLAGS = -L$(LIBDIR) -lwfdb $(LL)
+LDFLAGS = -L$(DESTDIR)$(LIBDIR) -lwfdb $(LL)
 
 # WFDBLIB is the name of the standard WFDB library.  In order to access it via
 # `-lwfdb', WFDBLIB should be `libwfdb.a'.

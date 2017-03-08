@@ -1,5 +1,5 @@
 # file: linux.def		G. Moody	31 May 2000
-#				Last revised:  13 August 2014
+#				Last revised:   8 March 2017
 # 'make' definitions for compiling the WFDB Software Package under Linux
 
 # Choose a value for WFDBROOT to determine where the WFDB Software Package will
@@ -73,7 +73,7 @@ MFLAGS =
 
 # CFLAGS is the set of C compiler options.  CFLAGS should always include
 # CCDEFS.
-CFLAGS = $(MFLAGS) -g -O $(CCDEFS) $(LC) -I$(INCDIR)
+CFLAGS = $(MFLAGS) -g -O $(CCDEFS) $(LC) -I$(DESTDIR)$(INCDIR)
 
 # RPATHFLAGS is a set of C compiler options that cause the program to
 # search for shared libraries in a non-standard location at run-time.
@@ -82,7 +82,7 @@ RPATHFLAGS = -Wl,--enable-new-dtags,-rpath,$(LIBDIR)
 
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.
-LDFLAGS = -L$(LIBDIR) -lwfdb $(LL)
+LDFLAGS = -L$(DESTDIR)$(LIBDIR) -lwfdb $(LL)
 
 # WFDBLIB is the name of the standard WFDB library.  In order to access it via
 # `-lwfdb', WFDBLIB should be `libwfdb.a'.
@@ -172,7 +172,7 @@ make-all:	all
 
 # `make lib-post-install' should be run after installing the WFDB library.
 lib-post-install:
-	ranlib $(LIBDIR)/$(WFDBLIB)
+	ranlib $(DESTDIR)$(LIBDIR)/$(WFDBLIB)
 
 lib-post-uninstall:
 	echo "Nothing to be done for lib-post-uninstall"

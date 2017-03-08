@@ -1,5 +1,5 @@
 # file: solaris.def		G. Moody	31 May 2000
-#				Last revised:  13 August 2014
+#				Last revised:   8 March 2017
 # 'make' definitions for compiling the WFDB Software Package under Solaris
 
 # Choose a value for WFDBROOT to determine where the WFDB Software Package will
@@ -81,7 +81,7 @@ MFLAGS =
 # use -g and -O simultaneously.  MFLAGS is gcc-specific.
 # CFLAGS = -O $(CCDEFS) $(LC) -I$(INCDIR)
 # `gcc' users may comment out the previous line, and uncomment the next one.
-CFLAGS = $(MFLAGS) -g -O $(CCDEFS) $(LC) -I$(INCDIR)
+CFLAGS = $(MFLAGS) -g -O $(CCDEFS) $(LC) -I$(DESTDIR)$(INCDIR)
 
 # RPATHFLAGS is a set of C compiler options that cause the program to
 # search for shared libraries in a non-standard location at run-time.
@@ -90,7 +90,7 @@ RPATHFLAGS = -R$(LIBDIR)
 
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.
-LDFLAGS = -L$(LIBDIR) -lwfdb $(LL)
+LDFLAGS = -L$(DESTDIR)$(LIBDIR) -lwfdb $(LL)
 
 # WFDBLIB is the name of the standard WFDB library.  In order to access it via
 # `-lwfdb', WFDBLIB should be `libwfdb.a'.

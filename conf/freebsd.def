@@ -1,5 +1,5 @@
 # file: freebsd.def		G. Moody	5 March 2002
-#				Last revised:  13 August 2014
+#				Last revised:   8 March 2017
 # 'make' definitions for compiling the WFDB Software Package under FreeBSD
 #
 # Based on 'linux.def', with edits for FreeBSD thanks to Giuseppe Pagnoni.
@@ -86,7 +86,7 @@ MFLAGS =
 
 # CFLAGS is the set of C compiler options.  CFLAGS should always include
 # CCDEFS.
-CFLAGS = $(MFLAGS) -g -O $(CCDEFS) $(LC) -I$(INCDIR)
+CFLAGS = $(MFLAGS) -g -O $(CCDEFS) $(LC) -I$(DESTDIR)$(INCDIR)
 
 # RPATHFLAGS is a set of C compiler options that cause the program to
 # search for shared libraries in a non-standard location at run-time.
@@ -95,7 +95,7 @@ RPATHFLAGS = -Wl,-rpath,$(LIBDIR)
 
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.
-LDFLAGS = -L$(LIBDIR) -lwfdb $(LL)
+LDFLAGS = -L$(DESTDIR)$(LIBDIR) -lwfdb $(LL)
 
 # WFDBLIB is the name of the standard WFDB library.  In order to access it via
 # `-lwfdb', WFDBLIB should be `libwfdb.a'.
@@ -181,7 +181,7 @@ make-all:	all
 
 # `make lib-post-install' should be run after installing the WFDB library.
 lib-post-install:
-	ranlib $(LIBDIR)/$(WFDBLIB)
+	ranlib $(DESTDIR)$(LIBDIR)/$(WFDBLIB)
 
 lib-post-uninstall:
 	echo "Nothing to be done for lib-post-uninstall"

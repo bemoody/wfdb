@@ -15,14 +15,14 @@ example-alt:	example.f wfdbf.c
 # 'make install' copies the wrapper sources into the directory where the
 # WFDB headers are also installed.
 install:
-	../install.sh $(INCDIR)/wfdb wfdbf.c
-	$(SETPERMISSIONS) $(INCDIR)/wfdb/wfdbf.c
+	../install.sh $(DESTDIR)$(INCDIR)/wfdb wfdbf.c
+	$(SETPERMISSIONS) $(DESTDIR)$(INCDIR)/wfdb/wfdbf.c
 
 collect:
 	../conf/collect.sh $(INCDIR)/wfdb wfdbf.c
 
 uninstall:
-	../uninstall.sh $(INCDIR)/wfdb wfdbf.c
+	../uninstall.sh $(DESTDIR)$(INCDIR)/wfdb wfdbf.c
 
 clean:
 	rm -f example example.c *.o *~

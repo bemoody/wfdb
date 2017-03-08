@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:	5 October 2015
+#				Last revised:	 8 March 2017
 # Change the settings below as appropriate for your setup.
 
 # D2PARGS is a list of options for dvips.  Uncomment one of these to set the
@@ -20,16 +20,16 @@ LN = ln -sf
 # section 1 (commands), section 3 (libraries), section 5 (formats), and
 # section 7 (conventions and miscellany) go.  You may wish to use
 # $(MANDIR)/manl for all of these; if so, uncomment the next four lines.
-# MAN1 = $(MANDIR)/manl
-# MAN3 = $(MANDIR)/manl
-# MAN5 = $(MANDIR)/manl
-# MAN7 = $(MANDIR)/manl
+# MAN1 = $(DESTDIR)$(MANDIR)/manl
+# MAN3 = $(DESTDIR)$(MANDIR)/manl
+# MAN5 = $(DESTDIR)$(MANDIR)/manl
+# MAN7 = $(DESTDIR)$(MANDIR)/manl
 # Uncomment the next four lines to put the man pages in with the standard
 # ones.
-MAN1 = $(MANDIR)/man1
-MAN3 = $(MANDIR)/man3
-MAN5 = $(MANDIR)/man5
-MAN7 = $(MANDIR)/man7
+MAN1 = $(DESTDIR)$(MANDIR)/man1
+MAN3 = $(DESTDIR)$(MANDIR)/man3
+MAN5 = $(DESTDIR)$(MANDIR)/man5
+MAN7 = $(DESTDIR)$(MANDIR)/man7
 # If you want to put the man pages somewhere else, edit 'maninst.sh' first.
 
 # PSPRINT is the name of the program that prints PostScript files. If your

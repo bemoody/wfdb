@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:    13 March 2014
+#				Last revised:     8 March 2017
 # Change the settings below as appropriate for your setup.
 
 # D2PARGS is a list of options for dvips.  Uncomment one of these to set the
@@ -32,7 +32,7 @@ LN = ln -sf
 # them.  If you have GNU 'makeinfo' and 'install-info' (preferred),
 # uncomment the next two lines.
 MAKEINFO = makeinfo --force --no-warn
-INSTALLINFO = /usr/sbin/install-info --info-dir=$(INFODIR) $(INFODIR)/wpg
+INSTALLINFO = /usr/sbin/install-info --info-dir=$(DESTDIR)$(INFODIR) $(DESTDIR)$(INFODIR)/wpg
 
 # Otherwise, you can use GNU emacs to do the formatting, and standard utilities
 # to install the info files, by uncommenting the next two lines.
@@ -104,17 +104,17 @@ wpg.html:	wpg.tex
 # 'make wpg.info': format the WFDB Programmer's Guide as info files
 wpg.info:	wpg.tex
 	$(MAKEINFO) wpg.tex
-	test -d $(INFODIR) || \
-	 ( mkdir -p $(INFODIR); $(SETDPERMISSIONS) $(INFODIR) )
-	cp wpg wpg-* $(INFODIR)
-	$(SETPERMISSIONS) $(INFODIR)/wpg*
+	test -d $(DESTDIR)$(INFODIR) || \
+	 ( mkdir -p $(DESTDIR)$(INFODIR); $(SETDPERMISSIONS) $(DESTDIR)$(INFODIR) )
+	cp wpg wpg-* $(DESTDIR)$(INFODIR)
+	$(SETPERMISSIONS) $(DESTDIR)$(INFODIR)/wpg*
 	rm -f wpg wpg-*
 	$(INSTALLINFO)
 
 # 'make install-wpg.info': install info entry (if install-info is unavailable)
 install-wpg.info:	wpg.info
-	test -s $(INFODIR)/dir || cp dir.top $(INFODIR)/dir
-	grep -s wpg $(INFODIR)/dir >/dev/null || cat dir.wpg >>$(INFODIR)/dir
+	test -s $(DESTDIR)$(INFODIR)/dir || cp dir.top $(DESTDIR)$(INFODIR)/dir
+	grep -s wpg $(DESTDIR)$(INFODIR)/dir >/dev/null || cat dir.wpg >>$(DESTDIR)$(INFODIR)/dir
 
 # 'make wpg.info.tar.gz': create a tarball of info files
 wpg.info.tar.gz:	wpg.tex

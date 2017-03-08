@@ -1,4 +1,5 @@
 # file: Makefile.tpl		G. Moody	  22 August 2010
+#				Last revised:	   8 March 2017
 #
 # This section of the Makefile should not need to be changed.
 
@@ -18,20 +19,21 @@ all:	$(XFILES)
 	$(STRIP) $(XFILES)
 
 # `make' or `make install':  build and install applications
-install:	all $(BINDIR)
+install:	all $(DESTDIR)$(BINDIR)
 	$(SETXPERMISSIONS) $(XFILES)
-	../install.sh $(BINDIR) $(XFILES)
+	../install.sh $(DESTDIR)$(BINDIR) $(XFILES)
 
 # 'make collect': retrieve the installed applications
 collect:
 	../conf/collect.sh $(BINDIR) $(XFILES)
 
 uninstall:
-	../uninstall.sh $(BINDIR) $(XFILES)
+	../uninstall.sh $(DESTDIR)$(BINDIR) $(XFILES)
 
 # Create directories for installation if necessary.
-$(BINDIR):
-	mkdir -p $(BINDIR); $(SETDPERMISSIONS) $(BINDIR)
+$(DESTDIR)$(BINDIR):
+	mkdir -p $(DESTDIR)$(BINDIR)
+	$(SETDPERMISSIONS) $(DESTDIR)$(BINDIR)
 
 # `make clean':  remove intermediate and backup files
 clean:

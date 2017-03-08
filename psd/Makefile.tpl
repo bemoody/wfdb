@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:	16 December 2016
+#				Last revised:	  8 March 2017
 # This section of the Makefile should not need to be changed.
 
 # Programs to be compiled.
@@ -13,25 +13,25 @@ all:	$(XFILES)
 	$(STRIP) $(XFILES)
 
 # `make' or `make install':  build and install applications
-install:	$(BINDIR) all scripts
+install:	$(DESTDIR)$(BINDIR) all scripts
 	$(SETXPERMISSIONS) $(XFILES)
-	../install.sh $(BINDIR) $(XFILES)
+	../install.sh $(DESTDIR)$(BINDIR) $(XFILES)
 
 # 'make collect': retrieve the installed applications
 collect:
 	../conf/collect.sh $(BINDIR) $(XFILES) $(SCRIPTS)
 
 # `make scripts': customize and install scripts
-scripts: $(BINDIR)
-	sed s+BINDIR+$(BINDIR)+g <hrfft >$(BINDIR)/hrfft
-	sed s+BINDIR+$(BINDIR)+g <hrlomb >$(BINDIR)/hrlomb
-	sed s+BINDIR+$(BINDIR)+g <hrmem >$(BINDIR)/hrmem
-	sed s+BINDIR+$(BINDIR)+g <hrplot >$(BINDIR)/hrplot
-	cp plot2d plot3d $(BINDIR)
-	cd $(BINDIR); $(SETXPERMISSIONS) $(SCRIPTS)
+scripts:	$(DESTDIR)$(BINDIR)
+	sed s+BINDIR+$(BINDIR)+g <hrfft >$(DESTDIR)$(BINDIR)/hrfft
+	sed s+BINDIR+$(BINDIR)+g <hrlomb >$(DESTDIR)$(BINDIR)/hrlomb
+	sed s+BINDIR+$(BINDIR)+g <hrmem >$(DESTDIR)$(BINDIR)/hrmem
+	sed s+BINDIR+$(BINDIR)+g <hrplot >$(DESTDIR)$(BINDIR)/hrplot
+	cp plot2d plot3d $(DESTDIR)$(BINDIR)
+	cd $(DESTDIR)$(BINDIR); $(SETXPERMISSIONS) $(SCRIPTS)
 
 uninstall:
-	../uninstall.sh $(BINDIR) $(XFILES) $(SCRIPTS)
+	../uninstall.sh $(DESTDIR)$(BINDIR) $(XFILES) $(SCRIPTS)
 
 coherence:	coherence.c
 	$(CC) $(MFLAGS) -o coherence -O coherence.c -lm
@@ -53,5 +53,6 @@ clean:
 	rm -f *.o *~ $(XFILES)
 
 # Create directory for installation if necessary.
-$(BINDIR):
-	mkdir -p $(BINDIR); $(SETDPERMISSIONS) $(BINDIR)
+$(DESTDIR)$(BINDIR):
+	mkdir -p $(DESTDIR)$(BINDIR)
+	$(SETDPERMISSIONS) $(DESTDIR)$(BINDIR)

@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	31 May 2000
-#				Last revised:   16 December 2016
+#				Last revised:   8 March 2017
 # Change the settings below as appropriate for your setup.
 
 # Choose directories in which to install WAVE and its ancillary files by
@@ -44,15 +44,17 @@ OTHERFILES = wave.hl0 wave.info demo.txt Wave.res wavemenu.def Makefile
 all:	wave wave.hlp news.hlp
 
 # `make install':  compile and install WAVE and its help files
-install:  $(BINDIR) $(HELPDIR)/wave $(MENUDIR) $(RESDIR) wave.hlp news.hlp
+install:  $(DESTDIR)$(BINDIR) $(DESTDIR)$(HELPDIR)/wave $(DESTDIR)$(MENUDIR) $(DESTDIR)$(RESDIR) wave.hlp news.hlp
 	rm -f wave.o analyze.o xvwave.o
 	$(MAKE) wave  # make sure all compiled-in paths are up-to-date
-	$(STRIP) wave; $(SETXPERMISSIONS) wave;	../install.sh $(BINDIR) wave
-	cp $(HELPFILES) wave.hlp wave.info demo.txt $(HELPDIR)/wave
-	cd $(HELPDIR)/wave; $(SETPERMISSIONS) $(HELPFILES) wave.info demo.txt
-	-cp wavemenu.def $(MENUDIR) && \
-	 $(SETPERMISSIONS) $(MENUDIR)/wavemenu.def
-	-cp Wave.res $(RESDIR)/Wave && $(SETPERMISSIONS) $(RESDIR)/Wave
+	$(STRIP) wave; $(SETXPERMISSIONS) wave
+	../install.sh $(DESTDIR)$(BINDIR) wave
+	cp $(HELPFILES) wave.hlp wave.info demo.txt $(DESTDIR)$(HELPDIR)/wave
+	cd $(DESTDIR)$(HELPDIR)/wave; $(SETPERMISSIONS) $(HELPFILES) wave.info demo.txt
+	-cp wavemenu.def $(DESTDIR)$(MENUDIR) && \
+	 $(SETPERMISSIONS) $(DESTDIR)$(MENUDIR)/wavemenu.def
+	-cp Wave.res $(DESTDIR)$(RESDIR)/Wave && \
+	 $(SETPERMISSIONS) $(DESTDIR)$(RESDIR)/Wave
 
 # 'make collect': retrieve the installed applications
 collect:
@@ -62,14 +64,14 @@ collect:
 	../conf/collect.sh $(RESDIR) Wave
 
 uninstall:
-	../uninstall.sh $(BINDIR) wave
-	../uninstall.sh $(HELPDIR)/wave $(HELPFILES) wave.hlp wave.info \
-	  demo.txt
-	rmdir $(HELPDIR) || echo "(Ignored)"
-	../uninstall.sh $(MENUDIR) wavemenu.def
-	../uninstall.sh $(RESDIR) Wave
-	../uninstall.sh $(LIBDIR)/X11
-	../uninstall.sh $(LIBDIR)
+	../uninstall.sh $(DESTDIR)$(BINDIR) wave
+	../uninstall.sh $(DESTDIR)$(HELPDIR)/wave $(HELPFILES) wave.hlp \
+	  wave.info demo.txt
+	rmdir $(DESTDIR)$(HELPDIR) || echo "(Ignored)"
+	../uninstall.sh $(DESTDIR)$(MENUDIR) wavemenu.def
+	../uninstall.sh $(DESTDIR)$(RESDIR) Wave
+	../uninstall.sh $(DESTDIR)$(LIBDIR)/X11
+	../uninstall.sh $(DESTDIR)$(LIBDIR)
 
 wave:		$(OFILES)
 	$(CC) $(WCFLAGS) -o wave $(OFILES) $(WLDFLAGS)
@@ -161,13 +163,18 @@ help.o:		help.c
 	$(CC) -c $(WCFLAGS) -w help.c
 
 # Create directories for installation if necessary.
-$(BINDIR):
-	mkdir -p $(BINDIR); $(SETDPERMISSIONS) $(BINDIR)
-$(HELPDIR):
-	mkdir -p $(HELPDIR); $(SETDPERMISSIONS) $(HELPDIR)
-$(HELPDIR)/wave:
-	mkdir -p $(HELPDIR)/wave; $(SETDPERMISSIONS) $(HELPDIR)/wave
-$(MENUDIR):
-	mkdir -p $(MENUDIR); $(SETDPERMISSIONS) $(MENUDIR)
-$(RESDIR):
-	mkdir -p $(RESDIR); $(SETDPERMISSIONS) $(RESDIR)
+$(DESTDIR)$(BINDIR):
+	mkdir -p $(DESTDIR)$(BINDIR)
+	$(SETDPERMISSIONS) $(DESTDIR)$(BINDIR)
+$(DESTDIR)$(HELPDIR):
+	mkdir -p $(DESTDIR)$(HELPDIR)
+	$(SETDPERMISSIONS) $(DESTDIR)$(HELPDIR)
+$(DESTDIR)$(HELPDIR)/wave:
+	mkdir -p $(DESTDIR)$(HELPDIR)/wave
+	$(SETDPERMISSIONS) $(DESTDIR)$(HELPDIR)/wave
+$(DESTDIR)$(MENUDIR):
+	mkdir -p $(DESTDIR)$(MENUDIR)
+	$(SETDPERMISSIONS) $(DESTDIR)$(MENUDIR)
+$(DESTDIR)$(RESDIR):
+	mkdir -p $(DESTDIR)$(RESDIR)
+	$(SETDPERMISSIONS) $(DESTDIR)$(RESDIR)

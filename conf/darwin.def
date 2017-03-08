@@ -1,5 +1,5 @@
 # file: darwin.def	G. Moody and I. Henry	14 November 2002
-#				Last revised: 	17 September 2014
+#				Last revised: 	  8 March 2017
 # 'make' definitions for compiling the WFDB Software Package under Darwin
 #
 # Based on 'freebsd.def'.
@@ -74,11 +74,11 @@ MFLAGS =
 
 # CFLAGS is the set of C compiler options.  CFLAGS should always include
 # CCDEFS.
-CFLAGS = $(MFLAGS) -g -O $(CCDEFS) $(LC) -I$(INCDIR)
+CFLAGS = $(MFLAGS) -g -O $(CCDEFS) $(LC) -I$(DESTDIR)$(INCDIR)
 
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.
-LDFLAGS = -L$(LIBDIR) -lwfdb $(LL)
+LDFLAGS = -L$(DESTDIR)$(LIBDIR) -lwfdb $(LL)
 
 # WFDBLIB is the name of the standard WFDB library.  In order to access it via
 # `-lwfdb', WFDBLIB should be `libwfdb.a'.
@@ -150,7 +150,7 @@ XLIBDIR = $(XHOME)/lib
 WMFLAGS =
 
 # WCFLAGS is the set of C compiler options to use when compiling WAVE.
-WCFLAGS = $(WMFLAGS) -g -O $(CCDEFS) $(LC) -I$(INCDIR) -I$(OWINCDIR) -I$(XINCDIR)
+WCFLAGS = $(WMFLAGS) -g -O $(CCDEFS) $(LC) -I$(DESTDIR)$(INCDIR) -I$(OWINCDIR) -I$(XINCDIR)
 
 # HELPOBJ can be set to "help.o" if you wish to recompile the XView spot help
 # functions in "wave/help.c" (recommended under Linux).
@@ -168,7 +168,7 @@ make-all:	all
 
 # `make lib-post-install' should be run after installing the WFDB library.
 lib-post-install:
-	ranlib $(LIBDIR)/$(WFDBLIB)
+	ranlib $(DESTDIR)$(LIBDIR)/$(WFDBLIB)
 
 lib-post-uninstall:
 	echo "Nothing to be done for lib-post-uninstall"

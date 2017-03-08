@@ -1,5 +1,5 @@
 # file: cygwin-slib.def	I. Henry and G. Moody	19 November 2002
-#				Last revised:	 5 October 2015
+#				Last revised:	  8 March 2017
 
 # This section contains settings suitable for generating a DLL (shared library)
 # under MS Windows using the free Cygwin/gcc ANSI C compiler, available from
@@ -53,7 +53,7 @@ LIBDIR = $(WFDBROOT)/bin
 
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.
-LDFLAGS = -L$(LIBDIR) -lwfdb
+LDFLAGS = -L$(DESTDIR)$(LIBDIR) -lwfdb
 
 # CC is the name of your C compiler.
 CC = gcc
@@ -69,7 +69,7 @@ MFLAGS =
 
 # CFLAGS is the set of C compiler options used when compiling the shared
 # library.  CFLAGS should always include CCDEFS.
-CFLAGS = $(MFLAGS) -g -O $(CCDEFS) $(LC) -I$(INCDIR)
+CFLAGS = $(MFLAGS) -g -O $(CCDEFS) $(LC) -I$(DESTDIR)$(INCDIR)
 
 # WFDBLIB_BASENAME is the name, without version numbers, of the alternate
 # library.  WFDBLIB_SONAME is the shared object name ("soname") of the
@@ -129,21 +129,23 @@ make-all:	all
 
 # `make lib-post-install' should be run after installing the WFDB library.
 lib-post-install:
-	cd $(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_BASENAME)
-	cd $(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_SONAME)
-	test -d $(BINDIR) || \
-	 ( mkdir -p $(BINDIR); $(SETDPERMISSIONS) $(BINDIR) )
+	cd $(DESTDIR)$(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_BASENAME)
+	cd $(DESTDIR)$(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_SONAME)
+	test -d $(DESTDIR)$(BINDIR) || \
+	 ( mkdir -p $(DESTDIR)$(BINDIR); \
+	   $(SETDPERMISSIONS) $(DESTDIR)$(BINDIR) )
 	test /usr/bin = $(BINDIR) || \
- 	 ( cp -p /usr/bin/cygwin1.dll $(BINDIR); \
-	   cp -p /usr/bin/cygz.dll $(BINDIR) )
-	cp $(WFDBLIB_DLLNAME) $(BINDIR)
-	cd $(BINDIR); $(SETLPERMISSIONS) *.dll
+	 ( cp -p /usr/bin/cygwin1.dll $(DESTDIR)$(BINDIR); \
+	   cp -p /usr/bin/cygz.dll $(DESTDIR)$(BINDIR) )
+	cp $(WFDBLIB_DLLNAME) $(DESTDIR)$(BINDIR)
+	cd $(DESTDIR)$(BINDIR); $(SETLPERMISSIONS) *.dll
 	test $(BINDIR) = $(LIBDIR) && \
-	 ( mkdir $(WFDBROOT)/lib; ln -sf $(BINDIR)/$(WFDBLIB_BASENAME) $(WFDBROOT)/lib )
+	 ( mkdir $(DESTDIR)$(WFDBROOT)/lib; \
+	   ln -sf $(BINDIR)/$(WFDBLIB_BASENAME) $(DESTDIR)$(WFDBROOT)/lib )
 
 lib-post-uninstall:
-	rm -f $(LIBDIR)/$(WFDBLIB_BASENAME)
-	rm -f $(LIBDIR)/$(WFDBLIB_SONAME)
-	rm -f $(BINDIR)/$(WFDBLIB_DLLNAME)
-	
+	rm -f $(DESTDIR)$(LIBDIR)/$(WFDBLIB_BASENAME)
+	rm -f $(DESTDIR)$(LIBDIR)/$(WFDBLIB_SONAME)
+	rm -f $(DESTDIR)$(BINDIR)/$(WFDBLIB_DLLNAME)
+
 #______________________________________________________________________________
