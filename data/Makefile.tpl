@@ -23,6 +23,8 @@ collect:
 	cd tape; ../../conf/collect.sh $(DBDIR)/tape *
 	
 uninstall:
+	cd pipe; ../../uninstall.sh $(DESTDIR)$(DBDIR)/pipe *
+	cd tape; ../../uninstall.sh $(DESTDIR)$(DBDIR)/tape *
 	../uninstall.sh $(DESTDIR)$(DBDIR) $(DBFILES) dbcal
 
 $(DESTDIR)$(DBDIR):

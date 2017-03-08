@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:  16 December 2016
+#				Last revised:    8 March 2017
 # This section of the Makefile should not need to be changed.
 
 # 'make' or 'make all': compile the WFDB applications without installing them
@@ -44,7 +44,7 @@ uninstall:	config.cache
 	cd waverc;   $(MAKE) uninstall
 	cd xml;      $(MAKE) uninstall
 	test -d doc && ( cd doc; $(MAKE) uninstall )
-	./uninstall.sh $(WFDBROOT)
+	./uninstall.sh $(DESTDIR)$(WFDBROOT)
 
 # 'make clean': remove binaries, other cruft from source directories
 clean:

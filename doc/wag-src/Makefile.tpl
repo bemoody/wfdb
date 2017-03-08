@@ -80,7 +80,7 @@ collect:
 uninstall:
 	../../uninstall.sh $(MAN1) *.1 ad2m.1 ahaconvert.1 ahaecg2mit.1 \
 	 ann2rr.1 m2a.1 md2a.1 hrlomb.1 hrmem.1 hrplot.1 plot3d.1 cshsetwfdb.1 \
-	 rr2ann.1
+	 rr2ann.1 gqpost.1 mit2edf.1 mit2wav.1 pNNx.1
 	../../uninstall.sh $(MAN3) *.3
 	../../uninstall.sh $(MAN5) *.5
 	../../uninstall.sh $(MAN7) *.7
