@@ -1,6 +1,9 @@
-10.5.25 (2 November 2016):
+10.5.25 (9 March 2017):
 	Changes in 'configure' and the various '.def' files make it simpler to
-	cross-compile WFDB using the GNU toolchain.
+	cross-compile WFDB using the GNU toolchain.  Further improvements to the
+	makefiles permit parallel compilation (when using the -j option of GNU
+	make) and permit installation into a temporary staging directory (using
+	the DESTDIR variable.)
 
 	Support for using libwww to read remote files has been removed.  libwww
 	support was introduced with version 10.0.1 in 2000, and was still
@@ -31,6 +34,14 @@
 	access (PhysioBank as well as PhysioNetWorks.)  This prevents the
 	possibility of disclosing private metadata (such as the names of records
 	that the application is attempting to read) to a network attacker.
+
+	Some systems (particulary those based on systemd) allow programs to open
+	a larger range of file descriptors than what the C select() function
+	accepts.  This causes older versions of the XView library to crash.
+	WAVE now works around this bug.
+
+	Password-protected remote files can now be accessed when WFDB_PAGESIZE
+	is set to zero.
 
 10.5.24 (28 May 2015):
 	A security flaw was found in the 'pnwlogin' script used to access
