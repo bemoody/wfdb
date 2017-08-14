@@ -1,5 +1,5 @@
 /* file: sig.c		G. Moody	 27 April 1990
-			Last revised:	 13 March 2017
+			Last revised:	 14 August 2017
 Signal display functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -507,6 +507,8 @@ static void show_signal_baselines(lp)
 struct display_list *lp;
 {
     int i, l, xoff, yoff;
+
+    if (!lp) return;
 
     yoff = mmy(2);
     for (i = 0; i < nsig; i++) {
