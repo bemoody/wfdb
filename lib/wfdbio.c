@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:   16 December 2016      wfdblib 10.5.25
+                        Last revised:   15 August 2017        wfdblib 10.5.25
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -60,6 +60,8 @@ library functions defined elsewhere:
  wfdb_export_config [10.3.9] (puts the WFDB path, etc. into the environment)
  wfdb_getiwfdb [6.2]	(sets WFDB from the contents of a file)
  wfdb_addtopath [6.2]	(adds path component of string argument to WFDB path)
+ wfdb_vasprintf		(allocates and formats a message)
+ wfdb_asprintf		(allocates and formats a message)
  wfdb_error		(produces an error message)
  wfdb_fprintf [10.0.1]	(like fprintf, but first arg is a WFDB_FILE pointer)
  wfdb_open		(finds and opens database files)
@@ -219,8 +221,7 @@ FVOID wfdbverbose(void)
     error_print = 1;
 }
 
-#define MFNLEN	1024	/* max length of WFDB filename, including '\0' */
-static char wfdb_filename[MFNLEN];
+static char *wfdb_filename;
 
 /* wfdbfile returns the pathname or URL of a WFDB file. */
 
@@ -703,6 +704,92 @@ void wfdb_addtopath(char *s)
     return;
 }
 
+#include <stdarg.h>
+#ifdef va_copy
+# define VA_COPY(dst, src) va_copy(dst, src)
+# define VA_END2(ap)       va_end(ap)
+#else
+# ifdef __va_copy
+#  define VA_COPY(dst, src) __va_copy(dst, src)
+#  define VA_END2(ap)       va_end(ap)
+# else
+#  define VA_COPY(dst, src) memcpy(&(dst), &(src), sizeof(va_list))
+#  define VA_END2(ap)       (void) (ap)
+# endif
+#endif
+
+/* wfdb_vasprintf formats a string in the same manner as vsprintf, and
+allocates a new buffer that is sufficiently large to hold the result.
+The original buffer, if any, is freed afterwards (meaning that, unlike
+vsprintf, it is permissible to use the original buffer as a '%s'
+argument.) */
+int wfdb_vasprintf(char **buffer, const char *format, va_list arguments)
+{
+    char *oldbuffer;
+    int length, bufsize;
+    va_list arguments2;
+
+    /* make an initial guess at how large the buffer should be */
+    bufsize = 2 * strlen(format) + 1;
+
+    oldbuffer = *buffer;
+    *buffer = NULL;
+
+    while (1) {
+	/* do not use SALLOC; avoid recursive calls to wfdb_error */
+	if (*buffer)
+	    free(*buffer);
+	*buffer = malloc(bufsize);
+	if (!(*buffer)) {
+	    if (wfdb_me_fatal()) {
+		fprintf(stderr, "WFDB: out of memory\n");
+		exit(1);
+	    }
+	    length = 0;
+	    break;
+	}
+
+	VA_COPY(arguments2, arguments);
+#ifdef _WINDOWS
+	length = _vsnprintf(*buffer, bufsize, format, arguments2);
+#else
+	length = vsnprintf(*buffer, bufsize, format, arguments2);
+#endif
+	VA_END2(arguments2);
+
+	/* some pre-standard versions of 'vsnprintf' return -1 if the
+	   formatted string does not fit in the buffer; in that case,
+	   try again with a larger buffer */
+	if (length < 0)
+	    bufsize *= 2;
+	/* standard 'vsnprintf' returns the actual length of the
+	   formatted string */
+	else if (length >= bufsize)
+	    bufsize = length + 1;
+	else
+	    break;
+    }
+
+    if (oldbuffer)
+	free(oldbuffer);
+    return (length);
+}
+
+/* wfdb_asprintf formats a string in the same manner as sprintf, and
+allocates a new buffer that is sufficiently large to hold the
+result. */
+int wfdb_asprintf(char **buffer, const char *format, ...)
+{
+    va_list arguments;
+    int length;
+
+    va_start(arguments, format);
+    length = wfdb_vasprintf(buffer, format, arguments);
+    va_end(arguments);
+
+    return (length);
+}
+
 /* The wfdb_error function handles error messages, normally by printing them
 on the standard error output.  Its arguments can be any set of arguments which
 would be legal for printf, i.e., the first one is a format string, and any
@@ -710,67 +797,52 @@ additional arguments are values to be filled into the '%*' placeholders
 in the format string.  It can be silenced by invoking wfdbquiet(), or
 re-enabled by invoking wfdbverbose().
 
-The wfdb_fprintf function handles all formatted output to files.  It is used
-in the same way as the standard fprintf function, except that its first
-argument is a pointer to a WFDB_FILE rather than a FILE.
+The function wfdberror (without the underscore) returns the most recent error
+message passed to wfdb_error (even if output was suppressed by wfdbquiet).
+This feature permits programs to handle errors somewhat more flexibly (in
+windowing environments, for example, where using the standard error output may
+be inappropriate).
+*/
 
-There are three major versions of each of wfdb_error and wfdb_fprintf below.
-The first version is compiled by ANSI C compilers.  (A variant of this version
-of wfdb_error can be used with Microsoft Windows; it puts the error message
-into a message box, rather than using the standard error output.)  The second
-version is compiled by traditional UNIX C compilers (System V, Berkeley 4.x)
-that are not ANSI-conforming.  The third version can be compiled by many older
-C compilers, if the symbol OLDC is defined; do so only if you are using a C
-library which does not include a vsprintf function and a "stdarg.h" or
-"varargs.h" header file.  This third version uses an undocumented function
-(_doprnt) which works for most if not all older UNIX C compilers, and several
-others as well.
-
-If OLDC is not defined, the function wfdberror (without the underscore) returns
-the most recent error message passed to wfdb_error (even if output was
-suppressed by wfdbquiet).  This feature permits programs to handle errors
-somewhat more flexibly (in windowing environments, for example, where using the
-standard error output may be inappropriate).  */
-
-#ifndef OLDC
-static char error_message[256];
-#endif
+static int error_flag;
+static char *error_message;
 
 FSTRING wfdberror(void)
 {
-    if (*error_message == '\0')
-	sprintf(error_message,
-	       "WFDB library version %d.%d.%d (%s).\n",
-	       WFDB_MAJOR, WFDB_MINOR, WFDB_RELEASE, __DATE__);
-    return (error_message);
+    if (!error_flag)
+	wfdb_asprintf(&error_message,
+		      "WFDB library version %d.%d.%d (%s).\n",
+		      WFDB_MAJOR, WFDB_MINOR, WFDB_RELEASE, __DATE__);
+    if (error_message)
+	return (error_message);
+    else
+	return ("WFDB: cannot allocate memory for error message");
 }
-
-/* First version: for ANSI C compilers and Microsoft Windows */
-#if defined(__STDC__) || defined(_WINDOWS)
-#include <stdarg.h>
-#ifdef _WINDOWS
-#include <windows.h>	      /* contains function prototype for MessageBox */
-#endif
 
 void wfdb_error(char *format, ...)
 {
     va_list arguments;
 
+    error_flag = 1;
     va_start(arguments, format);
+    wfdb_vasprintf(&error_message, format, arguments);
+    va_end(arguments);
+
 #if 1				/* standard variant: use stderr output */
-    (void)vsprintf(error_message, format, arguments);
     if (error_print) {
-	(void)fprintf(stderr, "%s", error_message);
+	(void)fprintf(stderr, "%s", wfdberror());
 	(void)fflush(stderr);
     }
 #else				/* MS Windows variant: use message box */
-    (void)wvsprintf(error_message, format, arguments);
     if (error_print)
-	MessageBox(GetFocus(), error_message, "WFDB Library Error",
-		    MB_ICONASTERISK | MB_OK);
+	MessageBox(GetFocus(), wfdberror(), "WFDB Library Error",
+		   MB_ICONASTERISK | MB_OK);
 #endif
-    va_end(arguments);
 }
+
+/* The wfdb_fprintf function handles all formatted output to files.  It is
+used in the same way as the standard fprintf function, except that its first
+argument is a pointer to a WFDB_FILE rather than a FILE. */
 
 #if WFDB_NETFILES
 static int nf_vfprintf(netfile *nf, const char *format, va_list ap)
@@ -797,73 +869,17 @@ int wfdb_fprintf(WFDB_FILE *wp, const char *format, ...)
     return (ret);
 }
 
-#else
-#ifndef OLDC	     /* Second version: for traditional UNIX K&R C compilers */
-#include <varargs.h>
-void wfdb_error(va_alist)
-va_dcl
-{
-    va_list arguments;
-    char *format;
-
-    va_start(arguments);
-    format = va_arg(arguments, char *);
-    (void)vsprintf(error_message, format, arguments);
-    if (error_print) {
-	(void)fprintf(stderr, "%s", error_message);
-	(void)fflush(stderr);
-    }
-    va_end(arguments);
-}
-
-int wfdb_fprintf(va_alist)
-va_dcl
-{
-    va_list arguments;
-    WFDB_FILE *wp;
-    char *format;
-    static char obuf[1024];	/* careful: buffer overflows possible! */
-    int ret;
-
-    va_start(arguments);
-    wp = va_arg(arguments, WFDB_FILE *);
-    format = va_arg(arguments, char *);
-    (void)vsprintf(obuf, format, arguments);
-    ret = fprintf(wp->fp, format, obuf);
-    va_end(arguments);
-    return (ret);
-}
-    
-#else			/* Third version: for many older C compilers */
-void wfdb_error(format, arguments)
-char *format;
-{
-    if (error_print) {
-	(void)_doprnt(format, &arguments, stderr);
-	(void)fflush(stderr);
-    }
-}
-
-int wfdb_fprintf(wp, format, arguments)
-WFDB_FILE *wp;
-char *format;
-{
-    return (_doprnt(format, &arguments, wp->fp));
-}
-#endif
-#endif
-
 #define spr1(S, RECORD, TYPE)   ((*TYPE == '\0') ? \
-				     (void)sprintf(S, "%s", RECORD) : \
-				     (void)sprintf(S, "%s.%s", RECORD, TYPE))
+				 wfdb_asprintf(S, "%s", RECORD) : \
+				 wfdb_asprintf(S, "%s.%s", RECORD, TYPE))
 #ifdef FIXISOCD
 # define spr2(S, RECORD, TYPE)  ((*TYPE == '\0') ? \
-				     (void)sprintf(S, "%s;1", RECORD) : \
-				     (void)sprintf(S, "%s.%.3s;1",RECORD,TYPE))
+				 wfdb_asprintf(S, "%s;1", RECORD) : \
+				 wfdb_asprintf(S, "%s.%.3s;1",RECORD,TYPE))
 #else
 # define spr2(S, RECORD, TYPE)  ((*TYPE == '\0') ? \
-				     (void)sprintf(S, "%s.", RECORD) : \
-				     (void)sprintf(S, "%s.%.3s", RECORD, TYPE))
+				 wfdb_asprintf(S, "%s.", RECORD) : \
+				 wfdb_asprintf(S, "%s.%.3s", RECORD, TYPE))
 #endif
 
 static char irec[WFDB_MAXRNL+1]; /* current record name, set by wfdb_setirec */
@@ -926,9 +942,10 @@ is no longer supported. */
 
 WFDB_FILE *wfdb_open(const char *s, const char *record, int mode)
 {
-    char *wfdb, *p, *q, *r;
+    char *wfdb, *p, *q, *r, *buf = NULL;
     int rlen;
     struct wfdb_path_component *c0;
+    int bufsize, len, ireclen;
     WFDB_FILE *ifile;
 
     /* If the type (s) is empty, replace it with an empty string so that
@@ -963,13 +980,17 @@ WFDB_FILE *wfdb_open(const char *s, const char *record, int mode)
        the final element (e.g., 'abc/123/' becomes 'abc/123/123'). */
     rlen = strlen(record);
     p = (char *)(record + rlen - 1);
-    if (*p == '/') {
+    if (rlen > 1 && *p == '/') {
 	for (q = p-1; q > record; q--)
 	    if (*q == '/') { q++; break; }
-	if (q < p-1) {
+	if (q < p) {
 	    SUALLOC(r, rlen + p-q + 1, 1); /* p-q is length of final element */
 	    strcpy(r, record);
 	    strncpy(r + rlen, q, p-q);
+	}
+	else {
+	    SUALLOC(r, rlen + 1, 1);
+	    strcpy(r, record);
 	}
     }
     else {
@@ -981,12 +1002,12 @@ WFDB_FILE *wfdb_open(const char *s, const char *record, int mode)
        An output file can be opened in another directory if the path to
        that directory is the first part of 'record'. */
     if (mode == WFDB_WRITE) {
-	spr1(wfdb_filename, r, s);
+	spr1(&wfdb_filename, r, s);
 	SFREE(r);
 	return (wfdb_fopen(wfdb_filename, WB));
     }
     else if (mode == WFDB_APPEND) {
-	spr1(wfdb_filename, r, s);
+	spr1(&wfdb_filename, r, s);
 	SFREE(r);
 	return (wfdb_fopen(wfdb_filename, AB));
     }
@@ -998,9 +1019,7 @@ WFDB_FILE *wfdb_open(const char *s, const char *record, int mode)
        this case, don't search the WFDB path, but add its parent directory
        to the path if the file can be read. */
     if (strncmp(r, "http://", 7) == 0 || strncmp(r, "https://", 8) == 0) {
-	if (strlen(r) + strlen(s) >= MFNLEN)
-	    return (NULL);  /* name too long */
-	spr1(wfdb_filename, r, s);
+	spr1(&wfdb_filename, r, s);
 	if ((ifile = wfdb_fopen(wfdb_filename, RB)) != NULL) {
 	    /* Found it! Add its path info to the WFDB path. */
 	    wfdb_addtopath(wfdb_filename);
@@ -1010,36 +1029,45 @@ WFDB_FILE *wfdb_open(const char *s, const char *record, int mode)
     }
 
     for (c0 = wfdb_path_list; c0; c0 = c0->next) {
-	static char long_filename[MFNLEN];
+	char *long_filename = NULL;
 
-        p = wfdb_filename;
+	ireclen = strlen(irec);
+	bufsize = 64;
+	SALLOC(buf, 1, bufsize);
+	len = 0;
 	wfdb = c0->prefix;
-	while (*wfdb && p < wfdb_filename+MFNLEN-20) {
-	  if (*wfdb == '%') {
+	while (*wfdb) {
+	    while (len + ireclen >= bufsize) {
+		bufsize *= 2;
+		SREALLOC(buf, 1, bufsize);
+	    }
+	    if (!buf)
+		break;
+
+	    if (*wfdb == '%') {
 		/* Perform substitutions in the WFDB path where '%' is found */
 		wfdb++;
 		if (*wfdb == 'r') {
 		    /* '%r' -> record name */
-		    (void)strcpy(p, irec);
-		    p += strlen(p);
+		    (void)strcpy(buf + len, irec);
+		    len += ireclen;
 		    wfdb++;
 		}
 		else if ('1' <= *wfdb && *wfdb <= '9' && *(wfdb+1) == 'r') {
 		    /* '%Nr' -> first N characters of record name */
 		    int n = *wfdb - '0';
-		    int len = strlen(irec);
 
-		    if (len < n) n = len;
-		    (void)strncpy(p, irec, n);
-		    p += n;
-		    *p = '\0';
+		    if (ireclen < n) n = ireclen;
+		    (void)strncpy(buf + len, irec, n);
+		    len += n;
+		    buf[len] = '\0';
 		    wfdb += 2;
 		}
 		else    /* '%X' -> X, if X is neither 'r', nor a non-zero digit
 			   followed by 'r' */
-		    *p++ = *wfdb++;
+		    buf[len++] = *wfdb++;
 	    }
-	    else *p++ = *wfdb++;
+	    else buf[len++] = *wfdb++;
 	}
 	/* Unless the WFDB component was empty, or it ended with a directory
 	   separator, append a directory separator to wfdb_filename;  then
@@ -1047,36 +1075,50 @@ WFDB_FILE *wfdb_open(const char *s, const char *record, int mode)
 	   files (URLs) are always constructed using '/' separators, even if
 	   the native directory separator is '\' (MS-DOS) or ':' (Macintosh).
 	*/
-	if (p != wfdb_filename) {
+	if (len + 2 >= bufsize) {
+	    bufsize = len + 2;
+	    SREALLOC(buf, 1, bufsize);
+	}
+	if (!buf)
+	    continue;
+	if (len > 0) {
 	    if (c0->type == WFDB_NET) {
-		if (*(p-1) != '/') *p++ = '/';
+		if (buf[len-1] != '/') buf[len++] = '/';
 	    }
 #ifndef MSDOS
-	    else if (*(p-1) != DSEP)
+	    else if (buf[len-1] != DSEP)
 #else
-	    else if (*(p-1) != DSEP && *(p-1) != ':')
+	    else if (buf[len-1] != DSEP && buf[len-1] != ':')
 #endif
-		*p++ = DSEP;
+		buf[len++] = DSEP;
 	}
-	if (p + strlen(r) + (s ? strlen(s) : 0) > wfdb_filename + MFNLEN-5)
-	    continue;	/* name too long -- skip */
-	spr1(p, r, s);
+	buf[len] = 0;
+	wfdb_asprintf(&buf, "%s%s", buf, r);
+	if (!buf)
+	    continue;
+
+	spr1(&wfdb_filename, buf, s);
 	if ((ifile = wfdb_fopen(wfdb_filename, RB)) != NULL) {
 	    /* Found it! Add its path info to the WFDB path. */
 	    wfdb_addtopath(wfdb_filename);
+	    SFREE(buf);
 	    SFREE(r);
 	    return (ifile);
 	}
 	/* Not found -- try again, using an alternate form of the name,
 	   provided that that form is distinct. */
-	strcpy(long_filename, wfdb_filename);
-	spr2(p, r, s);
+	SSTRCPY(long_filename, wfdb_filename);
+	spr2(&wfdb_filename, buf, s);
 	if (strcmp(wfdb_filename, long_filename) && 
 	    (ifile = wfdb_fopen(wfdb_filename, RB)) != NULL) {
 	    wfdb_addtopath(wfdb_filename);
+	    SFREE(long_filename);
+	    SFREE(buf);
 	    SFREE(r);
 	    return (ifile);
 	}
+	SFREE(long_filename);
+	SFREE(buf);
     }
     /* If the file was not found in any of the directories listed in wfdb,
        return a null file pointer to indicate failure. */
@@ -1203,9 +1245,8 @@ static char *curl_get_ua_string(void)
     static char *s = NULL;
 
     libcurl_ver = curl_version();
-    SALLOC(s, 1, 32 + strlen(libcurl_ver));
-    sprintf(s, "libwfdb/%d.%d.%d (%s)", WFDB_MAJOR, WFDB_MINOR,
-		WFDB_RELEASE, libcurl_ver);
+    wfdb_asprintf(&s, "libwfdb/%d.%d.%d (%s)", WFDB_MAJOR, WFDB_MINOR,
+		  WFDB_RELEASE, libcurl_ver);
     return (s);
 }
 
