@@ -31,6 +31,11 @@ Wave.SignalWindow.font:	-*-lucida-bold-r-normal-sans-14-*
 !	Wave.SignalWindow.font: lucidasans-bold-14
 ! (or use xlsfonts to find an alternative that you like).
 
+! The default behavior for XView menu buttons is that the left mouse button
+! (designated 'select') activates the menu's default action, whereas the right
+! mouse button (designated 'menu') pops up the menu.  If 'SelectDisplaysMenu'
+! is set to 'true', either button will open the menu.
+OpenWindows.SelectDisplaysMenu: true
 
 ! -----------------------------------------------------------------------------
 
