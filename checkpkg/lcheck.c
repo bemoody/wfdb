@@ -1,5 +1,5 @@
 /* file: lcheck.c	G. Moody       7 September 2001
-			Last revised:  26 November 2010
+			Last revised:  15 August 2017
 -------------------------------------------------------------------------------
 wfdbcheck: test WFDB library
 Copyright (C) 2001-2010 George B. Moody
@@ -60,7 +60,7 @@ char *argv[];
   strcpy(libversion, p);
 
   /* Print the library version number and date. */
-  fprintf(stderr, "Testing %s", libversion = wfdberror());
+  fprintf(stderr, "Testing %s", libversion);
 
   /* Check that the installed <wfdb/wfdb.h> matches the library. */
   sprintf(headerversion, "WFDB library version %d.%d.%d",
