@@ -342,9 +342,36 @@ scale' menu), add \fB-Vv 2\fR to the command line, or
 \fBWave.View.AmplitudeScale:2\fR to the X11 resource database.
 .TP
 \fBWave.View.TimeScale\fR (\fB-Vt\fR)
-Set the time scale (0: 50 mm/min; 1: 125 mm/min; 2: 250 mm/min; 3: 500 mm/min;
-4: 12.5 mm/sec; 5: 25 mm/sec (default); 6: 50 mm/sec; 7: 125 mm/sec;
-8: 250 mm/sec).
+Set the time scale:
+.TS
+l l.
+\fB-Vt 0\fR	0.25 mm/hour
+\fB-Vt 1\fR	1 mm/hour
+\fB-Vt 2\fR	5 mm/hour
+\fB-Vt 3\fR	0.25 mm/min
+\fB-Vt 4\fR	1 mm/min
+\fB-Vt 5\fR	5 mm/min
+\fB-Vt 6\fR	25 mm/min
+\fB-Vt 7\fR	50 mm/min
+\fB-Vt 8\fR	125 mm/min
+\fB-Vt 9\fR	250 mm/min
+\fB-Vt 10\fR	500 mm/min
+\fB-Vt 11\fR	12.5 mm/sec
+\fB-Vt 12\fR	25 mm/sec (default)
+\fB-Vt 13\fR	50 mm/sec
+\fB-Vt 14\fR	125 mm/sec
+\fB-Vt 15\fR	250 mm/sec
+\fB-Vt 16\fR	500 mm/sec
+\fB-Vt 17\fR	1000 mm/sec
+\fB-Vt 18\fR	2000 mm/sec
+\fB-Vt 19\fR	5000 mm/sec
+\fB-Vt 20\fR	10 mm/ms
+\fB-Vt 21\fR	20 mm/ms
+\fB-Vt 22\fR	50 mm/ms
+\fB-Vt 23\fR	100 mm/ms
+\fB-Vt 24\fR	200 mm/ms
+\fB-Vt 25\fR	500 mm/ms
+.TE
 .TP
 \fBWave.View.AmplitudeScale\fR (\fB-Vv\fR)
 Set the amplitude scale (0: 1 mm/mV; 1: 2.5 mm/mV; 2: 5 mm/mV; 3: 10 mm/mV
