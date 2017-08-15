@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:   1 January 2015  	wfdblib 10.5.24
+			Last revised:   2 November 2016 	wfdblib 10.5.25
 WFDB library functions for annotations
 
 _______________________________________________________________________________
@@ -101,6 +101,9 @@ may be attached to the same signal provided that their num fields are unique.
 #define CS	10	/* number of places by which code must be shifted */
 #define DATA	01777	/* data segment of annotation word */
 #define MAXRR	01777	/* longest interval which can be coded in a word */
+
+#define MAXSKIP 0x7fffffff /* largest interval represented by a SKIP */
+#define MINSKIP (-0x7fffffff) /* smallest interval represented by a SKIP */
 
 /* Pseudo-annotation codes.  Legal pseudo-annotation codes are between PAMIN
    (defined below) and CODE (defined above).  PAMIN must be greater than
@@ -549,7 +552,7 @@ FINT putann(WFDB_Annotator n, WFDB_Annotation *annot)
     unsigned annwd;
     unsigned char *ap;
     int i, len;
-    long delta;
+    unsigned long delta;
     WFDB_Time t;
     struct oadata *oa;
 
@@ -572,13 +575,31 @@ FINT putann(WFDB_Annotator n, WFDB_Annotation *annot)
 	tra.aux = NULL;
 	if (putann(n, &tra) < 0) return (-1);
     }
-    delta = t - oa->ann.time;
-    if (!(annot->chan > oa->ann.chan || annot->num > oa->ann.num || delta>0L ||
-	  (t == 0L && oa->ann.time == 0L)))
+    delta = (unsigned long) t - oa->ann.time;
+    if (!(annot->chan > oa->ann.chan || annot->num > oa->ann.num ||
+	  t > oa->ann.time || (t == 0L && oa->ann.time == 0L)))
         oa->out_of_order = 1;
     switch (oa->info.stat) {
       case WFDB_WRITE:	/* MIT-format output file */
       default:
+	if (t > oa->ann.time) {
+	    /* A SKIP can represent a forward offset of at most
+	       2^31-1, so if delta is larger than that, it needs to be
+	       represented by multiple SKIPs. */
+	    while (delta > MAXSKIP) {
+		wfdb_p16(SKIP, oa->file); wfdb_p32(MAXSKIP, oa->file);
+		delta -= MAXSKIP;
+	    }
+	}
+	else {
+	    /* Likewise, a SKIP can represent a backward offset of at
+	       most 2^31 (minus 1 to account for the special handling
+	       of null annotations below.) */
+	    while (-delta > -MINSKIP) {
+		wfdb_p16(SKIP, oa->file); wfdb_p32(MINSKIP, oa->file);
+		delta -= MINSKIP;
+	    }
+	}
 	if (annot->anntyp == 0) {
 	    /* The caller intends to write a null annotation here, but putann
 	       must not write a word of zeroes that would be interpreted as
@@ -586,7 +607,9 @@ FINT putann(WFDB_Annotator n, WFDB_Annotation *annot)
 	       just before the desired one;  thus annwd (below) is never 0. */
 	    wfdb_p16(SKIP, oa->file); wfdb_p32(delta-1, oa->file); delta = 1;
 	}
-	else if (delta > MAXRR || delta < 0L) {
+	else if (delta > MAXRR) {
+	    /* skip forward by more than MAXRR, or skip backward by
+	       any distance */
 	    wfdb_p16(SKIP, oa->file); wfdb_p32(delta, oa->file); delta = 0;
 	}	
 	annwd = (int)delta + ((int)(annot->anntyp) << CS);
