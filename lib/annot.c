@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:   2 November 2016 	wfdblib 10.5.25
+			Last revised:   16 August 2017  	wfdblib 10.5.25
 WFDB library functions for annotations
 
 _______________________________________________________________________________
@@ -27,6 +27,7 @@ _______________________________________________________________________________
 
 This file contains definitions of the following functions, which are not
 visible outside of this file:
+ round_to_time		(rounds a double to the nearest WFDB_Time)
  get_ann_table		(reads tables used by annstr, strann, and anndesc)
  put_ann_table		(writes tables used by annstr, strann, and anndesc)
  allociann		(sets max # of simultaneously open input annotators)
@@ -136,7 +137,7 @@ static struct iadata {
     unsigned char auxstr[AUXBUFLEN]; /* aux string buffer */
     unsigned index;		/* next available position in auxstr */
     double tmul, ptmul;		/* tmul * annotation time = sample count */
-    WFDB_Time tt;		/* annotation time (MIT format only).  This
+    double tt;			/* annotation time (MIT format only).  This
 				   equals ann.time unless a SKIP follows ann;
 				   in such cases, it is the time of the SKIP
 				   (i.e., the time of the annotation following
@@ -160,6 +161,35 @@ static WFDB_Frequency oafreq;	/* time resolution in ticks/sec for newly-
 				   created output annotators */
 
 /* Local functions (for the use of other functions in this module only). */
+
+#include <limits.h>
+
+/* Round a double to the nearest WFDB_Time, with halfway cases always
+   rounded up.  (For example, round_to_time(10.5) is 11, but
+   round_to_time(-10.5) is -10.) */
+static WFDB_Time round_to_time(double x)
+{
+    WFDB_Time t;
+
+    if (x >= 0) {
+	if (x >= LONG_MAX)
+	    return (LONG_MAX);
+	t = x;
+	if (x - t >= 0.5)
+	    return (t + 1);
+	else
+	    return (t);
+    }
+    else {
+	if (x <= LONG_MIN)
+	    return (LONG_MIN);
+	t = x;
+	if (x - t < -0.5)
+	    return (t - 1);
+	else
+	    return (t);
+    }
+}
 
 static int get_ann_table(WFDB_Annotator i)
 {
@@ -211,7 +241,7 @@ static int get_ann_table(WFDB_Annotator i)
 	}
 	else
 	    iad[i]->tmul = getspf();
-	annot.time = (WFDB_Time)(annot.time * iad[i]->tmul + 0.5);
+	annot.time = round_to_time(annot.time * iad[i]->tmul);
 	(void)ungetann(i, &annot);
     }
     return (0);
@@ -432,7 +462,7 @@ FINT getann(WFDB_Annotator n, WFDB_Annotation *annot)
 	if (ia->ptmul != ia->tmul) {
 	    ia->tmul = (ia->afreq) ? getifreq()/ia->afreq : getspf();
 	    if (ia->ptmul != ia->tmul) {
-		annot->time = (WFDB_Time)(annot->time*ia->tmul/ia->ptmul + 0.5);
+		annot->time = round_to_time(annot->time*ia->tmul/ia->ptmul);
 		ia->ptmul = ia->tmul;
 	    }
 	}
@@ -461,7 +491,7 @@ FINT getann(WFDB_Annotator n, WFDB_Annotation *annot)
 	    ia->ptmul = ia->tmul;
 	    ia->tmul = (ia->afreq) ? getifreq()/ia->afreq :getspf();
 	}
-	ia->ann.time = (WFDB_Time)(ia->tt * ia->tmul + 0.5);
+	ia->ann.time = round_to_time(ia->tt * ia->tmul);
 	ia->ann.anntyp = (ia->word & CODE) >> CS; /* set annotation type */
 	ia->ann.subtyp = 0;	/* reset subtype field */
 	ia->ann.aux = NULL;	/* reset aux field */
