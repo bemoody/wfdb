@@ -213,6 +213,7 @@ static WFDB_Frequency ffreq;	/* frame rate (frames/second) */
 static WFDB_Frequency ifreq;	/* samples/second/signal returned by getvec */
 static WFDB_Frequency sfreq;	/* samples/second/signal read by getvec */
 static WFDB_Frequency cfreq;	/* counter frequency (ticks/second) */
+static int spfmax;		/* max number of samples per frame */
 static long btime;		/* base time (milliseconds since midnight) */
 static WFDB_Date bdate;		/* base date (Julian date) */
 static WFDB_Time nsamples;	/* duration of signals (in samples) */
@@ -858,7 +859,7 @@ static int edfparse(WFDB_FILE *ifile)
 	for (i = 8; i >= 0 && buf[i] == ' '; i--)
 	    buf[i] = '\0';
 	sscanf(buf, "%d", &n);
-	if ((hsd[s]->info.spf = n) > ispfmax) ispfmax = n;	
+	if ((hsd[s]->info.spf = n) > spfmax) spfmax = n;
     }
 
     (void)wfdb_fclose(ifile);	/* (don't bother reading nsig*32 bytes of free
@@ -867,7 +868,7 @@ static int edfparse(WFDB_FILE *ifile)
 
     ffreq = 1.0 / spr;	/* frame frequency = 1/(seconds per EDF block) */
     cfreq = ffreq; /* set sampling and counter frequencies to match */
-    sfreq = ffreq * ispfmax;
+    sfreq = ffreq * spfmax;
     if (getafreq() == 0.0) setafreq(sfreq);
     gvmode |= WFDB_HIGHRES;
     sprintf(buf, "%02d:%02d:%02d %02d/%02d/%04d",
@@ -897,6 +898,8 @@ static int readheader(const char *record)
 	hheader = NULL;
     }
 
+    spfmax = 1;
+    sfreq = ffreq;
     isedf = 0;
     if (strcmp(record, "~") == 0) {
 	if (in_msrec && vsd) {
@@ -1213,6 +1216,7 @@ static int readheader(const char *record)
 	    if (*p == '+' && *(++p))
 		if ((hs->start = strtol(p, NULL, 10)) < 0L) hs->start = 0L;
 	}
+	if (hs->info.spf > spfmax) spfmax = hs->info.spf;
 	/* The resolution for deskewing is one frame.  The skew in samples
 	   (given in the header) is converted to skew in frames here. */
 	hs->skew = (int)(((double)hs->skew)/hs->info.spf + 0.5);
@@ -1303,6 +1307,7 @@ static int readheader(const char *record)
 	    (void)sprintf(hs->info.desc,
 			  "record %s, signal %d", record, s);
     }
+    setgvmode(gvmode);		/* Reset sfreq if appropriate. */
     return (s);			/* return number of available signals */
 }
 
@@ -2312,6 +2317,7 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
 	isigclose();
 	return (-3);
     }
+    spfmax = ispfmax;
     setgvmode(gvmode);	/* Reset sfreq if appropriate. */
     gvc = ispfmax;	/* Initialize getvec's sample-within-frame counter. */
 
@@ -2635,8 +2641,8 @@ FVOID setgvmode(int mode)
 
     if ((mode & WFDB_HIGHRES) == WFDB_HIGHRES) {
 	gvmode |= WFDB_HIGHRES;
-	if (ispfmax == 0) ispfmax = 1;
-	sfreq = ffreq * ispfmax;
+	if (spfmax == 0) spfmax = 1;
+	sfreq = ffreq * spfmax;
     }
     else {
 	gvmode &= ~(WFDB_HIGHRES);
@@ -2859,7 +2865,7 @@ FINT isigsettime(WFDB_Time t)
     /* Return immediately if no seek is needed. */
     if (nisig == 0) return (0);
     if (ifreq <= (WFDB_Frequency)0) {
-	if (sfreq == ffreq)
+	if (!(gvmode & WFDB_HIGHRES) || ispfmax < 2)
 	    curtime = istime;
 	else
 	    curtime = (istime - 1) * ispfmax + gvc;
@@ -3438,7 +3444,8 @@ FINT setsampfreq(WFDB_Frequency freq)
 {
     if (freq >= 0.) {
 	sfreq = ffreq = freq;
-	if ((gvmode & WFDB_HIGHRES) == WFDB_HIGHRES) sfreq *= ispfmax;
+	if (spfmax == 0) spfmax = 1;
+	if ((gvmode & WFDB_HIGHRES) == WFDB_HIGHRES) sfreq *= spfmax;
 	return (0);
     }
     wfdb_error("setsampfreq: sampling frequency must not be negative\n");
@@ -3616,7 +3623,7 @@ static WFDB_Time fstrtim(const char *string, WFDB_Frequency f)
 			(WFDB_Time)((strtod(string+1, NULL)-bcount)*f/cfreq) :
 			strtotime(string+1, NULL, 10));
       case 'e':	return ((in_msrec ? msnsamples : nsamples) * 
-		        (((gvmode&WFDB_HIGHRES) == WFDB_HIGHRES) ? ispfmax: 1));
+		        (((gvmode&WFDB_HIGHRES) == WFDB_HIGHRES) ? spfmax: 1));
       case 'f': return (WFDB_Time)(strtotime(string+1, NULL, 10)*f/ffreq);
       case 'i':	return (WFDB_Time)(istime *
 			(ifreq > 0.0 ? (ifreq/sfreq) : 1.0) *
