@@ -632,25 +632,21 @@ usually be given before or after the @samp{-lwfdb} option.
 @cindex NETFILES
 @cindex curl
 @cindex libcurl
-@cindex libwww
-@cindex W3C libwww
 
 If the WFDB library was installed with NETFILES support, it will make use of
-functions contained in the @code{libcurl} or @code{libwww} libraries.  If you
-have dynamically linkable versions of the @code{libcurl} or @code{libwww}
-libraries, as under GNU/Linux, these will be loaded automatically when you run
-@code{psamples}.  If you have only static versions of these libraries, however,
-it is necessary to provide additional arguments in the @code{cc} command line
-in order to compile successfully.  One way to do this is to follow the model
-used to compile the standard WFDB applications supplied with the WFDB library;
-see @file{Makefile} in the @file{app} directory of the WFDB software package
-source tree.
+functions contained in the @code{libcurl} library.  If you have a dynamically
+linkable version of the @code{libcurl} library, as under GNU/Linux, these will
+be loaded automatically when you run @code{psamples}.  If you have only static
+versions of these libraries, however, it is necessary to provide additional
+arguments in the @code{cc} command line in order to compile successfully.  One
+way to do this is to follow the model used to compile the standard WFDB
+applications supplied with the WFDB library; see @file{Makefile} in the
+@file{app} directory of the WFDB software package source tree.
 
-If you are using WFDB version 10.2.6 or a later version and @file{gcc}
-or a compatible compiler, the @file{wfdb-config} utility is available
-to help construct commands for compiling programs that use the WFDB
-library (and the @code{libcurl} or @code{libwww} libraries, if available).
-Use it like this:
+If you are using WFDB version 10.2.6 or a later version and @file{gcc} or a
+compatible compiler, the @file{wfdb-config} utility is available to help
+construct commands for compiling programs that use the WFDB library (and the
+@code{libcurl} library, if available).  Use it like this:
 
 @example
 gcc `wfdb-config --cflags` -o psamples psamples.c `wfdb-config --libs`
@@ -660,7 +656,7 @@ gcc `wfdb-config --cflags` -o psamples psamples.c `wfdb-config --libs`
 Note that this command contains backticks (`), not apostrophes (').
 @file{wfdb-config} is particularly useful if the WFDB library or
 its @file{*.h} files are installed in non-standard locations, or if
-you have only static @code{libcurl} or @code{libwww} libraries.
+you have only a static @code{libcurl} library.
 
 Under MS-Windows, @file{gcc} is included in the freely available Cygwin
 software development system (@uref{http://@-www@-.cygwin@-.com/}), and also in
@@ -1103,15 +1099,13 @@ modified version rather than the original.
 @cindex NETFILES
 @cindex curl
 @cindex libcurl
-@cindex libwww
-@cindex W3C libwww
 
 The WFDB path may contain @uref{http://} and @code{ftp://} URL prefixes (other
 schema, such as @code{file://} and @code{https://}, may also be supported if
-they are supported by your version of @code{libcurl} or @code{libwww}).  If
-NETFILES support is not compiled into the WFDB library, any WFDB path
-components containing @file{://} are ignored.  (These features were first
-introduced in WFDB library version 10.1.0.)
+they are supported by your version of @code{libcurl}).  If NETFILES support is
+not compiled into the WFDB library, any WFDB path components containing
+@file{://} are ignored.  (These features were first introduced in WFDB library
+version 10.1.0.)
 
 @cindex indirect WFDB path
 @cindex file containing WFDB path
@@ -5937,22 +5931,15 @@ as will be used; if, for example, only one signal is needed, only
 @cindex WFDB path
 @cindex curl
 @cindex libcurl
-@cindex libwww
-@cindex W3C libwww
 
 If the symbol @code{WFDB_NETFILES} is defined at the time the WFDB library is
 compiled, then input files located on remote web (HTTP) and FTP servers can be
-read directly.  This capability was originally implemented using the World Wide
-Web Consortium's @code{libwww} library (which is available on many of the
-platforms supported by the WFDB library).  In WFDB library version 10.3.16 and
-later, this capability can alternatively be provided by the @code{libcurl}
-library, which is smaller, faster, and more robust than @code{libwww}, and is
-actively supported and its creators on all of the popular platforms and many
-others as well.  NETFILES support, if available, is transparent to WFDB
-applications.  To make use of this feature, simply link to the NETFILES-enabled
-WFDB library (the necessary @code{libcurl} or @code{libwww} functions will be
-loaded automatically), and incorporate one or more URL prefixes in the WFDB
-path.
+read directly.  This capability is implemented using the @code{libcurl} library
+(which is available on many of the platforms supported by the WFDB library).
+NETFILES support, if available, is transparent to WFDB applications.  To make
+use of this feature, simply link to the NETFILES-enabled WFDB library (the
+necessary @code{libcurl} functions will be loaded automatically), and
+incorporate one or more URL prefixes in the WFDB path.
 
 @cindex WFDB path
 @cindex PhysioBank
@@ -5970,17 +5957,16 @@ possible to read record @code{slp37} of that database directly from PhysioBank
 by passing @code{slpdb/slp37} as the @var{record} argument to @code{wfdbinit}
 (or @code{isigopen}, @code{annopen}, etc.).
 
-Current implementations of @code{libcurl} and @code{libwww} permit input from
-@code{http://} URLs in much the same way that local files are read, provided
-that the remote web server supports HTTP 1.1 range requests (most, including
-PhysioNet's, do).  This means that it is not necessary to download an entire
-file in order to examine part of it, and you may notice little or no speed
-difference between local file and network file input for many applications.  If
-the remote server does not support range requests, however, or if input is from
-an @code{ftp://} URL, the current implementations download the entire file to
-memory, so you may notice a significant startup delay if the file is long and
-your network connection is slow, or if the file does not fit into physical
-memory.
+The current implementation of @code{libcurl} permits input from @code{http://}
+URLs in much the same way that local files are read, provided that the remote
+web server supports HTTP 1.1 range requests (most, including PhysioNet's, do).
+This means that it is not necessary to download an entire file in order to
+examine part of it, and you may notice little or no speed difference between
+local file and network file input for many applications.  If the remote server
+does not support range requests, however, or if input is from an @code{ftp://}
+URL, the current implementations download the entire file to memory, so you may
+notice a significant startup delay if the file is long and your network
+connection is slow, or if the file does not fit into physical memory.
 
 Currently, NETFILES support is limited to input files; as always, any output
 files created by the WFDB library are written into the current directory,
@@ -7788,16 +7774,13 @@ samples, thus representing an equal number of signals.
 @cindex NETFILES (defined)
 @cindex curl
 @cindex libcurl
-@cindex libwww
-@cindex W3C libwww
 WFDB files made available by an FTP or HTTP (web) server;  readable
 by applications linked with a NETFILES-enabled WFDB library.  A
 NETFILES-enabled WFDB library can be created by compiling the WFDB
 library sources with the symbol @code{WFDB_NETFILES} defined (to anything;
 its value is not important, only that it is defined) and then linking
-them with the @code{libwww} library available from the World Wide Web
-Consortium (@uref{http://www.w3.org/Library/}) or the @code{libcurl}
-library available from @uref{http://curl.haxx.se/}.
+them with the @code{libcurl} library available from
+@uref{http://curl.haxx.se/}.
 
 @item 9-track tape
 @cindex nine-track tape (defined)
@@ -8037,18 +8020,15 @@ that can be found on the WFDB home page.  In brief:
 
 @cindex curl
 @cindex libcurl
-@cindex libwww
-@cindex W3C libwww
 @enumerate
 @item
 @emph{Install any prerequisites needed for your platform.}  These include
 @code{gcc} (the GNU Compiler Collection), related software development tools
-such as @code{make}, a supported HTTP client library (either @code{libcurl} or
-@code{libwww}; this can be omitted if NETFILES support is not desired), the
-XView libraries (needed for WAVE only), and X11 (needed by XView). All of these
-components are free (open-source) software available for all popular platforms,
-including GNU/Linux, Mac OS X, MS Windows, and Unix.  The quick start guides
-list recommended packages and where to find them.
+such as @code{make}, the @code{libcurl} library (if NETFILES support is
+desired), the XView libraries (needed for WAVE only), and X11 (needed by
+XView). All of these components are free (open-source) software available for
+all popular platforms, including GNU/Linux, Mac OS X, MS Windows, and Unix.  The
+quick start guides list recommended packages and where to find them.
 
 @item
 @emph{Download and unpack the WFDB Software Package.}  Versions for all
@@ -8590,8 +8570,6 @@ corrections to the author (@email{george@@mit.edu}).
 @table @emph
 @cindex MIT DB
 @cindex waveform editor
-@cindex libwww
-@cindex W3C libwww
 @cindex XView toolkit
 @item WFDB Programmer's Guide (this guide)
 @itemx WFDB Applications Guide
@@ -8604,7 +8582,6 @@ corrections to the author (@email{george@@mit.edu}).
 @item Long-Term ST Database
 @itemx Other reference databases of physiologic signals
 @itemx WFDB Software Package
-@itemx W3C libwww sources
 @itemx XView toolkit (needed for WAVE)
 @sp 1
 @display
@@ -8784,8 +8761,8 @@ WWW: @uref{http://curl.haxx.se/}
 @end display
 
 The @code{libcurl} library is a modern and enhanced replacement for the
-@code{libwww} libraries (see below).  Only one of @code{libcurl} and
-@code{libwww} is needed for NETFILES support.
+@code{libwww} libraries (see below).  It provides the low-level functions needed
+to support the WFDB library's (optional) NETFILES capability.
 
 @cindex libwww
 @cindex W3C libwww
@@ -8796,10 +8773,10 @@ The @code{libcurl} library is a modern and enhanced replacement for the
 WWW: @uref{http://www.w3.org/Library/}
 @end display
 
-The @code{libwww} libraries, created and maintained by the World Wide
-Web Consortium, provide the low-level functions needed to support
-the WFDB library's (optional) NETFILES capability.  The @code{libwww}
-libraries are also available from PhysioNet.
+The @code{libwww} libraries, created and maintained by the World Wide Web
+Consortium, were used in the original implementation of NETFILES.  Since these
+libraries are no longer maintained, the WFDB library now uses @code{libcurl}
+instead.
 
 @cindex X11
 @cindex X Window System
