@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  1 November 2016		wfdblib 10.5.25
+			Last revised:  29 August 2017 		wfdblib 10.5.25
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -1482,11 +1482,12 @@ static int r311(struct igdata *g)
     /* Obtain the next 10-bit value right-justified in v. */
     switch (g->count++) {
       case 0:	v = (g->data = r16(g)); break;
-      case 1:	g->datb = r16(g);
+      case 1:	g->datb = (r8(g) & 0xff);
 	        v = ((g->data & 0xfc00) >> 10) | ((g->datb & 0xf) << 6);
 		break;
       case 2:
       default:	g->count = 0;
+		g->datb |= r8(g) << 8;
 		v = g->datb >> 4; break;
     }
     /* Sign-extend from the tenth bit. */
