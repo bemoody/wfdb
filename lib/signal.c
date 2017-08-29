@@ -2459,8 +2459,10 @@ FINT setifreq(WFDB_Frequency f)
 	return (-1);
     }
     if (f > 0.0) {
-	SREALLOC(gv0, nisig, sizeof(WFDB_Sample));
-	SREALLOC(gv1, nisig, sizeof(WFDB_Sample));
+	if (nvsig > 0) {
+	    SREALLOC(gv0, nvsig, sizeof(WFDB_Sample));
+	    SREALLOC(gv1, nvsig, sizeof(WFDB_Sample));
+	}
 	setafreq(ifreq = f);
 	/* The 0.005 below is the maximum tolerable error in the resampling
 	   frequency (in Hz).  The code in the while loop implements Euclid's
