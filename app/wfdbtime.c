@@ -1,4 +1,5 @@
 /* file: wfdbtime.c	G. Moody	16 February 2009
+			Last revised:	29 August 2017
 
 -------------------------------------------------------------------------------
 wfdbtime: convert to and from sample number, elapsed time, and absolute time
@@ -36,7 +37,6 @@ main(int argc, char **argv)
     for (i = 1; i < argc; i++) {
 	if (strcmp(argv[i], "-r") == 0) {
 	    if (record) wfdbquit();
-	    setgvmode(WFDB_HIGHRES);
 	    if (++i == argc) break;
 	    record = argv[i];
 	    if (isigopen(record, NULL, 0) < 0) exit(2);
