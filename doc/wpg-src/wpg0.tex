@@ -9028,6 +9028,25 @@ changes that may not be described here.
 
 @unnumberedsec WFDB 10.5
 
+@unnumberedsubsec Changes in version 10.5.24 (28 May 2015)
+
+The environment variable @code{WFDBPASSWORD} is used for user/password
+information, in place of the former (inflexible and insecurely
+implemented) @code{PNWUSER} and @code{PNWPASS} variables.
+
+The environment variable @code{CURL_CA_BUNDLE} defines the set of
+certificate authorities that are trusted to issue certificates for web
+servers, if any @code{https://} entries are used in the WFDB path.
+
+If the environment variable @code{WFDB_NET_DEBUG} is set, then
+whenever the WFDB library requests or receives data from a remote
+server, details of the operation will be written to the standard error
+output.
+
+On most platforms, the library is now installed in
+@file{/usr/local/lib} by default, rather than @file{/usr/local/lib64}
+(as in 10.5.23) or @file{/usr/lib64} (as in previous versions.)
+
 @unnumberedsubsec Changes in version 10.5.23 (13 March 2014)
 
 Changes in @file{configure}, @file{Makefile.tpl}, @file{conf/linux.def}, and
