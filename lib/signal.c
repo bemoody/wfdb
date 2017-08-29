@@ -317,6 +317,11 @@ static struct ogdata {		/* shared by all signals in a group (file) */
     char *bp;			/* pointer to next location in buf[]; */
     char *be;			/* pointer to output buffer endpoint */
     char count;		/* output counter for bit-packed signal */
+    signed char seek;		/* 1: seek works, -1: seek doesn't work,
+				   0: unknown */
+    char force_flush;		/* flush even if seek doesn't work */
+    char nrewind;		/* number of bytes to seek backwards
+				   after flushing */
 } **ogd;
 static WFDB_Time ostime;	/* time of next output sample */
 static int obsize;		/* default output buffer size */
@@ -1251,6 +1256,13 @@ static void osigclose(void)
 {
     struct osdata *os;
     struct ogdata *og;
+    WFDB_Group g;
+
+    for (g = 0; g < nogroup; g++)
+	if (ogd && (og = ogd[g]))
+	    og->force_flush = 1;
+
+    wfdb_osflush();
 
     if (osd) {
 	while (maxosig)
@@ -1435,6 +1447,16 @@ static void w212(WFDB_Sample v, struct ogdata *g)
     }
 }
 
+/* f212: flush output to a format 212 signal file */
+static void f212(struct ogdata *g)
+{
+    /* If we have one leftover sample, write it as two bytes. */
+    if (g->count == 1) {
+	w16(g->data, g);
+	g->nrewind = 2;
+    }
+}
+
 /* r310: read and return the next sample from a format 310 signal file
    (3 10-bit samples bit-packed in 4 bytes) */
 static int r310(struct igdata *g)
@@ -1469,6 +1491,26 @@ static void w310(WFDB_Sample v, struct ogdata *g)
 	        g->data |= (v << 11); w16(g->data, g);
 	        g->datb |= ((v <<  6) & ~0x7fe); w16(g->datb, g);
 		break;
+    }
+}
+
+/* f310: flush output to a format 310 signal file */
+static void f310(struct ogdata *g)
+{
+    switch (g->count) {
+      case 0:  break;
+      /* If we have one leftover sample, write it as two bytes. */
+      case 1:  w16(g->data, g);
+	       g->nrewind = 2;
+	       break;
+      /* If we have two leftover samples, write them as four bytes.
+	 In this case, the file will appear to have an extra (zero)
+	 sample at the end. */
+      case 2:
+      default: w16(g->data, g);
+	       w16(g->datb, g);
+	       g->nrewind = 4;
+	       break;
     }
 }
 
@@ -1511,7 +1553,29 @@ static void w311(WFDB_Sample v, struct ogdata *g)
 		break;
     }
 }
-    
+
+/* f311: flush output to a format 311 signal file */
+static void f311(struct ogdata *g)
+{
+    switch (g->count) {
+      case 0:	break;
+      /* If we have one leftover sample, write it as two bytes. */
+      case 1:	w16(g->data, g);
+		g->nrewind = 2;
+		break;
+      /* If we have two leftover samples, write them as four bytes
+	 (note that the first two bytes will already have been written
+	 by w311(), above.)  The file will appear to have an extra
+	 (zero) sample at the end.  It would be possible to write only
+	 three bytes here, but older versions of WFDB would not be
+	 able to read the resulting file. */
+      case 2:
+      default:	w16(g->datb, g);
+		g->nrewind = 2;
+		break;
+    }
+}
+
 static int isgsetframe(WFDB_Group g, WFDB_Time t)
 {
     int i, trem = 0;
@@ -3590,7 +3654,34 @@ void wfdb_sigclose(void)
 void wfdb_osflush(void)
 {
     WFDB_Group g;
+    WFDB_Signal s;
     struct ogdata *og;
+    struct osdata *os;
+
+    if (!osd || !ogd)
+	return;
+
+    for (s = 0; s < nosig; s++) {
+	if ((os = osd[s]) && (og = ogd[os->info.group]) && og->nrewind == 0) {
+	    if (!og->force_flush && og->seek == 0) {
+		if (og->bsize == 0 && !wfdb_fseek(og->fp, 0L, SEEK_CUR))
+		    og->seek = 1;
+		else
+		    og->seek = -1;
+	    }
+	    if (og->force_flush || og->seek > 0) {
+		/* Either we are closing the file (osigclose() was called),
+		   or the file is seekable: write out any
+		   partially-completed sets of bit-packed samples. */
+		switch (os->info.fmt) {
+		  case 212: f212(og); break;
+		  case 310: f310(og); break;
+		  case 311: f311(og); break;
+		  default: break;
+		}
+	    }
+	}
+    }
 
     for (g = 0; g < nogroup; g++) {
 	og = ogd[g];
@@ -3599,6 +3690,13 @@ void wfdb_osflush(void)
 	    og->bp = og->buf;
 	}
 	(void)wfdb_fflush(og->fp);
+
+	if (!og->force_flush && og->nrewind != 0) {
+	    /* Rewind the file so that subsequent samples will be
+	       written in the right place. */
+	    wfdb_fseek(og->fp, -((long) og->nrewind), SEEK_CUR);
+	    og->nrewind = 0;
+	}
     }
 }
 
