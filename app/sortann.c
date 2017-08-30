@@ -1,5 +1,5 @@
 /* file sortann.c	G. Moody	 7 April 1997
-			Last revised:	4 October 2010
+			Last revised:	30 August 2017
 -------------------------------------------------------------------------------
 sortann: Rearrange annotations in canonical order
 Copyright (C) 1997-2010 George B. Moody
@@ -119,6 +119,16 @@ char *argv[];
 	    ai[1].name = argv[i];
 	    break;
 	  case 'r':	/* input record name follows */
+	    /* If -r is followed by a non-empty string (with no
+	       intervening space), use that string as the WFDB path,
+	       overriding the library or environment defaults.  When
+	       the WFDB library invokes sortann, it uses '-r.' to
+	       indicate that the input file is located in the current
+	       working directory.  This is done to ensure
+	       compatibility in both directions: older versions of
+	       sortann will treat '-r.' as equivalent to '-r'. */
+	    if (argv[i][2] != 0)
+		setwfdb(&argv[i][2]);
 	    if (++i >= argc) {
 		(void)fprintf(stderr,
 			      "%s: input record name must follow -r\n",

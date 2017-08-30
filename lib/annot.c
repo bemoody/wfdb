@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:   16 August 2017  	wfdblib 10.5.25
+			Last revised:   30 August 2017  	wfdblib 10.5.25
 WFDB library functions for annotations
 
 _______________________________________________________________________________
@@ -1010,7 +1010,17 @@ FVOID oannclose(WFDB_Annotator n)
 		    wfdb_error(
 			 "Rearranging annotations for output annotator %s ...",
 			 oa->info.name);
-		    (void)sprintf(cmdbuf, "sortann -r %s -a %s",
+		    /* The option '-r.' tells sortann to change its
+		       WFDB path to the current directory (i.e, it
+		       should only attempt to read the annotation file
+		       that we just created, and should not look
+		       elsewhere, regardless of the WFDB environment
+		       variable.)
+
+		       Older versions of sortann interpret '-r.' as
+		       equivalent to '-r', and will search for the
+		       given annotation file within the WFDB path. */
+		    (void)sprintf(cmdbuf, "sortann -r. %s -a %s",
 				  oa->rname, oa->info.name);
 		    if (system(cmdbuf) == 0) {
 			wfdb_error("done!\n");
