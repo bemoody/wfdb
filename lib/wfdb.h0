@@ -77,6 +77,27 @@ typedef unsigned int WFDB_Group;    /* signal group number */
 typedef unsigned int WFDB_Signal;   /* signal number */
 typedef unsigned int WFDB_Annotator;/* annotator number */
 
+/* The following macros can be used to determine the ranges of the
+   above data types.  You will also need to include <limits.h> and/or
+   <float.h>. */
+#define WFDB_SAMPLE_MIN             INT_MIN
+#define WFDB_SAMPLE_MAX             INT_MAX
+#define WFDB_TIME_MIN               LONG_MIN
+#define WFDB_TIME_MAX               LONG_MAX
+#define WFDB_DATE_MIN               LONG_MIN
+#define WFDB_DATE_MAX               LONG_MAX
+#define WFDB_FREQUENCY_MAX          DBL_MAX
+#define WFDB_FREQUENCY_DIG          DBL_DIG
+#define WFDB_FREQUENCY_MAX_10_EXP   DBL_MAX_10_EXP
+#define WFDB_FREQUENCY_EPSILON      DBL_EPSILON
+#define WFDB_GAIN_MAX               DBL_MAX
+#define WFDB_GAIN_DIG               DBL_DIG
+#define WFDB_GAIN_MAX_10_EXP        DBL_MAX_10_EXP
+#define WFDB_GAIN_EPSILON           DBL_EPSILON
+#define WFDB_GROUP_MAX              UINT_MAX
+#define WFDB_SIGNAL_MAX             UINT_MAX
+#define WFDB_ANNOTATOR_MAX          UINT_MAX
+
 /* getvec and getframe return a sample with a value of WFDB_INVALID_SAMPLE
    when the amplitude of a signal is undefined (e.g., the input is clipped or
    the signal is not available) and padding is disabled (see WFDB_GVPAD, below).
