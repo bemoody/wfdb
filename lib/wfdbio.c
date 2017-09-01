@@ -295,7 +295,7 @@ FCONSTSTRING wfdbdefwfdbcal(void)
 
 /* Private functions (for the use of other WFDB library functions only). */
 
-int wfdb_me_fatal()	/* used by the MEMERR macro defined in wfdblib.h */
+FINT wfdb_me_fatal()	/* used by the MEMERR macro defined in wfdblib.h */
 {
     return (wfdb_mem_behavior);
 }

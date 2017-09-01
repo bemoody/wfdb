@@ -1,5 +1,5 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised:    21 May 2015 		wfdblib 10.5.24
+			Last revised: 1 September 2017  	wfdblib 10.6.0
 WFDB library type, constant, structure, and function interface definitions
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
@@ -359,6 +359,7 @@ extern FINT setobsize(int output_buffer_size);
 extern FSTRING wfdbfile(char *file_type, char *record);
 extern FVOID wfdbflush(void);
 extern FVOID wfdbmemerr(int exit_on_error);
+extern FINT wfdb_me_fatal(void);
 extern FCONSTSTRING wfdbversion(void);
 extern FCONSTSTRING wfdbldflags(void);
 extern FCONSTSTRING wfdbcflags(void);
@@ -380,7 +381,7 @@ extern FINT annopen(), isigopen(), osigopen(), wfdbinit(), findsig(), getspf(),
     adumuv(), newheader(), setheader(), setmsheader(), getseginfo(),
     wfdbputprolog(), setsampfreq(), setbasetime(), putinfo(), setinfo(),
     setibsize(), setobsize(), calopen(), getcal(), putcal(), newcal(),
-    wfdbgetskew(), sample_valid();
+    wfdbgetskew(), sample_valid(), wfdb_me_fatal();
 extern FLONGINT wfdbgetstart();
 extern FSAMPLE muvadu(), physadu(), sample();
 extern FSTRING ecgstr(), annstr(), anndesc(), timstr(), mstimstr(),
