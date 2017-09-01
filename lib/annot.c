@@ -156,6 +156,7 @@ static struct oadata {
     char out_of_order;		/* if >0, one or more annotations written by
 				   putann are not in the canonical (time, num,
 				   chan) order */
+    char table_written;		/* if >0, table has been written */
 } **oad;
 static WFDB_Frequency oafreq;	/* time resolution in ticks/sec for newly-
 				   created output annotators */
@@ -438,7 +439,8 @@ FINT annopen(char *record, WFDB_Anninfo *aiarray, unsigned int nann)
 	    oa->ann.time = 0L;
 	    oa->info.stat = aiarray[i].stat;
 	    oa->out_of_order = 0;
-	    (void)put_ann_table(noaf++);
+	    oa->table_written = 0;
+	    noaf++;
 	    break;
 	}
     }
@@ -591,19 +593,10 @@ FINT putann(WFDB_Annotator n, WFDB_Annotation *annot)
 	return (-2);
     }
     t = annot->time;
-    if (oa->ann.time == (WFDB_Time)0 && oafreq != oa->afreq && oafreq > 0.) {
-	static WFDB_Annotation tra;
-	char buf[40];
-
-	oa->afreq = oafreq;
-	tra.anntyp = NOTE;
-	tra.aux = (unsigned char *)buf;
-	(void)sprintf(buf+1, "## time resolution: %.12g", oafreq);
-	buf[0] = strlen(buf+1);
-	if (putann(n, &tra) < 0) return (-1);
-	tra.anntyp = 0;
-	tra.aux = NULL;
-	if (putann(n, &tra) < 0) return (-1);
+    if (!oa->table_written) {
+	oa->table_written = 1;
+	if (put_ann_table(n) < 0)
+	    return (-1);
     }
     delta = (unsigned long) t - oa->ann.time;
     if (!(annot->chan > oa->ann.chan || annot->num > oa->ann.num ||
