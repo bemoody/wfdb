@@ -254,8 +254,8 @@ static char modified[ACMAX+1];	/* modified[i] is non-zero if setannstr() or
 
 static int put_ann_table(WFDB_Annotator i)
 {
-    int a, flag = 0;
-    char buf[256];
+    int a, flag = 0, n;
+    char buf[256], *str = NULL;
     WFDB_Annotation annot;
 
     annot.time = 0L;
@@ -276,8 +276,14 @@ static int put_ann_table(WFDB_Annotator i)
 		buf[0] = strlen(buf+1);
 		if (putann(i, &annot) < 0) return (-1);
 	    }
-	    (void)sprintf(buf+1, "%d %s %s", a, annstr(a), anndesc(a));
-	    buf[0] = strlen(buf+1);
+	    if (anndesc(a))
+		n = wfdb_asprintf(&str, "%d %s %s", a, annstr(a), anndesc(a));
+	    else
+		n = wfdb_asprintf(&str, "%d %s", a, annstr(a));
+	    if (!str) return (-1);
+	    annot.aux[0] = (n > 255 ? 255 : n);
+	    memcpy(annot.aux + 1, str, n);
+	    SFREE(str);
 	    if (putann(i, &annot) < 0) return (-1);
 	    flag = 2;
 	}
