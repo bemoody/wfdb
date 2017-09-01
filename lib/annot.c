@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:   30 August 2017  	wfdblib 10.5.25
+			Last revised:   1 September 2017	wfdblib 10.6.0
 WFDB library functions for annotations
 
 _______________________________________________________________________________
@@ -172,8 +172,8 @@ static WFDB_Time round_to_time(double x)
     WFDB_Time t;
 
     if (x >= 0) {
-	if (x >= LONG_MAX)
-	    return (LONG_MAX);
+	if (x >= WFDB_TIME_MAX)
+	    return (WFDB_TIME_MAX);
 	t = x;
 	if (x - t >= 0.5)
 	    return (t + 1);
@@ -181,8 +181,8 @@ static WFDB_Time round_to_time(double x)
 	    return (t);
     }
     else {
-	if (x <= LONG_MIN)
-	    return (LONG_MIN);
+	if (x <= WFDB_TIME_MIN)
+	    return (WFDB_TIME_MIN);
 	t = x;
 	if (x - t < -0.5)
 	    return (t - 1);
