@@ -985,7 +985,7 @@ FVOID iannclose(WFDB_Annotator n)
 FVOID oannclose(WFDB_Annotator n)
 {
     int i;
-    char cmdbuf[256];
+    char *cmdbuf = NULL;
     struct oadata *oa;
 
     if (n < noaf && (oa = oad[n]) != NULL && oa->file != NULL) {
@@ -1020,15 +1020,16 @@ FVOID oannclose(WFDB_Annotator n)
 		       Older versions of sortann interpret '-r.' as
 		       equivalent to '-r', and will search for the
 		       given annotation file within the WFDB path. */
-		    (void)sprintf(cmdbuf, "sortann -r. %s -a %s",
+		    wfdb_asprintf(&cmdbuf, "sortann -r. %s -a %s",
 				  oa->rname, oa->info.name);
-		    if (system(cmdbuf) == 0) {
+		    if (cmdbuf && system(cmdbuf) == 0) {
 			wfdb_error("done!\n");
 			oa->out_of_order = 0;
 		    }
 		    else
 		      wfdb_error(
 			       "\nAnnotations still need to be rearranged.\n");
+		    SFREE(cmdbuf);
 		}
 	    }
 	}
