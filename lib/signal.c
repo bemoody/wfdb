@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  29 August 2017 		wfdblib 10.5.25
+			Last revised:  24 October 2017 		wfdblib 10.5.25
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -794,7 +794,10 @@ static int readheader(const char *record)
     static char sep[] = " \t\n\r";
 
     /* If another input header file was opened, close it. */
-    if (hheader) (void)wfdb_fclose(hheader);
+    if (hheader) {
+	(void)wfdb_fclose(hheader);
+	hheader = NULL;
+    }
 
     isedf = 0;
     if (strcmp(record, "~") == 0) {
