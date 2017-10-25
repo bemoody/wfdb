@@ -32,7 +32,7 @@ LN = ln -sf
 # them.  If you have GNU 'makeinfo' and 'install-info' (preferred),
 # uncomment the next two lines.
 MAKEINFO = makeinfo --force --no-warn
-INSTALLINFO = /usr/sbin/install-info --info-dir=$(DESTDIR)$(INFODIR) $(DESTDIR)$(INFODIR)/wpg
+INSTALLINFO = install-info --info-dir=$(DESTDIR)$(INFODIR) $(DESTDIR)$(INFODIR)/wpg
 
 # Otherwise, you can use GNU emacs to do the formatting, and standard utilities
 # to install the info files, by uncommenting the next two lines.
@@ -107,7 +107,7 @@ wpg.info:	wpg.tex
 	cp wpg wpg-* $(DESTDIR)$(INFODIR)
 	$(SETPERMISSIONS) $(DESTDIR)$(INFODIR)/wpg*
 	rm -f wpg wpg-*
-	$(INSTALLINFO)
+	PATH=$$PATH:/usr/sbin; $(INSTALLINFO)
 
 # 'make install-wpg.info': install info entry (if install-info is unavailable)
 install-wpg.info:	wpg.info
