@@ -99,9 +99,11 @@ wag.html:
 	./manhtml.sh ../wag *.1 *.3 *.5 *.7
 	cp -p install0.tex install.tex
 	cp -p eval0.tex eval.tex
-	latex2html -dir ../wag -local_icons -prefix in \
+	latex2html -init_file ./.latex2html-init \
+	 -dir ../wag -local_icons -prefix in \
 	 -up_url="wag.htm" -up_title="WFDB Applications Guide" install
-	latex2html -dir ../wag -local_icons -prefix ev \
+	latex2html -init_file ./.latex2html-init \
+	 -dir ../wag -local_icons -prefix ev \
 	 -up_url="wag.htm" -up_title="WFDB Applications Guide" eval
 	rm -f install.tex eval.tex
 	cd ../wag; rm -f index.html WARNINGS *.aux *.log *.tex

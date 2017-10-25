@@ -69,7 +69,8 @@ wug.html:	wug.tex wug.aux
 	cp -p ../misc/icons/* wave/png/* ../../examples/stdev.c \
 	 wave/misc/example.xws ../wug
 	wave/scripts/wugfigures -color	# get a set of figures
-	latex2html -dir ../wug -local_icons \
+	latex2html -init_file ./.latex2html-init \
+	 -dir ../wug -local_icons \
 	 -up_url="../manuals.shtml" -up_title="Books about PhysioToolkit" wug
 	cp wave/scripts/dossify-html wave/scripts/fixlinks ../wug
 	cd ../wug; ./dossify-html *.html
