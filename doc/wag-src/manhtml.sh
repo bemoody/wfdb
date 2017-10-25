@@ -1,9 +1,11 @@
 #!/bin/sh
 # file: manhtml		G. Moody	18 October 1996
-#			Last revised:  18 December 2001
+#			Last revised:   25 October 2017
 #
 # This script uses `rman' to convert man pages to HTML pages, with
 # hyperlinked cross-references.
+
+set -e
 
 case $# in
  0|1) echo usage: $0 html-dir manpage-filename; exit ;;

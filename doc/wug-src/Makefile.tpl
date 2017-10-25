@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:	   8 May 2015
+#				Last revised:	25 October 2017
 # Change the settings below as appropriate for your setup.
 
 # Set COLORS to 'color' if you have a color printer and would like to print
@@ -40,8 +40,6 @@ TROFF = groff
 
 # It should not be necessary to modify anything below this line.
 # -----------------------------------------------------------------------------
-
-.IGNORE:
 
 all:	wug.html wug.pdf
 	cp -p wug.pdf ../wug

@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:   12 March 2014
+#				Last revised:  25 October 2017
 # Change the settings below as appropriate for your setup.
 
 # Set COLORS to 'color' if you have a color printer and would like to print
@@ -97,8 +97,6 @@ TMS = -mgs
 
 # It should not be necessary to modify anything below this line.
 # -----------------------------------------------------------------------------
-
-.IGNORE:
 
 all:
 	@echo "Type 'make install' to install the man pages."

@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:	 8 March 2017
+#				Last revised:	 25 October 2017
 # Change the settings below as appropriate for your setup.
 
 # D2PARGS is a list of options for dvips.  Uncomment one of these to set the
@@ -66,8 +66,6 @@ PSPDF = ps2pdf
 
 # It should not be necessary to modify anything below this line.
 # -----------------------------------------------------------------------------
-
-.IGNORE:
 
 all:	wag.html wag.pdf
 	cp -p wag.pdf ../wag
