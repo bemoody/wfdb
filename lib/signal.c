@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  24 October 2017 		wfdblib 10.5.25
+			Last revised:  2 November 2017 		wfdblib 10.5.25
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -2740,7 +2740,7 @@ FSITIME tnextvec(WFDB_Signal s, WFDB_Time t)
 	    wfdb_error("nextvect: illegal signal number %d\n", s);
 	    return ((WFDB_Time) -1);
 	}
-	for ( ; stat=getvec(vvector) > 0; t++)
+	for ( ; (stat = getvec(vvector)) > 0; t++)
 	    /* Read samples until we find a valid one or reach the end of the
 	       record. */
 	    if (vvector[s] != WFDB_INVALID_SAMPLE) {
