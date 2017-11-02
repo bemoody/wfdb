@@ -1,5 +1,5 @@
 /* file: psfd.c		G. Moody         9 August 1988
-			Last revised:	21 November 2013
+			Last revised:	2 November 2017
 
 -------------------------------------------------------------------------------
 psfd: Produces annotated full-disclosure ECG plots on a PostScript device
@@ -1093,9 +1093,10 @@ long t0, t1;
 		  case NOTE:
 		    if (annot.time == 0L)
 			break;		/* don't show modification records */
-		    if (annot.aux == NULL || *annot.aux == 0)
-			(void)printf("(%s) %d a\n",
-				     annstr(annot.anntyp), x0+si(x));
+		    if (annot.aux == NULL || *annot.aux == 0) {
+			plabel(annstr(annot.anntyp), 0);
+			(void)printf(" %d a\n", x0 + si(x));
+		    }
 		    else {
 			move(x0 + si(x), y + pt(fs_ann * 1.1));
 			if (aux_shorten && *annot.aux > 1)
@@ -1104,9 +1105,10 @@ long t0, t1;
 		    }
 		    break;
 		  case RHYTHM:
-		    if (annot.aux == NULL || *annot.aux == 0)
-			(void)printf("(%s) %d a\n",
-				     annstr(annot.anntyp), x0+si(x));
+		    if (annot.aux == NULL || *annot.aux == 0) {
+			plabel(annstr(annot.anntyp), 0);
+			(void)printf(" %d a\n", x0 + si(x));
+		    }
 		    else {
 			move(x0 + si(x), ya[ia] - pt(fs_ann * 1.1));
 			label(annot.aux+1);
@@ -1115,17 +1117,9 @@ long t0, t1;
 		  case NORMAL:
 		    (void)printf("%d A\n", x0 + si(x));
 		    break;
-                  case WFON:
-		    (void)printf("(\\%s) %d a\n",
-				 annstr(annot.anntyp), x0 + si(x));
-		    break;
-                  case WFOFF:
-		    (void)printf("(\\%s) %d a\n",
-				 annstr(annot.anntyp), x0 + si(x));
-		    break;
 		  default:
-		    (void)printf("(%s) %d a\n",
-				 annstr(annot.anntyp), x0 + si(x));
+		    plabel(annstr(annot.anntyp), 0);
+		    (void)printf(" %d a\n", x0 + si(x));
 		    break;
 		}
 	    }
@@ -1496,7 +1490,9 @@ int t;
 	(void)putchar(*s);
 	s++;
     }
-    (void)printf(")%c\n", t);
+    (void)putchar(')');
+    if (t != 0)
+	(void)printf("%c\n", t);
 }
 
 /* Print a string beginning at the current point. */

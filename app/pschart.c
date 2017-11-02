@@ -1,5 +1,5 @@
 /* file: pschart.c	G. Moody       15 March 1988
-			Last revised:   27 May 2009
+			Last revised: 2 November 2017
 
 -------------------------------------------------------------------------------
 pschart: Produce annotated `chart recordings' on a PostScript device
@@ -1180,9 +1180,10 @@ char *record, *title;
 		  case NOTE:
 		    if (annot.time == 0L)
 			break;		/* don't show modification records */
-		    if (annot.aux == NULL || *annot.aux == 0)
-			(void)printf("(%s) %d a\n",
-				     annstr(annot.anntyp), x0+si(x));
+		    if (annot.aux == NULL || *annot.aux == 0) {
+			plabel(annstr(annot.anntyp), 0);
+			(void)printf(" %d a\n", x0 + si(x));
+		    }
 		    else {
 			move(x0 + si(x), y + pt(fs_ann * 1.1));
 			if (aux_shorten && *annot.aux > 1)
@@ -1191,9 +1192,10 @@ char *record, *title;
 		    }
 		    break;
 		  case RHYTHM:
-		    if (annot.aux == NULL || *annot.aux == 0)
-			(void)printf("(%s) %d a\n",
-				     annstr(annot.anntyp), x0+si(x));
+		    if (annot.aux == NULL || *annot.aux == 0) {
+			plabel(annstr(annot.anntyp), 0);
+			(void)printf(" %d a\n", x0 + si(x));
+		    }
 		    else {
 			move(x0 + si(x), ya[ia] - pt(fs_ann * 1.1));
 			label(annot.aux+1);
@@ -1202,17 +1204,9 @@ char *record, *title;
 		  case NORMAL:
 		    (void)printf("%d A\n", x0 + si(x) );
 		    break;
-                  case WFON:
-		    (void)printf("(\\%s) %d a\n",
-				 annstr(annot.anntyp), x0 + si(x));
-		    break;
-                  case WFOFF:
-		    (void)printf("(\\%s) %d a\n",
-				 annstr(annot.anntyp), x0 + si(x));
-		    break;
         	  default:
-		    (void)printf("(%s) %d a\n",
-				 annstr(annot.anntyp), x0 + si(x));
+		    plabel(annstr(annot.anntyp), 0);
+		    (void)printf(" %d a\n", x0 + si(x));
 		    break;
 		}
 	    }
@@ -1610,7 +1604,9 @@ int t;
 	(void)putchar(*s);
 	s++;
     }
-    (void)printf(")%c\n", t);
+    (void)putchar(')');
+    if (t != 0)
+	(void)printf("%c\n", t);
 }
 
 /* Print a string beginning at the current point. */
