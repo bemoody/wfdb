@@ -1,5 +1,5 @@
 /* file mrgann.c		G. Moody	28 May 1995
-				Last revised:  30 April 1999
+				Last revised:  3 November 2017
 
 -------------------------------------------------------------------------------
 mrgann: Merge annotation files by segments
@@ -61,6 +61,7 @@ extern void exit();
 
 char *pname, *record = NULL;
 static int ateof[2], map0 = -1, map1 = -1, vflag;
+static WFDB_Frequency sfreq, ffreq, afreq = 0;
 static WFDB_Anninfo ai[3];
 static WFDB_Annotation annot[2];
 void help(), mergeann();
@@ -118,13 +119,14 @@ char *argv[];
 			      pname, argv[i-1]);
 		exit(1);
 	    }
-	    tf = strtim(argv[i]);
-	    if (tf < (WFDB_Time)0) tf = -tf;
-	    if (argv[i][0] == 'e') tf = (WFDB_Time)(-1);
 	    if (mode == UNINITIALIZED) {
 		init();
 		mode = MERGE;
 	    }
+	    tf = strtim(argv[i]);
+	    if (tf < (WFDB_Time)0) tf = -tf;
+	    if (argv[i][0] == 'e') tf = (WFDB_Time)(-1);
+	    else tf = (tf * afreq / sfreq) + 0.5;
 	    mergeann(mode, tf);
 	    switch (*(argv[i-1]+2)) {
 	      case '0': mode = DISCARD_ALL; break;
@@ -181,15 +183,31 @@ char *argv[];
 
 init()
 {
+    WFDB_Frequency af1, af2;
     if (record == NULL || ai[0].name == NULL ||
 	ai[1].name == NULL || ai[2].name == NULL) {
 	help();
 	exit(1);
     }
-    if (sampfreq(record) < 0.)
-	(void)setsampfreq(WFDB_DEFFREQ);
+    if ((sfreq = sampfreq(record)) < 0.)
+	(void)setsampfreq(sfreq = WFDB_DEFFREQ);
+    ffreq = sfreq / getspf();
+
     if (annopen(record, ai, 3) < 0)
 	exit(2);
+    af1 = getiaorigfreq(0);
+    af2 = getiaorigfreq(1);
+    if (af1 > 0 && af2 > 0)
+	setafreq(afreq = (af1 > af2 ? af1 : af2));
+    else if (af1 > 0)
+	setafreq(afreq = (af1 > ffreq ? af1 : ffreq));
+    else if (af2 > 0)
+	setafreq(afreq = (af2 > ffreq ? af2 : ffreq));
+    else
+	afreq = ffreq;
+    setiafreq(0, afreq);
+    setiafreq(1, afreq);
+
     ateof[0] = getann(0, &annot[0]);
     ateof[1] = getann(1, &annot[1]);
 }
