@@ -318,6 +318,8 @@ extern FSTRING anndesc(int annotation_code);
 extern FINT setanndesc(int annotation_code, char *annotation_description);
 extern FVOID setafreq(WFDB_Frequency f);
 extern FFREQUENCY getafreq(void);
+extern FVOID setiafreq(WFDB_Annotator a, WFDB_Frequency f);
+extern FFREQUENCY getiafreq(WFDB_Annotator a);
 extern FFREQUENCY getiaorigfreq(WFDB_Annotator a);
 extern FVOID iannclose(WFDB_Annotator a);
 extern FVOID oannclose(WFDB_Annotator a);
@@ -416,8 +418,9 @@ extern FSITIME strtim(), tnextvec();
 extern FDATE strdat();
 extern FVOID setafreq(), setgvmode(), wfdb_freeinfo(), wfdbquit(), wfdbquiet(),
     wfdbverbose(), setdb(), wfdbflush(), setcfreq(), setbasecount(), flushcal(),
-    wfdbsetiskew(), wfdbsetskew(), wfdbsetstart(), wfdbmemerr(), wfdb_error();
-extern FFREQUENCY getafreq(), getifreq(), sampfreq(), getcfreq(),
+    wfdbsetiskew(), wfdbsetskew(), wfdbsetstart(), wfdbmemerr(), wfdb_error(),
+    setiafreq();
+extern FFREQUENCY getafreq(), getifreq(), sampfreq(), getcfreq(), getiafreq(),
     getiaorigfreq();
 extern FDOUBLE aduphys(), getbasecount();
 #endif

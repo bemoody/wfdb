@@ -1742,6 +1742,10 @@ for methods of opening output signal files.
                                 record and how invalid samples are represented.
 * getgvmode::                   Determining the getvec operating mode.
 * getspf::                      Determining the number of samples per frame.
+* setiafreq::                   Setting the time resolution of input
+                                annotations.
+* getiafreq::                   Determining the time resolution of input
+                                annotations.
 * getiaorigfreq::               Determining the underlying time resolution
                                 of an annotation file.
 * setafreq::			Setting the time resolution for output
@@ -1768,9 +1772,8 @@ void setifreq(WFDB_Frequency @var{frequency})
 This function sets the current input sampling frequency (in samples per
 second per signal).  It should be invoked after opening the input
 signals (using @code{isigopen} or @code{wfdbinit}), and before using any
-of @code{getvec}, @code{getann}, @code{putann}, @code{isigsettime},
-@code{isgsettime}, @code{timstr}, @code{mstimstr}, @code{strtim},
-or @code{annopen}.
+of @code{getvec}, @code{putann}, @code{isigsettime}, @code{isgsettime},
+@code{timstr}, @code{mstimstr}, or @code{strtim}.
 @emph{Note that the operation of @code{getframe} is unaffected by
 @code{setifreq}.}
 
@@ -1929,7 +1932,7 @@ an invalid or missing sample, rather than returning the value
 @file{<wfdb/wfdb.h>}.
 
 @c @group
-@node     getspf, getiaorigfreq, getgvmode, special I/O modes
+@node     getspf, setiafreq, getgvmode, special I/O modes
 @unnumberedsubsec getspf
 @findex getspf (9.6)
 @cindex interpolation
@@ -1956,7 +1959,53 @@ in high resolution mode, however, @code{getspf} returns the number of
 samples per signal per frame (hence @code{sampfreq(NULL)/getspf()} is
 the number of frames per second).
 
-@node     getiaorigfreq, setafreq, getspf, special I/O modes
+@node     setiafreq, getiafreq, getspf, special I/O modes
+@unnumberedsubsec setiafreq
+@findex setiafreq (10.6.0)
+@cindex interpolation
+@cindex decimation
+@cindex resampling
+@cindex multi-frequency records (reading)
+
+@example
+void setiafreq(WFDB_Annotator @var{an}, WFDB_Frequency @var{frequency})
+@end example
+@noindent
+
+@noindent
+This function sets the time resolution (number of ticks per second) used by
+@code{getann} and @code{ungetann} for the given input annotator.  By default,
+the time resolution equals the input sampling frequency (@pxref{getifreq}) at
+the time @code{annopen} is called.  After calling this function, the @code{time}
+fields of subsequent annotations will be scaled according to the new time
+resolution.
+
+@node     getiafreq, getiaorigfreq, setiafreq, special I/O modes
+@unnumberedsubsec getiafreq
+@findex getiafreq (10.6.0)
+@cindex interpolation
+@cindex decimation
+@cindex resampling
+@cindex multi-frequency records (reading)
+
+@example
+WFDB_Frequency getiafreq(WFDB_Annotator @var{an})
+@end example
+@noindent
+@strong{Return:}
+@table @asis
+@item @t{(WFDB_Frequency)>0.}
+Success: the annotation time resolution in Hz
+@item @t{(WFDB_Frequency)-2.}
+Failure: incorrect annotator number specified
+@end table
+
+@noindent
+This function returns the current time resolution of the given input annotator.
+The time resolution equals the input sampling frequency by default, but may be
+changed (@pxref{setiafreq}).
+
+@node     getiaorigfreq, setafreq, getiafreq, special I/O modes
 @unnumberedsubsec getiaorigfreq
 @findex getiaorigfreq (10.6.0)
 @cindex interpolation

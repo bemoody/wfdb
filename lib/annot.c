@@ -49,6 +49,8 @@ This file also contains definitions of the following WFDB library functions:
  setanndesc [5.3]	(modifies code-to-text translation table)
  setafreq [10.4.5]	(sets time resolution for output annotation files)
  getafreq [10.4.5]	(returns time resolution for output annotation files)
+ setiafreq [10.6]	(sets time resolution for input annotations)
+ getiafreq [10.6]	(returns time resolution for input annotations)
  getiaorigfreq [10.6]	(returns time resolution of original annotation file)
  iannclose [9.1]	(closes an input annotation file)
  oannclose [9.1]	(closes an output annotation file)
@@ -137,12 +139,18 @@ static struct iadata {
     int ateof;			/* EOF-reached indicator */
     unsigned char auxstr[AUXBUFLEN]; /* aux string buffer */
     unsigned index;		/* next available position in auxstr */
-    double tmul, ptmul;		/* tmul * annotation time = sample count */
+    double tmul;		/* tmul * annotation time = sample count */
     double tt;			/* annotation time (MIT format only).  This
 				   equals ann.time unless a SKIP follows ann;
 				   in such cases, it is the time of the SKIP
 				   (i.e., the time of the annotation following
 				   ann) */
+    double ann_tt;		/* unscaled annotation time of 'ann' */
+    double pann_tt;		/* unscaled annotation time of 'pann' */
+    double prev_tt;		/* unscaled time of the last annotation
+				   returned by getann */
+    WFDB_Time prev_time;	/* sample number of the last annotation
+				   returned by getann */
 } **iad;
 
 static unsigned maxoann;	/* max allowed number of output annotators */
@@ -198,6 +206,10 @@ static int get_ann_table(WFDB_Annotator i)
     char *p1, *p2, *s1 = NULL, *s2 = NULL;
     int a;
     WFDB_Annotation annot;
+    WFDB_Frequency sfreq;
+
+    iad[i]->tmul = 1.0;
+    iad[i]->afreq = 0.0;
 
     if (getann(i, &annot) < 0)	/* prime the pump */
 	return (-1);
@@ -206,15 +218,8 @@ static int get_ann_table(WFDB_Annotator i)
 	if (annot.aux == NULL || *annot.aux < 1)
 	    continue;
 	if (*(annot.aux+1) == '#') {
-	    if (strncmp((char *)annot.aux+1, "## time resolution: ", 20) == 0) {
+	    if (strncmp((char *)annot.aux+1, "## time resolution: ", 20) == 0)
 		sscanf((char *)annot.aux + 20, "%lf", &(iad[i]->afreq));
-		if (iad[i]->afreq) {
-		    WFDB_Frequency sf = getifreq();
-
-		    if (sf > 0.)
-		        iad[i]->tmul = sf/iad[i]->afreq;
-		}
-	    }
 	    continue;
 	}
 	    p1 = strtok((char *)annot.aux+1, " \t");
@@ -234,18 +239,10 @@ static int get_ann_table(WFDB_Annotator i)
     }
     if (annot.time != 0L || annot.anntyp != NOTE || annot.subtyp != 0 ||
 	annot.aux == NULL) {
-	if (iad[i]->tmul) annot.time /= iad[i]->tmul;
-	if (iad[i]->afreq) {
-	    WFDB_Frequency sf = getifreq();
-
-	    if (sf > 0.)
-	      iad[i]->tmul = sf/iad[i]->afreq;
-	}
-	else
-	    iad[i]->tmul = getspf();
-	annot.time = round_to_time(annot.time * iad[i]->tmul);
 	(void)ungetann(i, &annot);
     }
+
+    setiafreq(i, getifreq());
     return (0);
 }
 
@@ -468,14 +465,9 @@ FINT getann(WFDB_Annotator n, WFDB_Annotation *annot)
     if (ia->pann.anntyp) {	/* an annotation was pushed back */
 	*annot = ia->pann;
       	ia->pann.anntyp = 0;
-	if (ia->ptmul != ia->tmul) {
-	    ia->tmul = (ia->afreq) ? getifreq()/ia->afreq : getspf();
-	    if (ia->ptmul != ia->tmul) {
-		annot->time = round_to_time(annot->time*ia->tmul/ia->ptmul);
-		ia->ptmul = ia->tmul;
-	    }
-	}
-	if (annot->time)
+	ia->prev_time = annot->time;
+	ia->prev_tt = ia->pann_tt;
+	if (ia->pann_tt != 0)
 	    return (0);
     }
 
@@ -487,6 +479,8 @@ FINT getann(WFDB_Annotator n, WFDB_Annotation *annot)
 	return (-3);
     }
     *annot = ia->ann;
+    ia->prev_time = annot->time;
+    ia->prev_tt = ia->ann_tt;
 
     switch (ia->info.stat) {
       case WFDB_READ:		/* MIT-format input file */
@@ -496,11 +490,7 @@ FINT getann(WFDB_Annotator n, WFDB_Annotation *annot)
 	    return (0);
 	}
 	ia->tt += ia->word & DATA; /* annotation time */
-	if (ia->ptmul == 0.0) {
-	    ia->ptmul = ia->tmul;
-	    ia->tmul = (ia->afreq) ? getifreq()/ia->afreq :getspf();
-	}
-	ia->ann.time = round_to_time(ia->tt * ia->tmul);
+	ia->ann_tt = ia->tt;
 	ia->ann.anntyp = (ia->word & CODE) >> CS; /* set annotation type */
 	ia->ann.subtyp = 0;	/* reset subtype field */
 	ia->ann.aux = NULL;	/* reset aux field */
@@ -535,7 +525,7 @@ FINT getann(WFDB_Annotator n, WFDB_Annotation *annot)
 	}
 	a = ia->word >> 8;		 /* AHA annotation code */
 	ia->ann.anntyp = ammap(a);	 /* convert to MIT annotation code */
-	ia->ann.time = (WFDB_Time)wfdb_g32(ia->file);  /* time of annotation */
+	ia->ann_tt = (WFDB_Time)wfdb_g32(ia->file);  /* time of annotation */
 	if (wfdb_g16(ia->file) <= 0)	 /* serial number (starts at 1) */
 	    wfdb_error("getann: unexpected annot number in annotator %s\n",
 		       ia->info.name);
@@ -561,6 +551,7 @@ FINT getann(WFDB_Annotator n, WFDB_Annotation *annot)
 	ia->word = (unsigned)wfdb_g16(ia->file);
 	break;
     }
+    ia->ann.time = round_to_time(ia->ann_tt * ia->tmul);
     if (wfdb_feof(ia->file))
 	ia->ateof = -1;
     return (0);
@@ -581,7 +572,10 @@ FINT ungetann(WFDB_Annotator n, WFDB_Annotation *annot)
 	return (-1);
     }
     iad[n]->pann = *annot;
-    iad[n]->ptmul = iad[n]->tmul;
+    if (annot->time == iad[n]->prev_time)
+	iad[n]->pann_tt = iad[n]->prev_tt;
+    else
+	iad[n]->pann_tt = annot->time / iad[n]->tmul;
     return (0);
 }
 
@@ -960,6 +954,42 @@ FVOID setafreq(WFDB_Frequency f)
 FFREQUENCY getafreq(void)
 {
     return (oafreq);
+}
+
+/* setiafreq: set time resolution for input annotations */
+FVOID setiafreq(WFDB_Annotator n, WFDB_Frequency f)
+{
+    struct iadata *ia;
+    WFDB_Frequency sfreq;
+
+    if (n < niaf && (ia = iad[n]) != NULL) {
+	if (f > 0.0 && ia->afreq > 0.0)
+	    ia->tmul = f / ia->afreq;
+	else if (f > 0.0 && (sfreq = sampfreq(NULL)) > 0.0)
+	    ia->tmul = f * getspf() / sfreq;
+	else
+	    ia->tmul = 1.0;
+
+	ia->ann.time = round_to_time(ia->ann_tt * ia->tmul);
+	ia->pann.time = round_to_time(ia->pann_tt * ia->tmul);
+	ia->prev_time = round_to_time(ia->prev_tt * ia->tmul);
+    }
+}
+
+/* getiafreq: return time resolution for input annotations */
+FFREQUENCY getiafreq(WFDB_Annotator n)
+{
+    struct iadata *ia;
+
+    if (n < niaf && (ia = iad[n]) != NULL) {
+	if (ia->afreq > 0.0)
+	    return (ia->afreq * ia->tmul);
+	else
+	    return (sampfreq(NULL) * ia->tmul / getspf());
+    }
+    else {
+	return (-2);
+    }
 }
 
 /* getiaorigfreq: return the original time resolution of an input

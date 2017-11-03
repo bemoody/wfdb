@@ -36,6 +36,8 @@ WFDB_Frequency getcfreq(void)
 .br
 int getgvmode(void)
 .br
+WFDB_Frequency getiafreq(WFDB_Annotator \fIa\fP)
+.br
 WFDB_Frequency getiaorigfreq(WFDB_Annotator \fIa\fP)
 .br
 WFDB_Frequency getifreq(void)
@@ -103,6 +105,8 @@ void setbasecount(double \fIbase_count\fP)
 int setbasetime(char *\fItime_string\fP)
 .br
 void setcfreq(WFDB_Frequency \fIcounter_frequency\fP)
+.br
+void setiafreq(WFDB_Annotator \fIa\fP, WFDB_Frequency \fIannotation_clock_frequency\fP)
 .br
 int setifreq(WFDB_Frequency \fIgetvec_frequency\fP)
 .br

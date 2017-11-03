@@ -426,6 +426,17 @@ DOUBLE_PRECISION getafreq_(INTEGER *dummy)
     return (getafreq());
 }
 
+INTEGER setiafreq_(INTEGER *annotator, DOUBLE_PRECISION *freq)
+{
+    setiafreq(*annotator, *freq);
+    return (0L);
+}
+
+DOUBLE_PRECISION getiafreq_(INTEGER *annotator)
+{
+    return (getiafreq((*annotator));
+}
+
 DOUBLE_PRECISION getiaorigfreq_(INTEGER *annotator)
 {
     return (getiaorigfreq((*annotator));
