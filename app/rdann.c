@@ -1,5 +1,5 @@
 /* file rdann.c	    T. Baker and G. Moody	27 July 1981
-		    Last revised:	         4 June 2010
+		    Last revised:	       3 November 2017
 
 -------------------------------------------------------------------------------
 rdann: Print an annotation file in ASCII form
@@ -54,13 +54,14 @@ char *argv[];
 {
     char *record = NULL, *prog_name();
     signed char cflag = 0, chanmatch, nflag = 0, nummatch, sflag = 0, submatch;
-    double sps, spm, sph;
+    double sps, tps, tpm, tph;
     int eflag = 0, i, j, vflag = 0, xflag = 0;
     long afrom = 0L, anum = 0L, ato = 0L, bfrom = 0L, bnum = 0L, bto = 0L,
 	from = 0L, to = 0L, atol();
     static char flag[ACMAX+1];
     static WFDB_Anninfo ai;
     WFDB_Annotation annot;
+    WFDB_Time sample_num;
     void help();
 
     pname = prog_name(argv[0]);
@@ -197,12 +198,15 @@ char *argv[];
 
     if ((sps = sampfreq(record)) < 0.)
 	(void)setsampfreq(sps = WFDB_DEFFREQ);
-    spm = 60.0*sps;
-    sph = 60.0*spm;
 
     ai.stat = WFDB_READ;
     if (annopen(record, &ai, 1) < 0)	/* open annotation file */
 	exit(2);
+
+    if ((tps = getiaorigfreq(0)) < sps)
+	tps = sps;
+    tpm = 60.0*tps;
+    tph = 60.0*tpm;
 
     if (from) {
 	if (*argv[(int)from] == 'a') {
@@ -261,18 +265,30 @@ char *argv[];
       (void)printf("Type  Sub Chan  Num\tAux\n");
     }
 
-    while (getann(0, &annot) == 0 && (to == 0L || annot.time <= to)) {
+    setsampfreq(tps);
+    setiafreq(0, tps);
+    while (getann(0, &annot) == 0) {
+	if (tps == sps) {
+	    sample_num = annot.time;
+	}
+	else {
+	    sample_num = annot.time * sps / tps + 0.5;
+	    if (sample_num > annot.time * sps / tps + 0.5)
+		sample_num--;
+	}
+	if (to != 0L && sample_num > to)
+	    break;
 	if ((flag[0] || (isann(annot.anntyp) && flag[annot.anntyp])) &&
 	    (cflag == 0 || annot.chan == chanmatch) &&
 	    (nflag == 0 || annot.num == nummatch) &&
 	    (sflag == 0 || annot.subtyp == submatch)) {
 	    if (eflag)
-		(void)printf("%s  %7ld", mstimstr(annot.time), annot.time);
+		(void)printf("%s  %7ld", mstimstr(annot.time), sample_num);
 	    else if (xflag)
 		(void)printf("%9.3lf %9.5lf %9.7lf",
-			     annot.time/sps, annot.time/spm, annot.time/sph);
+			     annot.time/tps, annot.time/tpm, annot.time/tph);
 	    else
-		(void)printf("%s  %7ld", mstimstr(-annot.time), annot.time);
+		(void)printf("%s  %7ld", mstimstr(-annot.time), sample_num);
 	    (void)printf("%6s%5d%5d%5d", annstr(annot.anntyp), annot.subtyp,
 		annot.chan, annot.num);
 	    if (annot.aux != NULL) (void)printf("\t%s", annot.aux + 1);
