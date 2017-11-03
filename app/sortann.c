@@ -1,5 +1,5 @@
 /* file sortann.c	G. Moody	 7 April 1997
-			Last revised:	30 August 2017
+			Last revised:	3 November 2017
 -------------------------------------------------------------------------------
 sortann: Rearrange annotations in canonical order
 Copyright (C) 1997-2010 George B. Moody
@@ -82,7 +82,7 @@ char *argv[];
     char *record = NULL, *prog_name();
     long from = 0L, nann = 0L, to = 0L, atol();
     int i, insert_ann();
-    double sps, spm;
+    double sps, spm, tps;
     void cleanup(), help();
 
     pname = prog_name(argv[0]);
@@ -194,6 +194,13 @@ char *argv[];
 	if (to < 0L) to = -to;
     }
 
+    if ((tps = getiaorigfreq(0)) > 0) {
+	setafreq(tps);
+	setiafreq(0, tps);
+	from = from * tps / sps + 0.5;
+	to = to * tps / sps + 0.5;
+    }
+
     /* Build a linked list of annotations in memory. */
     while (getann(0, &annot) == 0) {
 	if (annot.time < from || (to > 0L && annot.time >= to))
@@ -210,7 +217,7 @@ char *argv[];
 	}
 	nann++;
     }
-    wfdbquit();
+    iannclose(0);
 
     if (in_order && ai[1].name == NULL) {
 	/* If all of the annotations were in order, don't copy them unless
