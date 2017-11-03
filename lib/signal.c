@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  2 November 2017 		wfdblib 10.5.25
+			Last revised:  3 November 2017 		wfdblib 10.6.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -290,7 +290,7 @@ static unsigned framelen;	/* total number of samples per frame */
 static int gvmode = DEFWFDBGVMODE;	/* getvec mode */
 static int gvc;			/* getvec sample-within-frame counter */
 static int isedf;		/* if non-zero, record is stored as EDF/EDF+ */
-WFDB_Sample *sbuf = NULL;	/* buffer used by sample() */
+static WFDB_Sample *sbuf = NULL;	/* buffer used by sample() */
 static int sample_vflag;	/* if non-zero, last value returned by sample()
 				   was valid */
 
