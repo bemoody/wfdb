@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:   1 September 2017	wfdblib 10.6.0
+			Last revised:   3 November 2017 	wfdblib 10.6.0
 WFDB library functions for annotations
 
 _______________________________________________________________________________
@@ -49,6 +49,7 @@ This file also contains definitions of the following WFDB library functions:
  setanndesc [5.3]	(modifies code-to-text translation table)
  setafreq [10.4.5]	(sets time resolution for output annotation files)
  getafreq [10.4.5]	(returns time resolution for output annotation files)
+ getiaorigfreq [10.6]	(returns time resolution of original annotation file)
  iannclose [9.1]	(closes an input annotation file)
  oannclose [9.1]	(closes an output annotation file)
 
@@ -959,6 +960,18 @@ FVOID setafreq(WFDB_Frequency f)
 FFREQUENCY getafreq(void)
 {
     return (oafreq);
+}
+
+/* getiaorigfreq: return the original time resolution of an input
+   annotation file */
+FFREQUENCY getiaorigfreq(WFDB_Annotator n)
+{
+    struct iadata *ia;
+
+    if (n < niaf && (ia = iad[n]) != NULL)
+	return (ia->afreq);
+    else
+	return (-2);
 }
 
 /* iannclose: close input annotation file n */

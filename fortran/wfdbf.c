@@ -1,5 +1,5 @@
 /* file: wfdbf.c	G. Moody	 23 August 1995
-			Last revised:    11 January 2016	wfdblib 10.5.25
+			Last revised:    3 November 2017	wfdblib 10.6.0
 
 _______________________________________________________________________________
 wfdbf: Fortran wrappers for the WFDB library functions
@@ -424,6 +424,11 @@ INTEGER setafreq_(DOUBLE_PRECISION *freq)
 DOUBLE_PRECISION getafreq_(INTEGER *dummy)
 {
     return (getafreq());
+}
+
+DOUBLE_PRECISION getiaorigfreq_(INTEGER *annotator)
+{
+    return (getiaorigfreq((*annotator));
 }
 
 INTEGER iannclose_(INTEGER *annotator)

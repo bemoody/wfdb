@@ -1742,6 +1742,8 @@ for methods of opening output signal files.
                                 record and how invalid samples are represented.
 * getgvmode::                   Determining the getvec operating mode.
 * getspf::                      Determining the number of samples per frame.
+* getiaorigfreq::               Determining the underlying time resolution
+                                of an annotation file.
 * setafreq::			Setting the time resolution for output
                                 annotations.
 * getafreq::                    Determining the time resolution for output
@@ -1927,7 +1929,7 @@ an invalid or missing sample, rather than returning the value
 @file{<wfdb/wfdb.h>}.
 
 @c @group
-@node     getspf, setafreq, getgvmode, special I/O modes
+@node     getspf, getiaorigfreq, getgvmode, special I/O modes
 @unnumberedsubsec getspf
 @findex getspf (9.6)
 @cindex interpolation
@@ -1954,7 +1956,39 @@ in high resolution mode, however, @code{getspf} returns the number of
 samples per signal per frame (hence @code{sampfreq(NULL)/getspf()} is
 the number of frames per second).
 
-@node     setafreq, getafreq, getspf, special I/O modes
+@node     getiaorigfreq, setafreq, getspf, special I/O modes
+@unnumberedsubsec getiaorigfreq
+@findex getiaorigfreq (10.6.0)
+@cindex interpolation
+@cindex decimation
+@cindex resampling
+@cindex multi-frequency records (reading)
+
+@example
+WFDB_Frequency getiaorigfreq(WFDB_Annotator @var{an})
+@end example
+@noindent
+@strong{Return:}
+@table @asis
+@item @t{(WFDB_Frequency)>0.}
+Success: the annotation time resolution in Hz
+@item @t{(WFDB_Frequency)0.}
+Failure: the annotation time resolution is not defined
+@item @t{(WFDB_Frequency)-2.}
+Failure: incorrect annotator number specified
+@end table
+
+@noindent
+This function returns the original time resolution for the given input
+annotator, if it was specified by the application that created the annotation
+file (@pxref{setafreq}).
+
+@noindent
+If the application that created the annotation file did not specify a time
+resolution, @code{getiaorigfreq} returns zero.  (In this case, the time
+resolution is assumed to equal the record's frame frequency.)
+
+@node     setafreq, getafreq, getiaorigfreq, special I/O modes
 @unnumberedsubsec setafreq
 @findex setafreq (10.4.5)
 @cindex interpolation
