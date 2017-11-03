@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:   15 August 2017        wfdblib 10.5.25
+                        Last revised:   3 November 2017       wfdblib 10.6.0
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -819,7 +819,7 @@ FSTRING wfdberror(void)
 	return ("WFDB: cannot allocate memory for error message");
 }
 
-void wfdb_error(char *format, ...)
+FVOID wfdb_error(const char *format, ...)
 {
     va_list arguments;
 

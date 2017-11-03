@@ -1,5 +1,5 @@
 /* file: wfdblib.h	G. Moody	13 April 1989
-                        Last revised:  1 September 2017       wfdblib 10.6.0
+                        Last revised:  3 November 2017        wfdblib 10.6.0
 External definitions for WFDB library private functions
 
 _______________________________________________________________________________
@@ -323,10 +323,6 @@ extern void wfdb_addtopath(char *pathname);
 __attribute__((__format__(__printf__, 2, 3)))
 #endif
 extern int wfdb_asprintf(char **buffer, const char *format, ...);
-#if __GNUC__ >= 3
-__attribute__((__format__(__printf__, 1, 2)))
-#endif
-extern void wfdb_error(char *format_string, ...);
 extern WFDB_FILE *wfdb_fopen(char *fname, const char *mode);
 #if __GNUC__ >= 3
 __attribute__((__format__(__printf__, 2, 3)))
@@ -371,7 +367,7 @@ extern int wfdb_fclose(), wfdb_checkname(), wfdb_g16(), wfdb_parse_path(),
     wfdb_fprintf();
 extern long wfdb_g32();
 extern void wfdb_striphea(), wfdb_p16(), wfdb_p32(), wfdb_addtopath(),
-    wfdb_error(), wfdb_setirec(), wfdb_sampquit(), wfdb_sigclose(),
+    wfdb_setirec(), wfdb_sampquit(), wfdb_sigclose(),
     wfdb_osflush(), wfdb_freeinfo(), wfdb_oinfoclose(),
     wfdb_anclose(), wfdb_oaflush();
 extern WFDB_FILE *wfdb_open(), *wfdb_fopen();
