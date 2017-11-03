@@ -4,11 +4,11 @@ wfdbf \- Waveform Database library wrappers for Fortran
 .SH SYNOPSIS
 implicit integer(a-z)
 .br
-real aduphys, getbasecount, getcfreq, getifreq, sampfreq
+real aduphys, getbasecount, getcfreq, getifreq, sampfreq, getafreq
 .br
-character aux(256), desc(80), filetype(32), fname(40), name(20), pathname(80), record(16), string(32), units(20)
+character aux(256), desc(80), filetype(32), fname(40), name(20), pathname(80), record(16), string(32), units(20), prolog(1000), version(80), options(80)
 .br
-integer a, adcres, adczero, ampl, anntyp, baseline, bsize, caltype, chan, cksum, date, dummy, fmt, group, initval, microvolts, mode, nann, nsamp, nsig, num, s, spf, stat, subtyp, time, v(32), value
+integer a, adcres, adczero, ampl, anntyp, baseline, bsize, caltype, chan, cksum, date, dummy, fmt, group, initval, microvolts, mode, nann, nsamp, nsig, num, s, spf, stat, subtyp, time, v(32), value, bytes
 .br
 real gain, frequency, high, low, scale
 .PP
@@ -28,7 +28,11 @@ osigfopen(nsig)
 .br
 wfdbinit(record, nann, nsig)
 .br
+findsig(desc)
+.br
 setgvmode(mode)
+.br
+getgvmode(dummy)
 .br
 getspf(dummy)
 .br
@@ -48,6 +52,8 @@ isigsettime(time)
 .br
 isgsettime(group, time)
 .br
+tnextvec(s, time)
+.br
 iannsettime(time)
 .br
 ecgstr(code, string)
@@ -65,6 +71,10 @@ setannstr(code, string)
 anndesc(code, string)
 .br
 setanndesc(code, string)
+.br
+setafreq(frequency)
+.br
+getafreq(dummy)
 .br
 iannclose(a)
 .br
@@ -88,6 +98,10 @@ aduphys(s, ampl)
 .br
 physadu(s, value)
 .br
+sample(s, time)
+.br
+sample_valid(dummy)
+.br
 calopen(fname)
 .br
 getcal(desc, units, low, high, scale, caltype)
@@ -102,17 +116,25 @@ getinfo(record, string)
 .br
 putinfo(string)
 .br
+setinfo(record)
+.br
+wfdb_freeinfo(dummy)
+.br
 newheader(record)
 .br
 setheader(record, nsig)
 .br
 wfdbgetskew(s)
 .br
+wfdbsetiskew(s, value)
+.br
 wfdbsetskew(s, value)
 .br
 wfdbgetstart(s)
 .br
 wfdbsetstart(s, value)
+.br
+wfdbputprolog(prolog, bytes, s)
 .br
 wfdbquit(dummy)
 .br
@@ -144,6 +166,8 @@ setwfdb(string)
 .br
 getwfdb(string)
 .br
+resetwfdb(dummy)
+.br
 setibsize(value)
 .br
 setobsize(value)
@@ -151,6 +175,18 @@ setobsize(value)
 wfdbfile(filetype, record, pathname)
 .br
 wfdbflush(dummy)
+.br
+wfdbmemerr(mode)
+.br
+wfdbversion(version)
+.br
+wfdbldflags(options)
+.br
+wfdbcflags(options)
+.br
+wfdbdefwfdb(string)
+.br
+wfdbdefwfdbcal(fname)
 .br
 isann(anntyp)
 .br
