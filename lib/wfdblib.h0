@@ -201,17 +201,6 @@ symbols reserved to the library begin with the characters "wfdb_".
 #endif 
 
 /* Structures used by internal WFDB library functions only */
-struct netfile {
-  char *url;
-  char *data;
-  int mode;
-  long base_addr;
-  long cont_len;
-  long pos;
-  long err;
-  int fd;
-};
-
 struct WFDB_FILE {
   FILE *fp;
   struct netfile *netfp;

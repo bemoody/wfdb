@@ -1231,6 +1231,17 @@ to set the search order in any way you wish, as in this example.
 
 #if WFDB_NETFILES
 
+struct netfile {
+  char *url;
+  char *data;
+  int mode;
+  long base_addr;
+  long cont_len;
+  long pos;
+  long err;
+  int fd;
+};
+
 static int nf_open_files = 0;		/* number of open netfiles */
 static long page_size = NF_PAGE_SIZE;	/* bytes per range request (0: disable
 					   range requests) */
