@@ -1948,8 +1948,9 @@ static int nf_putc(int c, netfile *nf)
 void wfdb_clearerr(WFDB_FILE *wp)
 {
     if (wp->type == WFDB_NET)
-	return (nf_clearerr(wp->netfp));
-    return (clearerr(wp->fp));
+	nf_clearerr(wp->netfp);
+    else
+	clearerr(wp->fp);
 }
 
 int wfdb_feof(WFDB_FILE *wp)
