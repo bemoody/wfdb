@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:   3 November 2017 	wfdblib 10.6.0
+			Last revised:   13 November 2017 	wfdblib 10.6.0
 WFDB library functions for annotations
 
 _______________________________________________________________________________
@@ -467,8 +467,7 @@ FINT getann(WFDB_Annotator n, WFDB_Annotation *annot)
       	ia->pann.anntyp = 0;
 	ia->prev_time = annot->time;
 	ia->prev_tt = ia->pann_tt;
-	if (ia->pann_tt != 0)
-	    return (0);
+	return (0);
     }
 
     if (ia->ateof) {
