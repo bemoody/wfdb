@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:   3 November 2017       wfdblib 10.6.0
+                        Last revised:   13 November 2017      wfdblib 10.6.0
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -1927,6 +1927,20 @@ static int nf_putc(int c, netfile *nf)
     return (EOF);
 }
 
+#else	/* !WFDB_NETFILES */
+# define nf_feof(nf)                      (0)
+# define nf_fgetc(nf)                     (EOF)
+# define nf_fgets(s, size, nf)            (NULL)
+# define nf_fread(ptr, size, nmemb, nf)   (0)
+# define nf_fseek(nf, offset, whence)     (-1)
+# define nf_ftell(nf)                     (-1)
+# define nf_ferror(nf)                    (0)
+# define nf_clearerr(nf)                  ((void) 0)
+# define nf_fflush(nf)                    (EOF)
+# define nf_fwrite(ptr, size, nmemb, nf)  (0)
+# define nf_putc(c, nf)                   (EOF)
+#endif
+
 /* The definition of nf_vfprintf (which is a stub) has been moved;  it is
    now just before wfdb_fprintf, which refers to it.  There is no completely
    portable way to make a forward reference to a static (local) function. */
@@ -2012,8 +2026,6 @@ int wfdb_putc(int c, WFDB_FILE *wp)
 	return (nf_putc(c, wp->netfp));
     return (putc(c, wp->fp));
 }
-
-#endif	/* WFDB_NETFILES */
 
 int wfdb_fclose(WFDB_FILE *wp)
 {
