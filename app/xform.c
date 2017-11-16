@@ -1,5 +1,5 @@
 /* file: xform.c	G. Moody        8 December 1983
-			Last revised:   3 November 2010
+			Last revised:   16 November 2017
 -------------------------------------------------------------------------------
 xform: Sampling frequency, amplitude, and format conversion for WFDB records
 Copyright (C) 1983-2010 George B. Moody
@@ -732,8 +732,8 @@ char *argv[];
 
     /* Determine the legal range of sample values for each output signal. */
     for (i = 0; i < nosig; i++) {
-	vmax[i] = dfout[i].adczero + (1 << (dfout[i].adcres-1)) - 1;
-	vmin[i] = dfout[i].adczero + (-1 << (dfout[i].adcres-1)) + 1;
+	vmax[i] = dfout[i].adczero + (1UL << (dfout[i].adcres-1)) - 1;
+	vmin[i] = dfout[i].adczero - (1UL << (dfout[i].adcres-1));
     }
 
     /* If resampling is required, initialize the interpolation/decimation
