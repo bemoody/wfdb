@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  3 November 2017 		wfdblib 10.6.0
+			Last revised:  16 November 2017		wfdblib 10.6.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -173,6 +173,8 @@ void example(void)
 #endif
 
 #include "wfdblib.h"
+
+#include <limits.h>
 
 #ifdef iAPX286
 #define BROKEN_CC
@@ -576,7 +578,7 @@ static int sigmap_init(void)
 	       "sigmap_init: loss of precision in signal %d in segment %s\n",
 				       i, segp->recname);
 			ps->offset = ps->baseline -
-			             ps->scale * isd[i]->info.baseline;
+			             ps->scale * isd[i]->info.baseline + 0.5;
 		    }
 		    break;
 		}
@@ -600,16 +602,32 @@ static int sigmap(WFDB_Sample *vector)
 	ovec[i] = vector[i];
 
     for (i = 0; i < tspf; i++) {
-      if (ovec[smi[i].index] == WFDB_INVALID_SAMPLE)
-	vector[i] = WFDB_INVALID_SAMPLE;
-      else {
-	v = ovec[smi[i].index] * smi[i].scale + smi[i].offset;
-	vector[i] = (WFDB_Sample)v;
-#if defined(WFDB_OVERFLOW_CHECK)
-	if (((v > 0.0 && v - ovec[i]) > 1.0) || ((v - ovec[i]) < -1.0))
-	    wfdb_error("sigmap: overflow detected\n");
-#endif
-      }
+	if (ovec[smi[i].index] == WFDB_INVALID_SAMPLE)
+	    vector[i] = WFDB_INVALID_SAMPLE;
+	else {
+	    /* Scale the input sample and round it to the nearest
+	       integer.  Halfway cases are always rounded up (10.5 is
+	       rounded to 11, but -10.5 is rounded to -10.)  Note that
+	       smi[i].offset already includes an extra 0.5, so we
+	       simply need to calculate the floor of v. */
+	    v = ovec[smi[i].index] * smi[i].scale + smi[i].offset;
+	    if (v >= 0) {
+		if (v <= WFDB_SAMPLE_MAX)
+		    vector[i] = (WFDB_Sample) v;
+		else
+		    vector[i] = WFDB_SAMPLE_MAX;
+	    }
+	    else {
+		if (v >= WFDB_SAMPLE_MIN) {
+		    vector[i] = (WFDB_Sample) v;
+		    if (vector[i] > v)
+			vector[i]--;
+		}
+		else {
+		    vector[i] = WFDB_SAMPLE_MIN;
+		}
+	    }
+	}
     }
     return (tspf);
 }
