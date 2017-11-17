@@ -460,6 +460,7 @@ static WFDB_Sample *ovec;
 static struct sigmapinfo {
     char *desc;
     double gain, scale, offset;
+    WFDB_Sample sample_offset;
     WFDB_Sample baseline;
     int index;
     int spf;
@@ -523,7 +524,8 @@ static int make_vsd(void)
 
 static int sigmap_init(void)
 {
-    int i, j, k, kmax, s;
+    int i, j, k, kmax, s, ivmin, ivmax;
+    double ovmin, ovmax;
     struct sigmapinfo *ps;
 
     /* is this the layout segment?  if so, set up output side of map */
@@ -553,7 +555,8 @@ static int sigmap_init(void)
 	for (s = 0; s < tspf; s++) {
 	    smi[s].index = 0;
 	    smi[s].scale = 0.;
-	    smi[s].offset = WFDB_INVALID_SAMPLE;
+	    smi[s].offset = 0.;
+	    smi[s].sample_offset = WFDB_INVALID_SAMPLE;
 	}
 
 	if (isd[0]->info.fmt == 0 && nisig == 1)
@@ -579,6 +582,37 @@ static int sigmap_init(void)
 				       i, segp->recname);
 			ps->offset = ps->baseline -
 			             ps->scale * isd[i]->info.baseline + 0.5;
+
+			/* If it is possible to add an additional
+			   offset such that all possible output values
+			   will fit into a positive signed integer, we
+			   can use the "fast" case in sigmap, below. */
+			switch (isd[i]->info.fmt) {
+			  case 80: ivmin = -0x80; ivmax = 0x7f; break;
+			  case 310:
+			  case 311: ivmin = -0x200; ivmax = 0x1ff; break;
+			  case 212: ivmin = -0x800; ivmax = 0x7ff; break;
+			  case 16:
+			  case 61:
+			  case 160: ivmin = -0x8000; ivmax = 0x7fff; break;
+			  case 24: ivmin = -0x800000; ivmax = 0x7fffff; break;
+			  default:
+			    ivmin = WFDB_SAMPLE_MIN;
+			    ivmax = WFDB_SAMPLE_MAX;
+			    break;
+			}
+			ovmin = ivmin * ps->scale + ps->offset;
+			ovmax = ivmax * ps->scale + ps->offset;
+			if (ovmin < ovmax &&
+			    ovmin >= WFDB_SAMPLE_MIN + 1 &&
+			    ovmax <= WFDB_SAMPLE_MAX &&
+			    ovmax - ovmin + 1 < WFDB_SAMPLE_MAX) {
+			    ps->sample_offset = ovmin - 1;
+			    ps->offset -= ps->sample_offset;
+			}
+			else {
+			    ps->sample_offset = 0;
+			}
 		    }
 		    break;
 		}
@@ -611,20 +645,31 @@ static int sigmap(WFDB_Sample *vector)
 	       smi[i].offset already includes an extra 0.5, so we
 	       simply need to calculate the floor of v. */
 	    v = ovec[smi[i].index] * smi[i].scale + smi[i].offset;
-	    if (v >= 0) {
-		if (v <= WFDB_SAMPLE_MAX)
-		    vector[i] = (WFDB_Sample) v;
-		else
-		    vector[i] = WFDB_SAMPLE_MAX;
+	    if (smi[i].sample_offset) {
+		/* Fast case: if we can guarantee that v is always
+		   positive and the following calculation cannot
+		   overflow, we can avoid additional floating-point
+		   operations. */
+		vector[i] = (WFDB_Sample) v + smi[i].sample_offset;
 	    }
 	    else {
-		if (v >= WFDB_SAMPLE_MIN) {
-		    vector[i] = (WFDB_Sample) v;
-		    if (vector[i] > v)
-			vector[i]--;
+		/* Slow case: we need to check bounds and handle
+		   negative values. */
+		if (v >= 0) {
+		    if (v <= WFDB_SAMPLE_MAX)
+			vector[i] = (WFDB_Sample) v;
+		    else
+			vector[i] = WFDB_SAMPLE_MAX;
 		}
 		else {
-		    vector[i] = WFDB_SAMPLE_MIN;
+		    if (v >= WFDB_SAMPLE_MIN) {
+			vector[i] = (WFDB_Sample) v;
+			if (vector[i] > v)
+			    vector[i]--;
+		    }
+		    else {
+			vector[i] = WFDB_SAMPLE_MIN;
+		    }
 		}
 	    }
 	}
