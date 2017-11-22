@@ -1,47 +1,55 @@
-10.5.25 (9 March 2017):
-	Changes in 'configure' and the various '.def' files make it simpler to
-	cross-compile WFDB using the GNU toolchain.  Further improvements to the
-	makefiles permit parallel compilation (when using the -j option of GNU
-	make) and permit installation into a temporary staging directory (using
-	the DESTDIR variable.)
+10.6.0 (unreleased):
+	A wide variety of bugs have been fixed in the WFDB library, and several
+	new features have been added.  See the WFDB Programmer's Guide for
+	details.  In particular, the library returns more accurate results when
+	reading a multi-segment record or an EDF file; many WFDB applications
+	may produce different output as a result.
 
-	Support for using libwww to read remote files has been removed.  libwww
-	support was introduced with version 10.0.1 in 2000, and was still
-	supported as an alternative after libcurl support was added in version
-	10.3.16.  However, libwww has not been actively developed for many
-	years; we don't recommend its use anymore, and removing support is
-	necessary in order to simplify and add new features to WFDB in the
-	future.
+	'sortann' and 'mrgann' preserve the original time resolution of their
+	input files, and 'rdann' displays the elapsed time with higher
+	precision, if possible.
 
-	When reading a signal from an EDF file in which the minimum
-	representable value is greater than zero (corresponding to a negative
-	baseline), the baseline reported to the application will now be
-	correctly rounded to the nearest integer.  In previous versions, the
-	baseline would be off by 1, causing applications to calculate an
-	incorrect physical value.
-
-	The 'install-wave32' script has been updated to work on current versions
-	of Fedora and Scientific Linux.
-
-	'wfdb2mat' will display the correct instructions for computing physical
+	'wfdb2mat' displays the correct instructions for computing physical
 	values, in the case of an 8-bit data file.
 
-	The Fortran wrapper functions in 'fortran/wfdbf.c' have been updated for
-	compatibility with modern Fortran compilers on 64-bit systems.
+	'mrgann' correctly interprets the argument to the first '-mX' option, if
+	any.
 
-	Now that all of PhysioNet is accessible using secure HTTPS, the
-	'pnwlogin' script has been updated to use HTTPS for all remote file
-	access (PhysioBank as well as PhysioNetWorks.)  This prevents the
-	possibility of disclosing private metadata (such as the names of records
-	that the application is attempting to read) to a network attacker.
+	'xform' correctly computes the lower limit of the output ADC range.
+	This will result in different output if the '-c' option is used and the
+	signals are clipped.
+
+	'psfd' and 'pschart' correctly handle custom annotation mnemonics that
+	include parentheses or backslashes.
+
+	WAVE sets the X resource 'OpenWindows.SelectDisplaysMenu' to 'true' by
+	default, so that the left mouse button will do what users normally
+	expect it to do.  If you prefer the traditional XView behavior, you can
+	set this to 'false' in your .Xdefaults or .Xresources.
+
+	WAVE permits viewing records at finer time scales, up to 500 mm/ms.
+
+	In some circumstances, when jumping to the beginning of a record in
+	WAVE, the signals would mysteriously disappear.  This was most apparent
+	with very short records; it has now been fixed.
 
 	Some systems (particulary those based on systemd) allow programs to open
 	a larger range of file descriptors than what the C select() function
 	accepts.  This causes older versions of the XView library to crash.
 	WAVE now works around this bug.
 
-	Password-protected remote files can now be accessed when WFDB_PAGESIZE
-	is set to zero.
+	Changes in 'configure' and the various '.def' files make it simpler to
+	cross-compile WFDB using the GNU toolchain.  Further improvements to the
+	makefiles permit parallel compilation (when using the -j option of GNU
+	make) and permit installation into a temporary staging directory (using
+	the DESTDIR variable.)
+
+	The 'install-wave32' script has been updated to work on current versions
+	of Fedora and Scientific Linux.
+
+	Now that all of PhysioNet is accessible using secure HTTPS, the
+	'pnwlogin' script has been updated to use HTTPS for all remote file
+	access (PhysioBank as well as PhysioNetWorks.)
 
 10.5.24 (28 May 2015):
 	A security flaw was found in the 'pnwlogin' script used to access
