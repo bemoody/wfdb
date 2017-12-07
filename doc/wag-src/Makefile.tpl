@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	 24 May 2000
-#				Last revised:	 25 October 2017
+#				Last revised:	 7 December 2017
 # Change the settings below as appropriate for your setup.
 
 # D2PARGS is a list of options for dvips.  Uncomment one of these to set the
@@ -169,6 +169,12 @@ wag4.pdf:	eval.tex
 	sed "s/LONGDATE/$(LONGDATE)/" <eval.tex | \
 	  sed "s/VERSION/$(VERSION)/" >wag4.tex
 	pdflatex '\nonstopmode\input{wag4}'
+
+getpagenos:	getpagenos.c
+	$(BUILD_CC) -o getpagenos -O getpagenos.c
+
+maketoclines:	maketoclines.c
+	$(BUILD_CC) -o maketoclines -O maketoclines.c
 
 # 'make clean': remove intermediate and backup files
 clean:
