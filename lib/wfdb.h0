@@ -1,5 +1,5 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised: 3 November 2017   	wfdblib 10.6.0
+			Last revised: 8 December 2017   	wfdblib 10.6.0
 WFDB library type, constant, structure, and function interface definitions
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
@@ -224,8 +224,8 @@ typedef struct WFDB_seginfo WFDB_Seginfo;
 
 /* Dynamic memory allocation macros. */
 #define MEMERR(P, N, S) \
-    { wfdb_error("WFDB: can't allocate (%ld*%ld) bytes for %s\n", \
-	     (size_t)N, (size_t)S, #P);			      \
+    { wfdb_error("WFDB: can't allocate (%lu*%lu) bytes for %s\n", \
+		 (unsigned long)N, (unsigned long)S, #P);	  \
       if (wfdb_me_fatal()) exit(1); }
 #define SFREE(P) { if (P) { free (P); P = 0; } }
 #define SUALLOC(P, N, S) { if (!(P = calloc((N), (S)))) MEMERR(P, (N), (S)); }
