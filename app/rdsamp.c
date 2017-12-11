@@ -1,5 +1,5 @@
 /* file: rdsamp.c	G. Moody	 23 June 1983
-			Last revised:	6 October 2010
+			Last revised:  11 December 2017
 
 -------------------------------------------------------------------------------
 rdsamp: Print an arbitrary number of samples from each signal
@@ -381,7 +381,7 @@ char *argv[];
 	    (void)printf("\n");
 	}
 
-	if (xflag) (void)printf("<samplevectors>\n", nsig+1);
+	if (xflag) (void)printf("<samplevectors>\n");
 	while ((to == 0L || from < to) && getvec(v) >= 0) {
 	    if (cflag == 0) {
 	      switch (timeunits) {
@@ -437,7 +437,7 @@ char *argv[];
     }
 
     else {	/* output in raw units */
-	if (xflag) (void)printf("<samplevectors>\n", nsig+1);
+	if (xflag) (void)printf("<samplevectors>\n");
 	while ((to == 0L || from < to) && getvec(v) >= 0) {
 	    (void)printf(tfmt, from++);
 	    for (i = 0; i < nsig; i++)

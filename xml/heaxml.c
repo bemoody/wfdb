@@ -1,5 +1,5 @@
 /* file: heaxml.c	G. Moody	28 June 2010
-			Last revised:	 1 July 2010
+			Last revised:	11 December 2017
 -------------------------------------------------------------------------------
 heaxml: Convert a WFDB .hea (header) file to XML format
 Copyright (C) 2010 George B. Moody
@@ -366,7 +366,7 @@ int process_record(void)
 	if (s[i].spf > 1)
 	  fprintf(ofile,"<samplesperframe>%d</samplesperframe>\n", s[i].spf);
 	if (skew = wfdbgetskew(i))
-	  fprintf(ofile, "<skew>%ld</skew>\n", skew);
+	  fprintf(ofile, "<skew>%d</skew>\n", skew);
 	fprintf(ofile, "<blocksize>%d</blocksize>\n", s[i].bsize);
 	fprintf(ofile, "<adcresolution>%d</adcresolution>\n", s[i].adcres);
 	fprintf(ofile, "<adczero>%d</adczero>\n", s[i].adczero);

@@ -1,5 +1,5 @@
 /* file: parsescp.c	G. Moody and E. Moody	 10 January 2000
-			Last revised:		 16 December 2016
+			Last revised:		 11 December 2017
 -------------------------------------------------------------------------------
 parsescp: parse an SCP-ECG file (read from the standard input)
 Copyright (C) 2000-2014 George B. Moody and Edna S. Moody
@@ -917,7 +917,7 @@ main(int argc, char **argv)
 
     bytesread = fread(header, 1, 6, stdin);
     if (bytesread != 6) {
-	fprintf(stderr, "%s: input too short (only %d bytes)\n",
+	fprintf(stderr, "%s: input too short (only %lu bytes)\n",
 		pname, bytesread);
 	exit(1);
     }	
@@ -934,7 +934,7 @@ main(int argc, char **argv)
     while (!ferror(stdin) && bytesread < length && i > 0)
 	bytesread += i = fread(data+bytesread, 1, length-bytesread, stdin);
     if (bytesread < length) {
-	fprintf(stderr, "%s: input too short (%d byte%s missing)\n",
+	fprintf(stderr, "%s: input too short (%lu byte%s missing)\n",
 		pname, length-bytesread, (length-bytesread == 1) ? "" : "s");
 	exit(3);
     }
@@ -952,8 +952,8 @@ main(int argc, char **argv)
 	if (sec_len < 8) {
 	    if (vflag) printf(
     " Warning: section length too short (must be at least 8 bytes)\n"
-    "  Remaining data (%d bytes) following short section will not be read\n",
-			      data+length-(p+8));
+    "  Remaining data (%lu bytes) following short section will not be read\n",
+			      (unsigned long) (data+length-(p+8)));
 	    sec_len = 8;
 	    //	    break;	/* don't attempt to read any further */
 	}
@@ -1284,7 +1284,7 @@ int section1(unsigned char *p, long len)
 	if (*p == 255) break;	/* tag 255 is the terminator */
 	vlen = get16(p+1);
 	if (vlen > len) {
-	    if (vflag) printf(" Error: tagged field (%d bytes) overlaps next section\n");
+	    if (vflag) printf(" Error: tagged field overlaps next section\n");
 	    return (0);
 	}
 	switch (*p) {
@@ -1632,7 +1632,7 @@ int section3(unsigned char *p, long len)
 
     if ((nsamp=(unsigned long *)malloc((nleads+4)*sizeof(unsigned long))) ==
 	NULL){
-	if (vflag) printf("  Error: too many (%ld) leads\n", nleads);
+	if (vflag) printf("  Error: too many (%d) leads\n", nleads);
 	return (0);
     }
 
@@ -1675,7 +1675,7 @@ int section3(unsigned char *p, long len)
 	}
 	else
 	    if (vflag) printf("  <Manufacturer-defined lead>");
-	if (vflag) printf(": ID %d, samples %d to %d\n", *(p+8),
+	if (vflag) printf(": ID %d, samples %lu to %lu\n", *(p+8),
 	       get32(p), get32(p+4));
 	nsamp[i++] = get32(p+4) - get32(p) + 1;
 	p += 9; len -= 9;
@@ -1684,7 +1684,7 @@ int section3(unsigned char *p, long len)
     /* allocate space for 4 extra signals that will be calculated later,
        and for a NULL pointer to signal the end of the array */
     if ((ecg = (short **)malloc((nleads+5)*sizeof(short *))) == NULL) {
-	if (vflag) printf("  Error: too many (%ld) leads\n", nleads);
+	if (vflag) printf("  Error: too many (%d) leads\n", nleads);
 	return (0);
     }
 
@@ -1693,7 +1693,7 @@ int section3(unsigned char *p, long len)
 	else if (nsamp[i] > nsmax) nsmax = nsamp[i];
 	if (nsamp[i] < 1) nsamp[i] = 1;
 	if ((ecg[i] = (short *)calloc(nsamp[i], sizeof(short))) == NULL) {
-	    if (vflag) printf("  Error: too many (%ld) leads\n", nleads);
+	    if (vflag) printf("  Error: too many (%d) leads\n", nleads);
 	    return (0);
 	}
     }
@@ -1716,7 +1716,7 @@ int section4(unsigned char *p, long len)
     fcM = get16(p+2);
     nqrs = get16(p+4);
     if (vflag) {
-	printf("  Length of reference beat type 0 data: %d msec\n", rblenms);
+	printf("  Length of reference beat type 0 data: %ld msec\n", rblenms);
 	printf(
           "  Sample # of fiducial relative to start of ref beat type 0: %d\n",
 	  fcM);
@@ -1744,7 +1744,8 @@ int section4(unsigned char *p, long len)
 
 	    if (vflag) {
 		printf(
-		   "   %2d  Type: %2d  start: %7d  fiducial: %7d  end: %7d\n",
+		   "   %2d  Type: %2d  start: %7ld"
+		   "  fiducial: %7ld  end: %7ld\n",
 		   i+1, subz[i].type, subz[i].t0, subz[i].t1, subz[i].t2);
 		if (subz[i].type != 0 && (subz[i].t0 != 0 ||
 					  subz[i].t2 != 0))
@@ -1762,7 +1763,7 @@ int section4(unsigned char *p, long len)
     if (len >= nqrs*8) {
 	if (vflag) printf("  QRS locations:\n");
 	for (i = 0; i < nqrs; i++) {
-	    if (vflag) printf("   %2d  start: %7d  end: %7d\n",
+	    if (vflag) printf("   %2d  start: %7lu  end: %7lu\n",
 		   i+1, get32(p), get32(p+4));
 	    p += 8; len -= 8;
 	}
@@ -1987,17 +1988,17 @@ int Huffdecode(unsigned char *p, long len, int section)
 	return (0);
     }
     if ((leadlen=(unsigned long *)malloc(nleads*sizeof(unsigned long)))==NULL){
-	if (vflag) printf("  Error: too many (%ld) leads\n", nleads);
+	if (vflag) printf("  Error: too many (%d) leads\n", nleads);
 	return (0);
     }
 
     for (i = 0; i < nleads; i++, p += 2, len -= 2) {
 	tleadlen += leadlen[i] = get16(p);
-	if (vflag) printf("  Lead %d:%5d bytes\n", i, leadlen[i]);
+	if (vflag) printf("  Lead %d:%5lu bytes\n", i, leadlen[i]);
     }
 
     if (len < tleadlen) {
-	if (vflag) printf("  Error: %d data byte%s missing from section %d\n",
+	if (vflag) printf("  Error: %lu data byte%s missing from section %d\n",
 			  tleadlen - len,
 			  (tleadlen - len == 1) ? "" : "s",
 			  section);
@@ -2006,7 +2007,7 @@ int Huffdecode(unsigned char *p, long len, int section)
     }
     else if (len > ((tleadlen + 1) & ~1))
 	/* the expression above rounds tleadlen up to an even number */
-	if (vflag) printf("  Warning: %d extra byte%s in section %d\n",
+	if (vflag) printf("  Warning: %lu extra byte%s in section %d\n",
 			  len - tleadlen,
 			  (len - tleadlen == 1) ? "" : "s",
 			  section);
@@ -2069,7 +2070,7 @@ int section7(unsigned char *p, long len)
     if (xflag && vflag) hexdump(p, len);
 
     if (len < 20) {                  /* there isn't enough room left for measurements */
-	if (vflag) printf(" Error: section 7 is too short (len = %d)\n", len);
+	if (vflag) printf(" Error: section 7 is too short (len = %ld)\n", len);
 	return (0);
     }
 
@@ -2176,7 +2177,7 @@ int section7(unsigned char *p, long len)
 #endif
 
 
-	printf("%d bytes remaining in section 7\n", len - (q - p));
+	printf("%ld bytes remaining in section 7\n", len - (q - p));
 	while (q < p + len) {
 	    printf(" %5d", get16(q));
 	    printf(" [%3d]", *q++);

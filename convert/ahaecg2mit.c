@@ -1,5 +1,5 @@
 /* file: ahaecg2mit.c		G. Moody		7 May 2008
-				Last revised:	       11 July 2012
+				Last revised:	     11 December 2017
 Convert *.ecg or *.txt files from an AHA Database DVD to WFDB-compatible format
 */
 
@@ -30,8 +30,8 @@ int readbindata(void)
 
 int readtxtdata(void)
 {
-    char buf[16];
-    int c, i, n;
+    char buf[16], c;
+    int i, n;
 
     for (i = 0; i < sizeof(buf); i++) {
 	c = getc(ifile);

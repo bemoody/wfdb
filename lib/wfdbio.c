@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:   13 November 2017      wfdblib 10.6.0
+                        Last revised:   11 December 2017      wfdblib 10.6.0
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -1773,7 +1773,7 @@ static long nf_get_range(netfile* nf, long startb, long len, char *rbuf)
 	    /* long request (> page_size) */
 	    if (chunk_size(chunk) != len) {
 		wfdb_error(
-		       "nf_get_range: requested %d bytes, received %d bytes\n",
+		     "nf_get_range: requested %ld bytes, received %ld bytes\n",
 		           len, (long)chunk_size(chunk));
 	    }
 	    rp = chunk_data(chunk);

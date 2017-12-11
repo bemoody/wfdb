@@ -1,5 +1,5 @@
 /* file: xmlann.c	G. Moody	22 August 2010
-
+			Last revised:	11 December 2017
 -------------------------------------------------------------------------------
 xmlann: Convert a WFDB-XML file to a WFDB-compatible annotation file
 Copyright (C) 2010 George B. Moody
@@ -50,7 +50,7 @@ void XMLCALL start(void *data, const char *el, const char **attr)
 
   sprintf(data + strlen(data), "/%s", el);
   if (vflag) {
-      printf("\n%s", data);
+      printf("\n%s", (char *) data);
       for (i = 0; attr[i]; i += 2)
 	  printf(" %s='%s'", attr[i], attr[i + 1]);
       fflush(stdout);

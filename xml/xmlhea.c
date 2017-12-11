@@ -1,5 +1,5 @@
 /* file: xmlhea.c	G. Moody	20 August 2010
-			Last revised:	22 August 2010
+			Last revised:	11 December 2017
 -------------------------------------------------------------------------------
 xmlhea: Convert an XML file to a WFDB-compatible .hea (header) file
 Copyright (C) 2010 George B. Moody
@@ -66,7 +66,7 @@ void XMLCALL start(void *data, const char *el, const char **attr)
 
   sprintf(data + strlen(data), "/%s", el);
   if (vflag) {
-      printf("\n%s", data);
+      printf("\n%s", (char *) data);
       for (i = 0; attr[i]; i += 2)
 	  printf(" %s='%s'", attr[i], attr[i + 1]);
       fflush(stdout);
@@ -203,7 +203,7 @@ void XMLCALL end(void *data, const char *el)
       else if (strcmp("counterfrequency", el) == 0)
 	  sscanf(content, "%lf", &cps);
       else if (strcmp("signals", el) == 0) {
-	  sscanf(content, "%ld", &nsig);
+	  sscanf(content, "%d", &nsig);
 	  SUALLOC(si, sizeof(WFDB_Siginfo), nsig);
 	  SUALLOC(sa, sizeof(struct asiginfo), nsig);
       }
@@ -224,7 +224,7 @@ void XMLCALL end(void *data, const char *el)
       segi[nseg].nsamp = length;
   }
   else if (strcmp("/wfdbrecord/segment/signals", data) == 0)
-      sscanf(content, "%ld", &nsig);
+      sscanf(content, "%d", &nsig);
   
   else if (strcmp("/info/age", dp) == 0) {
       SSTRCPY(age, content);
@@ -265,19 +265,19 @@ void XMLCALL end(void *data, const char *el)
   }
 
   else if (strcmp("/start/year", dp) == 0) {
-      sscanf(content, "%ld", &year);
+      sscanf(content, "%d", &year);
   }
   else if (strcmp("/start/month", dp) == 0) {
-      sscanf(content, "%ld", &month);
+      sscanf(content, "%d", &month);
   }
   else if (strcmp("/start/day", dp) == 0) {
-      sscanf(content, "%ld", &day);
+      sscanf(content, "%d", &day);
   }
   else if (strcmp("/start/hour", dp) == 0) {
-      sscanf(content, "%ld", &hour);
+      sscanf(content, "%d", &hour);
   }
   else if (strcmp("/start/minute", dp) == 0) {
-      sscanf(content, "%ld", &minute);
+      sscanf(content, "%d", &minute);
   }
   else if (strcmp("/start/second", dp) == 0) {
       sscanf(content, "%lf", &second);
