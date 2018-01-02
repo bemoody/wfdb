@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  16 November 2017		wfdblib 10.6.0
+			Last revised:   2 January 2018 		wfdblib 10.6.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -453,7 +453,7 @@ static int copysi(WFDB_Siginfo *to, WFDB_Siginfo *from)
    number that follows indicates the length of the gap in sample intervals.
  */
 
-static int need_sigmap, maxvsig, nvsig, tspf;
+static int need_sigmap, maxvsig, nvsig, tspf, vspfmax;
 static struct isdata **vsd;
 static WFDB_Sample *ovec;
 
@@ -470,7 +470,7 @@ static void sigmap_cleanup(void)
 {
     int i;
 
-    need_sigmap = nvsig = tspf = 0;
+    need_sigmap = nvsig = tspf = vspfmax = 0;
     SFREE(ovec);
     if (smi) {
 	for (i = 0; i < tspf; i += smi[i].spf)
@@ -535,6 +535,7 @@ static int sigmap_init(void)
 	/* The number of virtual signals is the number of signals defined
 	   in the layout segment. */
 	nvsig = nisig;
+	vspfmax = ispfmax;
 	for (s = tspf = 0; s < nisig; s++)
 	    tspf += isd[s]->info.spf;
 	SALLOC(smi, tspf, sizeof(struct sigmapinfo));
@@ -558,6 +559,7 @@ static int sigmap_init(void)
 	    smi[s].offset = 0.;
 	    smi[s].sample_offset = WFDB_INVALID_SAMPLE;
 	}
+	ispfmax = vspfmax;
 
 	if (isd[0]->info.fmt == 0 && nisig == 1)
 	    return (0);    /* the current segment is a null record */
@@ -2165,12 +2167,12 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
 	if (ispfmax < is->info.spf) ispfmax = is->info.spf;
 	if (skewmax < is->skew) skewmax = is->skew;
     }
-    setgvmode(gvmode);	/* Reset sfreq if appropriate. */
-    gvc = ispfmax;	/* Initialize getvec's sample-within-frame counter. */
     nisig += s;		/* Update the count of open input signals. */
     nigroup += g;	/* Update the count of open input signal groups. */
     if (sigmap_init() < 0)
 	return (-1);
+    setgvmode(gvmode);	/* Reset sfreq if appropriate. */
+    gvc = ispfmax;	/* Initialize getvec's sample-within-frame counter. */
 
     /* Determine the total number of samples per frame. */
     for (si = framelen = 0; si < nisig; si++)
