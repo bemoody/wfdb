@@ -2191,8 +2191,8 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
 	}
 	else
 	    SREALLOC(vvector, framelen, sizeof(WFDB_Sample));
+	tuvlen = framelen;
     }
-    tuvlen = framelen;
 
     /* If deskewing is required, allocate the deskewing buffer (unless this is
        a multi-segment record and dsbuf has been allocated already). */
