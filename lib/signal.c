@@ -1730,6 +1730,8 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
 	    for (i = 0; i < nn; i++)
 		(void)r212(ig);
 	    istime++;
+	    for (n = 0; s+n < nisig && isd[s+n]->info.group == g; n++)
+		isd[s+n]->info.nsamp = (WFDB_Time)0L;
 	    return (0);
 	}
 	b = 3*nn; d = 2; break;
@@ -1746,6 +1748,8 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
 	    for (i = nn*trem; i > 0; i--)
 		(void)r310(ig);
 	    istime += trem;
+	    for (n = 0; s+n < nisig && isd[s+n]->info.group == g; n++)
+		isd[s+n]->info.nsamp = (WFDB_Time)0L;
 	    return (0);
 	}		  
 	b = 4*nn; d = 3; break;
@@ -1762,6 +1766,8 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
 	    for (i = nn*trem; i > 0; i--)
 		(void)r311(ig);
 	    istime += trem;
+	    for (n = 0; s+n < nisig && isd[s+n]->info.group == g; n++)
+		isd[s+n]->info.nsamp = (WFDB_Time)0L;
 	    return (0);
 	}		  
 	b = 4*nn; d = 3; break;
