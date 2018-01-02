@@ -1703,7 +1703,8 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
 	if (t < nsamples) {
 	    if (s == 0) istime = (in_msrec) ? t + segp->samp0 : t;
 	    isd[s]->info.nsamp = nsamples - t;
-	    return (ig->stat = 1);
+	    ig->stat = 1;
+	    return (0);
 	}
 	else {
 	    if (s == 0) istime = (in_msrec) ? msnsamples : nsamples;
