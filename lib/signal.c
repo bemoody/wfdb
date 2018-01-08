@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   2 January 2018 		wfdblib 10.6.0
+			Last revised:   8 January 2018 		wfdblib 10.6.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -2718,10 +2718,18 @@ FINT putvec(WFDB_Sample *vector)
 FINT isigsettime(WFDB_Time t)
 {
     WFDB_Group g;
+    WFDB_Time curtime;
     int stat = 0;
 	
     /* Return immediately if no seek is needed. */
-    if (t == istime || nisig == 0) return (0);
+    if (nisig == 0) return (0);
+    if (ifreq <= (WFDB_Frequency)0) {
+	if (sfreq == ffreq)
+	    curtime = istime;
+	else
+	    curtime = (istime - 1) * ispfmax + gvc;
+	if (t == curtime) return (0);
+    }
 
     for (g = 1; g < nigroup; g++)
         if ((stat = isgsettime(g, t)) < 0) break;
