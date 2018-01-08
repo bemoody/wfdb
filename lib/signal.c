@@ -1701,6 +1701,7 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
     switch (isd[s]->info.fmt) {
       case 0:
 	if (t < nsamples) {
+	    gvc = ispfmax;
 	    if (s == 0) istime = (in_msrec) ? t + segp->samp0 : t;
 	    isd[s]->info.nsamp = nsamples - t;
 	    ig->stat = 1;
