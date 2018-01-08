@@ -1654,7 +1654,7 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
 
     /* Do nothing if there is no more than one input signal group and
        the input pointer is correct already. */
-    if (nigroup < 2 && istime == (in_msrec ? t + segp->samp0 : t) &&
+    if (nigroup < 2 && istime == t && gvc == ispfmax &&
 	igd[g]->start == 0)
 	return (0);
 
