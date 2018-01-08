@@ -1673,6 +1673,7 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
        containing the desired sample. */
     if (in_msrec) {
 	WFDB_Seginfo *tseg = segp;
+	WFDB_Group h;
 
 	if (t >= msnsamples) {
 	    wfdb_error("isigsettime: improper seek on signal group %d\n", g);
@@ -1689,6 +1690,28 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
 			   segp->recname);
 		return (-1);
 	    }
+	    /* Following isigopen(), nigroup may have changed and
+	       group numbers may not make any sense anymore.  However,
+	       isigsettime() will still call isgsettime() once for
+	       each non-zero group (if the previous segment had
+	       multiple groups) and then once for group zero.
+
+	       Calling isgsetframe() multiple times for a non-zero
+	       group is mostly harmless, but seeking on group 0 should
+	       only be done once.  Thus, when we jump to a new
+	       segment, implicitly seek on all non-zero groups
+	       (regardless of g), but only seek on group 0 if g is 0.
+
+	       (Note that isgsettime() is not and has never been fully
+	       functional for multi-segment records, because it cannot
+	       read signals from two different segments at once.) */
+	    for (h = 1; h < nigroup; h++)
+		if (i = isgsetframe(h, t))
+		    return (i);
+	    if (g == 0)
+		return (isgsetframe(0, t));
+	    else
+		return (0);
 	}
 	t -= segp->samp0;
     }
