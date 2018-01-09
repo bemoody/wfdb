@@ -1,5 +1,5 @@
 /* file: xform.c	G. Moody        8 December 1983
-			Last revised:   16 November 2017
+			Last revised:   9 January 2018
 -------------------------------------------------------------------------------
 xform: Sampling frequency, amplitude, and format conversion for WFDB records
 Copyright (C) 1983-2010 George B. Moody
@@ -32,15 +32,30 @@ _______________________________________________________________________________
 #define DITHER	        (((double)rand() + (double)rand())/RAND_MAX - 1.0)
 
 char *pname, *prog_name();
+char *script = NULL;
 double gcd();
 void help();
+
+static char *script_fgets(char *buffer, size_t length, FILE *f)
+{
+    if (!fgets(buffer, length, f)) {
+	if (script) {
+	    fprintf(stderr, "\n%s: unexpected end of file in %s\n", pname, script);
+	    exit(1);
+	}
+	else {
+	    strcpy(buffer, "\n");
+	}
+    }
+    return (buffer);
+}
 
 main(argc, argv)
 int argc;
 char *argv[];
 {
     char btstring[30], **description, **filename, *irec = NULL, *orec = NULL,
-	*nrec = NULL, *script = NULL, *startp = "0:0", **units;
+	*nrec = NULL, *startp = "0:0", **units;
     double *gain, ifreq, ofreq = 0.0;
     int clip = 0, *deltav, dflag = 0, fflag = 0, gflag = 0, Hflag = 0, i,
 	iframelen, j, m, Mflag = 0, mn, *msiglist, n, nann = 0, nisig,
@@ -333,7 +348,7 @@ char *argv[];
 		(void)fprintf(stderr,
 		 "Choose a name for the output record (up to %d characters): ",
 			      WFDB_MAXRNL);
-		(void)fgets(record, WFDB_MAXRNL+2, ttyin);
+		script_fgets(record, WFDB_MAXRNL+2, ttyin);
 		record[strlen(record)-1] = '\0';
 	    } while (record[0] == '\0' || newheader(record) < 0);
 	    nrec = record;
@@ -344,12 +359,12 @@ char *argv[];
 		(void)fprintf(stderr,
 			      "Number of signals to be written (1-%d) [%d]: ",
 		       nisig, nosig);
-		(void)fgets(answer, sizeof(answer), ttyin);
+		script_fgets(answer, sizeof(answer), ttyin);
 		(void)sscanf(answer, "%d", &nosig);
 		if (nosig == 0) {
 		    (void)fprintf(stderr,
 			"No signals will be written.  Are you sure? [n]: ");
-		    (void)fgets(answer, sizeof(answer), ttyin);
+		    script_fgets(answer, sizeof(answer), ttyin);
 		    if (*answer != 'y' && *answer != 'Y')
 			nosig = -1;
 		}
@@ -366,7 +381,7 @@ char *argv[];
 	    (void)fprintf(stderr,
 		  "Output sampling frequency (Hz per signal, > 0) [%g]: ",
 			  ofreq);
-	    (void)fgets(answer, sizeof(answer), ttyin);
+	    script_fgets(answer, sizeof(answer), ttyin);
 	    (void)sscanf(answer, "%lf", &ofreq);
 	} while (ofreq < 0);
 	if (ofreq == 0) ofreq = WFDB_DEFFREQ;
@@ -376,7 +391,7 @@ char *argv[];
 	    (void)fprintf(stderr,
 		" signals should be written, or press <return> to write\n");
 	    (void)fprintf(stderr, " them in the current directory: ");
-	    (void)fgets(directory, sizeof(directory)-1, ttyin);
+	    script_fgets(directory, sizeof(directory)-1, ttyin);
 	    if (*directory == '\n') *directory = '\0';
 	    else directory[strlen(directory)-1] = '/';
 	    (void)fprintf(stderr,"Any of these output formats may be used:\n");
@@ -402,14 +417,14 @@ char *argv[];
 		(void)fprintf(stderr,
 		 "Choose an output format (8/16/61/80/160/212/310/311/24/32) [%d]: ",
 			      format);
-		(void)fgets(answer, sizeof(answer), ttyin);
+		script_fgets(answer, sizeof(answer), ttyin);
 		(void)sscanf(answer, "%d", &format);
 		for (i = 1; i < WFDB_NFMTS; i++) /* skip format[0] (= 0) */
 		    if (format == formats[i]) break;
 	    } while (i >= WFDB_NFMTS);
 	    if (nosig > 1) {
 		(void)fprintf(stderr, "Save all signals in one file? [y]: ");
-		(void)fgets(answer, sizeof(answer), ttyin);
+		script_fgets(answer, sizeof(answer), ttyin);
 	    }
 	    /* Use the input signal specifications as defaults for output. */
 	    for (i = 0; i < nosig; i++)
@@ -456,13 +471,13 @@ char *argv[];
 		(void)fprintf(stderr,
 			      "Signal %d description (up to %d characters): ",
 			      i, WFDB_MAXDSL);
-		(void)fgets(description[i], WFDB_MAXDSL+2, ttyin);
+		script_fgets(description[i], WFDB_MAXDSL+2, ttyin);
 		description[i][strlen(description[i])-1] = '\0';
 		dfout[i].desc = description[i];
 		(void)fprintf(stderr,
 			      "Signal %d units (up to %d characters): ",
 			      i, WFDB_MAXUSL);
-		(void)fgets(units[i], WFDB_MAXUSL+2, ttyin);
+		script_fgets(units[i], WFDB_MAXUSL+2, ttyin);
 		for (p = units[i]; *p; p++) {
 		    if (*p == ' ' || *p == '\t') *p = '_';
 		    else if (*p == '\n') { *p = '\0'; break; }
@@ -472,7 +487,7 @@ char *argv[];
 	    (void)fprintf(stderr, " Signal %d gain (adu/%s) [%g]: ",
 			  i, dfout[i].units ? dfout[i].units : "mV",
 			  dfout[i].gain);
-	    (void)fgets(answer, sizeof(answer), ttyin);
+	    script_fgets(answer, sizeof(answer), ttyin);
 	    sscanf(answer, "%lf", &dfout[i].gain);
 	    do {
 		if (i > 0) dfout[i].adcres = dfout[i-1].adcres;
@@ -504,12 +519,12 @@ char *argv[];
 		(void)fprintf(stderr,
 			" Signal %d ADC resolution in bits (8-32) [%d]: ", i,
 			      dfout[i].adcres);
-		(void)fgets(answer, sizeof(answer), ttyin);
+		script_fgets(answer, sizeof(answer), ttyin);
 		(void)sscanf(answer, "%d", &dfout[i].adcres);
 	    } while (dfout[i].adcres < 8 || dfout[i].adcres > 32);
 	    (void)fprintf(stderr, " Signal %d ADC zero level (adu) [%d]: ",
 			  i, dfout[i].adczero);
-	    (void)fgets(answer, sizeof(answer), ttyin);
+	    script_fgets(answer, sizeof(answer), ttyin);
 	    (void)sscanf(answer, "%d", &dfout[i].adczero);
 	}
     }
