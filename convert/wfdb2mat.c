@@ -289,13 +289,21 @@ char *argv[];
     /* Determine if we can write 8-bit unsigned samples, or if 16 or 32 bits are
        needed per sample. */
     nbytesperelement = 1;
-    for (i = 0; i < nosig; i++)
-	switch (si[sig[i]].fmt) {
-	  case 24:
-	  case 32: nbytesperelement=4; break;
-	  case 80: break;
-	  default: if (nbytesperelement < 2) nbytesperelement=2; break;
+    for (i = 0; i < nosig; i++) {
+	if (si[sig[i]].adcres > 0) {
+	    if (si[sig[i]].adcres > 16)
+		nbytesperelement = 4;
+	    else if (si[sig[i]].adcres > 8 && nbytesperelement < 2)
+		nbytesperelement = 2;
 	}
+	else {
+	    /* adcres not specified; try to guess from format */
+	    if (si[sig[i]].fmt == 24 || si[sig[i]].fmt == 32)
+		nbytesperelement = 4;
+	    else if (si[sig[i]].fmt != 80 && nbytesperelement < 2)
+		nbytesperelement = 2;
+	}
+    }
     if (nbytesperelement == 1) {
 	sub4type = MAT8;
 	wfdbtype = 80;
@@ -315,6 +323,8 @@ char *argv[];
 	so[i].group = 0;
 	so[i].spf = 1;
 	so[i].fmt = wfdbtype;
+	so[i].adczero = 0;
+	so[i].baseline -= si[sig[i]].adczero;
 	/* handle possibly missing units strings */
 	if (so[i].units == NULL) {
 	    /* in a .hea file, missing units can be assumed to be millivolts */
@@ -424,7 +434,7 @@ char *argv[];
     for (t = from; t < to && stat >= 0; t++) {
 	stat = getvec(vi);
 	for (i = 0; i < nosig; i++)
-	    vo[i] = vi[sig[i]];
+	    vo[i] = vi[sig[i]] - si[sig[i]].adczero;
 	if (putvec(vo) != nosig)
 	    break;
     }
