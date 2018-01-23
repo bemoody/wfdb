@@ -1,5 +1,5 @@
 /* file: wfdb2mat.c	G. Moody	26 February 2009
-			Last revised:	 1 November 2016
+			Last revised:	 23 January 2018
 -------------------------------------------------------------------------------
 wfdb2mat: Convert (all or part of) a WFDB signal file to Matlab .mat format
 Copyright (C) 2009-2013 George B. Moody
@@ -403,7 +403,7 @@ char *argv[];
 
     /* Subelement 3: Array Name */
     prolog[168] = sub3type & 0xff;
-    prolog[172] = 8 & 0xff;
+    prolog[172] = 3 & 0xff;
     sprintf(prolog + 176, "val");
 
     /* Subelement 4: Data itself */
