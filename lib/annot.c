@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:   13 November 2017 	wfdblib 10.6.0
+			Last revised:   23 January 2018  	wfdblib 10.6.0
 WFDB library functions for annotations
 
 _______________________________________________________________________________
@@ -605,6 +605,18 @@ FINT putann(WFDB_Annotator n, WFDB_Annotation *annot)
     switch (oa->info.stat) {
       case WFDB_WRITE:	/* MIT-format output file */
       default:
+	/* Do not allow annotations to be written at the minimum or
+	   maximum possible time value.  This prevents applications
+	   from inadvertently clamping annotations to the WFDB_Time
+	   range, which is almost always a mistake (for example, using
+	   a 32-bit 'mrgann' on a record longer than 2^31 samples.)
+	   In addition, encoding an annotation at time WFDB_TIME_MAX
+	   on a 64-bit system would require 2^32 SKIPs (24 GB), so
+	   it's better to catch such bugs beforehand. */
+	if (t == WFDB_TIME_MIN || t == WFDB_TIME_MAX) {
+	    wfdb_error("putann: time overflow in annotation file %d\n", n);
+	    return (-1);
+	}
 	if (t > oa->ann.time) {
 	    /* A SKIP can represent a forward offset of at most
 	       2^31-1, so if delta is larger than that, it needs to be
