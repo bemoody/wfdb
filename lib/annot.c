@@ -222,9 +222,10 @@ static int get_ann_table(WFDB_Annotator i)
 		sscanf((char *)annot.aux + 20, "%lf", &(iad[i]->afreq));
 	    continue;
 	}
-	    p1 = strtok((char *)annot.aux+1, " \t");
-	    a = strtol(p1, NULL, 10);
-	if (0 <= a && a <= ACMAX && (p1 = strtok((char *)NULL, " \t"))) {
+	p1 = strtok((char *)annot.aux+1, " \t");
+	a = strtol(p1, &p2, 10);
+	if (0 <= a && a <= ACMAX && p2 != p1 &&
+	    (p1 = strtok((char *)NULL, " \t"))) {
 	    SSTRCPY(s1, p1);
 	    (void)setannstr(a, s1);
 	    p2 = p1 + strlen(p1) + 1;
