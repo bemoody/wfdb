@@ -1,5 +1,5 @@
 /* file: wfdb2mat.c	G. Moody	26 February 2009
-			Last revised:	 22 January 2016
+			Last revised:	 1 November 2016
 -------------------------------------------------------------------------------
 wfdb2mat: Convert (all or part of) a WFDB signal file to Matlab .mat format
 Copyright (C) 2009-2013 George B. Moody
@@ -44,7 +44,7 @@ input record (minus however many samples were skipped at the beginning of the
 record, as specified using the -f option).  If this seems odd, transpose your
 matrix after reading it!
 
-This program writes version 4 MAT-file format output files, as documented in
+This program writes version 5 MAT-file format output files, as documented in
 http://www.mathworks.com/access/helpdesk/help/pdf_doc/matlab/matfile_format.pdf
 The samples are written as 32-bit signed integers (mattype=20 below) in
 little-endian format if the record contains any format 24 or format 32 signals,
@@ -52,10 +52,11 @@ as 8-bit unsigned integers (mattype=50) if the record contains only format 80
 signals, or as 16-bit signed integers in little-endian format (mattype=30)
 otherwise.
 
-Although version 5 and newer versions of Matlab normally use a different (less
-compact and more complex) format, they can read these files without difficulty.
-The advantage of version 4 MAT-file format, apart from compactness and
-portability, is that files in these formats are still WFDB-compatible, given
+The maximum size of the output variable is 2^31 bytes. wfdb2mat from versions
+10.5.24 and earlier of the WFDB software package writes version 4 MAT files
+which have the additional constraint of 100,000,000 elements per variable.
+
+The output files (recordm.mat + recordm.hea) are still WFDB-compatible, given
 the .hea file constructed by this program.
 
 Example:
@@ -75,11 +76,12 @@ wfdb2mat.
 #include <stdio.h>
 #include <wfdb/wfdb.h>
 
-/* Output .mat file types (values of mattype), defined by the .mat format
-   specification, see above */
-#define MAT8	50	/* 8 bits per sample */
-#define MAT16	30	/* 16 bits per sample */
-#define	MAT32	20	/* 32 bits per sample */
+/* Output .mat data storage types (values of mattype), defined by the
+   .mat format specification.  These variables are for the sub4 tag
+   data STORAGE type. */
+#define MAT8 2	/* 8 bits per sample unsigned */
+#define MAT16 3	/* 16 bits per sample signed */
+#define	MAT32 5	/* 32 bits per sample signed */
 
 char *pname;
 
@@ -88,13 +90,42 @@ int argc;
 char *argv[];
 {
     char *matname, *orec, *p, *q, *record = NULL, *search = NULL, *prog_name();
-    static char prolog[24];
+
+    /* The entire file is composed of:
+       - 128 byte descriptive text
+       - 8 byte master tag. 4 bytes indicate data type = matrix, 4
+         bytes indicate data size.
+       - 4 subelements. Each subelement has a 4 byte tag giving the
+         data type of the elements, a 4 byte tag giving the subelement
+         size, and the subelement's actual content.
+         - Subelement 1: array flags (8 + 8 bytes)
+         - Subelement 2: array dimension (8 + 8 bytes)
+         - Subelement 3: array name (8 + 8 bytes)
+         - Subelement 4: array content (8 + ?? bytes)
+    */
+    static char prolog[192];  /* 128 byte descriptive text
+				 + 64 bytes of fixed length content */
+    /* mastertype=matrix, sub1type=UINT32, sub2type=INT32, sub3type=INT8
+       fieldversion=0x0100 indicating mat file */
     int highres = 0, i, isiglist, mattype, nisig, nosig = 0, pflag = 0,
-	s, sfname = 0, *sig = NULL, stat = 0, vflag = 0, wfdbtype, offset;
+	mastertype = 14, sub1type = 6, sub2type = 5, sub3type = 1, sub4type,
+	fieldversion = 256, s, sfname = 0, *sig = NULL, stat = 0, vflag = 0,
+	sub1class = 6, nbytesperelement, wfdbtype, offset;
+
+    /* nbytesmaster is the value specified in the master tag
+       representing the size of all following content.
+       nbytesofdata gives the number of bytes of signal data.
+       lremain stores the number of bytes to pad to make the file size
+       a multiple of 8.
+       max_length is the maximum permissible signal length. */
+    unsigned long nbytesmaster, nbytesofdata, lremain, max_length;
+
     WFDB_Frequency freq;
     WFDB_Sample *vi, *vo;
     WFDB_Siginfo *si, *so;
     WFDB_Time from = 0L, maxl = 0L, t, to = 0L;
+    FILE *fp;
+
     void help();
 
     pname = prog_name(argv[0]);
@@ -257,15 +288,27 @@ char *argv[];
 
     /* Determine if we can write 8-bit unsigned samples, or if 16 or 32 bits are
        needed per sample. */
-    mattype = MAT8;
-    wfdbtype = 80;
+    nbytesperelement = 1;
     for (i = 0; i < nosig; i++)
 	switch (si[sig[i]].fmt) {
 	  case 24:
-	  case 32: mattype = MAT32; wfdbtype = 32; break;
+	  case 32: nbytesperelement=4; break;
 	  case 80: break;
-	default: if (mattype != MAT32) mattype = MAT16; wfdbtype = 16; break;
+	  default: if (nbytesperelement < 2) nbytesperelement=2; break;
 	}
+    if (nbytesperelement == 1) {
+	sub4type = MAT8;
+	wfdbtype = 80;
+    }
+    else if (nbytesperelement == 2) {
+	sub4type = MAT16;
+	wfdbtype = 16;
+    }
+    else {
+	sub4type = MAT32;
+	wfdbtype = 32;
+    }
+
     for (i = 0; i < nosig; i++) {
 	so[i] = si[sig[i]];
 	so[i].fname = matname;
@@ -284,6 +327,30 @@ char *argv[];
 	}
     }
 
+
+    /* Ensure the signal size does not exceed 2^31 byte limit */
+    max_length = 2147483648/nbytesperelement/nosig;
+    if ((to - from) > max_length){
+	(void)fprintf(stderr, "%s: cannot write mat file -"
+		      " data size exceeds 2GB limit\n", pname);
+	exit(1);
+    }
+
+    nbytesofdata = nbytesperelement*nosig*(to-from);   /* Bytes of actual data */
+    lremain = nbytesofdata%8; /* This is the remaining no. bytes that
+				 don't fit into integer multiple of
+				 8. ie if 18 bytes, lremain=2, from 17
+				 to 18. */
+
+    /* nbytesmaster= (8 + 8) + (8 + 8) + (8 + 8) + (8 + nbytesofdata) + padding.
+       Must be integer multiple 8. */
+    if (lremain==0){
+	nbytesmaster = nbytesofdata + 56;
+    }
+    else{
+	nbytesmaster = nbytesofdata + 64 - (lremain);
+    }
+
     /* Create an empty .mat file. */
     if (osigfopen(so, nosig) != nosig) {
 	wfdbquit();		/* failed to open output, quit */
@@ -291,20 +358,67 @@ char *argv[];
     }
     
     /* Fill in the .mat file's prolog and write it. (Elements of prolog[]
-       not set explicitly below are always zero.) */
-    prolog[ 0] = mattype & 0xff;				/* format */
-    prolog[ 1] = (mattype >> 8) & 0xff;
-    prolog[ 4] = nosig & 0xff;			/* number of rows */
-    prolog[ 5] = (nosig >> 8) & 0xff;
-    prolog[ 6] = (nosig >> 16) & 0xff;
-    prolog[ 7] = (nosig >> 24) & 0xff;
-    prolog[ 8] = (to - from) & 0xff;		/* number of columns */
-    prolog[ 9] = ((to - from) >> 8) & 0xff;
-    prolog[10] = ((to - from) >> 16) & 0xff;
-    prolog[11] = ((to - from) >> 24) & 0xff;
-    prolog[16] = 4;		/* strlen("val") + 1 */
-    sprintf(prolog+20, "val");
-    wfdbputprolog((char *)prolog, 24, 0);
+       not set explicitly below are always zero.)  */
+
+    /* Start with 128 byte header */
+    sprintf(prolog, "MATLAB 5.0");  /* First 116 bits are descriptive text */
+    prolog[124] = fieldversion & 0xff; /* Bytes 125-126 indicate version,
+					  set to 0x0100 hex = 256.*/
+    prolog[125] = (fieldversion >> 8) & 0xff;
+    sprintf(prolog + 126, "I");   /* Characters IM to indicate little endian */
+    sprintf(prolog + 127, "M");
+
+    /* 8 byte MASTER TAG, followed by the actual data.
+       First 4 is data type, next 4 is number of bytes of entire field. */
+    prolog[128] = mastertype & 0xff; /* Data type is always 14 for matrix. */
+    /* Number of bytes of data element
+       = (8 + 8) + (8 + 8) + (8 + 8) + (8 + Nvalues*bytespervalue)
+       = 56 + Nvalues*bytespervalue */
+    prolog[132] = nbytesmaster & 0xff;
+    prolog[133] = (nbytesmaster >> 8) & 0xff;
+    prolog[134] = (nbytesmaster >> 16) & 0xff;
+    prolog[135] = (nbytesmaster >> 24) & 0xff;
+
+    /* Matrix data has 4 subelements (5 if imag):
+       Array flags, dimensions array, array name, real part.
+       Each subelement has its own subtag, and subdata. */
+
+    /* Subelement 1: Array flags. */
+    prolog[136] = (sub1type & 0xff); /* Sub tag 1: type */
+    prolog[140] = 8 & 0xff; /* Sub tag 1: size */
+    prolog[144] = sub1class & 0xff; /*Value class, indicating the MATLAB
+				      data type. NOT the same as sub4type. */
+
+    /* Subelement 2: Rows and Cols */
+    prolog[152] = sub2type & 0xff;  /* Sub tag 2: type */
+    prolog[156] = 8 & 0xff; /* sub tag 2: size */
+    prolog[160] = nosig & 0xff;  /* Number of signals. */
+    prolog[161] = (nosig >> 8) & 0xff;
+    prolog[162] = (nosig >> 16) & 0xff;
+    prolog[163] = (nosig >> 24) & 0xff;
+    prolog[164] = (to - from) & 0xff;   /* Value nrows. */
+    prolog[165] = ((to - from) >> 8) & 0xff;
+    prolog[166] = ((to - from) >> 16) & 0xff;
+    prolog[167] = ((to - from) >> 24) & 0xff;
+
+    /* Subelement 3: Array Name */
+    prolog[168] = sub3type & 0xff;
+    prolog[172] = 8 & 0xff;
+    sprintf(prolog + 176, "val");
+
+    /* Subelement 4: Data itself */
+    prolog[184] = sub4type & 0xff;
+    prolog[188] = nbytesofdata & 0xff;
+    prolog[189] = (nbytesofdata >> 8) & 0xff;
+    prolog[190] = (nbytesofdata >> 16) & 0xff;
+    prolog[191] = (nbytesofdata >> 24) & 0xff;
+
+    /* Total size of everything before actual data:
+       128 byte header
+       + 8 byte master tag
+       + 56 byte Subelements (48 byte default + 8 byte name)
+       = 192. */
+    wfdbputprolog((char *)prolog, 192, 0);
 
     /* Copy the selected data into the .mat file. */
     for (t = from; t < to && stat >= 0; t++) {
@@ -369,10 +483,19 @@ char *argv[];
 	printf("%d\t%s\t%.12g\t%d\t%s\n", i+1, so[i].desc, so[i].gain,
 	       so[i].baseline + offset, so[i].units);
     printf("\nTo convert from raw units to the physical units shown\n"
-	   "above, subtract 'base' and divide by 'gain'.\n");
+	   "above, call the 'rdmat.m' function from the wfdb-matlab\n"
+	   "toolbox: https://physionet.org/physiotools/matlab/wfdb-app-matlab/\n");
 
     SFREE(p);
     wfdbquit();
+
+    /* If the signal length is not an integer multiple of 8, pad with zeros */
+    if (lremain > 0){
+	fp = fopen(matname, "ab");
+	for (i = 0; i < (8 - lremain); i++)
+	    fputc(0, fp);
+	fclose(fp);
+    }
 
     exit(0);	/*NOTREACHED*/
 }
