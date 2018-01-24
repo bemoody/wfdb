@@ -124,8 +124,6 @@ char *argv[];
     WFDB_Sample *vi, *vo;
     WFDB_Siginfo *si, *so;
     WFDB_Time from = 0L, maxl = 0L, t, to = 0L;
-    FILE *fp;
-
     void help();
 
     pname = prog_name(argv[0]);
@@ -359,6 +357,8 @@ char *argv[];
     }
     else{
 	nbytesmaster = nbytesofdata + 64 - (lremain);
+	for (i = 0; i < nosig; i++)
+	    so[i].bsize = 8;
     }
 
     /* Create an empty .mat file. */
@@ -498,14 +498,6 @@ char *argv[];
 
     SFREE(p);
     wfdbquit();
-
-    /* If the signal length is not an integer multiple of 8, pad with zeros */
-    if (lremain > 0){
-	fp = fopen(matname, "ab");
-	for (i = 0; i < (8 - lremain); i++)
-	    fputc(0, fp);
-	fclose(fp);
-    }
 
     exit(0);	/*NOTREACHED*/
 }
