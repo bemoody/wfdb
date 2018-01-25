@@ -1,5 +1,5 @@
 # file: freebsd.def		G. Moody	5 March 2002
-#				Last revised:   8 March 2017
+#				Last revised:   25 January 2018
 # 'make' definitions for compiling the WFDB Software Package under FreeBSD
 #
 # Based on 'linux.def', with edits for FreeBSD thanks to Giuseppe Pagnoni.
@@ -106,6 +106,10 @@ WFDBLIB = libwfdb.a
 # make up the library will be appended to BUILDLIB.
 BUILDLIB = $(AR) $(ARFLAGS) $(WFDBLIB)
 
+# RANLIB is the command that builds an index of symbols in the static
+# library, after it has been created by the BUILDLIB command.
+RANLIB = ranlib
+
 # PRINT is the name of the program used to produce listings (including any
 # options for the desired formatting).
 PRINT = lpr
@@ -181,7 +185,7 @@ make-all:	all
 
 # `make lib-post-install' should be run after installing the WFDB library.
 lib-post-install:
-	ranlib $(DESTDIR)$(LIBDIR)/$(WFDBLIB)
+	$(RANLIB) $(DESTDIR)$(LIBDIR)/$(WFDBLIB)
 
 lib-post-uninstall:
 	echo "Nothing to be done for lib-post-uninstall"
