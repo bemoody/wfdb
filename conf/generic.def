@@ -1,5 +1,5 @@
 # file: generic.def		G. Moody	31 May 2000
-#				Last revised:   8 March 2017
+#				Last revised: 25 January 2018
 # This file contains default 'make' definitions for compiling the WFDB Software
 # Package under versions of UNIX that are not otherwise recognized by
 # 'configure'.
@@ -220,7 +220,7 @@ make-all:	all
 
 # `make lib-post-install' should be run after installing the WFDB library.
 lib-post-install:
-	echo "Nothing to be done for lib-post-install"
+	$(RANLIB) $(DESTDIR)$(LIBDIR)/$(WFDBLIB)
 
 lib-post-uninstall:
 	echo "Nothing to be done for lib-post-uninstall"
