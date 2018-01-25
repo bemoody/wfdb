@@ -261,11 +261,6 @@ case $OS in
 	sed 's/NOCYGWIN/-mno-cygwin/' mingw.def >>site.def ;;
   Darwin)
 	echo "It is normal for Mac OS X to be recognized as Darwin."
-	if [ x$LIBTYPE != xdynamic ]
-	then
-	    echo "Building static libraries is not supported on Darwin."
-	    LIBTYPE=dynamic
-	fi
         case $MACHINE in
           x86_64) LMFLAGS="$MFLAGS -arch i386 -arch x86_64"
                   WMFLAGS="$MFLAGS -arch i386" ;;
