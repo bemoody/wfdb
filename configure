@@ -407,6 +407,12 @@ then
     mv site.tmp site-slib.def
 fi
 
+if [ $LIBTYPE = static ] && [ "x${CROSS_COMPILE}" != "x" ]
+then
+    sed "s|^RANLIB = ranlib|RANLIB = ${CROSS_COMPILE}ranlib|" <site.def >site.tmp
+    mv site.tmp site.def
+fi
+
 if [ x$DIR = x ]
 then
     echo
