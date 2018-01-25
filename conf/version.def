@@ -1,12 +1,12 @@
 # file: version.def		G. Moody	24 May 2000
-#				Last revised:	12 July 2010
+#				Last revised:	25 January 2018
 # Each release of the WFDB Software Package is identified by a three-part
 # version number, defined below.  Be sure to leave a single space before
 # and after the "=" in each of the next three lines!
 MAJOR = VMAJ
 MINOR = VMIN
 RELEASE = VREL
-VERSION = $(MAJOR).$(MINOR).$(RELEASE)
+VERSION = VTAG
 
 # RPMRELEASE can be incremented if changes are made between official
 # releases.  It should be reset to 1 whenever the VERSION is changed.
