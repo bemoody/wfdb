@@ -1,5 +1,5 @@
 # file: generic-slib.def	G. Moody	31 May 2000
-#				Last revised:   8 March 2017
+#				Last revised: 25 January 2018
 # This section contains settings suitable for compiling a shared version of the
 # WFDB library under versions of UNIX that are not otherwise recognized by
 # 'configure'.  Not all versions of UNIX support shared libraries, so you may
@@ -117,8 +117,8 @@ WFDBLIB = $(WFDBLIB_SONAME).$(MINOR)
 # make up the library will be appended to BUILDLIB.  This command varies
 # considerably depending on the operating system;  the setting here works
 # if gcc and the GNU binutils are installed.
-BUILDLIB = $(CC) $(MFLAGS) -shared -Wl,-soname,$(SWFDBLIB_SONAME) \
- -o $(SWFDBLIB)
+BUILDLIB = $(CC) $(MFLAGS) -shared -Wl,-soname,$(WFDBLIB_SONAME) \
+ -o $(WFDBLIB)
 
 # BUILDLIB_LDFLAGS is a list of arguments appended to BUILDLIB following
 # the list of *.o files (for most platforms, BUILDLIB_LDFLAGS is empty).
@@ -162,7 +162,7 @@ make-all:	all
 lib-post-install:
 	cd $(DESTDIR)$(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_BASENAME)
 	cd $(DESTDIR)$(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_SONAME)
-	$(RANLIB) $(DESTDIR)$(LIBDIR)/$(WFDBLIB)
+	$(SRANLIB) $(DESTDIR)$(LIBDIR)/$(WFDBLIB)
 	@$(LDCONFIG) || echo Warning: "$(LDCONFIG)" was unsuccessful
 
 lib-post-uninstall:
