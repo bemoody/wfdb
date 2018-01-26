@@ -17,6 +17,6 @@ RPMRELEASE = 1
 VDEFS = -DWFDB_MAJOR=$(MAJOR) -DWFDB_MINOR=$(MINOR) -DWFDB_RELEASE=$(RELEASE)
 
 # WAVEVERSION is the WAVE version number.
-WAVEVERSION = 6.11
+WAVEVERSION = 6.12
 # _____________________________________________________________________________
 
