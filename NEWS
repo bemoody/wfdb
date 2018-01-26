@@ -1,16 +1,21 @@
-10.6.0 (unreleased):
+10.6.0 (26 January 2018):
 	A wide variety of bugs have been fixed in the WFDB library, and several
 	new features have been added.  See the WFDB Programmer's Guide for
 	details.  In particular, the library returns more accurate results when
 	reading a multi-segment record or an EDF file; many WFDB applications
 	may produce different output as a result.
 
+	The WFDB library now supports reading variable-layout, multi-frequency
+	records, provided that each signal's sampling frequency is constant
+	across the entire record.
+
 	'sortann' and 'mrgann' preserve the original time resolution of their
 	input files, and 'rdann' displays the elapsed time with higher
 	precision, if possible.
 
-	'wfdb2mat' displays the correct instructions for computing physical
-	values, in the case of an 8-bit data file.
+	'wfdb2mat' uses the "version 5" format instead of "version 4".  It
+	displays the correct instructions for computing physical values, in the
+	case of an 8-bit data file.
 
 	'mrgann' correctly interprets the argument to the first '-mX' option, if
 	any.

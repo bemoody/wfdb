@@ -9111,7 +9111,7 @@ changes that may not be described here.
 
 @unnumberedsec WFDB 10.6
 
-@unnumberedsubsec Changes in version 10.6.0 (unreleased)
+@unnumberedsubsec Changes in version 10.6.0 (26 January 2018)
 
 The new functions @code{getiafreq()} and @code{setiafreq()} allow the
 application to change the time scale for input annotations, as
@@ -9134,6 +9134,12 @@ supported as an alternative after @code{libcurl} support was added in version
 years; we don't recommend its use anymore, and removing support is necessary in
 order to simplify and add new features to WFDB in the future.
 
+The WFDB library now supports reading variable-layout, @emph{multi-frequency}
+records, provided that each signal's sampling frequency is constant across the
+entire record.  Although previous versions of the library were able to read
+such records in some cases, the behavior of @code{getvec()} and
+@code{isigsettime()} was buggy and inconsistent.
+
 When reading a variable-layout multi-segment record, values returned by
 @code{getvec()}, @code{getframe()}, or @code{sample()} are rounded to the
 nearest integer.  If that value is outside the range of a @code{WFDB_Sample}
@@ -9152,6 +9158,9 @@ total number of bytes is @math{4n+3}.)  Files created by the WFDB library
 itself do not use this format (an extra zero sample will be added in this case,
 for backwards compatibility), but such files may be created by other
 applications.
+
+@code{isigsettime()} works correctly when reading a multi-segment record with
+multiple signal files per segment.
 
 @code{setifreq()} works correctly if there are no input signals open.
 
