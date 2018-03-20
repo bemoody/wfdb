@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   8 January 2018 		wfdblib 10.6.0
+			Last revised:   20 March 2018 		wfdblib 10.6.1
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -719,6 +719,7 @@ static int edfparse(WFDB_FILE *ifile)
     wfdb_fread(buf, 1, 8, ifile);	/* number of frames (EDF blocks) */
     buf[8] = '\0';
     sscanf(buf, "%ld", &nframes);
+    if (nframes < 0) nframes = 0;
     nsamples = nframes;
     wfdb_fread(buf, 1, 8, ifile);	/* data record duration (seconds) */
     sscanf(buf, "%lf", &spr);
