@@ -799,7 +799,7 @@ static int edfparse(WFDB_FILE *ifile)
 	sscanf(buf, "%ld", &dmax[s]);
 	hsd[s]->info.initval = hsd[s]->info.adczero = (dmax[s]+1 + dmin[s])/2;
 	adcrange = dmax[s] - dmin[s];
-	for (i = 0; adcrange > 1; i++)
+	for (i = 0; adcrange > 0; i++)
 	    adcrange /= 2;
 	hsd[s]->info.adcres = i;
 	if (pmax[s] != pmin[s]) {
