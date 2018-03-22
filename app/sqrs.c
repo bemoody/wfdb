@@ -1,5 +1,5 @@
 /* file: sqrs.c		G. Moody	27 October 1990
-			Last revised:    9 April 2010
+			Last revised:    22 March 2018
 
 -------------------------------------------------------------------------------
 sqrs: Single-channel QRS detector
@@ -177,6 +177,8 @@ char *argv[];
     }
     if (sampfreq((char *)NULL) < 240. || sampfreq((char *)NULL) > 260.) 
 	setifreq(250.);
+    else if (gvmode & WFDB_HIGHRES)
+	setafreq(sampfreq(NULL));
 
     a.name = "qrs"; a.stat = WFDB_WRITE;
     if (annopen(record, &a, 1) < 0) exit(2);
