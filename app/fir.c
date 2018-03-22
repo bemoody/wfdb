@@ -1,5 +1,5 @@
 /* file: fir.c		G. Moody	5 January 1987
-			Last revised:  25 February 2006
+			Last revised:    22 March 2018
 
 -------------------------------------------------------------------------------
 fir: General-purpose FIR filter for database records
@@ -215,11 +215,13 @@ char *argv[];
 	    chout[i] = chin[i];
 	    chout[i].fname = ofname;
 	    chout[i].group = 0;
+	    chout[i].spf = 1;
 	}
 	if ((osigfopen(chout, nsig) < nsig)) {
 	    wfdbquit();
 	    exit(1);
 	}
+	setsampfreq(sampfreq(NULL));
     }
     else if (osigopen(orec, chout, (unsigned)nsig) <= 0) {
 	wfdbquit();
