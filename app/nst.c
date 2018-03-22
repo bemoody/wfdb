@@ -450,11 +450,13 @@ double snr;
 	zz[i] = si[i].adczero;		/* any offset will be removed */
 	si[i].adczero = 0;
 	si[i].fmt = format;
+	si[i].spf = 1;
 	gn[i] = 0.0;
 	nse[i] = nisig + (i % nnsig);	/* signal number of noise signal to be
 					   added to ECG signal i */
     }
     if (osigfopen(si, (unsigned)nisig) < nisig) exit(2);
+    setsampfreq(sampfreq(NULL));
 
     if ((nend = strtim("e")) <= 0L)
 	nlen = nend = strtim("30:0");
