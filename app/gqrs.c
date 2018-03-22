@@ -1,5 +1,5 @@
 /* file: gqrs.c			G. Moody		16 November 2006
-				Last revised:		  21 July 2013   
+				Last revised:		  22 March 2018
 -------------------------------------------------------------------------------
 gqrs: A QRS detector
 Copyright (C) 2006-2013 George B. Moody
@@ -228,6 +228,8 @@ main(int argc, char **argv)
 		      gvmode & WFDB_HIGHRES ? "\n" : ", try -H option\n");
 	cleanup(3);
     }
+    if (gvmode & WFDB_HIGHRES)
+	setafreq(sampfreq(NULL));
     if (t0 > 0L && (t0 = strtim(argv[t0])) < 0L)
 	    t0 = -t0;
     if (tf > 0L) {
