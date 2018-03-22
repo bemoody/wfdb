@@ -292,7 +292,9 @@ char *argv[];
 	}
     }
 
-    if (Hflag)
+    if (Mflag)
+	setgvmode(WFDB_LOWRES);
+    else if (Hflag)
 	setgvmode(WFDB_HIGHRES);
     ifreq = sampfreq(NULL);
     spf = getspf();
@@ -547,11 +549,27 @@ char *argv[];
     }
     spm = strtim("1:0");
 
-    /* The time resolution for output annotations is equal to the
-       output frame frequency (ofreq), so we do not need an explicit
-       time resolution.  If a default time resolution is set by
-       isigopen, remove it. */
-    setafreq(0.0);
+    if (Mflag) {
+	/* In multifrequency mode, the preceding calculations are
+	   performed in low-resolution mode (so that 'from' and 'to'
+	   are rounded to the nearest frame number, and 'nsamp' is the
+	   number of frames to copy.)  For annotation processing,
+	   switch to high-resolution mode, convert 'from' and 'to'
+	   into high-resolution sample numbers, and set the output
+	   annotation resolution accordingly. */
+	setgvmode(WFDB_HIGHRES);
+	spf = getspf();
+	from *= spf;
+	to *= spf;
+	setafreq(ofreq * spf);
+    }
+    else {
+	/* For a single-frequency record, the time resolution for
+	   output annotations is equal to the output frame frequency
+	   (ofreq), so we do not need an explicit time resolution.  If
+	   a default time resolution is set by isigopen, remove it. */
+	setafreq(0.0);
+    }
 
     /* Process the annotation file(s), if any. */
     if (nann > 0) {
