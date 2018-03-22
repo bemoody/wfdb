@@ -1,5 +1,5 @@
 /* file: snip.c		G. Moody	30 July 1989
-			Last revised:  1 December 2013
+			Last revised:   22 March 2018
 -------------------------------------------------------------------------------
 snip: Copy an excerpt of a database record
 Copyright (C) 1989-2013 George B. Moody
@@ -412,6 +412,7 @@ void copy_sig(char *nrec, char *irec, WFDB_Time from, WFDB_Time to, int recurse)
 	si[i].fname = ofname;
 	si[i].group = 0;
 	si[i].fmt = fmt;
+	si[i].spf = 1;
     }
     if (osigfopen(si, (unsigned)nsig) != nsig) exit(2);
 
@@ -431,6 +432,7 @@ void copy_sig(char *nrec, char *irec, WFDB_Time from, WFDB_Time to, int recurse)
     free(ofname);
     free(si);
     free(v);
+    setsampfreq(sampfreq(NULL));
     if (tstring[0]) setbasetime(tstring);
     (void)newheader(nrec);
 }
