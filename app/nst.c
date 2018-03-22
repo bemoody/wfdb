@@ -215,8 +215,8 @@ char *argv[];
 	(g = malloc(nisig * sizeof(double))) == NULL ||
 	(gn = malloc(nisig * sizeof(double))) == NULL ||
 	(nse = malloc(nisig * sizeof(int))) == NULL ||
-	(vin = malloc(nisig * sizeof(int))) == NULL ||
-	(vout = malloc(nisig * sizeof(int))) == NULL ||
+	(vin = malloc((nisig+nnsig) * sizeof(int))) == NULL ||
+	(vout = calloc(nisig, sizeof(int))) == NULL ||
 	(z = calloc(nisig, sizeof(int))) == NULL ||
 	(zz = calloc(nisig, sizeof(int))) == NULL) {
 	(void)fprintf(stderr, "%s: insufficient memory\n", pname);
