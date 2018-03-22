@@ -1,5 +1,5 @@
 /* file: mfilt.c	G. Moody	 27 June 1993
-			Last revised:  25 February 2006
+			Last revised:    22 March 2018
 
 -------------------------------------------------------------------------------
 mfilt: General-purpose median filter for database records
@@ -204,9 +204,11 @@ char *argv[];
 	for (i = 0; i < nsig; i++) {
 	    si[i].fname = ofname;
 	    si[i].fmt = format;
+	    si[i].spf = 1;
 	}
 	if (osigfopen(si, (unsigned)nsig) < nsig)
 	    exit(2);
+	setsampfreq(sampfreq(NULL));
     }
     else if (osigopen(orec, so, (unsigned)nsig) != nsig)
 	exit(2);
