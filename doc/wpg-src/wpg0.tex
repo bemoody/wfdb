@@ -3872,13 +3872,13 @@ int setsampfreq(WFDB_Frequency @var{freq})
 @item @t{ 0}
 Success
 @item @t{-1}
-Failure:  illegal sampling frequency specified (@var{freq} must not be
+Failure:  illegal frame frequency specified (@var{freq} must not be
 negative)
 @end table
 @c @end group
 
 @noindent
-This function sets the sampling frequency used by the time-conversion
+This function sets the frame frequency used by the time-conversion
 functions
 @ifnotinfo
 (@pxref{timstr and strtim, , @code{timstr} and @code{strtim}}).
@@ -3893,6 +3893,12 @@ Use @code{setsampfreq} before creating a new @file{hea} file
 @ifinfo
 (@pxref{newheader}).
 @end ifinfo
+
+Note that despite the name of this function, the argument specifies the record
+@emph{frame} frequency, not the @emph{sampling} frequency; the two are not
+equivalent when reading or writing a multi-frequency record
+(@pxref{Multi-Frequency Records}).
+
 @xref{Example 8}, for an illustration of the use of @code{setsampfreq}.
 
 @c @group
