@@ -1,5 +1,5 @@
 /* file: mit2wav.c	G. Moody	12 February 2003
-			Last revised:	  27 July 2010
+			Last revised:	  22 March 2018
 -------------------------------------------------------------------------------
 mit2wav: Convert WFDB format signal file(s) to .wav format
 Copyright (C) 2003-2010 George B. Moody
@@ -236,6 +236,7 @@ main(int argc, char **argv)
 	s[i].fname = ofname;
 	s[i].group = 0;
 	s[i].fmt = 16;
+	s[i].spf = 1;
     }
     
     /* Get information needed for the header and format chunks. */
@@ -288,6 +289,7 @@ main(int argc, char **argv)
     }
 
     /* Write the new header file if requested. */
+    setsampfreq(sampfreq(NULL));
     if (nrec) (void)newheader(nrec);
 
     /* Clean up. */
