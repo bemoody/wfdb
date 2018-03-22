@@ -27,6 +27,7 @@ _______________________________________________________________________________
 #include <stdio.h>
 #include <stdlib.h>
 #include <wfdb/wfdb.h>
+#include <wfdb/ecgcodes.h>
 
 /* The following definition yields dither with a triangular PDF in (-1,1). */
 #define DITHER	        (((double)rand() + (double)rand())/RAND_MAX - 1.0)
@@ -601,6 +602,10 @@ char *argv[];
 	    cc = -129;
 	    while (getann((unsigned)i, &annot) == 0 &&
 		   (to == 0L || annot.time <= to)) {
+		if (annot.time == 0 && annot.subtyp == 0 &&
+		    annot.chan == 0 && annot.num == 0 &&
+		    (annot.anntyp == NOTQRS || annot.anntyp == NOTE))
+		    continue;
 		annot.time = (annot.time - from) * ofreq / ifreq;
 		/* If the -u option was specified, make sure that the corrected
 		   annotation time is positive and that it is later than the
