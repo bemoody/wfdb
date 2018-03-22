@@ -1,4 +1,5 @@
 /* file: stepdet.c		G. Moody	28 February 2014
+				Last revised:	  22 March 2018
 
 -------------------------------------------------------------------------------
 stepann: detect and annotate step changes in a signal
@@ -147,6 +148,8 @@ char *argv[];
     }
     if ((nsig = isigopen(record, s, nsig)) < 1) exit(2);
 
+    if (gvmode & WFDB_HIGHRES)
+	setafreq(sampfreq(NULL));
     if (annopen(record, &a, 1) < 0) exit(2);
 
     if (from > 0L) {
