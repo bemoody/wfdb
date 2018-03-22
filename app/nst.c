@@ -1,5 +1,5 @@
 /* file: nst.c		G. Moody	8 December 1983
-			Last revised:    6 October 2009
+			Last revised:    22 March 2018
 -------------------------------------------------------------------------------
 nst: Noise stress test
 Copyright (C) 1983-2009 George B. Moody
@@ -146,7 +146,7 @@ char *argv[];
 	!(*wfdbp == '.' && ((*wfdbp+1) == PSEP || *(wfdbp+1) == ' '))) {
 	char *nwfdbp;
 
-	if ((nwfdbp = (char *)malloc(strlen(wfdbp+2))) == NULL) {
+	if ((nwfdbp = (char *)malloc(strlen(wfdbp)+2)) == NULL) {
 	    fprintf(stderr, "%s: insufficient memory\n", pname);
 	    exit(1);
 	}
