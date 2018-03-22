@@ -223,10 +223,6 @@ char *argv[];
        value, quit (isigopen will have emitted an error message). */
     if ((nisig = isigopen(irec, NULL, 0)) < 0) exit(2);
 
-    /* Determine the input sampling frequency. */
-    ifreq = sampfreq(NULL);
-    (void)setsampfreq(0.);
-
     /* If the input record contains no signals, we won't write any -- but
        we might still read and write annotations. */
     if (nisig == 0) nosig = 0;
@@ -292,6 +288,7 @@ char *argv[];
 	}
     }
 
+    /* Determine the input sampling frequency. */
     if (Mflag)
 	setgvmode(WFDB_LOWRES);
     else if (Hflag)
