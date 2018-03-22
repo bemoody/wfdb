@@ -1,5 +1,5 @@
 /* file: wfdb2mat.c	G. Moody	26 February 2009
-			Last revised:	 23 January 2018
+			Last revised:	  22 March 2018
 -------------------------------------------------------------------------------
 wfdb2mat: Convert (all or part of) a WFDB signal file to Matlab .mat format
 Copyright (C) 2009-2013 George B. Moody
@@ -450,6 +450,7 @@ char *argv[];
     }
 
     /* Create the new header file. */
+    setsampfreq(freq);
     p = mstimstr(-from);
     if (p && *p == '[')
 	setbasetime(p+1);
