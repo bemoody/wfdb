@@ -575,7 +575,7 @@ char *argv[];
 	long tt;
 
 	/* Check that the input annotation files are readable. */
-	if (annopen(irec, ai, (unsigned)nann) < 0 || iannsettime(from) < 0)
+	if (annopen(irec, ai, (unsigned)nann) < 0 || iannsettime(from) < -1)
 	    exit(2);
 
 	/* Associate the output annotation files with the new record, if a
