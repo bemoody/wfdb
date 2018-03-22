@@ -547,6 +547,12 @@ char *argv[];
     }
     spm = strtim("1:0");
 
+    /* The time resolution for output annotations is equal to the
+       output frame frequency (ofreq), so we do not need an explicit
+       time resolution.  If a default time resolution is set by
+       isigopen, remove it. */
+    setafreq(0.0);
+
     /* Process the annotation file(s), if any. */
     if (nann > 0) {
 	char *p0, *p1;
@@ -580,7 +586,7 @@ char *argv[];
 	    cc = -129;
 	    while (getann((unsigned)i, &annot) == 0 &&
 		   (to == 0L || annot.time <= to)) {
-		annot.time = (annot.time - from) * (ofreq*spf) / ifreq;
+		annot.time = (annot.time - from) * ofreq / ifreq;
 		/* If the -u option was specified, make sure that the corrected
 		   annotation time is positive and that it is later than the
 		   previous annotation time (exception: if it matches the
