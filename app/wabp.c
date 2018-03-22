@@ -1,5 +1,5 @@
 /* file wabp.c          Wei Zong       23 October 1998
-   			Last revised:   9 April 2010 (by G. Moody)
+   			Last revised:   22 March 2018
 -----------------------------------------------------------------------------
 wabp: beat detector for arterial blood presure (ABP) signal
 Copyright (C) 1998-2010 Wei Zong
@@ -271,6 +271,8 @@ int main(int argc, char **argv)
     sps = sampfreq((char *)NULL);
     if (Rflag)
     	setifreq(sps = 125.); 
+    else if (gvmode & WFDB_HIGHRES)
+	setafreq(sps);
     if (from > 0L) {
 	if ((from = strtim(argv[from])) < 0L)
 	    from = -from;
