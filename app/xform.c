@@ -1,5 +1,5 @@
 /* file: xform.c	G. Moody        8 December 1983
-			Last revised:   9 January 2018
+			Last revised:    22 March 2018
 -------------------------------------------------------------------------------
 xform: Sampling frequency, amplitude, and format conversion for WFDB records
 Copyright (C) 1983-2010 George B. Moody
@@ -294,7 +294,8 @@ char *argv[];
 
     if (Hflag)
 	setgvmode(WFDB_HIGHRES);
-    ifreq *= spf = getspf();
+    ifreq = sampfreq(NULL);
+    spf = getspf();
 
     if (Mflag) {
 	for (i = iframelen = 0; i < nisig; i++)
