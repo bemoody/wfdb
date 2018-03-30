@@ -1,5 +1,5 @@
 /* file: nguess.c		G. Moody	9 June 1986
-				Last revised:  11 June 2008
+				Last revised:  30 March 2018
 -------------------------------------------------------------------------------
 nguess: Guess the times of missing normal sinus beats in an annotation file
 Copyright (C) 1986-2008 George B. Moody
@@ -180,8 +180,6 @@ char *argv[];
     an[1].stat = WFDB_WRITE;
 
     /* Open the input and output annotation files. */
-    if (annopen(record, an, 2) < 0)
-	exit(2);
     wfdbquiet();
     if ((sps = sampfreq(record)) < 0) {
 	fprintf(stderr,
@@ -190,6 +188,8 @@ char *argv[];
 	setsampfreq(sps);
     }
     wfdbverbose();
+    if (annopen(record, an, 2) < 0)
+	exit(2);
     
     if (from) {
 	from = strtim(argv[(int)from]);
