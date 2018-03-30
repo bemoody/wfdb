@@ -190,6 +190,10 @@ char *argv[];
     wfdbverbose();
     if (annopen(record, an, 2) < 0)
 	exit(2);
+    if (getiaorigfreq(0) > sps) {
+	setifreq(sps = getiaorigfreq(0));
+	setiafreq(0, sps);
+    }
     
     if (from) {
 	from = strtim(argv[(int)from]);
