@@ -589,6 +589,8 @@ void wfdb_free_config(void)
     SFREE(p_wfdbcal);
     SFREE(p_wfdbannsort);
     SFREE(p_wfdbgvmode);
+    SFREE(wfdbpath);
+    SFREE(wfdbpath_init);
 }
 
 void wfdb_export_config(void)
