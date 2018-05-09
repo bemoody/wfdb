@@ -1,5 +1,5 @@
 /* file: gqfuse.c		G. Moody	6 May 2012
-				Last revised:  25 September 2012
+				Last revised:   9 May 2018
 -------------------------------------------------------------------------------
 gqfuse: combine QRS annotation files
 Copyright (C) 2012 George B. Moody
@@ -75,7 +75,7 @@ main(int argc, char **argv)
 	n, niann = 0, nseg, tdn;
     WFDB_Anninfo *a;
     WFDB_Annotation annot;
-    WFDB_Frequency spm;
+    WFDB_Frequency sps, spm;
     WFDB_Time t0, tf;
 
     pname = prog_name(argv[0]);
@@ -171,7 +171,8 @@ main(int argc, char **argv)
        initialize them here (using values chosen for adult human ECGs). */
     if (HR == 0.0) HR = 75;
 
-    spm = 60.0 * sampfreq(record);  /* sample intervals per minute */
+    sps = sampfreq(record);
+    spm = 60.0 * sps;		    /* sample intervals per minute */
     nseg = strtim("e")/spm;	    /* number of complete 1-minute intervals */
 
     /* Set up buffer for median calculation. */
@@ -183,8 +184,17 @@ main(int argc, char **argv)
     for (i = 0; i < niann; i++)
 	count[i] = gcalloc(sizeof(int), nseg+1);
 
-    /* Pass 1: Load the HR arrays. */
+    /* Open input annotators and determine the highest annotation time
+       resolution. */
     if (annopen(record, a, niann) < 0) cleanup(2);
+    for (i = 0; i < niann; i++)
+	if (sps < getiaorigfreq(i))
+	    sps = getiaorigfreq(i);
+    for (i = 0; i < niann; i++)
+	setiafreq(i, sps);
+    spm = 60.0 * sps;		    /* annotation ticks per minute */
+
+    /* Pass 1: Load the HR arrays. */
     for (i = 0; i < niann; i++) {
 	for (tf = spm, j = 0; j < nseg+1; tf += spm, j++) {
 	    n = 0;
@@ -196,6 +206,8 @@ main(int argc, char **argv)
     wfdbquit();
 
     /* Pass 2: Select the input annotations to be copied, and copy them. */
+    if (sampfreq(record) != sps)
+	setifreq(sps);
     if (annopen(record, a, niann+1) < 0) cleanup(2);
     for (j = 0, t0 = 0, tf = spm; j < nseg+1; j++, t0 = tf, tf += spm) {
 	for (i = 0; i < niann; i++)
