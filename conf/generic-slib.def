@@ -1,5 +1,5 @@
 # file: generic-slib.def	G. Moody	31 May 2000
-#				Last revised: 25 January 2018
+#				Last revised:    9 May 2018
 # This section contains settings suitable for compiling a shared version of the
 # WFDB library under versions of UNIX that are not otherwise recognized by
 # 'configure'.  Not all versions of UNIX support shared libraries, so you may
@@ -154,6 +154,8 @@ LDCONFIG = ldconfig
 # Under operating systems that do not maintain a cached index of shared
 # libraries, uncomment the next line.
 # LDCONFIG = :
+
+.POSIX: # enable POSIX compliance mode for some versions of 'make'
 
 # `make' (with no target specified) will be equivalent to `make all'.
 make-all:	all
