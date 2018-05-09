@@ -1,5 +1,5 @@
 /* file: gqpost.c		G. Moody	16 November 2006
-				Last revised:	   6 May 2012
+				Last revised:	   9 May 2018
 -------------------------------------------------------------------------------
 gqpost: A post-processor for gqrs
 Copyright (C) 2006-2012 George B. Moody
@@ -195,6 +195,10 @@ main(int argc, char **argv)
 
     sps = sampfreq(record);
     if (annopen(record, a, 2) < 0) cleanup(2);
+    if (getiaorigfreq(0) > 0) {
+	setifreq(sps = getiaorigfreq(0));
+	setiafreq(0, sps);
+    }
     meanrr = RR * sps;
     meanrrd = RRdelta * sps;
     if ((minrrd = meanrrd/2) < 4) minrrd = 4;
