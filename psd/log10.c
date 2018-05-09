@@ -1,5 +1,5 @@
 /* file: log10.c	G. Moody	19 July 1995
-		   Last revised:	22 March 2006
+		   Last revised:	 9 May 2018
 
 -------------------------------------------------------------------------------
 log10: common log transform of 2-column data
@@ -29,7 +29,7 @@ _______________________________________________________________________________
 #include <math.h>
 
 #ifndef MINDOUBLE
-#ifdef BSD
+#ifdef __STDC__
 #include <float.h>
 #define MINDOUBLE DBL_MIN
 #define NOVALUES_H
