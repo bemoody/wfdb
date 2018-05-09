@@ -1,5 +1,5 @@
 /* file: psfd.c		G. Moody         9 August 1988
-			Last revised:	2 November 2017
+			Last revised:	   9 May 2018
 
 -------------------------------------------------------------------------------
 psfd: Produces annotated full-disclosure ECG plots on a PostScript device
@@ -48,32 +48,6 @@ out of memory.
 #include <time.h>
 #include <wfdb/wfdb.h>
 #include <wfdb/ecgcodes.h>
-
-/* The ANSI C function strstr is defined here for those systems that don't
-   include it in their libraries.  This includes all older (pre-ANSI) C
-   libraries;  some modern non-ANSI C libraries (notably those supplied with
-   SunOS 4.1) do have strstr, so we can't just make this conditional on
-   __STDC__. */
-#ifdef sun
-#ifdef i386
-#define NOSTRSTR
-#endif
-#endif
-
-#ifdef NOSTRSTR
-char *strstr(s1, s2)
-char *s1, *s2;
-{
-    char *p = s1;
-    int n;
-
-    if (s1 == NULL || s2 == NULL || *s2 == '\0') return (s1);
-    n = strlen(s2);
-    while ((p = strchr(p, *s2)) && strncmp(p, s2, n))
-	p++;
-    return (p);
-}
-#endif
 
 /* PROLOG is the pathname of the accompanying prolog file, `psfd.pro', which
    should normally be accessible to this program at run-time.  In most cases,

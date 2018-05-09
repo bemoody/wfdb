@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody	  1 May 1990
-			Last revised:    22 June 2010
+			Last revised:     9 May 2018
 Annotation list handling and display functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -32,32 +32,6 @@ _______________________________________________________________________________
 #include <wfdb/ecgmap.h>
 #include <xview/defaults.h>
 #include <xview/notice.h>
-
-/* The ANSI C function strstr is defined here for those systems which don't
-   include it in their libraries.  This includes all older (pre-ANSI) C
-   libraries;  some modern non-ANSI C libraries (notably those supplied with
-   SunOS 4.1) do have strstr, so we can't just make this conditional on
-   __STDC__. */
-#ifdef sun
-#ifdef i386
-#define NOSTRSTR
-#endif
-#endif
-
-#ifdef NOSTRSTR
-char *strstr(s1, s2)
-char *s1, *s2;
-{
-    char *p = s1;
-    int n;
-
-    if (s1 == NULL || s2 == NULL || *s2 == '\0') return (s1);
-    n = strlen(s2);
-    while ((p = strchr(p, *s2)) && strncmp(p, s2, n))
-	p++;
-    return (p);
-}
-#endif
 
 void set_frame_title();
 
