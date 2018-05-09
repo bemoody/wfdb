@@ -1,5 +1,5 @@
 # file: solaris-slib.def	G. Moody	31 May 2000
-#				Last revised:   8 March 2017
+#				Last revised:   9 May 2018
 # This section contains settings suitable for generating a shared library under
 # Solaris.
 
@@ -123,12 +123,14 @@ SETDPERMISSIONS = chmod 755
 # programs linked to it.
 SETLPERMISSIONS = chmod 644
 
+.POSIX: # enable POSIX compliance mode
+
 # `make' (with no target specified) will be equivalent to `make all'.
 make-all:	all
 
 # `make lib-post-install' should be run after installing the WFDB library.
 lib-post-install:
-	cd $(DESTDIR)$(LIBDIR); rm $(WFDBLIB_BASENAME) $(WFDBLIB_SONAME); \
+	cd $(DESTDIR)$(LIBDIR); rm -f $(WFDBLIB_BASENAME) $(WFDBLIB_SONAME); \
 	 ln -s $(WFDBLIB) $(WFDBLIB_BASENAME); \
 	 ln -s $(WFDBLIB) $(WFDBLIB_SONAME)
 
