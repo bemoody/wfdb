@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  23 May 2000
-#				Last revised:	  8 March 2017
+#				Last revised:	   9 May 2018
 # This section of the Makefile should not need to be changed.
 
 CFILES = ann2rr.c bxb.c calsig.c ecgeval.c epicmp.c fir.c gqfuse.c gqpost.c \
@@ -79,6 +79,8 @@ listing:
 
 bxb:		bxb.c
 	$(CC) $(CFLAGS) bxb.c -o $@ $(LDFLAGS) -lm
+ihr:		ihr.c
+	$(CC) $(CFLAGS) ihr.c -o $@ $(LDFLAGS) -lm
 hrstats:	hrstats.c
 	$(CC) $(CFLAGS) hrstats.c -o $@ $(LDFLAGS) -lm
 mxm:		mxm.c
