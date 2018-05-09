@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   20 March 2018 		wfdblib 10.6.1
+			Last revised:     9 May 2018		wfdblib 10.6.1
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -2087,6 +2087,8 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
 		if (msbtime == 0L) msbtime = btime;
 		if (msbdate == (WFDB_Date)0) msbdate = bdate;
 	    }
+	    if (nsig <= 0)
+		in_msrec = 0;
 	}
 	if (navail == 0 && nsig)
 	    wfdb_error("isigopen: record %s has no signals\n", record);
