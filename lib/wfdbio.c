@@ -817,12 +817,16 @@ be inappropriate).
 static int error_flag;
 static char *error_message;
 
+#ifndef WFDB_BUILD_DATE
+#define WFDB_BUILD_DATE __DATE__
+#endif
+
 FSTRING wfdberror(void)
 {
     if (!error_flag)
 	wfdb_asprintf(&error_message,
 		      "WFDB library version %d.%d.%d (%s).\n",
-		      WFDB_MAJOR, WFDB_MINOR, WFDB_RELEASE, __DATE__);
+		      WFDB_MAJOR, WFDB_MINOR, WFDB_RELEASE, WFDB_BUILD_DATE);
     if (error_message)
 	return (error_message);
     else

@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:     24 October 2017
+#				Last revised:     9 May 2018
 # This section of the Makefile should not need to be changed.
 
 INCLUDES = $(DESTDIR)$(INCDIR)/wfdb/wfdb.h \
@@ -80,4 +80,4 @@ wfdbio.o:	wfdb.h wfdblib.h wfdbio.c
 	lf='"$(LDFLAGS)"' ; \
 	lf=`echo "$$lf" | sed 's|$(DESTDIR)$(LIBDIR)|$(LIBDIR)|g'` ; \
 	$(CC) $(CFLAGS) -DVERSION='"$(VERSION)"' -DCFLAGS='"-I$(INCDIR)"' \
-	  -DLDFLAGS="$$lf" -c wfdbio.c
+	  -DLDFLAGS="$$lf" $(BUILD_DATE_FLAGS) -c wfdbio.c
