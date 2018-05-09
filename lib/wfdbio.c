@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:   11 December 2017      wfdblib 10.6.0
+                        Last revised:      9 May 2018         wfdblib 10.6.1
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -577,6 +577,14 @@ static char *p_wfdb, *p_wfdbcal, *p_wfdbannsort, *p_wfdbgvmode;
    semantics for putenv.  */
 void wfdb_free_config(void)
 {
+    static char n_wfdb[] = "WFDB=";
+    static char n_wfdbcal[] = "WFDBCAL=";
+    static char n_wfdbannsort[] = "WFDBANNSORT=";
+    static char n_wfdbgvmode[] = "WFDBGVMODE=";
+    if (p_wfdb) putenv(n_wfdb);
+    if (p_wfdbcal) putenv(n_wfdbcal);
+    if (p_wfdbannsort) putenv(n_wfdbannsort);
+    if (p_wfdbgvmode) putenv(n_wfdbgvmode);
     SFREE(p_wfdb);
     SFREE(p_wfdbcal);
     SFREE(p_wfdbannsort);
