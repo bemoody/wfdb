@@ -1,6 +1,6 @@
 all:
 	@rm -f lcheck
-	@make lcheck	
+	@$(MAKE) lcheck
 	-@./libcheck $(DESTDIR)$(DBDIR) $(DESTDIR)$(LIBDIR) >libcheck.out
 	@./appcheck $(DESTDIR)$(INCDIR) $(DESTDIR)$(BINDIR) $(DESTDIR)$(LIBDIR) $(DESTDIR)$(PSPDIR)
 	@echo
