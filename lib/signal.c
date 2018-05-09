@@ -911,8 +911,9 @@ static int readheader(const char *record)
 
 	i = sscanf(linebuf+5, "%d.%d.%d", &major, &minor, &release);
 	if ((i > 0 && major > WFDB_MAJOR) ||
-	    (i > 1 && minor > WFDB_MINOR) ||
-	    (i > 2 && release > WFDB_RELEASE)) {
+	    (i > 1 && major == WFDB_MAJOR && minor > WFDB_MINOR) ||
+	    (i > 2 && major == WFDB_MAJOR && minor == WFDB_MINOR &&
+	     release > WFDB_RELEASE)) {
 	    wfdb_error("init: reading record %s requires WFDB library "
 		       "version %d.%d.%d or later\n"
 "  (the most recent version is always available from http://physionet.org)\n",
