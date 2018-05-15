@@ -1,5 +1,5 @@
 /* file sortann.c	G. Moody	 7 April 1997
-			Last revised:	3 November 2017
+			Last revised:	 24 April 2020
 -------------------------------------------------------------------------------
 sortann: Rearrange annotations in canonical order
 Copyright (C) 1997-2010 George B. Moody
@@ -79,7 +79,8 @@ char *argv[];
     static WFDB_Annotation annot;
     static struct annlistentry *ap;
     char *record = NULL, *prog_name();
-    long from = 0L, nann = 0L, to = 0L, atol();
+    WFDB_Time from = 0L, to = 0L;
+    long nann = 0L;
     int i, insert_ann();
     double sps, spm, tps;
     void cleanup(), help();
