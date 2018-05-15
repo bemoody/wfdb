@@ -1,5 +1,5 @@
 /* file: xform.c	G. Moody        8 December 1983
-			Last revised:    22 March 2018
+			Last revised:    24 April 2020
 -------------------------------------------------------------------------------
 xform: Sampling frequency, amplitude, and format conversion for WFDB records
 Copyright (C) 1983-2010 George B. Moody
@@ -62,7 +62,7 @@ char *argv[];
 	nminutes = 0, nosig = 0, oframelen, reopen = 0, sflag = 0,
 	*siglist = NULL, spf, uflag = 0, use_irec_desc = 1, *v, *vin, *vmax,
 	*vmin, *vout, vt, *vv;
-    long from = 0L, it = 0L, nsamp = -1L, nsm = 0L, ot = 0L, spm, to = 0L;
+    WFDB_Time from = 0L, it = 0L, nsamp = -1L, nsm = 0L, ot = 0L, spm, to = 0L;
     WFDB_Anninfo *ai = NULL;
     WFDB_Annotation annot;
     WFDB_Siginfo *dfin, *dfout;
@@ -572,7 +572,7 @@ char *argv[];
     if (nann > 0) {
 	char *p0, *p1;
 	int cc;
-	long tt;
+	WFDB_Time tt;
 
 	/* Check that the input annotation files are readable. */
 	if (annopen(irec, ai, (unsigned)nann) < 0 || iannsettime(from) < -1)
