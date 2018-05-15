@@ -1,5 +1,5 @@
 /* file: psfd.c		G. Moody         9 August 1988
-			Last revised:	   9 May 2018
+               		Last revised:	 24 April 2020
 
 -------------------------------------------------------------------------------
 psfd: Produces annotated full-disclosure ECG plots on a PostScript device
@@ -523,7 +523,7 @@ double dppt;		/* pixels per PostScript "printer's point" (PostScript
 			   "printer's points" are 1/72 inch;  true printer's
 			   points are 1/72.27 inch) */
 double dpsi;		/* pixels per sample interval */
-long nisamp;		/* number of input samples/signal/strip */
+WFDB_Time nisamp;	/* number of input samples/signal/strip */
 int nosamp;		/* number of output samples/signal/strip */
 double sdur;		/* strip duration in seconds */
 double nticks;		/* number of ticks on grid (see grid() below) */
@@ -548,7 +548,7 @@ FILE *cfile;
 {
     char *strtok();
     int i;
-    long t0, t1, tt;
+    WFDB_Time t0, t1, tt;
     static char combuf[256];
     static char *rstring, *tstring, *tstring2;
     static WFDB_Anninfo af[2] = { { aname, WFDB_READ },
@@ -713,7 +713,7 @@ double dpadu;	/* pixels per adu.  This quantity must be recalculated for each
 
 /* Convert time argument to counter value and format as a string. */
 char *timcstr(t)
-long t;
+WFDB_Time t;
 {
     static char cstring[10];
     static double basecount, cfreq = -1.;
@@ -738,12 +738,12 @@ double t_height;	/* height (mm) of space actually alloted per trace */
    the annotations, or 0 if nothing was printed. */
 
 int printstrip(t0, t1)
-long t0, t1;
+WFDB_Time t0, t1;
 {
     char *ts;
     double curr_s_top;
     int i, k;
-    long j, jmax;
+    WFDB_Time j, jmax;
     int nstrips, tm_y, tt, ttmax, *vp, x0, y0, ya[2];
 
     /* Allocate buffers for the samples to be plotted, and initialize the
