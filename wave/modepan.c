@@ -1,5 +1,5 @@
 /* file: modepan.c	G. Moody        30 April 1990
-			Last revised:	15 August 2017
+			Last revised:	24 April 2020
 Mode panel functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -429,7 +429,7 @@ long t;
         }
       case 2:
 	{
-	    static char buf[12];
+	    static char buf[100];
 
 	    if (t < 0L) t = -t;
 	    sprintf(buf, "s%ld", t);
@@ -466,7 +466,7 @@ long t;
 	}
       case 2:
 	{
-	    static char buf[12];
+	    static char buf[100];
 
 	    if (t < 0L) t = -t;
 	    sprintf(buf, "s%ld", t);
