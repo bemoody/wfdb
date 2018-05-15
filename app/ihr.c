@@ -1,5 +1,5 @@
 /* file ihr.c		G. Moody      12 November 1992
-			Last revised:   5 March 2004
+			Last revised:   24 April 2020
 
 -------------------------------------------------------------------------------
 ihr: Generate instantaneous heart rate data from annotation file
@@ -47,7 +47,7 @@ char *argv[];
 	atof(), fabs();
     int i, j, lastann = NOTQRS, last2ann = NOTQRS, tformat = 1, vflag = 1,
 	xflag = 0, lastint = 1, thisint = 0;
-    long from = 0L, to = 0L, lasttime = -9999L;
+    WFDB_Time from = 0L, to = 0L, lasttime = -9999L;
     static char flag[ACMAX+1];
     static WFDB_Anninfo ai;
     WFDB_Annotation annot;
@@ -192,9 +192,9 @@ char *argv[];
 	    mhr += dmhr;
 	    if (flag[lastann] && fabs(ihr-ihrlast)<tol && fabs(ihr-mhr)<tol) {
 		if (flag[last2ann] || !xflag) {
-		    long tt = (vflag > 0) ? lasttime : annot.time;
+		    WFDB_Time tt = (vflag > 0) ? lasttime : annot.time;
 		    switch (tformat) {
-		      case 0: (void)printf("%ld\t", tt); break;
+		      case 0: (void)printf("%"WFDB_Pd_TIME"\t", tt); break;
 		      default:
 		      case 1: (void)printf("%.3lf\t", tt/sps); break;
 		      case 2: (void)printf("%.5lf\t", tt/spm); break;
