@@ -1,5 +1,5 @@
 /* file: mxm.c		G. Moody	20 March 1992
-			Last revised:  14 November 2002
+			Last revised:   24 April 2020
 
 -------------------------------------------------------------------------------
 mxm: ANSI/AAMI-standard measurement-by-measurement annotation file comparator
@@ -40,6 +40,7 @@ Thanks to Denny Dow for pointing out the problem!
 */
 
 #include <stdio.h>
+#include <limits.h>
 #include <math.h>	/* for declaration of sqrt() */
 #include <wfdb/wfdb.h>
 #include <wfdb/ecgcodes.h>
@@ -50,12 +51,13 @@ double A, Anext;	/* measurements from the current & next reference
 double a;		/* measurement from the current test annotation */
 int fflag;		/* output format (0: standard, 1: line format) */
 int mtype = 0;		/* measurement subtype to be compared */
-long start;		/* time of the beginning of the test period */
-long end_time;		/* end of the test period (-1: end of reference annot
+WFDB_Time start;	/* time of the beginning of the test period */
+WFDB_Time end_time;	/* end of the test period (-1: end of reference annot
 			   file; 0: end of either annot file) */
-long huge_time = 0x7FFFFFFF;		/* largest possible time */
-long T, Tnext = -1L;	/* times of the current & next reference annotations */
-long t;			/* time of the current test annotation */
+WFDB_Time huge_time = WFDB_TIME_MAX; /* largest possible time */
+WFDB_Time T, Tnext = -1L;	/* times of the current & next reference
+				   annotations */
+WFDB_Time t;			/* time of the current test annotation */
 
 main(argc, argv)
 int argc;
