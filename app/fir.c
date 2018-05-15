@@ -1,5 +1,5 @@
 /* file: fir.c		G. Moody	5 January 1987
-			Last revised:    22 March 2018
+			Last revised:    24 April 2020
 
 -------------------------------------------------------------------------------
 fir: General-purpose FIR filter for database records
@@ -36,7 +36,7 @@ int nsig;	/* number of signals to be filtered */
 int ri, ro;	/* rectify input/output if non-zero */
 int **vin;	/* pointers to input vectors */
 int *vout;	/* pointer to output vector */
-long nsamp;	/* number of samples to be processed */
+WFDB_Time nsamp; /* number of samples to be processed */
 
 char *prog_name();
 void help(), init(), memerr();
@@ -79,7 +79,7 @@ char *argv[];
     char *irec = "16", *orec = "16", *p;
     double *tc = NULL, atof();
     int i, n = 128, s;
-    long from = 0L, shift = 0L, to = 0L;
+    WFDB_Time from = 0L, shift = 0L, to = 0L;
     static int gvmode = 0;
     static WFDB_Siginfo *chin, *chout;
     FILE *ifile;
