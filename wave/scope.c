@@ -1,5 +1,5 @@
 /* file: scope.c	G. Moody	31 July 1991
-			Last revised:	10 June 2005
+			Last revised:	24 April 2020
 Scope window functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ Rectlist *repaint_area;
 static unsigned int scope_height, scope_width;
 static XPoint *sbuf;
 static int v0n, v0f, v0v, xt, yt;
-static long scope_dt;
+static WFDB_Time scope_dt;
 static Display *scope_display;
 static XID scope_xid;
 static GC clear_plane[4], plot_sig;
@@ -480,7 +480,7 @@ static int show_this_frame()
 {
     static char plane = 3, first_frame = 1;
     int i, i0, tt, tt0 = 0, v0;
-    long t;
+    WFDB_Time t;
 
     if (first_frame && scope_use_overlays) {
       first_frame = 0;
@@ -553,7 +553,7 @@ static void refresh_time()
 {
     char *tp;
     int i, ytt;
-    long t;
+    WFDB_Time t;
 
     ytt = scope_height - mmy(5);
     for (i = 0; i < 4; i++)
@@ -677,7 +677,7 @@ int speed;
 static void scope_proc(Panel_item item, Event *event)
 {
     int client_data;
-    long t0;
+    WFDB_Time t0;
 
     if (item) client_data = (int)xv_get(item, PANEL_CLIENT_DATA);
     else client_data = (int)event;
@@ -771,7 +771,7 @@ int value;
 }
 
 static char *lmstimstr(t)
-long t;
+WFDB_Time t;
 {
     char *p, *p0;
 

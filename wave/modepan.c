@@ -380,10 +380,10 @@ void dismiss_mode()
    is 0, and (2) absolute times (if available) are displayed without brackets
    if time_mode is non-zero. */
 
-long wstrtim(s)
+WFDB_Time wstrtim(s)
 char *s;
 {
-    long t;
+    WFDB_Time t;
 
     while (*s == ' ' || *s == '\t') s++;
     if (time_mode == 1 && *s != '[' && *s != 's' && *s != 'c' && *s != 'e') {
@@ -402,7 +402,7 @@ char *s;
 }
 
 char *wtimstr(t)
-long t;
+WFDB_Time t;
 {
     switch (time_mode) {
       case 0:
@@ -432,14 +432,14 @@ long t;
 	    static char buf[100];
 
 	    if (t < 0L) t = -t;
-	    sprintf(buf, "s%ld", t);
+	    sprintf(buf, "s%"WFDB_Pd_TIME, t);
 	    return (buf);
 	}
     }
 }
 
 char *wmstimstr(t)
-long t;
+WFDB_Time t;
 {
     switch (time_mode) {
       case 0:
@@ -469,7 +469,7 @@ long t;
 	    static char buf[100];
 
 	    if (t < 0L) t = -t;
-	    sprintf(buf, "s%ld", t);
+	    sprintf(buf, "s%"WFDB_Pd_TIME, t);
 	    return (buf);
 	}
     }

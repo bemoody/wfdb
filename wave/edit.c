@@ -1,5 +1,5 @@
 /* file: edit.c		G. Moody	 1 May 1990
-			Last revised:	13 July 2010
+               		Last revised:	24 April 2020
 Annotation-editing functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -497,7 +497,7 @@ Event *event;
 Notify_arg arg;
 {
     int e, i, x, y;
-    long t, tt;
+    WFDB_Time t, tt;
     struct ap *a;
     static int left_down, middle_down, right_down, redrawing, dragged, warped;
     void delete_annotation(), move_annotation();
@@ -1043,7 +1043,7 @@ Notify_arg arg;
 
 		XFillRectangle(display, osb, clear_all,
 			       0, 0, canvas_width+mmx(10), canvas_height);
-		if ((tt = annp->this.time - (long)((nsamp-freq)/2)) < 0L)
+		if ((tt = annp->this.time - (WFDB_Time)((nsamp-freq)/2)) < 0L)
 		    display_start_time = 0L;
 		else
 		    display_start_time = strtim(timstr(tt));
@@ -1276,7 +1276,7 @@ Notify_arg arg;
 
 		XFillRectangle(display, osb, clear_all,
 			       0, 0, canvas_width+mmx(10), canvas_height);
-		tt = annp->this.time - (long)((nsamp-freq)/2);
+		tt = annp->this.time - (WFDB_Time)((nsamp-freq)/2);
 		display_start_time = strtim(timstr(tt));
 		do_disp();
 		right_down = bar_on = box_on = 0;
