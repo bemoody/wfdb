@@ -1,5 +1,5 @@
 /* file: sigamp.c	G. Moody	30 November 1991
-			Last revised:	13 November 2009
+			Last revised:	24 April 2020
 
 -------------------------------------------------------------------------------
 sigamp: Measure signal amplitudes
@@ -57,7 +57,7 @@ int timeunits = SECONDS;
 int vflag;		/* if non-zero, print individual measurements */
 int *v0, *vmax, *vmin, *vv;
 double **amp, *vmean, *vsum;
-long dt1, dt2, dtw;
+WFDB_Time dt1, dt2, dtw;
 WFDB_Anninfo ai;
 WFDB_Frequency sfreq;
 WFDB_Siginfo *si;
@@ -239,7 +239,7 @@ main(int argc, char **argv)
 	    if (*p == '-') dt1 = strtim(p+1);
 	    else dt1 = -strtim(p);
 	    if (dt1 > dt2) {
-		long temp = dt1;
+		WFDB_Time temp = dt1;
 		
 		dt1 = dt2; dt2 = temp;
 	    }
@@ -293,7 +293,7 @@ main(int argc, char **argv)
 int getrms(WFDB_Time t)
 {
     int i, v;
-    long tt;
+    WFDB_Time tt;
 
     if (getvec(vv) < nsig) return (-1);
 
@@ -337,7 +337,7 @@ int getrms(WFDB_Time t)
 int getptp(WFDB_Time t)
 {
     int i;
-    long tt;
+    WFDB_Time tt;
 
     if (isigsettime(t + dt1) < 0) return (-1);
 
