@@ -1,5 +1,5 @@
 /* file: sqrs125.c	G. Moody	27 October 1990
-			Last revised:	 22 March 2018
+			Last revised:	 24 April 2020
 
 -------------------------------------------------------------------------------
 sqrs125: Single-channel QRS detector for data sampled at 100 - 150 Hz
@@ -93,7 +93,7 @@ char *argv[];
         slopecrit, sign, maxslope = 0, nslope = 0,
         qtime, maxtime, t0, t1, t2, t3, t4, t5,
         ms160, ms200, s2, scmax, scmin = 250, signal = -1, *v;
-    long from = 0L, next_minute, now, spm, to = 0L;
+    WFDB_Time from = 0L, next_minute, now, spm, to = 0L;
     WFDB_Anninfo a;
     WFDB_Annotation annot;
     static int gvmode = 0;
