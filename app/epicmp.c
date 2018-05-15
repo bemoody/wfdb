@@ -1,5 +1,5 @@
 /* file: epicmp.c	G. Moody       3 March 1992
-			Last revised:   9 May 2010
+			Last revised:  24 April 2020
 
 -------------------------------------------------------------------------------
 epicmp: ANSI/AAMI-standard episode-by-episode annotation file comparator
@@ -111,10 +111,11 @@ char *pname;		/* name by which this program was invoked */
 char *record;
 char *afname, *sfname, *s0fname, *s1fname, *vfname;
 int Iflag, match, mismatch, nexcl, overlap_ex0, overlap_ex1;
-long start_time, end_time, min_length, total_duration, total_overlap;
-long ep_start[2], ep_ex0[2], ep_ex1[2], ep_end[2];
-long ex_start[MAXEXCL], ex_end[MAXEXCL];
-long ref_duration, ref_overlap, test_duration, test_overlap, STP, FN, PTP, FP;
+WFDB_Time start_time, end_time, min_length, total_duration, total_overlap;
+WFDB_Time ep_start[2], ep_ex0[2], ep_ex1[2], ep_end[2];
+WFDB_Time ex_start[MAXEXCL], ex_end[MAXEXCL];
+WFDB_Time ref_duration, ref_overlap, test_duration, test_overlap;
+long STP, FN, PTP, FP;
 WFDB_Anninfo an[2];
 
 /* Perform an episode-by-episode comparison. */
@@ -123,7 +124,7 @@ unsigned int stat, type;
 {
     int i;
     unsigned int a, b;
-    long duration, overlap, find_overlap();
+    WFDB_Time duration, overlap, find_overlap();
     void find_episode(), find_exclusions();
 
     /* Find and mark any intervals to be excluded from the comparison. */
@@ -284,13 +285,13 @@ unsigned int stat, type;
 }
 
 int lflag;
-long min_length;
+WFDB_Time min_length;
 
 void find_episode(annotator, type)
 unsigned int annotator, type;
 {
     int stat, stcount = 0;
-    long tt;
+    WFDB_Time tt;
     static WFDB_Annotation annot;
 
     ep_start[annotator] = ep_ex0[annotator] = ep_ex1[annotator] =
@@ -451,10 +452,10 @@ unsigned int stat, type;
    overlap_ex0 and overlap_ex1 if the period of overlap includes the times
    ep_ex0[1-annotator] and ep_ex1[1-annotator]. */
 
-long find_overlap(annotator, type)
+WFDB_Time find_overlap(annotator, type)
 unsigned int annotator, type;
 {
-    long overlap = 0L, o_start, o_end;
+    WFDB_Time overlap = 0L, o_start, o_end;
 
     overlap_ex0 = overlap_ex1 = 0;
 
@@ -522,7 +523,7 @@ unsigned int annotator, type;
 }	
 
 FILE *ofile;
-long tref;		/* time of the most recent reference ST extremum */
+WFDB_Time tref;		/* time of the most recent reference ST extremum */
 int sigref, stref;	/* signal number and ST deviation for the most recent
 			   reference ST extremum */
 
@@ -582,7 +583,7 @@ int mode;	/* 0: signal 0 only, 1: signal 1 only, 2: both signals */
     char *ofname;
     WFDB_Annotation testann;
     static int pst0, pst1, stat, st0, st1, sttest;
-    static long pttest;
+    static WFDB_Time pttest;
 
     /* Return to the beginning of the annotation files. */
     if (iannsettime(0L) < 0) exit(2);
@@ -672,7 +673,7 @@ long a, b;
 
 void tstat(s, a, b)
 char *s;
-long a, b;
+WFDB_Time a, b;
 {
     if (!lflag) {
 	(void)fprintf(ofile, "%s:", s);
@@ -686,7 +687,7 @@ long a, b;
 }
 
 char *lzmstimstr(t)
-long t;
+WFDB_Time t;
 {
     char *p = zmstimstr(t);
 
@@ -696,7 +697,7 @@ long t;
 }
 
 char *zmstimstr(t)
-long t;
+WFDB_Time t;
 {
     return (t ? mstimstr(t) : "       0.000");
 }
