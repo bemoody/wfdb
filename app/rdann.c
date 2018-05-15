@@ -1,5 +1,5 @@
 /* file rdann.c	    T. Baker and G. Moody	27 July 1981
-		    Last revised:	       26 October 2018
+               	    Last revised:               24 April 2020
 
 -------------------------------------------------------------------------------
 rdann: Print an annotation file in ASCII form
@@ -57,7 +57,8 @@ char *argv[];
     int sprec, mprec, hprec;
     int eflag = 0, i, j, vflag = 0, xflag = 0;
     long afrom = 0L, anum = 0L, ato = 0L, bfrom = 0L, bnum = 0L, bto = 0L,
-	from = 0L, to = 0L, atol();
+	atol();
+    WFDB_Time from = 0L, to = 0L;
     static char flag[ACMAX+1];
     static WFDB_Anninfo ai;
     WFDB_Annotation annot;
