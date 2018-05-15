@@ -1,5 +1,5 @@
 /* file: wfdbcollate.c        G. Moody        28 April 1994
-			      Last revised:  14 November 2002
+                              Last revised:   24 April 2020
 
 -------------------------------------------------------------------------------
 wfdbcollate: Collate WFDB records into a multi-segment record
@@ -326,7 +326,7 @@ char *argv[];
 
     if (ai.name) {
 	char buf[20];
-	long t0 = 0L;
+	WFDB_Time t0 = 0L;
 
 	ai.stat = WFDB_WRITE;
 	if (annopen(orecname, &ai, 1) < 0)
