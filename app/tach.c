@@ -1,5 +1,5 @@
 /* file: tach.c		G. Moody	 18 April 1985
-			Last revised:  14 November 2002
+               		Last revised:    24 April 2020
 
 -------------------------------------------------------------------------------
 tach: Generate heart rate vs. time signal with evenly spaced samples
@@ -69,7 +69,8 @@ char *argv[];
 {
     double sps, decf, dx, k=1., left, rdmax=40., right, rrcnt, rrate=80., x;
     int i, Oflag = 0, vflag = 0, Vflag = 0;
-    long beatab[ABL], lastn, max, min, maxbt, minbt, n, start = 0L, end = 0L;
+    WFDB_Time beatab[ABL], lastn, maxbt, minbt, n, start = 0L, end = 0L;
+    long max, min;
 #ifndef atol
     long atol();
 #endif
@@ -325,7 +326,7 @@ char *argv[];
 	      case 2: (void)printf("%g\t", n/(ofreq*60.0)); break;
 	      case 3: (void)printf("%g\t", n/(ofreq*3600.0)); break;
 	    }
-	    if (vflag) (void)printf("%ld\t", n);
+	    if (vflag) (void)printf("%"WFDB_Pd_TIME"\t", n);
 	    (void)printf("%g\n", rrate);
 	}
 	n++;
