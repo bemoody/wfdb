@@ -1,5 +1,5 @@
 /* file: snip.c		G. Moody	30 July 1989
-			Last revised:   22 March 2018
+               		Last revised:   24 April 2020
 -------------------------------------------------------------------------------
 snip: Copy an excerpt of a database record
 Copyright (C) 1989-2013 George B. Moody
@@ -239,7 +239,7 @@ void copy_sig(char *nrec, char *irec, WFDB_Time from, WFDB_Time to, int recurse)
 {
     char *ofname, *p, tstring[24];
     int i, j, nsig, maxseg, maxres;
-    long nsamp;
+    WFDB_Time nsamp;
     WFDB_Sample *v;
     WFDB_Siginfo *si;
     WFDB_Time t, tf;
@@ -355,8 +355,7 @@ void copy_sig(char *nrec, char *irec, WFDB_Time from, WFDB_Time to, int recurse)
 	}
 
 	for (i = 0, j = first_seg; j <= last_seg; j++) {
-	    long len;
-	    WFDB_Time start;
+	    WFDB_Time len, start;
 
 	    t = seginfo[j].samp0;
 	    tf = seginfo[j].samp0 + seginfo[j].nsamp;
@@ -374,7 +373,7 @@ void copy_sig(char *nrec, char *irec, WFDB_Time from, WFDB_Time to, int recurse)
 		sprintf(orseg, "%s_%04d", nrec, ++i);
 		copy_sig(orseg, seginfo[j].recname, start, start + len, 0);
 	    }
-	    fprintf(ohfile, "%s %ld\r\n", orseg, len);
+	    fprintf(ohfile, "%s %"WFDB_Pd_TIME"\r\n", orseg, len);
 	}
 	fclose(ohfile);
 	return;
