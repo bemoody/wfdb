@@ -1,5 +1,5 @@
 /* file: mfilt.c	G. Moody	 27 June 1993
-			Last revised:    22 March 2018
+			Last revised:    24 April 2020
 
 -------------------------------------------------------------------------------
 mfilt: General-purpose median filter for database records
@@ -35,10 +35,10 @@ int nsig;	/* number of signals to be filtered */
 int **vin;	/* pointers to input vectors */
 int *vtemp;	/* temporary array for calculating medians */
 int *vout;	/* output vector */
-long from = 0L;	/* first sample to be processed */
-long to = 0L;	/* (if > 0) sample following last sample to be processed */
-long spm;	/* samples per minute */
-long tt;	/* time to print next progress indicator */
+WFDB_Time from = 0L; /* first sample to be processed */
+WFDB_Time to = 0L; /* (if > 0) sample following last sample to be processed */
+WFDB_Time spm;	/* samples per minute */
+WFDB_Time tt;	/* time to print next progress indicator */
 
 char *prog_name();
 void help(), init(), memerr();
@@ -54,7 +54,7 @@ int argc;
 char *argv[];
 {
     int i = 0, j, s;
-    long t;
+    WFDB_Time t;
 
     init(argc, argv);	/* read and interpret command line */
     if (from < median) {	/* preload array with copies of sample 0 */
