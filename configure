@@ -20,6 +20,7 @@ MANDIR=unknown
 LIBDIR=unknown
 HOST=
 MFLAGS=
+ARCHLIST=
 
 NETLIB=unknown
 WAVE=unknown
@@ -43,6 +44,8 @@ do
 		        else
 		            MFLAGS="$MFLAGS $i"
 		        fi ;;
+    --enable-arch=*)    a=`echo $i | sed 's/[-a-zA-Z0-9]*=//' | tr , ' '`
+                        ARCHLIST="$ARCHLIST $a" ;;
     --host=*)           HOST=`echo $i | sed 's/[-a-zA-Z0-9]*=//'` ;;
     --mandir=*)         MANDIR=`echo $i | sed 's/[-a-zA-Z0-9]*=//'` ;;
     --prefix=*)         DIR=`echo $i | sed 's/[-a-zA-Z0-9]*=//'` ;;
@@ -276,14 +279,19 @@ case $OS in
 	sed 's/NOCYGWIN/-mno-cygwin/' mingw.def >>site.def ;;
   Darwin)
 	echo "It is normal for Mac OS X to be recognized as Darwin."
-        case $MACHINE in
-          x86_64) LMFLAGS="$MFLAGS -arch i386 -arch x86_64"
-                  WMFLAGS="$MFLAGS -arch i386" ;;
-          i386)   LMFLAGS="$MFLAGS -arch i386"
-                  WMFLAGS="$MFLAGS -arch i386" ;;
-          *)      LMFLAGS="$MFLAGS"
-                  WMFLAGS="$MFLAGS" ;;
-        esac
+	LMFLAGS=$MFLAGS
+	WMFLAGS=$MFLAGS
+	for a in $ARCHLIST
+	do
+	    LMFLAGS="$LMFLAGS -arch $a"
+	    case $a in
+	      i386|ppc) WMFLAGS="$WMFLAGS -arch $a" ;;
+	    esac
+	done
+	if [ $WAVE = unknown ] && [ "x$WMFLAGS" = "x$MFLAGS" ]
+	then
+            WAVE=0
+	fi
 	cat site.def darwin-slib.def | \
 	    sed "s+^MFLAGS =+MFLAGS = $LMFLAGS+" >site-slib.def
 	cat darwin.def | \
