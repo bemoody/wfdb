@@ -1,6 +1,6 @@
 #!/bin/sh
 # file: appcheck		G. Moody       7 September 2001
-#                               Last revised:    8 March 2017
+#                               Last revised:    17 May 2018
 #
 # This script checks the basic functionality of most of the WFDB applications
 # in the 'app' directory.  These programs are not (yet) tested by this script:
@@ -54,7 +54,7 @@ esac
 
 echo Testing wfdbwhich ...
 F=wfdbwhich.out
-wfdbwhich 100s.atr >$F 2>&1
+$BINDIR/wfdbwhich 100s.atr >$F 2>&1
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
@@ -66,7 +66,7 @@ TESTS=`expr $TESTS + 1`
 
 echo Testing wfdbcat ...
 F=wfdbcat.out
-wfdbcat 100s.atr >$F 2>&1
+$BINDIR/wfdbcat 100s.atr >$F 2>&1
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
@@ -78,7 +78,7 @@ TESTS=`expr $TESTS + 1`
 
 echo Testing rdann ...
 F=rdann.out
-rdann -r 100s -a atr >$F
+$BINDIR/rdann -r 100s -a atr >$F
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
@@ -92,7 +92,7 @@ TESTS=`expr $TESTS + 1`
 
 echo Testing wrann ...
 F=100s.wra
-wrann -r 100s -a wra <wrann.in
+$BINDIR/wrann -r 100s -a wra <wrann.in
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
@@ -105,7 +105,7 @@ rm -f wrann.in
 
 echo Testing rdsamp ...
 F=rdsamp.out
-rdsamp -r 100s -f 10 -t 11 -p -v >$F
+$BINDIR/rdsamp -r 100s -f 10 -t 11 -p -v >$F
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
@@ -119,7 +119,7 @@ TESTS=`expr $TESTS + 1`
 
 echo Testing wrsamp ...
 F=100w.dat
-wrsamp -o 100w -F 360 -O 212 -x 200 1 2 <wrsamp.in
+$BINDIR/wrsamp -o 100w -F 360 -O 212 -x 200 1 2 <wrsamp.in
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
@@ -141,7 +141,7 @@ rm -f wrsamp.in
 
 echo Testing ann2rr ...
 F=ann2rr.out
-ann2rr -r 100s -a atr >$F
+$BINDIR/ann2rr -r 100s -a atr >$F
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
@@ -155,7 +155,7 @@ TESTS=`expr $TESTS + 1`
 
 echo Testing rr2ann ...
 F=100s.a2r
-rr2ann -r 100s -a a2r <rr2ann.in
+$BINDIR/rr2ann -r 100s -a a2r <rr2ann.in
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
@@ -168,7 +168,7 @@ rm -f rr2ann.in
 
 echo Testing sqrs ...
 F=100s.qrs
-sqrs -r 100s 2>sqrs.log
+$BINDIR/sqrs -r 100s 2>sqrs.log
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
@@ -183,7 +183,7 @@ TESTS=`expr $TESTS + 1`
 echo Testing ecgeval ...
 F=ecgeval.out
 rm -f qrs-mit.bat qrs-mit.out
-ecgeval <input/ecgeval >$F 2>&1
+$BINDIR/ecgeval <input/ecgeval >$F 2>&1
 grep -v file: qrs-mit.bat >>$F
 grep -v file: qrs-mit.out >>$F
 if ( ./checkfile $F )
@@ -198,7 +198,7 @@ TESTS=`expr $TESTS + 1`
 echo Testing bxb ...
 F=bxb.out
 E=bxb.err
-bxb -r 100s -a atr ann -f 0 >$F 2>$E
+$BINDIR/bxb -r 100s -a atr ann -f 0 >$F 2>$E
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
@@ -218,7 +218,7 @@ TESTS=`expr $TESTS + 2`
 echo Testing rxr ...
 F=rxr.out
 E=rxr.err
-rxr -r 100s -a atr ann -f 0 >$F 2>$E
+$BINDIR/rxr -r 100s -a atr ann -f 0 >$F 2>$E
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
@@ -237,7 +237,7 @@ TESTS=`expr $TESTS + 2`
 rm 100s.ann
 
 echo Testing fir ...
-fir -i 100s -n fir -f 10 -t 15 -c -1 1
+$BINDIR/fir -i 100s -n fir -f 10 -t 15 -c -1 1
 for F in fir.dat fir.hea
 do
   if ( ./checkfile $F )
@@ -252,7 +252,7 @@ done
 
 echo Testing ihr ...
 F=ihr.out
-ihr -r 100s -a atr >$F
+$BINDIR/ihr -r 100s -a atr >$F
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
@@ -263,7 +263,7 @@ fi
 TESTS=`expr $TESTS + 1`
 
 echo Testing mfilt ...
-mfilt -l 5 -i 100s -n mfilt -f 10 -t 15 2>mfilt.log
+$BINDIR/mfilt -l 5 -i 100s -n mfilt -f 10 -t 15 2>mfilt.log
 for F in mfilt.dat mfilt.hea
 do
   if ( ./checkfile $F )
@@ -279,7 +279,7 @@ done
 echo Testing mrgann ...
 F=100s.mrg
 cp expected/100s.qrs expected/100s.wqrs .
-mrgann -r 100s -i qrs wqrs -o mrg -m0 10 -m1 20 -m2 30 -m3 40
+$BINDIR/mrgann -r 100s -i qrs wqrs -o mrg -m0 10 -m1 20 -m2 30 -m3 40
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
@@ -291,7 +291,7 @@ TESTS=`expr $TESTS + 1`
 
 echo Testing nguess ...
 F=100a.nguess
-nguess -r 100a -a atr
+$BINDIR/nguess -r 100a -a atr
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
@@ -303,7 +303,7 @@ TESTS=`expr $TESTS + 1`
 
 echo Testing pschart ...
 F=pschart.ps
-pschart -a atr -c "" -g -l -T Test - >$F <<EOF
+$BINDIR/pschart -a atr -c "" -g -l -T Test - >$F <<EOF
 100s 10-15
 EOF
 if ( ./checkfile $F )
@@ -317,7 +317,7 @@ TESTS=`expr $TESTS + 1`
 
 echo Testing psfd ...
 F=psfd.ps
-psfd -a atr -c "" -g -l -T Test - >$F <<EOF
+$BINDIR/psfd -a atr -c "" -g -l -T Test - >$F <<EOF
 100s 0-e
 EOF
 if ( ./checkfile $F )
@@ -331,7 +331,7 @@ TESTS=`expr $TESTS + 1`
 
 echo Testing sampfreq ...
 F=sampfreq.out
-sampfreq 100s >$F
+$BINDIR/sampfreq 100s >$F
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
@@ -343,7 +343,7 @@ TESTS=`expr $TESTS + 1`
 
 echo Testing sigamp ...
 F=sigamp.out
-sigamp -r 100s -a atr >$F
+$BINDIR/sigamp -r 100s -a atr >$F
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
@@ -355,7 +355,7 @@ TESTS=`expr $TESTS + 1`
 
 echo Testing sigavg ...
 F=100s.sigavg
-sigavg -r 100s -a atr -v>$F
+$BINDIR/sigavg -r 100s -a atr -v>$F
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
@@ -366,7 +366,7 @@ fi
 TESTS=`expr $TESTS + 1`
 
 echo Testing snip ...
-snip -i 100s -n snip -a atr -f 10 -t 15
+$BINDIR/snip -i 100s -n snip -a atr -f 10 -t 15
 for F in snip.atr snip.dat snip.hea
 do
   if ( ./checkfile $F )
@@ -380,12 +380,12 @@ do
 done
 
 echo Testing sortann ...
-rdann -r 100s -a atr -f 30 >foo
-rdann -r 100s -a atr -t 30 >>foo
+$BINDIR/rdann -r 100s -a atr -f 30 >foo
+$BINDIR/rdann -r 100s -a atr -t 30 >>foo
 ( WFDBANNSORT=0; export WFDBANNSORT; \
-  wrann -r 100s -a mix <foo 2>wrann.log )
+  $BINDIR/wrann -r 100s -a mix <foo 2>wrann.log )
 rm -f foo
-sortann -r 100s -a mix
+$BINDIR/sortann -r 100s -a mix
 F=100s.mix
 if ( ./checkfile $F )
 then
@@ -398,7 +398,7 @@ TESTS=`expr $TESTS + 1`
 
 echo Testing sumann ...
 F=sumann.out
-sumann -r 100s -a atr >$F
+$BINDIR/sumann -r 100s -a atr >$F
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
@@ -410,7 +410,7 @@ TESTS=`expr $TESTS + 1`
 
 echo Testing sumstats ...
 F=sumstats.out
-sumstats input/sumstats >$F
+$BINDIR/sumstats input/sumstats >$F
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
@@ -422,7 +422,7 @@ TESTS=`expr $TESTS + 1`
 
 echo Testing tach ...
 F=tach.out
-tach -r 100s -a atr >$F
+$BINDIR/tach -r 100s -a atr >$F
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
@@ -433,7 +433,7 @@ fi
 TESTS=`expr $TESTS + 1`
 
 echo Testing wfdbcollate ...
-wfdbcollate -s 100s -o wfd -l 30 2>wfdbcollate.log
+$BINDIR/wfdbcollate -s 100s -o wfd -l 30 2>wfdbcollate.log
 for F in wfd*hea wfd*dat
 do
   if ( ./checkfile $F )
@@ -448,7 +448,7 @@ done
 
 echo Testing wfdbdesc ...
 F=wfdbdesc.out
-wfdbdesc 100s >$F
+$BINDIR/wfdbdesc 100s >$F
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
@@ -461,7 +461,7 @@ TESTS=`expr $TESTS + 1`
 echo Testing wabp ...
 F=xform.wabp
 cp expected/xform.hea expected/xform.dat .
-wabp -r xform 2>wabp.log
+$BINDIR/wabp -r xform 2>wabp.log
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
@@ -473,7 +473,7 @@ TESTS=`expr $TESTS + 1`
 
 echo Testing wqrs ...
 F=100s.wqrs
-wqrs -r 100s -j 2>wqrs.log
+$BINDIR/wqrs -r 100s -j 2>wqrs.log
 if ( ./checkfile $F )
 then
     PASS=`expr $PASS + 1`
@@ -484,7 +484,7 @@ fi
 TESTS=`expr $TESTS + 1`
 
 echo Testing parsescp ...
-parsescp -o test -w <input/test.scp
+$BINDIR/parsescp -o test -w <input/test.scp
 for F in test.dat test.des test.ecg test.hea test.key
 do
   if ( ./checkfile $F )
@@ -498,7 +498,7 @@ do
 done
 
 echo Testing xform ...
-xform -i 100s -a atr -n 100x -o input/100x >xform-1.out 2>&1
+$BINDIR/xform -i 100s -a atr -n 100x -o input/100x >xform-1.out 2>&1
 for F in xform-1.out 100x.atr 100x.dat 100x.hea
 do
   if ( ./checkfile $F )
@@ -514,7 +514,7 @@ done
 if ( grep "WFDB_NETFILES 1" $INCDIR/wfdb/wfdb.h >grep.out 2>&1 )
 then
   echo "Testing xform (with NETFILES) ..."
-  xform -i mimicdb/237/237 -s 1 2 0 3 -a all -M -n xform -f 9:19:45 \
+  $BINDIR/xform -i mimicdb/237/237 -s 1 2 0 3 -a all -M -n xform -f 9:19:45 \
    -t "[22:01:23 20/07/1995]" -S input/xform >xform-2.out 2>&1
   for F in xform-2.out xform.hea xform.dat xform.all
   do
