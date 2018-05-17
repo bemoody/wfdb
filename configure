@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody         24 May 2000
-#                             Last revised:    9 May 2018
+#                             Last revised:    17 May 2018
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -383,16 +383,18 @@ then
 	exit
     else
 	CC=${CROSS_COMPILE}cc
+	wflags=
     fi
 else
     CC=${CROSS_COMPILE}gcc
+    wflags="-Wno-implicit -Wformat "
 fi
 echo "$CC"
 sed "s|CC = gcc|CC = $CC|" <site.def >site.tmp
-mv site.tmp site.def
+sed "s|^CFLAGS = |CFLAGS = $wflags|" <site.tmp >site.def
 sed "s|CC = gcc|CC = $CC|" <site-slib.def >site.tmp
-mv site.tmp site-slib.def
-rm -f wcc.t1 wcc.t2
+sed "s|^CFLAGS = |CFLAGS = $wflags|" <site.tmp >site-slib.def
+rm -f wcc.t1 wcc.t2 site.tmp
 
 ./prompt "Looking for the command to strip debugging metadata ..."
 WSTRIP=`which ${CROSS_COMPILE}strip 2>&1`
