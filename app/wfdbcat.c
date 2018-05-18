@@ -1,5 +1,5 @@
 /* file: wfdbcat.c	G. Moody	3 March 2000
-			Last revised:	22 May 2000
+			Last revised:	18 May 2018
 -------------------------------------------------------------------------------
 wfdbcat: Find and concatenate WFDB files on the standard output
 Copyright (C) 2000 George B. Moody
@@ -26,35 +26,7 @@ _______________________________________________________________________________
 
 #include <stdio.h>
 #include <wfdb/wfdb.h>
-
-/* Structures used by internal WFDB library functions only */
-struct netfile {
-  char *url;
-  char *data;
-  int mode;
-  long base_addr;
-  long cont_len;
-  long pos;
-  long err;
-  int fd;
-};
-
-struct WFDB_FILE {
-  FILE *fp;
-  struct netfile *netfp;
-  int type;
-};
-
-typedef struct WFDB_FILE WFDB_FILE;
-
-extern WFDB_FILE *wfdb_open(char *file_type, char *record, int mode);
-#if WFDB_NETFILES
-extern size_t wfdb_fread(void *ptr, size_t size, size_t nmemb, WFDB_FILE *fp);
-extern int wfdb_fclose(WFDB_FILE *fp);
-#else
-#define wfdb_fread(p, s, n, wp)		fread(p, s, n, wp->fp)
-#define wfdb_fclose(wp)			fclose(wp->fp)
-#endif
+#include <wfdb/wfdblib.h>
 
 #ifndef __STDC__
 extern void exit();
