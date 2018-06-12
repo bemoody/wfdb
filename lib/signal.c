@@ -2097,6 +2097,9 @@ static int getskewedframe(WFDB_Sample *vector)
 
     if (need_sigmap)
 	sigmap(vecstart, ovec);
+    else if (framelen != tspf)
+	for (s = framelen; s < tspf; s++)
+	    vecstart[s] = WFDB_INVALID_SAMPLE;
 
     return (stat);
 }
