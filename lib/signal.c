@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   28 April 2020		wfdblib 10.7.0
+			Last revised:   30 April 2020		wfdblib 10.7.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -523,8 +523,10 @@ static int make_vsd(void)
 	maxvsig = nvsig;
     }
 
-    for (i = 0; i < nvsig; i++)
+    for (i = 0; i < nvsig; i++) {
 	copysi(&vsd[i]->info, &isd[i]->info);
+	vsd[i]->skew = isd[i]->skew;
+    }
 
     return (nvsig);
 }
@@ -663,16 +665,13 @@ static int sigmap_init(int first_segment)
     return (0);
 }
 
-static int sigmap(WFDB_Sample *vector)
+static int sigmap(WFDB_Sample *vector, const WFDB_Sample *ivec)
 {
     int i;
     double v;
 
-    for (i = 0; i < tspf; i++)
-	ovec[i] = vector[i];
-
     for (i = 0; i < tspf; i++) {
-	if (ovec[smi[i].index] == WFDB_INVALID_SAMPLE)
+	if (ivec[smi[i].index] == WFDB_INVALID_SAMPLE)
 	    vector[i] = WFDB_INVALID_SAMPLE;
 	else {
 	    /* Scale the input sample and round it to the nearest
@@ -680,7 +679,7 @@ static int sigmap(WFDB_Sample *vector)
 	       rounded to 11, but -10.5 is rounded to -10.)  Note that
 	       smi[i].offset already includes an extra 0.5, so we
 	       simply need to calculate the floor of v. */
-	    v = ovec[smi[i].index] * smi[i].scale + smi[i].offset;
+	    v = ivec[smi[i].index] * smi[i].scale + smi[i].offset;
 	    if (smi[i].sample_offset) {
 		/* Fast case: if we can guarantee that v is always
 		   positive and the following calculation cannot
@@ -1975,6 +1974,11 @@ static int getskewedframe(WFDB_Sample *vector)
 	}
     }
 
+    /* If the vector needs to be rearranged (variable-layout record),
+       then read samples into a temporary buffer. */
+    if (need_sigmap)
+	vector = ovec;
+
     for (s = 0; s < nisig; s++) {
 	is = isd[s];
 	ig = igd[is->info.group];
@@ -2090,6 +2094,10 @@ static int getskewedframe(WFDB_Sample *vector)
 	    stat = -4;
 	}
     }
+
+    if (need_sigmap)
+	sigmap(vecstart, ovec);
+
     return (stat);
 }
 
@@ -2730,7 +2738,7 @@ FINT getframe(WFDB_Sample *vector)
     int stat = -1;
 
     if (dsbuf) {	/* signals must be deskewed */
-	int c, i, j, nsig, s;
+	int c, i, j, s;
 
 	/* First, obtain the samples needed. */
 	if (dsbi < 0) {	/* dsbuf contents are invalid -- refill dsbuf */
@@ -2747,16 +2755,14 @@ FINT getframe(WFDB_Sample *vector)
 	}
 
 	/* Assemble the deskewed frame from the data in dsbuf. */
-	for (j = s = 0; s < nisig; s++) {
-	    if ((i = j + dsbi + isd[s]->skew*tspf) >= dsblen) i %= dsblen;
-	    for (c = 0; c < isd[s]->info.spf; c++)
+	for (j = s = 0; s < nvsig; s++) {
+	    if ((i = j + dsbi + vsd[s]->skew*tspf) >= dsblen) i %= dsblen;
+	    for (c = 0; c < vsd[s]->info.spf; c++)
 		vector[j++] = dsbuf[i++];
 	}
     }
     else		/* no deskewing necessary */
 	stat = getskewedframe(vector);
-    if (need_sigmap && stat > 0)
-	stat = sigmap(vector);
     istime++;
     return (stat);
 }
