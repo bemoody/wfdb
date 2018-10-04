@@ -1,5 +1,5 @@
 /* file: wfdbf.c	G. Moody	 23 August 1995
-			Last revised:    7 December 2017	wfdblib 10.6.0
+			Last revised:     29 April 2020 	wfdblib 10.7.0
 
 _______________________________________________________________________________
 wfdbf: Fortran wrappers for the WFDB library functions
@@ -683,7 +683,7 @@ INTEGER wfdbsetstart_(INTEGER *s, INTEGER *bytes)
 
 INTEGER wfdbputprolog_(char *prolog, INTEGER *bytes, INTEGER *signal)
 {
-    return (wfdbputprolog(fcstring(prolog), (long)*bytes,(WFDB_Signal)*signal));
+    return (wfdbputprolog(prolog, (long)*bytes,(WFDB_Signal)*signal));
 }
 
 INTEGER wfdbquit_(INTEGER *dummy)
