@@ -720,9 +720,9 @@ INTEGER flushcal_(INTEGER *dummy)
 
 INTEGER getinfo_(char *record, char *string, STRINGSIZE record_size, STRINGSIZE string_size)
 {
-    char *s = getinfo(fcstring(&s1, record, record_size));
+    char *s = getinfo(fcstring0(&s1, record, record_size));
     cfstring(string, string_size, s);
-    return (0L);
+    return (s ? 0L : -1L);
 }
 
 INTEGER putinfo_(char *string, STRINGSIZE string_size)
