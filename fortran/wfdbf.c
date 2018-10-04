@@ -797,7 +797,7 @@ INTEGER wfdbquit_(INTEGER *dummy)
 
 DOUBLE_PRECISION sampfreq_(char *record, STRINGSIZE record_size)
 {
-    return (sampfreq(fcstring(&s1, record, record_size)));
+    return (sampfreq(fcstring0(&s1, record, record_size)));
 }
 
 INTEGER setsampfreq_(DOUBLE_PRECISION *frequency)
