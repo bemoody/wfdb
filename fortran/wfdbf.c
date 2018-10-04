@@ -273,9 +273,9 @@ INTEGER getsiginfo_(INTEGER *s, char *fname, char *desc, char *units, DOUBLE_PRE
 INTEGER setsiginfo_(INTEGER *s, char *fname, char *desc, char *units, DOUBLE_PRECISION *gain, INTEGER *initval, INTEGER *group, INTEGER *fmt, INTEGER *spf, INTEGER *bsize, INTEGER *adcres, INTEGER *adczero, INTEGER *baseline, INTEGER *nsamp, INTEGER *cksum, STRINGSIZE fname_size, STRINGSIZE desc_size, STRINGSIZE units_size)
 {
     if (0 <= *s && *s < WFDB_MAXSIG) {
-	sinfo[*s].fname = fname;
-	sinfo[*s].desc = desc;
-	sinfo[*s].units = units;
+	fcstring(&sinfo[*s].fname, fname, fname_size);
+	fcstring(&sinfo[*s].desc, desc, desc_size);
+	fcstring(&sinfo[*s].units, units, units_size);
 	sinfo[*s].gain = *gain;
 	sinfo[*s].initval = *initval;
 	sinfo[*s].group = *group;
