@@ -72,40 +72,151 @@ you are on your own.
 #ifndef DOUBLE_PRECISION
 #define DOUBLE_PRECISION double
 #endif
+#ifndef STRINGSIZE
+#define STRINGSIZE int
+#endif
 
 /* If Fortran strings are terminated by spaces rather than by null characters,
    define FIXSTRINGS. */
 /* #define FIXSTRINGS */
 
-#ifdef FIXSTRINGS
-/* This function leaks memory!  Ideally we would like to free(t) once *t is
-   no longer needed.  If this is a concern, we might push all values assigned
-   to t onto a stack and free them all on exit.  In practice we are usually
-   dealing with a small number of short strings. */
-char *fcstring(char *s)	/* change final space to null */
+/* If the size of a string is not specified, define NOSTRINGSIZE. */
+/* #define NOSTRINGSIZE */
+
+/* Convert a Fortran string (passed as a function or subroutine
+   argument) to a C string. */
+static char *fcstring(char **dest, const char *src, STRINGSIZE size)
 {
-    char *p = s, *t;
+    size_t len = size;
 
-    while (*s && *s != ' ')
-	s++;
-    t = calloc(1, s-p+1);
-    if (s > p) strncpy(t, p, s-p);
-    return (t);
-}
-
-char *cfstring(char *s)	/* change final null to space */
-{
-    char *p = s;
-
-    while (*s)
-	s++;
-    *s = ' ';
-    return (p);
-}
+#ifdef NOSTRINGSIZE
+# ifdef FIXSTRINGS
+    /* NOSTRINGSIZE && FIXSTRINGS:
+       - Buffer size is unknown.
+       - The input string is terminated by the first space or null
+         character. */
+    len = strcspn(src, " ");
+# else
+    /* NOSTRINGSIZE && !FIXSTRINGS:
+       - Buffer size is unknown.
+       - The input string is terminated by the first null character. */
+    len = strlen(src);
+# endif
 #else
-#define fcstring(s)	(s)
-#define cfstring(s)	(s)
+# ifdef FIXSTRINGS
+    /* !NOSTRINGSIZE && FIXSTRINGS:
+       - Buffer size is specified as a hidden parameter.
+       - The input string is terminated by the first null character or
+         the last non-space character, or the end of the buffer. */
+    while (len > 0 && src[len - 1] == ' ')
+	len--;
+# else
+    /* !NOSTRINGSIZE && !FIXSTRINGS:
+       - Buffer size is specified as a hidden parameter.
+       - The input string is terminated by the first null character,
+         or the end of the buffer. */
+    const char *p = memchr(src, 0, len);
+    if (p)
+	len = p - src;
+# endif
 #endif
+
+    SALLOC(*dest, len + 1, sizeof(char));
+    if (*dest && len > 0)
+	memcpy(*dest, src, len);
+    return (*dest);
+}
+
+/* Convert a Fortran string to a C string; convert an empty string to NULL. */
+static char *fcstring0(char **dest, const char *src, STRINGSIZE size)
+{
+    fcstring(dest, src, size);
+    if (*dest && (*dest)[0] == 0)
+	SFREE(*dest);
+    return (*dest);
+}
+
+/* Convert a Fortran string to an 'aux' string. */
+static void fastring(unsigned char **dest, const char *src, STRINGSIZE size)
+{
+    char *s = NULL;
+    STRINGSIZE n;
+
+    fcstring(&s, src, size);
+    if (s && s[0]) {
+	n = strlen(s);
+	if (n > 255)
+	    n = 255;
+	SALLOC(*dest, n + 2, sizeof(char));
+	if (*dest) {
+	    (*dest)[0] = n;
+	    memcpy(*dest + 1, s, n);
+	}
+    }
+    else {
+	SFREE(*dest);
+    }
+    SFREE(s);
+}
+
+/* Convert a C string to a Fortran string. */
+static void cfstring(char *dest, STRINGSIZE size, const char *src)
+{
+    size_t max = size;
+    size_t len;
+
+    if (!src)
+	src = "";
+    len = strlen(src);
+
+#ifdef NOSTRINGSIZE
+# ifdef FIXSTRINGS
+    /* NOSTRINGSIZE && FIXSTRINGS:
+       - Buffer size is unknown.  If the length of the string exceeds
+         the size of the buffer, the program will probably crash or
+         misbehave.
+       - The output string will be terminated by a single space
+         character. */
+    memcpy(dest, src, len);
+    dest[len] = ' ';
+# else
+    /* NOSTRINGSIZE && !FIXSTRINGS:
+       - Buffer size is unknown.  If the length of the string exceeds
+         the size of the buffer, the program will probably crash or
+         misbehave.
+       - The output string will be terminated by a single null
+         character. */
+    memcpy(dest, src, len + 1);
+# endif
+#else
+# ifdef FIXSTRINGS
+    /* !NOSTRINGSIZE && FIXSTRINGS:
+       - Buffer size is specified as a hidden parameter.  If the
+         length of the string exceeds the size of the buffer, the
+         string will be truncated.
+       - The output string will be padded with space characters. */
+    if (len >= max) {
+	memcpy(dest, src, max);
+    }
+    else {
+	memcpy(dest, src, len);
+	memset(dest + len, ' ', max - len);
+    }
+# else
+    /* !NOSTRINGSIZE && !FIXSTRINGS:
+       - Buffer size is specified as a hidden parameter.  If the
+         length of the string exceeds the size of the buffer, the
+         string will be truncated.
+       - The output string will be terminated by a single null
+         character.  The remainder of the buffer will not be
+         modified. */
+    if (len >= max)
+	len = max - 1;
+    memcpy(dest, src, len);
+    dest[len] = 0;
+# endif
+#endif
+}
 
 /* Static data shared by the wrapper functions.  Since Fortran does not support
    composite data types (such as C `struct' types), these are defined here, and
@@ -115,6 +226,7 @@ char *cfstring(char *s)	/* change final null to space */
 static WFDB_Siginfo sinfo[WFDB_MAXSIG];
 static WFDB_Calinfo cinfo;
 static WFDB_Anninfo ainfo[WFDB_MAXANN*2];
+static char *s1, *s2;
 
 /* The functions setanninfo_, setsiginfo_, and getsiginfo_ do not have direct
    equivalents in the WFDB library;  they are provided in order to permit
@@ -124,10 +236,10 @@ static WFDB_Anninfo ainfo[WFDB_MAXANN*2];
    needed in the C library.
 */
 
-INTEGER setanninfo_(INTEGER *a, char *name, INTEGER *stat)
+INTEGER setanninfo_(INTEGER *a, char *name, INTEGER *stat, STRINGSIZE name_size)
 {
     if (0 <= *a && *a < WFDB_MAXANN*2) {
-	ainfo[*a].name = fcstring(name);
+	fcstring(&ainfo[*a].name, name, name_size);
 	ainfo[*a].stat = *stat;
 	return (0L);
     }
@@ -135,7 +247,7 @@ INTEGER setanninfo_(INTEGER *a, char *name, INTEGER *stat)
 	return (-1L);
 }
 
-INTEGER getsiginfo_(INTEGER *s, char *fname, char *desc, char *units, DOUBLE_PRECISION *gain, INTEGER *initval, INTEGER *group, INTEGER *fmt, INTEGER *spf, INTEGER *bsize, INTEGER *adcres, INTEGER *adczero, INTEGER *baseline, INTEGER *nsamp, INTEGER *cksum)
+INTEGER getsiginfo_(INTEGER *s, char *fname, char *desc, char *units, DOUBLE_PRECISION *gain, INTEGER *initval, INTEGER *group, INTEGER *fmt, INTEGER *spf, INTEGER *bsize, INTEGER *adcres, INTEGER *adczero, INTEGER *baseline, INTEGER *nsamp, INTEGER *cksum, STRINGSIZE fname_size, STRINGSIZE desc_size, STRINGSIZE units_size)
 {
     if (0 <= *s && *s < WFDB_MAXSIG) {
 	fname = sinfo[*s].fname;
@@ -158,7 +270,7 @@ INTEGER getsiginfo_(INTEGER *s, char *fname, char *desc, char *units, DOUBLE_PRE
 	return (-1L);
 }
 
-INTEGER setsiginfo_(INTEGER *s, char *fname, char *desc, char *units, DOUBLE_PRECISION *gain, INTEGER *initval, INTEGER *group, INTEGER *fmt, INTEGER *spf, INTEGER *bsize, INTEGER *adcres, INTEGER *adczero, INTEGER *baseline, INTEGER *nsamp, INTEGER *cksum)
+INTEGER setsiginfo_(INTEGER *s, char *fname, char *desc, char *units, DOUBLE_PRECISION *gain, INTEGER *initval, INTEGER *group, INTEGER *fmt, INTEGER *spf, INTEGER *bsize, INTEGER *adcres, INTEGER *adczero, INTEGER *baseline, INTEGER *nsamp, INTEGER *cksum, STRINGSIZE fname_size, STRINGSIZE desc_size, STRINGSIZE units_size)
 {
     if (0 <= *s && *s < WFDB_MAXSIG) {
 	sinfo[*s].fname = fname;
@@ -183,21 +295,24 @@ INTEGER setsiginfo_(INTEGER *s, char *fname, char *desc, char *units, DOUBLE_PRE
 
 /* Before using annopen_, set up the annotation information structures using
    setanninfo_. */
-INTEGER annopen_(char *record, INTEGER *nann)
+INTEGER annopen_(char *record, INTEGER *nann, STRINGSIZE record_size)
 {
-    return (annopen(fcstring(record), ainfo, (unsigned int)(*nann)));
+    return (annopen(fcstring(&s1, record, record_size),
+		    ainfo, (unsigned int)(*nann)));
 }
 
 /* After using isigopen_ or osigopen_, use getsiginfo_ to obtain the contents
    of the signal information structures if necessary. */
-INTEGER isigopen_(char *record, INTEGER *nsig)
+INTEGER isigopen_(char *record, INTEGER *nsig, STRINGSIZE record_size)
 {
-    return (isigopen(fcstring(record), sinfo, (unsigned int)(*nsig)));
+    return (isigopen(fcstring(&s1, record, record_size),
+		     sinfo, (unsigned int)(*nsig)));
 }
 
-INTEGER osigopen_(char *record, INTEGER *nsig)
+INTEGER osigopen_(char *record, INTEGER *nsig, STRINGSIZE record_size)
 {
-    return (osigopen(fcstring(record), sinfo, (unsigned int)(*nsig)));
+    return (osigopen(fcstring(&s1, record, record_size),
+		     sinfo, (unsigned int)(*nsig)));
 }
 
 /* Before using osigfopen_, use setsiginfo_ to set the contents of the signal
@@ -209,15 +324,16 @@ INTEGER osigfopen_(INTEGER *nsig)
 
 /* Before using wfdbinit_, use setanninfo_ and setsiginfo_ to set the contents
    of the annotation and signal information structures. */
-INTEGER wfdbinit_(char *record, INTEGER *nann, INTEGER *nsig)
+INTEGER wfdbinit_(char *record, INTEGER *nann, INTEGER *nsig, STRINGSIZE record_size)
 {
-    return (wfdbinit(fcstring(record), ainfo, (unsigned int)(*nann),
+    return (wfdbinit(fcstring(&s1, record, record_size),
+		     ainfo, (unsigned int)(*nann),
 		     sinfo, (unsigned int)(*nsig)));
 }
 
-INTEGER findsig_(char *signame)
+INTEGER findsig_(char *signame, STRINGSIZE signame_size)
 {
-    return (findsig(fcstring(signame)));
+    return (findsig(fcstring(&s1, signame, signame_size)));
 }
 
 INTEGER getspf_(INTEGER *dummy)
@@ -294,7 +410,7 @@ INTEGER putvec_(INTEGER *long_vector)
     }
 }
 
-INTEGER getann_(INTEGER *annotator, INTEGER *time, INTEGER *anntyp, INTEGER *subtyp, INTEGER *chan, INTEGER *num, char *aux)
+INTEGER getann_(INTEGER *annotator, INTEGER *time, INTEGER *anntyp, INTEGER *subtyp, INTEGER *chan, INTEGER *num, char *aux, STRINGSIZE aux_size)
 {
     static WFDB_Annotation iann;
     int i, j;
@@ -311,7 +427,7 @@ INTEGER getann_(INTEGER *annotator, INTEGER *time, INTEGER *anntyp, INTEGER *sub
     return (i);
 }
 
-INTEGER ungetann_(INTEGER *annotator, INTEGER *time, INTEGER *anntyp, INTEGER *subtyp, INTEGER *chan, INTEGER *num, char *aux)
+INTEGER ungetann_(INTEGER *annotator, INTEGER *time, INTEGER *anntyp, INTEGER *subtyp, INTEGER *chan, INTEGER *num, char *aux, STRINGSIZE aux_size)
 {
     static WFDB_Annotation oann;
     int i, j;
@@ -325,27 +441,18 @@ INTEGER ungetann_(INTEGER *annotator, INTEGER *time, INTEGER *anntyp, INTEGER *s
     return (ungetann((WFDB_Annotator)(*annotator), &oann));
 }
 
-INTEGER putann_(INTEGER *annotator, INTEGER *time, INTEGER *anntyp, INTEGER *subtyp, INTEGER *chan, INTEGER *num, char *aux)
+INTEGER putann_(INTEGER *annotator, INTEGER *time, INTEGER *anntyp, INTEGER *subtyp, INTEGER *chan, INTEGER *num, char *aux, STRINGSIZE aux_size)
 {
     static WFDB_Annotation oann;
     int i, j;
-    char *p, *q = NULL;
 
     oann.time = *time;
     oann.anntyp = *anntyp;
     oann.subtyp = *subtyp;
     oann.chan = *chan;
     oann.num = *num;
-    if (aux) {
-	p = fcstring(aux);
-	q = calloc(strlen(p)+2, 1);
-	*q = strlen(p);
-	strcpy(q+1, p);
-    }
-    oann.aux = q;
-    i = putann((WFDB_Annotator)(*annotator), &oann);
-    if (q) free(q);
-    return (i);
+    fastring(&oann.aux, aux, aux_size);
+    return (putann((WFDB_Annotator)(*annotator), &oann));
 }
 
 INTEGER isigsettime_(INTEGER *time)
@@ -368,50 +475,47 @@ INTEGER iannsettime_(INTEGER *time)
     return (iannsettime((WFDB_Time)(*time)));
 }
 
-INTEGER ecgstr_(INTEGER *code, char *string)
+INTEGER ecgstr_(INTEGER *code, char *string, STRINGSIZE string_size)
 {
-    strcpy(string, ecgstr((int)(*code)));
-    cfstring(string);
+    cfstring(string, string_size, ecgstr((int)(*code)));
     return (0L);
 }
 
-INTEGER strecg_(char *string)
+INTEGER strecg_(char *string, STRINGSIZE string_size)
 {
-    return (strecg(fcstring(string)));
+    return (strecg(fcstring(&s1, string, string_size)));
 }
 
-INTEGER setecgstr_(INTEGER *code, char *string)
+INTEGER setecgstr_(INTEGER *code, char *string, STRINGSIZE string_size)
 {
-    return (setecgstr((int)(*code), fcstring(string)));
+    return (setecgstr((int)(*code), fcstring(&s1, string, string_size)));
 }
 
-INTEGER annstr_(INTEGER *code, char *string)
+INTEGER annstr_(INTEGER *code, char *string, STRINGSIZE string_size)
 {
-    strcpy(string, annstr((int)(*code)));
-    cfstring(string);
+    cfstring(string, string_size, annstr((int)(*code)));
     return (0L);
 }
 
-INTEGER strann_(char *string)
+INTEGER strann_(char *string, STRINGSIZE string_size)
 {
-    return (strann(fcstring(string)));
+    return (strann(fcstring(&s1, string, string_size)));
 }
 
-INTEGER setannstr_(INTEGER *code, char *string)
+INTEGER setannstr_(INTEGER *code, char *string, STRINGSIZE string_size)
 {
-    return (setannstr((int)(*code), fcstring(string)));
+    return (setannstr((int)(*code), fcstring(&s1, string, string_size)));
 }
 
-INTEGER anndesc_(INTEGER *code, char *string)
+INTEGER anndesc_(INTEGER *code, char *string, STRINGSIZE string_size)
 {
-    strcpy(string, anndesc((int)(*code)));
-    cfstring(string);
+    cfstring(string, string_size, anndesc((int)(*code)));
     return (0L);
 }
 
-INTEGER setanndesc_(INTEGER *code, char *string)
+INTEGER setanndesc_(INTEGER *code, char *string, STRINGSIZE string_size)
 {
-    return (setanndesc((int)(*code), fcstring(string)));
+    return (setanndesc((int)(*code), fcstring(&s1, string, string_size)));
 }
 
 INTEGER setafreq_(DOUBLE_PRECISION *freq)
@@ -515,35 +619,32 @@ INTEGER setannpos_(INTEGER *anntyp, INTEGER *value)
     return (0L);
 }
 
-INTEGER timstr_(INTEGER *time, char *string)
+INTEGER timstr_(INTEGER *time, char *string, STRINGSIZE string_size)
 {
-    strcpy(string, timstr((WFDB_Time)(*time)));
-    cfstring(string);
+    cfstring(string, string_size, timstr((WFDB_Time)(*time)));
     return (0L);
 }
 
-INTEGER mstimstr_(INTEGER *time, char *string)
+INTEGER mstimstr_(INTEGER *time, char *string, STRINGSIZE string_size)
 {
-    strcpy(string, mstimstr((WFDB_Time)(*time)));
-    cfstring(string);
+    cfstring(string, string_size, mstimstr((WFDB_Time)(*time)));
     return (0L);
 }
 
-INTEGER strtim_(char *string)
+INTEGER strtim_(char *string, STRINGSIZE string_size)
 {
-    return (strtim(fcstring(string)));
+    return (strtim(fcstring(&s1, string, string_size)));
 }
 
-INTEGER datstr_(INTEGER *date, char *string)
+INTEGER datstr_(INTEGER *date, char *string, STRINGSIZE string_size)
 {
-    strcpy(string, datstr((WFDB_Date)(*date)));
-    cfstring(string);
+    cfstring(string, string_size, datstr((WFDB_Date)(*date)));
     return (0L);
 }
 
-INTEGER strdat_(char *string)
+INTEGER strdat_(char *string, STRINGSIZE string_size)
 {
-    return (strdat(fcstring(string)));
+    return (strdat(fcstring(&s1, string, string_size)));
 }
 
 INTEGER adumuv_(INTEGER *signal, INTEGER *ampl)
@@ -576,14 +677,15 @@ INTEGER sample_valid_(INTEGER *dummy)
     return (sample_valid());
 }
 
-INTEGER calopen_(char *calibration_filename)
+INTEGER calopen_(char *filename, STRINGSIZE filename_size)
 {
-    return (calopen(fcstring(calibration_filename)));
+    return (calopen(fcstring(&s1, filename, filename_size)));
 }
 
-INTEGER getcal_(char *description, char *units, DOUBLE_PRECISION *low, DOUBLE_PRECISION *high, DOUBLE_PRECISION *scale, INTEGER *caltype)
+INTEGER getcal_(char *description, char *units, DOUBLE_PRECISION *low, DOUBLE_PRECISION *high, DOUBLE_PRECISION *scale, INTEGER *caltype, STRINGSIZE description_size, STRINGSIZE units_size)
 {
-    if (getcal(fcstring(description), fcstring(units), &cinfo) == 0) {
+    if (getcal(fcstring(&s1, description, description_size),
+	       fcstring(&s2, units, units_size), &cinfo) == 0) {
 	*low = cinfo.low;
 	*high = cinfo.high;
 	*scale = cinfo.scale;
@@ -594,10 +696,10 @@ INTEGER getcal_(char *description, char *units, DOUBLE_PRECISION *low, DOUBLE_PR
 	return (-1L);
 }
 
-INTEGER putcal_(char *description, char *units, DOUBLE_PRECISION *low, DOUBLE_PRECISION *high, DOUBLE_PRECISION *scale, INTEGER *caltype)
+INTEGER putcal_(char *description, char *units, DOUBLE_PRECISION *low, DOUBLE_PRECISION *high, DOUBLE_PRECISION *scale, INTEGER *caltype, STRINGSIZE description_size, STRINGSIZE units_size)
 {
-    cinfo.sigtype = fcstring(description);
-    cinfo.units = fcstring(units);
+    cinfo.sigtype = fcstring(&s1, description, description_size);
+    cinfo.units = fcstring(&s2, units, units_size);
     cinfo.low = *low;
     cinfo.high = *high;
     cinfo.scale = *scale;
@@ -605,9 +707,9 @@ INTEGER putcal_(char *description, char *units, DOUBLE_PRECISION *low, DOUBLE_PR
     return (putcal(&cinfo));
 }
 
-INTEGER newcal_(char *calibration_filename)
+INTEGER newcal_(char *filename, STRINGSIZE filename_size)
 {
-    return (newcal(fcstring(calibration_filename)));
+    return (newcal(fcstring(&s1, filename, filename_size)));
 }
 
 INTEGER flushcal_(INTEGER *dummy)
@@ -616,21 +718,21 @@ INTEGER flushcal_(INTEGER *dummy)
     return (0L);
 }
 
-INTEGER getinfo_(char *record, char *string)
+INTEGER getinfo_(char *record, char *string, STRINGSIZE record_size, STRINGSIZE string_size)
 {
-    strcpy(string, getinfo(fcstring(record)));
-    cfstring(string);
+    char *s = getinfo(fcstring(&s1, record, record_size));
+    cfstring(string, string_size, s);
     return (0L);
 }
 
-INTEGER putinfo_(char *string)
+INTEGER putinfo_(char *string, STRINGSIZE string_size)
 {
-    return (putinfo(fcstring(string)));
+    return (putinfo(fcstring(&s1, string, string_size)));
 }
 
-INTEGER setinfo_(char *record)
+INTEGER setinfo_(char *record, STRINGSIZE record_size)
 {
-    return (setinfo(fcstring(record)));
+    return (setinfo(fcstring(&s1, record, record_size)));
 }
 
 INTEGER wfdb_freeinfo_(INTEGER *dummy)
@@ -639,16 +741,17 @@ INTEGER wfdb_freeinfo_(INTEGER *dummy)
     return (0L);
 }
 
-INTEGER newheader_(char *record)
+INTEGER newheader_(char *record, STRINGSIZE record_size)
 {
-    return (newheader(fcstring(record)));
+    return (newheader(fcstring(&s1, record, record_size)));
 }
 
 /* Before using setheader_, use setsiginfo to set the contents of the signal
    information structures. */
-INTEGER setheader_(char *record, INTEGER *nsig)
+INTEGER setheader_(char *record, INTEGER *nsig, STRINGSIZE record_size)
 {
-    return (setheader(fcstring(record), sinfo, (unsigned int)(*nsig)));
+    return (setheader(fcstring(&s1, record, record_size),
+		      sinfo, (unsigned int)(*nsig)));
 }
 
 /* No wrappers are provided for setmsheader or getseginfo. */
@@ -681,7 +784,7 @@ INTEGER wfdbsetstart_(INTEGER *s, INTEGER *bytes)
     return (0L);
 }
 
-INTEGER wfdbputprolog_(char *prolog, INTEGER *bytes, INTEGER *signal)
+INTEGER wfdbputprolog_(char *prolog, INTEGER *bytes, INTEGER *signal, STRINGSIZE prolog_size)
 {
     return (wfdbputprolog(prolog, (long)*bytes,(WFDB_Signal)*signal));
 }
@@ -692,9 +795,9 @@ INTEGER wfdbquit_(INTEGER *dummy)
     return (0L);
 }
 
-DOUBLE_PRECISION sampfreq_(char *record)
+DOUBLE_PRECISION sampfreq_(char *record, STRINGSIZE record_size)
 {
-    return (sampfreq(fcstring(record)));
+    return (sampfreq(fcstring(&s1, record, record_size)));
 }
 
 INTEGER setsampfreq_(DOUBLE_PRECISION *frequency)
@@ -724,9 +827,9 @@ INTEGER setbasecount_(DOUBLE_PRECISION *count)
     return (0L);
 }
 
-INTEGER setbasetime_(char *string)
+INTEGER setbasetime_(char *string, STRINGSIZE string_size)
 {
-    return (setbasetime(fcstring(string)));
+    return (setbasetime(fcstring(&s1, string, string_size)));
 }
 
 INTEGER wfdbquiet_(INTEGER *dummy)
@@ -741,23 +844,21 @@ INTEGER wfdbverbose_(INTEGER *dummy)
     return (0L);
 }
 
-INTEGER wfdberror_(char *string)
+INTEGER wfdberror_(char *string, STRINGSIZE string_size)
 {
-    strcpy(string, wfdberror());
-    cfstring(string);
+    cfstring(string, string_size, wfdberror());
     return (0L);
 }
 
-INTEGER setwfdb_(char *string)
+INTEGER setwfdb_(char *string, STRINGSIZE string_size)
 {
-    setwfdb(fcstring(string));
+    setwfdb(fcstring(&s1, string, string_size));
     return (0L);
 }
 
-INTEGER getwfdb_(char *string)
+INTEGER getwfdb_(char *string, STRINGSIZE string_size)
 {
-    strcpy(string, getwfdb());
-    cfstring(string);
+    cfstring(string, string_size, getwfdb());
     return (0L);
 }
 
@@ -777,10 +878,11 @@ INTEGER setobsize_(INTEGER *output_buffer_size)
     return (setobsize((int)(*output_buffer_size)));
 }
 
-INTEGER wfdbfile_(char *file_type, char *record, char *pathname)
+INTEGER wfdbfile_(char *file_type, char *record, char *pathname, STRINGSIZE file_type_size, STRINGSIZE record_size, STRINGSIZE pathname_size)
 {
-    strcpy(pathname, wfdbfile(fcstring(file_type), fcstring(record)));
-    cfstring(pathname);
+    char *s = wfdbfile(fcstring(&s1, file_type, file_type_size),
+		       fcstring(&s2, record, record_size));
+    cfstring(pathname, pathname_size, s);
     return (0L);
 }
 
@@ -796,37 +898,32 @@ INTEGER wfdbmemerr_(INTEGER *exit_if_error)
     return (0L);
 }
 
-INTEGER wfdbversion_(char *version)
+INTEGER wfdbversion_(char *version, STRINGSIZE version_size)
 {
-    strcpy(version, wfdbversion());
-    cfstring(version);
+    cfstring(version, version_size, wfdbversion());
     return (0L);
 }
 
-INTEGER wfdbldflags_(char *ldflags)
+INTEGER wfdbldflags_(char *ldflags, STRINGSIZE ldflags_size)
 {
-    strcpy(ldflags, wfdbldflags());
-    cfstring(ldflags);
+    cfstring(ldflags, ldflags_size, wfdbldflags());
     return (0L);
 }
 
-INTEGER wfdbcflags_(char *cflags)
+INTEGER wfdbcflags_(char *cflags, STRINGSIZE cflags_size)
 {
-    strcpy(cflags, wfdbcflags());
-    cfstring(cflags);
+    cfstring(cflags, cflags_size, wfdbcflags());
     return (0L);
 }
 
-INTEGER wfdbdefwfdb_(char *defwfdb)
+INTEGER wfdbdefwfdb_(char *defwfdb, STRINGSIZE defwfdb_size)
 {
-    strcpy(defwfdb, wfdbdefwfdb());
-    cfstring(defwfdb);
+    cfstring(defwfdb, defwfdb_size, wfdbdefwfdb());
     return (0L);
 }
 
-INTEGER wfdbdefwfdbcal_(char *defwfdbcal)
+INTEGER wfdbdefwfdbcal_(char *defwfdbcal, STRINGSIZE defwfdbcal_size)
 {
-    strcpy(defwfdbcal, wfdbdefwfdbcal());
-    cfstring(defwfdbcal);
+    cfstring(defwfdbcal, defwfdbcal_size, wfdbdefwfdbcal());
     return (0L);
 }
