@@ -684,8 +684,8 @@ INTEGER calopen_(char *filename, STRINGSIZE filename_size)
 
 INTEGER getcal_(char *description, char *units, DOUBLE_PRECISION *low, DOUBLE_PRECISION *high, DOUBLE_PRECISION *scale, INTEGER *caltype, STRINGSIZE description_size, STRINGSIZE units_size)
 {
-    if (getcal(fcstring(&s1, description, description_size),
-	       fcstring(&s2, units, units_size), &cinfo) == 0) {
+    if (getcal(fcstring0(&s1, description, description_size),
+	       fcstring0(&s2, units, units_size), &cinfo) == 0) {
 	*low = cinfo.low;
 	*high = cinfo.high;
 	*scale = cinfo.scale;
