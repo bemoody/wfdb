@@ -422,7 +422,7 @@ INTEGER getann_(INTEGER *annotator, INTEGER *time, INTEGER *anntyp, INTEGER *sub
 	*subtyp = iann.subtyp;
 	*chan = iann.chan;
 	*num = iann.num;
-	aux = iann.aux;
+	cfstring(aux, aux_size, iann.aux ? (char *) &iann.aux[1] : "");
     }
     return (i);
 }
@@ -437,7 +437,7 @@ INTEGER ungetann_(INTEGER *annotator, INTEGER *time, INTEGER *anntyp, INTEGER *s
     oann.subtyp = *subtyp;
     oann.chan = *chan;
     oann.num = *num;
-    oann.aux = aux;
+    fastring(&oann.aux, aux, aux_size);
     return (ungetann((WFDB_Annotator)(*annotator), &oann));
 }
 
