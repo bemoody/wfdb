@@ -250,9 +250,9 @@ INTEGER setanninfo_(INTEGER *a, char *name, INTEGER *stat, STRINGSIZE name_size)
 INTEGER getsiginfo_(INTEGER *s, char *fname, char *desc, char *units, DOUBLE_PRECISION *gain, INTEGER *initval, INTEGER *group, INTEGER *fmt, INTEGER *spf, INTEGER *bsize, INTEGER *adcres, INTEGER *adczero, INTEGER *baseline, INTEGER *nsamp, INTEGER *cksum, STRINGSIZE fname_size, STRINGSIZE desc_size, STRINGSIZE units_size)
 {
     if (0 <= *s && *s < WFDB_MAXSIG) {
-	fname = sinfo[*s].fname;
-	desc = sinfo[*s].desc;
-	units = sinfo[*s].units;
+	cfstring(fname, fname_size, sinfo[*s].fname);
+	cfstring(desc, desc_size, sinfo[*s].desc);
+	cfstring(units, units_size, sinfo[*s].units);
 	*gain = sinfo[*s].gain;
 	*initval = sinfo[*s].initval;
 	*group = sinfo[*s].group;
