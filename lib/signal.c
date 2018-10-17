@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   30 April 2020		wfdblib 10.7.0
+			Last revised:     4 May 2020 		wfdblib 10.7.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -2349,13 +2349,16 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
     return (s);
 }
 
+static int openosig (const char *func, WFDB_Siginfo *si_out,
+		     const WFDB_Siginfo *si_in, unsigned int nsig);
+static int openosig2 (const char *func, WFDB_Siginfo *si_out,
+		      const WFDB_Siginfo *si_in, unsigned int nsig);
+
 FINT osigopen(char *record, WFDB_Siginfo *siarray, unsigned int nsig)
 {
     int n;
-    struct osdata *os, *op;
-    struct ogdata *og;
     WFDB_Signal s;
-    unsigned int ga;
+    WFDB_Siginfo *hsi;
 
     /* Close previously opened output signals unless otherwise requested. */
     if (*record == '+') record++;
@@ -2372,10 +2375,27 @@ FINT osigopen(char *record, WFDB_Siginfo *siarray, unsigned int nsig)
 	return (-3);
     }
 
+    SUALLOC(hsi, nsig, sizeof(WFDB_Siginfo));
+    if (!hsi) return (-3);
+    for (s = 0; s < nsig; s++)
+	hsi[s] = hsd[s]->info;
+    s = openosig("osigopen", siarray, hsi, nsig);
+    SFREE(hsi);
+    return (s);
+}
+
+static int openosig(const char *func, WFDB_Siginfo *si_out,
+		    const WFDB_Siginfo *si_in, unsigned int nsig)
+{
+    struct osdata *os, *op;
+    struct ogdata *og;
+    WFDB_Signal s;
+    unsigned int ga;
+
     /* Allocate workspace for output signals. */
     if (allocosig(nosig + nsig) < 0) return (-3);
     /* Allocate workspace for output signal groups. */
-    if (allocogroup(nogroup + hsd[nsig-1]->info.group + 1) < 0) return (-3);
+    if (allocogroup(nogroup + si_in[nsig-1].group + 1) < 0) return (-3);
 
     /* Initialize local variables. */
     if (obsize <= 0) obsize = BUFSIZ;
@@ -2386,17 +2406,20 @@ FINT osigopen(char *record, WFDB_Siginfo *siarray, unsigned int nsig)
     ga = nogroup;
 
     /* Open the signal files.  One signal is handled per iteration. */
-    for (s = 0, os = osd[nosig]; s < nsig; s++, nosig++, siarray++) {
+    for (s = 0, os = osd[nosig]; s < nsig; s++, nosig++) {
 	op = os;
 	os = osd[nosig];
 
 	/* Copy signal information from readheader's workspace. */
-	copysi(&os->info, &hsd[s]->info);
-	copysi(siarray, &hsd[s]->info);
-	if (os->info.spf < 1) os->info.spf = siarray->spf = 1;
-	os->info.cksum = siarray->cksum = 0;
-	os->info.nsamp = siarray->nsamp = (WFDB_Time)0L;
-	os->info.group += ga; siarray->group += ga;
+	copysi(&os->info, &si_in[s]);
+	if (os->info.spf < 1) os->info.spf = 1;
+	os->info.cksum = 0;
+	os->info.nsamp = (WFDB_Time)0L;
+	os->info.group += ga;
+	if (si_out) {
+	    copysi(si_out, &os->info);
+	    si_out++;
+	}
 
 	if (s == 0 || os->info.group != op->info.group) {
 	    /* This is the first signal in a new group; allocate buffer. */
@@ -2446,8 +2469,6 @@ FINT osigopen(char *record, WFDB_Siginfo *siarray, unsigned int nsig)
 
 FINT osigfopen(const WFDB_Siginfo *siarray, unsigned int nsig)
 {
-    struct osdata *os, *op;
-    struct ogdata *og;
     int s;
     const WFDB_Siginfo *si;
 
@@ -2485,13 +2506,22 @@ FINT osigfopen(const WFDB_Siginfo *siarray, unsigned int nsig)
 	}
     }
 
+    return (openosig2("osigfopen", NULL, siarray, nsig));
+}
+
+static int openosig2(const char *func, WFDB_Siginfo *si_out,
+		     const WFDB_Siginfo *si_in, unsigned int nsig)
+{
+    struct osdata *os, *op;
+    struct ogdata *og;
+
     /* Allocate workspace for output signals. */
     if (allocosig(nsig) < 0) return (-3);
     /* Allocate workspace for output signal groups. */
-    if (allocogroup((si-1)->group + 1) < 0) return (-3);
+    if (allocogroup(si_in[nsig-1].group + 1) < 0) return (-3);
 
     /* Open the signal files.  One signal is handled per iteration. */
-    for (os = osd[0]; nosig < nsig; nosig++, siarray++) {
+    for (os = osd[0]; nosig < nsig; nosig++, si_in++) {
 
 	op = os;
 	os = osd[nosig];
@@ -2500,17 +2530,17 @@ FINT osigfopen(const WFDB_Siginfo *siarray, unsigned int nsig)
 	   must not be negative, the format should be legal, group numbers
 	   should be the same if and only if file names are the same, and
 	   group numbers should begin at zero and increase in steps of 1. */
-	if (strlen(siarray->fname) + strlen(siarray->desc) > 200 ||
-	    siarray->bsize < 0 || !isfmt(siarray->fmt)) {
+	if (strlen(si_in->fname) + strlen(si_in->desc) > 200 ||
+	    si_in->bsize < 0 || !isfmt(si_in->fmt)) {
 	    wfdb_error("osigfopen: error in specification of signal %d\n",
 		       nosig);
 	    return (-2);
 	}
-	if (!((nosig == 0 && siarray->group == 0) ||
-	    (nosig && siarray->group == (siarray-1)->group &&
-	     strcmp(siarray->fname, (siarray-1)->fname) == 0) ||
-	    (nosig && siarray->group == (siarray-1)->group + 1 &&
-	     strcmp(siarray->fname, (siarray-1)->fname) != 0))) {
+	if (!((nosig == 0 && si_in->group == 0) ||
+	    (nosig && si_in->group == (si_in-1)->group &&
+	     strcmp(si_in->fname, (si_in-1)->fname) == 0) ||
+	    (nosig && si_in->group == (si_in-1)->group + 1 &&
+	     strcmp(si_in->fname, (si_in-1)->fname) != 0))) {
 	    wfdb_error(
 		     "osigfopen: incorrect file name or group for signal %d\n",
 		     nosig);
@@ -2518,7 +2548,7 @@ FINT osigfopen(const WFDB_Siginfo *siarray, unsigned int nsig)
 	}
 
 	/* Copy signal information from the caller's array. */
-	copysi(&os->info, siarray);
+	copysi(&os->info, si_in);
 	if (os->info.spf < 1) os->info.spf = 1;
 	os->info.cksum = 0;
 	os->info.nsamp = (WFDB_Time)0L;
