@@ -44,6 +44,7 @@ visible outside of this file:
  isgsetframe	(skips to a specified frame number in a specified signal group)
  getskewedframe	(reads an input frame, without skew correction)
  rgetvec        (reads a sample from each input signal without resampling)
+ openosig       (opens output signals)
 
 This file also contains low-level I/O routines for signals in various formats;
 typically, the input routine for format N signals is named rN(), and the output
@@ -52,7 +53,7 @@ efficiency.  These low-level I/O routines are not visible outside of this file.
 
 This file also contains definitions of the following WFDB library functions:
  isigopen	(opens input signals)
- osigopen	(opens output signals)
+ osigopen	(opens output signals according to a header file)
  osigfopen	(opens output signals by name)
  findsig [10.4.12] (find an input signal with a specified name)
  getspf [9.6]	(returns number of samples returned by getvec per frame)
@@ -2349,41 +2350,6 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
     return (s);
 }
 
-static int openosig (const char *func, WFDB_Siginfo *si_out,
-		     const WFDB_Siginfo *si_in, unsigned int nsig);
-static int openosig2 (const char *func, WFDB_Siginfo *si_out,
-		      const WFDB_Siginfo *si_in, unsigned int nsig);
-
-FINT osigopen(char *record, WFDB_Siginfo *siarray, unsigned int nsig)
-{
-    int n;
-    WFDB_Signal s;
-    WFDB_Siginfo *hsi;
-
-    /* Close previously opened output signals unless otherwise requested. */
-    if (*record == '+') record++;
-    else osigclose();
-
-    /* Remove trailing .hea, if any, from record name. */
-    wfdb_striphea(record);
-
-    if ((n = readheader(record)) < 0)
-	return (n);
-    if (n < nsig) {
-	wfdb_error("osigopen: record %s has fewer signals than needed\n",
-		 record);
-	return (-3);
-    }
-
-    SUALLOC(hsi, nsig, sizeof(WFDB_Siginfo));
-    if (!hsi) return (-3);
-    for (s = 0; s < nsig; s++)
-	hsi[s] = hsd[s]->info;
-    s = openosig("osigopen", siarray, hsi, nsig);
-    SFREE(hsi);
-    return (s);
-}
-
 static int openosig(const char *func, WFDB_Siginfo *si_out,
 		    const WFDB_Siginfo *si_in, unsigned int nsig)
 {
@@ -2468,6 +2434,36 @@ static int openosig(const char *func, WFDB_Siginfo *si_out,
     return (s);
 }
 
+FINT osigopen(char *record, WFDB_Siginfo *siarray, unsigned int nsig)
+{
+    int n;
+    WFDB_Signal s;
+    WFDB_Siginfo *hsi;
+
+    /* Close previously opened output signals unless otherwise requested. */
+    if (*record == '+') record++;
+    else osigclose();
+
+    /* Remove trailing .hea, if any, from record name. */
+    wfdb_striphea(record);
+
+    if ((n = readheader(record)) < 0)
+	return (n);
+    if (n < nsig) {
+	wfdb_error("osigopen: record %s has fewer signals than needed\n",
+		 record);
+	return (-3);
+    }
+
+    SUALLOC(hsi, nsig, sizeof(WFDB_Siginfo));
+    if (!hsi) return (-3);
+    for (s = 0; s < nsig; s++)
+	hsi[s] = hsd[s]->info;
+    s = openosig("osigopen", siarray, hsi, nsig);
+    SFREE(hsi);
+    return (s);
+}
+
 FINT osigfopen(const WFDB_Siginfo *siarray, unsigned int nsig)
 {
     int s;
@@ -2507,91 +2503,7 @@ FINT osigfopen(const WFDB_Siginfo *siarray, unsigned int nsig)
 	}
     }
 
-    return (openosig2("osigfopen", NULL, siarray, nsig));
-}
-
-static int openosig2(const char *func, WFDB_Siginfo *si_out,
-		     const WFDB_Siginfo *si_in, unsigned int nsig)
-{
-    struct osdata *os, *op;
-    struct ogdata *og;
-    WFDB_Signal s;
-    unsigned int ga;
-
-    /* Allocate workspace for output signals. */
-    if (allocosig(nosig + nsig) < 0) return (-3);
-    /* Allocate workspace for output signal groups. */
-    if (allocogroup(nogroup + si_in[nsig-1].group + 1) < 0) return (-3);
-
-    /* Initialize local variables. */
-    if (obsize <= 0) obsize = BUFSIZ;
-
-    /* Set the group number adjustment.  This quantity is added to the group
-       numbers of signals which are opened below;  it accounts for any output
-       signals which were left open from previous calls. */
-    ga = nogroup;
-
-    /* Open the signal files.  One signal is handled per iteration. */
-    for (s = 0, os = osd[nosig]; s < nsig; s++, nosig++, si_in++) {
-	op = os;
-	os = osd[nosig];
-
-	/* Copy signal information from the caller's array. */
-	copysi(&os->info, si_in);
-	if (os->info.spf < 1) os->info.spf = 1;
-	os->info.cksum = 0;
-	os->info.nsamp = (WFDB_Time)0L;
-	os->info.group += ga;
-	if (si_out) {
-	    copysi(si_out, &os->info);
-	    si_out++;
-	}
-
-	/* Check if this signal is in the same group as the previous one. */
-	if (s == 0 || os->info.group != op->info.group) {
-	    size_t obuflen;
-
-	    og = ogd[os->info.group];
-	    og->bsize = os->info.bsize;
-	    obuflen = og->bsize ? og->bsize : obsize;
-	    /* This is the first signal in a new group; allocate buffer. */
-	    SALLOC(og->buf, 1, obuflen);
-	    og->bp = og->buf;
-	    og->be = og->buf + obuflen;
-	    if (os->info.fmt == 0) {
-		/* If the signal file name was NULL or "~", don't create a
-		   signal file. */
-		if (os->info.fname == NULL || strcmp("~", os->info.fname) == 0)
-		    og->fp = NULL;
-		/* Otherwise, assume that the user wants to write a signal
-		   file in the default format (16). */
-		else
-		    os->info.fmt = 16;
-	    }
-	    if (os->info.fmt != 0) {
-		/* An error in opening an output file is fatal. */
-		og->fp = wfdb_open(os->info.fname,(char *)NULL, WFDB_WRITE);
-		if (og->fp == NULL) {
-		    wfdb_error("%s: can't open %s\n", func, os->info.fname);
-		    SFREE(og->buf);
-		    osigclose();
-		    return (-3);
-		}
-	    }
-	    nogroup++;
-	}
-	else {
-	    /* This signal belongs to the same group as the previous signal. */
-	    if (os->info.fmt != op->info.fmt ||
-		os->info.bsize != op->info.bsize) {
-		wfdb_error(
-		    "%s: error in specification of signal %d or %d\n",
-		    func, s-1, s);
-		return (-2);
-	    }
-	}
-    }
-    return (s);
+    return (openosig("osigfopen", NULL, siarray, nsig));
 }
 
 /* Function findsig finds an open input signal with the name specified by its
