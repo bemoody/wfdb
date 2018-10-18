@@ -2514,14 +2514,21 @@ static int openosig2(const char *func, WFDB_Siginfo *si_out,
 {
     struct osdata *os, *op;
     struct ogdata *og;
+    WFDB_Signal s;
+    unsigned int ga;
 
     /* Allocate workspace for output signals. */
-    if (allocosig(nsig) < 0) return (-3);
+    if (allocosig(nosig + nsig) < 0) return (-3);
     /* Allocate workspace for output signal groups. */
-    if (allocogroup(si_in[nsig-1].group + 1) < 0) return (-3);
+    if (allocogroup(nogroup + si_in[nsig-1].group + 1) < 0) return (-3);
+
+    /* Set the group number adjustment.  This quantity is added to the group
+       numbers of signals which are opened below;  it accounts for any output
+       signals which were left open from previous calls. */
+    ga = nogroup;
 
     /* Open the signal files.  One signal is handled per iteration. */
-    for (os = osd[0]; nosig < nsig; nosig++, si_in++) {
+    for (s = 0, os = osd[nosig]; s < nsig; s++, nosig++, si_in++) {
 
 	op = os;
 	os = osd[nosig];
@@ -2533,17 +2540,17 @@ static int openosig2(const char *func, WFDB_Siginfo *si_out,
 	if (strlen(si_in->fname) + strlen(si_in->desc) > 200 ||
 	    si_in->bsize < 0 || !isfmt(si_in->fmt)) {
 	    wfdb_error("%s: error in specification of signal %d\n",
-		       func, nosig);
+		       func, s);
 	    return (-2);
 	}
-	if (!((nosig == 0 && si_in->group == 0) ||
-	    (nosig && si_in->group == (si_in-1)->group &&
+	if (!((s == 0 && si_in->group == 0) ||
+	    (s && si_in->group == (si_in-1)->group &&
 	     strcmp(si_in->fname, (si_in-1)->fname) == 0) ||
-	    (nosig && si_in->group == (si_in-1)->group + 1 &&
+	    (s && si_in->group == (si_in-1)->group + 1 &&
 	     strcmp(si_in->fname, (si_in-1)->fname) != 0))) {
 	    wfdb_error(
 		     "%s: incorrect file name or group for signal %d\n",
-		     func, nosig);
+		     func, s);
 	    return (-2);
 	}
 
@@ -2552,9 +2559,10 @@ static int openosig2(const char *func, WFDB_Siginfo *si_out,
 	if (os->info.spf < 1) os->info.spf = 1;
 	os->info.cksum = 0;
 	os->info.nsamp = (WFDB_Time)0L;
+	os->info.group += ga;
 
 	/* Check if this signal is in the same group as the previous one. */
-	if (nosig == 0 || os->info.group != op->info.group) {
+	if (s == 0 || os->info.group != op->info.group) {
 	    size_t obuflen;
 
 	    og = ogd[os->info.group];
@@ -2592,13 +2600,13 @@ static int openosig2(const char *func, WFDB_Siginfo *si_out,
 		os->info.bsize != op->info.bsize) {
 		wfdb_error(
 		    "%s: error in specification of signal %d or %d\n",
-		    func, nosig-1, nosig);
+		    func, s-1, s);
 		return (-2);
 	    }
 	}
     }
 
-    return (nosig);
+    return (s);
 }
 
 /* Function findsig finds an open input signal with the name specified by its
