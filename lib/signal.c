@@ -2406,12 +2406,12 @@ static int openosig(const char *func, WFDB_Siginfo *si_out,
     ga = nogroup;
 
     /* Open the signal files.  One signal is handled per iteration. */
-    for (s = 0, os = osd[nosig]; s < nsig; s++, nosig++) {
+    for (s = 0, os = osd[nosig]; s < nsig; s++, nosig++, si_in++) {
 	op = os;
 	os = osd[nosig];
 
 	/* Copy signal information from readheader's workspace. */
-	copysi(&os->info, &si_in[s]);
+	copysi(&os->info, si_in);
 	if (os->info.spf < 1) os->info.spf = 1;
 	os->info.cksum = 0;
 	os->info.nsamp = (WFDB_Time)0L;
