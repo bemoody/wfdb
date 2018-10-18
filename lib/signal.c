@@ -2560,6 +2560,10 @@ static int openosig2(const char *func, WFDB_Siginfo *si_out,
 	os->info.cksum = 0;
 	os->info.nsamp = (WFDB_Time)0L;
 	os->info.group += ga;
+	if (si_out) {
+	    copysi(si_out, &os->info);
+	    si_out++;
+	}
 
 	/* Check if this signal is in the same group as the previous one. */
 	if (s == 0 || os->info.group != op->info.group) {
