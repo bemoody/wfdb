@@ -2445,7 +2445,7 @@ static int openosig(const char *func, WFDB_Siginfo *si_out,
 		/* An error in opening an output file is fatal. */
 		og->fp = wfdb_open(os->info.fname,(char *)NULL, WFDB_WRITE);
 		if (og->fp == NULL) {
-		    wfdb_error("osigopen: can't open %s\n", os->info.fname);
+		    wfdb_error("%s: can't open %s\n", func, os->info.fname);
 		    SFREE(og->buf);
 		    osigclose();
 		    return (-3);
@@ -2458,8 +2458,8 @@ static int openosig(const char *func, WFDB_Siginfo *si_out,
 	    if (os->info.fmt != op->info.fmt ||
 		os->info.bsize != op->info.bsize) {
 		wfdb_error(
-		    "osigopen: error in specification of signal %d or %d\n",
-		     s-1, s);
+		    "%s: error in specification of signal %d or %d\n",
+		    func, s-1, s);
 		return (-2);
 	    }
 	}
@@ -2532,8 +2532,8 @@ static int openosig2(const char *func, WFDB_Siginfo *si_out,
 	   group numbers should begin at zero and increase in steps of 1. */
 	if (strlen(si_in->fname) + strlen(si_in->desc) > 200 ||
 	    si_in->bsize < 0 || !isfmt(si_in->fmt)) {
-	    wfdb_error("osigfopen: error in specification of signal %d\n",
-		       nosig);
+	    wfdb_error("%s: error in specification of signal %d\n",
+		       func, nosig);
 	    return (-2);
 	}
 	if (!((nosig == 0 && si_in->group == 0) ||
@@ -2542,8 +2542,8 @@ static int openosig2(const char *func, WFDB_Siginfo *si_out,
 	    (nosig && si_in->group == (si_in-1)->group + 1 &&
 	     strcmp(si_in->fname, (si_in-1)->fname) != 0))) {
 	    wfdb_error(
-		     "osigfopen: incorrect file name or group for signal %d\n",
-		     nosig);
+		     "%s: incorrect file name or group for signal %d\n",
+		     func, nosig);
 	    return (-2);
 	}
 
@@ -2578,7 +2578,7 @@ static int openosig2(const char *func, WFDB_Siginfo *si_out,
 		/* An error in opening an output file is fatal. */
 	        og->fp = wfdb_open(os->info.fname,(char *)NULL, WFDB_WRITE);
 		if (og->fp == NULL) {
-		    wfdb_error("osigfopen: can't open %s\n", os->info.fname);
+		    wfdb_error("%s: can't open %s\n", func, os->info.fname);
 		    SFREE(og->buf);
 		    osigclose();
 		    return (-3);
@@ -2591,8 +2591,8 @@ static int openosig2(const char *func, WFDB_Siginfo *si_out,
 	    if (os->info.fmt != op->info.fmt ||
 		os->info.bsize != op->info.bsize) {
 		wfdb_error(
-		    "osigfopen: error in specification of signal %d or %d\n",
-		     nosig-1, nosig);
+		    "%s: error in specification of signal %d or %d\n",
+		    func, nosig-1, nosig);
 		return (-2);
 	    }
 	}
