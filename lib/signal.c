@@ -2535,27 +2535,6 @@ static int openosig2(const char *func, WFDB_Siginfo *si_out,
 
 	op = os;
 	os = osd[nosig];
-	/* Check signal specifications.  The combined lengths of the fname
-	   and desc strings should be 200 characters or less, the bsize field
-	   must not be negative, the format should be legal, group numbers
-	   should be the same if and only if file names are the same, and
-	   group numbers should begin at zero and increase in steps of 1. */
-	if (strlen(si_in->fname) + strlen(si_in->desc) > 200 ||
-	    si_in->bsize < 0 || !isfmt(si_in->fmt)) {
-	    wfdb_error("%s: error in specification of signal %d\n",
-		       func, s);
-	    return (-2);
-	}
-	if (!((s == 0 && si_in->group == 0) ||
-	    (s && si_in->group == (si_in-1)->group &&
-	     strcmp(si_in->fname, (si_in-1)->fname) == 0) ||
-	    (s && si_in->group == (si_in-1)->group + 1 &&
-	     strcmp(si_in->fname, (si_in-1)->fname) != 0))) {
-	    wfdb_error(
-		     "%s: incorrect file name or group for signal %d\n",
-		     func, s);
-	    return (-2);
-	}
 
 	/* Copy signal information from the caller's array. */
 	copysi(&os->info, si_in);
