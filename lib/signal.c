@@ -2522,6 +2522,9 @@ static int openosig2(const char *func, WFDB_Siginfo *si_out,
     /* Allocate workspace for output signal groups. */
     if (allocogroup(nogroup + si_in[nsig-1].group + 1) < 0) return (-3);
 
+    /* Initialize local variables. */
+    if (obsize <= 0) obsize = BUFSIZ;
+
     /* Set the group number adjustment.  This quantity is added to the group
        numbers of signals which are opened below;  it accounts for any output
        signals which were left open from previous calls. */
