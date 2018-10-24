@@ -84,6 +84,7 @@ s+"http://www.edfplus.info/"+"http://www.edfplus.info/" target="other"+
 s+>Evaluating ECG Analyzers<+><a href="eval.htm">Evaluating ECG Analyzers</a><+
 s+>WFDB Programmer's Guide<+><a href="../wpg/wpg.htm">WFDB Programmer's Guide</a><+
 s+>WFDB Applications Guide<+><a href="wag.htm">WFDB Applications Guide</a><+
+s+<a href="wag.htm">WFDB Applications Guide</a></A>+WFDB Applications Guide</A>+
 s+>WAVE User's Guide<+><a href="../wug/wug.htm">WAVE User's Guide</a><+
 s+>plt Tutorial and Cookbook<+><a href="../plt/plt/html/">plt Tutorial and Cookbook</a><+
 s+<A HREF="#toc">Table of Contents</A>+<table width=100%><tr><td align=left><b>Next:</b> NEXTPAGE <b>Up:</b> <a href="wag.htm">WFDB Applications Guide</a> <b>Previous:</b> PREVPAGE</td><td align=right><a href="#toc">On This Page</a></td></tr></table>+

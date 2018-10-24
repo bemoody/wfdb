@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: fixag.sh	G. Moody	10 April 1997
-#			Last revised:    7 April 2003
+#			Last revised:   24 October 2018
 #
 # Post-process WFDB Applications Guide HTML files
 
@@ -71,17 +71,26 @@ sed "s+NEXTPAGE+<a href=install.htm>Installing the WFDB Software Package</a>+" <
   sed "s+PREVPAGE+<a href=$PREVU>$PREVT</a>+" >tmp.$$
 mv tmp.$$ $THISU
 
-echo adding previous links in install.htm ...
-sed "s+<IMG WIDTH=\"63\" HEIGHT=\"24\" ALIGN=\"BOTTOM\" BORDER=\"0\" ALT=\"previous\" SRC=\"prev_gr.png\">+<a href=$THISU><IMG WIDTH=\"63\" HEIGHT=\"24\" ALIGN=\"BOTTOM\" BORDER=\"0\" ALT=\"previous\" SRC=\"previous.png\"></a>+" <install.htm |
- sed "s+WFDB Applications Guide</A>+WFDB Applications Guide</A> <b>Previous:</b> <a href=$THISU>$THIST</a>+" >tmp.$$
-mv tmp.$$ install.htm
+PREVT=$THIST
+PREVU=$THISU
+THIST="Installing the WFDB Software Package"
+THISU=install.htm
+NEXTT="Evaluating ECG Analyzers"
+NEXTU=eval.htm
 
-echo adding next links in innode5.htm ...
-sed "s+<IMG WIDTH=\"37\" HEIGHT=\"24\" ALIGN=\"BOTTOM\" BORDER=\"0\" ALT=\"next\" SRC=\"next_gr.png\">+<a href=\"eval.htm\"><IMG WIDTH=\"37\" HEIGHT=\"24\" ALIGN=\"BOTTOM\" BORDER=\"0\" ALT=\"next\" SRC=\"next.png\"></a>+" <innode5.htm |
- sed "s+<B>Up:</B> <A NAME+<B>Next:</B> <a href=\"eval.htm\">Evaluating ECG Analyzers</a> <B>Up:</B> <A NAME+" >tmp.$$
-mv tmp.$$ innode5.htm
+echo adding previous/next links in $THISU ...
+sed "s+<IMG\\([^<>]*\\)SRC=\"prev_g.png\">+<a href=$PREVU><IMG\\1SRC=\"previous.png\"></a>+" <$THISU |
+ sed "s+<IMG\\([^<>]*\\)SRC=\"next_g.png\">+<a href=$NEXTU><IMG\\1SRC=\"next.png\"></a>+" |
+ sed "s+<B>Up:</B> <A+<b>Next:</b> <a href=$NEXTU>$NEXTT</a> <B>Up:</B> <A+" |
+ sed "s+WFDB Applications Guide</A>+WFDB Applications Guide</A> <b>Previous:</b> <a href=$PREVU>$PREVT</a>+" >tmp.$$
+mv tmp.$$ $THISU
 
-echo adding previous links in eval.htm ...
-sed "s+<IMG WIDTH=\"63\" HEIGHT=\"24\" ALIGN=\"BOTTOM\" BORDER=\"0\" ALT=\"previous\" SRC=\"prev_gr.png\">+<a href=\"innode5.htm\"><IMG WIDTH=\"63\" HEIGHT=\"24\" ALIGN=\"BOTTOM\" BORDER=\"0\" ALT=\"previous\" SRC=\"previous.png\"></a>+" <eval.htm |
- sed "s+WFDB Applications Guide</A>+WFDB Applications Guide</A> <b>Previous:</b> <a href=\"innode5.htm\">Other systems</a>+" >tmp.$$
-mv tmp.$$ eval.htm
+PREVT=$THIST
+PREVU=$THISU
+THIST=$NEXTT
+THISU=$NEXTU
+
+echo adding previous links in $THISU ...
+sed "s+<IMG\\([^<>]*\\)SRC=\"prev_g.png\">+<a href=$PREVU><IMG\\1SRC=\"previous.png\"></a>+" <$THISU |
+ sed "s+WFDB Applications Guide</A>+WFDB Applications Guide</A> <b>Previous:</b> <a href=$PREVU>$PREVT</a>+" >tmp.$$
+mv tmp.$$ $THISU
