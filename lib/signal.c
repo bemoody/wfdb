@@ -3818,7 +3818,7 @@ FSAMPLE sample(WFDB_Signal s, WFDB_Time t)
     if (t <= tt - BUFLN || t > tt + BUFLN) {
 	tt = t - BUFLN;
 	if (tt < 0L) tt = -1L;
-	else if (isigsettime(tt-1) < 0) {
+	if (isigsettime(tt+1) < 0) {
 	    sample_vflag = 0;
 	    return (WFDB_INVALID_SAMPLE);
 	}
