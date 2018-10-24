@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody         24 May 2000
-#                             Last revised:    17 May 2018
+#                             Last revised:    24 October 2018
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -86,7 +86,7 @@ Options:
     --without-xview     disable WAVE even if XView is available
     --with-xview=PREFIX use XView libraries and headers installed in PREFIX
 EOF
-                        exit ;;
+                        exit 1 ;;
   esac
 done
 
@@ -388,7 +388,7 @@ then
         echo "install one, be sure that it is in your PATH, and that it is"
 	echo "accessible as either '${CROSS_COMPILE}cc' or '${CROSS_COMPILE}gcc', then run ./configure again."
 	cd ..
-	exit
+	exit 1
     else
 	CC=${CROSS_COMPILE}cc
 	wflags=
