@@ -2,6 +2,8 @@
 # file: fixwug.sh		G. Moody	24 June 2002
 #				Last revised:	24 October 2018
 
+set -e
+
 cd $1
 rm -f wave-faq.htm wave-web.htm
 R=`grep -l "<TITLE>Frequently Asked Questions</TITLE>" *.htm`
