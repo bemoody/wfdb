@@ -4,6 +4,8 @@
 #
 # Post-process WFDB Applications Guide HTML files
 
+set -e
+
 URLPREFIX=http://www.physionet.org/physiotools/wag/
 
 LONGDATE=$1
