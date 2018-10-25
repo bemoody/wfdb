@@ -1121,7 +1121,7 @@ static int readheader(const char *record)
 	int nobaseline;
 
 	hs = hsd[s];
-	if (s) hp = hsd[s-1];
+	hp = (s ? hsd[s-1] : NULL);
 	/* Get the first token (the signal file name) from the next
 	   non-empty, non-comment line. */
 	do {
@@ -2633,7 +2633,7 @@ FINT getvec(WFDB_Sample *vector)
 
 FINT getframe(WFDB_Sample *vector)
 {
-    int stat;
+    int stat = -1;
 
     if (dsbuf) {	/* signals must be deskewed */
 	int c, i, j, nsig, s;
@@ -2994,9 +2994,9 @@ FINT getseginfo(WFDB_Seginfo **sarray)
 
 FINT setmsheader(char *record, char **segment_name, unsigned int nsegments)
 {
-    WFDB_Frequency msfreq, mscfreq;
-    double msbcount;
-    int n, nsig, old_in_msrec = in_msrec;
+    WFDB_Frequency msfreq = 0, mscfreq = 0;
+    double msbcount = 0;
+    int n, nsig = 0, old_in_msrec = in_msrec;
     long *ns;
     unsigned i;
 
