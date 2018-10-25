@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:     9 May 2018		wfdblib 10.6.1
+			Last revised:  25 October 2018		wfdblib 10.6.1
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -3696,7 +3696,10 @@ FSAMPLE sample(WFDB_Signal s, WFDB_Time t)
     if (t <= tt - BUFLN || t > tt + BUFLN) {
 	tt = t - BUFLN;
 	if (tt < 0L) tt = -1L;
-	else if (isigsettime(tt-1) < 0) exit(2);
+	else if (isigsettime(tt-1) < 0) {
+	    sample_vflag = 0;
+	    return (WFDB_INVALID_SAMPLE);
+	}
     }
     /* If the requested sample is not yet in the buffer, read and buffer
        more samples.  If we reach the end of the record, clear sample_vflag
