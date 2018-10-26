@@ -1,5 +1,5 @@
 /* file rdann.c	    T. Baker and G. Moody	27 July 1981
-		    Last revised:	       3 November 2017
+		    Last revised:	       26 October 2018
 
 -------------------------------------------------------------------------------
 rdann: Print an annotation file in ASCII form
@@ -287,7 +287,7 @@ char *argv[];
       (void)printf("Type  Sub Chan  Num\tAux\n");
     }
 
-    setsampfreq(tps);
+    setifreq(tps);
     setiafreq(0, tps);
     while (getann(0, &annot) == 0) {
 	if (tps == sps) {
