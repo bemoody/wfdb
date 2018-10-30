@@ -1500,7 +1500,8 @@ static size_t curl_chunk_write(void *ptr, size_t size, size_t nmemb,
 	    c->buffer_size += 1024;
 	    SREALLOC(c->data, 1, c->buffer_size);
 	}
-	memcpy(c->data + c->size, ptr, size);
+	if (c->data)
+	    memcpy(c->data + c->size, ptr, size);
 	c->size += size;
 	count += size;
 	p = (char *)ptr + size;	/* avoid arithmetic on void pointer */
@@ -1524,6 +1525,8 @@ static CHUNK *www_get_url_range_chunk(const char *url, long startb, long len)
     if (url && *url) {
 	sprintf(range_req_str, "%ld-%ld", startb, startb+len-1);
 	chunk = chunk_new(len);
+	if (!chunk)
+	    return (NULL);
 
 	if (/* In this case we want to send a GET request rather than
 	       a HEAD */
@@ -1549,7 +1552,7 @@ static CHUNK *www_get_url_range_chunk(const char *url, long startb, long len)
 	    || curl_try(curl_easy_perform(curl_ua))) {
 
 	    chunk_delete(chunk);
-	    return NULL;
+	    return (NULL);
 	}
 
 	if (chunk && (chunk_size(chunk) > len)) {
@@ -1611,6 +1614,8 @@ static CHUNK *www_get_url_chunk(const char *url)
     CHUNK *chunk = NULL;
 
     chunk = chunk_new(1024);
+    if (!chunk)
+	return (NULL);
 
     if (/* Send a GET request */
 	curl_try(curl_easy_setopt(curl_ua, CURLOPT_NOBODY, 0L))
@@ -1634,7 +1639,7 @@ static CHUNK *www_get_url_chunk(const char *url)
 	|| curl_easy_perform(curl_ua)) {
 
 	chunk_delete(chunk);
-	return NULL;
+	return (NULL);
     }
 
     return (chunk);
