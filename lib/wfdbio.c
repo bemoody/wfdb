@@ -1576,7 +1576,7 @@ static CHUNK *www_get_url_range_chunk(const char *url, long startb, long len)
 	    /* The pointer to pass to the header function */
 	    || curl_try(curl_easy_setopt(curl_ua, CURLOPT_WRITEHEADER, chunk))
 	    /* Perform the request */
-	    || curl_try(curl_easy_perform(curl_ua))) {
+	    || curl_easy_perform(curl_ua)) {
 
 	    chunk_delete(chunk);
 	    return (NULL);
@@ -1814,6 +1814,12 @@ static long nf_get_range(netfile* nf, long startb, long len, char *rbuf)
 		           len, (long)chunk_size(chunk));
 	    }
 	    rp = chunk_data(chunk);
+	}
+	else {
+	    wfdb_error(
+	       "nf_get_range: couldn't read %ld bytes of %s starting at %ld\n",
+		       len, nf->url, startb);
+	    len = 0L;
 	}
     }
 
