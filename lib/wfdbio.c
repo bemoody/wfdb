@@ -1289,6 +1289,7 @@ static int curl_try(CURLcode err)
 
 struct chunk {
     long size, buffer_size;
+    unsigned long start_pos, end_pos, total_size;
     char *data;
 };
 
@@ -1472,6 +1473,9 @@ static CHUNK *curl_chunk_new(long len)
     SALLOC(c->data, 1, len);
     c->size = 0L;
     c->buffer_size = len;
+    c->start_pos = 0;
+    c->end_pos = 0;
+    c->total_size = 0;
     return c;
 }
 
@@ -1482,6 +1486,27 @@ static void curl_chunk_delete(struct chunk *c)
 	SFREE(c->data);
 	SFREE(c);
     }
+}
+
+/* Write metadata (e.g., HTTP headers) into a chunk.  This function is
+   called by curl and must take the same arguments as fwrite().  ptr
+   points to the data received, size*nmemb is the number of bytes, and
+   stream is the user data specified by CURLOPT_WRITEHEADER. */
+static size_t curl_chunk_header_write(void *ptr, size_t size, size_t nmemb,
+				      void *stream)
+{
+    char *s = (char *) ptr;
+    struct chunk *c = (struct chunk *) stream;
+
+    if (0 == strncasecmp(s, "Content-Range:", 14)) {
+	s += 14;
+	while (*s == ' ')
+	    s++;
+	if (0 == strncasecmp(s, "bytes ", 6))
+	    sscanf(s + 6, "%lu-%lu/%lu",
+		   &c->start_pos, &c->end_pos, &c->total_size);
+    }
+    return (size * nmemb);
 }
 
 /* Write data into a chunk.  This function is called by curl and must
@@ -1545,9 +1570,11 @@ static CHUNK *www_get_url_range_chunk(const char *url, long startb, long len)
 					 curl_chunk_write))
 	    /* The pointer to pass to the write function */
 	    || curl_try(curl_easy_setopt(curl_ua, CURLOPT_WRITEDATA, chunk))
-	    /* Don't bother writing the header data anywhere */
+	    /* This function will be used to parse HTTP headers */
 	    || curl_try(curl_easy_setopt(curl_ua, CURLOPT_HEADERFUNCTION,
-					 curl_null_write))
+					 curl_chunk_header_write))
+	    /* The pointer to pass to the header function */
+	    || curl_try(curl_easy_setopt(curl_ua, CURLOPT_WRITEHEADER, chunk))
 	    /* Perform the request */
 	    || curl_try(curl_easy_perform(curl_ua))) {
 
