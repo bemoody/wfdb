@@ -1812,6 +1812,7 @@ static long nf_get_range(netfile* nf, long startb, long len, char *rbuf)
 		wfdb_error(
 		     "nf_get_range: requested %ld bytes, received %ld bytes\n",
 		           len, (long)chunk_size(chunk));
+		len = 0L;
 	    }
 	    rp = chunk_data(chunk);
 	}
