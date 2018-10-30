@@ -1767,7 +1767,7 @@ static netfile *nf_new(const char* url)
 static long nf_get_range(netfile* nf, long startb, long len, char *rbuf)
 {
     CHUNK *chunk = NULL;
-    char *rp;
+    char *rp = NULL;
     long avail = nf->cont_len - startb;
 
     if (len > avail) len = avail;	/* limit request to available bytes */
@@ -1826,7 +1826,8 @@ static long nf_get_range(netfile* nf, long startb, long len, char *rbuf)
     else  /* cannot use range requests -- cache contains full file */
 	rp = nf->data + startb;		
 
-    memcpy(rbuf, rp, len);
+    if (rp != NULL && len > 0)
+	memcpy(rbuf, rp, len);
     if (chunk) chunk_delete(chunk);
     return (len);
 }
