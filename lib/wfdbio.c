@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:      9 May 2018         wfdblib 10.6.1
+                        Last revised:    30 October 2018      wfdblib 10.6.1
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -1433,24 +1433,9 @@ static void www_init(void)
     }
 }
 
-/* This function is called when a header is received.  ptr points to
-   the string received; size*nmemb is the number of bytes, and stream
-   is the pointer specified as CURLOPT_WRITEHEADER. */
-static size_t curl_header_length_write(void *ptr, size_t size, size_t nmemb,
-				       void *stream)
-{
-    char *s = (char *) ptr;
-    double *d = (double *) stream;
-
-    if (0 == strncasecmp(s, "Content-Length:", 15)) {
-	sscanf(s + 15, "%lf", d);
-    }
-    return size*nmemb;
-}
-
 static long www_get_cont_len(const char *url)
 {
-    static double length;
+    double length;
 
     length = 0;
     if (/* We just want the content length; NOBODY means we want to
@@ -1463,21 +1448,19 @@ static long www_get_cont_len(const char *url)
 	                             www_userpwd(url)))
 	/* Don't send a range request */
 	|| curl_try(curl_easy_setopt(curl_ua, CURLOPT_RANGE, NULL))
-	/* If any body data is received, ignore it */
+	/* Ignore both headers and body */
 	|| curl_try(curl_easy_setopt(curl_ua, CURLOPT_WRITEFUNCTION,
 				     curl_null_write))
-	|| curl_try(curl_easy_setopt(curl_ua, CURLOPT_WRITEDATA, NULL))
-	/* Process received headers using curl_header_length_write */
 	|| curl_try(curl_easy_setopt(curl_ua, CURLOPT_HEADERFUNCTION,
-				     curl_header_length_write))
-	/* Set the user data for curl_header_length_write */
-	|| curl_try(curl_easy_setopt(curl_ua, CURLOPT_WRITEHEADER,
-				     &length))
+				     curl_null_write))
 	/* Actually perform the request and wait for a response */
 	|| curl_easy_perform(curl_ua))
-	return 0;
+	return (0);
 
-    return (long) length;
+    if (curl_easy_getinfo(curl_ua, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &length))
+	return (0);
+
+    return ((long) length);
 }
 
 /* Create a new, empty chunk. */
