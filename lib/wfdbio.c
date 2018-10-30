@@ -85,6 +85,7 @@ visible outside of this file):
  www_userpwd		(get username/password for a given url)
  wfdb_wwwquit		(shut down libcurl cleanly)
  www_init		(initialize libcurl)
+ www_perform_request    (request a url and check the response code)
  www_get_cont_len	(find length of data for a given url)
  www_get_url_range_chunk (get a block of data from a given url)
  www_get_url_chunk	(get all data from a given url)
@@ -1406,8 +1407,6 @@ static void www_init(void)
 	curl_ua = curl_easy_init();
 	/* Buffer for error messages */
 	curl_easy_setopt(curl_ua, CURLOPT_ERRORBUFFER, curl_error_buf);
-	/* Return an error code when the server replies with status >= 400 */
-	curl_easy_setopt(curl_ua, CURLOPT_FAILONERROR, 1L);
 	/* String to send as a User-Agent header */
 	curl_easy_setopt(curl_ua, CURLOPT_USERAGENT, curl_get_ua_string());
 #ifdef USE_NETRC
@@ -1434,6 +1433,18 @@ static void www_init(void)
     }
 }
 
+/* Send a request and wait for the response.  If using HTTP, check the
+   response code to see whether the request was successful. */
+static int www_perform_request(CURL *c)
+{
+    long code;
+    if (curl_easy_perform(c))
+	return (-1);
+    if (curl_easy_getinfo(c, CURLINFO_HTTP_CODE, &code))
+	return (0);
+    return (code < 400 ? 0 : -1);
+}
+
 static long www_get_cont_len(const char *url)
 {
     double length;
@@ -1455,7 +1466,7 @@ static long www_get_cont_len(const char *url)
 	|| curl_try(curl_easy_setopt(curl_ua, CURLOPT_HEADERFUNCTION,
 				     curl_null_write))
 	/* Actually perform the request and wait for a response */
-	|| curl_easy_perform(curl_ua))
+	|| www_perform_request(curl_ua))
 	return (0);
 
     if (curl_easy_getinfo(curl_ua, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &length))
@@ -1576,7 +1587,7 @@ static CHUNK *www_get_url_range_chunk(const char *url, long startb, long len)
 	    /* The pointer to pass to the header function */
 	    || curl_try(curl_easy_setopt(curl_ua, CURLOPT_WRITEHEADER, chunk))
 	    /* Perform the request */
-	    || curl_easy_perform(curl_ua)) {
+	    || www_perform_request(curl_ua)) {
 
 	    chunk_delete(chunk);
 	    return (NULL);
@@ -1616,7 +1627,7 @@ static CHUNK *www_get_url_chunk(const char *url)
 	/* and ignore the header data */
 	|| curl_try(curl_easy_setopt(curl_ua, CURLOPT_WRITEDATA, chunk))
 	/* perform the request */
-	|| curl_easy_perform(curl_ua)) {
+	|| www_perform_request(curl_ua)) {
 
 	chunk_delete(chunk);
 	return (NULL);
