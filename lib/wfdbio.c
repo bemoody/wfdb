@@ -1585,57 +1585,6 @@ static CHUNK *www_get_url_range_chunk(const char *url, long startb, long len)
 	    chunk_delete(chunk);
 	    chunk = NULL;
 	}
-
-	if (chunk && (chunk_size(chunk) > len)) {
-	    /* We received a larger chunk than requested. */
-	    if (chunk_size(chunk) >= startb + len) {
-		/* If the chunk is large enough to include the requested range
-		   and everything before it, assume that that's what we have
-		   (it may be the entire file).  This might happen if the
-		   file was in the cache or if the server does not support the
-		   range request.  Since the caller expects only a chunk of
-		   len bytes beginning with the data of interest, we need to
-		   create a new chunk of the proper length, fill it, and
-
-		   return it to the caller.  HTChunk_new makes a new chunk,
-		   which grows as needed in multiples of its argument (in
-		   bytes). */
-		extra_chunk = chunk_new(len);
-		/* Copy the desired range out of the chunk we received into the
-		   new chunk. */
-		chunk_putb(extra_chunk, &chunk_data(chunk)[startb], len);
-		/* Discard the chunk we received. */
-		chunk_delete(chunk);
-		/* Arrange for the new chunk to be returned. */
-		chunk = extra_chunk;
-	    }
-	    else {
-		/* We received some chunk of the file (not the whole file, but
-		   not what we requested, either).  Since we don't know what
-		   we have, let's try again, but only once. */
-		static int retry = 1;
-
-		if (retry) {
-		    retry = 0;
-		    fflush(stderr);
-		    chunk = www_get_url_range_chunk(url, startb, len);
-		    retry = 1;
-		    return (chunk);
-		}
-		else {
-		    /* We did no better the second time, so let's return an
-		       error to the caller. */
-		    wfdb_error(
-		   "www_get_url_range_chunk: fatal error requesting %s (%s)\n",
-		   url, range_req_str);
-		    if (chunk) {
-			chunk_delete(chunk);
-			chunk = NULL;
-		    }
-		    retry = 1;
-		}
-	    }
-	}
     }
     return (chunk);
 }
@@ -1710,7 +1659,6 @@ static netfile *nf_new(const char* url)
 {
     netfile *nf;
     CHUNK *chunk = NULL;
-    long bytes_received = 0L;
 
     SUALLOC(nf, 1, sizeof(netfile));
     if (nf && url && *url) {
@@ -1721,34 +1669,56 @@ static netfile *nf_new(const char* url)
 	nf->err = NF_NO_ERR;
 	nf->fd = -1;
 
-	/* First try to get the content length.  If it works, we're probably
-	   trying to read an http url. */
-	if (page_size > 0L && (nf->cont_len = www_get_cont_len(url))) {
-	    /* Success!  Let's try a range request now. */
-	    long bytes_requested = nf->cont_len;
-	    if (bytes_requested > page_size) bytes_requested = page_size;
-	    if (chunk = www_get_url_range_chunk(nf->url,0L, bytes_requested)) {
-		bytes_received = chunk_size(chunk);
-	        if (bytes_requested != bytes_received)
-		    wfdb_error(
-			      "nf_new: requested %ld, got %ld bytes from %s\n",
-			      bytes_requested, bytes_received, url);
-		if (bytes_received > 0)
-		    nf->mode = NF_CHUNK_MODE;
-	    }
+	if (page_size > 0L)
+	    /* Try to read the first part of the file. */
+	    chunk = www_get_url_range_chunk(nf->url, 0L, page_size);
+	else
+	    /* Try to read the entire file. */
+	    chunk = www_get_url_chunk(nf->url);
+
+	if (!chunk) {
+	    nf_delete(nf);
+	    return (NULL);
 	}
-	if (bytes_received == 0L && (chunk = www_get_url_chunk(nf->url))) {
-	    nf->mode = NF_FULL_MODE;
-	    bytes_received = nf->cont_len = chunk_size(chunk);
+
+	if (chunk->start_pos == 0 &&
+	    chunk->end_pos == chunk->size - 1 &&
+	    chunk->total_size >= chunk->size &&
+	    (chunk->size == page_size || chunk->size == chunk->total_size)) {
+	    /* Range request works and the total file size is known. */
+	    nf->cont_len = chunk->total_size;
+	    nf->mode = NF_CHUNK_MODE;
 	}
-	if (bytes_received > 0L) {
-	    SALLOC(nf->data, bytes_received, sizeof(char));
-	    memcpy(nf->data, chunk_data(chunk), bytes_received);
+	else if (chunk->total_size == 0) {
+	    if (page_size > 0 && chunk->size == page_size)
+		/* This might be a range response from a protocol that
+		   doesn't report the file size, or might be a file
+		   that happens to be exactly the size we requested.
+		   Check the full size of the file. */
+		nf->cont_len = www_get_cont_len(nf->url);
+	    else
+		nf->cont_len = chunk->size;
+
+	    if (nf->cont_len > chunk->size)
+		nf->mode = NF_CHUNK_MODE;
+	    else
+		nf->mode = NF_FULL_MODE;
+	}
+	else {
+	    wfdb_error("nf_new: unexpected range response (%lu-%lu/%lu)\n",
+		       chunk->start_pos, chunk->end_pos, chunk->total_size);
+	    chunk_delete(chunk);
+	    nf_delete(nf);
+	    return (NULL);
+	}
+	if (chunk->size > 0L) {
+	    nf->data = chunk->data;
+	    chunk->data = NULL;
 	}
 	if (nf->data == NULL) {
-	    if (bytes_received > 0L)
+	    if (chunk->size > 0L)
 		wfdb_error("nf_new: insufficient memory (needed %ld bytes)\n",
-			   bytes_received);
+			   chunk->size);
 	    /* If no bytes were received, the remote file probably doesn't
 	       exist.  This happens routinely while searching the WFDB path, so
 	       it's not flagged as an error.  Note, however, that we can't tell
