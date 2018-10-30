@@ -1554,6 +1554,10 @@ static CHUNK *www_get_url_range_chunk(const char *url, long startb, long len)
 	    chunk_delete(chunk);
 	    return (NULL);
 	}
+	if (!chunk->data) {
+	    chunk_delete(chunk);
+	    chunk = NULL;
+	}
 
 	if (chunk && (chunk_size(chunk) > len)) {
 	    /* We received a larger chunk than requested. */
@@ -1640,6 +1644,10 @@ static CHUNK *www_get_url_chunk(const char *url)
 
 	chunk_delete(chunk);
 	return (NULL);
+    }
+    if (!chunk->data) {
+	chunk_delete(chunk);
+	chunk = NULL;
     }
 
     return (chunk);
