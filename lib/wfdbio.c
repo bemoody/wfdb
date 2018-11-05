@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:    30 October 2018      wfdblib 10.6.1
+                        Last revised:    5 November 2018      wfdblib 10.6.1
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -1271,7 +1271,11 @@ static char *curl_get_ua_string(void)
     static char *s = NULL;
 
     libcurl_ver = curl_version();
-    wfdb_asprintf(&s, "libwfdb/%d.%d.%d (%s)", WFDB_MAJOR, WFDB_MINOR,
+
+    /* The +3XX flag informs the server that this client understands
+       and supports HTTP redirection (CURLOPT_FOLLOWLOCATION
+       enabled.) */
+    wfdb_asprintf(&s, "libwfdb/%d.%d.%d (%s +3XX)", WFDB_MAJOR, WFDB_MINOR,
 		  WFDB_RELEASE, libcurl_ver);
     return (s);
 }
@@ -1423,6 +1427,10 @@ static void www_init(void)
 
 	/* Use any available authentication method */
 	curl_easy_setopt(curl_ua, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
+
+	/* Follow up to 5 redirections */
+	curl_easy_setopt(curl_ua, CURLOPT_FOLLOWLOCATION, 1L);
+	curl_easy_setopt(curl_ua, CURLOPT_MAXREDIRS, 5L);
 
 	/* Show details of URL requests if WFDB_NET_DEBUG is set */
 	if ((p = getenv("WFDB_NET_DEBUG")) && *p)
