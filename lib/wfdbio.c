@@ -157,6 +157,7 @@ module.
 */
 
 #include "wfdblib.h"
+#include <time.h>
 
 /* WFDB library functions */
 
@@ -1246,6 +1247,9 @@ to set the search order in any way you wish, as in this example.
 
 #if WFDB_NETFILES
 
+/* cache redirections for 5 minutes */
+#define REDIRECT_CACHE_TIME (5 * 60)
+
 struct netfile {
   char *url;
   char *data;
@@ -1255,6 +1259,8 @@ struct netfile {
   long pos;
   long err;
   int fd;
+  char *redirect_url;
+  unsigned int redirect_time;
 };
 
 static int nf_open_files = 0;		/* number of open netfiles */
@@ -1292,10 +1298,23 @@ static int curl_try(CURLcode err)
     return err;
 }
 
+/* Get the current time, as an unsigned number of seconds since some
+   arbitrary starting point. */
+static unsigned int www_time(void)
+{
+#ifdef CLOCK_MONOTONIC
+    struct timespec ts;
+    if (!clock_gettime(CLOCK_MONOTONIC, &ts))
+	return ((unsigned int) ts.tv_sec);
+#endif
+    return ((unsigned int) time(NULL));
+}
+
 struct chunk {
     long size, buffer_size;
     unsigned long start_pos, end_pos, total_size;
     char *data;
+    char *url;
 };
 
 /* This is a dummy write callback, for when we don't care about the
@@ -1495,6 +1514,7 @@ static CHUNK *curl_chunk_new(long len)
     c->start_pos = 0;
     c->end_pos = 0;
     c->total_size = 0;
+    c->url = NULL;
     return c;
 }
 
@@ -1503,6 +1523,7 @@ static void curl_chunk_delete(struct chunk *c)
 {
     if (c) {
 	SFREE(c->data);
+	SFREE(c->url);
 	SFREE(c);
     }
 }
@@ -1565,6 +1586,7 @@ static CHUNK *www_get_url_range_chunk(const char *url, long startb, long len)
 {
     CHUNK *chunk = NULL, *extra_chunk = NULL;
     char range_req_str[6*sizeof(long) + 2];
+    const char *url2 = NULL;
 
     if (url && *url) {
 	sprintf(range_req_str, "%ld-%ld", startb, startb+len-1);
@@ -1603,6 +1625,10 @@ static CHUNK *www_get_url_range_chunk(const char *url, long startb, long len)
 	if (!chunk->data) {
 	    chunk_delete(chunk);
 	    chunk = NULL;
+	}
+	else if (!curl_easy_getinfo(curl_ua, CURLINFO_EFFECTIVE_URL, &url2) &&
+		 url2 && *url2 && strcmp(url, url2)) {
+	    SSTRCPY(chunk->url, url2);
 	}
     }
     return (chunk);
@@ -1653,8 +1679,36 @@ static void nf_delete(netfile *nf)
     if (nf) {
 	SFREE(nf->url);
 	SFREE(nf->data);
+	SFREE(nf->redirect_url);
 	SFREE(nf);
     }
+}
+
+static CHUNK *nf_get_url_range_chunk(netfile *nf, long startb, long len)
+{
+    char *url;
+    CHUNK *chunk;
+    unsigned int request_time;
+
+    /* If a previous request for this file was recently redirected,
+       use the previous (redirected) URL; otherwise, use the original
+       URL.  (If the system clock moves backwards, the cache is
+       assumed to be out-of-date.) */
+    request_time = www_time();
+    if (request_time - nf->redirect_time > REDIRECT_CACHE_TIME) {
+	SFREE(nf->redirect_url);
+    }
+    url = (nf->redirect_url ? nf->redirect_url : nf->url);
+
+    chunk = www_get_url_range_chunk(url, startb, len);
+
+    if (chunk && chunk->url) {
+	/* don't update redirect_time if we didn't hit nf->url */
+	if (!nf->redirect_url)
+	    nf->redirect_time = request_time;
+	SSTRCPY(nf->redirect_url, chunk->url);
+    }
+    return (chunk);
 }
 
 /* nf_new attempts to read (at least part of) the file named by its
@@ -1687,10 +1741,11 @@ static netfile *nf_new(const char* url)
 	nf->data = NULL;
 	nf->err = NF_NO_ERR;
 	nf->fd = -1;
+	nf->redirect_url = NULL;
 
 	if (page_size > 0L)
 	    /* Try to read the first part of the file. */
-	    chunk = www_get_url_range_chunk(nf->url, 0L, page_size);
+	    chunk = nf_get_url_range_chunk(nf, 0L, page_size);
 	else
 	    /* Try to read the entire file. */
 	    chunk = www_get_url_chunk(nf->url);
@@ -1771,7 +1826,7 @@ static long nf_get_range(netfile* nf, long startb, long len, char *rbuf)
 	    if ((startb < nf->base_addr) ||
 		((startb + len) > (nf->base_addr + page_size))) {
 		/* requested data not in cache -- update the cache */
-		if (chunk = www_get_url_range_chunk(nf->url, startb, rlen)) {
+		if (chunk = nf_get_url_range_chunk(nf, startb, rlen)) {
 		    if (chunk_size(chunk) != rlen) {
 			wfdb_error(
 		     "nf_get_range: requested %ld bytes, received %ld bytes\n",
@@ -1795,7 +1850,7 @@ static long nf_get_range(netfile* nf, long startb, long len, char *rbuf)
 	    rp = nf->data + startb - nf->base_addr;
 	}
 
-	else if (chunk = www_get_url_range_chunk(nf->url, startb, len)) {
+	else if (chunk = nf_get_url_range_chunk(nf, startb, len)) {
 	    /* long request (> page_size) */
 	    if (chunk_size(chunk) != len) {
 		wfdb_error(
