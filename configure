@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody         24 May 2000
-#                             Last revised:    24 October 2018
+#                             Last revised:    14 November 2018
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -164,7 +164,7 @@ VERSION=
 if [ -d ../.git ]
 then
     ./prompt "Checking the package version number ..."
-    VERSION=`git --git-dir=../.git describe --dirty 2>gitver.t1`
+    VERSION=`cd ..; git --git-dir=.git describe --dirty 2>gitver.t1`
     rm -f gitver.t1
     if [ "x$VERSION" = "x" ]
     then
