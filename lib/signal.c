@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  25 October 2018		wfdblib 10.6.1
+			Last revised:  28 November 2018		wfdblib 10.6.1
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -1880,7 +1880,7 @@ static int getskewedframe(WFDB_Sample *vector)
     struct isdata *is;
     struct igdata *ig;
     WFDB_Group g;
-    WFDB_Sample v;
+    WFDB_Sample v, *vecstart = vector;
     WFDB_Signal s;
 
     if ((stat = (int)nisig) == 0) return (0);
@@ -1988,7 +1988,7 @@ static int getskewedframe(WFDB_Sample *vector)
 		    }
 		    else {
 			istime = segp->samp0;
-			return (getskewedframe(vector));
+			return (getskewedframe(vecstart));
 		    }
 		}
 		else
