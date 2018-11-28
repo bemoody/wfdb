@@ -13,7 +13,7 @@
 # directory.
 #
 # Suggestions for additional checks are welcome;  please send them to the
-# author (george@mit.edu).
+# author (wfdb@physionet.org).
 
 cp -pr ../data .
 

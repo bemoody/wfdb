@@ -6,7 +6,7 @@
 #
 # If you find that changes are needed in order to compile successfully, please
 # send a copy of your modifications together with the name of your operating
-# system (as reported by the 'uname' command) to george@mit.edu, so that
+# system (as reported by the 'uname' command) to wfdb@physionet.org, so that
 # support for your operating system can be incorporated in future versions of
 # this package.  Thanks!
 

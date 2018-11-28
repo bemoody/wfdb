@@ -18,7 +18,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with
 this program; if not, see <http://www.gnu.org/licenses/>.
 
-You may contact the author by e-mail (george@mit.edu) or postal mail
+You may contact the author by e-mail (wfdb@physionet.org) or postal mail
 (MIT Room E25-505A, Cambridge, MA 02139 USA).  For updates to this software,
 please visit PhysioNet (http://www.physionet.org/).
 _______________________________________________________________________________

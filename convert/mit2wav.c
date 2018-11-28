@@ -16,7 +16,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with
 this program; if not, see <http://www.gnu.org/licenses/>.
 
-You may contact the author by e-mail (george@mit.edu) or postal mail
+You may contact the author by e-mail (wfdb@physionet.org) or postal mail
 (MIT Room E25-505A, Cambridge, MA 02139 USA).  For updates to this software,
 please visit PhysioNet (http://www.physionet.org/).
 _______________________________________________________________________________
@@ -50,7 +50,7 @@ following potential pitfalls:
   interest, and to convert this AM signal into a .wav file;  on playback,
   an analog AM demodulator would then recover the original low-frequency
   signal of interest.  If you successfully implement this solution, please
-  send details to the author (george@mit.edu).
+  send details to wfdb@physionet.org.
 
   If the output contains 2, 3, 4, or 6 signals, and you play it through a
   sound card with at least that many outputs, the association between the

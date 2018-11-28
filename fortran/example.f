@@ -18,7 +18,7 @@ C
 C You should have received a copy of the GNU General Public License along with
 C this program; if not, see <http://www.gnu.org/licenses/>.
 C
-C You may contact the author by e-mail (george@mit.edu) or postal mail
+C You may contact the author by e-mail (wfdb@physionet.org) or postal mail
 C (MIT Room E25-505A, Cambridge, MA 02139 USA).  For updates to this software,
 C please visit PhysioNet (http://www.physionet.org/).
 C _____________________________________________________________________________

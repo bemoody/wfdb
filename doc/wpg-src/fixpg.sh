@@ -14,8 +14,8 @@ do
   head -$L2 </tmp/.fix.$$ >$1/$i
   cat >>$1/$i <<EOF
 <p><address>
-<a href="mailto:george@mit.edu"><em>George B. Moody
- (<tt>george@mit.edu</tt>)</em></A>
+<a href="mailto:wfdb@physionet.org"><em>PhysioNet
+ (<tt>wfdb@physionet.org</tt>)</em></A>
 </address>
 </body>
 </html>

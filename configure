@@ -5,7 +5,7 @@
 
 # This script was not generated using 'autoconf'.  If you can implement
 # autoconf input files for a 'configure' that does what this one does,
-# please send them to me (george@mit.edu) for inclusion in a future
+# please send them to wfdb@physionet.org for inclusion in a future
 # version of this package.
 
 # Note that any -m options (although parsed below) are currently ignored,
@@ -730,7 +730,7 @@ library).  Run ./configure again after making any necessary changes to
 these files.  Please send reports of success or failure, together with
 the output of the command 'uname -a', and copies of any files you have
 changed, to:
-             george@mit.edu
+             wfdb@physionet.org
 EOF
 
 fi
