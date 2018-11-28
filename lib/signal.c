@@ -2251,18 +2251,11 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
 	framelen += isd[si]->info.spf;
 
     /* Allocate workspace for getvec, isgsettime, and tnextvec. */
-    if (framelen > tuvlen) {
-	SREALLOC(tvector, framelen, sizeof(WFDB_Sample));
-	SREALLOC(uvector, framelen, sizeof(WFDB_Sample));
-	if (nvsig > nisig) {
-	    int vframelen;
-	    for (si = vframelen = 0; si < nvsig; si++)
-		vframelen += vsd[si]->info.spf;
-	    SREALLOC(vvector, vframelen, sizeof(WFDB_Sample));
-	}
-	else
-	    SREALLOC(vvector, framelen, sizeof(WFDB_Sample));
-	tuvlen = framelen;
+    if (tspf > tuvlen) {
+	SREALLOC(tvector, tspf, sizeof(WFDB_Sample));
+	SREALLOC(uvector, tspf, sizeof(WFDB_Sample));
+	SREALLOC(vvector, tspf, sizeof(WFDB_Sample));
+	tuvlen = tspf;
     }
 
     /* If deskewing is required, allocate the deskewing buffer (unless this is
