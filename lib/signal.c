@@ -1916,7 +1916,7 @@ static int getskewedframe(WFDB_Sample *vector)
     WFDB_Sample v, *vecstart = vector;
     WFDB_Signal s;
 
-    if ((stat = (int)nisig) == 0) return (0);
+    if ((stat = (int)nisig) == 0) return (nvsig > 0 ? -1 : 0);
     if (istime == 0L) {
 	for (s = 0; s < nisig; s++)
 	    isd[s]->samp = isd[s]->info.initval;
