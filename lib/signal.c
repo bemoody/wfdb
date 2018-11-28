@@ -2252,9 +2252,9 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
 
     /* Allocate workspace for getvec, isgsettime, and tnextvec. */
     if (tspf > tuvlen) {
-	SREALLOC(tvector, tspf, sizeof(WFDB_Sample));
-	SREALLOC(uvector, tspf, sizeof(WFDB_Sample));
-	SREALLOC(vvector, tspf, sizeof(WFDB_Sample));
+	SALLOC(tvector, tspf, sizeof(WFDB_Sample));
+	SALLOC(uvector, tspf, sizeof(WFDB_Sample));
+	SALLOC(vvector, tspf, sizeof(WFDB_Sample));
 	tuvlen = tspf;
     }
 
