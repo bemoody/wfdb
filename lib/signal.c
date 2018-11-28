@@ -2095,7 +2095,7 @@ static int rgetvec(WFDB_Sample *vector)
 
 FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
 {
-    int navail, ngroups, nn;
+    int navail, ngroups, nn, spflimit;
     int first_segment = 0;
     struct hsdata *hs;
     struct isdata *is;
@@ -2225,6 +2225,19 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
     if (s == 0 && nsig)
 	wfdb_error("isigopen: none of the signals for record %s is readable\n",
 		 record);
+
+    /* Check that the total number of samples per frame is less than
+       or equal to INT_MAX. */
+    spflimit = INT_MAX - framelen;
+    for (si = 0; si < s; si++) {
+	spflimit -= isd[nisig + si]->info.spf;
+	if (spflimit < 0) {
+	    wfdb_error("isigopen: total frame size too large in record %s\n",
+		       record);
+	    isigclose();
+	    return (-3);
+	}
+    }
 
     /* Copy the WFDB_Siginfo structures to the caller's array.  Use these
        data to construct the initial sample vector, and to determine the
