@@ -2274,6 +2274,12 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
     /* If deskewing is required, allocate the deskewing buffer (unless this is
        a multi-segment record and dsbuf has been allocated already). */
     if (skewmax != 0 && (!in_msrec || dsbuf == NULL)) {
+	if (tspf > INT_MAX / (skewmax + 1)) {
+	    wfdb_error("isigopen: maximum skew too large in record %s\n",
+		       record);
+	    isigclose();
+	    return (-3);
+	}
 	dsbi = -1;	/* mark buffer contents as invalid */
 	dsblen = framelen * (skewmax + 1);
 	SALLOC(dsbuf, dsblen, sizeof(WFDB_Sample));
