@@ -9124,6 +9124,60 @@ changes that may not be described here.
 
 @unnumberedsec WFDB 10.6
 
+@unnumberedsubsec Changes in version 10.6.1 (28 November 2018)
+
+The internal function @code{edfparse()} will correctly calculate the ADC
+resolution of EDF signals, and will correctly interpret a negative ``number of
+data records'' (meaning that the length of the record was unknown at the time
+the header was written.)
+
+@code{sample()} now returns @code{WFDB_INVALID_SAMPLE} if the requested sample
+is not in the buffer and cannot be read (i.e., @code{isigsettime()} fails.)
+@code{sample_valid()} returns 0 in this case.  In previous versions of the
+library, @code{sample()} would call @code{exit()} in this situation, forcing
+the program to exit immediately.
+
+In some circumstances, @code{isigopen()} will now return -3; unlike a return
+value of -1 or -2, this indicates that no new signals have been opened and all
+previously-opened signals have been closed.
+
+The implementation of NETFILES has been optimized in several ways, to avoid
+making unnecessary HTTP requests, and to avoid unnecessarily disconnecting from
+and reconnecting to a remote server, especially when opening a remote file for
+the first time.
+
+The library will now honor HTTP redirections.  (Previously, the
+@code{libwww}-based implementation would follow redirections properly, but the
+@code{libcurl}-based implementation would not.)  Up to five redirections will
+be followed for a particular file, and (if range requests are used) the new URL
+will be cached for up to five minutes.
+
+The internal function @code{readheader()} will correctly parse ``minimum
+version'' requirements (denoted by @code{#wfdb} at the start of a header file.)
+
+The library will cope better with records that are incorrectly formatted or
+partially unreadable: @code{getskewedframe()} will avoid crashing if a signal
+file ends unexpectedly in a multi-segment record; @code{readheader()} will
+reject segment names beginning with `+'; @code{isigopen()} will reject records
+or segments where the total number of samples per frame, or the maximum signal
+skew, is too large; @code{isgsetframe()} and @code{getskewedframe()} will treat
+an unreadable segment as an error.
+
+Several bugs have been fixed in @code{isigopen()}.  It will now correctly
+handle the sitation where @code{nsig} is zero or negative, the record has
+multiple segments, and the first segment header cannot be read or contains no
+signals.  It will correctly handle some situations where a record contains
+three or more signal groups, and not all signals can be opened (for example,
+when the first signal file contains more than @code{nsig} signals, but the
+second and third signal files together contain @code{nsig} or fewer signals.)
+When multiple records are opened at once (``+ mode''), it will correctly honor
+the limit provided by the caller, and will not open more than @code{nsig} new
+signals.
+
+The internal function @code{wfdb_fopen()} will treat any path containing
+@code{://} as a possible URL, and will correctly handle non-URL paths that end
+with @code{:} or @code{:/}.
+
 @unnumberedsubsec Changes in version 10.6.0 (26 January 2018)
 
 The new functions @code{getiafreq()} and @code{setiafreq()} allow the

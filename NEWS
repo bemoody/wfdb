@@ -1,3 +1,44 @@
+10.6.1 (28 November 2018):
+	'fir', 'mfilt', 'nst', 'snip', 'mit2wav', 'wfdb2mat', and 'xform' have
+	been updated to work correctly with multi-frequency input records.
+	(With the exception of xform in '-M' mode, these applications always
+	produce uniform-frequency output; in the case of multi-frequency input,
+	all signals will be resampled to either the highest or lowest sampling
+	frequency.)
+
+	'gqrs', 'sqrs', 'sqrs125', 'stepdet', and 'wabp', when invoked in
+	high-resolution mode, will now write an annotation time resolution
+	comment, so that other applications can correctly interpret their
+	output.  'nguess', 'gqfuse', and 'gqpost' will correctly handle
+	high-resolution input annotations, and produce high-resolution output
+	annotations in that case.
+
+	'rdann' will correctly display the elapsed or absolute time for
+	annotations in an EDF record.  This worked correctly in versions
+	10.5.24 and earlier, but in version 10.6.0, the time values displayed
+	were incorrect.
+
+	The WFDB library will correctly handle HTTP redirection responses.  The
+	library has also been optimized in various ways to reduce the amount of
+	unnecessary network traffic.
+
+	The internal function edfparse() will correctly calculate the ADC
+	resolution (digital sample range) of EDF signals, and will correctly
+	interpret EDF files that have an "unknown number of data records".
+
+	Numerous bugs have been corrected in the library functions isigopen(),
+	getframe(), and isgsettime(), which could cause applications to crash
+	or produce incorrect results when reading an incorrectly-formatted
+	record, or a record where some files are missing.
+
+	sample() now returns WFDB_INVALID_SAMPLE if the requested sample is not
+	in the buffer and cannot be read.  In previous versions of the library,
+	sample() would call exit(), forcing the program to exit immediately.
+
+	On Mac OS X, multi-architecture binaries are no longer produced by
+	default.  They can be enabled, if desired, by passing the argument
+	'--enable-arch=i386,x86_64' to configure.
+
 10.6.0 (26 January 2018):
 	A wide variety of bugs have been fixed in the WFDB library, and several
 	new features have been added.  See the WFDB Programmer's Guide for
