@@ -16,8 +16,7 @@ PARTICULAR PURPOSE.  See the GNU Library General Public License for more
 details.
 
 You should have received a copy of the GNU Library General Public License along
-with this library; if not, write to the Free Software Foundation, Inc., 59
-Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+with this library; if not, see <http://www.gnu.org/licenses/>.
 
 You may contact the author by e-mail (george@mit.edu) or postal mail
 (MIT Room E25-505A, Cambridge, MA 02139 USA).  For updates to this software,
