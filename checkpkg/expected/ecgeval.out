@@ -4,11 +4,11 @@
 
 The most recent version of this program can always be obtained as part of
 the WFDB Software Package, from PhysioNet (http://physionet.org/).
-If you have questions about this software, please contact the author:
-	George B. Moody
+If you have questions about this software, please contact:
+	PhysioNet
 	MIT Room E25-505A
 	Cambridge, MA 02139 USA
-	email: george@mit.edu
+	email: wfdb@physionet.org
 
 This program constructs a script (batch) file which evaluates a set of
 test annotation files by comparing them with reference annotation files

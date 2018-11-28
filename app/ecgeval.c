@@ -145,10 +145,10 @@ main()
     (void)fprintf(stderr,
 "the WFDB Software Package, from PhysioNet (http://physionet.org/).\n");
     (void)fprintf(stderr,
- "If you have questions about this software, please contact the author:\n");
+ "If you have questions about this software, please contact:\n");
     (void)fprintf(stderr,
- "\tGeorge B. Moody\n\tMIT Room E25-505A\n\tCambridge, MA 02139 USA\n");
-    (void)fprintf(stderr, "\temail: george@mit.edu\n\n");
+ "\tPhysioNet\n\tMIT Room E25-505A\n\tCambridge, MA 02139 USA\n");
+    (void)fprintf(stderr, "\temail: wfdb@physionet.org\n\n");
     if (getdblists() < 0) exit(1);
 
     (void)fprintf(stderr,
