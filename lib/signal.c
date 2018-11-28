@@ -1070,6 +1070,14 @@ static int readheader(const char *record)
 		    return (-2);
 		}
 	    } while ((p = strtok(linebuf, sep)) == NULL || *p == '#');
+	    if (*p == '+') {
+		wfdb_error(
+		    "init: `%s' is not a valid segment name in record %s\n",
+		    p, record);
+		SFREE(segarray);
+		segments = 0;
+		return (-2);
+	    }
 	    if (strlen(p) > WFDB_MAXRNL) {
 		wfdb_error(
 		    "init: `%s' is too long for a segment name in record %s\n",
