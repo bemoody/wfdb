@@ -2154,7 +2154,9 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
     nn = nisig + nsig;
     if (allocisig(nn) != nn)
 	return (-1);	/* failed, nisig is unchanged, allocisig emits error */
-    nn = nigroup + hsd[nsig-1]->info.group + 1;
+    nn = nigroup + hsd[navail-1]->info.group + 1;
+    if (nn > nigroup + nsig)
+	nn = nigroup + nsig;
     if (allocigroup(nn) != nn)
 	return (-1);	/* failed, allocigroup emits error */
     else
