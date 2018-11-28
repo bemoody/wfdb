@@ -2689,8 +2689,11 @@ FINT getframe(WFDB_Sample *vector)
 
 	/* First, obtain the samples needed. */
 	if (dsbi < 0) {	/* dsbuf contents are invalid -- refill dsbuf */
-	    for (dsbi = i = 0; i < dsblen; dsbi = i += tspf)
+	    for (dsbi = i = 0; i < dsblen; dsbi = i += tspf) {
 		stat = getskewedframe(dsbuf + dsbi);
+		if (stat < 0)
+		    break;
+	    }
 	    dsbi = 0;
 	}
 	else {		/* replace oldest frame in dsbuf only */
