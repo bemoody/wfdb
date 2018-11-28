@@ -817,7 +817,7 @@ static int edfparse(WFDB_FILE *ifile)
     for (s = 0; s < nsig; s++)
 	wfdb_fread(buf, 1, 80, ifile);	/* filtering information (ignored) */
 
-    for (s = framelen = 0; s < nsig; s++) {
+    for (s = 0; s < nsig; s++) {
 	int n;
 
 	wfdb_fread(buf, 1, 8, ifile);	/* samples per frame (EDF block) */
@@ -826,7 +826,6 @@ static int edfparse(WFDB_FILE *ifile)
 	    buf[i] = '\0';
 	sscanf(buf, "%d", &n);
 	if ((hsd[s]->info.spf = n) > ispfmax) ispfmax = n;	
-	framelen += n;
     }
 
     (void)wfdb_fclose(ifile);	/* (don't bother reading nsig*32 bytes of free
