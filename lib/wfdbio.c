@@ -2139,17 +2139,16 @@ WFDB_FILE *wfdb_fopen(char *fname, const char *mode)
     if (p == NULL || strstr(p, ".."))
 	return (NULL);
     SUALLOC(wp, 1, sizeof(WFDB_FILE));
-    while (*p)
-	if (*p++ == ':' && *p++ == '/' && *p++ == '/') {
+    if (strstr(p, "://")) {
 #if WFDB_NETFILES
-	    if (wp->netfp = nf_fopen(fname, mode)) {
-		wp->type = WFDB_NET;
-		return (wp);
-	    }
-#endif
-	    SFREE(wp);
-	    return (NULL);
+	if (wp->netfp = nf_fopen(fname, mode)) {
+	    wp->type = WFDB_NET;
+	    return (wp);
 	}
+#endif
+	SFREE(wp);
+	return (NULL);
+    }
     if (wp->fp = fopen(fname, mode)) {
 	wp->type = WFDB_LOCAL;
 	return (wp);
