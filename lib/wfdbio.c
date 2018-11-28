@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:    5 November 2018      wfdblib 10.6.1
+                        Last revised:   28 November 2018      wfdblib 10.6.1
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -1302,7 +1302,7 @@ static int curl_try(CURLcode err)
    arbitrary starting point. */
 static unsigned int www_time(void)
 {
-#ifdef CLOCK_MONOTONIC
+#ifdef HAVE_CLOCK_GETTIME
     struct timespec ts;
     if (!clock_gettime(CLOCK_MONOTONIC, &ts))
 	return ((unsigned int) ts.tv_sec);
