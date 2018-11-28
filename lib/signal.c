@@ -1720,7 +1720,7 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
 	    tseg++;
 	if (segp != tseg) {
 	    segp = tseg;
-	    if (isigopen(segp->recname, NULL, (int)nvsig) < 0) {
+	    if (isigopen(segp->recname, NULL, (int)nvsig) <= 0) {
 	        wfdb_error("isigsettime: can't open segment %s\n",
 			   segp->recname);
 		return (-1);
@@ -2013,7 +2013,7 @@ static int getskewedframe(WFDB_Sample *vector)
 		}
 		else if (in_msrec && segp && segp < segend) {
 		    segp++;
-		    if (isigopen(segp->recname, NULL, (int)nvsig) < 0) {
+		    if (isigopen(segp->recname, NULL, (int)nvsig) <= 0) {
 			wfdb_error("getvec: error opening segment %s\n",
 				   segp->recname);
 			stat = -3;
