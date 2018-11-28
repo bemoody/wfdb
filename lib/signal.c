@@ -522,14 +522,14 @@ static int make_vsd(void)
     return (nvsig);
 }
 
-static int sigmap_init(void)
+static int sigmap_init(int first_segment)
 {
     int i, j, k, kmax, s, ivmin, ivmax;
     double ovmin, ovmax;
     struct sigmapinfo *ps;
 
     /* is this the layout segment?  if so, set up output side of map */
-    if (in_msrec && ovec == NULL && isd[0]->info.nsamp == 0L) {
+    if (in_msrec && first_segment && isd[0]->info.nsamp == 0L) {
 	need_sigmap = 1;
 
 	/* The number of virtual signals is the number of signals defined
@@ -618,11 +618,36 @@ static int sigmap_init(void)
 		    }
 		    break;
 		}
+	if (j > tspf) {
+	    wfdb_error("sigmap_init: frame size too large in segment %s\n",
+		       segp->recname);
+	    return (-1);
+	}
+    }
+
+    else if (in_msrec && !first_segment && framelen == 0) {
+	/* opening a new segment of a fixed-layout multisegment
+	   record */
+	if (nisig > nvsig) {
+	    wfdb_error("sigmap_init: wrong number of signals in segment %s\n",
+		       segp->recname);
+	    return (-1);
+	}
+	for (i = 0; i < nisig; i++) {
+	    if (isd[i]->info.spf != vsd[i]->info.spf) {
+		wfdb_error(
+		    "sigmap_init: wrong spf for signal %d in segment %s\n",
+		    i, segp->recname);
+		return (-1);
+	    }
+	}
     }
 
     else {	/* normal record, or multisegment record without a dummy
 		   header */
 	nvsig = nisig;
+	for (s = tspf = 0; s < nisig; s++)
+	    tspf += isd[s]->info.spf;
 	return (make_vsd());
     }
 
@@ -1307,6 +1332,7 @@ static void isigclose(void)
 	SFREE(isd);
     }
     maxisig = nisig = 0;
+    framelen = 0;
 
     if (igd) {
 	while (maxigroup)
@@ -2070,6 +2096,7 @@ static int rgetvec(WFDB_Sample *vector)
 FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
 {
     int navail, ngroups, nn;
+    int first_segment = 0;
     struct hsdata *hs;
     struct isdata *is;
     struct igdata *ig;
@@ -2090,6 +2117,7 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
     if ((navail = readheader(record)) <= 0) {
 	if (navail == 0 && segments) {	/* this is a multi-segment record */
 	    in_msrec = 1;
+	    first_segment = 1;
 	    /* Open the first segment to get signal information. */
 	    if (segp && (navail = readheader(segp->recname)) >= 0) {
 		if (msbtime == 0L) msbtime = btime;
@@ -2211,8 +2239,10 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
     }
     nisig += s;		/* Update the count of open input signals. */
     nigroup += g;	/* Update the count of open input signal groups. */
-    if (sigmap_init() < 0)
-	return (-1);
+    if (sigmap_init(first_segment) < 0) {
+	isigclose();
+	return (-3);
+    }
     setgvmode(gvmode);	/* Reset sfreq if appropriate. */
     gvc = ispfmax;	/* Initialize getvec's sample-within-frame counter. */
 
