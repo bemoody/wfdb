@@ -1426,6 +1426,8 @@ Failure: no input signals available
 Failure: unable to read header file (probably incorrect record name)
 @item @t{-2}
 Failure: incorrect header file format
+@item @t{-3}
+Failure: internal limits exceeded (all signal files closed)
 @end table
 @c @end group
 
@@ -1525,6 +1527,11 @@ determine which signals were opened;
 Several of the example programs in chapter 6
 illustrate the use of @code{isigopen}; for example, @pxref{Example
 5}.
+
+If the overall set of open signals exceeds internal limits (for example, the
+total number of samples per frame is greater than @code{INT_MAX}),
+@code{isigopen} returns -3 and closes @emph{all} previously-opened input
+signals.
 
 If @var{nsig} is less than 0, @code{isigopen} fills in up to
 @ifnotinfo
