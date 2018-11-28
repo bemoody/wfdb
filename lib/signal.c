@@ -2281,7 +2281,7 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
 	    return (-3);
 	}
 	dsbi = -1;	/* mark buffer contents as invalid */
-	dsblen = framelen * (skewmax + 1);
+	dsblen = tspf * (skewmax + 1);
 	SALLOC(dsbuf, dsblen, sizeof(WFDB_Sample));
     }
     return (s);
@@ -2689,18 +2689,18 @@ FINT getframe(WFDB_Sample *vector)
 
 	/* First, obtain the samples needed. */
 	if (dsbi < 0) {	/* dsbuf contents are invalid -- refill dsbuf */
-	    for (dsbi = i = 0; i < dsblen; dsbi = i += framelen)
+	    for (dsbi = i = 0; i < dsblen; dsbi = i += tspf)
 		stat = getskewedframe(dsbuf + dsbi);
 	    dsbi = 0;
 	}
 	else {		/* replace oldest frame in dsbuf only */
 	    stat = getskewedframe(dsbuf + dsbi);
-	    if ((dsbi += framelen) >= dsblen) dsbi = 0;
+	    if ((dsbi += tspf) >= dsblen) dsbi = 0;
 	}
+
 	/* Assemble the deskewed frame from the data in dsbuf. */
-	nsig = (nvsig > nisig) ? nvsig : nisig;
-	for (j = s = 0; s < nsig; s++) {
-	    if ((i = j + dsbi + isd[s]->skew*framelen) >= dsblen) i -= dsblen;
+	for (j = s = 0; s < nisig; s++) {
+	    if ((i = j + dsbi + isd[s]->skew*tspf) >= dsblen) i %= dsblen;
 	    for (c = 0; c < isd[s]->info.spf; c++)
 		vector[j++] = dsbuf[i++];
 	}
