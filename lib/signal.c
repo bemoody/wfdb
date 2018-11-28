@@ -2095,7 +2095,7 @@ static int rgetvec(WFDB_Sample *vector)
 
 FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
 {
-    int navail, ngroups, nn, spflimit;
+    int navail, nn, spflimit;
     int first_segment = 0;
     struct hsdata *hs;
     struct isdata *is;
@@ -2159,8 +2159,6 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
 	nn = nigroup + nsig;
     if (allocigroup(nn) != nn)
 	return (-1);	/* failed, allocigroup emits error */
-    else
-	ngroups = nn;
 
     /* Set default buffer size (if not set already by setibsize). */
     if (ibsize <= 0) ibsize = BUFSIZ;
