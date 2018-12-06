@@ -423,6 +423,12 @@ static int copysi(WFDB_Siginfo *to, WFDB_Siginfo *from)
     return (1);
 }
 
+#ifndef WFDB_LARGETIME
+# define strtotime strtol
+#else
+# define strtotime strtoll
+#endif
+
 /* Code for handling variable-layout multi-segment records
 
     The following code (together with minor changes elsewhere in this file)
