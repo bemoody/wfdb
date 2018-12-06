@@ -3597,15 +3597,15 @@ static WFDB_Time fstrtim(char *string, WFDB_Frequency f)
     switch (*string) {
       case 'c': return (cfreq > 0. ?
 			(WFDB_Time)((strtod(string+1, NULL)-bcount)*f/cfreq) :
-			(WFDB_Time)(strtol(string+1, NULL, 10)));
+			strtotime(string+1, NULL, 10));
       case 'e':	return ((in_msrec ? msnsamples : nsamples) * 
 		        (((gvmode&WFDB_HIGHRES) == WFDB_HIGHRES) ? ispfmax: 1));
-      case 'f': return (WFDB_Time)(strtol(string+1, NULL, 10)*f/ffreq);
+      case 'f': return (WFDB_Time)(strtotime(string+1, NULL, 10)*f/ffreq);
       case 'i':	return (WFDB_Time)(istime *
 			(ifreq > 0.0 ? (ifreq/sfreq) : 1.0) *
 			(((gvmode&WFDB_HIGHRES) == WFDB_HIGHRES) ? ispfmax: 1));
       case 'o':	return (ostime);
-	  case 's':	return ((WFDB_Time)strtol(string+1, NULL, 10));
+      case 's':	return (strtotime(string+1, NULL, 10));
       case '[':	  /* time of day, possibly with date or days since start */
 	if ((q = strchr(++string, ']')) == NULL)
 	    return ((WFDB_Time)0);	/* '[...': malformed time string */
