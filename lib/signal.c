@@ -3504,12 +3504,12 @@ static char *fmstimstr(WFDB_Time t, WFDB_Frequency f)
     int hours, minutes, seconds, msec;
     WFDB_Date days;
     double tms;
-    long s;
+    WFDB_Time s;
 
     if (t > 0L || (btime == 0L && bdate == (WFDB_Date)0)) { /* time interval */
 	if (t < 0L) t = -t;
 	/* Convert from sample intervals to seconds. */
-	s = (long)(t / f);
+	s = (WFDB_Time)(t / f);
 	msec = (int)((t - s*f)*1000/f + 0.5);
 	if (msec == 1000) { msec = 0; s++; }
 	t = s;
@@ -3528,7 +3528,7 @@ static char *fmstimstr(WFDB_Time t, WFDB_Frequency f)
 	/* Convert to milliseconds since midnight. */
 	tms = btime - (t * 1000.0 / f);
 	/* Convert to seconds. */
-	s = (long)(tms / 1000.0);
+	s = (WFDB_Time)(tms / 1000.0);
 	msec = (int)((tms - s*1000.0) + 0.5);
 	if (msec == 1000) { msec = 0; s++; }
 	t = s;
