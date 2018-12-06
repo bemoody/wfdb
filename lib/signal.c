@@ -3104,7 +3104,7 @@ FINT setmsheader(char *record, char **segment_name, unsigned int nsegments)
     WFDB_Frequency msfreq = 0, mscfreq = 0;
     double msbcount = 0;
     int n, nsig = 0, old_in_msrec = in_msrec;
-    long *ns;
+    WFDB_Time *ns;
     unsigned i;
 
     isigclose();	/* close any open input signals */
@@ -3128,7 +3128,7 @@ FINT setmsheader(char *record, char **segment_name, unsigned int nsegments)
 	return (-1);
     }
 
-    SUALLOC(ns, nsegments, (sizeof(long)*nsegments));
+    SUALLOC(ns, nsegments, sizeof(WFDB_Time));
     for (i = 0; i < nsegments; i++) {
 	if (strlen(segment_name[i]) > WFDB_MAXRNL) {
 	    wfdb_error(
@@ -3138,6 +3138,7 @@ FINT setmsheader(char *record, char **segment_name, unsigned int nsegments)
 	    return (-2);
 	}
 	in_msrec = 1;
+	nsamples = 0;
 	n = readheader(segment_name[i]);
 	in_msrec = old_in_msrec;
 	if (n < 0) {
@@ -3146,7 +3147,7 @@ FINT setmsheader(char *record, char **segment_name, unsigned int nsegments)
 	    SFREE(ns);
 	    return (-3);
 	}
-	if ((ns[i] = hsd[0]->info.nsamp) <= 0L) {
+	if ((ns[i] = nsamples) <= 0L) {
 	    wfdb_error("setmsheader: length of segment %s must be specified\n",
 		     segment_name[i]);
 	    SFREE(ns);
@@ -3195,7 +3196,7 @@ FINT setmsheader(char *record, char **segment_name, unsigned int nsegments)
 	if (msbcount != 0.0)
 	    (void)wfdb_fprintf(oheader, "(%.12g)", msbcount);
     }
-    (void)wfdb_fprintf(oheader, " %ld", msnsamples);
+    (void)wfdb_fprintf(oheader, " %"WFDB_Pd_TIME, msnsamples);
     if (msbtime != 0L || msbdate != (WFDB_Date)0) {
         if (msbtime % 1000 == 0)
 	    (void)wfdb_fprintf(oheader, " %s",
@@ -3210,7 +3211,8 @@ FINT setmsheader(char *record, char **segment_name, unsigned int nsegments)
 
     /* Write a line for each segment. */
     for (i = 0; i < nsegments; i++)
-	(void)wfdb_fprintf(oheader, "%s %ld\r\n", segment_name[i], ns[i]);
+	(void)wfdb_fprintf(oheader, "%s %"WFDB_Pd_TIME"\r\n",
+			   segment_name[i], ns[i]);
 
     SFREE(ns);
     return (0);
