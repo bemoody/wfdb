@@ -171,6 +171,12 @@ static struct oadata {
 static WFDB_Frequency oafreq;	/* time resolution in ticks/sec for newly-
 				   created output annotators */
 
+#ifdef WFDB_LARGETIME
+typedef unsigned long long unsigned_time;
+#else
+typedef unsigned long unsigned_time;
+#endif
+
 /* Local functions (for the use of other functions in this module only). */
 
 /* Round a double to the nearest WFDB_Time, with halfway cases always
@@ -586,7 +592,7 @@ FINT putann(WFDB_Annotator n, WFDB_Annotation *annot)
     unsigned annwd;
     unsigned char *ap;
     int i, len;
-    unsigned long delta;
+    unsigned_time delta;
     WFDB_Time t;
     struct oadata *oa;
 
@@ -600,7 +606,7 @@ FINT putann(WFDB_Annotator n, WFDB_Annotation *annot)
 	if (put_ann_table(n) < 0)
 	    return (-1);
     }
-    delta = (unsigned long) t - oa->ann.time;
+    delta = (unsigned_time) t - oa->ann.time;
     if (!(annot->chan > oa->ann.chan || annot->num > oa->ann.num ||
 	  t > oa->ann.time || (t == 0L && oa->ann.time == 0L)))
         oa->out_of_order = 1;
