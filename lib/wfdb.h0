@@ -1,5 +1,5 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised: 8 December 2017   	wfdblib 10.6.0
+			Last revised:  24 April 2020    	wfdblib 10.7.0
 WFDB library type, constant, structure, and function interface definitions
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
@@ -96,6 +96,63 @@ typedef unsigned int WFDB_Annotator;/* annotator number */
 #define WFDB_GROUP_MAX              UINT_MAX
 #define WFDB_SIGNAL_MAX             UINT_MAX
 #define WFDB_ANNOTATOR_MAX          UINT_MAX
+
+/* The following macros can be used to construct format strings for
+   printf and scanf, and related standard library functions. */
+
+#define WFDB_SAMPLE_PRINTF_MODIFIER ""
+#define WFDB_SAMPLE_SCANF_MODIFIER ""
+#define WFDB_TIME_PRINTF_MODIFIER  "l"
+#define WFDB_TIME_SCANF_MODIFIER   "l"
+#define WFDB_FREQUENCY_PRINTF_MODIFIER ""
+#define WFDB_FREQUENCY_SCANF_MODIFIER "l"
+#define WFDB_GAIN_PRINTF_MODIFIER ""
+#define WFDB_GAIN_SCANF_MODIFIER "l"
+
+#define WFDB_Pd_SAMP WFDB_SAMPLE_PRINTF_MODIFIER "d"
+#define WFDB_Pi_SAMP WFDB_SAMPLE_PRINTF_MODIFIER "i"
+#define WFDB_Po_SAMP WFDB_SAMPLE_PRINTF_MODIFIER "o"
+#define WFDB_Pu_SAMP WFDB_SAMPLE_PRINTF_MODIFIER "u"
+#define WFDB_Px_SAMP WFDB_SAMPLE_PRINTF_MODIFIER "x"
+#define WFDB_PX_SAMP WFDB_SAMPLE_PRINTF_MODIFIER "X"
+#define WFDB_Sd_SAMP WFDB_SAMPLE_SCANF_MODIFIER "d"
+#define WFDB_Si_SAMP WFDB_SAMPLE_SCANF_MODIFIER "i"
+#define WFDB_So_SAMP WFDB_SAMPLE_SCANF_MODIFIER "o"
+#define WFDB_Su_SAMP WFDB_SAMPLE_SCANF_MODIFIER "u"
+#define WFDB_Sx_SAMP WFDB_SAMPLE_SCANF_MODIFIER "x"
+#define WFDB_SX_SAMP WFDB_SAMPLE_SCANF_MODIFIER "X"
+#define WFDB_Pd_TIME WFDB_TIME_PRINTF_MODIFIER "d"
+#define WFDB_Pi_TIME WFDB_TIME_PRINTF_MODIFIER "i"
+#define WFDB_Po_TIME WFDB_TIME_PRINTF_MODIFIER "o"
+#define WFDB_Pu_TIME WFDB_TIME_PRINTF_MODIFIER "u"
+#define WFDB_Px_TIME WFDB_TIME_PRINTF_MODIFIER "x"
+#define WFDB_PX_TIME WFDB_TIME_PRINTF_MODIFIER "X"
+#define WFDB_Sd_TIME WFDB_TIME_SCANF_MODIFIER "d"
+#define WFDB_Si_TIME WFDB_TIME_SCANF_MODIFIER "i"
+#define WFDB_So_TIME WFDB_TIME_SCANF_MODIFIER "o"
+#define WFDB_Su_TIME WFDB_TIME_SCANF_MODIFIER "u"
+#define WFDB_Sx_TIME WFDB_TIME_SCANF_MODIFIER "x"
+#define WFDB_SX_TIME WFDB_TIME_SCANF_MODIFIER "X"
+#define WFDB_Pe_FREQ WFDB_FREQUENCY_PRINTF_MODIFIER "e"
+#define WFDB_PE_FREQ WFDB_FREQUENCY_PRINTF_MODIFIER "E"
+#define WFDB_Pf_FREQ WFDB_FREQUENCY_PRINTF_MODIFIER "f"
+#define WFDB_Pg_FREQ WFDB_FREQUENCY_PRINTF_MODIFIER "g"
+#define WFDB_PG_FREQ WFDB_FREQUENCY_PRINTF_MODIFIER "G"
+#define WFDB_Se_FREQ WFDB_FREQUENCY_SCANF_MODIFIER "e"
+#define WFDB_SE_FREQ WFDB_FREQUENCY_SCANF_MODIFIER "E"
+#define WFDB_Sf_FREQ WFDB_FREQUENCY_SCANF_MODIFIER "f"
+#define WFDB_Sg_FREQ WFDB_FREQUENCY_SCANF_MODIFIER "g"
+#define WFDB_SG_FREQ WFDB_FREQUENCY_SCANF_MODIFIER "G"
+#define WFDB_Pe_GAIN WFDB_GAIN_PRINTF_MODIFIER "e"
+#define WFDB_PE_GAIN WFDB_GAIN_PRINTF_MODIFIER "E"
+#define WFDB_Pf_GAIN WFDB_GAIN_PRINTF_MODIFIER "f"
+#define WFDB_Pg_GAIN WFDB_GAIN_PRINTF_MODIFIER "g"
+#define WFDB_PG_GAIN WFDB_GAIN_PRINTF_MODIFIER "G"
+#define WFDB_Se_GAIN WFDB_GAIN_SCANF_MODIFIER "e"
+#define WFDB_SE_GAIN WFDB_GAIN_SCANF_MODIFIER "E"
+#define WFDB_Sf_GAIN WFDB_GAIN_SCANF_MODIFIER "f"
+#define WFDB_Sg_GAIN WFDB_GAIN_SCANF_MODIFIER "g"
+#define WFDB_SG_GAIN WFDB_GAIN_SCANF_MODIFIER "G"
 
 /* getvec and getframe return a sample with a value of WFDB_INVALID_SAMPLE
    when the amplitude of a signal is undefined (e.g., the input is clipped or
