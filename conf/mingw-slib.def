@@ -1,5 +1,5 @@
 # file: mingw-slib.def		I. Henry and G. Moody	    11 February 2005
-#				Last revised:		      8 March 2017
+#				Last revised:		      27 April 2020
 #
 # This section contains settings suitable for generating a DLL (shared library)
 # under MS Windows using the free gcc ANSI C compiler.
@@ -101,7 +101,7 @@ BUILDLIB = $(CC) NOCYGWIN -shared -o $(WFDBLIB_DLLNAME) \
 
 # BUILDLIB_LDFLAGS is a list of arguments appended to BUILDLIB following
 # the list of *.o files.
-BUILDLIB_LDFLAGS = $(LL)
+BUILDLIB_LDFLAGS = -static-libgcc $(LL)
  
 # LDCONFIG is the name of the program needed to refresh the system's cached
 # index of shared libraries.
