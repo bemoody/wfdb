@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:     8 March 2019   	wfdblib 10.6.2
+			Last revised:    27 April 2020   	wfdblib 10.7.0
 WFDB library functions for annotations
 
 _______________________________________________________________________________
@@ -99,6 +99,8 @@ may be attached to the same signal provided that their num fields are unique.
 #include "ecgcodes.h"
 #include "ecgmap.h"
 
+#include <limits.h>
+
 /* Annotation word format */
 #define CODE	0176000	/* annotation code segment of annotation word */
 #define CS	10	/* number of places by which code must be shifted */
@@ -170,8 +172,6 @@ static WFDB_Frequency oafreq;	/* time resolution in ticks/sec for newly-
 				   created output annotators */
 
 /* Local functions (for the use of other functions in this module only). */
-
-#include <limits.h>
 
 /* Round a double to the nearest WFDB_Time, with halfway cases always
    rounded up.  (For example, round_to_time(10.5) is 11, but
