@@ -174,6 +174,7 @@ void example(void)
 #include "wfdblib.h"
 
 #include <limits.h>
+#include <errno.h>
 
 #ifdef iAPX286
 #define BROKEN_CC
@@ -249,6 +250,7 @@ static WFDB_Date msbdate;	/* base date for multi-segment record */
 static WFDB_Time msnsamples;	/* duration of multi-segment record */
 static WFDB_Seginfo *segarray, *segp, *segend;
 				/* beginning, current segment, end pointers */
+static struct WFDB_seginfo_L *segarray_L;
 
 /* These variables relate to open input signals. */
 static unsigned maxisig;	/* max number of input signals */
@@ -1088,6 +1090,7 @@ static int readheader(const char *record)
 	msnsamples = nsamples;
 	/* Read the names and lengths of the segment records. */
 	SALLOC(segarray, segments, sizeof(WFDB_Seginfo));
+	SFREE(segarray_L);
 	segp = segarray;
 	for (i = 0, ns = (WFDB_Time)0L; i < segments; i++, segp++) {
 	    /* Get next segment spec, skip empty lines and comments. */
@@ -3867,6 +3870,7 @@ void wfdb_sigclose(void)
 	    SFREE(isd[i]->info.units);
 	}
     }
+    SFREE(segarray_L);
     SFREE(gv0);
     SFREE(gv1);
     SFREE(tvector);
@@ -3943,3 +3947,88 @@ void wfdb_oinfoclose(void)
 	wfdb_fclose(outinfo);
     outinfo = NULL;
 }
+
+#ifdef WFDB_LARGETIME
+
+/* Wrapper functions
+
+   The following functions are provided for compatibility with
+   applications that do not support WFDB_LARGETIME.  The behavior,
+   arguments, and return values of these functions are the same as the
+   "non-wrapped" functions above, except that 'long' is used in place
+   of WFDB_Time. */
+
+struct WFDB_seginfo_L {
+    char recname[WFDB_MAXRNL+1];
+    /* WFDB_Time */ long nsamp;
+    /* WFDB_Time */ long samp0;
+};
+
+static long tclamp(WFDB_Time t)
+{
+    if (t >= LONG_MIN && t <= LONG_MAX)
+	return (t);
+    errno = ERANGE;
+    return (t < 0 ? LONG_MIN : LONG_MAX);
+}
+
+#undef isigsettime
+FINT isigsettime(long t)
+{
+    return (wfdb_isigsettime_LL(t));
+}
+
+#undef isgsettime
+FINT isgsettime(WFDB_Group g, long t)
+{
+    return (wfdb_isgsettime_LL(g, t));
+}
+
+#undef tnextvec
+FLONGINT tnextvec(WFDB_Signal s, long t)
+{
+    return (tclamp(wfdb_tnextvec_LL(s, t)));
+}
+
+#undef timstr
+FSTRING timstr(long t)
+{
+    return (wfdb_timstr_LL(t));
+}
+
+#undef mstimstr
+FSTRING mstimstr(long t)
+{
+    return (wfdb_mstimstr_LL(t));
+}
+
+#undef strtim
+FLONGINT strtim(char *time_string)
+{
+    return (tclamp(wfdb_strtim_LL(time_string)));
+}
+
+#undef sample
+FSAMPLE sample(WFDB_Signal s, long t)
+{
+    return (wfdb_sample_LL(s, t));
+}
+
+#undef getseginfo
+FINT getseginfo(struct WFDB_seginfo_L **sarray)
+{
+    int i;
+    if (segarray && !segarray_L) {
+	SALLOC(segarray_L, segments, sizeof(struct WFDB_seginfo_L));
+	for (i = 0; i < segments; i++) {
+	    memcpy(segarray_L[i].recname, segarray[i].recname,
+		   sizeof(segarray[i].recname));
+	    segarray_L[i].nsamp = tclamp(segarray[i].nsamp);
+	    segarray_L[i].samp0 = tclamp(segarray[i].samp0);
+	}
+    }
+    *sarray = segarray_L;
+    return (segments);
+}
+
+#endif /* WFDB_LARGETIME */

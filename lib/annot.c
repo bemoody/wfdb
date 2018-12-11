@@ -1197,3 +1197,76 @@ void wfdb_anclose(void)
     for (an = noaf; an != 0; an--)
 	oannclose(an-1);
 }
+
+#ifdef WFDB_LARGETIME
+
+/* Wrapper functions
+
+   The following functions are provided for compatibility with
+   applications that do not support WFDB_LARGETIME. The behavior,
+   arguments, and return values of these functions are the same as the
+   "non-wrapped" functions above, except that 'long' is used in place
+   of WFDB_Time. */
+
+struct WFDB_ann_L {
+    /* WFDB_Time */ long time;
+    char anntyp;
+    signed char subtyp;
+    unsigned char chan;
+    signed char num;
+    unsigned char *aux;
+};
+
+#undef getann
+FINT getann(WFDB_Annotator a, struct WFDB_ann_L *annot)
+{
+    WFDB_Annotation lla;
+    int stat = wfdb_getann_LL(a, &lla);
+    if (stat < 0)
+	return (stat);
+
+    if (lla.time > LONG_MAX || lla.time < LONG_MIN)
+	lla.time = (lla.time < 0 ? LONG_MIN : LONG_MAX);
+
+    annot->time = lla.time;
+    annot->anntyp = lla.anntyp;
+    annot->subtyp = lla.subtyp;
+    annot->chan = lla.chan;
+    annot->num = lla.num;
+    annot->aux = lla.aux;
+    return (stat);
+}
+
+#undef ungetann
+FINT ungetann(WFDB_Annotator a, struct WFDB_ann_L *annot)
+{
+    WFDB_Annotation lla;
+    lla.time = annot->time;
+    lla.anntyp = annot->anntyp;
+    lla.subtyp = annot->subtyp;
+    lla.chan = annot->chan;
+    lla.num = annot->num;
+    lla.aux = annot->aux;
+    return (wfdb_ungetann_LL(a, &lla));
+}
+
+#undef putann
+FINT putann(WFDB_Annotator a, struct WFDB_ann_L *annot)
+{
+    WFDB_Annotation lla;
+    lla.time = annot->time;
+    lla.anntyp = annot->anntyp;
+    lla.subtyp = annot->subtyp;
+    lla.chan = annot->chan;
+    lla.num = annot->num;
+    lla.aux = annot->aux;
+    return (wfdb_putann_LL(a, &lla));
+}
+
+#undef iannsettime
+FINT iannsettime(long t)
+{
+    return (wfdb_iannsettime_LL(t));
+}
+
+#endif /* WFDB_LARGETIME */
