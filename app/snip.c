@@ -1,5 +1,5 @@
 /* file: snip.c		G. Moody	30 July 1989
-               		Last revised:   24 April 2020
+               		Last revised:   27 April 2020
 -------------------------------------------------------------------------------
 snip: Copy an excerpt of a database record
 Copyright (C) 1989-2013 George B. Moody
@@ -345,7 +345,8 @@ void copy_sig(char *nrec, char *irec, WFDB_Time from, WFDB_Time to, int recurse)
 	    to = tf;
 
 	/* Start writing the master output header. */
-	fprintf(ohfile, "%s/%d %d %.12g %ld", nrec, nseg, nsig, sfreq, to-from);
+	fprintf(ohfile, "%s/%d %d %.12g %"WFDB_Pd_TIME,
+		nrec, nseg, nsig, sfreq, to-from);
 	if (tstring[0]) fprintf(ohfile, " %s", tstring);
 	fprintf(ohfile, "\r\n");
 

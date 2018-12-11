@@ -1,5 +1,5 @@
 /* file: lcheck.c	G. Moody       7 September 2001
-			Last revised:  8 March 2019
+			Last revised:  27 April 2020
 -------------------------------------------------------------------------------
 wfdbcheck: test WFDB library
 Copyright (C) 2001-2010 George B. Moody
@@ -365,12 +365,13 @@ int check(char *record, char *orec)
   /* *** strtim, timstr *** */
   t = strtim("0:5");
   if (t != (WFDB_Time)(5.0 * f)) {
-    printf("Error: strtim returned %ld (should have been %ld)\n", t,
+    printf("Error: strtim returned %"WFDB_Pd_TIME
+	   " (should have been %"WFDB_Pd_TIME")\n", t,
 	    (WFDB_Time)(5.0 * f));
     errors++;
   }
   else if (vflag)
-    printf("[OK]:  strtim returned %ld\n", t);
+    printf("[OK]:  strtim returned %"WFDB_Pd_TIME"\n", t);
 
   p = timstr(t); q = "    0:05";
   if (strcmp(p, q)) {
@@ -417,7 +418,7 @@ int check(char *record, char *orec)
       errors++;
     }
     else if (vflag)
-      printf("[OK]:  getann read: {%s %d %d %d} at %s (%ld)\n",
+      printf("[OK]:  getann read: {%s %d %d %d} at %s (%"WFDB_Pd_TIME")\n",
 	     annstr(annot.anntyp), annot.subtyp, annot.chan, annot.num,
 	     mstimstr(annot.time), annot.time);
   }
@@ -539,12 +540,13 @@ int check(char *record, char *orec)
   /* *** strtim *** */
   t = strtim("0:20");
   if (t != (WFDB_Time)(20.0 * f)) {
-    printf("Error: strtim returned %ld (should have been %ld)\n", t,
+    printf("Error: strtim returned %"WFDB_Pd_TIME
+	   " (should have been %"WFDB_Pd_TIME")\n", t,
 	    (WFDB_Time)(20.0 * f));
     errors++;
   }
   else if (vflag)
-    printf("[OK]:  strtim returned %ld\n", t);
+    printf("[OK]:  strtim returned %"WFDB_Pd_TIME"\n", t);
 
   p = timstr(t); q = "    0:20";
   if (strcmp(p, q)) {
@@ -650,14 +652,14 @@ int check(char *record, char *orec)
     errors++;
   }
   else if (vflag)	/* getframe reached EOF, checksums OK */
-    printf("[OK]:  getframe read %ld samples\n", t);
+    printf("[OK]:  getframe read %"WFDB_Pd_TIME" samples\n", t);
   if (istat != nsig) {	/* some error occurred while writing samples */
     printf("Error: putvec returned %d (should have been %d) at %s\n",
 	   istat, nsig, mstimstr(t));
     errors++;
   }
   else if (vflag)	/* putvec wrote all samples without apparent error */
-    printf("[OK]:  putvec wrote %ld samples\n", t);
+    printf("[OK]:  putvec wrote %"WFDB_Pd_TIME" samples\n", t);
 
   /* *** newheader *** */
   istat = newheader(orec);

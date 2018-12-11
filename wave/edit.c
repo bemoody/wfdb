@@ -1,5 +1,5 @@
 /* file: edit.c		G. Moody	 1 May 1990
-               		Last revised:	24 April 2020
+               		Last revised:	27 April 2020
 Annotation-editing functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -87,10 +87,11 @@ int stat;
 		      mstimstr(ref_mark_time - level_time));
 	  break;
       case 2:
-	  sprintf(level_time_string, "Sample number: %ld", level_time);
+	  sprintf(level_time_string, "Sample number: %"WFDB_Pd_TIME,
+		  level_time);
 	  break;
       case 3:
-	  sprintf(level_time_string, "Interval: %ld samples",
+	  sprintf(level_time_string, "Interval: %"WFDB_Pd_TIME" samples",
 		  level_time - ref_mark_time);
 	  break;
     }

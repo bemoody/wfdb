@@ -1,5 +1,5 @@
 /* file: wfdbdesc.c		G. Moody	  June 1989
-				Last revised:   6 April 2012
+				Last revised:   27 April 2020
 
 -------------------------------------------------------------------------------
 wfdbdesc: Describe signal specifications
@@ -86,7 +86,7 @@ char *argv[];
     (void)printf("\nStarting time: %s\n", *p == '[' ? p : "not specified");
     (void)printf("Length: ");
     if (nsig < 1 || t > 0L)
-	(void)printf("%s (%ld sample intervals)\n",
+	(void)printf("%s (%"WFDB_Pd_TIME" sample intervals)\n",
 		     t > 0L ? mstimstr(t) : "0", t);
     else if (s[0].fmt && (ifile = fopen(s[0].fname, "rb")) &&
 	     (fseek(ifile, 0L, 2) == 0)) {
@@ -115,7 +115,8 @@ char *argv[];
 	    t = (3L * nbytes) / (4*framesize);
 	    break;
 	}
-	(void)printf("%s (%ld sample intervals) [from signal file size]\n",
+	(void)printf("%s (%"WFDB_Pd_TIME" sample intervals)"
+		     " [from signal file size]\n",
 		     mstimstr(t), t);
     }
     else (void)printf("not specified\n");

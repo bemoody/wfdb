@@ -1,5 +1,5 @@
 /* file: heaxml.c	G. Moody	28 June 2010
-			Last revised:	11 December 2017
+                 	Last revised:	27 April 2020
 -------------------------------------------------------------------------------
 heaxml: Convert a WFDB .hea (header) file to XML format
 Copyright (C) 2010 George B. Moody
@@ -142,7 +142,8 @@ main(int argc, char **argv)
 	if (strcmp("~", sp[i].recname) == 0) {
 	  fprintf(ofile, "\n<segment name=\"gap_%d\">\n<gap>\n", i);
 	  process_start(nextts);
-	  fprintf(ofile, "<length>%ld</length></gap>\n", sp[i].nsamp);
+	  fprintf(ofile, "<length>%"WFDB_Pd_TIME"</length></gap>\n",
+		  sp[i].nsamp);
 	}
 	else {
 	  sprintf(segname, "%s/%s", record, sp[i].recname);
@@ -301,7 +302,7 @@ int process_record(void)
     process_start(mstimstr(0L));
 
     if (nsig < 1 || t > 0L)
-      (void)fprintf(ofile, "<length>%ld</length>\n", t);
+      (void)fprintf(ofile, "<length>%"WFDB_Pd_TIME"</length>\n", t);
     else if (s[0].fmt && (ifile = fopen(s[0].fname, "rb")) &&
 	     (fseek(ifile, 0L, 2) == 0)) {
 	int framesize = 0;
@@ -329,7 +330,7 @@ int process_record(void)
 	    t = (3L * nbytes) / (4*framesize);
 	    break;
 	}
-      (void)fprintf(ofile, "<length>%ld</length>\n", t);
+      (void)fprintf(ofile, "<length>%"WFDB_Pd_TIME"</length>\n", t);
     }
 
     (void)fprintf(ofile, "<samplingfrequency>%.12g</samplingfrequency>\n",

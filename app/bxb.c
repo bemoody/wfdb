@@ -1,5 +1,5 @@
 /* file: bxb.c		G. Moody	14 December 1987
-			Last revised:	  24 April 2020
+			Last revised:	  27 April 2020
 
 -------------------------------------------------------------------------------
 bxb: ANSI/AAMI-standard beat-by-beat annotation file comparator
@@ -1188,8 +1188,8 @@ void genxcmp()
 			(void)sprintf(p, " (%s)", test_annot.aux+1);
 		    alen = strlen(mstring+1);
 		    if (alen > 254) {
-			(void)fprintf(stderr,
-				      "aux string truncated at %s (%ld)\n",
+			(void)fprintf(stderr, "aux string truncated at %s "
+				"(%"WFDB_Pd_TIME")\n",
 				timstr(test_annot.time), test_annot.time);
 			alen = 254;
 			mstring[alen+1] = '\0';
@@ -1214,7 +1214,8 @@ void genxcmp()
 		    (void)sprintf(p, " (%s)", test_annot.aux+1);
 		alen = strlen(mstring+1);
 		if (alen > 254) {
-		    (void)fprintf(stderr, "aux string truncated at %s (%ld)\n",
+		    (void)fprintf(stderr, "aux string truncated at %s "
+			    "(%"WFDB_Pd_TIME")\n",
 			    timstr(test_annot.time), test_annot.time);
 		    alen = 254;
 		    mstring[alen+1] = '\0';
@@ -1258,8 +1259,8 @@ void genxcmp()
 			(void)sprintf(p, " (%s)", test_annot.aux+1);
 		    alen = strlen(mstring+1);
 		    if (alen > 254) {
-			(void)fprintf(stderr,
-				      "aux string truncated at %s (%ld)\n",
+			(void)fprintf(stderr, "aux string truncated at %s "
+				"(%"WFDB_Pd_TIME")\n",
 				timstr(test_annot.time), test_annot.time);
 			alen = 254;
 			mstring[alen+1] = '\0';
@@ -1286,7 +1287,8 @@ void genxcmp()
 		(void)sprintf(p, "/%c", tpann(ref_annot.time));
 		alen = strlen(mstring+1);
 		if (alen > 254) {
-		    (void)fprintf(stderr, "aux string truncated at %s (%ld)\n",
+		    (void)fprintf(stderr, "aux string truncated at %s "
+			    "(%"WFDB_Pd_TIME")\n",
 			    timstr(ref_annot.time), ref_annot.time);
 		    alen = 254;
 		    mstring[alen+1] = '\0';

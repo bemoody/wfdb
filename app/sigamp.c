@@ -1,5 +1,5 @@
 /* file: sigamp.c	G. Moody	30 November 1991
-			Last revised:	24 April 2020
+			Last revised:	27 April 2020
 
 -------------------------------------------------------------------------------
 sigamp: Measure signal amplitudes
@@ -367,7 +367,7 @@ void printamp(WFDB_Time t)
     switch (timeunits) {
       case TIMSTR:  printf("%s",mstimstr(-t)); break;
       case HHMMSS:    printf("%s", mstimstr(t)); break;
-      case SAMPLES:   printf("%ld", t); break;
+      case SAMPLES:   printf("%"WFDB_Pd_TIME, t); break;
       default:	    printf("%lf", t/sfreq); break;
     }
     for (i = 0; i < nsig; i++)

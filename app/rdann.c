@@ -1,5 +1,5 @@
 /* file rdann.c	    T. Baker and G. Moody	27 July 1981
-               	    Last revised:               24 April 2020
+               	    Last revised:               27 April 2020
 
 -------------------------------------------------------------------------------
 rdann: Print an annotation file in ASCII form
@@ -305,14 +305,16 @@ char *argv[];
 	    (nflag == 0 || annot.num == nummatch) &&
 	    (sflag == 0 || annot.subtyp == submatch)) {
 	    if (eflag)
-		(void)printf("%s  %7ld", mstimstr(annot.time), sample_num);
+		(void)printf("%s  %7"WFDB_Pd_TIME,
+			     mstimstr(annot.time), sample_num);
 	    else if (xflag)
 		(void)printf("%*.*f %*.*f %*.*f",
 			     sprec + 6, sprec, annot.time/tps,
 			     mprec + 4, mprec, annot.time/tpm,
 			     hprec + 2, hprec, annot.time/tph);
 	    else
-		(void)printf("%s  %7ld", mstimstr(-annot.time), sample_num);
+		(void)printf("%s  %7"WFDB_Pd_TIME,
+			     mstimstr(-annot.time), sample_num);
 	    (void)printf("%6s%5d%5d%5d", annstr(annot.anntyp), annot.subtyp,
 		annot.chan, annot.num);
 	    if (annot.aux != NULL) (void)printf("\t%s", annot.aux + 1);
