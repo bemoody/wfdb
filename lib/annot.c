@@ -567,7 +567,8 @@ FINT ungetann(WFDB_Annotator n, WFDB_Annotation *annot)
     if (iad[n]->pann.anntyp) {
 	wfdb_error("ungetann: pushback buffer is full\n");
 	wfdb_error(
-		 "ungetann: annotation at %ld, annotator %d not pushed back\n",
+		 "ungetann: annotation at %"WFDB_Pd_TIME", annotator %d "
+		 "not pushed back\n",
 		 annot->time, n);
 	return (-1);
     }
