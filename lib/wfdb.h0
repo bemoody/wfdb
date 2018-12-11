@@ -1,5 +1,5 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised:  24 April 2020    	wfdblib 10.7.0
+			Last revised:  27 April 2020    	wfdblib 10.7.0
 WFDB library type, constant, structure, and function interface definitions
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
@@ -64,11 +64,11 @@ _______________________________________________________________________________
 #ifndef wfdb_PROTO	/* should be true for K&R C compilers only */
 #define wfdb_KRC
 #define signed
+#undef WFDB_LARGETIME
 #endif
 
 /* Simple data types */
 typedef int	     WFDB_Sample;   /* units are adus */
-typedef long 	     WFDB_Time;	    /* units are sample intervals */
 typedef long	     WFDB_Date;	    /* units are days */
 typedef double	     WFDB_Frequency;/* units are Hz (samples/second/signal) */
 typedef double	     WFDB_Gain;	    /* units are adus per physical unit */
@@ -81,8 +81,6 @@ typedef unsigned int WFDB_Annotator;/* annotator number */
    <float.h>. */
 #define WFDB_SAMPLE_MIN             INT_MIN
 #define WFDB_SAMPLE_MAX             INT_MAX
-#define WFDB_TIME_MIN               LONG_MIN
-#define WFDB_TIME_MAX               LONG_MAX
 #define WFDB_DATE_MIN               LONG_MIN
 #define WFDB_DATE_MAX               LONG_MAX
 #define WFDB_FREQUENCY_MAX          DBL_MAX
@@ -97,13 +95,56 @@ typedef unsigned int WFDB_Annotator;/* annotator number */
 #define WFDB_SIGNAL_MAX             UINT_MAX
 #define WFDB_ANNOTATOR_MAX          UINT_MAX
 
+/* The 'WFDB_Time' type is traditionally defined as a long integer.
+   However, if the preprocessor symbol WFDB_LARGETIME is defined prior
+   to including this file, it is defined as a 'long long' instead. */
+#ifndef WFDB_LARGETIME
+typedef long 	     WFDB_Time;	    /* units are sample intervals */
+# define WFDB_TIME_MIN              LONG_MIN
+# define WFDB_TIME_MAX              LONG_MAX
+# define WFDB_TIME_PRINTF_MODIFIER  "l"
+# define WFDB_TIME_SCANF_MODIFIER   "l"
+#else
+# if defined(_MSC_VER) && _MSC_VER < 1400
+typedef __int64      WFDB_Time;
+#  define WFDB_TIME_MIN             _I64_MIN
+#  define WFDB_TIME_MAX             _I64_MAX
+# else
+typedef long long    WFDB_Time;
+#  define WFDB_TIME_MIN             LLONG_MIN
+#  define WFDB_TIME_MAX             LLONG_MAX
+# endif
+# ifdef _WIN32
+#  define WFDB_TIME_PRINTF_MODIFIER "I64"
+#  define WFDB_TIME_SCANF_MODIFIER  "I64"
+# else
+#  define WFDB_TIME_PRINTF_MODIFIER "ll"
+#  define WFDB_TIME_SCANF_MODIFIER  "ll"
+# endif
+
+/* A number of WFDB library functions use WFDB_Time as either a
+   parameter or return value, so the library includes two versions of
+   each of these functions.  The following preprocessor definitions
+   ensure that 'isigsettime' refers to the correct version. */
+# define isigsettime  wfdb_isigsettime_LL
+# define isgsettime   wfdb_isgsettime_LL
+# define tnextvec     wfdb_tnextvec_LL
+# define iannsettime  wfdb_iannsettime_LL
+# define timstr       wfdb_timstr_LL
+# define mstimstr     wfdb_mstimstr_LL
+# define strtim       wfdb_strtim_LL
+# define sample       wfdb_sample_LL
+# define getann       wfdb_getann_LL
+# define ungetann     wfdb_ungetann_LL
+# define putann       wfdb_putann_LL
+# define getseginfo   wfdb_getseginfo_LL
+#endif
+
 /* The following macros can be used to construct format strings for
    printf and scanf, and related standard library functions. */
 
 #define WFDB_SAMPLE_PRINTF_MODIFIER ""
 #define WFDB_SAMPLE_SCANF_MODIFIER ""
-#define WFDB_TIME_PRINTF_MODIFIER  "l"
-#define WFDB_TIME_SCANF_MODIFIER   "l"
 #define WFDB_FREQUENCY_PRINTF_MODIFIER ""
 #define WFDB_FREQUENCY_SCANF_MODIFIER "l"
 #define WFDB_GAIN_PRINTF_MODIFIER ""
