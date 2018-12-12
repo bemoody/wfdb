@@ -1273,6 +1273,13 @@ FINT ungetann(WFDB_Annotator a, struct WFDB_ann_L *annot)
     lla.num = annot->num;
     lla.aux = annot->aux;
 
+    if (a < niaf && (ia = iad[a])) {
+	if (ia->prev_time < LONG_MIN)
+	    ia->prev_time = LONG_MIN;
+	else if (ia->prev_time > LONG_MAX)
+	    ia->prev_time = LONG_MAX;
+    }
+
     stat = wfdb_ungetann_LL(a, &lla);
     if (stat == 0 && a < niaf && (ia = iad[a]))
 	ia->pann_L = *annot;
