@@ -1119,7 +1119,7 @@ static int readheader(const char *record)
 	    }
 	    (void)strcpy(segp->recname, p);
 	    if ((p = strtok((char *)NULL, sep)) == NULL ||
-		(segp->nsamp = (WFDB_Time)strtol(p, NULL, 10)) < 0L) {
+		(segp->nsamp = strtotime(p, NULL, 10)) < 0L) {
 		wfdb_error(
 		"init: length must be specified for segment %s in record %s\n",
 		           segp->recname, record);
