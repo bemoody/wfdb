@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:    8 March 2019		wfdblib 10.6.2
+			Last revised:   27 April 2020		wfdblib 10.7.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -1887,7 +1887,7 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
     }
     /* For special files, rewind if necessary and then read ahead. */
     else {
-	long t0, t1;
+	WFDB_Time t0, t1;
 
 	/* Get the time of the earliest buffered sample ... */
 	t0 = istime - (ig->bp - ig->buf)/b;
