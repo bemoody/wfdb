@@ -1056,7 +1056,7 @@ static int readheader(const char *record)
     /* Determine the number of samples per signal, if present and not
        set already. */
     if (p = strtok((char *)NULL, sep)) {
-	if ((ns = (WFDB_Time)strtol(p, NULL, 10)) < 0L) {
+	if ((ns = strtotime(p, NULL, 10)) < 0L) {
 	    wfdb_error(
 		"init: number of samples in record %s header is incorrect\n",
 		record);
@@ -1136,8 +1136,10 @@ static int readheader(const char *record)
 	    msnsamples = ns;
 	else if (ns != msnsamples) {
 	    wfdb_error("warning (init): in record %s, "
-		       "stated record length (%ld)\n", record, msnsamples);
-	    wfdb_error(" does not match sum of segment lengths (%ld)\n", ns);
+		       "stated record length (%"WFDB_Pd_TIME")\n",
+		       record, msnsamples);
+	    wfdb_error(" does not match sum of segment lengths "
+		       "(%"WFDB_Pd_TIME")\n", ns);
 	}
 	return (0);
     }
@@ -1270,7 +1272,7 @@ static int readheader(const char *record)
 	/* Determine the checksum (assumed to be zero if missing). */
 	if (p = strtok((char *)NULL, sep)) {
 	    hs->info.cksum = strtol(p, NULL, 10);
-	    hs->info.nsamp = ns;
+	    hs->info.nsamp = (ns > LONG_MAX ? 0 : ns);
 	}
 	else {
 	    hs->info.cksum = 0;
