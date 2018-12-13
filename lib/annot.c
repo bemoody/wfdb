@@ -1301,7 +1301,7 @@ FINT putann(WFDB_Annotator a, struct WFDB_ann_L *annot)
 #undef iannsettime
 FINT iannsettime(long t)
 {
-    return (wfdb_iannsettime_LL(t));
+    return (wfdb_iannsettime_LL(t == LONG_MIN ? WFDB_TIME_MIN : t));
 }
 
 #endif /* WFDB_LARGETIME */
