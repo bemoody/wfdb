@@ -1289,12 +1289,22 @@ FINT ungetann(WFDB_Annotator a, struct WFDB_ann_L *annot)
 FINT putann(WFDB_Annotator a, struct WFDB_ann_L *annot)
 {
     WFDB_Annotation lla;
+    struct oadata *oa;
+
     lla.time = annot->time;
     lla.anntyp = annot->anntyp;
     lla.subtyp = annot->subtyp;
     lla.chan = annot->chan;
     lla.num = annot->num;
     lla.aux = annot->aux;
+
+    if (a < noaf && (oa = oad[a]) && oa->info.stat != WFDB_AHA_WRITE) {
+	if (lla.time == LONG_MIN)
+	    lla.time = WFDB_TIME_MIN;
+	else if (lla.time == LONG_MAX)
+	    lla.time = WFDB_TIME_MAX;
+    }
+
     return (wfdb_putann_LL(a, &lla));
 }
 
