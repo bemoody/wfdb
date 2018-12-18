@@ -1,5 +1,5 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised:  28 April 2020    	wfdblib 10.7.0
+			Last revised:    4 May 2020     	wfdblib 10.7.0
 WFDB library type, constant, structure, and function interface definitions
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
@@ -327,7 +327,11 @@ typedef struct WFDB_seginfo WFDB_Seginfo;
 #define SFREE(P) { if (P) { free (P); P = 0; } }
 #define SUALLOC(P, N, S) { if (!(P = calloc((N), (S)))) MEMERR(P, (N), (S)); }
 #define SALLOC(P, N, S) { SFREE(P); SUALLOC(P, (N), (S)) }
-#define SREALLOC(P, N, S) { if (!(P = realloc(P, (N)*(S)))) MEMERR(P,(N),(S)); }
+#define SREALLOC(P, N, S) \
+    { size_t WFDB_tmp1 = (N), WFDB_tmp2 = (S); \
+      if (!(P = ((WFDB_tmp2 && WFDB_tmp1 > (size_t) -1 / WFDB_tmp2) \
+		 ? 0 : realloc(P, WFDB_tmp1 * WFDB_tmp2)))) \
+	  MEMERR(P, WFDB_tmp1, WFDB_tmp2); }
 #define SSTRCPY(P, Q) { const char *WFDB_tmp = (Q); if (WFDB_tmp) { \
 	 SALLOC(P, (size_t)strlen(WFDB_tmp)+1,1); strcpy(P, WFDB_tmp); } }
 
