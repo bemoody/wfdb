@@ -1,5 +1,5 @@
 /* file: gqpost.c		G. Moody	16 November 2006
-				Last revised:	   9 May 2018
+				Last revised:	15 January 2019
 -------------------------------------------------------------------------------
 gqpost: A post-processor for gqrs
 Copyright (C) 2006-2012 George B. Moody
@@ -202,11 +202,20 @@ main(int argc, char **argv)
     meanrrd = RRdelta * sps;
     if ((minrrd = meanrrd/2) < 4) minrrd = 4;
     if ((dt = meanrr/80) < 1) dt = 1;
-    
+
+    if (from) {
+	from = strtim(argv[from]);
+	if (from < 0) from = -from;
+    }
+    if (to) {
+	to = strtim(argv[to]);
+	if (to < 0) to = -to;
+    }
+
     while (getann(0, &annot) == 0) {
 	switch (state) {
 	  case 0:
-	    if (annot.time < from) continue;
+	    if (annot.time < from) break;
 	    else state++;
 	    /* fall through to case 1 */
   	  case 1:
