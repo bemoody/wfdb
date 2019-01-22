@@ -1,5 +1,5 @@
 /* file: wfdblib.h	G. Moody	13 April 1989
-                        Last revised:   28 April 2020         wfdblib 10.7.0
+                        Last revised:   30 April 2020         wfdblib 10.7.0
 External definitions for WFDB library private functions
 
 _______________________________________________________________________________
@@ -273,6 +273,7 @@ typedef struct WFDB_FILE WFDB_FILE;
 #include <direct.h>
 #define MKDIR(D,P)	mkdir((D))
 #else
+#include <sys/stat.h>
 #define MKDIR(D,P)	mkdir((D),(P))
 #endif
 #endif
