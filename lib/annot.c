@@ -278,7 +278,7 @@ static int put_ann_table(WFDB_Annotator i)
 	    if (anndesc(a))
 		n = wfdb_asprintf(&str, "%d %s %s", a, annstr(a), anndesc(a));
 	    else
-		n = wfdb_asprintf(&str, "%d %s", a, annstr(a));
+		n = wfdb_asprintf(&str, "%d %s ", a, annstr(a));
 	    if (!str) return (-1);
 	    annot.aux[0] = (n > 255 ? 255 : n);
 	    memcpy(annot.aux + 1, str, n);
