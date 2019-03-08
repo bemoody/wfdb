@@ -1865,6 +1865,11 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
 	break;
     }
 
+    if (t > (LONG_MAX / b) || ((long) (t * b))/d > (LONG_MAX - ig->start)) {
+	wfdb_error("isigsettime: improper seek on signal group %d\n", g);
+	return (-1);
+    }
+
     /* Seek to the beginning of the block which contains the desired sample.
        For normal files, use fseek() to do so. */
     if (ig->seek) {
