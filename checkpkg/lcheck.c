@@ -1,5 +1,5 @@
 /* file: lcheck.c	G. Moody       7 September 2001
-			Last revised:  15 August 2017
+			Last revised:  8 March 2019
 -------------------------------------------------------------------------------
 wfdbcheck: test WFDB library
 Copyright (C) 2001-2010 George B. Moody
@@ -179,7 +179,7 @@ char *argv[];
   if (WFDB_NETFILES) {
     if (vflag)
       printf("[OK]:  Repeating tests using NETFILES");
-    if (strstr(defpath, "http://") == NULL) {
+    if (strstr(defpath, "://") == NULL) {
       fprintf(stderr,
        "\nWarning: default WFDB path does not include an http:// component\n");
       setwfdb(". http://www.physionet.org/physiobank/database");
