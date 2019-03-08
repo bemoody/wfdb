@@ -1,5 +1,5 @@
 /* file: gqfuse.c		G. Moody	6 May 2012
-				Last revised:   9 May 2018
+				Last revised:   8 March 2019
 -------------------------------------------------------------------------------
 gqfuse: combine QRS annotation files
 Copyright (C) 2012 George B. Moody
@@ -82,7 +82,7 @@ main(int argc, char **argv)
     for (i = 1; i < argc; i++) {
 	if (*argv[i] == '-') switch (*(argv[i]+1)) {
 	  case 'a':	/* input annotator names */
-	      for (a0 = a1 = ++i; a1 < argc && *argv[a1] != '-'; a1++, i++)
+	    for (a0 = a1 = i + 1; a1 < argc && *argv[a1] != '-'; a1++, i++)
 		;
 	    if ((niann = a1 - a0) < 2) {
 		(void)fprintf(stderr,
