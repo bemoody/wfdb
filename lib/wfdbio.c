@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:   28 November 2018      wfdblib 10.6.1
+                        Last revised:     8 March 2019        wfdblib 10.6.2
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -592,6 +592,7 @@ void wfdb_free_config(void)
     SFREE(p_wfdbgvmode);
     SFREE(wfdbpath);
     SFREE(wfdbpath_init);
+    SFREE(wfdb_filename);
 }
 
 void wfdb_export_config(void)
