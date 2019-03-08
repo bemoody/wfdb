@@ -133,6 +133,12 @@ checkpkg/expected/xform.hea
 checkpkg/expected/xform.wabp
 checkpkg/input
 checkpkg/input/100x.hea
+checkpkg/input/237s.all
+checkpkg/input/237s.hea
+checkpkg/input/237s1.dat
+checkpkg/input/237s1.hea
+checkpkg/input/237s2.dat
+checkpkg/input/237s2.hea
 checkpkg/input/ecgeval
 checkpkg/input/sumstats
 checkpkg/input/test.scp

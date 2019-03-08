@@ -1,6 +1,6 @@
 #!/bin/sh
 # file: appcheck		G. Moody       7 September 2001
-#                               Last revised:    17 May 2018
+#                               Last revised:    8 March 2019
 #
 # This script checks the basic functionality of most of the WFDB applications
 # in the 'app' directory.  These programs are not (yet) tested by this script:
@@ -11,7 +11,15 @@
 
 cp -pr ../data .
 
-WFDB=". data http://www.physionet.org/physiobank/database"
+if [ "x$WFDB_NO_NET_CHECK" != x ]
+then
+    mkdir data/www
+    cp -p input/237s* data/www/
+    DBURL=file://`pwd`/data/www
+else
+    DBURL=http://www.physionet.org/physiobank/database
+fi
+WFDB=". data $DBURL"
 export WFDB
 
 INCDIR=$1
@@ -514,8 +522,19 @@ done
 if ( grep "WFDB_NETFILES 1" $INCDIR/wfdb/wfdb.h >grep.out 2>&1 )
 then
   echo "Testing xform (with NETFILES) ..."
-  $BINDIR/xform -i mimicdb/237/237 -s 1 2 0 3 -a all -M -n xform -f 9:19:45 \
+  if [ "x$WFDB_NO_NET_CHECK" != x ]
+  then
+      rec=237s
+  else
+      rec=mimicdb/237/237
+  fi
+  $BINDIR/xform -i $rec -s 1 2 0 3 -a all -M -n xform -f 9:19:45 \
    -t "[22:01:23 20/07/1995]" -S input/xform >xform-2.out 2>&1
+  if [ -f xform.hea ]
+  then
+      sed "s+record $rec+record mimicdb/237/237+" < xform.hea > xform.tmp
+      mv xform.tmp xform.hea
+  fi
   for F in xform-2.out xform.hea xform.dat xform.all
   do
     if ( ./checkfile $F )
