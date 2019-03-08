@@ -202,7 +202,7 @@ static WFDB_Time round_to_time(double x)
 
 static int get_ann_table(WFDB_Annotator i)
 {
-    char *p1, *p2, *s1 = NULL, *s2 = NULL;
+    char *p1, *p2;
     int a;
     WFDB_Annotation annot;
     WFDB_Frequency sfreq;
@@ -221,21 +221,22 @@ static int get_ann_table(WFDB_Annotator i)
 		sscanf((char *)annot.aux + 20, "%lf", &(iad[i]->afreq));
 	    continue;
 	}
-	p1 = strtok((char *)annot.aux+1, " \t");
+	p1 = (char *) annot.aux + 1;
+	p1 = p1 + strspn(p1, " \t"); /* whitespace preceding annotation code */
 	a = strtol(p1, &p2, 10);
-	if (0 <= a && a <= ACMAX && p2 != p1 &&
-	    (p1 = strtok((char *)NULL, " \t"))) {
-	    SSTRCPY(s1, p1);
-	    (void)setannstr(a, s1);
-	    p2 = p1 + strlen(p1) + 1;
-	    if (*p2) {
-		SSTRCPY(s2, p2);
-		(void)setanndesc(a, s2);
-	    }
+	if (a < 0 || a > ACMAX || p1 == p2)
+	    continue;
+	p2 = p2 + strcspn(p2, " \t"); /* non-whitespace following code */
+	p1 = p2 + strspn(p2, " \t"); /* whitespace between code and mnemonic */
+	p2 = p1 + strcspn(p1, " \t"); /* non-whitespace (mnemonic) */
+	if (p2 != p1) {
+	    if (*p2)
+		setanndesc(a, p2 + 1);
 	    else
-		(void)setanndesc(a, (char *)NULL);
+		setanndesc(a, (char *)NULL);
+	    *p2 = 0;
+	    setannstr(a, p1);
 	}
-
     }
     if (annot.time != 0L || annot.anntyp != NOTE || annot.subtyp != 0 ||
 	annot.aux == NULL) {
