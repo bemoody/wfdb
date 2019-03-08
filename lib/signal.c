@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  28 November 2018		wfdblib 10.6.1
+			Last revised:    8 March 2019		wfdblib 10.6.2
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -627,6 +627,7 @@ static int sigmap_init(int first_segment)
     else if (in_msrec && !first_segment && framelen == 0) {
 	/* opening a new segment of a fixed-layout multisegment
 	   record */
+	ispfmax = vspfmax;
 	if (nisig > nvsig) {
 	    wfdb_error("sigmap_init: wrong number of signals in segment %s\n",
 		       segp->recname);
@@ -645,6 +646,7 @@ static int sigmap_init(int first_segment)
     else {	/* normal record, or multisegment record without a dummy
 		   header */
 	nvsig = nisig;
+	vspfmax = ispfmax;
 	for (s = tspf = 0; s < nisig; s++)
 	    tspf += isd[s]->info.spf;
 	return (make_vsd());
