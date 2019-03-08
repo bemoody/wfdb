@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:   23 January 2018  	wfdblib 10.6.0
+			Last revised:     8 March 2019   	wfdblib 10.6.2
 WFDB library functions for annotations
 
 _______________________________________________________________________________
@@ -704,8 +704,11 @@ FINT iannsettime(WFDB_Time t)
     WFDB_Annotation tempann;
     WFDB_Annotator i;
 
-    /* Handle negative arguments as equivalent positive arguments. */
-    if (t < 0L) t = -t;
+    /* Handle negative arguments as equivalent positive arguments.  As
+       an exception, WFDB_TIME_MIN indicates that we should rewind to
+       the very beginning of the annotation file, even if there are
+       annotations at negative time values. */
+    if (t < 0 && t != WFDB_TIME_MIN) t = -t;
 
     /* Loop over all annotators. */
     for (i = 0; i < niaf; i++) {
