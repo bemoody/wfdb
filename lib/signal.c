@@ -1686,7 +1686,7 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
     long nb, tt;
     struct igdata *ig;
     WFDB_Signal s;
-    unsigned int b, d = 1, n, nn;
+    unsigned int b, d = 1, n, nn, j;
 
     /* Do nothing if there is no more than one input signal group and
        the input pointer is correct already. */
@@ -1776,8 +1776,18 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
       default: b = nn; break;
       case 16:
       case 61:
-      case 160: b = 2*nn; break;
+      case 160:
+	if (nn > UINT_MAX / 2) {
+	    wfdb_error("isigsettime: overflow in signal group %d\n", g);
+	    return (-1);
+	}
+	b = 2*nn;
+	break;
       case 212:
+	if (nn > UINT_MAX / 3) {
+	    wfdb_error("isigsettime: overflow in signal group %d\n", g);
+	    return (-1);
+	}
 	/* Reset the input counter. */
 	ig->count = 0;
 	/* If the desired sample does not lie on a byte boundary, seek to
@@ -1787,7 +1797,7 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
 		t += segp->samp0;	/* restore absolute time */
 	    if (i = isgsetframe(g, t - 1))
 		return (i);
-	    for (i = 0; i < nn; i++)
+	    for (j = 0; j < nn; j++)
 		(void)r212(ig);
 	    istime++;
 	    for (n = 0; s+n < nisig && isd[s+n]->info.group == g; n++)
@@ -1796,6 +1806,10 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
 	}
 	b = 3*nn; d = 2; break;
       case 310:
+	if (nn > UINT_MAX / 4) {
+	    wfdb_error("isigsettime: overflow in signal group %d\n", g);
+	    return (-1);
+	}
 	/* Reset the input counter. */
 	ig->count = 0;
 	/* If the desired sample does not lie on a byte boundary, seek to
@@ -1805,7 +1819,7 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
 		t += segp->samp0;	/* restore absolute time */
 	    if (i = isgsetframe(g, t - trem))
 		return (i);
-	    for (i = nn*trem; i > 0; i--)
+	    for (j = nn*trem; j > 0; j--)
 		(void)r310(ig);
 	    istime += trem;
 	    for (n = 0; s+n < nisig && isd[s+n]->info.group == g; n++)
@@ -1814,6 +1828,10 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
 	}		  
 	b = 4*nn; d = 3; break;
       case 311:
+	if (nn > UINT_MAX / 4) {
+	    wfdb_error("isigsettime: overflow in signal group %d\n", g);
+	    return (-1);
+	}
 	/* Reset the input counter. */
 	ig->count = 0;
 	/* If the desired sample does not lie on a byte boundary, seek to
@@ -1823,7 +1841,7 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
 		t += segp->samp0;	/* restore absolute time */
 	    if (i = isgsetframe(g, t - trem))
 		return (i);
-	    for (i = nn*trem; i > 0; i--)
+	    for (j = nn*trem; j > 0; j--)
 		(void)r311(ig);
 	    istime += trem;
 	    for (n = 0; s+n < nisig && isd[s+n]->info.group == g; n++)
@@ -1831,8 +1849,20 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
 	    return (0);
 	}		  
 	b = 4*nn; d = 3; break;
-      case 24: b = 3*nn; break;
-      case 32: b = 4*nn; break;
+      case 24:
+	if (nn > UINT_MAX / 3) {
+	    wfdb_error("isigsettime: overflow in signal group %d\n", g);
+	    return (-1);
+	}
+	b = 3*nn;
+	break;
+      case 32:
+	if (nn > UINT_MAX / 4) {
+	    wfdb_error("isigsettime: overflow in signal group %d\n", g);
+	    return (-1);
+	}
+	b = 4*nn;
+	break;
     }
 
     /* Seek to the beginning of the block which contains the desired sample.
