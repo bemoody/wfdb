@@ -2856,6 +2856,7 @@ FINT isigsettime(WFDB_Time t)
 FINT isgsettime(WFDB_Group g, WFDB_Time t)
 {
     int spf, stat, trem = 0;
+    double tt;
 
     /* Handle negative arguments as equivalent positive arguments. */
     if (t < 0L) {
@@ -2867,8 +2868,14 @@ FINT isgsettime(WFDB_Group g, WFDB_Time t)
     }
 
     /* Convert t to raw sample intervals if we are resampling. */
-    if (ifreq > (WFDB_Frequency)0)
-	t = (WFDB_Time)(t * sfreq/ifreq);
+    if (ifreq > (WFDB_Frequency)0) {
+	tt = t * sfreq/ifreq;
+	if (tt > WFDB_TIME_MAX) {
+	    wfdb_error("isigsettime: improper seek on signal group %d\n", g);
+	    return (-1);
+	}
+	t = (WFDB_Time) tt;
+    }
 
     /* If we're in WFDB_HIGHRES mode, convert t from samples to frames, and
        save the remainder (if any) in trem. */
