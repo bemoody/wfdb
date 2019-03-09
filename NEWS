@@ -1,3 +1,19 @@
+10.6.2 (8 March 2019):
+	Minor bugs have been fixed in the command-line option handling of
+	'gqfuse' and 'gqpost', so these programs will behave as documented.
+
+	Changes to the internal functions get_ann_table() and put_ann_table()
+	ensure sensible and consistent behavior if a custom annotation type is
+	defined (using setannstr()) but no description is provided (using
+	setanndesc()).
+
+	Changes in isgsettime() and isgsetframe() avoid incorrect behavior if
+	the specified time value is large enough to cause integer overflow.
+
+	It is now possible to run the package test suite without network
+	access, by setting the environment variable WFDB_NO_NET_CHECK to 1
+	before running 'make check'.
+
 10.6.1 (28 November 2018):
 	'fir', 'mfilt', 'nst', 'snip', 'mit2wav', 'wfdb2mat', and 'xform' have
 	been updated to work correctly with multi-frequency input records.

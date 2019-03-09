@@ -9124,6 +9124,22 @@ changes that may not be described here.
 
 @unnumberedsec WFDB 10.6
 
+@unnumberedsubsec Changes in version 10.6.2 (8 March 2019)
+
+Changes to the internal functions @code{get_ann_table()} and
+@code{put_ann_table()} ensure sensible and consistent behavior if a custom
+annotation type is defined (using @code{setannstr()}) but no description is
+provided (using @code{setanndesc()}).  Prior to version 10.6.0, the library
+would typically set the description to @code{"(null)"} in this case, but this
+was not guaranteed.  In version 10.6.0, this behavior was changed in an attempt
+to fix the undefined behavior, but the result was an annotation file that could
+not be read correctly.  Version 10.6.2 fixes both of these problems; annotation
+files written by any older version can be read by version 10.6.2, and
+annotation files written by version 10.6.2 can be read by any older version.
+
+Changes in @code{isgsettime()} and @code{isgsetframe()} avoid incorrect
+behavior if the specified time value is large enough to cause integer overflow.
+
 @unnumberedsubsec Changes in version 10.6.1 (28 November 2018)
 
 The internal function @code{edfparse()} will correctly calculate the ADC
