@@ -578,7 +578,7 @@ FINT getann(WFDB_Annotator n, WFDB_Annotation *annot)
 }
 
 /* ungetann: push back an annotation into an input stream */
-FINT ungetann(WFDB_Annotator n, WFDB_Annotation *annot)
+FINT ungetann(WFDB_Annotator n, const WFDB_Annotation *annot)
 {
     if (n >= niaf || iad[n] == NULL) {
 	wfdb_error("ungetann: annotator %d is not initialized\n", n);
@@ -601,10 +601,10 @@ FINT ungetann(WFDB_Annotator n, WFDB_Annotation *annot)
 }
 
 /* putann: write annotation at annot to annotator n */
-FINT putann(WFDB_Annotator n, WFDB_Annotation *annot)
+FINT putann(WFDB_Annotator n, const WFDB_Annotation *annot)
 {
     unsigned annwd;
-    unsigned char *ap;
+    const unsigned char *ap;
     int i, len;
     unsigned_time delta;
     WFDB_Time t;
@@ -1260,7 +1260,7 @@ FINT getann(WFDB_Annotator a, struct WFDB_ann_L *annot)
 }
 
 #undef ungetann
-FINT ungetann(WFDB_Annotator a, struct WFDB_ann_L *annot)
+FINT ungetann(WFDB_Annotator a, const struct WFDB_ann_L *annot)
 {
     WFDB_Annotation lla;
     struct iadata *ia;
@@ -1287,7 +1287,7 @@ FINT ungetann(WFDB_Annotator a, struct WFDB_ann_L *annot)
 }
 
 #undef putann
-FINT putann(WFDB_Annotator a, struct WFDB_ann_L *annot)
+FINT putann(WFDB_Annotator a, const struct WFDB_ann_L *annot)
 {
     WFDB_Annotation lla;
     struct oadata *oa;
