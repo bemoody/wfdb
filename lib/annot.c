@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:    27 April 2020   	wfdblib 10.7.0
+			Last revised:    28 April 2020   	wfdblib 10.7.0
 WFDB library functions for annotations
 
 _______________________________________________________________________________
@@ -811,7 +811,7 @@ FSTRING ecgstr(int code)
 }
 
 /* strecg: convert a mnemonic string to an anntyp value */
-FINT strecg(char *str)
+FINT strecg(const char *str)
 {
     int code;
 
@@ -823,7 +823,7 @@ FINT strecg(char *str)
 }
 
 /* setecgstr: set the mnemonic string associated with the specified anntyp */
-FINT setecgstr(int code, char *string)
+FINT setecgstr(int code, const char *string)
 {
     if (NOTQRS <= code && code <= ACMAX) {
 	if (string == NULL) string = "";
@@ -864,7 +864,7 @@ FSTRING annstr(int code)
     }
 }
 
-FINT strann(char *str)
+FINT strann(const char *str)
 {
     int code;
 
@@ -875,7 +875,7 @@ FINT strann(char *str)
     return (NOTQRS);
 }
 
-FINT setannstr(int code, char *string)
+FINT setannstr(int code, const char *string)
 {
     int mflag = 0;
 
@@ -957,7 +957,7 @@ FSTRING anndesc(int code)
 	return ("illegal annotation code");
 }
 
-FINT setanndesc(int code, char *string)
+FINT setanndesc(int code, const char *string)
 {
     int mflag = 0;
 

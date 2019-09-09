@@ -1,5 +1,5 @@
 /* file: wfdb.h		G. Moody	13 June 1983
-			Last revised:  27 April 2020    	wfdblib 10.7.0
+			Last revised:  28 April 2020    	wfdblib 10.7.0
 WFDB library type, constant, structure, and function interface definitions
 _______________________________________________________________________________
 wfdb: a library for reading and writing annotated waveforms (time series data)
@@ -406,13 +406,16 @@ extern FINT isgsettime(WFDB_Group g, WFDB_Time t);
 extern FSITIME tnextvec(WFDB_Signal s, WFDB_Time t);
 extern FINT iannsettime(WFDB_Time t);
 extern FSTRING ecgstr(int annotation_code);
-extern FINT strecg(char *annotation_mnemonic_string);
-extern FINT setecgstr(int annotation_code, char *annotation_mnemonic_string);
+extern FINT strecg(const char *annotation_mnemonic_string);
+extern FINT setecgstr(int annotation_code,
+		      const char *annotation_mnemonic_string);
 extern FSTRING annstr(int annotation_code);
-extern FINT strann(char *annotation_mnemonic_string);
-extern FINT setannstr(int annotation_code, char *annotation_mnemonic_string);
+extern FINT strann(const char *annotation_mnemonic_string);
+extern FINT setannstr(int annotation_code,
+		      const char *annotation_mnemonic_string);
 extern FSTRING anndesc(int annotation_code);
-extern FINT setanndesc(int annotation_code, char *annotation_description);
+extern FINT setanndesc(int annotation_code,
+		       const char *annotation_description);
 extern FVOID setafreq(WFDB_Frequency f);
 extern FFREQUENCY getafreq(void);
 extern FVOID setiafreq(WFDB_Annotator a, WFDB_Frequency f);
