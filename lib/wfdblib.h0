@@ -1,5 +1,5 @@
 /* file: wfdblib.h	G. Moody	13 April 1989
-                        Last revised:  13 November 2017       wfdblib 10.6.0
+                        Last revised:   28 April 2020         wfdblib 10.7.0
 External definitions for WFDB library private functions
 
 _______________________________________________________________________________
@@ -286,7 +286,7 @@ extern "C" {
 /* These functions are defined in wfdbio.c */
 extern int wfdb_fclose(WFDB_FILE *fp);
 extern WFDB_FILE *wfdb_open(const char *file_type, const char *record, int mode);
-extern int wfdb_checkname(char *name, char *description);
+extern int wfdb_checkname(const char *name, const char *description);
 extern void wfdb_striphea(char *record);
 extern int wfdb_g16(WFDB_FILE *fp);
 extern long wfdb_g32(WFDB_FILE *fp);

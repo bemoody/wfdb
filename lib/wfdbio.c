@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:     8 March 2019        wfdblib 10.6.2
+                        Last revised:     28 April 2020       wfdblib 10.7.0
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -1146,7 +1146,7 @@ WFDB_FILE *wfdb_open(const char *s, const char *record, int mode)
    and they must contain only letters, digits, hyphens, tildes, underscores, and
    directory separators. */
 
-int wfdb_checkname(char *p, char *s)
+int wfdb_checkname(const char *p, const char *s)
 {
     do {
 	if (('0' <= *p && *p <= '9') || *p == '_' || *p == '~' || *p== '-' ||
