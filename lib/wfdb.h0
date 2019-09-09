@@ -380,14 +380,14 @@ extern "C" {
 
 /* Define function prototypes for ANSI C compilers and C++ compilers */
 #ifdef wfdb_PROTO
-extern FINT annopen(char *record, WFDB_Anninfo *aiarray,
+extern FINT annopen(char *record, const WFDB_Anninfo *aiarray,
 		    unsigned int nann);
 extern FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig);
 extern FINT osigopen(char *record, WFDB_Siginfo *siarray,
 		     unsigned int nsig);
 extern FINT osigfopen(WFDB_Siginfo *siarray, unsigned int nsig);
 extern FINT wfdbinit(char *record,
-		     WFDB_Anninfo *aiarray, unsigned int nann,
+		     const WFDB_Anninfo *aiarray, unsigned int nann,
 		     WFDB_Siginfo *siarray, unsigned int nsig);
 extern FINT findsig(char *signame);
 extern FINT getspf(void);

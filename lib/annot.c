@@ -355,7 +355,8 @@ static int allocoann(unsigned n)
 /* WFDB library functions (for general use). */
 
 /* annopen: open annotation files for the specified record */
-FINT annopen(char *record, WFDB_Anninfo *aiarray, unsigned int nann)
+FINT annopen(char *record, const WFDB_Anninfo *aiarray,
+	     unsigned int nann)
 {
     int a;
     unsigned int i, niafneeded, noafneeded;
