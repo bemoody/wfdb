@@ -1,5 +1,5 @@
 /* file: calib.c	G. Moody	  4 July 1991
-			Last revised:  18 November 2013		wfdblib 10.5.21
+			Last revised:    28 April 2020 		wfdblib 10.7.0
 WFDB library functions for signal calibration
 
 _______________________________________________________________________________
@@ -66,7 +66,7 @@ static struct cle {
    otherwise, the "+" is discarded before attempting to open the file,
    which may be in any directory in the WFDB path.  If the file can be read,
    its contents are appended to the calibration list. */
-FINT calopen(char *cfname)
+FINT calopen(const char *cfname)
 {
     WFDB_FILE *cfile;
     char buf[128], *p1, *p2, *p3, *p4, *p5, *p6;
@@ -152,7 +152,7 @@ FINT calopen(char *cfname)
    of finding a match.  If a match is found, it is copied into the caller's
    WFDB_Calinfo structure.  The caller must not write over the storage
    addressed by the desc and units fields. */
-FINT getcal(char *desc, char *units, WFDB_Calinfo *cal)
+FINT getcal(const char *desc, const char *units, WFDB_Calinfo *cal)
 {
     for (this_cle = first_cle; this_cle; this_cle = this_cle->next) {
 	if ((desc == NULL || strncmp(desc, this_cle->sigtype,
@@ -172,7 +172,7 @@ FINT getcal(char *desc, char *units, WFDB_Calinfo *cal)
 
 /* Function putcal appends the caller's WFDB_Calinfo structure to the end of
    the calibration list. */
-FINT putcal(WFDB_Calinfo *cal)
+FINT putcal(const WFDB_Calinfo *cal)
 {
     SUALLOC(this_cle, 1, sizeof(struct cle));
     SSTRCPY(this_cle->sigtype, cal->sigtype);
@@ -194,7 +194,7 @@ FINT putcal(WFDB_Calinfo *cal)
 
 /* Function newcal generates a calibration file based on the contents of the
    calibration list. */
-FINT newcal(char *cfname)
+FINT newcal(const char *cfname)
 {
     WFDB_FILE *cfile;
 
@@ -207,7 +207,7 @@ FINT newcal(char *cfname)
     }
 
     for (this_cle = first_cle; this_cle; this_cle = this_cle->next) {
-	char *pulsetype;
+	const char *pulsetype;
 
 	(void)wfdb_fprintf(cfile, "%s\t", this_cle->sigtype);
 	if (this_cle->caltype & WFDB_DC_COUPLED)

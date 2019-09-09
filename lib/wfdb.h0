@@ -445,10 +445,11 @@ extern FDOUBLE aduphys(WFDB_Signal s, WFDB_Sample a);
 extern FSAMPLE physadu(WFDB_Signal s, double v);
 extern FSAMPLE sample(WFDB_Signal s, WFDB_Time t);
 extern FINT sample_valid(void);
-extern FINT calopen(char *calibration_filename);
-extern FINT getcal(char *description, char *units, WFDB_Calinfo *cal);
-extern FINT putcal(WFDB_Calinfo *cal);
-extern FINT newcal(char *calibration_filename);
+extern FINT calopen(const char *calibration_filename);
+extern FINT getcal(const char *description, const char *units,
+		   WFDB_Calinfo *cal);
+extern FINT putcal(const WFDB_Calinfo *cal);
+extern FINT newcal(const char *calibration_filename);
 extern FVOID flushcal(void);
 extern FSTRING getinfo(char *record);
 extern FINT putinfo(char *info);
