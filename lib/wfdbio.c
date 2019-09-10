@@ -226,7 +226,7 @@ static char *wfdb_filename;
 
 /* wfdbfile returns the pathname or URL of a WFDB file. */
 
-FSTRING wfdbfile(char *s, char *record)
+FSTRING wfdbfile(const char *s, char *record)
 {
     WFDB_FILE *ifile;
 
@@ -2096,7 +2096,7 @@ long wfdb_ftell(WFDB_FILE *wp)
     return (ftell(wp->fp));
 }
 
-size_t wfdb_fwrite(void *ptr, size_t size, size_t nmemb, WFDB_FILE *wp)
+size_t wfdb_fwrite(const void *ptr, size_t size, size_t nmemb, WFDB_FILE *wp)
 {
     if (wp->type == WFDB_NET)
 	return (nf_fwrite(ptr, size, nmemb, wp->netfp));

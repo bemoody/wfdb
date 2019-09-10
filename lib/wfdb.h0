@@ -481,7 +481,7 @@ extern FSTRING getwfdb(void);
 extern FVOID resetwfdb(void);
 extern FINT setibsize(int input_buffer_size);
 extern FINT setobsize(int output_buffer_size);
-extern FSTRING wfdbfile(char *file_type, char *record);
+extern FSTRING wfdbfile(const char *file_type, char *record);
 extern FVOID wfdbflush(void);
 extern FVOID wfdbmemerr(int exit_on_error);
 #if __GNUC__ >= 3

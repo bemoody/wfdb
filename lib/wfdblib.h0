@@ -314,7 +314,8 @@ extern char *wfdb_fgets(char *s, int size, WFDB_FILE *fp);
 extern size_t wfdb_fread(void *ptr, size_t size, size_t nmemb, WFDB_FILE *fp);
 extern int wfdb_fseek(WFDB_FILE *fp, long offset, int whence);
 extern long wfdb_ftell(WFDB_FILE *fp);
-extern size_t wfdb_fwrite(void *ptr, size_t size, size_t nmemb, WFDB_FILE *fp);
+extern size_t wfdb_fwrite(const void *ptr, size_t size, size_t nmemb,
+			  WFDB_FILE *fp);
 extern int wfdb_getc(WFDB_FILE *fp);
 extern int wfdb_putc(int c, WFDB_FILE *fp);
 
