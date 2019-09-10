@@ -2561,9 +2561,9 @@ assumed to represent a signal number, which is returned.  Otherwise, findsig
 looks for a signal with a description matching the string, and returns the
 first match if any, or -1 if not. */
 
-int findsig(char *p)
+int findsig(const char *p)
 {
-  char *q = p;
+  const char *q = p;
   int s;
 
   while ('0' <= *q && *q <= '9')

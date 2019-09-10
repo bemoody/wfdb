@@ -389,7 +389,7 @@ extern FINT osigfopen(WFDB_Siginfo *siarray, unsigned int nsig);
 extern FINT wfdbinit(char *record,
 		     const WFDB_Anninfo *aiarray, unsigned int nann,
 		     WFDB_Siginfo *siarray, unsigned int nsig);
-extern FINT findsig(char *signame);
+extern FINT findsig(const char *signame);
 extern FINT getspf(void);
 extern FVOID setgvmode(int mode);
 extern FINT getgvmode(void);
