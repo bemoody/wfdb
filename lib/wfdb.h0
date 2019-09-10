@@ -385,7 +385,7 @@ extern FINT annopen(char *record, const WFDB_Anninfo *aiarray,
 extern FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig);
 extern FINT osigopen(char *record, WFDB_Siginfo *siarray,
 		     unsigned int nsig);
-extern FINT osigfopen(WFDB_Siginfo *siarray, unsigned int nsig);
+extern FINT osigfopen(const WFDB_Siginfo *siarray, unsigned int nsig);
 extern FINT wfdbinit(char *record,
 		     const WFDB_Anninfo *aiarray, unsigned int nann,
 		     WFDB_Siginfo *siarray, unsigned int nsig);
@@ -456,7 +456,8 @@ extern FINT putinfo(const char *info);
 extern FINT setinfo(char *record);
 extern FVOID wfdb_freeinfo(void);
 extern FINT newheader(char *record);
-extern FINT setheader(char *record, WFDB_Siginfo *siarray, unsigned int nsig);
+extern FINT setheader(char *record, const WFDB_Siginfo *siarray,
+		      unsigned int nsig);
 extern FINT setmsheader(char *record, char **segnames, unsigned int nsegments);
 extern FINT getseginfo(WFDB_Seginfo **segments);
 extern FINT wfdbgetskew(WFDB_Signal s);

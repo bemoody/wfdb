@@ -414,7 +414,7 @@ static int isfmt(int f)
     return (0);
 }
 
-static int copysi(WFDB_Siginfo *to, WFDB_Siginfo *from)
+static int copysi(WFDB_Siginfo *to, const WFDB_Siginfo *from)
 {
     if (to == NULL || from == NULL) return (0);
     *to = *from;
@@ -2427,12 +2427,12 @@ FINT osigopen(char *record, WFDB_Siginfo *siarray, unsigned int nsig)
     return (s);
 }
 
-FINT osigfopen(WFDB_Siginfo *siarray, unsigned int nsig)
+FINT osigfopen(const WFDB_Siginfo *siarray, unsigned int nsig)
 {
     struct osdata *os, *op;
     struct ogdata *og;
     int s;
-    WFDB_Siginfo *si;
+    const WFDB_Siginfo *si;
 
     /* Close any open output signals. */
     osigclose();
@@ -3020,7 +3020,7 @@ FINT newheader(char *record)
     return (stat);
 }
 
-FINT setheader(char *record, WFDB_Siginfo *siarray, unsigned int nsig)
+FINT setheader(char *record, const WFDB_Siginfo *siarray, unsigned int nsig)
 {
     char *p;
     WFDB_Signal s;
