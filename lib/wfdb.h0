@@ -397,7 +397,7 @@ extern FINT setifreq(WFDB_Frequency freq);
 extern FFREQUENCY getifreq(void);
 extern FINT getvec(WFDB_Sample *vector);
 extern FINT getframe(WFDB_Sample *vector);
-extern FINT putvec(WFDB_Sample *vector);
+extern FINT putvec(const WFDB_Sample *vector);
 extern FINT getann(WFDB_Annotator a, WFDB_Annotation *annot);
 extern FINT ungetann(WFDB_Annotator a, const WFDB_Annotation *annot);
 extern FINT putann(WFDB_Annotator a, const WFDB_Annotation *annot);

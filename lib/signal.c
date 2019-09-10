@@ -2761,13 +2761,14 @@ FINT getframe(WFDB_Sample *vector)
     return (stat);
 }
 
-FINT putvec(WFDB_Sample *vector)
+FINT putvec(const WFDB_Sample *vector)
 {
     int c, dif, stat = (int)nosig;
     struct osdata *os;
     struct ogdata *og;
     WFDB_Signal s;
     WFDB_Group g;
+    WFDB_Sample samp;
 
     for (s = 0; s < nosig; s++) {
 	os = osd[s];
@@ -2777,7 +2778,7 @@ FINT putvec(WFDB_Sample *vector)
 	    os->info.initval = os->samp = *vector;
 	for (c = 0; c < os->info.spf; c++, vector++) {
 	    /* Replace invalid samples with lowest possible value for format */
-	    if (*vector == WFDB_INVALID_SAMPLE)
+	    if ((samp = *vector) == WFDB_INVALID_SAMPLE)
 		switch (os->info.fmt) {
 		  case 0:
 		  case 8:
@@ -2785,48 +2786,48 @@ FINT putvec(WFDB_Sample *vector)
 		  case 61:
 		  case 160:
 		  default:
-		    *vector = -1 << 15; break;
+		    samp = -1 << 15; break;
 		  case 80:
-		    *vector = -1 << 7; break;
+		    samp = -1 << 7; break;
 		  case 212:
-		    *vector = -1 << 11; break;
+		    samp = -1 << 11; break;
 		  case 310:
 		  case 311:
-		    *vector = -1 << 9; break;
+		    samp = -1 << 9; break;
 		  case 24:
-		    *vector = -1 << 23; break;
+		    samp = -1 << 23; break;
 		  case 32:
-		    *vector = -1 << 31; break;
+		    samp = -1 << 31; break;
 		}
 	    switch (os->info.fmt) {
 	      case 0:	/* null signal (do not write) */
-		os->samp = *vector; break;
+		os->samp = samp; break;
 	      case 8:	/* 8-bit first differences */
 	      default:
 		/* Handle large slew rates sensibly. */
-		if ((dif = *vector - os->samp) < -128) { dif = -128; stat=0; }
+		if ((dif = samp - os->samp) < -128) { dif = -128; stat=0; }
 		else if (dif > 127) { dif = 127; stat = 0; }
 		os->samp += dif;
 		w8(dif, og);
 		break;
 	      case 16:	/* 16-bit amplitudes */
-		w16(*vector, og); os->samp = *vector; break;
+		w16(samp, og); os->samp = samp; break;
 	      case 61:	/* 16-bit amplitudes, bytes swapped */
-		w61(*vector, og); os->samp = *vector; break;
+		w61(samp, og); os->samp = samp; break;
 	      case 80:	/* 8-bit offset binary amplitudes */
-		w80(*vector, og); os->samp = *vector; break;
+		w80(samp, og); os->samp = samp; break;
 	      case 160:	/* 16-bit offset binary amplitudes */
-		w160(*vector, og); os->samp = *vector; break;
+		w160(samp, og); os->samp = samp; break;
 	      case 212:	/* 2 12-bit amplitudes bit-packed in 3 bytes */
-		w212(*vector, og); os->samp = *vector; break;
+		w212(samp, og); os->samp = samp; break;
 	      case 310:	/* 3 10-bit amplitudes bit-packed in 4 bytes */
-		w310(*vector, og); os->samp = *vector; break;
+		w310(samp, og); os->samp = samp; break;
 	      case 311:	/* 3 10-bit amplitudes bit-packed in 4 bytes */
-		w311(*vector, og); os->samp = *vector; break;
+		w311(samp, og); os->samp = samp; break;
 	      case 24: /* 24-bit amplitudes */
-	        w24(*vector, og); os->samp = *vector; break;
+	        w24(samp, og); os->samp = samp; break;
 	      case 32: /* 32-bit amplitudes */
-	        w32(*vector, og); os->samp = *vector; break;
+	        w32(samp, og); os->samp = samp; break;
 	    }
 	    if (wfdb_ferror(og->fp)) {
 		wfdb_error("putvec: write error in signal %d\n", s);
