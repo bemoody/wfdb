@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   27 April 2020		wfdblib 10.7.0
+			Last revised:   28 April 2020		wfdblib 10.7.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -338,7 +338,7 @@ static int ninfo;	/* number of info strings read */
 
 static char *ftimstr(WFDB_Time t, WFDB_Frequency f);
 static char *fmstimstr(WFDB_Time t, WFDB_Frequency f);
-static WFDB_Time fstrtim(char *string, WFDB_Frequency f);
+static WFDB_Time fstrtim(const char *string, WFDB_Frequency f);
 
 /* Allocate workspace for up to n input signals. */
 static int allocisig(unsigned int n)
@@ -3592,9 +3592,9 @@ FVOID setbasecount(double counter)
 
 /* Convert string to sample number, using the given sampling
    frequency */
-static WFDB_Time fstrtim(char *string, WFDB_Frequency f)
+static WFDB_Time fstrtim(const char *string, WFDB_Frequency f)
 {
-    char *p, *q, *r;
+    const char *p, *q, *r;
     double x, y, z;
     WFDB_Date days;
     WFDB_Time t;
@@ -3636,7 +3636,7 @@ static WFDB_Time fstrtim(char *string, WFDB_Frequency f)
     }
 }
 
-FSITIME strtim(char *string)
+FSITIME strtim(const char *string)
 {
     double f;
 
@@ -3676,9 +3676,9 @@ FSTRING datstr(WFDB_Date date)
     return (date_string);
 }
 
-FDATE strdat(char *string)
+FDATE strdat(const char *string)
 {
-    char *mp, *yp;
+    const char *mp, *yp;
     int d, m, y, gcorr, jm, jy;
     WFDB_Date date;
 
