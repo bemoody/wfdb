@@ -3266,7 +3266,7 @@ FVOID wfdbsetstart(WFDB_Signal s, long int bytes)
     prolog_bytes = bytes;
 }
 
-FINT wfdbputprolog(char *buf, long int size, WFDB_Signal s)
+FINT wfdbputprolog(const char *buf, long int size, WFDB_Signal s)
 {
     long int n;
     WFDB_Group g = osd[s]->info.group;
@@ -3305,7 +3305,7 @@ FINT setinfo(char *record)
 }
 
 /* Write an info string to the open output .hea or .info file */
-FINT putinfo(char *s)
+FINT putinfo(const char *s)
 {
     if (outinfo == NULL) {
 	if (oheader) outinfo = oheader;
