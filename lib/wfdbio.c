@@ -196,7 +196,7 @@ FSTRING getwfdb(void)
 
 /* setwfdb can be called within an application to change the WFDB path. */
 
-FVOID setwfdb(char *p)
+FVOID setwfdb(const char *p)
 {
     void wfdb_export_config(void);
 
@@ -458,9 +458,9 @@ OS- and compiler-dependent definitions:
 /* wfdb_parse_path constructs a linked list of path components by splitting
 its string input (usually the value of WFDB). */
 
-int wfdb_parse_path(char *p)
+int wfdb_parse_path(const char *p)
 {
-    char *q;
+    const char *q;
     int current_type, found_end;
     struct wfdb_path_component *c0 = NULL, *c1 = wfdb_path_list;
     static first_call = 1;
@@ -656,9 +656,9 @@ current directory should not be specified initially as the first component of
 the WFDB path.
  */
 
-void wfdb_addtopath(char *s)
+void wfdb_addtopath(const char *s)
 {
-    char *p, *t;
+    const char *p;
     int i, len;
     struct wfdb_path_component *c0, *c1;
 

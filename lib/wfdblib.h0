@@ -292,8 +292,8 @@ extern int wfdb_g16(WFDB_FILE *fp);
 extern long wfdb_g32(WFDB_FILE *fp);
 extern void wfdb_p16(unsigned int x, WFDB_FILE *fp);
 extern void wfdb_p32(long x, WFDB_FILE *fp);
-extern int wfdb_parse_path(char *wfdb_path);
-extern void wfdb_addtopath(char *pathname);
+extern int wfdb_parse_path(const char *wfdb_path);
+extern void wfdb_addtopath(const char *pathname);
 #if __GNUC__ >= 3
 __attribute__((__format__(__printf__, 2, 3)))
 #endif

@@ -476,7 +476,7 @@ extern FINT setbasetime(char *time_string);
 extern FVOID wfdbquiet(void);
 extern FVOID wfdbverbose(void);
 extern FSTRING wfdberror(void);
-extern FVOID setwfdb(char *database_path_string);
+extern FVOID setwfdb(const char *database_path_string);
 extern FSTRING getwfdb(void);
 extern FVOID resetwfdb(void);
 extern FINT setibsize(int input_buffer_size);
