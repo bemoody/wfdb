@@ -538,7 +538,7 @@ static int sigmap_init(int first_segment)
     struct sigmapinfo *ps;
 
     /* is this the layout segment?  if so, set up output side of map */
-    if (in_msrec && first_segment && isd[0]->info.nsamp == 0L) {
+    if (in_msrec && first_segment && segarray && segarray[0].nsamp == 0) {
 	need_sigmap = 1;
 
 	/* The number of virtual signals is the number of signals defined
