@@ -3233,7 +3233,7 @@ FINT setmsheader(char *record, char **segment_name, unsigned int nsegments)
 
 FINT wfdbgetskew(WFDB_Signal s)
 {
-    if (s < nisig)
+    if (s < nvsig)
 	return (vsd[s]->skew);
     else
 	return (0);
@@ -3243,7 +3243,7 @@ FINT wfdbgetskew(WFDB_Signal s)
    skews when they have been reset as a side effect of using, e.g., sampfreq */
 FVOID wfdbsetiskew(WFDB_Signal s, int skew)
 {
-    if (s < nisig)
+    if (s < nvsig)
         vsd[s]->skew = skew;
 }
 
