@@ -3243,7 +3243,7 @@ FINT wfdbgetskew(WFDB_Signal s)
    skews when they have been reset as a side effect of using, e.g., sampfreq */
 FVOID wfdbsetiskew(WFDB_Signal s, int skew)
 {
-    if (s < nvsig)
+    if (s < nvsig && skew >= 0 && skew < dsblen / tspf)
         vsd[s]->skew = skew;
 }
 
