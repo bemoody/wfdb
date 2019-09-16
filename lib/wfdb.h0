@@ -327,13 +327,17 @@ typedef struct WFDB_seginfo WFDB_Seginfo;
 #define SFREE(P) { if (P) { free (P); P = 0; } }
 #define SUALLOC(P, N, S) \
     { size_t WFDB_tmp1 = (N), WFDB_tmp2 = (S); \
+      if (WFDB_tmp1 == 0 || WFDB_tmp2 == 0) \
+	  WFDB_tmp1 = WFDB_tmp2 = 1; \
       if (!(P = calloc(WFDB_tmp1, WFDB_tmp2))) \
 	  MEMERR(P, WFDB_tmp1, WFDB_tmp2); }
 #define SALLOC(P, N, S) { SFREE(P); SUALLOC(P, (N), (S)) }
 #define SREALLOC(P, N, S) \
     { size_t WFDB_tmp1 = (N), WFDB_tmp2 = (S); \
-      if (!(P = ((WFDB_tmp2 && WFDB_tmp1 > (size_t) -1 / WFDB_tmp2) \
-		 ? 0 : realloc(P, WFDB_tmp1 * WFDB_tmp2)))) \
+      if (!(P = ((WFDB_tmp1 == 0 || WFDB_tmp2 == 0) \
+		 ? realloc(P, 1) \
+		 : ((WFDB_tmp1 > (size_t) -1 / WFDB_tmp2) \
+		    ? 0 : realloc(P, WFDB_tmp1 * WFDB_tmp2))))) \
 	  MEMERR(P, WFDB_tmp1, WFDB_tmp2); }
 #define SSTRCPY(P, Q) { const char *WFDB_tmp = (Q); if (WFDB_tmp) { \
 	 SALLOC(P, (size_t)strlen(WFDB_tmp)+1,1); strcpy(P, WFDB_tmp); } }
