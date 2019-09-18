@@ -48,12 +48,13 @@ The WFDB library function \fIgetcal\fR, used by programs such as
 \fBcalsig\fR(1), \fBpsfd\fR(1), and \fBwave\fR(1) to obtain calibration
 data from a calibration file, returns the first entry that matches a signal's
 description and units.  A calibration file entry is considered to match a
-signal if the \fBDESC\fR field is either an exact match or a prefix of the
-signal description as given in the header file, and if the \fBUNITS\fR field in
-the calibration file is an exact match of the units field in the header file.
-By making use of these two rules, it is possible to write a calibration file
-that contains entries for several specific cases followed by a `catch-all'
-case for which the \fBDESC\fR field contains only the common prefix.
+signal if the \fBDESC\fR field is either `*', or an exact match or a prefix of
+the signal description as given in the header file, and if the \fBUNITS\fR
+field in the calibration file is an exact match of the units field in the
+header file.  By making use of these two rules, it is possible to write a
+calibration file that contains entries for several specific cases followed by a
+`catch-all' case for which the \fBDESC\fR field contains only the common
+prefix.
 .PP
 Note that \fBSCALE\fR specifications are advisory, not mandatory.  The
 intended use of \fBSCALE\fR is to specify the customary size for

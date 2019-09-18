@@ -1,5 +1,5 @@
 /* file: calib.c	G. Moody	  4 July 1991
-			Last revised:    28 April 2020 		wfdblib 10.7.0
+			Last revised:    30 April 2020 		wfdblib 10.7.0
 WFDB library functions for signal calibration
 
 _______________________________________________________________________________
@@ -105,6 +105,10 @@ FINT calopen(const char *cfname)
 	/* This line appears to be a correctly formatted entry.  Allocate
 	   memory for a calibration list entry. */
 	SUALLOC(this_cle, 1, (sizeof(struct cle)));
+
+	/* "*" is a wildcard that matches any signal type. */
+	if (strcmp(p1, "*") == 0)
+	    p1++;
 
 	/* Fill in the fields of the new calibration list entry. */
 	SSTRCPY(this_cle->sigtype, p1);
