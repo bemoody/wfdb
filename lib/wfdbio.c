@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:     28 April 2020       wfdblib 10.7.0
+                        Last revised:     30 April 2020       wfdblib 10.7.0
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -461,7 +461,7 @@ its string input (usually the value of WFDB). */
 int wfdb_parse_path(const char *p)
 {
     const char *q;
-    int current_type, found_end;
+    int current_type, slashes, found_end;
     struct wfdb_path_component *c0 = NULL, *c1 = wfdb_path_list;
     static first_call = 1;
 
@@ -487,6 +487,7 @@ int wfdb_parse_path(const char *p)
 	current_type = WFDB_LOCAL;
 	/* Find the end of the current component. */
 	found_end = 0;
+	slashes = 0;
 	do {
 	    switch (*++q) {
 	    case ':':	/* might be a component delimiter, part of '://',
@@ -494,7 +495,11 @@ int wfdb_parse_path(const char *p)
 			   (Mac) */
 		if (*(q+1) == '/' && *(q+2) == '/') current_type = WFDB_NET;
 #if PSEP == ':'
-		else found_end = 1;
+		/* Allow colons within the authority portion of the URL.
+		   For example, "http://[::1]:8080/database:/usr/database"
+		   is a database path with two components. */
+		else if (current_type != WFDB_NET || slashes > 2)
+		    found_end = 1;
 #endif
 		break;
 	    case ';':	/* definitely a component delimiter */
@@ -504,6 +509,9 @@ int wfdb_parse_path(const char *p)
 	    case '\r':
 	    case '\0':
 		found_end = 1;
+		break;
+	    case '/':
+		slashes++;
 		break;
 	    }
 	} while (!found_end);
