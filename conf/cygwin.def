@@ -1,5 +1,5 @@
 # file: cygwin.def		G. Moody	6 June 2000
-#				Last revised:   8 March 2017
+#				Last revised:	24 April 2020
 #
 # This file contains default 'make' definitions for compiling the WFDB Software
 # Package under MS Windows using the free Cygwin/gcc ANSI C compiler, available
@@ -103,6 +103,9 @@ CFLAGS = $(MFLAGS) -g -O $(CCDEFS) $(LC) -I$(DESTDIR)$(INCDIR)
 # WFDB library.
 LDFLAGS = -L$(DESTDIR)$(LIBDIR) -lwfdb $(LL)
 
+# EXEEXT is a suffix appended to the names of all executable programs.
+EXEEXT = .exe
+
 # WFDBLIB is the name of the standard WFDB library.  In order to access it via
 # `-lwfdb', WFDBLIB should be `libwfdb.a'.
 WFDBLIB = libwfdb.a
@@ -205,4 +208,9 @@ lib-post-install:
 
 lib-post-uninstall:
 	echo "Nothing to be done for lib-post-uninstall"
+
+.SUFFIXES: .exe
+
+.c.exe:
+	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
 # _____________________________________________________________________________

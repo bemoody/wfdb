@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	31 May 2000
-#				Last revised:   8 March 2017
+#				Last revised:	24 April 2020
 # Change the settings below as appropriate for your setup.
 
 # Choose directories in which to install WAVE and its ancillary files by
@@ -41,7 +41,7 @@ HELPFILES = analysis.hlp buttons.hlp editing.hlp intro.hlp log.hlp news.hlp \
  printing.hlp resource.hlp
 OTHERFILES = wave.hl0 wave.info demo.txt Wave.res wavemenu.def Makefile
 
-all:	wave wave.hlp news.hlp
+all:	wave$(EXEEXT) wave.hlp news.hlp
 
 # `make install':  compile and install WAVE and its help files
 install:  $(DESTDIR)$(BINDIR) $(DESTDIR)$(HELPDIR)/wave $(DESTDIR)$(MENUDIR) $(DESTDIR)$(RESDIR) wave.hlp news.hlp
@@ -73,8 +73,8 @@ uninstall:
 	../uninstall.sh $(DESTDIR)$(LIBDIR)/X11
 	../uninstall.sh $(DESTDIR)$(LIBDIR)
 
-wave:		$(OFILES)
-	$(CC) $(WCFLAGS) -o wave $(OFILES) $(WLDFLAGS)
+wave$(EXEEXT):		$(OFILES)
+	$(CC) $(WCFLAGS) -o wave$(EXEEXT) $(OFILES) $(WLDFLAGS)
 
 # `make help':  show help text
 help:
@@ -95,8 +95,8 @@ help:
 	@echo "the WAVE User's Guide, by typing 'make guide'."
 	@echo "*************************************************************"
 
-wave-static:	$(OFILES)
-	$(CC) $(WCFLAGS) -o wave-static $(OFILES) -static $(LDFLAGS)
+wave-static$(EXEEXT):	$(OFILES)
+	$(CC) $(WCFLAGS) -o wave-static$(EXEEXT) $(OFILES) -static $(LDFLAGS)
 
 soelim:		soelim.c
 	$(BUILD_CC) -o soelim -O soelim.c
@@ -122,7 +122,8 @@ TAGS:		$(HFILES) $(CFILES)
 
 # `make clean':  remove intermediate and backup files
 clean:
-	rm -f soelim wave wave-static *.o *~ wave.hlp news.hlp
+	rm -f soelim wave$(EXEEXT) wave-static$(EXEEXT)
+	rm -f *.o *~ wave.hlp news.hlp
 
 # `make listing':  print a listing of WAVE sources
 listing:	wave.hlp news.hlp

@@ -1,9 +1,14 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:	   9 May 2018
+#				Last revised:	 24 April 2020
 # This section of the Makefile should not need to be changed.
 
 # Programs to be compiled.
-XFILES = coherence fft log10 lomb memse
+XFILES = \
+ coherence$(EXEEXT) \
+ fft$(EXEEXT) \
+ log10$(EXEEXT) \
+ lomb$(EXEEXT) \
+ memse$(EXEEXT)
 
 # Shell scripts to be installed.
 SCRIPTS = hrfft hrlomb hrmem hrplot plot2d plot3d
@@ -33,20 +38,20 @@ scripts:	$(DESTDIR)$(BINDIR)
 uninstall:
 	../uninstall.sh $(DESTDIR)$(BINDIR) $(XFILES) $(SCRIPTS)
 
-coherence:	coherence.c
-	$(CC) $(CFLAGS) -o coherence -O coherence.c -lm
+coherence$(EXEEXT):	coherence.c
+	$(CC) $(CFLAGS) -o coherence$(EXEEXT) -O coherence.c -lm
 
-fft:		fft.c
-	$(CC) $(CFLAGS) -o fft -O fft.c -lm
+fft$(EXEEXT):		fft.c
+	$(CC) $(CFLAGS) -o fft$(EXEEXT) -O fft.c -lm
 
-log10:		log10.c
-	$(CC) $(CFLAGS) -o log10 -O log10.c -lm
+log10$(EXEEXT):		log10.c
+	$(CC) $(CFLAGS) -o log10$(EXEEXT) -O log10.c -lm
 
-lomb:		lomb.c
-	$(CC) $(CFLAGS) -o lomb -O lomb.c -lm
+lomb$(EXEEXT):		lomb.c
+	$(CC) $(CFLAGS) -o lomb$(EXEEXT) -O lomb.c -lm
 
-memse:		memse.c
-	$(CC) $(CFLAGS) -o memse -O memse.c -lm
+memse$(EXEEXT):		memse.c
+	$(CC) $(CFLAGS) -o memse$(EXEEXT) -O memse.c -lm
 
 # `make clean': remove intermediate and backup files.
 clean:

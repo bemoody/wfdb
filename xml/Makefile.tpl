@@ -1,12 +1,12 @@
 # file: Makefile.tpl		G. Moody	  22 August 2010
-#				Last revised:	   8 March 2017
+#				Last revised:	   24 April 2020
 #
 # This section of the Makefile should not need to be changed.
 
 CFILES = annxml.c heaxml.c xmlann.c xmlhea.c
 HFILES = xmlproc.h
 MFILES = Makefile
-XFILES = annxml heaxml xmlann xmlhea
+XFILES = annxml$(EXEEXT) heaxml$(EXEEXT) xmlann$(EXEEXT) xmlhea$(EXEEXT)
 
 # General rule for compiling C sources into executable files.  This is
 # redundant for most versions of `make', but at least one System V version
@@ -45,8 +45,8 @@ listing:
 
 # Rules for compiling WFDB-XML applications that require non-standard options
 
-xmlann:		xmlann.c xmlproc.h
+xmlann$(EXEEXT):		xmlann.c xmlproc.h
 	$(CC) $(CFLAGS) xmlann.c -o $@ $(LDFLAGS) -lexpat
 
-xmlhea:		xmlhea.c xmlproc.h
+xmlhea$(EXEEXT):		xmlhea.c xmlproc.h
 	$(CC) $(CFLAGS) xmlhea.c -o $@ $(LDFLAGS) -lexpat

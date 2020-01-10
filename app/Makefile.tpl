@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  23 May 2000
-#				Last revised:	   9 May 2018
+#				Last revised:	 24 April 2020
 # This section of the Makefile should not need to be changed.
 
 CFILES = ann2rr.c bxb.c calsig.c ecgeval.c epicmp.c fir.c gqfuse.c gqpost.c \
@@ -11,13 +11,59 @@ CFILES = ann2rr.c bxb.c calsig.c ecgeval.c epicmp.c fir.c gqfuse.c gqpost.c \
  wfdbwhich.c wqrs.c wrann.c wrsamp.c xform.c
 CFFILES = gqrs.conf
 HFILES = signal-colors.h
-XFILES = ann2rr bxb calsig ecgeval epicmp fir gqfuse gqpost \
- gqrs hrstats ihr mfilt mrgann mxm nguess nst plotstm \
- pscgen pschart psfd rdann rdsamp rr2ann rxr sampfreq sigamp \
- sigavg signame signum skewedit snip sortann sqrs sqrs125 \
- stepdet sumann sumstats tach time2sec wabp wfdb-config \
- wfdbcat wfdbcollate wfdbdesc wfdbmap wfdbsignals wfdbtime \
- wfdbwhich wqrs wrann wrsamp xform
+XFILES = \
+ ann2rr$(EXEEXT) \
+ bxb$(EXEEXT) \
+ calsig$(EXEEXT) \
+ ecgeval$(EXEEXT) \
+ epicmp$(EXEEXT) \
+ fir$(EXEEXT) \
+ gqfuse$(EXEEXT) \
+ gqpost$(EXEEXT) \
+ gqrs$(EXEEXT) \
+ hrstats$(EXEEXT) \
+ ihr$(EXEEXT) \
+ mfilt$(EXEEXT) \
+ mrgann$(EXEEXT) \
+ mxm$(EXEEXT) \
+ nguess$(EXEEXT) \
+ nst$(EXEEXT) \
+ plotstm$(EXEEXT) \
+ pscgen$(EXEEXT) \
+ pschart$(EXEEXT) \
+ psfd$(EXEEXT) \
+ rdann$(EXEEXT) \
+ rdsamp$(EXEEXT) \
+ rr2ann$(EXEEXT) \
+ rxr$(EXEEXT) \
+ sampfreq$(EXEEXT) \
+ sigamp$(EXEEXT) \
+ sigavg$(EXEEXT) \
+ signame$(EXEEXT) \
+ signum$(EXEEXT) \
+ skewedit$(EXEEXT) \
+ snip$(EXEEXT) \
+ sortann$(EXEEXT) \
+ sqrs$(EXEEXT) \
+ sqrs125$(EXEEXT) \
+ stepdet$(EXEEXT) \
+ sumann$(EXEEXT) \
+ sumstats$(EXEEXT) \
+ tach$(EXEEXT) \
+ time2sec$(EXEEXT) \
+ wabp$(EXEEXT) \
+ wfdb-config$(EXEEXT) \
+ wfdbcat$(EXEEXT) \
+ wfdbcollate$(EXEEXT) \
+ wfdbdesc$(EXEEXT) \
+ wfdbmap$(EXEEXT) \
+ wfdbsignals$(EXEEXT) \
+ wfdbtime$(EXEEXT) \
+ wfdbwhich$(EXEEXT) \
+ wqrs$(EXEEXT) \
+ wrann$(EXEEXT) \
+ wrsamp$(EXEEXT) \
+ xform$(EXEEXT)
 SCRIPTS = cshsetwfdb setwfdb pnwlogin
 PSFILES = pschart.pro psfd.pro 12lead.pro
 MFILES = Makefile
@@ -35,8 +81,9 @@ all:	$(XFILES)
 # `make' or `make install':  build and install applications
 install:	all $(DESTDIR)$(BINDIR) $(DESTDIR)$(PSPDIR) scripts
 	rm -f pschart psfd pschart.exe psfd.exe
-	$(MAKE) pschart psfd	# be sure compiled-in paths are up-to-date
-	$(STRIP) pschart psfd
+# be sure compiled-in paths are up-to-date
+	$(MAKE) pschart$(EXEEXT) psfd$(EXEEXT)
+	$(STRIP) pschart$(EXEEXT) psfd$(EXEEXT)
 	$(SETXPERMISSIONS) $(XFILES)
 	../install.sh $(DESTDIR)$(BINDIR) $(XFILES)
 	cp $(PSFILES) $(DESTDIR)$(PSPDIR)
@@ -77,28 +124,28 @@ listing:
 
 # Rules for compiling applications that require non-standard options
 
-bxb:		bxb.c
+bxb$(EXEEXT):		bxb.c
 	$(CC) $(CFLAGS) bxb.c -o $@ $(LDFLAGS) -lm
-ihr:		ihr.c
+ihr$(EXEEXT):		ihr.c
 	$(CC) $(CFLAGS) ihr.c -o $@ $(LDFLAGS) -lm
-hrstats:	hrstats.c
+hrstats$(EXEEXT):	hrstats.c
 	$(CC) $(CFLAGS) hrstats.c -o $@ $(LDFLAGS) -lm
-mxm:		mxm.c
+mxm$(EXEEXT):		mxm.c
 	$(CC) $(CFLAGS) mxm.c -o $@ $(LDFLAGS) -lm
-nguess:		nguess.c
+nguess$(EXEEXT):	nguess.c
 	$(CC) $(CFLAGS) nguess.c -o $@ $(LDFLAGS) -lm
-nst:		nst.c
+nst$(EXEEXT):		nst.c
 	$(CC) $(CFLAGS) nst.c -o $@ $(LDFLAGS) -lm
-plotstm:	plotstm.c
+plotstm$(EXEEXT):	plotstm.c
 	$(CC) $(CFLAGS) plotstm.c -o $@
-pschart:
+pschart$(EXEEXT):
 	$(CC) $(CFLAGS) -DPROLOG=\"$(PSPDIR)/pschart.pro\" pschart.c -o $@ \
           $(LDFLAGS)
-psfd:
+psfd$(EXEEXT):
 	$(CC) $(CFLAGS) -DPROLOG=\"$(PSPDIR)/psfd.pro\" psfd.c -o $@ $(LDFLAGS)
-sigamp:		sigamp.c
+sigamp$(EXEEXT):	sigamp.c
 	$(CC) $(CFLAGS) sigamp.c -o $@ $(LDFLAGS) -lm
-wfdbmap:      wfdbmap.c signal-colors.h
+wfdbmap$(EXEEXT):	wfdbmap.c signal-colors.h
 	$(CC) $(CFLAGS) wfdbmap.c -o $@ $(LDFLAGS)
-wqrs:		wqrs.c
+wqrs$(EXEEXT):		wqrs.c
 	$(CC) $(CFLAGS) wqrs.c -o $@ $(LDFLAGS) -lm

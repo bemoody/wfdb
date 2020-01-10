@@ -1,11 +1,25 @@
 # file: Makefile.tpl		G. Moody	24 May 2000
-#				Last revised:	8 March 2017
+#				Last revised:	24 April 2020
 # This section of the Makefile should not need to be changed.
 
 CFILES = a2m.c ad2m.c ahaecg2mit.c m2a.c md2a.c readid.c makeid.c edf2mit.c \
  mit2edf.c parsescp.c rdedfann.c wav2mit.c mit2wav.c wfdb2mat.c revise.c
-XFILES = a2m ad2m ahaecg2mit m2a md2a readid makeid edf2mit \
- mit2edf parsescp rdedfann wav2mit mit2wav wfdb2mat revise
+XFILES = \
+ a2m$(EXEEXT) \
+ ad2m$(EXEEXT) \
+ ahaecg2mit$(EXEEXT) \
+ m2a$(EXEEXT) \
+ md2a$(EXEEXT) \
+ readid$(EXEEXT) \
+ makeid$(EXEEXT) \
+ edf2mit$(EXEEXT) \
+ mit2edf$(EXEEXT) \
+ parsescp$(EXEEXT) \
+ rdedfann$(EXEEXT) \
+ wav2mit$(EXEEXT) \
+ mit2wav$(EXEEXT) \
+ wfdb2mat$(EXEEXT) \
+ revise$(EXEEXT)
 SCRIPTS = ahaconvert
 MFILES = Makefile
 
