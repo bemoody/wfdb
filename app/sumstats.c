@@ -162,7 +162,8 @@ char *argv[];
 	(void)printf(
 	 "__________________________________________________________________");
 	(void)printf("____________________\n");
-	(void)printf("Sum  %6"pctr" %3"pctr" %3"pctr" %3"pctr"", Nn, Vn, Fn, On);
+	(void)printf("Sum  %6"pctr" %3"pctr" %3"pctr" %3"pctr"",
+                     Nn, Vn, Fn, On);
 	(void)printf(" %3"pctr" %4"pctr" %3"pctr" %3"pctr"", Nv, Vv, Fv, Ov);
 	(void)printf(" %3"pctr" %3"pctr" %3"pctr"\n", No, Vo, Fo);
 	(void)printf("Gross                                                 ");
@@ -184,7 +185,8 @@ char *argv[];
       case 2:	/* bxb shutdown report */
 	(void)printf("______________________________________________________");
 	(void)printf("______________\n");
-	(void)printf("Sum   %4"pctr" %4"pctr" %4"pctr" %4"pctr"", Nx, Vx, Fx, Qx);
+	(void)printf("Sum   %4"pctr" %4"pctr" %4"pctr" %4"pctr"",
+                     Nx, Vx, Fx, Qx);
 	(void)printf("                               %4"pctr" seconds\n", ST);
 	(void)printf("Gross                    ");
         pstat(" %6.2f", (double)Nx+Vx+Fx+Qx, (double)(NT+VT+FT+QT));
@@ -203,9 +205,12 @@ char *argv[];
       case 6:	/* rxr SVE run-by-run table */
 	(void)printf("______________________________________________________");
 	(void)printf("_______________________\n");
-	(void)printf(
-	 "Sum   %4"pctr" %3"pctr" %3"pctr" %3"pctr" %3"pctr" %3"pctr" %3"pctr" %3"pctr" %3"pctr" %3"pctr" %3"pctr" %3"pctr"\n",
-	       CTS, CFN, CTP, CFP, STS, SFN, STP, SFP, LTS, LFN, LTP, LFP);
+	(void)printf("Sum   %4"pctr" %3"pctr" %3"pctr" %3"pctr
+                     " %3"pctr" %3"pctr" %3"pctr" %3"pctr
+                     " %3"pctr" %3"pctr" %3"pctr" %3"pctr"\n",
+                     CTS, CFN, CTP, CFP,
+                     STS, SFN, STP, SFP,
+                     LTS, LFN, LTP, LFP);
 	(void)printf(
 		    "Gross                                                  ");
 	rstat(" %3.0f", (double)CTS, (double)(CTS+CFN));
@@ -222,9 +227,10 @@ char *argv[];
 	rstat(" %3.0f", CSP, (double)NSP);
 	rstat(" %3.0f", CLS, (double)NLS);
 	rstat(" %3.0f", CLP, (double)NLP);
-	(void)printf(
-	"\nTotal couplets: %"pctr"  Total short runs: %"pctr"  Total long runs: %"pctr"\n",
-	       CTS+CFN, STS+SFN, LTS+LFN);
+	(void)printf("\nTotal couplets: %"pctr
+                     "  Total short runs: %"pctr
+                     "  Total long runs: %"pctr"\n",
+                     CTS+CFN, STS+SFN, LTS+LFN);
 	break;
       case 4:	/* bxb -L beat-by-beat table */
 	QTP = Nn+Ns+Nv+Sn+Ss+Sv+Vn+Vs+Vv+Fn+Fs+Fv;
@@ -233,10 +239,14 @@ char *argv[];
 	(void)printf("______________________________________________________");
 	(void)printf("______________________________________________________");
 	(void)printf("________________________\n");
-	(void)printf("Sum %6"pctr" %3"pctr" %3"pctr" %3"pctr" %3"pctr"", Nn, Sn, Vn, Fn, On);
-	(void)printf(" %3"pctr" %3"pctr" %3"pctr" %3"pctr" %3"pctr"", Ns, Ss, Vs, Fs, Os);
-	(void)printf(" %3"pctr" %3"pctr" %4"pctr" %3"pctr" %3"pctr"", Nv, Sv, Vv, Fv, Ov);
-	(void)printf(" %3"pctr" %3"pctr" %3"pctr" %3"pctr"\n", No, So, Vo, Fo);
+	(void)printf("Sum %6"pctr" %3"pctr" %3"pctr" %3"pctr" %3"pctr"",
+                     Nn, Sn, Vn, Fn, On);
+	(void)printf(" %3"pctr" %3"pctr" %3"pctr" %3"pctr" %3"pctr"",
+                     Ns, Ss, Vs, Fs, Os);
+	(void)printf(" %3"pctr" %3"pctr" %4"pctr" %3"pctr" %3"pctr"",
+                     Nv, Sv, Vv, Fv, Ov);
+	(void)printf(" %3"pctr" %3"pctr" %3"pctr" %3"pctr"\n",
+                     No, So, Vo, Fo);
 	(void)printf("Gross                                                 ");
 	(void)printf("                             ");
 	pstat(" %6.2f", (double)QTP, (double)(QTP+QFN));
@@ -254,21 +264,24 @@ char *argv[];
 	pstat(" %6.2f", CSVS, (double)NSVS);
 	pstat(" %6.2f", CSVP, (double)NSVP);
 	pstat(" %6.2f", CRRE/100.0, (double)NRRE);
-	(void)printf(
-	     "\nTotal QRS complexes: %"pctr"  Total VEBs: %"pctr"  Total SVEBs: %"pctr"\n",
-		  QTP+QFN, Vn+Vs+Vv+Vo, Sn+Ss+Sv+So);
+	(void)printf("\nTotal QRS complexes: %"pctr
+                     "  Total VEBs: %"pctr
+                     "  Total SVEBs: %"pctr"\n",
+                     QTP+QFN, Vn+Vs+Vv+Vo, Sn+Ss+Sv+So);
 	break;
       case 5:	/* bxb -L shutdown report */
 	(void)printf("______________________________________________________");
 	(void)printf("__________________\n");
-	(void)printf("Sum  %4"pctr" %4"pctr" %4"pctr" %4"pctr" %4"pctr"", Nx, Sx, Vx, Fx, Qx);
+	(void)printf("Sum  %4"pctr" %4"pctr" %4"pctr" %4"pctr" %4"pctr"",
+                     Nx, Sx, Vx, Fx, Qx);
 	(void)printf("                                      %4"pctr" seconds\n",
 		     ST);
 	break;
       case 7:	/* epic report */
 	(void)printf("______________________________________________________");
 	(void)printf("__________________\n");
-	(void)printf("Sum    %4"pctr" %4"pctr" %4"pctr" %4"pctr"                   %s",
+	(void)printf("Sum    %4"pctr" %4"pctr" %4"pctr" %4"pctr
+                     "                   %s",
 		     ETS, EFN, ETP, EFP, mstimstr(total_episode_length));
 	(void)printf("   %s\n", mstimstr(detected_episode_length));
 	(void)printf("Gross                      ");
@@ -317,8 +330,12 @@ char *s;
     switch (type) {
       case 1:	/* bxb beat-by-beat report */
 	fo = -1L;
-	(void)sscanf(s, "%s%"sctr"%"sctr"%"sctr"%"sctr"%"sctr"%"sctr"%"sctr"%"sctr"%"sctr"%"sctr"%"sctr"", rec,
-	       &nn, &vn, &fn, &on, &nv, &vv, &fv, &ov, &no, &vo, &fo);
+	(void)sscanf(s, "%s%"sctr"%"sctr"%"sctr"%"sctr
+                     "%"sctr"%"sctr"%"sctr"%"sctr
+                     "%"sctr"%"sctr"%"sctr"",
+                     rec, &nn, &vn, &fn, &on,
+                     &nv, &vv, &fv, &ov,
+                     &no, &vo, &fo);
 	if (fo < 0L) return (0);
 	Nn += nn; Vn += vn; Fn += fn; On += on;
 	Nv += nv; Vv += vv; Fv += fv; Ov += ov;
@@ -347,8 +364,11 @@ char *s;
 	return (1);
       case 2:	/* bxb -l shutdown report */
 	st = -1L;
-	(void)sscanf(s, "%s%"sctr"%"sctr"%"sctr"%"sctr"%s%s%s%s%"sctr" seconds %"sctr"%"sctr"%"sctr"%"sctr"%"sctr"",
-		     rec, &nx, &vx, &fx, &qx, mb, mn, mv, mf, &st,
+	(void)sscanf(s, "%s%"sctr"%"sctr"%"sctr"%"sctr
+                     "%s%s%s%s%"sctr" seconds "
+                     "%"sctr"%"sctr"%"sctr"%"sctr"%"sctr"",
+		     rec, &nx, &vx, &fx, &qx,
+                     mb, mn, mv, mf, &st,
 		     &nt, &dummy, &vt, &ft, &qt);
 	if (st < 0L) return (0);
 	Nx += nx; Vx += vx; Fx += fx; Qx += qx; ST += st;
@@ -399,11 +419,16 @@ char *s;
 	return (1);
       case 4:	/* bxb -L beat-by-beat report */
 	fo = -1L;
-	(void)sscanf(s,
- "%s%"sctr"%"sctr"%"sctr"%"sctr"%"sctr"%"sctr"%"sctr"%"sctr"%"sctr"%"sctr"%"sctr"%"sctr"%"sctr"%"sctr"%"sctr"%"sctr"%"sctr"%"sctr"%"sctr"%s%s%s%s%s%s%s",
-	       rec, &nn, &sn, &vn, &fn, &on, &ns, &ss, &vs, &fs, &os,
-			  &nv, &sv, &vv, &fv, &ov, &no, &so, &vo, &fo,
-				  qse, qpp, vse, vpp, sse, spp, srre);
+	(void)sscanf(s, "%s%"sctr"%"sctr"%"sctr"%"sctr"%"sctr
+                     "%"sctr"%"sctr"%"sctr"%"sctr"%"sctr
+                     "%"sctr"%"sctr"%"sctr"%"sctr"%"sctr
+                     "%"sctr"%"sctr"%"sctr"%"sctr
+                     "%s%s%s%s%s%s%s",
+                     rec, &nn, &sn, &vn, &fn, &on,
+                     &ns, &ss, &vs, &fs, &os,
+                     &nv, &sv, &vv, &fv, &ov,
+                     &no, &so, &vo, &fo,
+                     qse, qpp, vse, vpp, sse, spp, srre);
 	if (fo < 0L) return (0);
 	Nn += nn; Sn += sn; Vn += vn; Fn += fn; On += on;
 	Ns += ns; Ss += ss; Vs += vs; Fs += fs; Os += os;
@@ -445,8 +470,10 @@ char *s;
 	return (1);
       case 5:	/* bxb -L shutdown report */
 	st = -1L;
-	(void)sscanf(s, "%s%"sctr"%"sctr"%"sctr"%"sctr"%"sctr"%s%s%s%s%s%"sctr"", rec,
-	       &nx, &sx, &vx, &fx, &qx, mb, mn, ms, mv, mf, &st);
+	(void)sscanf(s, "%s%"sctr"%"sctr"%"sctr"%"sctr"%"sctr
+                     "%s%s%s%s%s%"sctr"",
+                     rec, &nx, &sx, &vx, &fx, &qx,
+                     mb, mn, ms, mv, mf, &st);
 	if (st < 0L) return (0);
 	Nx += nx; Sx += sx; Vx += vx; Fx += fx; Qx += qx; ST += st;
 	nrec++;
