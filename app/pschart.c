@@ -542,7 +542,7 @@ int *uncal;		/* if non-zero, signal is uncalibrated */
 
 /* Arrays indexed by signal # (allocated by process(), used by printstrip()) */
 int *accept, *buflen, *v, *vbase, **vbuf, *vmax, *vmin;
-long *vsum;
+double *vsum;
 
 /* Derived parameters */
 double dpmm;		/* pixels per millimeter */
@@ -659,7 +659,7 @@ FILE *cfile;
 		    (vbase = realloc(vbase, nosig * sizeof(int))) == NULL ||
 		    (vmax = realloc(vmax, nosig * sizeof(int))) == NULL ||
 		    (vmin = realloc(vmin, nosig * sizeof(int))) == NULL ||
-		    (vsum = realloc(vsum, nosig * sizeof(long))) == NULL ||
+		    (vsum = realloc(vsum, nosig * sizeof(double))) == NULL ||
 		    (vbuf = realloc(vbuf, nosig * sizeof(int *))) == NULL) {
 		    (void)fprintf(stderr, "%s: insufficient memory\n", pname);
 		    exit(2);

@@ -514,10 +514,10 @@ int *uncal;		/* if non-zero, signal is uncalibrated */
 
 /* Arrays indexed by signal # (allocated by process(), used by printstrip()) */
 int *accept, *buflen, *v, *vbase, **vbuf, *vmax, *vmin, *vn;
-long *vs, *vsum;
+double *vs, *vsum;
 
 /* Derived parameters */
-int decf;		/* decimation factor (input samples/output sample) */
+WFDB_Time decf; 	/* decimation factor (input samples/output sample) */
 double dpmm;		/* pixels per millimeter */
 double dppt;		/* pixels per PostScript "printer's point" (PostScript
 			   "printer's points" are 1/72 inch;  true printer's
@@ -639,8 +639,8 @@ FILE *cfile;
 		    (vmax = realloc(vmax, nosig * sizeof(int))) == NULL ||
 		    (vmin = realloc(vmin, nosig * sizeof(int))) == NULL ||
 		    (vn = realloc(vn, nosig * sizeof(int))) == NULL ||
-		    (vs = realloc(vs, nosig * sizeof(long))) == NULL ||
-		    (vsum = realloc(vsum, nosig * sizeof(long))) == NULL ||
+		    (vs = realloc(vs, nosig * sizeof(double))) == NULL ||
+		    (vsum = realloc(vsum, nosig * sizeof(double))) == NULL ||
 		    (vbuf = realloc(vbuf, nosig * sizeof(int *))) == NULL) {
 		    (void)fprintf(stderr, "%s: insufficient memory\n", pname);
 		    exit(2);
@@ -659,8 +659,9 @@ FILE *cfile;
 	    (void)setpagetitle(0L);
 	    if ((sps = sampfreq((char *)NULL)) <= 0.) sps = WFDB_DEFFREQ;
 	    dpsi = dpmm * tscale / sps;
- 	    nisamp = (int)(sps*sdur);
-	    if ((decf = (int)(nisamp/mm(s_defwidth) + 0.5)) < 1) decf = 1;
+	    nisamp = (WFDB_Time)(sps*sdur);
+	    if ((decf = (WFDB_Time)(nisamp/mm(s_defwidth) + 0.5)) < 1)
+		decf = 1;
 	    nosamp = nisamp/decf;
 	    if (aname2[0]) nann = 2;
 	    else if (aname[0]) nann = 1;
