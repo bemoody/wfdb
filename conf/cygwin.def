@@ -1,5 +1,5 @@
 # file: cygwin.def		G. Moody	6 June 2000
-#				Last revised:	24 April 2020
+#				Last revised:	27 April 2020
 #
 # This file contains default 'make' definitions for compiling the WFDB Software
 # Package under MS Windows using the free Cygwin/gcc ANSI C compiler, available
@@ -84,7 +84,7 @@ CC = gcc
 #   -DOLDC	  if you have neither `stdarg.h' nor `varargs.h' (see wfdbio.c)
 # If your C compiler fails to compile `signal.c', add -DBROKEN_CC to CCDEFS
 # and try again (see signal.c).
-CCDEFS = $(VDEFS) -DNOVALUES_H
+CCDEFS = $(VDEFS) -DWFDB_LARGETIME -DNOVALUES_H
 
 # MFLAGS is the set of architecture-dependent (-m*) compiler options, which
 # is usually empty.  See the gcc manual for information about gcc's -m options.

@@ -1,5 +1,5 @@
 # file: darwin.def	G. Moody and I. Henry	14 November 2002
-#				Last revised: 	 25 January 2018
+#				Last revised: 	  27 April 2020
 # 'make' definitions for compiling the WFDB Software Package under Darwin
 #
 # Based on 'freebsd.def'.
@@ -66,7 +66,7 @@ CC = gcc
 # CCDEFS is the set of C compiler options needed to set preprocessor variables
 # while compiling the WFDB Software Package.  CCDEFS should always include
 # VDEFS.
-CCDEFS = $(VDEFS)  -DNOVALUES_H
+CCDEFS = $(VDEFS) -DWFDB_LARGETIME  -DNOVALUES_H
 
 # MFLAGS is the set of architecture-dependent (-m*) compiler options, which
 # is usually empty.  See the gcc manual for information about gcc's -m options.

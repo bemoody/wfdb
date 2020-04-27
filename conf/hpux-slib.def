@@ -1,5 +1,5 @@
 # file: hpux-slib.def	G. Moody	31 May 2000
-#			Last revised:   8 March 2017
+#			Last revised:	27 April 2020
 # This section contains settings suitable for generating a shared library under
 # HP-UX.
 
@@ -67,7 +67,7 @@ CC = gcc
 # CCDEFS is the set of C compiler options needed to set preprocessor variables
 # while compiling the WFDB Software Package.  CCDEFS should always include
 # VDEFS.
-CCDEFS = $(VDEFS)
+CCDEFS = $(VDEFS) -DWFDB_LARGETIME
 
 # MFLAGS is the set of architecture-dependent (-m*) compiler options, which
 # is usually empty.  See the gcc manual for information about gcc's -m options.

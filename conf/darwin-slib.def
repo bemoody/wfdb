@@ -1,5 +1,5 @@
 # file: darwin-slib.def	I. Henry and G. Moody	14 November 2002
-#				Last revised:	  8 March 2017
+#				Last revised:	  27 April 2020
 # Based on 'freebsd-slib.def'.
 
 # This section contains settings suitable for generating a shared library under
@@ -60,7 +60,7 @@ CC = gcc
 # CCDEFS is the set of C compiler options needed to set preprocessor variables
 # while compiling the WFDB Software Package.  CCDEFS should always include
 # VDEFS.
-CCDEFS = $(VDEFS) -DNOVALUES_H
+CCDEFS = $(VDEFS) -DWFDB_LARGETIME -DNOVALUES_H
 
 # MFLAGS is the set of architecture-dependent (-m*) compiler options, which
 # is usually empty.  See the gcc manual for information about gcc's -m options.

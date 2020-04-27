@@ -1,5 +1,5 @@
 # file: freebsd.def		G. Moody	5 March 2002
-#				Last revised:   25 January 2018
+#				Last revised:	27 April 2020
 # 'make' definitions for compiling the WFDB Software Package under FreeBSD
 #
 # Based on 'linux.def', with edits for FreeBSD thanks to Giuseppe Pagnoni.
@@ -78,7 +78,7 @@ CC = gcc
 #   -DOLDC	  if you have neither `stdarg.h' nor `varargs.h' (see wfdbio.c)
 # If your C compiler fails to compile `signal.c', add -DBROKEN_CC to CCDEFS
 # and try again (see signal.c).
-CCDEFS = $(VDEFS) -DNOVALUES_H
+CCDEFS = $(VDEFS) -DWFDB_LARGETIME -DNOVALUES_H
 
 # MFLAGS is the set of architecture-dependent (-m*) compiler options, which
 # is usually empty.  See the gcc manual for information about gcc's -m options.

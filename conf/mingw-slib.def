@@ -59,7 +59,7 @@ CC = gcc NOCYGWIN
 # CCDEFS is the set of C compiler options needed to set preprocessor variables
 # while compiling the WFDB Software Package.  CCDEFS should always include
 # VDEFS.
-CCDEFS = $(VDEFS) -DMSDOS -DNOVALUES_H -DNOMKSTEMP
+CCDEFS = $(VDEFS) -DWFDB_LARGETIME -DMSDOS -DNOVALUES_H -DNOMKSTEMP
 
 # MFLAGS is the set of architecture-dependent (-m*) compiler options, which
 # is usually empty.  See the gcc manual for information about gcc's -m options.

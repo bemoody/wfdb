@@ -1,5 +1,5 @@
 # file: linux-slib.def		G. Moody	31 May 2000
-#                               Last revised:   8 March 2017
+#                               Last revised:  27 April 2020
 # This section contains settings suitable for generating an ELF-format shared
 # library under Linux.
 
@@ -64,7 +64,7 @@ CC = gcc
 # while compiling the WFDB Software Package.  CCDEFS should always include
 # VDEFS (the version definitions).  Under Linux, add -fno-stack-protector
 # when compiling the original (SWIG-based) WFDB Toolkit for Matlab.
-CCDEFS = $(VDEFS)
+CCDEFS = $(VDEFS) -DWFDB_LARGETIME
 
 # MFLAGS is the set of architecture-dependent (-m*) compiler options, which
 # is usually empty.  See the gcc manual for information about gcc's -m options.
