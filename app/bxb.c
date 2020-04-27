@@ -1,5 +1,5 @@
 /* file: bxb.c		G. Moody	14 December 1987
-			Last revised:	 10 August 2010
+			Last revised:	  27 April 2020
 
 -------------------------------------------------------------------------------
 bxb: ANSI/AAMI-standard beat-by-beat annotation file comparator
@@ -36,6 +36,7 @@ understanding of algorithm errors.
 */
 
 #include <stdio.h>
+#include <limits.h>
 #include <math.h>	/* for declaration of sqrt() */
 #include <wfdb/wfdb.h>
 #define map1
@@ -55,13 +56,13 @@ int fflag = 3;		/* report format (0: none; 1: compressed; 2: line;
 			   with SVEB;  6: standard with SVEB) */
 int match_dt = 0;	/* match window duration in samples */
 int Oflag = 0;		/* if non-zero, produce an extended annotation file */
-long shut_down;		/* duration of test annotator's shutdown */
-long start;		/* time of the beginning of the test period */
-long end_time;		/* end of the test period (-1: end of reference annot
+WFDB_Time shut_down;	/* duration of test annotator's shutdown */
+WFDB_Time start;	/* time of the beginning of the test period */
+WFDB_Time end_time;	/* end of the test period (-1: end of reference annot
 			   file; 0: end of either annot file) */
-long huge_time = 0x7FFFFFFF;		/* largest possible time */
-long T, Tprime;		/* times of the current & next reference annotations */
-long t, tprime;		/* times of the current & next test annotations */
+WFDB_Time huge_time = WFDB_TIME_MAX; /* largest possible time */
+WFDB_Time T, Tprime;	/* times of the current & next reference annotations */
+WFDB_Time t, tprime;	/* times of the current & next test annotations */
 
 main(argc, argv)
 int argc;
@@ -225,20 +226,20 @@ char *argv[];
 char *record;			/* record name */
 WFDB_Anninfo an[3];
 unsigned int oflag = 0;	/* if non-zero, produce an output annotation file */
-long RR;		/* reference RR interval, if non-zero */
-long sdonref = -1L;	/* start of reference shutdown */
-long sdoffref = -1L;	/* end of reference shutdown */
-long vfonref = -1L;	/* start of reference VF */
-long vfoffref = -1L;	/* end of reference VF */
-long psdonref = -1L;	/* start of previous reference shutdown */
-long psdoffref = -1L;	/* end of previous reference shutdown */
-long pvfonref = -1L;	/* start of previous reference VF */
-long pvfoffref = -1L;	/* end of previous reference VF */
+WFDB_Time RR;			/* reference RR interval, if non-zero */
+WFDB_Time sdonref = -1L;	/* start of reference shutdown */
+WFDB_Time sdoffref = -1L;	/* end of reference shutdown */
+WFDB_Time vfonref = -1L;	/* start of reference VF */
+WFDB_Time vfoffref = -1L;	/* end of reference VF */
+WFDB_Time psdonref = -1L;	/* start of previous reference shutdown */
+WFDB_Time psdoffref = -1L;	/* end of previous reference shutdown */
+WFDB_Time pvfonref = -1L;	/* start of previous reference VF */
+WFDB_Time pvfoffref = -1L;	/* end of previous reference VF */
 WFDB_Annotation ref_annot;
 
 void getref()	/* get next reference beat annotation */
 {
-    static long TT;	/* time of previous reference beat annotation */
+    static WFDB_Time TT;    /* time of previous reference beat annotation */
     static WFDB_Annotation annot;
 
     TT = T;
@@ -328,20 +329,20 @@ void getref()	/* get next reference beat annotation */
     Aprime = '*';
 }
 
-long rr;		/* test RR interval, if non-zero */
-long sdontest = -1L;	/* start of test shutdown */
-long sdofftest = -1L;	/* end of test shutdown */
-long vfontest = -1L;	/* start of test VF */
-long vfofftest = -1L;	/* end of test VF */
-long psdontest = -1L;	/* start of previous test shutdown */
-long psdofftest = -1L;	/* end of previous test shutdown */
-long pvfontest = -1L;	/* start of previous test VF */
-long pvfofftest = -1L;	/* end of previous test VF */
+WFDB_Time rr;		/* test RR interval, if non-zero */
+WFDB_Time sdontest = -1L;	/* start of test shutdown */
+WFDB_Time sdofftest = -1L;	/* end of test shutdown */
+WFDB_Time vfontest = -1L;	/* start of test VF */
+WFDB_Time vfofftest = -1L;	/* end of test VF */
+WFDB_Time psdontest = -1L;	/* start of previous test shutdown */
+WFDB_Time psdofftest = -1L;	/* end of previous test shutdown */
+WFDB_Time pvfontest = -1L;	/* start of previous test VF */
+WFDB_Time pvfofftest = -1L;	/* end of previous test VF */
 WFDB_Annotation test_annot;
 
 void gettest()	/* get next test annotation */
 {
-    static long tt;	/* time of previous test beat annotation */
+    static WFDB_Time tt;	/* time of previous test beat annotation */
     static WFDB_Annotation annot;
 
     tt = t;
@@ -424,7 +425,7 @@ void gettest()	/* get next test annotation */
    most recent VF and shutdown periods and have no information about earlier
    or later VF or shutdown periods. */
 int rpann(t)
-long t;
+WFDB_Time t;
 {
     if ((vfonref!=-1L && vfonref<=t && (t<=vfoffref || vfoffref==-1L)) ||
 	(pvfonref!=-1L && pvfonref<=t && t<=pvfoffref))
@@ -441,7 +442,7 @@ long t;
 }
 
 int tpann(t)
-long t;
+WFDB_Time t;
 {
     /* no special treatment for reference beat labels during test-marked VF */
     if ((sdontest!=-1L && sdontest<=t && (t<=sdofftest || sdofftest==-1L)) ||
@@ -559,11 +560,14 @@ int ref, test;			/* reference and test annotation types */
     }
     if (verbose && ref != test) {
 	if (ref == 'O' || ref == 'X')
-	    (void)fprintf(stderr, "%c(%ld)/%c(%ld)\n", ref, t, test, t);
+	    (void)fprintf(stderr, "%c(%"WFDB_Pd_TIME")/%c(%"WFDB_Pd_TIME")\n",
+			  ref, t, test, t);
 	else if (test == 'O' || test == 'X')
-	    (void)fprintf(stderr, "%c(%ld)/%c(%ld)\n", ref, T, test, T);
+	    (void)fprintf(stderr, "%c(%"WFDB_Pd_TIME")/%c(%"WFDB_Pd_TIME")\n",
+			  ref, T, test, T);
 	else
-	    (void)fprintf(stderr, "%c(%ld)/%c(%ld)\n", ref, T, test, t);
+	    (void)fprintf(stderr, "%c(%"WFDB_Pd_TIME")/%c(%"WFDB_Pd_TIME")\n",
+			  ref, T, test, t);
     }
 }
 
@@ -1074,10 +1078,10 @@ int fflag;
     if (fflag == 1 || fflag == 3 || fflag == 4 || fflag == 6)
 	(void)fprintf(sfile, "       Total shutdown time: ");
     if (fflag != 2 && fflag != 5)
-        (void)fprintf(sfile, "%5ld seconds\n", shut_down);
+        (void)fprintf(sfile, "%5"WFDB_Pd_TIME" seconds\n", shut_down);
     else 
-        (void)fprintf(sfile, "%5ld seconds %ld %ld %ld %ld %ld\n", shut_down,
-		      Nn+Ns+Nv+Nf+Nq+No+Nx, Sn+Ss+Sv+Sf+Sq+So+Sx,
+        (void)fprintf(sfile, "%5"WFDB_Pd_TIME" seconds %ld %ld %ld %ld %ld\n",
+		      shut_down, Nn+Ns+Nv+Nf+Nq+No+Nx, Sn+Ss+Sv+Sf+Sq+So+Sx,
 		      Vn+Vs+Vv+Vf+Vq+Vo+Vx, Fn+Fs+Fv+Ff+Fq+Fo+Fx,
 		      Qn+Qs+Qv+Qf+Qq+Qo+Qx);
 }
@@ -1184,8 +1188,8 @@ void genxcmp()
 			(void)sprintf(p, " (%s)", test_annot.aux+1);
 		    alen = strlen(mstring+1);
 		    if (alen > 254) {
-			(void)fprintf(stderr,
-				      "aux string truncated at %s (%ld)\n",
+			(void)fprintf(stderr, "aux string truncated at %s "
+				"(%"WFDB_Pd_TIME")\n",
 				timstr(test_annot.time), test_annot.time);
 			alen = 254;
 			mstring[alen+1] = '\0';
@@ -1210,7 +1214,8 @@ void genxcmp()
 		    (void)sprintf(p, " (%s)", test_annot.aux+1);
 		alen = strlen(mstring+1);
 		if (alen > 254) {
-		    (void)fprintf(stderr, "aux string truncated at %s (%ld)\n",
+		    (void)fprintf(stderr, "aux string truncated at %s "
+			    "(%"WFDB_Pd_TIME")\n",
 			    timstr(test_annot.time), test_annot.time);
 		    alen = 254;
 		    mstring[alen+1] = '\0';
@@ -1254,8 +1259,8 @@ void genxcmp()
 			(void)sprintf(p, " (%s)", test_annot.aux+1);
 		    alen = strlen(mstring+1);
 		    if (alen > 254) {
-			(void)fprintf(stderr,
-				      "aux string truncated at %s (%ld)\n",
+			(void)fprintf(stderr, "aux string truncated at %s "
+				"(%"WFDB_Pd_TIME")\n",
 				timstr(test_annot.time), test_annot.time);
 			alen = 254;
 			mstring[alen+1] = '\0';
@@ -1282,7 +1287,8 @@ void genxcmp()
 		(void)sprintf(p, "/%c", tpann(ref_annot.time));
 		alen = strlen(mstring+1);
 		if (alen > 254) {
-		    (void)fprintf(stderr, "aux string truncated at %s (%ld)\n",
+		    (void)fprintf(stderr, "aux string truncated at %s "
+			    "(%"WFDB_Pd_TIME")\n",
 			    timstr(ref_annot.time), ref_annot.time);
 		    alen = 254;
 		    mstring[alen+1] = '\0';

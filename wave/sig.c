@@ -1,5 +1,5 @@
 /* file: sig.c		G. Moody	 27 April 1990
-			Last revised:	 14 August 2017
+			Last revised:	 24 April 2020
 Signal display functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -309,7 +309,7 @@ reads the requested segment and determines the pixel ordinates of the
 vertices of the polylines for each signal. */
 
 struct display_list *find_display_list(fdl_time)
-long fdl_time;
+WFDB_Time fdl_time;
 {
     int c, i, j, x, x0, y, ymax, ymin;
     struct display_list *lp;

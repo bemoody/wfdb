@@ -1,5 +1,5 @@
 /* file: analyze.c	G. Moody	10 August 1990
-			Last revised:  26 November 2001
+			Last revised:    24 April 2020
 Functions for the analysis panel of WAVE
 
 -------------------------------------------------------------------------------
@@ -732,7 +732,7 @@ Event *event;
 
 void set_back()
 {
-    long step = end_analysis_time - begin_analysis_time, t0, t1;
+    WFDB_Time step = end_analysis_time - begin_analysis_time, t0, t1;
 
     if (begin_analysis_time <= 0L || step <= 0L) return;
     if ((t0 = begin_analysis_time - step) < 0L) t0 = 0L;
@@ -745,7 +745,7 @@ void set_back()
 
 void set_ahead()
 {
-    long step = end_analysis_time - begin_analysis_time, t0, t1,
+    WFDB_Time step = end_analysis_time - begin_analysis_time, t0, t1,
         te = strtim("e");
 
     if ((te > 0L && end_analysis_time >= te) || step <= 0L) return;
@@ -925,7 +925,7 @@ char *p1;
 		p1 = p2 += 3;
 	    }
 	    else if (strncmp(p1, "DURATION", 8) == 0) {
-		long t0 = begin_analysis_time, t1 = end_analysis_time;
+		WFDB_Time t0 = begin_analysis_time, t1 = end_analysis_time;
 
 		/* If end_analysis_time is unspecified, determine the
 		   record length. */

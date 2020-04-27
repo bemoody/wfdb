@@ -1,5 +1,5 @@
 /* file: rxr.c		G. Moody	16 August 1989
-			Last revised:    7 August 2009
+			Last revised:    24 April 2020
 
 -------------------------------------------------------------------------------
 rxr: ANSI/AAMI-standard run-by-run annotation file comparator
@@ -54,7 +54,7 @@ WFDB_Anninfo an[2];
 WFDB_Annotation annot[2], tempann;
 int fflag = 3;
 FILE *ofile, *sfile;
-long start, end_time, match_dt;
+WFDB_Time start, end_time, match_dt;
 int verbose;
 long s[2][7][7];
 
@@ -79,7 +79,7 @@ char *argv[];
     exit(0);    /*NOTREACHED*/
 }
 
-static long f_end;
+static WFDB_Time f_end;
 
 /* Perform a run-by-run comparison. */
 void rxr(stat, type)
@@ -88,7 +88,7 @@ int stat, type;
     int i, j, goflag = 1;
     int run_length[2];
     unsigned int a, b;
-    long run_start, run_end;
+    WFDB_Time run_start, run_end;
     void initamap();
 
     if (iannsettime(0L) < 0) exit(2);
@@ -164,8 +164,8 @@ int stat, type;
 		run_length[b] = find_longest_run(b, run_start, run_end, type);
 		/* Update the confusion matrix. */
 		if (verbose && run_length[0] != run_length[1])
-		    (void)printf("%d/%d(%ld-%ld)\n", run_length[0],
-			   run_length[1], run_start, run_end);
+		    printf("%d/%d(%"WFDB_Pd_TIME"-%"WFDB_Pd_TIME")\n",
+			   run_length[0], run_length[1], run_start, run_end);
 		s[stat][run_length[0]][run_length[1]]++;
 		/* Reset the state variable. */
 		run_length[a] = 0;
@@ -181,8 +181,9 @@ int stat, type;
 		else {	/* this beat ends an SVE run */
 		    run_length[b] = find_longest_run(b,run_start,run_end,type);
 		    if (verbose && run_length[0] != run_length[1])
-			(void)printf("%d/%d(%ld-%ld)\n", run_length[0],
-			       run_length[1], run_start, run_end);
+			printf("%d/%d(%"WFDB_Pd_TIME"-%"WFDB_Pd_TIME")\n",
+			       run_length[0], run_length[1],
+			       run_start, run_end);
 		    s[stat][run_length[0]][run_length[1]]++;
 		    run_length[a] = 0;
 		}
@@ -200,8 +201,9 @@ int stat, type;
 		else {	/* this beat ends a VE run */
 		    run_length[b] = find_longest_run(b,run_start,run_end,type);
 		    if (verbose && run_length[0] != run_length[1])
-			(void)printf("%d/%d(%ld-%ld)\n", run_length[0],
-			       run_length[1], run_start, run_end);
+			printf("%d/%d(%"WFDB_Pd_TIME"-%"WFDB_Pd_TIME")\n",
+			       run_length[0], run_length[1],
+			       run_start, run_end);
 		    s[stat][run_length[0]][run_length[1]]++;
 		    run_length[a] = 0;
 		}
@@ -430,7 +432,7 @@ void initamap()		/* initialize state variables for amap() */
 
 find_longest_run(a, t0, t1, type)
 unsigned int a;
-long t0, t1;
+WFDB_Time t0, t1;
 int type;	/* 0: find VE run; 1: find SVE run */
 {
     int am, len = 0, len0 = 0;

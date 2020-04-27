@@ -1,5 +1,5 @@
 /* file: wfdbtime.c	G. Moody	16 February 2009
-			Last revised:	29 August 2017
+			Last revised:	27 April 2020
 
 -------------------------------------------------------------------------------
 wfdbtime: convert to and from sample number, elapsed time, and absolute time
@@ -42,7 +42,7 @@ main(int argc, char **argv)
 	}
 	else if (record) {
 	    if ((t = strtim(argv[i])) < 0L) t = -t;
-	    sprintf(sbuf, "s%ld", t);
+	    sprintf(sbuf, "s%"WFDB_Pd_TIME, t);
 	    printf("%15s\t%15s", sbuf, (t == 0L) ? "0:00.000" : mstimstr(t));
 	    printf("\t%15s\n", mstimstr(-t));
 	}

@@ -1,5 +1,5 @@
 /* file: logpan.c	G. Moody	 1 May 1990
-			Last revised:   22 June 1999
+			Last revised:   24 April 2020
 Log panel functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -67,7 +67,7 @@ struct log_entry {
    to the specified time and selects the marker.
 */
 void set_marker(t)
-long t;
+WFDB_Time t;
 {
     static struct ap *log_marker;
 
@@ -99,7 +99,6 @@ char *recp, *timep, *textp; /* record name, time specification, and text */
 {
     struct log_entry *new_entry;
     char *p;
-    long t0;
 
     /* Allocate memory for structure and strings. */
     if ((new_entry = (struct log_entry *)malloc(sizeof(struct log_entry)))
@@ -196,7 +195,6 @@ char *logfname;
     char buf[LLLMAX+1], *p, *recp = record, *timep, *textp = NULL, *strtok();
     FILE *logfile;
     int ignore;
-    long t0, t1;
 
     if ((logfile = fopen(logfname, "r")) == NULL)
 	return (0);
@@ -326,7 +324,7 @@ void show_current_entry()
 {
     char *p;
     int record_changed = 0;
-    long t0;
+    WFDB_Time t0;
 
     if (current_entry) {
 	if (current_entry->text)
@@ -365,7 +363,7 @@ void show_current_entry()
 Notify_value show_next_entry()
 {
     char *p;
-    long t0;
+    WFDB_Time t0;
 
     if (current_entry->next) current_entry = current_entry->next;
     else current_entry = first_entry;
@@ -385,7 +383,7 @@ Notify_value show_next_entry()
 Notify_value show_prev_entry()
 {
     char *p;
-    long t0;
+    WFDB_Time t0;
 
     if (current_entry->prev) current_entry = current_entry->prev;
     else current_entry = last_entry;

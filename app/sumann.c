@@ -1,5 +1,5 @@
 /* file: sumann.c	G. Moody        5 February 1982
-			Last revised:    2 August 2012
+			Last revised:    24 April 2020
 
 -------------------------------------------------------------------------------
 sumann: Tabulates annotations
@@ -52,7 +52,7 @@ char *argv[];
     WFDB_Annotation annot;
     int i, j, rhythm = 0, noise = 2, qflag = 0;
     static long tab[ACMAX+1], rtab[MAXR+1], ntab[6];
-    static long rtime[MAXR+1], ntime[6], r0, n0, from_time, to_time;
+    static WFDB_Time rtime[MAXR+1], ntime[6], r0, n0, from_time, to_time;
     char *record = NULL, *prog_name();
     FILE *bfile = NULL, *rfile = NULL;
     void help();
@@ -204,7 +204,7 @@ char *argv[];
     if (to_time < 0L) to_time = -to_time;
 
     if (to_time > 0L && to_time < from_time) {
-	long tt;
+	WFDB_Time tt;
 
 	tt = from_time; from_time = to_time; to_time = tt;
     }

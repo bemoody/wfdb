@@ -1,5 +1,5 @@
 /* file: mainpan.c	G. Moody	30 April 1990
-			Last revised:	13 July 2010
+			Last revised:	24 April 2020
 Functions for the main control panel of WAVE
 
 -------------------------------------------------------------------------------
@@ -690,7 +690,7 @@ Panel_item item;
 Event *event;
 {
     int etype, i;
-    long cache_time, next_match(), previous_match();
+    WFDB_Time cache_time, next_match(), previous_match();
     void set_frame_footer();
 
     /* Reset display modes if necessary. */
@@ -801,7 +801,7 @@ Event *event;
 	    char *fp = (char *)xv_get(find_item, PANEL_VALUE);
 	    static char auxstr[256];
 	    int mask, noise_mask, target;
-	    long t;
+	    WFDB_Time t;
 	    struct WFDB_ann template;
 
 	    if (*fp == '\0') {
@@ -871,10 +871,11 @@ Event *event;
 #endif
 	    }
 	    else {
-		display_start_time = strtim(timstr(t-(long)((nsamp-freq)/2)));
+		WFDB_Time halfwindow = (nsamp - freq) / 2;
+		display_start_time = strtim(timstr(t - halfwindow));
 	        if (etype == (int)']') t = next_match(&template, mask);
 		else t = previous_match(&template, mask);
-		if (t > 0) cache_time=strtim(timstr(t-(long)((nsamp-freq)/2)));
+		if (t > 0) cache_time=strtim(timstr(t - halfwindow));
 		else cache_time = -1L;
 	    }
 	}

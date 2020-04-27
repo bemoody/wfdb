@@ -1,5 +1,5 @@
 /* file: wave.h		G. Moody	26 April 1990
-			Last revised:   13 July 2010
+               		Last revised:   24 April 2020
 Constants, macros, global variables, and function prototypes for WAVE
 
 -------------------------------------------------------------------------------
@@ -168,13 +168,13 @@ COMMON double canvas_height_mv;		/* sig window height, in millivolts */
 COMMON double canvas_width_sec;		/* sig window width, in seconds */
 COMMON int nsamp;			/* sig window width, in samples */
 COMMON int linesp;			/* text line spacing, in pixels */
-COMMON long display_start_time;		/* sample number at left edge of signal
+COMMON WFDB_Time display_start_time;	/* sample number at left edge of signal
 					   window */
-COMMON long begin_analysis_time;	/* sample number of BEGIN_ANALYSIS
+COMMON WFDB_Time begin_analysis_time;	/* sample number of BEGIN_ANALYSIS
 					   marker (or -1 if none) */
-COMMON long end_analysis_time;		/* sample number of END_ANALYSIS
+COMMON WFDB_Time end_analysis_time;	/* sample number of END_ANALYSIS
 					   marker (or -1 if none) */
-COMMON long ref_mark_time;		/* sample number of REF_MARK marker
+COMMON WFDB_Time ref_mark_time;		/* sample number of REF_MARK marker
 					   (or -1 if none) */
 COMMON double freq;			/* sampling frequency (Hz) */
 COMMON int atimeres;			/* annot time resolution in samples */
@@ -288,9 +288,9 @@ extern void create_mode_popup(void);		/* in modepan.c */
 extern void show_mode(void);			/* in modepan.c */
 extern void set_modes(void);			/* in modepan.c */
 extern void dismiss_mode(void);			/* in modepan.c */
-extern long wstrtim(char *tstring);		/* in modepan.c */
-extern char *wtimstr(long t);			/* in modepan.c */
-extern char *wmstimstr(long t);			/* in modepan.c */
+extern WFDB_Time wstrtim(char *tstring);	/* in modepan.c */
+extern char *wtimstr(WFDB_Time t);		/* in modepan.c */
+extern char *wmstimstr(WFDB_Time t);		/* in modepan.c */
 extern void help(void);				/* in helppan.c */
 extern void create_help_popup(void);		/* in helppan.c */
 extern void show_help(void);			/* in helppan.c */
@@ -318,17 +318,17 @@ extern void clear_cache(void);			/* in signal.c */
 extern int sigy(int sig, int x);		/* in signal.c */
 extern struct ap *get_ap(void);			/* in annot.c */
 extern int annot_init(void);			/* in annot.c */
-extern long next_match(struct WFDB_ann *template,	/* in annot.c */
-		       int mask);
-extern long previous_match(struct WFDB_ann *template,/* in annot.c */
-			   int mask);
-extern void show_annotations(long start_time,	/* in annot.c */
+extern WFDB_Time next_match(struct WFDB_ann *template,/* in annot.c */
+			    int mask);
+extern WFDB_Time previous_match(struct WFDB_ann *template,/* in annot.c */
+				int mask);
+extern void show_annotations(WFDB_Time start_time,/* in annot.c */
 			     int duration);
 extern void clear_annotation_display(void);	/* in annot.c */
-extern struct ap *locate_annotation(long time, int chan); /* in annot.c */
-extern void delete_annotation(long time, int chan); /* in annot.c */
+extern struct ap *locate_annotation(WFDB_Time time, int chan); /* in annot.c */
+extern void delete_annotation(WFDB_Time time, int chan); /* in annot.c */
 extern void move_annotation(struct ap *a,	/* in annot.c */
-			    long time);
+			    WFDB_Time time);
 extern void insert_annotation(struct ap *a);	/* in annot.c */
 extern void change_annotations(void);		/* in annot.c */
 extern void check_post_update(void);		/* in annot.c */
@@ -363,7 +363,7 @@ extern void sync_other_wave_processes(void);	/* in xvwave.c */
 extern char *wmstimstr(), *wtimstr();
 extern int record_init(), annot_init(), post_changes(), initialize_graphics(),
     sigy(), in_siglist();
-extern long next_match(), previous_match(), wstrtim();
+extern WFDB_Time next_match(), previous_match(), wstrtim();
 extern struct ap *get_ap(), *locate_annotation();
 extern void set_baselines(), calibrate(), set_record_item(), set_annot_item(),
     set_start_time(), set_end_time(), set_find_item(), show_search_template(),

@@ -1,5 +1,5 @@
 /* file: xvwave.h    	G. Moody	27 April 1990
-			Last revised:   10 June 2005
+			Last revised:   24 April 2020
 XView constants, macros, function prototypes, and global variables for WAVE
 
 -------------------------------------------------------------------------------
@@ -111,7 +111,7 @@ to by first_list.
 
 struct display_list {
     struct display_list *next;	/* link to next display list */
-    long start;		/* time of first sample */
+    WFDB_Time start;	/* time of first sample */
     int nsig;		/* number of signals */
     int npoints;	/* number of (input) points per signal */
     int ndpts;		/* number of (output) points per signal */
@@ -132,7 +132,7 @@ extern void disp_proc(Panel_item i, Event *e);	/* in mainpan.c */
 extern void window_event_proc(Xv_Window w,	/* in edit.c */
 			      Event *e, Notify_arg a);
 extern struct display_list *find_display_list(	/* in signal.c */
-					      long time);
+					      WFDB_Time time);
 
 /* Function return types for K&R C compilers. */
 #else

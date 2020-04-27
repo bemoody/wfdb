@@ -1,5 +1,5 @@
 /* file: xmlhea.c	G. Moody	20 August 2010
-			Last revised:	11 December 2017
+                 	Last revised:	27 April 2020
 -------------------------------------------------------------------------------
 xmlhea: Convert an XML file to a WFDB-compatible .hea (header) file
 Copyright (C) 2010 George B. Moody
@@ -181,7 +181,8 @@ void XMLCALL end(void *data, const char *el)
 		  fprintf(ofile, " %02d/%02d/%d", mday, mmonth, myear);
 	      fprintf(ofile, "\r\n");
 	      for (i = 0; i < nseg; i++)
-		  fprintf(ofile, "%s %ld\r\n", segi[i].recname, segi[i].nsamp);
+		  fprintf(ofile, "%s %"WFDB_Pd_TIME"\r\n",
+			  segi[i].recname, segi[i].nsamp);
 	      if (!qflag) printf("%s\n", ofname);
 	  }
       }

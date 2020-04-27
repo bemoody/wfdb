@@ -1,4 +1,5 @@
 /* file: annxml.c	G. Moody	28 June 2010
+                 	Last revised:	27 April 2020
 
 -------------------------------------------------------------------------------
 heaxml: Convert a WFDB annotation file to XML format
@@ -180,7 +181,8 @@ void process_anntab()
 
 void process_annotation()
 {
-  fprintf(ofile, "<annotation><time>%ld</time><anncode>%s</anncode>",
+  fprintf(ofile, "<annotation><time>%"WFDB_Pd_TIME"</time>"
+	  "<anncode>%s</anncode>",
 	  annot.time, annstr(annot.anntyp));
   if (annot.subtyp) fprintf(ofile, "<subtype>%d</subtype>", annot.subtyp);
   if (annot.chan) fprintf(ofile, "<chan>%d</chan>", annot.chan);

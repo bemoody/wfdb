@@ -1,5 +1,5 @@
 /* file: nst.c		G. Moody	8 December 1983
-			Last revised:    22 March 2018
+			Last revised:    24 April 2020
 -------------------------------------------------------------------------------
 nst: Noise stress test
 Copyright (C) 1983-2009 George B. Moody
@@ -57,7 +57,7 @@ char *argv[];
     double *anoise, *asig, *g, nsf = 0.0, nsr, *r, snr = -999999.0, ssf = 0.0;
     FILE *ifile;
     int i;
-    long t, t0, tf, dt;
+    WFDB_Time t, t0, tf, dt;
     WFDB_Anninfo ai;
     static WFDB_Annotation annot;
     void help(), nst();
@@ -422,7 +422,7 @@ double snr;
 {
     char buf[80], ofname[20], *p;
     int errct = 0, i;
-    long nlen, nend, t = 0L, dt, next_tick;
+    WFDB_Time nlen, nend, t = 0L, dt, next_tick;
     WFDB_Annotation annot;
     WFDB_Anninfo ai;
 

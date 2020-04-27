@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody	  1 May 1990
-			Last revised:     9 May 2018
+			Last revised:    24 April 2020
 Annotation list handling and display functions for WAVE
 
 -------------------------------------------------------------------------------
@@ -193,7 +193,7 @@ annot_init()
 /* next_match() returns the time of the next annotation (i.e., the one later
    than and closest to those currently displayed) that matches the template
    annotation.  The mask specifies which fields must match. */
-long next_match(template, mask)
+WFDB_Time next_match(template, mask)
 struct WFDB_ann *template;
 int mask;
 {
@@ -232,7 +232,7 @@ int mask;
 /* previous_match() returns the time of the previous annotation (i.e., the one
    earlier than and closest to those currently displayed) that matches the
    template annotation.  The mask specifies which fields must match. */
-long previous_match(template, mask)
+WFDB_Time previous_match(template, mask)
 struct WFDB_ann *template;
 int mask;
 {
@@ -278,12 +278,12 @@ int mask;
 /* Show_annotations() displays annotations between times left and left+dt at
 appropriate x-locations in the ECG display area. */
 void show_annotations(left, dt)
-long left;
+WFDB_Time left;
 int dt;
 {
     char buf[5], *p;
     int n, s, x, y, ytop, xs = -1, ys;
-    long t, right = left + dt;
+    WFDB_Time t, right = left + dt;
 
     if (annotations == 0) return;
 
@@ -492,7 +492,7 @@ void clear_annotation_display()
  */
 
 struct ap *locate_annotation(t, s)
-long t;
+WFDB_Time t;
 int s;
 {
     /* First, find out which of ap_start, annp, and ap_end is nearest t. */
@@ -552,7 +552,7 @@ void check_post_update()
    this function deletes the marker without leaving a "phantom" annotation.
  */
 void delete_annotation(t, s)
-long t;
+WFDB_Time t;
 int s;
 {
     if (locate_annotation(t, s)) {
@@ -607,7 +607,7 @@ int s;
    called. */
 void move_annotation(a, t)
 struct ap *a;
-long t;
+WFDB_Time t;
 {
     if (a->this.anntyp <= ACMAX && accept_edit == 0) {
 #ifdef NOTICE
@@ -833,7 +833,7 @@ void change_annotations()
 	    if (ann_template.anntyp == NOTQRS)
 		a->this.anntyp ^= 0x80;		/* see delete_annotation() */
 	    else {
-		long t = a->this.time;
+		WFDB_Time t = a->this.time;
 		a->this = ann_template;
 		a->this.time = t;
 	    }

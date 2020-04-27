@@ -1,5 +1,5 @@
 /* file: pschart.c	G. Moody       15 March 1988
-			Last revised:    9 May 2018
+			Last revised:  24 April 2020
 
 -------------------------------------------------------------------------------
 pschart: Produce annotated `chart recordings' on a PostScript device
@@ -542,7 +542,7 @@ int *uncal;		/* if non-zero, signal is uncalibrated */
 
 /* Arrays indexed by signal # (allocated by process(), used by printstrip()) */
 int *accept, *buflen, *v, *vbase, **vbuf, *vmax, *vmin;
-long *vsum;
+double *vsum;
 
 /* Derived parameters */
 double dpmm;		/* pixels per millimeter */
@@ -572,7 +572,7 @@ FILE *cfile;
 {
     char *tokptr, *strtok();
     int i;
-    long t0, t1, tt;
+    WFDB_Time t0, t1, tt;
     static char combuf[256];
     static char *title, *tstring, *tstring2;
     static WFDB_Anninfo af[2] = { { aname, WFDB_READ },
@@ -659,7 +659,7 @@ FILE *cfile;
 		    (vbase = realloc(vbase, nosig * sizeof(int))) == NULL ||
 		    (vmax = realloc(vmax, nosig * sizeof(int))) == NULL ||
 		    (vmin = realloc(vmin, nosig * sizeof(int))) == NULL ||
-		    (vsum = realloc(vsum, nosig * sizeof(long))) == NULL ||
+		    (vsum = realloc(vsum, nosig * sizeof(double))) == NULL ||
 		    (vbuf = realloc(vbuf, nosig * sizeof(int *))) == NULL) {
 		    (void)fprintf(stderr, "%s: insufficient memory\n", pname);
 		    exit(2);
@@ -724,7 +724,7 @@ double t_height;	/* height (mm) of space alloted per trace */
    the annotations, or 0 if nothing was printed. */
 
 int printstrip(t0, t1, record, title)
-long t0, t1;
+WFDB_Time t0, t1;
 char *record, *title;
 {
     char *ts;

@@ -1,5 +1,5 @@
 /* file: rdsamp.c	G. Moody	 23 June 1983
-			Last revised:  11 December 2017
+			Last revised:    27 April 2020
 
 -------------------------------------------------------------------------------
 rdsamp: Print an arbitrary number of samples from each signal
@@ -253,7 +253,7 @@ char *argv[];
 	}
 	else {	/* output in raw units */
 	    tnfmt = "'sample #'";
-	    tfmt = "%ld";
+	    tfmt = "%"WFDB_Pd_TIME;
 	    vfmt = ",%d";
 	}
     }
@@ -295,7 +295,7 @@ char *argv[];
 	else {	/* output in raw units */
 	    snfmt = "\t%7s";
 	    tnfmt = "       sample #";
-	    tfmt = "%15ld";
+	    tfmt = "%15"WFDB_Pd_TIME;
 	    vfmt = "\t%7d";
 	}
     }
@@ -389,7 +389,7 @@ char *argv[];
 	        case MSTIMSTR: (void)printf("%s", mstimstr(-from)); break;
 	        case HHMMSS:   (void)printf("%15s", from == 0L ?
 					    "0:00.000" : mstimstr(from)); break;
-	        case SAMPLES:  (void)printf("%15ld", from); break;
+	        case SAMPLES:  (void)printf("%15"WFDB_Pd_TIME, from); break;
 	        default:
 	        case SECONDS:  (void)printf("%15.3lf",(double)from/freq); break;
 	        case MINUTES:  (void)printf("%15.5lf",(double)from/freq); break;
@@ -415,7 +415,7 @@ char *argv[];
 			(void)printf("'%s'", p); break;
 		    }
 		    break;
-	        case SAMPLES:  (void)printf("%ld", from); break;
+	        case SAMPLES:  (void)printf("%"WFDB_Pd_TIME, from); break;
 	        default:
 	        case SECONDS:  (void)printf("%.3lf",(double)from/freq); break;
 	        case MINUTES:  (void)printf("%.5lf",(double)from/freq); break;

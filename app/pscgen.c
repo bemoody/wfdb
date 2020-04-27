@@ -1,5 +1,5 @@
 /* file: pscgen.c	G. Moody	26 November 1990
-			Last revised:	  20 May 2002
+			Last revised:	  24 April 2020
 
 -------------------------------------------------------------------------------
 pscgen: Generate a script for pschart
@@ -41,7 +41,7 @@ char *argv[];
 {
     static char *record, *ts, save_aux[255];
     int delay_ann, i, j;
-    long from = 0L, to = 0L, delay = 0L, length = 0L;
+    WFDB_Time from = 0L, to = 0L, delay = 0L, length = 0L;
     static char flag[ACMAX+1];
     WFDB_Anninfo ai;
     WFDB_Annotation annot;
@@ -108,7 +108,7 @@ char *argv[];
     if (to < 0L) to = 0L;
     while (getann(0, &annot) == 0 && (to == 0L || annot.time <= to))
 	if (flag[0] || (isann(annot.anntyp) && flag[annot.anntyp])) {
-	    long t0, t1;
+	    WFDB_Time t0, t1;
 
 	    if (annot.aux) strcpy(save_aux, annot.aux+1);
 	    else save_aux[0] = '\0';

@@ -1,5 +1,5 @@
 /* file: calsig.c	G. Moody	 4 March 1991
-			Last revised:  7 January 2009
+			Last revised:    24 April 2020
 
 -------------------------------------------------------------------------------
 calsig: measure gains and baselines in a WFDB record and rewrite header
@@ -82,7 +82,7 @@ char *argv[];
     char *cfname=NULL, *p, *record = NULL, *t0p = NULL, *t1p = NULL, *getenv();
     int do_skip = 1,  **h, **ho, i, multi_seg = 0, n = 0, *o, qflag = 0,
 	Qflag = 0, *v, vflag = 0, *vmax, *vmin;
-    long nsamp, t, t0 = 0L, t1;
+    WFDB_Time nsamp, t, t0 = 0L, t1;
 
     /* Read and interpret command-line arguments. */
     pname = prog_name(argv[0]);

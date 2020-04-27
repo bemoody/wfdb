@@ -1,5 +1,5 @@
 /* file: nguess.c		G. Moody	9 June 1986
-				Last revised:  30 March 2018
+				Last revised:  24 April 2020
 -------------------------------------------------------------------------------
 nguess: Guess the times of missing normal sinus beats in an annotation file
 Copyright (C) 1986-2008 George B. Moody
@@ -95,7 +95,7 @@ char *argv[];
     char *record = NULL;
     static double alpha = 0.75, bestpe, pe[PBLEN], rrmax, sps, worstpe;
     static int b, best, i, n, worst;
-    static long rr[PBLEN], rrsum;
+    static WFDB_Time rr[PBLEN], rrsum;
     static WFDB_Anninfo an[2];
     static WFDB_Annotation in_ann, out_ann;
     static WFDB_Time from, from0, next, to;
@@ -288,7 +288,7 @@ char *argv[];
 	    }
 	}
 	if (i > 1) {	/* gap found -- prepare to insert an annotation */
-	    rr[0] = (long)(0.5 + ((double)rr[0]*rr[best])/(double)rrsum);
+	    rr[0] = 0.5 + ((double)rr[0]*rr[best])/(double)rrsum;
 	    out_ann.anntyp = UNKNOWN;
 	}
 	else {		/* no gap -- prepare to copy the input annotation */

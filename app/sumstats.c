@@ -1,5 +1,5 @@
 /* file: sumstats.c	G. Moody	17 August 1989
-			Last revised:  11 December 2017
+			Last revised:    24 April 2020
 -------------------------------------------------------------------------------
 sumstats: Derive aggregate statistics from bxb, rxr, or epic line-format output
 Copyright (C) 1989-2010 George B. Moody
@@ -33,20 +33,27 @@ graphs" (ANSI/AAMI EC38:1998).  These standards are available from AAMI,
 #include <stdio.h>
 #include <wfdb/wfdb.h>
 
+/* Integer type used for counting events of various types */
+typedef WFDB_Time counter;
+/* Macro to read a "counter" value using scanf (e.g. "ld" or "lld") */
+#define sctr WFDB_Sd_TIME
+/* Macro to print a "counter" value using printf (e.g. "ld" or "lld")  */
+#define pctr WFDB_Pd_TIME
+
 static int nrec, Nrec, Vrec, Frec;
 static int NQS, NQP, NVS, NVP, NVF, NSVS, NSVP, NRRE;
-static long Nn, Ns, Nv, No, Nx,
-	    Sn, Ss, Sv, So, Sx,
-	    Vn, Vs, Vv, Vo, Vx,
-	    Fn, Fs, Fv, Fo, Fx,
-			    Qx,
-	    On, Os, Ov;
-static long QTP, QFN, QFP, ST;
-static long CTS, CFN, CTP, CFP, STS, SFN, STP, SFP, LTS, LFN, LTP, LFP;
-static long ETS, EFN, ETP, EFP;
-static long NCS, NCP, NSS, NSP, NLS, NLP, NES, NEP, NDS, NDP;
-static long NT, VT, FT, QT;
-static long detected_episode_length, overlap, total_episode_length;
+static counter Nn, Ns, Nv, No, Nx,
+               Sn, Ss, Sv, So, Sx,
+               Vn, Vs, Vv, Vo, Vx,
+               Fn, Fs, Fv, Fo, Fx,
+                               Qx,
+               On, Os, Ov;
+static counter QTP, QFN, QFP, ST;
+static counter CTS, CFN, CTP, CFP, STS, SFN, STP, SFP, LTS, LFN, LTP, LFP;
+static counter ETS, EFN, ETP, EFP;
+static counter NCS, NCP, NSS, NSP, NLS, NLP, NES, NEP, NDS, NDP;
+static counter NT, VT, FT, QT;
+static WFDB_Time detected_episode_length, overlap, total_episode_length;
 static double CQS, CQP, CVS, CVP, CVF, CSVS, CSVP, CRRE, CBM, CNM, CVM, CFM;
 static double CCS, CCP, CSS, CSP, CLS, CLP, CES, CEP, CDS, CDP, CERR, CMREF;
 char *pname;		/* name by which this program was invoked */
@@ -155,9 +162,10 @@ char *argv[];
 	(void)printf(
 	 "__________________________________________________________________");
 	(void)printf("____________________\n");
-	(void)printf("Sum  %6ld %3ld %3ld %3ld", Nn, Vn, Fn, On);
-	(void)printf(" %3ld %4ld %3ld %3ld", Nv, Vv, Fv, Ov);
-	(void)printf(" %3ld %3ld %3ld\n", No, Vo, Fo);
+	(void)printf("Sum  %6"pctr" %3"pctr" %3"pctr" %3"pctr"",
+                     Nn, Vn, Fn, On);
+	(void)printf(" %3"pctr" %4"pctr" %3"pctr" %3"pctr"", Nv, Vv, Fv, Ov);
+	(void)printf(" %3"pctr" %3"pctr" %3"pctr"\n", No, Vo, Fo);
 	(void)printf("Gross                                                 ");
         pstat(" %6.2f", (double)QTP, (double)(QTP+QFN));
 	pstat(" %6.2f", (double)QTP, (double)(QTP+QFP));
@@ -171,14 +179,15 @@ char *argv[];
 	pstat(" %6.2f", CVS, (double)NVS);
 	pstat(" %6.2f", CVP, (double)NVP);
 	pstat(" %6.3f", CVF, (double)NVF);
-	(void)printf("\nTotal QRS complexes: %ld  Total VEBs: %ld\n",
+	(void)printf("\nTotal QRS complexes: %"pctr"  Total VEBs: %"pctr"\n",
 		     QTP+QFN, Vn+Vv+Vo);
 	break;
       case 2:	/* bxb shutdown report */
 	(void)printf("______________________________________________________");
 	(void)printf("______________\n");
-	(void)printf("Sum   %4ld %4ld %4ld %4ld", Nx, Vx, Fx, Qx);
-	(void)printf("                               %4ld seconds\n", ST);
+	(void)printf("Sum   %4"pctr" %4"pctr" %4"pctr" %4"pctr"",
+                     Nx, Vx, Fx, Qx);
+	(void)printf("                               %4"pctr" seconds\n", ST);
 	(void)printf("Gross                    ");
         pstat(" %6.2f", (double)Nx+Vx+Fx+Qx, (double)(NT+VT+FT+QT));
 	pstat(" %6.2f", (double)Nx, (double)(NT));
@@ -196,9 +205,12 @@ char *argv[];
       case 6:	/* rxr SVE run-by-run table */
 	(void)printf("______________________________________________________");
 	(void)printf("_______________________\n");
-	(void)printf(
-	 "Sum   %4ld %3ld %3ld %3ld %3ld %3ld %3ld %3ld %3ld %3ld %3ld %3ld\n",
-	       CTS, CFN, CTP, CFP, STS, SFN, STP, SFP, LTS, LFN, LTP, LFP);
+	(void)printf("Sum   %4"pctr" %3"pctr" %3"pctr" %3"pctr
+                     " %3"pctr" %3"pctr" %3"pctr" %3"pctr
+                     " %3"pctr" %3"pctr" %3"pctr" %3"pctr"\n",
+                     CTS, CFN, CTP, CFP,
+                     STS, SFN, STP, SFP,
+                     LTS, LFN, LTP, LFP);
 	(void)printf(
 		    "Gross                                                  ");
 	rstat(" %3.0f", (double)CTS, (double)(CTS+CFN));
@@ -215,9 +227,10 @@ char *argv[];
 	rstat(" %3.0f", CSP, (double)NSP);
 	rstat(" %3.0f", CLS, (double)NLS);
 	rstat(" %3.0f", CLP, (double)NLP);
-	(void)printf(
-	"\nTotal couplets: %ld  Total short runs: %ld  Total long runs: %ld\n",
-	       CTS+CFN, STS+SFN, LTS+LFN);
+	(void)printf("\nTotal couplets: %"pctr
+                     "  Total short runs: %"pctr
+                     "  Total long runs: %"pctr"\n",
+                     CTS+CFN, STS+SFN, LTS+LFN);
 	break;
       case 4:	/* bxb -L beat-by-beat table */
 	QTP = Nn+Ns+Nv+Sn+Ss+Sv+Vn+Vs+Vv+Fn+Fs+Fv;
@@ -226,10 +239,14 @@ char *argv[];
 	(void)printf("______________________________________________________");
 	(void)printf("______________________________________________________");
 	(void)printf("________________________\n");
-	(void)printf("Sum %6ld %3ld %3ld %3ld %3ld", Nn, Sn, Vn, Fn, On);
-	(void)printf(" %3ld %3ld %3ld %3ld %3ld", Ns, Ss, Vs, Fs, Os);
-	(void)printf(" %3ld %3ld %4ld %3ld %3ld", Nv, Sv, Vv, Fv, Ov);
-	(void)printf(" %3ld %3ld %3ld %3ld\n", No, So, Vo, Fo);
+	(void)printf("Sum %6"pctr" %3"pctr" %3"pctr" %3"pctr" %3"pctr"",
+                     Nn, Sn, Vn, Fn, On);
+	(void)printf(" %3"pctr" %3"pctr" %3"pctr" %3"pctr" %3"pctr"",
+                     Ns, Ss, Vs, Fs, Os);
+	(void)printf(" %3"pctr" %3"pctr" %4"pctr" %3"pctr" %3"pctr"",
+                     Nv, Sv, Vv, Fv, Ov);
+	(void)printf(" %3"pctr" %3"pctr" %3"pctr" %3"pctr"\n",
+                     No, So, Vo, Fo);
 	(void)printf("Gross                                                 ");
 	(void)printf("                             ");
 	pstat(" %6.2f", (double)QTP, (double)(QTP+QFN));
@@ -247,21 +264,24 @@ char *argv[];
 	pstat(" %6.2f", CSVS, (double)NSVS);
 	pstat(" %6.2f", CSVP, (double)NSVP);
 	pstat(" %6.2f", CRRE/100.0, (double)NRRE);
-	(void)printf(
-	     "\nTotal QRS complexes: %ld  Total VEBs: %ld  Total SVEBs: %ld\n",
-		  QTP+QFN, Vn+Vs+Vv+Vo, Sn+Ss+Sv+So);
+	(void)printf("\nTotal QRS complexes: %"pctr
+                     "  Total VEBs: %"pctr
+                     "  Total SVEBs: %"pctr"\n",
+                     QTP+QFN, Vn+Vs+Vv+Vo, Sn+Ss+Sv+So);
 	break;
       case 5:	/* bxb -L shutdown report */
 	(void)printf("______________________________________________________");
 	(void)printf("__________________\n");
-	(void)printf("Sum  %4ld %4ld %4ld %4ld %4ld", Nx, Sx, Vx, Fx, Qx);
-	(void)printf("                                      %4ld seconds\n",
+	(void)printf("Sum  %4"pctr" %4"pctr" %4"pctr" %4"pctr" %4"pctr"",
+                     Nx, Sx, Vx, Fx, Qx);
+	(void)printf("                                      %4"pctr" seconds\n",
 		     ST);
 	break;
       case 7:	/* epic report */
 	(void)printf("______________________________________________________");
 	(void)printf("__________________\n");
-	(void)printf("Sum    %4ld %4ld %4ld %4ld                   %s",
+	(void)printf("Sum    %4"pctr" %4"pctr" %4"pctr" %4"pctr
+                     "                   %s",
 		     ETS, EFN, ETP, EFP, mstimstr(total_episode_length));
 	(void)printf("   %s\n", mstimstr(detected_episode_length));
 	(void)printf("Gross                      ");
@@ -300,18 +320,22 @@ char *s;
     static char rts[20], tts[20];
     static double rre, ds, dp, err, mref;
     static int cts, cfn, ctp, cfp, sts, sfn, stp, sfp, lts, lfn, ltp, lfp;
-    static long dummy, nt, vt, ft, qt;
-    static long ets, efn, etp, efp;
-    static long nn, sn, vn, fn, on, ns, ss, vs, fs, os;
-    static long nv, sv, vv, fv, ov, no, so, vo, fo;
-    static long nx, sx, vx, fx, qx, st;
-    static long rt, tt;
+    static counter dummy, nt, vt, ft, qt;
+    static counter ets, efn, etp, efp;
+    static counter nn, sn, vn, fn, on, ns, ss, vs, fs, os;
+    static counter nv, sv, vv, fv, ov, no, so, vo, fo;
+    static counter nx, sx, vx, fx, qx, st;
+    static WFDB_Time rt, tt;
 
     switch (type) {
       case 1:	/* bxb beat-by-beat report */
 	fo = -1L;
-	(void)sscanf(s, "%s%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld", rec,
-	       &nn, &vn, &fn, &on, &nv, &vv, &fv, &ov, &no, &vo, &fo);
+	(void)sscanf(s, "%s%"sctr"%"sctr"%"sctr"%"sctr
+                     "%"sctr"%"sctr"%"sctr"%"sctr
+                     "%"sctr"%"sctr"%"sctr"",
+                     rec, &nn, &vn, &fn, &on,
+                     &nv, &vv, &fv, &ov,
+                     &no, &vo, &fo);
 	if (fo < 0L) return (0);
 	Nn += nn; Vn += vn; Fn += fn; On += on;
 	Nv += nv; Vv += vv; Fv += fv; Ov += ov;
@@ -340,8 +364,11 @@ char *s;
 	return (1);
       case 2:	/* bxb -l shutdown report */
 	st = -1L;
-	(void)sscanf(s, "%s%ld%ld%ld%ld%s%s%s%s%ld seconds %ld%ld%ld%ld%ld",
-		     rec, &nx, &vx, &fx, &qx, mb, mn, mv, mf, &st,
+	(void)sscanf(s, "%s%"sctr"%"sctr"%"sctr"%"sctr
+                     "%s%s%s%s%"sctr" seconds "
+                     "%"sctr"%"sctr"%"sctr"%"sctr"%"sctr"",
+		     rec, &nx, &vx, &fx, &qx,
+                     mb, mn, mv, mf, &st,
 		     &nt, &dummy, &vt, &ft, &qt);
 	if (st < 0L) return (0);
 	Nx += nx; Vx += vx; Fx += fx; Qx += qx; ST += st;
@@ -392,11 +419,16 @@ char *s;
 	return (1);
       case 4:	/* bxb -L beat-by-beat report */
 	fo = -1L;
-	(void)sscanf(s,
- "%s%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%ld%s%s%s%s%s%s%s",
-	       rec, &nn, &sn, &vn, &fn, &on, &ns, &ss, &vs, &fs, &os,
-			  &nv, &sv, &vv, &fv, &ov, &no, &so, &vo, &fo,
-				  qse, qpp, vse, vpp, sse, spp, srre);
+	(void)sscanf(s, "%s%"sctr"%"sctr"%"sctr"%"sctr"%"sctr
+                     "%"sctr"%"sctr"%"sctr"%"sctr"%"sctr
+                     "%"sctr"%"sctr"%"sctr"%"sctr"%"sctr
+                     "%"sctr"%"sctr"%"sctr"%"sctr
+                     "%s%s%s%s%s%s%s",
+                     rec, &nn, &sn, &vn, &fn, &on,
+                     &ns, &ss, &vs, &fs, &os,
+                     &nv, &sv, &vv, &fv, &ov,
+                     &no, &so, &vo, &fo,
+                     qse, qpp, vse, vpp, sse, spp, srre);
 	if (fo < 0L) return (0);
 	Nn += nn; Sn += sn; Vn += vn; Fn += fn; On += on;
 	Ns += ns; Ss += ss; Vs += vs; Fs += fs; Os += os;
@@ -438,15 +470,17 @@ char *s;
 	return (1);
       case 5:	/* bxb -L shutdown report */
 	st = -1L;
-	(void)sscanf(s, "%s%ld%ld%ld%ld%ld%s%s%s%s%s%ld", rec,
-	       &nx, &sx, &vx, &fx, &qx, mb, mn, ms, mv, mf, &st);
+	(void)sscanf(s, "%s%"sctr"%"sctr"%"sctr"%"sctr"%"sctr
+                     "%s%s%s%s%s%"sctr"",
+                     rec, &nx, &sx, &vx, &fx, &qx,
+                     mb, mn, ms, mv, mf, &st);
 	if (st < 0L) return (0);
 	Nx += nx; Sx += sx; Vx += vx; Fx += fx; Qx += qx; ST += st;
 	nrec++;
 	return (1);
       case 7:	/* epic report */
 	tts[0] = '\0';
-	(void)sscanf(s, "%s%ld%ld%ld%ld%s%s%s%s%s%s", rec,
+	(void)sscanf(s, "%s%"sctr"%"sctr"%"sctr"%"sctr"%s%s%s%s%s%s", rec,
 		     &ets, &efn, &etp, &efp, mb, mn, mds, mdp, rts, tts);
 	if (tts[0] == '\0') return (0);
 	ETS += ets; EFN += efn; ETP += etp; EFP += efp;

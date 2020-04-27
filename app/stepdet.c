@@ -1,5 +1,5 @@
 /* file: stepdet.c		G. Moody	28 February 2014
-				Last revised:	  22 March 2018
+				Last revised:	  24 April 2020
 
 -------------------------------------------------------------------------------
 stepann: detect and annotate step changes in a signal
@@ -47,7 +47,7 @@ char *argv[];
     char *p, *record = NULL, *prog_name();
     int i, minutes = 0, nsig, signal = -1, time, tdown = 450, tup = 550, *v,
 	v0, v1;
-    long from = 0L, next_minute, now, spm, to = 0L;
+    WFDB_Time from = 0L, next_minute, now, spm, to = 0L;
     WFDB_Anninfo a;
     WFDB_Annotation annot;
     static int gvmode = WFDB_LOWRES;

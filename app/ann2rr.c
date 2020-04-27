@@ -1,5 +1,5 @@
 /* file: ann2rr.c		G. Moody	 16 May 1995
-				Last revised:  23 February 2009
+				Last revised:   27 April 2020
 -------------------------------------------------------------------------------
 ann2rr: Calculate RR intervals from an annotation file
 Copyright (C) 1995-2009 George B. Moody
@@ -239,7 +239,7 @@ char *argv[];
 				    (void)printf("%s", mstimstr(t0));
 		                break;
 		      case 'T': (void)printf("%s", mstimstr(-t0)); break;
-		      default:  (void)printf("%ld", t0); break;
+		      default:  (void)printf("%"WFDB_Pd_TIME, t0); break;
 		    }
 		    (void)printf("\t");
 		}
@@ -259,20 +259,20 @@ char *argv[];
 		  case 'h': (void)sprintf(rrstr, rrfstr, rr/sph);
 		      (void)printf("%s", rrstr);
 		      (void)sscanf(rrstr, "%lf", &frr);
-		      t1 = (long)(t0 + frr * sph + 0.5);
+		      t1 = t0 + frr * sph + 0.5;
 		      break;
 		  case 'm': (void)sprintf(rrstr, rrfstr, rr/spm);
 		      (void)printf("%s", rrstr);
 		      (void)sscanf(rrstr, "%lf", &frr);
-		      t1 = (long)(t0 + frr * spm + 0.5);
+		      t1 = t0 + frr * spm + 0.5;
 		      break;
 		  case 's': (void)sprintf(rrstr, rrfstr, rr/sps);
 		      (void)printf("%s", rrstr);
 		      (void)sscanf(rrstr, "%lf", &frr);
-		      t1 = (long)(t0 + frr * sps + 0.5);
+		      t1 = t0 + frr * sps + 0.5;
 		      break;
 		  case 't': (void)printf("%s", mstimstr(t1)); break;
-		  default:  (void)printf("%ld", rr); break;
+		  default:  (void)printf("%"WFDB_Pd_TIME, rr); break;
 		}
 
 		/* If requested, print annotation at end of interval. */
@@ -288,7 +288,7 @@ char *argv[];
 		      case 's': (void)printf(t1fstr, t1/sps); break;
 		      case 't': (void)printf("%s", mstimstr(t1)); break;
 		      case 'T': (void)printf("%s", mstimstr(-t1)); break;
-		      default:  (void)printf("%ld", t1); break;
+		      default:  (void)printf("%"WFDB_Pd_TIME, t1); break;
 		    }
 		}
 
