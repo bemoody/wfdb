@@ -611,52 +611,42 @@ compiler, but careful attention has been given to making it usable with any
 ANSI/ISO C compiler.  Since @code{gcc} is free, high quality, and supported, it
 is highly recommended that you use it for compiling your WFDB applications.
 
-To compile the example program using @code{gcc}, we can say:
+To compile the example program using @code{gcc} on a Unix shell, we can say:
 
 @example
-gcc -o psamples psamples.c -lwfdb
+gcc -o psamples psamples.c `wfdb-config --cflags --libs`
 @end example
 
 @noindent
 to produce an executable program called @code{psamples}.  (Your C
 compiler may be named @file{cc}, @file{acc}, @file{CC}, or something
-else, rather than @file{gcc}.)  You may use any other compiler
-options you choose, but the @samp{-lwfdb} option must appear in the
-@code{cc} command line following any and all source (@file{*.c}) and
-object (@file{*.o}) file names, in order to instruct the loader to
-search the WFDB library for any functions that the program needs (in
-this case, @code{isigopen} and @code{getvec}).  Some programs will need
-additional libraries, and the corresponding @samp{-l} options can
-usually be given before or after the @samp{-lwfdb} option.
+else, rather than @file{gcc}.)
 
-@cindex NETFILES
-@cindex curl
-@cindex libcurl
-
-If the WFDB library was installed with NETFILES support, it will make use of
-functions contained in the @code{libcurl} library.  If you have a dynamically
-linkable version of the @code{libcurl} library, as under GNU/Linux, these will
-be loaded automatically when you run @code{psamples}.  If you have only static
-versions of these libraries, however, it is necessary to provide additional
-arguments in the @code{cc} command line in order to compile successfully.  One
-way to do this is to follow the model used to compile the standard WFDB
-applications supplied with the WFDB library; see @file{Makefile} in the
-@file{app} directory of the WFDB software package source tree.
-
-If you are using WFDB version 10.2.6 or a later version and @file{gcc} or a
-compatible compiler, the @file{wfdb-config} utility is available to help
-construct commands for compiling programs that use the WFDB library (and the
-@code{libcurl} library, if available).  Use it like this:
+Note that this command contains backticks (`), not apostrophes (').  The
+program @command{wfdb-config} is part of the WFDB Software Package, and tells
+the compiler where to find the header files (such as @file{wfdb/wfdb.h}) and
+the library itself (such as @file{libwfdb.so}).  Writing the
+@command{wfdb-config} command in backticks means that the output of the command
+is inserted into the @code{gcc} command line.  So if the WFDB library is
+installed in @file{/usr/local/lib}, then the command above is equivalent to:
 
 @example
-gcc `wfdb-config --cflags` -o psamples psamples.c `wfdb-config --libs`
+gcc -o psamples psamples.c -I/usr/local/include -L/usr/local/lib -lwfdb
 @end example
 
 @noindent
-Note that this command contains backticks (`), not apostrophes (').
-@file{wfdb-config} is particularly useful if the WFDB library or
-its @file{*.h} files are installed in non-standard locations, or if
-you have only a static @code{libcurl} library.
+In addition to being shorter to type, it's a good idea to use
+@command{wfdb-config} so that your program can be compiled on other systems,
+regardless of where the WFDB library has been installed.
+
+You may use any other compiler options you choose, but
+@samp{`wfdb-config --cflags --libs`} must appear in the @command{cc} command
+line following any and all source (@file{*.c}) and object (@file{*.o}) file
+names, in order to instruct the loader to search the WFDB library for any
+functions that the program needs (in this case, @code{isigopen} and
+@code{getvec}).  Some programs will need additional libraries, and the
+corresponding @samp{-l} options can usually be given before or after the
+@command{wfdb-config} command.
 
 Under MS-Windows, @file{gcc} is included in the freely available Cygwin
 software development system (@uref{http://@-www@-.cygwin@-.com/}), and also in
@@ -765,7 +755,7 @@ found in the same directory as @file{wfdb.h}, usually @file{/usr/include/wfdb})
 to the current directory, then type:
 
 @example
-g77 -o fsamples -DFIXSTRINGS fsamples.f wfdbf.c -lwfdb
+g77 -o fsamples -DFIXSTRINGS fsamples.f wfdbf.c `wfdb-config --libs`
 @end example
 
 @noindent
