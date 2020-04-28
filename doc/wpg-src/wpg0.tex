@@ -749,13 +749,13 @@ is also available, at
 @uref{http://physionet.org/physiotools/wfdb/fortran/example.f}.)
 
 @noindent
-To compile this program using @code{g77} (the GNU Fortran compiler), save it as
-@file{fsamples.f} in the current directory, copy @file{wfdbf.c} (which can be
-found in the same directory as @file{wfdb.h}, usually @file{/usr/include/wfdb})
-to the current directory, then type:
+To compile this program using @command{gfortran} (the GNU Fortran compiler),
+save it as @file{fsamples.f} in the current directory, copy @file{wfdbf.c}
+(which can be found in the same directory as @file{wfdb.h}, usually
+@file{/usr/local/include/wfdb}) to the current directory, then type:
 
 @example
-g77 -o fsamples -DFIXSTRINGS fsamples.f wfdbf.c `wfdb-config --libs`
+gfortran -o fsamples -DFIXSTRINGS fsamples.f wfdbf.c `wfdb-config --libs`
 @end example
 
 @noindent
