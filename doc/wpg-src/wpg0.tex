@@ -1382,13 +1382,9 @@ annotator 0, and @file{c} becomes input annotator 1.  Thus
 will read an annotation from annotator @file{c}, and
 @code{putann(0, &annot)} will write an annotation for annotator @file{b}.
 Input annotation files will be found if they are located in any of the
-directories specified by @code{WFDB} (@pxref{WFDB path}); output annotators
-are created in the current directory (but note that, under Unix at
-least, it is possible to specify annotator names such as @file{/here} or
-@file{zzz/there} or even @file{../somewhere/else}; @pxref{Annotation
-Files}, for details of how file names are constructed from annotator and
-record names).  Several of the example programs in chapter 6 illustrate
-the use of @code{annopen}; for example, @pxref{Example 1}.
+directories specified by @code{WFDB} (@pxref{WFDB path}); output annotators are
+created in the current directory.  Several of the example programs in chapter 6
+illustrate the use of @code{annopen}; for example, @pxref{Example 1}.
 
 As a special case, if @var{nann} is 0, @var{aiarray} can be @code{NULL}.
 This can be useful to force open annotation files to be closed without
