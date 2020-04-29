@@ -1,15 +1,16 @@
 # This example works with either f77 (g77) or gfortran.
-example$(EXEEXT):	example.f wfdbf.c
-	$(F77) -o example$(EXEEXT) -DFIXSTRINGS example.f wfdbf.c -lwfdb
+example$(EXEEXT):	example.f wfdbf.o
+	$(F77) -o example$(EXEEXT) example.f wfdbf.o $(LDFLAGS)
 
 wfdbf.o:	wfdbf.c
-	$(CC) -g -O -DFIXSTRINGS wfdbf.c
+	$(CC) $(CFLAGS) -g -O -DFIXSTRINGS -c wfdbf.c
 
 
 # If you have `f2c', but not `f77', use `make example-alt' instead of `make'.
 example-alt:	example.f wfdbf.c
 	f2c example.f
-	$(CC) -o example$(EXEEXT) example.c wfdbf.c -lf2c -lm -lwfdb
+	$(CC) $(CFLAGS) -o example$(EXEEXT) example.c wfdbf.c \
+	 -lf2c -lm $(LDFLAGS)
 
 
 # 'make install' copies the wrapper sources into the directory where the
