@@ -30,9 +30,9 @@ C level as this one).  The program prints the number of signals, the sampling
 C frequency, and the first ten samples from each signal.
 C
 C To compile this program on a UNIX system, type:
-C    f77 example.f wfdbf.c -lwfdb
+C    f77 example.f wfdbf.c `wfdb-config --cflags --libs`
 C To run the resulting executable file, type:
-C    a.out
+C    ./a.out
 C Compare the output with that shown in section 1.4 of the WFDB Programmer's
 C Guide.
 C
