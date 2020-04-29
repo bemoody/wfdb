@@ -1,5 +1,5 @@
 C file: example.f		G. Moody	23 August 1995
-C                               Last revised:  23 February 2006
+C                               Last revised:    29 April 2020
 C
 C -----------------------------------------------------------------------------
 C Sample program illustrating use of Fortran wrappers for the WFDB library
@@ -39,9 +39,10 @@ C
 C If your Fortran compiler is a very old one, you might need to replace the
 C tabs at the beginnings of the lines below with spaces.
 
-C The next two lines specify the data types returned by the wrappers.
+C The next three lines specify the data types returned by the wrappers.
 	implicit integer(a-z)
-	real aduphys, getbasecount, getcfreq, sampfreq
+	double precision aduphys, getafreq, getbasecount, getcfreq
+	double precision getiafreq, getiaorigfreq, getifreq, sampfreq
 
 	integer i, v(32), g
 	real f

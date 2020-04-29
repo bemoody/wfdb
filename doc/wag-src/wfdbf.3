@@ -4,13 +4,13 @@ wfdbf \- Waveform Database library wrappers for Fortran
 .SH SYNOPSIS
 implicit integer(a-z)
 .br
-real aduphys, getbasecount, getcfreq, getifreq, sampfreq, getafreq, getiafreq, getiaorigfreq
+double precision aduphys, getbasecount, getcfreq, getifreq, sampfreq, getafreq, getiafreq, getiaorigfreq
 .br
 character aux(256), desc(80), filetype(32), fname(40), name(20), pathname(80), record(16), string(32), units(20), prolog(1000), version(80), options(80)
 .br
 integer a, adcres, adczero, ampl, anntyp, baseline, bsize, caltype, chan, cksum, date, dummy, fmt, group, initval, microvolts, mode, nann, nsamp, nsig, num, s, spf, stat, subtyp, time, v(32), value, bytes
 .br
-real gain, frequency, high, low, scale
+double precision gain, frequency, high, low, scale
 .PP
 setanninfo(a, name, stat)
 .br
