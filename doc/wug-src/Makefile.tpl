@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:	25 October 2017
+#				Last revised:	 30 April 2020
 # Change the settings below as appropriate for your setup.
 
 # Set COLORS to 'color' if you have a color printer and would like to print
@@ -85,13 +85,6 @@ wug.html:	wug.tex wug.aux
 # 'make wug.pdf': format the WAVE User's Guide as PDF
 wug.pdf:	wug.tex
 	wave/scripts/wugfigures -pdf
-	convert -scale 50\% wave/ppm/print-setup-window.ppm.gz \
-	  print-setup-window.pdf
-	convert -scale 50\% wave/ppm/title-with-parens.ppm.gz \
-	  title-with-parens.pdf
-	# epstopdf chokes on the two files above for some reason.
-	# convert does not do a great job on them, but the results are
-	# at least recognizable!
 	rm -f wug.aux wug.idx wug.ind wug.toc
 	pdflatex '\nonstopmode\input{wug}'
 	makeindex wug.idx
