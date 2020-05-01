@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: fixpg.sh	G. Moody       12 April 1997
-#			Last revised:  21 July 2002
+#			Last revised:    1 May 2020
 #
 # Post-process WFDB Programmer's Guide HTML files
 
@@ -30,8 +30,9 @@ cd $1
 
 for L in database-path.htm records.htm strtim.htm compiling.htm
 do
+  rm -f "$L"
   R=`grep -l "link: $L" *.htm`
-  if [ "x$R" != "x" ]; then ln -s $R $L
-  else echo "Can't find $L"
+  if [ -f "$R" ]; then ln -s "$R" "$L"
+  else echo "Can't find $L"; exit 1
   fi
 done
