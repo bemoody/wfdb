@@ -7,7 +7,7 @@ main()
     WFDB_Sample v[2];
     WFDB_Siginfo s[2];
 
-    if (isigopen("100s", s, 2) < 1)
+    if (isigopen("100s", s, 2) < 2)
 	exit(1);
     for (i = 0; i < 10; i++) {
 	if (getvec(v) < 0)
