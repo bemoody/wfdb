@@ -4820,6 +4820,9 @@ time intervals, in units of sample intervals.  Only the magnitude is
 significant;  the sign of a @code{WFDB_Time} variable indicates how it
 is to be printed by @code{timstr} or @code{mstimstr}.
 
+The definition of @code{WFDB_Time} depends on whether the @code{WFDB_LARGETIME}
+macro is defined (@pxref{Large time values}).
+
 @item WFDB_Date
 @cindex @code{WFDB_Date} (defined)
 a signed integer type (at least 32 bits) used to represent Julian dates,
@@ -4880,6 +4883,7 @@ given time.
 * Limits of numeric types::		Maximum and minimum values.
 * Displaying numeric values::		Converting numbers to strings.
 * Parsing numeric values::		Converting strings to numbers.
+* Large time values::			Handling very long records.
 @end menu
 
 @node WFDB_Siginfo structures, WFDB_Calinfo structures, Data Types, Data Types
@@ -5538,7 +5542,7 @@ The following macros are defined in @file{<wfdb/wfdb.h>}:
 symmetry with @code{scanf}.  For more information, see the documentation of
 your C compiler.)
 
-@node Parsing numeric values, , Displaying numeric values, Data Types
+@node Parsing numeric values, Large time values, Displaying numeric values, Data Types
 @section Parsing Numeric Values
 @cindex parsing numeric values
 @cindex converting strings to numbers
@@ -5639,6 +5643,46 @@ The following macros are defined in @file{<wfdb/wfdb.h>}:
 @samp{E}, @samp{f}, @samp{g}, and @samp{G} formats, and are provided for
 symmetry with @code{printf}.  For more information, see the documentation of
 your C compiler.)
+
+@node Large time values, , Parsing numeric values, Data Types
+@section Large Time Values
+@cindex large time values
+@cindex @code{WFDB_Time} (64-bit)
+@cindex @code{WFDB_LARGETIME}
+@findex WFDB_LARGETIME
+
+@noindent
+The @code{WFDB_Time} type is defined as a signed integer type of at least 32
+bits, which means that it can represent sample numbers up to 2,147,483,647.  By
+default, @code{WFDB_Time} is defined as an alias for the standard C
+@code{long int}, and many existing applications have been written with the
+assumption that @code{WFDB_Time} and @code{long int} are interchangeable.
+
+However, it is quite possible for a record to be longer than 2,147,483,647
+samples (about 25 days of recording at @w{1 kHz}) and it is useful to be able
+to process such records on machines where a @code{long int} is only 32 bits.
+
+If you are using a modern C compiler, with WFDB library version 10.7.0 or
+later, it is possible to define @code{WFDB_Time} as @code{long long int}
+instead of @code{long int}.  This lets your program work with sample numbers as
+large as 9,223,372,036,854,775,807, even on a 32-bit machine.  To do this, add
+the following line at the very beginning of your source file, @emph{before}
+including @file{<wfdb/wfdb.h>}:
+
+@example
+#define WFDB_LARGETIME
+@end example
+
+@noindent
+If your program consists of multiple @file{*.c} files, be sure to do the same
+for each file.  Alternatively, you can define this macro on the C compiler
+command line (e.g., @code{-DWFDB_LARGETIME} if you are using @command{gcc}).
+
+When doing this, you will also need to ensure that your program handles large
+time values consistently, by using the @code{WFDB_Time} data type rather than
+@code{long} or @code{long long}, using @code{WFDB_TIME_MAX} rather than
+@code{LONG_MAX} or @code{LLONG_MAX}, using @code{WFDB_Pd_TIME} rather than
+@code{"ld"} or @code{"lld"}, and so forth.
 
 @node     Annotation Codes, Database Files, Data Types, Top
 @chapter Annotation Codes
