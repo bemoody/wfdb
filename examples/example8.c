@@ -5,7 +5,7 @@ main()
 {
     char answer[32], record[8], directory[32];
     int i, nsig = 0;
-    long nsamp, t;
+    WFDB_Time nsamp, t;
     double freq = 0.;
     char **filename, **description, **units;
     WFDB_Sample *v;
