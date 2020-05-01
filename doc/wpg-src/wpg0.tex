@@ -6762,13 +6762,13 @@ an annotator name, and its second argument is a record name.
 @i{16}      (void)sampfreq(argv[2]);
 @i{17}      if (annopen(argv[2], &a, 1) < 0) exit(2);
 @i{18}      while (getann(0, &annot) == 0)
-@i{19}          printf("%s (%ld) %s %d %d %d %s\n",
+@i{19}          printf("%s (%"WFDB_Pd_TIME") %s %d %d %d %s\n",
 @i{20}                 timstr(-(annot.time)),
 @i{21}                 annot.time,
 @i{22}                 annstr(annot.anntyp),
 @i{23}                 annot.subtyp, annot.chan, annot.num,
 @i{24}                 (annot.aux != NULL && *annot.aux > 0) ?
-@i{25}                  annot.aux+1 : "");
+@i{25}                 (char *) annot.aux+1 : "");
 @i{26}      exit(0);
 @i{27}  @}
 @end example
