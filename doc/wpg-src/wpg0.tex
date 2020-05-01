@@ -7612,9 +7612,9 @@ is based on a Pascal program written by W.A.H. Engelse and C. Zeelenberg,
  @i{1}  #include <stdio.h>
  @i{2}  #include <wfdb/wfdb.h>
  @i{3}  #include <wfdb/ecgcodes.h>
- @i{4}  
+ @i{4}
  @i{5}  #define abs(A)  ((A) >= 0 ? (A) : -(A))
- @i{6}  
+ @i{6}
  @i{7}  main(argc, argv)
  @i{8}  int argc;
  @i{9}  char *argv[];
@@ -7626,24 +7626,24 @@ is based on a Pascal program written by W.A.H. Engelse and C. Zeelenberg,
 @i{15}      WFDB_Annotation annot;
 @i{16}      WFDB_Sample *v;
 @i{17}      WFDB_Siginfo *s;
-@i{18}  
+@i{18}
 @i{19}      if (argc < 2) @{
 @i{20}          fprintf(stderr, "usage: %s record [threshold]\n", argv[0]);
 @i{21}          exit(1);
 @i{22}      @}
 @i{23}      a.name = "qrs"; a.stat = WFDB_WRITE;
-@i{24}      if ((nsig = isigopen(argv[1], NULL, 0)) < 1) exit(2);
-@i{25}      s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
-@i{26}      v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
-@i{27}      if (s == NULL || v == NULL) @{
-@i{28}          fprintf(stderr, "%s: insufficient memory\n", argv[0]);
-@i{29}          exit(2);
-@i{30}      @}
-@i{31}      if (isigopen(argv[1], s, nsig) != nsig) exit(2);
-@i{32}      if (sampfreq((char *)NULL) < 240. ||
-@i{33}          sampfreq((char *)NULL) > 260.)
-@i{34}          setifreq(250.);
-@i{35}      if (annopen(argv[1], &a, 1) < 0) exit(2);
+@i{24}
+@i{25}      if ((nsig = isigopen(argv[1], NULL, 0)) < 1) exit(2);
+@i{26}      s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
+@i{27}      v = (WFDB_Sample *)malloc(nsig * sizeof(WFDB_Sample));
+@i{28}      if (s == NULL || v == NULL) @{
+@i{29}          fprintf(stderr, "%s: insufficient memory\n", argv[0]);
+@i{30}          exit(2);
+@i{31}      @}
+@i{32}      if (wfdbinit(argv[1], &a, 1, s, nsig) != nsig) exit(2);
+@i{33}      if (sampfreq((char *)NULL) < 240. ||
+@i{34}          sampfreq((char *)NULL) > 260.)
+@i{35}          setifreq(250.);
 @i{36}      if (argc > 2) scmin = muvadu(0, atoi(argv[2]));
 @i{37}      if (scmin < 1) scmin = muvadu(0, 1000);
 @i{38}      slopecrit = scmax = 10 * scmin;
@@ -7651,7 +7651,7 @@ is based on a Pascal program written by W.A.H. Engelse and C. Zeelenberg,
 @i{40}      annot.subtyp = annot.chan = annot.num = 0; annot.aux = NULL;
 @i{41}      (void)getvec(v);
 @i{42}      t9 = t8 = t7 = t6 = t5 = t4 = t3 = t2 = t1 = v[0];
-@i{43}  
+@i{43}
 @i{44}      do @{
 @i{45}          filter = (t0 = v[0]) + 4*t1 + 6*t2 + 4*t3 + t4
 @i{46}                  - t5         - 4*t6 - 6*t7 - 4*t8 - t9;
@@ -7697,7 +7697,7 @@ is based on a Pascal program written by W.A.H. Engelse and C. Zeelenberg,
 @i{86}          t9 = t8; t8 = t7; t7 = t6; t6 = t5; t5 = t4;
 @i{87}          t4 = t3; t3 = t2; t2 = t1; t1 = t0; time++;
 @i{88}      @} while (getvec(v) > 0);
-@i{89}  
+@i{89}
 @i{90}      wfdbquit();
 @i{91}      exit(0);
 @i{92}  @}
@@ -7717,7 +7717,7 @@ A macro that evaluates to the absolute value of its argument.
 @item Lines 11--12:
 The names of these variables match those in the original Pascal program.
 
-@item Lines 32--35:
+@item Lines 33--35:
 Most of this program is independent of sampling frequency, but the filter
 (lines 45--46) and the threshold are as specified by the authors
 of the original program for human ECGs sampled at 250 Hz (e.g., the AHA DB).
