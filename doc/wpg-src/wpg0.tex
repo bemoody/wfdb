@@ -6814,7 +6814,7 @@ histogram of them.
  @i{7}  char *argv[];
  @i{8}  @{
  @i{9}      int rr, *rrhist, rrmax;
-@i{10}      long t;
+@i{10}      WFDB_Time t;
 @i{11}      WFDB_Anninfo a;
 @i{12}      WFDB_Annotation annot;
 @i{13}      void *calloc();
@@ -6840,8 +6840,8 @@ histogram of them.
 @i{33}              t = annot.time;
 @i{34}          @}
 @i{35}      for (rr = 1; rr < rrmax; rr++)
-@i{36}          printf("%4d %s\n", rrhist[rr], mstimstr((long)rr));
-@i{37}      printf("%4d %s (or longer)\n", rrhist[rr], mstimstr((long)rr));
+@i{36}          printf("%4d %s\n", rrhist[rr], mstimstr((WFDB_Time)rr));
+@i{37}      printf("%4d %s (or longer)\n", rrhist[rr], mstimstr((WFDB_Time)rr));
 @i{38}      exit(0);
 @i{39}  @}
 @end example

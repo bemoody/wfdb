@@ -7,7 +7,7 @@ int argc;
 char *argv[];
 {
     int rr, *rrhist, rrmax;
-    long t;
+    WFDB_Time t;
     WFDB_Anninfo a;
     WFDB_Annotation annot;
     void *calloc();
@@ -33,7 +33,7 @@ char *argv[];
             t = annot.time;
         }
     for (rr = 1; rr < rrmax; rr++)
-        printf("%4d %s\n", rrhist[rr], mstimstr((long)rr));
-    printf("%4d %s (or longer)\n", rrhist[rr], mstimstr((long)rr));
+        printf("%4d %s\n", rrhist[rr], mstimstr((WFDB_Time)rr));
+    printf("%4d %s (or longer)\n", rrhist[rr], mstimstr((WFDB_Time)rr));
     exit(0);
 }
