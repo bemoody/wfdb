@@ -15,7 +15,7 @@ main(int argc, char **argv)
 	exit(1);
     setifreq(f);
     t0 = strtim("1");
-    isigsettime(t);
+    isigsettime(t0);
     t1 = strtim("2");
     for (t = t0; t <= t1; t++) {
 	if (getvec(v) < 0)
