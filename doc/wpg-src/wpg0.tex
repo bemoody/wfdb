@@ -7463,12 +7463,12 @@ average normal QRS complex).
  @i{7}  char *argv[];
  @i{8}  @{
  @i{9}      int btype, i, j, nbeats = 0, nsig, hwindow, window;
-@i{10}      long stoptime = 0L, **sum;
-@i{11}      WFDB_Anninfo a;
-@i{12}      WFDB_Annotation annot;
-@i{13}      WFDB_Sample *v, *vb;
-@i{14}      WFDB_Siginfo *s;
-@i{15}      void *calloc();
+@i{10}      WFDB_Time stoptime = 0;
+@i{11}      long **sum;
+@i{12}      WFDB_Anninfo a;
+@i{13}      WFDB_Annotation annot;
+@i{14}      WFDB_Sample *v, *vb;
+@i{15}      WFDB_Siginfo *s;
 @i{16}
 @i{17}      if (argc < 3) @{
 @i{18}          fprintf(stderr,

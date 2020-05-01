@@ -7,12 +7,12 @@ int argc;
 char *argv[];
 {
     int btype, i, j, nbeats = 0, nsig, hwindow, window;
-    long stoptime = 0L, **sum;
+    WFDB_Time stoptime = 0;
+    long **sum;
     WFDB_Anninfo a;
     WFDB_Annotation annot;
     WFDB_Sample *v, *vb;
     WFDB_Siginfo *s;
-    void *calloc();
 
     if (argc < 3) {
         fprintf(stderr,
