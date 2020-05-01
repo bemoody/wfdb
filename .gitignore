@@ -34,6 +34,7 @@ doc/wag-src/wag3.tex
 doc/wag-src/wag4.tex
 doc/wag-src/*.ps
 doc/wpg/*
+doc/wpg-src/ctotexi
 doc/wpg-src/wpg.tex
 doc/wpg-src/wpg.ps
 doc/wpg-src/wpg.cp
@@ -120,6 +121,29 @@ convert/readid
 convert/revise
 convert/wav2mit
 convert/wfdb2mat
+
+examples/example1
+examples/example2
+examples/example3
+examples/example4
+examples/example5
+examples/example6
+examples/example7
+examples/example8
+examples/example9
+examples/example10
+examples/exannstr
+examples/exgetann
+examples/exgetvec
+examples/exputvec
+examples/pgain
+examples/psamples
+examples/psamplex
+examples/refhr
+examples/stdev
+examples/wfdbversion
+
+fortran/example
 
 psd/coherence
 psd/fft
