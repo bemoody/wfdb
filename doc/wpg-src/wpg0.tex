@@ -7258,7 +7258,7 @@ data acquisition are hardware-dependent and are not shown here.
 @example
   @i{1}  #include <stdio.h>
   @i{2}  #include <wfdb/wfdb.h>
-  @i{3}  
+  @i{3}
   @i{4}  main()
   @i{5}  @{
   @i{6}      char answer[32], record[8], directory[32];
@@ -7268,7 +7268,7 @@ data acquisition are hardware-dependent and are not shown here.
  @i{10}      char **filename, **description, **units;
  @i{11}      WFDB_Sample *v;
  @i{12}      WFDB_Siginfo *s;
- @i{13}  
+ @i{13}
  @i{14}      do @{
  @i{15}          printf("Choose a record name [up to 6 characters]: ");
  @i{16}          fgets(record, 8, stdin); record[strlen(record)-1] = '\0';
@@ -7341,7 +7341,7 @@ data acquisition are hardware-dependent and are not shown here.
  @i{83}              sscanf(answer, "%lf", &s[i].gain);
  @i{84}          @} while (s[i].gain < 0.);
  @i{85}          do @{
- @i{86}              printf(" Signal %d ADC resolution in bits [8-16]: ",i);
+ @i{86}              printf(" Signal %d ADC resolution in bits [8-16]: ", i);
  @i{87}              fgets(answer, 32, stdin);
  @i{88}              sscanf(answer, "%d", &s[i].adcres);
  @i{89}          @} while (s[i].adcres < 8 || s[i].adcres > 16);
@@ -7355,17 +7355,17 @@ data acquisition are hardware-dependent and are not shown here.
  @i{97}      printf(" it in H:M:S format before pressing RETURN: ");
  @i{98}      fgets(answer, 32, stdin); answer[strlen(answer)-1] = '\0';
  @i{99}      setbasetime(answer);
-@i{100}  
+@i{100}
 @i{101}      adinit();
-@i{102}  
+@i{102}
 @i{103}      for (t = 0; t < nsamp; t++) @{
 @i{104}          for (i = 0; i < nsig; i++)
 @i{105}              v[i] = adget(i);
 @i{106}          if (putvec(v) < 0) break;
 @i{107}      @}
-@i{108}  
+@i{108}
 @i{109}      adquit();
-@i{110}  
+@i{110}
 @i{111}      (void)newheader(record);
 @i{112}      wfdbquit();
 @i{113}      exit(0);
