@@ -7110,7 +7110,7 @@ header file is created in the current directory.
 @example
  @i{1}  #include <stdio.h>
  @i{2}  #include <wfdb/wfdb.h>
- @i{3}  
+ @i{3}
  @i{4}  main(argc, argv)
  @i{5}  int argc;
  @i{6}  char *argv[];
@@ -7120,7 +7120,7 @@ header file is created in the current directory.
 @i{10}      WFDB_Time nsamp, t, t0, t1;
 @i{11}      static WFDB_Sample *v;
 @i{12}      static WFDB_Siginfo *s;
-@i{13}  
+@i{13}
 @i{14}      if (argc < 4) @{
 @i{15}          fprintf(stderr,
 @i{16}            "usage: %s record start duration [ coefficients ... ]\n",
@@ -7162,7 +7162,7 @@ header file is created in the current directory.
 @i{52}      t1 = t0 + nsamp;
 @i{53}      if (osigopen("16l", s, nsig) != nsig)
 @i{54}          exit(8);
-@i{55}  
+@i{55}
 @i{56}      for (t = t0; t < t1 && sample_valid(); t++) @{
 @i{57}          for (j = 0; j < nsig; j++) @{
 @i{58}              for (i = 0, vv = 0.; i < nc; i++)
@@ -7171,7 +7171,7 @@ header file is created in the current directory.
 @i{61}          @}
 @i{62}          if (putvec(v) < 0) break;
 @i{63}      @}
-@i{64}  
+@i{64}
 @i{65}      (void)newheader("out");
 @i{66}      wfdbquit();
 @i{67}      exit(0);
