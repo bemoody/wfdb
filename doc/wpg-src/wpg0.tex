@@ -6907,7 +6907,7 @@ argument:
 @i{17}      s = (WFDB_Siginfo *)malloc(nsig * sizeof(WFDB_Siginfo));
 @i{18}      if (s == NULL) @{
 @i{19}          fprintf(stderr, "insufficient memory\n");
-@i{20}	        exit(3);
+@i{20}          exit(3);
 @i{21}      @}
 @i{22}      if (isigopen(argv[1], s, nsig) != nsig) exit(2);
 @i{23}      printf("Record %s\n", argv[1]);
