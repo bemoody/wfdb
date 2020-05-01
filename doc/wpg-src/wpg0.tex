@@ -4878,6 +4878,8 @@ given time.
 * WFDB_Annotation structures::		Annotation contents.
 * WFDB_Seginfo structures::		Segment information.
 * Limits of numeric types::		Maximum and minimum values.
+* Displaying numeric values::		Converting numbers to strings.
+* Parsing numeric values::		Converting strings to numbers.
 @end menu
 
 @node WFDB_Siginfo structures, WFDB_Calinfo structures, Data Types, Data Types
@@ -5295,7 +5297,7 @@ for any record.  If the record to which the segment belongs is opened,
 the @code{n}th sample in the segment has sample number @code{n-1+samp0}.
 @end table
 
-@node Limits of numeric types, , WFDB_Seginfo structures, Data Types
+@node Limits of numeric types, Displaying numeric values, WFDB_Seginfo structures, Data Types
 @section Limits of Numeric Types
 @cindex minimum values of numeric types
 @cindex maximum values of numeric types
@@ -5411,6 +5413,232 @@ Largest finite power of 10 that can be represented as a @code{WFDB_Gain}.
 The difference between 1.0 and the smallest value greater than 1.0 that can be
 represented as a @code{WFDB_Gain}.
 @end table
+
+@node Displaying numeric values, Parsing numeric values, Limits of numeric types, Data Types
+@section Displaying Numeric Values
+@cindex displaying numeric values
+@cindex converting numbers to strings
+@cindex @code{printf} (using WFDB data types)
+@cindex @code{fprintf} (using WFDB data types)
+@cindex @code{sprintf} (using WFDB data types)
+@cindex @code{WFDB_Sample} (printing using @code{printf})
+@cindex @code{WFDB_Time} (printing using @code{printf})
+@cindex @code{WFDB_Frequency} (printing using @code{printf})
+@cindex @code{WFDB_Gain} (printing using @code{printf})
+@findex WFDB_Pd_SAMP (10.7.0)
+@findex WFDB_Pi_SAMP (10.7.0)
+@findex WFDB_Po_SAMP (10.7.0)
+@findex WFDB_Pu_SAMP (10.7.0)
+@findex WFDB_Px_SAMP (10.7.0)
+@findex WFDB_PX_SAMP (10.7.0)
+@findex WFDB_Pd_TIME (10.7.0)
+@findex WFDB_Pi_TIME (10.7.0)
+@findex WFDB_Po_TIME (10.7.0)
+@findex WFDB_Pu_TIME (10.7.0)
+@findex WFDB_Px_TIME (10.7.0)
+@findex WFDB_PX_TIME (10.7.0)
+@findex WFDB_Pe_FREQ (10.7.0)
+@findex WFDB_PE_FREQ (10.7.0)
+@findex WFDB_Pf_FREQ (10.7.0)
+@findex WFDB_Pg_FREQ (10.7.0)
+@findex WFDB_PG_FREQ (10.7.0)
+@findex WFDB_Pe_GAIN (10.7.0)
+@findex WFDB_PE_GAIN (10.7.0)
+@findex WFDB_Pf_GAIN (10.7.0)
+@findex WFDB_Pg_GAIN (10.7.0)
+@findex WFDB_PG_GAIN (10.7.0)
+
+@noindent
+To display numeric values on the screen, or convert them to strings, it is
+often convenient to use the standard @code{printf}, @code{fprintf}, or
+@code{sprintf} functions.  Each of these functions requires you to specify the
+data type as part of the ``format'' string (for example, to display an
+@code{int}, you might write @code{printf("%d", x)}, but to display a @code{long
+int}, you might write @code{printf("%ld", x)}).
+
+The macros listed below can be used to display @code{WFDB_Sample},
+@code{WFDB_Time}, @code{WFDB_Frequency}, and @code{WFDB_Gain} values,
+regardless of which standard C data types these represent.  Using these macros
+can help to ensure your program is portable to other operating systems and C
+compilers.
+
+Each macro expands to a string constant (such as @code{"d"} or @code{"ld"}),
+which does not include the leading @samp{%} character.  For example, to display
+a table of time and sample values, we might write:
+
+@example
+WFDB_Time t = 0;
+WFDB_Sample v[2];
+while (getvec(v) > 0) @{
+    printf("%10"WFDB_Pd_TIME" %6"WFDB_Pd_SAMP" %6"WFDB_Pd_SAMP"\n",
+           t, v[0], v[1]);
+    t++;
+@}
+@end example
+
+@noindent
+The following macros are defined in @file{<wfdb/wfdb.h>}:
+
+@multitable {@t{WFDB_PX_SAMP}} {@t{WFDB_Frequency}} {Unsigned base 16} {@samp{3.600000E+02}}
+@headitem Macro
+@tab Argument type
+@tab Format
+@tab Example output
+@comment ---------------- WFDB_Sample ----------------
+@item @t{WFDB_Pd_SAMP} @tab @t{WFDB_Sample} @tab Base 10
+@tab @samp{995}
+@item @t{WFDB_Pi_SAMP} @tab @t{WFDB_Sample} @tab Base 10
+@tab @samp{995}
+@item @t{WFDB_Po_SAMP} @tab @t{WFDB_Sample} @tab Unsigned base 8
+@tab @samp{1743}
+@item @t{WFDB_Pu_SAMP} @tab @t{WFDB_Sample} @tab Unsigned base 10
+@tab @samp{995}
+@item @t{WFDB_Px_SAMP} @tab @t{WFDB_Sample} @tab Unsigned base 16
+@tab @samp{3e3}
+@item @t{WFDB_PX_SAMP} @tab @t{WFDB_Sample} @tab Unsigned base 16
+@tab @samp{3E3}
+@comment ---------------- WFDB_Time ----------------
+@item @t{WFDB_Pd_TIME} @tab @t{WFDB_Time} @tab Base 10
+@tab @samp{650000}
+@item @t{WFDB_Pi_TIME} @tab @t{WFDB_Time} @tab Base 10
+@tab @samp{650000}
+@item @t{WFDB_Po_TIME} @tab @t{WFDB_Time} @tab Unsigned base 8
+@tab @samp{2365420}
+@item @t{WFDB_Pu_TIME} @tab @t{WFDB_Time} @tab Unsigned base 10
+@tab @samp{650000}
+@item @t{WFDB_Px_TIME} @tab @t{WFDB_Time} @tab Unsigned base 16
+@tab @samp{9eb10}
+@item @t{WFDB_PX_TIME} @tab @t{WFDB_Time} @tab Unsigned base 16
+@tab @samp{9EB10}
+@comment ---------------- WFDB_Frequency ----------------
+@item @t{WFDB_Pe_FREQ} @tab @t{WFDB_Frequency} @tab Exponential
+@tab @samp{3.600000e+02}
+@item @t{WFDB_PE_FREQ} @tab @t{WFDB_Frequency} @tab Exponential
+@tab @samp{3.600000E+02}
+@item @t{WFDB_Pf_FREQ} @tab @t{WFDB_Frequency} @tab Fixed-point
+@tab @samp{360.000000}
+@item @t{WFDB_Pg_FREQ} @tab @t{WFDB_Frequency} @tab Automatic
+@tab @samp{360}
+@item @t{WFDB_PG_FREQ} @tab @t{WFDB_Frequency} @tab Automatic
+@tab @samp{360}
+@comment ---------------- WFDB_Gain ----------------
+@item @t{WFDB_Pe_GAIN} @tab @t{WFDB_Gain} @tab Exponential
+@tab @samp{2.000000e+02}
+@item @t{WFDB_PE_GAIN} @tab @t{WFDB_Gain} @tab Exponential
+@tab @samp{2.000000E+02}
+@item @t{WFDB_Pf_GAIN} @tab @t{WFDB_Gain} @tab Fixed-point
+@tab @samp{200.000000}
+@item @t{WFDB_Pg_GAIN} @tab @t{WFDB_Gain} @tab Automatic
+@tab @samp{200}
+@item @t{WFDB_PG_GAIN} @tab @t{WFDB_Gain} @tab Automatic
+@tab @samp{200}
+@end multitable
+
+(The @samp{d} and @samp{i} formats are equivalent, and are provided for
+symmetry with @code{scanf}.  For more information, see the documentation of
+your C compiler.)
+
+@node Parsing numeric values, , Displaying numeric values, Data Types
+@section Parsing Numeric Values
+@cindex parsing numeric values
+@cindex converting strings to numbers
+@cindex @code{scanf} (using WFDB data types)
+@cindex @code{fscanf} (using WFDB data types)
+@cindex @code{sscanf} (using WFDB data types)
+@cindex @code{WFDB_Sample} (parsing using @code{scanf})
+@cindex @code{WFDB_Time} (parsing using @code{scanf})
+@cindex @code{WFDB_Frequency} (parsing using @code{scanf})
+@cindex @code{WFDB_Gain} (parsing using @code{scanf})
+@findex WFDB_Sd_SAMP (10.7.0)
+@findex WFDB_Si_SAMP (10.7.0)
+@findex WFDB_So_SAMP (10.7.0)
+@findex WFDB_Su_SAMP (10.7.0)
+@findex WFDB_Sx_SAMP (10.7.0)
+@findex WFDB_SX_SAMP (10.7.0)
+@findex WFDB_Sd_TIME (10.7.0)
+@findex WFDB_Si_TIME (10.7.0)
+@findex WFDB_So_TIME (10.7.0)
+@findex WFDB_Su_TIME (10.7.0)
+@findex WFDB_Sx_TIME (10.7.0)
+@findex WFDB_SX_TIME (10.7.0)
+@findex WFDB_Se_FREQ (10.7.0)
+@findex WFDB_SE_FREQ (10.7.0)
+@findex WFDB_Sf_FREQ (10.7.0)
+@findex WFDB_Sg_FREQ (10.7.0)
+@findex WFDB_SG_FREQ (10.7.0)
+@findex WFDB_Se_GAIN (10.7.0)
+@findex WFDB_SE_GAIN (10.7.0)
+@findex WFDB_Sf_GAIN (10.7.0)
+@findex WFDB_Sg_GAIN (10.7.0)
+@findex WFDB_SG_GAIN (10.7.0)
+
+@noindent
+To convert text input to a numeric value, it is often convenient to use the
+standard @code{scanf}, @code{fscanf}, or @code{sscanf} functions.  Each of
+these functions requires you to specify the data type as part of the ``format''
+string (for example, to read an integer and store it as an @code{int}, you
+might write @code{scanf("%d", &x)}, but to store it as a @code{long int}, you
+might write @code{scanf("%ld", &x)}).
+
+As with the @code{printf}-style macros described in the previous section, the
+macros listed below can be used to convert a string to a @code{WFDB_Sample},
+@code{WFDB_Time}, @code{WFDB_Frequency}, or @code{WFDB_Gain} value, regardless
+of which standard C data types these represent.  Each macro expands to a string
+constant (such as @code{"d"} or @code{"ld"}), which does not include the
+leading @samp{%} character.  For example, to read a table of time and sample
+values, we might write:
+
+@example
+WFDB_Time t;
+WFDB_Sample v[2];
+char buf[1000];
+while (fgets(buf, sizeof(buf), stdin)) @{
+    if (sscanf(buf, "%"WFDB_Sd_TIME"%"WFDB_Sd_SAMP"%"WFDB_Sd_SAMP",
+               &t, &v[0], &v[1]) == 3) @{
+        putvec(v);
+    @}
+@}
+@end example
+
+@noindent
+The following macros are defined in @file{<wfdb/wfdb.h>}:
+
+@multitable {@t{WFDB_PX_SAMP}} {@code{WFDB_Frequency *}} {Base 8, 10, or 16}
+@headitem Macro
+@tab Argument type
+@tab Format
+@comment ---------------- WFDB_Sample ----------------
+@item @t{WFDB_Sd_SAMP} @tab @code{WFDB_Sample *} @tab Base 10
+@item @t{WFDB_Si_SAMP} @tab @code{WFDB_Sample *} @tab Base 8, 10, or 16
+@item @t{WFDB_So_SAMP} @tab @code{WFDB_Sample *} @tab Unsigned base 8
+@item @t{WFDB_Su_SAMP} @tab @code{WFDB_Sample *} @tab Unsigned base 10
+@item @t{WFDB_Sx_SAMP} @tab @code{WFDB_Sample *} @tab Unsigned base 16
+@item @t{WFDB_SX_SAMP} @tab @code{WFDB_Sample *} @tab Unsigned base 16
+@comment ---------------- WFDB_Time ----------------
+@item @t{WFDB_Sd_TIME} @tab @code{WFDB_Time *} @tab Base 10
+@item @t{WFDB_Si_TIME} @tab @code{WFDB_Time *} @tab Base 8, 10, or 16
+@item @t{WFDB_So_TIME} @tab @code{WFDB_Time *} @tab Unsigned base 8
+@item @t{WFDB_Su_TIME} @tab @code{WFDB_Time *} @tab Unsigned base 10
+@item @t{WFDB_Sx_TIME} @tab @code{WFDB_Time *} @tab Unsigned base 16
+@item @t{WFDB_SX_TIME} @tab @code{WFDB_Time *} @tab Unsigned base 16
+@comment ---------------- WFDB_Frequency ----------------
+@item @t{WFDB_Se_FREQ} @tab @code{WFDB_Frequency *} @tab Decimal
+@item @t{WFDB_SE_FREQ} @tab @code{WFDB_Frequency *} @tab Decimal
+@item @t{WFDB_Sf_FREQ} @tab @code{WFDB_Frequency *} @tab Decimal
+@item @t{WFDB_Sg_FREQ} @tab @code{WFDB_Frequency *} @tab Decimal
+@item @t{WFDB_SG_FREQ} @tab @code{WFDB_Frequency *} @tab Decimal
+@comment ---------------- WFDB_Gain ----------------
+@item @t{WFDB_Se_GAIN} @tab @code{WFDB_Gain *} @tab Decimal
+@item @t{WFDB_SE_GAIN} @tab @code{WFDB_Gain *} @tab Decimal
+@item @t{WFDB_Sf_GAIN} @tab @code{WFDB_Gain *} @tab Decimal
+@item @t{WFDB_Sg_GAIN} @tab @code{WFDB_Gain *} @tab Decimal
+@item @t{WFDB_SG_GAIN} @tab @code{WFDB_Gain *} @tab Decimal
+@end multitable
+
+(The @samp{x} and @samp{X} formats are equivalent, as are the @samp{e},
+@samp{E}, @samp{f}, @samp{g}, and @samp{G} formats, and are provided for
+symmetry with @code{printf}.  For more information, see the documentation of
+your C compiler.)
 
 @node     Annotation Codes, Database Files, Data Types, Top
 @chapter Annotation Codes
