@@ -4876,7 +4876,8 @@ given time.
 * WFDB_Calinfo structures::		Signal calibration specifications.
 * WFDB_Anninfo structures::		Annotator names and file types.
 * WFDB_Annotation structures::		Annotation contents.
-* WFDB_Seginfo structures::              Segment information.
+* WFDB_Seginfo structures::		Segment information.
+* Limits of numeric types::		Maximum and minimum values.
 @end menu
 
 @node WFDB_Siginfo structures, WFDB_Calinfo structures, Data Types, Data Types
@@ -5261,7 +5262,7 @@ allocated for each input annotator beginning with WFDB library version
 @xref{Example 3}, for a short program that examines the contents of a
 @code{WFDB_Annotation}.
 
-@node WFDB_Seginfo structures, , WFDB_Annotation structures, Data Types
+@node WFDB_Seginfo structures, Limits of numeric types, WFDB_Annotation structures, Data Types
 @section Segment Information Structures
 @cindex @code{WFDB_Seginfo} structure (defined)
 @cindex segment information structure
@@ -5292,6 +5293,123 @@ to which it belongs.  If the segment is opened as an individual
 record, its @code{n}th sample has sample number @code{n-1}, just as
 for any record.  If the record to which the segment belongs is opened,
 the @code{n}th sample in the segment has sample number @code{n-1+samp0}.
+@end table
+
+@node Limits of numeric types, , WFDB_Seginfo structures, Data Types
+@section Limits of Numeric Types
+@cindex minimum values of numeric types
+@cindex maximum values of numeric types
+@cindex range of numeric types
+@cindex precision of numeric types
+
+@noindent
+It is sometimes useful to refer to the minimum or maximum possible value for a
+particular data type.  Although the WFDB library has certain minimum
+requirements for its numeric types, the actual range of @emph{possible} values
+depends on your C compiler, and the CPU and operating system where your program
+is running.
+
+Note that the range of values for a particular @emph{signal} is usually smaller
+than the possible range of values that can be stored in a @code{WFDB_Sample}
+variable.  If you want to know the maximum and minimum values for a particular
+signal, refer to the @code{adcres} and @code{adczero} fields of the of the
+@code{WFDB_Siginfo} structure
+@ifnotinfo
+(@pxref{WFDB_Siginfo structures, , Signal Information Structures}).
+@end ifnotinfo
+@ifinfo
+(@pxref{WFDB_Siginfo structures}).
+@end ifinfo
+
+The following macros (defined in @file{<wfdb/wfdb.h>}) can be used to determine
+the limits of @emph{integer} types.  In order to use these macros, your program
+must also include the statement @code{#include <limits.h>}.
+
+@table @code
+@findex WFDB_SAMPLE_MIN (10.6.0)
+@cindex @code{WFDB_Sample} (minimum and maximum value)
+@item WFDB_SAMPLE_MIN
+Smallest value that can be stored as a @code{WFDB_Sample}.
+
+@findex WFDB_SAMPLE_MAX (10.6.0)
+@item WFDB_SAMPLE_MAX
+Largest value that can be stored as a @code{WFDB_Sample}.
+
+@findex WFDB_DATE_MIN (10.6.0)
+@cindex @code{WFDB_Date} (minimum and maximum value)
+@item WFDB_DATE_MIN
+Smallest value that can be stored as a @code{WFDB_Date}.
+
+@findex WFDB_DATE_MAX (10.6.0)
+@item WFDB_DATE_MAX
+Largest value that can be stored as a @code{WFDB_Date}.
+
+@findex WFDB_TIME_MIN (10.6.0)
+@cindex @code{WFDB_Time} (minimum and maximum value)
+@item WFDB_TIME_MIN
+Smallest value that can be stored as a @code{WFDB_Time}.
+
+@findex WFDB_TIME_MAX (10.6.0)
+@item WFDB_TIME_MAX
+Largest value that can be stored as a @code{WFDB_Time}.
+
+@findex WFDB_GROUP_MAX (10.6.0)
+@cindex @code{WFDB_Group} (maximum value)
+@item WFDB_GROUP_MAX
+Largest value that can be stored as a @code{WFDB_Group}.
+
+@findex WFDB_SIGNAL_MAX (10.6.0)
+@cindex @code{WFDB_Signal} (maximum value)
+@item WFDB_SIGNAL_MAX
+Largest value that can be stored as a @code{WFDB_Signal}.
+
+@findex WFDB_ANNOTATOR_MAX (10.6.0)
+@cindex @code{WFDB_Annotator} (maximum value)
+@item WFDB_ANNOTATOR_MAX
+Largest value that can be stored as a @code{WFDB_Annotator}.
+@end table
+
+@noindent
+The following macros can be used to determine the limits and precision of
+@emph{floating-point} types.  In order to use these macros, your program must
+also include the statement @code{#include <float.h>}.
+
+@table @code
+@findex WFDB_FREQUENCY_MAX (10.6.0)
+@cindex @code{WFDB_Frequency} (range and precision)
+@item WFDB_FREQUENCY_MAX
+Largest finite value that can be represented as a @code{WFDB_Frequency}.
+
+@findex WFDB_FREQUENCY_DIG (10.6.0)
+@item WFDB_FREQUENCY_DIG
+Number of decimal digits of precision of a @code{WFDB_Frequency}.
+
+@findex WFDB_FREQUENCY_MAX_10_EXP (10.6.0)
+@item WFDB_FREQUENCY_MAX_10_EXP
+Largest finite power of 10 that can be represented as a @code{WFDB_Frequency}.
+
+@findex WFDB_FREQUENCY_EPSILON (10.6.0)
+@item WFDB_FREQUENCY_EPSILON
+The difference between 1.0 and the smallest value greater than 1.0 that can be
+represented as a @code{WFDB_Frequency}.
+
+@findex WFDB_GAIN_MAX (10.6.0)
+@cindex @code{WFDB_Gain} (range and precision)
+@item WFDB_GAIN_MAX
+Largest finite value that can be represented as a @code{WFDB_Gain}.
+
+@findex WFDB_GAIN_DIG (10.6.0)
+@item WFDB_GAIN_DIG
+Number of decimal digits of precision of a @code{WFDB_Gain}.
+
+@findex WFDB_GAIN_MAX_10_EXP (10.6.0)
+@item WFDB_GAIN_MAX_10_EXP
+Largest finite power of 10 that can be represented as a @code{WFDB_Gain}.
+
+@findex WFDB_GAIN_EPSILON (10.6.0)
+@item WFDB_GAIN_EPSILON
+The difference between 1.0 and the smallest value greater than 1.0 that can be
+represented as a @code{WFDB_Gain}.
 @end table
 
 @node     Annotation Codes, Database Files, Data Types, Top
