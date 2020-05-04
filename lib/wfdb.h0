@@ -320,10 +320,12 @@ typedef struct WFDB_ann WFDB_Annotation;
 typedef struct WFDB_seginfo WFDB_Seginfo;
 
 /* Dynamic memory allocation macros. */
-#define MEMERR(P, N, S) \
-    { wfdb_error("WFDB: can't allocate (%lu*%lu) bytes for %s\n", \
-		 (unsigned long)N, (unsigned long)S, #P);	  \
-      if (wfdb_me_fatal()) exit(1); }
+#define MEMERR(P, N, S)                                                 \
+    do {                                                                \
+        wfdb_error("WFDB: can't allocate (%lu*%lu) bytes for %s\n",     \
+                   (unsigned long)N, (unsigned long)S, #P);             \
+        if (wfdb_me_fatal()) exit(1);                                   \
+    } while (0)
 #define SFREE(P) { if (P) { free (P); P = 0; } }
 #define SUALLOC(P, N, S) \
     { size_t WFDB_tmp1 = (N), WFDB_tmp2 = (S); \
