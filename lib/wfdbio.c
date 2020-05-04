@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:     30 April 2020       wfdblib 10.7.0
+                        Last revised:      4 May 2020         wfdblib 10.7.0
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -1063,7 +1063,7 @@ WFDB_FILE *wfdb_open(const char *s, const char *record, int mode)
 	while (*wfdb) {
 	    while (len + ireclen >= bufsize) {
 		bufsize *= 2;
-		SREALLOC(buf, 1, bufsize);
+		SREALLOC(buf, bufsize, 1);
 	    }
 	    if (!buf)
 		break;
@@ -1101,7 +1101,7 @@ WFDB_FILE *wfdb_open(const char *s, const char *record, int mode)
 	*/
 	if (len + 2 >= bufsize) {
 	    bufsize = len + 2;
-	    SREALLOC(buf, 1, bufsize);
+	    SREALLOC(buf, bufsize, 1);
 	}
 	if (!buf)
 	    continue;
