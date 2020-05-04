@@ -1571,7 +1571,7 @@ static size_t curl_chunk_write(void *ptr, size_t size, size_t nmemb,
     while (nmemb > 0) {
 	while ((c->size + size) > c->buffer_size) {
 	    c->buffer_size += 1024;
-	    SREALLOC(c->data, 1, c->buffer_size);
+	    SREALLOC(c->data, c->buffer_size, 1);
 	}
 	if (c->data)
 	    memcpy(c->data + c->size, ptr, size);
