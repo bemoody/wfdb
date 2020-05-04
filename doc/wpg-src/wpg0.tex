@@ -4769,7 +4769,7 @@ to point to the allocated memory.  If there is not enough available memory,
 @code{SREALLOC} invokes @code{MEMERR} (above).
 
 Use @code{SREALLOC} to expand a previously allocated block of memory,
-preserving its contents.  @code{REALLOC} usually allocates a new block of the
+preserving its contents.  @code{SREALLOC} usually allocates a new block of the
 desired size, moving the contents of the previously allocated block into
 the beginning of the new block and then freeing the original block.  Pointers
 to locations in the original block will no longer be valid in this case.
@@ -4778,7 +4778,7 @@ The portion of the newly allocated block that extends beyond the previous
 contents is uninitialized.
 
 If @var{object_name} is initially NULL, @code{SUALLOC}, @code{SALLOC}, and
-@code{REALLOC} are functionally equivalent, except that @code{REALLOC} does
+@code{SREALLOC} are functionally equivalent, except that @code{SREALLOC} does
 not fill the allocated block with zeroes.
 
 @c @group
