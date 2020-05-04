@@ -327,13 +327,15 @@ typedef struct WFDB_seginfo WFDB_Seginfo;
         if (wfdb_me_fatal()) exit(1);                                   \
     } while (0)
 #define SFREE(P) do { if (P) { free (P); P = 0; } } while (0)
-#define SUALLOC(P, N, S) \
-    { size_t WFDB_tmp1 = (N), WFDB_tmp2 = (S); \
-      if (WFDB_tmp1 == 0 || WFDB_tmp2 == 0) \
-	  WFDB_tmp1 = WFDB_tmp2 = 1; \
-      if (!(P = calloc(WFDB_tmp1, WFDB_tmp2))) \
-	  MEMERR(P, WFDB_tmp1, WFDB_tmp2); }
-#define SALLOC(P, N, S) { SFREE(P); SUALLOC(P, (N), (S)) }
+#define SUALLOC(P, N, S)                                                \
+    do {                                                                \
+        size_t WFDB_tmp1 = (N), WFDB_tmp2 = (S);                        \
+        if (WFDB_tmp1 == 0 || WFDB_tmp2 == 0)                           \
+            WFDB_tmp1 = WFDB_tmp2 = 1;                                  \
+        if (!(P = calloc(WFDB_tmp1, WFDB_tmp2)))                        \
+            MEMERR(P, WFDB_tmp1, WFDB_tmp2);                            \
+    } while (0)
+#define SALLOC(P, N, S) { SFREE(P); SUALLOC(P, (N), (S)); }
 #define SREALLOC(P, N, S) \
     { size_t WFDB_tmp1 = (N), WFDB_tmp2 = (S); \
       if (!(P = ((WFDB_tmp1 == 0 || WFDB_tmp2 == 0) \
