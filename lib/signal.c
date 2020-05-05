@@ -31,6 +31,7 @@ visible outside of this file:
  allocosig	(sets max number of simultaneously open output signals)
  allocogroup	(sets max number of simultaneously open output signal groups)
  isfmt		(checks if argument is a legal signal format type)
+ isflacfmt	(checks if argument refers to a FLAC signal format)
  copysi		(deep-copies a WFDB_Siginfo structure)
  sigmap_cleanup (deallocates memory used by sigmap)
  make_vsd	(makes a virtual signal object)
@@ -39,6 +40,14 @@ visible outside of this file:
  edfparse [10.4.5](gets header info from an EDF file)
  readheader	(reads a header file)
  hsdfree	(deallocates memory used by readheader)
+ flac_getsamp	(reads the next sample from a FLAC input file)
+ flac_isopen	(opens a FLAC input file)
+ flac_isclose	(closes a FLAC input file)
+ flac_isseek	(skips to a specified location in a FLAC input file)
+ flac_putsamp	(writes a sample to a FLAC output file)
+ flac_osinit	(prepares to encode a FLAC output file)
+ flac_osopen	(opens a FLAC output file)
+ flac_osclose	(closes a FLAC output file)
  isigclose	(closes input signals)
  osigclose	(closes output signals)
  isgsetframe	(skips to a specified frame number in a specified signal group)
@@ -434,6 +443,11 @@ static int isfmt(int f)
     for (i = 0; i < WFDB_NFMTS; i++)
 	if (f == fmt_list[i]) return (1);
     return (0);
+}
+
+static int isflacfmt(int f)
+{
+    return (f >= 500 && f <= 532);
 }
 
 static int copysi(WFDB_Siginfo *to, const WFDB_Siginfo *from)
@@ -1351,7 +1365,54 @@ static void hsdfree(void)
     }
     maxhsig = 0;
 }
-		
+
+/* Routines for reading FLAC signal files. */
+
+static int flac_getsamp(struct igdata *ig)
+{
+    ig->stat = -1;
+    return (0);
+}
+
+static int flac_isopen(struct igdata *ig, struct hsdata **hs, unsigned ns)
+{
+    wfdb_error("isigopen: libwfdb was compiled without FLAC support\n");
+    return (-1);
+}
+
+static int flac_isclose(struct igdata *ig)
+{
+    return (-1);
+}
+
+static int flac_isseek(struct igdata *ig, WFDB_Time t)
+{
+    return (-1);
+}
+
+/* Routines for writing FLAC signal files. */
+
+static int flac_putsamp(WFDB_Sample v, int fmt, struct ogdata *g)
+{
+    return (-1);
+}
+
+static int flac_osinit(struct ogdata *og, const WFDB_Siginfo *si, unsigned ns)
+{
+    wfdb_error("osigfopen: libwfdb was compiled without FLAC support\n");
+    return (-1);
+}
+
+static int flac_osopen(struct ogdata *og)
+{
+    return (-1);
+}
+
+static int flac_osclose(struct ogdata *og)
+{
+    return (-1);
+}
+
 static void isigclose(void)
 {
     struct isdata *is;
@@ -1377,6 +1438,8 @@ static void isigclose(void)
     if (igd) {
 	while (maxigroup)
 	    if (ig = igd[--maxigroup]) {
+		if (ig->flacdec)
+		    flac_isclose(ig);
 		if (ig->fp) (void)wfdb_fclose(ig->fp);
 		SFREE(ig->buf);
 		SFREE(ig);
@@ -1425,6 +1488,9 @@ static int osigclose(void)
 	while (maxogroup)
 	    if (og = ogd[--maxogroup]) {
 		if (og->fp) {
+		    if (og->flacenc)
+			flac_osclose(og);
+
 		    /* If a block size has been defined, null-pad the buffer */
 		    if (og->bsize)
 			while (og->bp != og->be)
@@ -2351,6 +2417,14 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
 	    }
 	}
 
+	if (isflacfmt(hs->info.fmt)) {
+	    if (flac_isopen(ig, &hsd[si], sj - si) < 0) {
+		SFREE(ig->buf);
+		wfdb_fclose(ig->fp);
+		continue;
+	    }
+	}
+
 	/* All tests passed -- fill in remaining data for this group. */
 	ig->be = ig->bp = ig->buf + ig->bsize;
 	ig->start = hs->start;
@@ -2480,6 +2554,16 @@ static int openosig(const char *func, WFDB_Siginfo *si_out,
 
 	    og = ogd[os->info.group];
 	    og->bsize = os->info.bsize;
+	    if (isflacfmt(os->info.fmt)) {
+		unsigned ns = 1;
+		while (s + ns < nsig && si_in[ns].group == si_in[0].group)
+		    ns++;
+		if (flac_osinit(og, si_in, ns) < 0) {
+		    osigclose();
+		    return (-3);
+		}
+	    }
+
 	    obuflen = og->bsize ? og->bsize : obsize;
 	    /* This is the first signal in a new group; allocate buffer. */
 	    SALLOC(og->buf, 1, obuflen);
@@ -2504,6 +2588,11 @@ static int openosig(const char *func, WFDB_Siginfo *si_out,
 		    osigclose();
 		    return (-3);
 		}
+	    }
+	    if (isflacfmt(os->info.fmt) && flac_osopen(og) < 0) {
+		SFREE(og->buf);
+		osigclose();
+		return (-3);
 	    }
 	    nogroup++;
 	}
