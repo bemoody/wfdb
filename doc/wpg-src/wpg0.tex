@@ -1317,7 +1317,8 @@ functions that exist to serve unusual applications.
 @cindex opening annotation files
 
 @example
-int annopen(char *@var{record}, WFDB_Anninfo *@var{aiarray}, unsigned int @var{nann})
+int annopen(char *@var{record}, const WFDB_Anninfo *@var{aiarray},
+            unsigned int @var{nann})
 @end example
 @noindent
 @strong{Return:}
@@ -1610,7 +1611,7 @@ without closing open annotation or input signal files.
 @cindex creating signal files
 
 @example
-int osigfopen(WFDB_Siginfo *@var{siarray}, unsigned int @var{nsig})
+int osigfopen(const WFDB_Siginfo *@var{siarray}, unsigned int @var{nsig})
 @end example
 @noindent
 @strong{Return:}
@@ -1663,8 +1664,9 @@ without closing open annotation or input signal files.
 @findex wfdbinit
 
 @example
-int wfdbinit(char *@var{record}, WFDB_Anninfo *@var{aiarray}, unsigned int @var{nann},
-           WFDB_Siginfo *@var{siarray}, unsigned int @var{nsig})
+int wfdbinit(char *@var{record},
+             const WFDB_Anninfo *@var{aiarray}, unsigned int @var{nann},
+             WFDB_Siginfo *@var{siarray}, unsigned int @var{nsig})
 @end example
 @noindent
 @strong{Return:}
@@ -2238,7 +2240,7 @@ with the input signals
 @cindex writing signals
 
 @example
-int putvec(WFDB_Sample *@var{vector})
+int putvec(const WFDB_Sample *@var{vector})
 @end example
 @noindent
 @strong{Return:}
@@ -2312,6 +2314,10 @@ output signal specifications; the output signal files will be named
 @file{data0} and @file{data1} in the current directory.  Several of the example
 programs in chapter 6 illustrate the use of @code{putvec}; for example,
 @pxref{Example 6}.
+
+Note that prior to WFDB library version 10.7.0, @code{putvec} would modify the
+input vector in some cases (the @var{vector} argument was not declared as
+@code{const}.)
 
 @cindex annotation I/O
 @c @group
@@ -2401,7 +2407,7 @@ read by @code{getann} in this example.
 @cindex unreading annotations
 
 @example
-int ungetann(WFDB_Annotator @var{an}, WFDB_Annotation *@var{annot})
+int ungetann(WFDB_Annotator @var{an}, const WFDB_Annotation *@var{annot})
 @end example
 @noindent
 @strong{Return:}
@@ -2431,7 +2437,7 @@ first introduced in WFDB library version 5.3.)
 @cindex writing annotations
 
 @example
-int putann(WFDB_Annotator @var{an}, WFDB_Annotation *@var{annot})
+int putann(WFDB_Annotator @var{an}, const WFDB_Annotation *@var{annot})
 @end example
 @noindent
 @strong{Return:}
@@ -2780,8 +2786,8 @@ in WFDB library version 5.3.)
 @cindex conversion between annotation code and string
 
 @example
-int strann(char *@var{string})
-int strecg(char *@var{string})
+int strann(const char *@var{string})
+int strecg(const char *@var{string})
 @end example
 @noindent
 @strong{Return:}
@@ -2810,9 +2816,9 @@ version 5.3.)
 @cindex setting annotation code strings
 
 @example
-int setannstr(int @var{code}, char *@var{string})
-int setanndesc(int @var{code}, char *@var{string})
-int setecgstr(int @var{code}, char *@var{string})
+int setannstr(int @var{code}, const char *@var{string})
+int setanndesc(int @var{code}, const char *@var{string})
+int setecgstr(int @var{code}, const char *@var{string})
 @end example
 @noindent
 @strong{Return:}
@@ -2945,7 +2951,7 @@ subsequent calls.  @xref{Example 3}, for an illustration of the use of
 @cindex conversion between time and string
 
 @example
-WFDB_Time strtim(char *@var{string})
+WFDB_Time strtim(const char *@var{string})
 @end example
 @noindent
 @strong{Return:}
@@ -3066,7 +3072,7 @@ an ASCII string in the form @var{DD/MM/YYYY}.
 @cindex conversion between Julian date and string
 
 @example
-WFDB_Date strdat(char *@var{string})
+WFDB_Date strdat(const char *@var{string})
 @end example
 @noindent
 @strong{Return:}
@@ -3237,7 +3243,7 @@ memory and which contains entries for various types of signals.
 @cindex @code{WFDBCAL} (environment variable)
 
 @example
-int calopen(char *@var{file})
+int calopen(const char *@var{file})
 @end example
 @noindent
 @strong{Return:}
@@ -3271,7 +3277,7 @@ appended to the current calibration list.  If @var{file} is @samp{-},
 @cindex retrieving calibration data
 
 @example
-int getcal(char *@var{desc}, char *@var{units}, WFDB_Calinfo *@var{cal})
+int getcal(const char *@var{desc}, const char *@var{units}, WFDB_Calinfo *@var{cal})
 @end example
 @noindent
 @strong{Return:}
@@ -3314,7 +3320,7 @@ initialized by a previous invocation of @code{calopen} or @code{putcal}.
 @cindex storing calibration data
 
 @example
-int putcal(WFDB_Calinfo *@var{cal})
+int putcal(const WFDB_Calinfo *@var{cal})
 @end example
 @noindent
 @strong{Return:}
@@ -3339,7 +3345,7 @@ in WFDB library version 6.0.)
 @cindex writing calibration list
 
 @example
-int newcal(char *@var{file})
+int newcal(const char *@var{file})
 @end example
 @noindent
 @strong{Return:}
@@ -3478,7 +3484,8 @@ and AHA DB records, do not use three- or four-digit record names.
 @cindex modifying header files
 
 @example
-int setheader(char *@var{record}, WFDB_Siginfo *@var{siarray}, unsigned int @var{nsig})
+int setheader(char *@var{record}, const WFDB_Siginfo *@var{siarray},
+              unsigned int @var{nsig})
 @end example
 @noindent
 @strong{Return:}
@@ -3947,7 +3954,7 @@ time after opening a record to convert the base date and time into a string.
 @cindex signal lookup
 
 @example
-int findsig(char *@var{string})
+int findsig(const char *@var{string})
 @end example
 @noindent
 @strong{Return:}
@@ -4089,7 +4096,7 @@ functions that read @file{hea} files.
 @cindex WFDB path
 
 @example
-void setwfdb(char *@var{string})
+void setwfdb(const char *@var{string})
 @end example
 @c @end group
 
@@ -4204,7 +4211,7 @@ first value returned by @code{getwfdb} in the current process, or @code{NULL}).
 @cindex WFDB path
 
 @example
-char *wfdbfile(char *@var{type}, char *@var{record})
+char *wfdbfile(const char *@var{type}, char *@var{record})
 @end example
 @noindent
 @strong{Return:}
@@ -4314,7 +4321,7 @@ if (sps = sampfreq("100s")
 @cindex info (in header files)
 
 @example
-int putinfo(char *@var{s})
+int putinfo(const char *@var{s})
 @end example
 @noindent
 @strong{Return:}
@@ -4623,7 +4630,8 @@ version 9.4.)
 @cindex start of sample data
 
 @example
-void wfdbputprolog(char *@var{prolog}, long @var{bytes}, WFDB_Signal @var{s})
+void wfdbputprolog(const char *@var{prolog}, long @var{bytes},
+                   WFDB_Signal @var{s})
 @end example
 @c @end group
 
