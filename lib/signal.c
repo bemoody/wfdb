@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:     4 May 2020 		wfdblib 10.7.0
+			Last revised:     5 May 2020 		wfdblib 10.7.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -2092,7 +2092,7 @@ static int getskewedframe(WFDB_Sample *vector)
 	    }
 	    is->info.cksum -= v;
 	}
-	if (--is->info.nsamp == (WFDB_Time)0L &&
+	if (is->info.nsamp >= 0 && --is->info.nsamp == 0 &&
 	    (is->info.cksum & 0xffff) &&
 	    !in_msrec && !isedf &&
 	    is->info.fmt != 0) {
