@@ -635,13 +635,16 @@ static int sigmap_init(int first_segment)
 			   will fit into a positive signed integer, we
 			   can use the "fast" case in sigmap, below. */
 			switch (isd[i]->info.fmt) {
+			  case 508:
 			  case 80: ivmin = -0x80; ivmax = 0x7f; break;
 			  case 310:
 			  case 311: ivmin = -0x200; ivmax = 0x1ff; break;
 			  case 212: ivmin = -0x800; ivmax = 0x7ff; break;
 			  case 16:
 			  case 61:
+			  case 516:
 			  case 160: ivmin = -0x8000; ivmax = 0x7fff; break;
+			  case 524:
 			  case 24: ivmin = -0x800000; ivmax = 0x7fffff; break;
 			  default:
 			    ivmin = WFDB_SAMPLE_MIN;
