@@ -6,7 +6,7 @@
 [OK]:  WFDB_MAXRNL = 50
 [OK]:  WFDB_MAXUSL = 50
 [OK]:  WFDB_MAXDSL = 100
-[OK]:  Signal formats = {0, 8, 16, 61, 80, 160, 212, 310, 311, 24, 32}
+[OK]:  Signal formats = {0, 8, 16, 61, 80, 160, 212, 310, 311, 24, 32, 508, 516, 524}
 [OK]:  WFDB_DEFFREQ = 250
 [OK]:  WFDB_DEFGAIN = 200
 [OK]:  WFDB_DEFRES = 12

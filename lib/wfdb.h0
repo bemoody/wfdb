@@ -238,9 +238,13 @@ the legal values for the format field in a WFDB_siginfo structure.
  311    3 10-bit amplitudes bit-packed in 4 bytes
   24	24-bit 2's complement amplitudes, low byte first
   32	32-bit 2's complement amplitudes, low byte first
+ 508    FLAC, 8 bits per sample
+ 516    FLAC, 16 bits per sample
+ 524    FLAC, 24 bits per sample
 */
-#define WFDB_FMT_LIST {0, 8, 16, 61, 80, 160, 212, 310, 311, 24, 32}
-#define WFDB_NFMTS	  11    /* number of items in WFDB_FMT_LIST */
+#define WFDB_FMT_LIST {0, 8, 16, 61, 80, 160, 212, 310, 311, 24, 32, \
+      508, 516, 524}
+#define WFDB_NFMTS	  14    /* number of items in WFDB_FMT_LIST */
 
 /* Default signal specifications */
 #define WFDB_DEFFREQ	250.0  /* default sampling frequency (Hz) */
