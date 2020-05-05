@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:   11 April 2022		wfdblib 10.7.0
+			Last revised:    18 May 2022		wfdblib 10.7.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -186,6 +186,14 @@ void example(void)
 #include <time.h>
 #endif
 
+#ifdef WFDB_FLAC_SUPPORT
+#include <FLAC/stream_encoder.h>
+#include <FLAC/stream_decoder.h>
+#else
+#define FLAC__StreamEncoder struct dummy
+#define FLAC__StreamDecoder struct dummy
+#endif
+
 /* Shared local data */
 
 /* These variables are set by readheader, and contain information about the
@@ -281,6 +289,10 @@ static struct igdata {		/* shared by all signals in a group (file) */
     char *buf;			/* pointer to input buffer */
     char *bp;			/* pointer to next location in buf[] */
     char *be;			/* pointer to input buffer endpoint */
+    FLAC__StreamDecoder *flacdec; /* internal state for FLAC decoder */
+    char *packptr;		/* pointer to next partially-decoded frame */
+    unsigned packspf;		/* number of samples per signal per frame */
+    unsigned packcount; 	/* number of samples decoded in this frame */
     char count;			/* input counter for bit-packed signal */
     char seek;			/* 0: do not seek on file, 1: seeks permitted */
     char initial_skip;		/* 1 if isgsetframe is needed before reading */
@@ -327,6 +339,8 @@ static struct ogdata {		/* shared by all signals in a group (file) */
     char *buf;			/* pointer to output buffer */
     char *bp;			/* pointer to next location in buf[]; */
     char *be;			/* pointer to output buffer endpoint */
+    FLAC__StreamEncoder *flacenc; /* internal state for FLAC encoder */
+    unsigned packspf;		/* number of samples per frame */
     char count;		/* output counter for bit-packed signal */
     signed char seek;		/* 1: seek works, -1: seek doesn't work,
 				   0: unknown */
