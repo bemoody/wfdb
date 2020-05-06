@@ -1,5 +1,5 @@
 /* file: calib.c	G. Moody	  4 July 1991
-			Last revised:    30 April 2020 		wfdblib 10.7.0
+			Last revised:      6 May 2020  		wfdblib 10.7.0
 WFDB library functions for signal calibration
 
 _______________________________________________________________________________
@@ -213,7 +213,10 @@ FINT newcal(const char *cfname)
     for (this_cle = first_cle; this_cle; this_cle = this_cle->next) {
 	const char *pulsetype;
 
-	(void)wfdb_fprintf(cfile, "%s\t", this_cle->sigtype);
+	/* If sigtype is an empty string (matches anything), write it
+	   as "*". */
+	wfdb_fprintf(cfile, "%s\t", (this_cle->sigtype[0]
+				     ? this_cle->sigtype : "*"));
 	if (this_cle->caltype & WFDB_DC_COUPLED)
 	    (void)wfdb_fprintf(cfile, "%g ", this_cle->low);
 	else
