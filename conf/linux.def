@@ -1,5 +1,5 @@
 # file: linux.def		G. Moody	31 May 2000
-#				Last revised:	4 May 2022
+#				Last revised:	18 May 2022
 # 'make' definitions for compiling the WFDB Software Package under Linux
 
 # Choose a value for WFDBROOT to determine where the WFDB Software Package will
@@ -30,6 +30,11 @@ WFDBROOT = /usr
 # will be disabled).
 LC =
 LL =
+
+# LIBFLAC_CFLAGS and LIBFLAC_LIBS specify the set of C compiler and
+# linker options needed to link with the FLAC library.
+LIBFLAC_CFLAGS = `pkg-config --cflags flac`
+LIBFLAC_LIBS = `pkg-config --libs flac`
 
 # BINDIR specifies the directory in which the applications will be installed;
 # it should be a directory in the PATH of those who will use the applications.
@@ -73,7 +78,8 @@ MFLAGS =
 
 # CFLAGS is the set of C compiler options.  CFLAGS should always include
 # CCDEFS.
-CFLAGS = $(MFLAGS) -g -O $(CCDEFS) $(LC) -I$(DESTDIR)$(INCDIR)
+CFLAGS = $(MFLAGS) -g -O $(CCDEFS) $(LC) $(LIBFLAC_CFLAGS) \
+ -I$(DESTDIR)$(INCDIR)
 
 # RPATHFLAGS is a set of C compiler options that cause the program to
 # search for shared libraries in a non-standard location at run-time.
@@ -82,7 +88,7 @@ RPATHFLAGS = -Wl,--enable-new-dtags,-rpath,$(LIBDIR)
 
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.
-LDFLAGS = -L$(DESTDIR)$(LIBDIR) -lwfdb $(LL)
+LDFLAGS = -L$(DESTDIR)$(LIBDIR) -lwfdb $(LL) $(LIBFLAC_LIBS)
 
 # WFDBLIB is the name of the standard WFDB library.  In order to access it via
 # `-lwfdb', WFDBLIB should be `libwfdb.a'.

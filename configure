@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody         24 May 2000
-#                             Last revised:    19 October 2021
+#                             Last revised:    18 May 2022
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -23,8 +23,11 @@ MFLAGS=
 ARCHLIST=
 
 NETLIB=unknown
+FLAC=unknown
 WAVE=unknown
 OWHOME=/usr/openwin
+LIBFLAC_CFLAGS=
+LIBFLAC_LIBS=
 
 LC_ALL=C
 export LC_ALL
@@ -59,6 +62,12 @@ do
     --without-cygwin)   NOCYGWIN=yes ;;
     --without-netfiles) NETLIB=none ;;
     --with-libcurl)     NETLIB=libcurl ;;
+    --without-flac)     FLAC=0 ;;
+    --with-flac)        FLAC=1 ;;
+    --with-flac=*)      dir=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+                        LIBFLAC_LIBS="-L$dir/lib -lFLAC"
+                        LIBFLAC_CFLAGS="-I$dir/include"
+                        FLAC=1 ;;
     --without-xview)    WAVE=0 ;;
     --with-xview=*)     OWHOME=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
 			WAVE=1 ;;
@@ -83,6 +92,8 @@ Options:
                          Cygwin DLL. WAVE will not be built.
     --without-netfiles  disable NETFILES even if libcurl is available
     --with-libcurl      enable NETFILES via libcurl [default]
+    --without-flac      disable FLAC compressed signal support
+    --with-flac=PREFIX  use FLAC libraries and headers installed in PREFIX
     --without-xview     disable WAVE even if XView is available
     --with-xview=PREFIX use XView libraries and headers installed in PREFIX
 EOF
@@ -578,18 +589,89 @@ esac
 echo "NETFILES=$NETFILES" >../config.cache
 echo "NETFILES_LIBCURL=$NETFILES_LIBCURL" >>../config.cache
 
+# Search for libFLAC
+if [ $FLAC != 0 ] && [ "x$LIBFLAC_LIBS" = "x" ]
+then
+    ./prompt "Looking for libFLAC ..."
+    PC=${CROSS_COMPILE}pkg-config
+    WHICH=`$which "$PC"`
+    if [ -x "$WHICH" ]
+    then
+        if $PC --exists flac
+        then
+            LIBFLAC_CFLAGS="\`$PC --cflags flac\`"
+            if [ x$SYSLIBS = xstatic ]
+            then
+                LIBFLAC_LIBS="\`$PC --libs --static flac\`"
+            else
+                LIBFLAC_LIBS="\`$PC --libs flac\`"
+            fi
+        fi
+    elif [ "x$HOST" = "x" ]
+    then
+        for dir in /usr/local /usr
+        do
+            if [ -f "$dir/include/FLAC/stream_encoder.h" ]
+            then
+                LIBFLAC_CFLAGS="-I$dir/include"
+                LIBFLAC_LIBS="-L$dir/lib -lFLAC"
+                break
+            fi
+        done
+    fi
+    if [ "x$LIBFLAC_LIBS" = "x" ]
+    then
+        echo "not found"
+        echo
+        if [ -x "$WHICH" ]
+        then
+            $PC --print-errors flac
+            echo
+        elif [ "x$HOST" != "x" ]
+        then
+            echo "$PC was not found."
+            echo "When cross-compiling, you may need to specify"
+            echo "./configure --with-flac=PREFIX"
+            echo
+        fi
+        if [ $FLAC = 1 ]
+        then
+            exit 1
+        fi
+        echo "The WFDB software will be compiled without support for"
+        echo "compressed signal files.  To add FLAC support, install"
+        echo "libFLAC and run ./configure again."
+        FLAC=0
+    else
+        echo "found"
+        echo "The WFDB software will be compiled with support for"
+        echo "compressed signal files using libFLAC."
+        FLAC=1
+    fi
+fi
+if [ $FLAC = 1 ]
+then
+    sed "s/^CCDEFS = /CCDEFS = -DWFDB_FLAC_SUPPORT /" <site.def >site.tmp
+    mv site.tmp site.def
+    sed "s/^CCDEFS = /CCDEFS = -DWFDB_FLAC_SUPPORT /" <site-slib.def >site.tmp
+    mv site.tmp site-slib.def
+fi
+
 sed "s/WFDB_NETFILES 1/WFDB_NETFILES $NETFILES/" < ../lib/wfdb.h0 | \
     sed "s/WFDBMAJOR/$MAJOR/" | \
     sed "s/WFDBMINOR/$MINOR/" | \
     sed "s/WFDBRELEASE/$RELEASE/" | \
     sed "s/WFDB_NETFILES_LIBCURL 1/WFDB_NETFILES_LIBCURL $NETFILES_LIBCURL/" \
       >../lib/wfdb.h
-if [ $NETLIB != "none" ]
-    then
-    sed "s/LC =/LC = $LC/" <site.def | sed "s/LL =/LL = $LL/" >site.tmp
-    mv site.tmp site.def
-fi
-sed "s/LC =/LC = $LC/" <site-slib.def | sed "s/LL =/LL = $LL/" >site.tmp
+
+sed "s/^LC =/LC = $LC/" <site.def | sed "s/^LL =/LL = $LL/" | \
+    sed "s|^LIBFLAC_CFLAGS = .*|LIBFLAC_CFLAGS = $LIBFLAC_CFLAGS|" | \
+    sed "s|^LIBFLAC_LIBS = .*|LIBFLAC_LIBS = $LIBFLAC_LIBS|" >site.tmp
+mv site.tmp site.def
+
+sed "s/^LC =/LC = $LC/" <site-slib.def | sed "s/^LL =/LL = $LL/" | \
+    sed "s|^LIBFLAC_CFLAGS = .*|LIBFLAC_CFLAGS = $LIBFLAC_CFLAGS|" | \
+    sed "s|^LIBFLAC_LIBS = .*|LIBFLAC_LIBS = $LIBFLAC_LIBS|" >site.tmp
 mv site.tmp site-slib.def
 
 cd ..
