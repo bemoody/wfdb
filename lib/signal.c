@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:     5 May 2020 		wfdblib 10.7.0
+			Last revised:     6 May 2020 		wfdblib 10.7.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -2080,12 +2080,6 @@ static int getskewedframe(WFDB_Sample *vector)
 			istime = segp->samp0;
 			return (getskewedframe(vecstart));
 		    }
-		}
-		else
-		    stat = -1;
-		if (is->info.nsamp > (WFDB_Time)0L) {
-		    wfdb_error("getvec: unexpected EOF in signal %d\n", s);
-		    stat = -3;
 		}
 		else
 		    stat = -1;
