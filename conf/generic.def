@@ -39,6 +39,11 @@ WFDBROOT = /usr
 LC =
 LL =
 
+# LIBFLAC_CFLAGS and LIBFLAC_LIBS specify the set of C compiler and
+# linker options needed to link with the FLAC library.
+LIBFLAC_CFLAGS = `pkg-config --cflags flac`
+LIBFLAC_LIBS = `pkg-config --libs flac`
+
 # BINDIR specifies the directory in which the applications will be installed;
 # it should be a directory in the PATH of those who will use the applications.
 BINDIR = $(WFDBROOT)/bin
@@ -110,7 +115,8 @@ MFLAGS =
 #   -O		  if you trust your C compiler's optimizer
 # With the exception of `gcc', most C compilers do not allow you to use -g and
 # -O simultaneously.
-CFLAGS = $(MFLAGS) -g -O $(CCDEFS) $(LC) -I$(DESTDIR)$(INCDIR)
+CFLAGS = $(MFLAGS) -g -O $(CCDEFS) $(LC) $(LIBFLAC_CFLAGS) \
+ -I$(DESTDIR)$(INCDIR)
 
 # RPATHFLAGS is a set of C compiler options that cause the program to
 # search for shared libraries in a non-standard location at run-time.
@@ -119,7 +125,7 @@ RPATHFLAGS = -Wl,-rpath -Wl,$(LIBDIR)
 
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.
-LDFLAGS = -L$(DESTDIR)$(LIBDIR) -lwfdb $(LL)
+LDFLAGS = -L$(DESTDIR)$(LIBDIR) -lwfdb $(LL) $(LIBFLAC_LIBS)
 
 # WFDBLIB is the name of the standard WFDB library.  In order to access it via
 # `-lwfdb', WFDBLIB should be `libwfdb.a'.

@@ -32,6 +32,11 @@ WFDBROOT = /usr
 LC =
 LL =
 
+# LIBFLAC_CFLAGS and LIBFLAC_LIBS specify the set of C compiler and
+# linker options needed to link with the FLAC library.
+LIBFLAC_CFLAGS = `pkg-config --cflags flac`
+LIBFLAC_LIBS = `pkg-config --libs flac`
+
 # BINDIR specifies the directory in which the applications will be installed;
 # it should be a directory in the PATH of those who will use the applications.
 BINDIR = $(WFDBROOT)/bin
@@ -59,7 +64,7 @@ RPATHFLAGS = -Wl,+b -Wl,$(LIBDIR)
 
 # LDFLAGS is appended to the C compiler command line to specify loading the
 # WFDB library.
-LDFLAGS = -L$(DESTDIR)$(LIBDIR) -lwfdb $(RPATHFLAGS) $(LL)
+LDFLAGS = -L$(DESTDIR)$(LIBDIR) -lwfdb $(RPATHFLAGS) $(LL) $(LIBFLAC_LIBS)
 
 # CC is the name of your C compiler.
 CC = gcc
@@ -75,7 +80,8 @@ MFLAGS =
 
 # CFLAGS is the set of C compiler options used when compiling the shared
 # library.  CFLAGS should always include CCDEFS.
-CFLAGS = $(MFLAGS) -fpic -g -O $(CCDEFS) $(LC) -I$(DESTDIR)$(INCDIR)
+CFLAGS = $(MFLAGS) -fpic -g -O $(CCDEFS) $(LC) $(LIBFLAC_CFLAGS) \
+ -I$(DESTDIR)$(INCDIR)
 
 # WFDBLIB_BASENAME is the name, without version numbers, of the alternate
 # library.  WFDBLIB_SONAME is the shared object name ("soname") of the
@@ -98,7 +104,7 @@ WFDBLIB = $(WFDBLIB_SONAME).$(MINOR)
 # BUILDLIB is the command that creates the shared WFDB library once its
 # components have been compiled separately;  the list of *.o files that
 # make up the library will be appended to BUILDLIB.
-BUILDLIB = ld -b $(LL) -o $(WFDBLIB)
+BUILDLIB = ld -b $(LL) $(LIBFLAC_LIBS) -o $(WFDBLIB)
 
 # BUILDLIB_LDFLAGS is a list of arguments appended to BUILDLIB following
 # the list of *.o files (for most platforms, BUILDLIB_LDFLAGS is empty).

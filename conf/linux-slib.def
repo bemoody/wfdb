@@ -32,6 +32,11 @@ WFDBROOT = /usr
 LC =
 LL =
 
+# LIBFLAC_CFLAGS and LIBFLAC_LIBS specify the set of C compiler and
+# linker options needed to link with the FLAC library.
+LIBFLAC_CFLAGS = `pkg-config --cflags flac`
+LIBFLAC_LIBS = `pkg-config --libs flac`
+
 # BINDIR specifies the directory in which the applications will be installed;
 # it should be a directory in the PATH of those who will use the applications.
 BINDIR = $(WFDBROOT)/bin
@@ -72,7 +77,8 @@ MFLAGS =
 
 # CFLAGS is the set of C compiler options used when compiling the shared
 # library.  CFLAGS should always include CCDEFS.
-CFLAGS = $(MFLAGS) -fpic -g -O $(CCDEFS) $(LC) -I$(DESTDIR)$(INCDIR)
+CFLAGS = $(MFLAGS) -fpic -g -O $(CCDEFS) $(LC) $(LIBFLAC_CFLAGS) \
+ -I$(DESTDIR)$(INCDIR)
 
 # WFDBLIB_BASENAME is the name, without version numbers, of the alternate
 # library.  WFDBLIB_SONAME is the shared object name ("soname") of the
@@ -100,7 +106,7 @@ BUILDLIB = $(CC) $(MFLAGS) -shared -Wl,-soname,$(WFDBLIB_SONAME) \
 
 # BUILDLIB_LDFLAGS is a list of arguments appended to BUILDLIB following
 # the list of *.o files.
-BUILDLIB_LDFLAGS = $(LL)
+BUILDLIB_LDFLAGS = $(LL) $(LIBFLAC_LIBS)
 
 # LDCONFIG is the name of the program needed to refresh the system's cached
 # index of shared libraries.
