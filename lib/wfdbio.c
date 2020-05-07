@@ -1961,22 +1961,21 @@ static int nf_fseek(netfile* nf, long offset, int whence)
   if (nf)
     switch (whence) {
       case SEEK_SET:
-	if (offset <= nf->cont_len) {
+	if (offset >= 0 && offset <= nf->cont_len) {
 	  nf->pos = offset;
 	  nf->err = NF_NO_ERR;
 	  ret = 0;
 	}
 	break;
       case SEEK_CUR:
-	if ((nf->pos + offset) <= nf->cont_len) {
+	if (((unsigned long) nf->pos + offset) <= nf->cont_len) {
 	  nf->pos += offset;
 	  nf->err = NF_NO_ERR;
 	  ret = 0;
 	}
 	break;
       case SEEK_END:
-	if (((nf->cont_len + offset) >= 0) &&
-	    ((nf->cont_len + offset) <= nf->cont_len)) {
+	if (offset <= 0 && offset >= -nf->cont_len) {
 	  nf->pos = nf->cont_len + offset;
 	  nf->err = NF_NO_ERR;
 	  ret = 0; 
