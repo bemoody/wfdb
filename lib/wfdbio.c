@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:      4 May 2020         wfdblib 10.7.0
+                        Last revised:      7 May 2020         wfdblib 10.7.0
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -1961,14 +1961,14 @@ static int nf_fseek(netfile* nf, long offset, int whence)
   if (nf)
     switch (whence) {
       case SEEK_SET:
-	if (offset < nf->cont_len) {
+	if (offset <= nf->cont_len) {
 	  nf->pos = offset;
 	  nf->err = NF_NO_ERR;
 	  ret = 0;
 	}
 	break;
       case SEEK_CUR:
-	if ((nf->pos + offset) < nf->cont_len) {
+	if ((nf->pos + offset) <= nf->cont_len) {
 	  nf->pos += offset;
 	  nf->err = NF_NO_ERR;
 	  ret = 0;
