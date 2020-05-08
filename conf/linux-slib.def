@@ -1,5 +1,5 @@
 # file: linux-slib.def		G. Moody	31 May 2000
-#                               Last revised:  30 April 2020
+#                               Last revised:    8 May 2020
 # This section contains settings suitable for generating an ELF-format shared
 # library under Linux.
 
@@ -96,7 +96,7 @@ WFDBLIB = $(WFDBLIB_SONAME).$(MINOR)
 # components have been compiled separately;  the list of *.o files that
 # make up the library will be appended to BUILDLIB.
 BUILDLIB = $(CC) $(MFLAGS) -shared -Wl,-soname,$(WFDBLIB_SONAME) \
- -o $(WFDBLIB)
+ -Wl,-z,defs -o $(WFDBLIB)
 
 # BUILDLIB_LDFLAGS is a list of arguments appended to BUILDLIB following
 # the list of *.o files.
