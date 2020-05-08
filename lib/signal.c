@@ -2959,9 +2959,11 @@ FINT putvec(const WFDB_Sample *vector)
 		  case 16:
 		  case 61:
 		  case 160:
+		  case 516:
 		  default:
 		    samp = -1 << 15; break;
 		  case 80:
+		  case 508:
 		    samp = -1 << 7; break;
 		  case 212:
 		    samp = -1 << 11; break;
@@ -2969,6 +2971,7 @@ FINT putvec(const WFDB_Sample *vector)
 		  case 311:
 		    samp = -1 << 9; break;
 		  case 24:
+		  case 524:
 		    samp = -1 << 23; break;
 		  case 32:
 		    samp = -1 << 31; break;
@@ -3002,6 +3005,14 @@ FINT putvec(const WFDB_Sample *vector)
 	        w24(samp, og); os->samp = samp; break;
 	      case 32: /* 32-bit amplitudes */
 	        w32(samp, og); os->samp = samp; break;
+
+	      case 508: /* 8-bit compressed FLAC */
+	      case 516:	/* 16-bit compressed FLAC */
+	      case 524:	/* 24-bit compressed FLAC */
+		if (flac_putsamp(samp, os->info.fmt, og) < 0)
+		    stat = -1;
+		os->samp = samp;
+		break;
 	    }
 	    if (wfdb_ferror(og->fp)) {
 		wfdb_error("putvec: write error in signal %d\n", s);
