@@ -1787,6 +1787,238 @@ static int flac_isseek(struct igdata *ig, WFDB_Time t)
 
 /* Routines for writing FLAC signal files. */
 
+#ifdef WFDB_FLAC_SUPPORT
+
+/* The following functions (oflac_write, oflac_seek, and oflac_tell)
+   are used as callbacks for the FLAC library.  The client_data
+   argument is the value passed to FLAC__stream_encoder_init_stream,
+   which is a pointer to a struct ogdata. */
+
+/* oflac_write is called by the FLAC library in order to write a
+   chunk of data to the output file. */
+static FLAC__StreamEncoderWriteStatus
+oflac_write(const FLAC__StreamEncoder *encoder, const FLAC__byte buffer[],
+	    size_t bytes, unsigned samples, unsigned current_frame,
+	    void *client_data)
+{
+    struct ogdata *g = client_data;
+    if (wfdb_fwrite(buffer, 1, bytes, g->fp) != bytes)
+	return (FLAC__STREAM_ENCODER_WRITE_STATUS_FATAL_ERROR);
+    else
+	return (FLAC__STREAM_ENCODER_WRITE_STATUS_OK);
+}
+
+/* oflac_seek is called by the FLAC library in order to move to a
+   different position in the output file. */
+static FLAC__StreamEncoderSeekStatus
+oflac_seek(const FLAC__StreamEncoder *encoder,
+	   FLAC__uint64 pos, void *client_data)
+{
+    struct ogdata *g = client_data;
+    if (pos > LONG_MAX)
+	return (FLAC__STREAM_ENCODER_SEEK_STATUS_ERROR);
+    else if (wfdb_fseek(g->fp, pos, SEEK_SET))
+	return (FLAC__STREAM_ENCODER_SEEK_STATUS_UNSUPPORTED);
+    else
+	return (FLAC__STREAM_ENCODER_SEEK_STATUS_OK);
+}
+
+/* oflac_tell is called by the FLAC library in order to determine
+   the current position in the output file. */
+static FLAC__StreamEncoderTellStatus
+oflac_tell(const FLAC__StreamEncoder *encoder,
+	   FLAC__uint64 *pos, void *client_data)
+{
+    struct ogdata *g = client_data;
+    long p;
+    if ((p = wfdb_ftell(g->fp)) < 0)
+	return (FLAC__STREAM_ENCODER_TELL_STATUS_UNSUPPORTED);
+    else {
+	*pos = p;
+	return (FLAC__STREAM_ENCODER_TELL_STATUS_OK);
+    }
+}
+
+/* Write the next sample to a FLAC signal file. */
+static int flac_putsamp(WFDB_Sample v, int fmt, struct ogdata *g)
+{
+    FLAC__int32 *obp;
+    const FLAC__int32 *channels[FLAC__MAX_CHANNELS];
+    unsigned spf, i;
+    struct { WFDB_Sample v : 8; } v8;
+    struct { WFDB_Sample v : 16; } v16;
+    struct { WFDB_Sample v : 24; } v24;
+
+    /* If sample values passed to the FLAC encoder exceed the
+       specified number of "bits per sample", the result is
+       unpredictable: the encoder might discard the upper bits, or it
+       might actually encode some values outside the stated range.  To
+       ensure that the results are consistent and predictable, even if
+       the caller supplies invalid sample values to putvec, we discard
+       the upper bits by sign-extending values before passing them to
+       the encoder. */
+    switch (fmt) {
+      case 508: v = v8.v = v; break;
+      case 516: v = v16.v = v; break;
+      case 524: v = v24.v = v; break;
+    }
+
+    obp = (FLAC__int32 *) g->bp;
+    *obp++ = v;
+
+    /* The output buffer is exactly the size of one frame, so when obp
+       reaches g->be we have one frame's worth of data to encode. */
+    if (obp == (FLAC__int32 *) g->be) {
+	obp = (FLAC__int32 *) g->buf;
+	spf = g->packspf;
+	for (i = 0; obp != (FLAC__int32 *) g->be; i++) {
+	    channels[i] = obp;
+	    obp += spf;
+	}
+	if (!FLAC__stream_encoder_process(g->flacenc, channels, spf)) {
+	    wfdb_error("putvec: error writing FLAC signal data\n");
+	    return (-1);
+	}
+	g->bp = g->buf;
+	return (0);
+    }
+    else {
+	g->bp = (char *) obp;
+	return (0);
+    }
+}
+
+static int flac_osinit(struct ogdata *og, const WFDB_Siginfo *si, unsigned ns)
+{
+    FLAC__StreamEncoder *enc;
+    char *p;
+    int min = 0, max = 0;
+    unsigned int i;
+
+    if (ns > FLAC__MAX_CHANNELS) {
+	wfdb_error(
+	    "osigfopen: cannot store %u signals in a single FLAC file\n",
+	    ns);
+	return (-1);
+    }
+    for (i = 1; i < ns; i++) {
+	if (si[i].spf != si[0].spf) {
+	    wfdb_error(
+	       "osigfopen: every signal in a FLAC file must have\n"
+	       "  the same sampling frequency\n");
+	    return (-1);
+	}
+    }
+
+    og->flacenc = enc = FLAC__stream_encoder_new();
+    og->packspf = si->spf;
+    if (!enc) {
+	wfdb_error("osigfopen: cannot initialize stream encoder\n");
+	return (-1);
+    }
+    FLAC__stream_encoder_set_channels(enc, ns);
+    FLAC__stream_encoder_set_bits_per_sample(enc, si->fmt - 500);
+    FLAC__stream_encoder_set_sample_rate(enc, 96000);
+
+    /* If the output file is not seekable, set the STREAMINFO length
+       to the maximum possible value.  If the length is zero, libFLAC
+       will have problems when trying to read the file. */
+    FLAC__stream_encoder_set_total_samples_estimate(enc, (FLAC__uint64) -1);
+
+    /* Make the buffer exactly large enough to hold a single frame.
+       (Also note that setting og->bsize to a non-zero value prevents
+       wfdb_osflush from trying to flush the output buffer.) */
+    og->bsize = ns * si->spf * sizeof(FLAC__int32);
+
+    /* The following environment variables may be used to set
+       parameters for the FLAC compression algorithm. */
+
+    if (p = getenv("WFDB_FLAC_COMPRESSION_LEVEL"))
+	FLAC__stream_encoder_set_compression_level(enc, atoi(p));
+    else
+	FLAC__stream_encoder_set_compression_level(enc, 5);
+
+    if (p = getenv("WFDB_FLAC_BLOCK_SIZE"))
+	FLAC__stream_encoder_set_blocksize(enc, atoi(p));
+    if (p = getenv("WFDB_FLAC_STEREO")) {
+	if (p[0] == 'a' || p[0] == 'A') { /* auto */
+	    FLAC__stream_encoder_set_do_mid_side_stereo(enc, 1);
+	    FLAC__stream_encoder_set_loose_mid_side_stereo(enc, 1);
+	}
+	else if (p[0] == 'b' || p[0] == 'B') { /* best */
+	    FLAC__stream_encoder_set_do_mid_side_stereo(enc, 1);
+	    FLAC__stream_encoder_set_loose_mid_side_stereo(enc, 0);
+	}
+	else {
+	    FLAC__stream_encoder_set_do_mid_side_stereo(enc, 0);
+	}
+    }
+    if (p = getenv("WFDB_FLAC_APODIZATION"))
+	FLAC__stream_encoder_set_apodization(enc, p);
+    if (p = getenv("WFDB_FLAC_MAX_LPC_ORDER"))
+	FLAC__stream_encoder_set_max_lpc_order(enc, atoi(p));
+    if (p = getenv("WFDB_FLAC_QLP_COEFF_PRECISION")) {
+	if (p[0] == 'a' || p[0] == 'A') { /* auto */
+	    FLAC__stream_encoder_set_qlp_coeff_precision(enc, 0);
+	    FLAC__stream_encoder_set_do_qlp_coeff_prec_search(enc, 0);
+	}
+	else if (p[0] == 'b' || p[0] == 'B') { /* best */
+	    FLAC__stream_encoder_set_qlp_coeff_precision(enc, 0);
+	    FLAC__stream_encoder_set_do_qlp_coeff_prec_search(enc, 1);
+	}
+	else {
+	    FLAC__stream_encoder_set_qlp_coeff_precision(enc, atoi(p));
+	    FLAC__stream_encoder_set_do_qlp_coeff_prec_search(enc, 0);
+	}
+    }
+    if (p = getenv("WFDB_FLAC_EXHAUSTIVE_MODEL_SEARCH")) {
+	if (p[0] == 'y' || p[0] == 'Y')
+	    FLAC__stream_encoder_set_do_exhaustive_model_search(enc, 1);
+	else
+	    FLAC__stream_encoder_set_do_exhaustive_model_search(enc, 0);
+    }
+    if (p = getenv("WFDB_FLAC_RICE_PARTITION_ORDER")) {
+	min = strtol(p, &p, 10);
+	if (p && *p == ',') {
+	    max = strtol(p + 1, NULL, 10);
+	}
+	else {
+	    max = min;
+	    min = 0;
+	}
+	FLAC__stream_encoder_set_min_residual_partition_order(enc, min);
+	FLAC__stream_encoder_set_max_residual_partition_order(enc, max);
+    }
+
+    return (0);
+}
+
+static int flac_osopen(struct ogdata *og)
+{
+    if (FLAC__stream_encoder_init_stream(og->flacenc, &oflac_write,
+					 &oflac_seek, &oflac_tell,
+					 NULL, og)) {
+	wfdb_error("osigfopen: cannot open stream encoder\n");
+	return (-1);
+    }
+    return (0);
+}
+
+static int flac_osclose(struct ogdata *og)
+{
+    int stat = 0;
+
+    if (!FLAC__stream_encoder_finish(og->flacenc)) {
+	wfdb_error("osigclose: error writing FLAC signal file\n");
+	stat = -1;
+    }
+    FLAC__stream_encoder_delete(og->flacenc);
+    og->bp = og->be = og->buf;
+    return (stat);
+}
+
+#else /* !WFDB_FLAC_SUPPORT */
+
 static int flac_putsamp(WFDB_Sample v, int fmt, struct ogdata *g)
 {
     return (-1);
@@ -1807,6 +2039,8 @@ static int flac_osclose(struct ogdata *og)
 {
     return (-1);
 }
+
+#endif
 
 static void isigclose(void)
 {
