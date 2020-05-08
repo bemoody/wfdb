@@ -2186,11 +2186,36 @@ static int getskewedframe(WFDB_Sample *vector)
 		else
 		    is->samp = *vector;
 		break;
+	      case 508:	/* 8-bit compressed FLAC */
+		*vector = v = flac_getsamp(ig);
+		if (v == -1 << 7)
+		    *vector = VFILL;
+		else
+		    is->samp = *vector;
+		break;
+	      case 516:	/* 16-bit compressed FLAC */
+		*vector = v = flac_getsamp(ig);
+		if (v == -1 << 15)
+		    *vector = VFILL;
+		else
+		    is->samp = *vector;
+		break;
+	      case 524:	/* 24-bit compressed FLAC */
+		*vector = v = flac_getsamp(ig);
+		if (v == -1 << 23)
+		    *vector = VFILL;
+		else
+		    is->samp = *vector;
+		break;
 	    }
 	    if (ig->stat <= 0) {
 		/* End of file -- reset input counter. */
 		ig->count = 0;
-		if (is->info.nsamp > (WFDB_Time)0L) {
+		if (ig->stat == -2) {
+		    /* error in decoding compressed data */
+		    stat = -3;
+		}
+		else if (is->info.nsamp > (WFDB_Time)0L) {
 		    wfdb_error("getvec: unexpected EOF in signal %d\n", s);
 		    stat = -3;
 		}
