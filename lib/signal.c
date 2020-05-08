@@ -1893,6 +1893,26 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
 	    isd[s]->info.nsamp = 0L;
 	    return (-1);
 	}
+
+      case 508:
+      case 516:
+      case 524:
+	if (flac_isseek(ig, t) < 0) {
+	    wfdb_error("isigsettime: improper seek on signal group %d\n", g);
+	    return (-1);
+	}
+
+	/* Reset the getvec sample-within-frame counter. */
+	gvc = ispfmax;
+
+	/* Reset the time (if signal 0 belongs to the group) and
+	   disable checksum testing (by setting the number of samples
+	   remaining to 0). */
+	if (s == 0) istime = in_msrec ? t + segp->samp0 : t;
+	while (n-- != 0)
+	    isd[s+n]->info.nsamp = (WFDB_Time)0L;
+	return (0);
+
       case 8:
       case 80:
       default: b = nn; break;
