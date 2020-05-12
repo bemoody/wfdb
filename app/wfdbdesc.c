@@ -101,7 +101,6 @@ char *argv[];
 	  case 80:
 	    t = nbytes / framesize;
 	    break;
-	  default:
 	  case 16:
 	  case 61:
 	  case 160:
@@ -120,10 +119,16 @@ char *argv[];
 	  case 311:
 	    t = (3L * nbytes) / (4*framesize);
 	    break;
+	  default:
+	    t = -1;
+	    break;
 	}
-	(void)printf("%s (%"WFDB_Pd_TIME" sample intervals)"
-		     " [from signal file size]\n",
-		     mstimstr(t), t);
+	if (t >= 0)
+	    printf("%s (%"WFDB_Pd_TIME" sample intervals)"
+		   " [from signal file size]\n",
+		   mstimstr(t), t);
+	else
+	    printf("not specified\n");
     }
     else (void)printf("not specified\n");
     (void)printf("Sampling frequency: %.12g Hz\n", sampfreq(NULL));
