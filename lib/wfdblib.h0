@@ -1,5 +1,5 @@
 /* file: wfdblib.h	G. Moody	13 April 1989
-                        Last revised:   30 April 2020         wfdblib 10.7.0
+                        Last revised:    20 May 2020          wfdblib 10.7.0
 External definitions for WFDB library private functions
 
 _______________________________________________________________________________
@@ -325,7 +325,7 @@ extern void wfdb_sampquit(void);
 extern void wfdb_sigclose(void);
 extern void wfdb_osflush(void);
 extern void wfdb_freeinfo(void);
-extern void wfdb_oinfoclose(void);
+extern int wfdb_oinfoclose(void);
 
 /* These functions are defined in annot.c */
 extern void wfdb_anclose(void);

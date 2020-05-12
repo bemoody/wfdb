@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:     6 May 2020 		wfdblib 10.7.0
+			Last revised:    20 May 2020 		wfdblib 10.7.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -3227,10 +3227,10 @@ FINT wfdbputprolog(const char *buf, long int size, WFDB_Signal s)
 FINT setinfo(char *record)
 {
     /* Close any previously opened output info file. */
-    wfdb_oinfoclose();
+    int stat = wfdb_oinfoclose();
 
     /* Quit unless a record name has been specified. */
-    if (record == NULL) return (0);
+    if (record == NULL) return (stat);
 
     /* Remove trailing .hea, if any, from record name. */
     wfdb_striphea(record);
@@ -3887,11 +3887,21 @@ void wfdb_freeinfo(void)
 }
 
 /* Close any previously opened output info file. */
-void wfdb_oinfoclose(void)
+int wfdb_oinfoclose(void)
 {
-    if (outinfo && outinfo != oheader)
-	wfdb_fclose(outinfo);
+    int stat = 0, errflag;
+
+    if (outinfo && outinfo != oheader) {
+	errflag = wfdb_ferror(outinfo);
+	if (wfdb_fclose(outinfo))
+	    errflag = 1;
+	if (errflag) {
+	    wfdb_error("setinfo: write error in info file\n");
+	    stat = -2;
+	}
+    }
     outinfo = NULL;
+    return (stat);
 }
 
 #ifdef WFDB_LARGETIME

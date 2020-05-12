@@ -4361,6 +4361,8 @@ int setinfo(int @var{record})
 Success
 @item @t{-1}
 Failure: illegal record name, or info file could not be opened
+@item @t{-2}
+Failure: error writing info file (only if @var{record} is @code{NULL})
 @end table
 @c @end group
 
@@ -4371,10 +4373,13 @@ the current directory, it is created;  otherwise, it is opened for appending
 (i.e., so that anything @code{putinfo} writes is added at the end of the
 file rather than overwriting any existing contents).
 
-@noindent
 The file opened by @code{setinfo} can be used to store arbitrary information
 associated with @var{record}, without altering @var{record}'s header file.
 (@code{setinfo} was first introduced in WFDB library version 10.5.11.)
+
+To close the @file{info} file and check that it was written successfully,
+invoke @code{setinfo(NULL)}.  (Prior to WFDB library version 10.7.0, this would
+always return 0.)
 
 @c @group
 @node     wfdb_freeinfo, setibsize, setinfo, miscellaneous functions
