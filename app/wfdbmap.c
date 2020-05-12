@@ -126,7 +126,7 @@ char *argv[];
         /* calculate the length of the record from the signal file size */
         char *p;
         double fs = 0;
-	FILE *ifile;
+	FILE *ifile = NULL;
 	long bpm;
 
         for (i = 0; i < nsig && si[i].group == 0; i++)
@@ -145,11 +145,12 @@ char *argv[];
 	  }
 	if (fs > 0) {
 	    bpm = fs * spm + 0.5;  /* bytes per minute */
-	    p = wfdbfile(si[i].fname, NULL);
-	    ifile = fopen(p, "r");
-	    fseek(ifile, 0L, SEEK_END);
-	    length = ftell(ifile)/bpm;
-	    fclose(ifile);
+	    if ((p = wfdbfile(si[i].fname, NULL)) != NULL &&
+		(ifile = fopen(p, "r")) != NULL &&
+		fseek(ifile, 0L, SEEK_END) == 0)
+		length = ftell(ifile)/bpm;
+	    if (ifile)
+		fclose(ifile);
 	}
     }
 
