@@ -1,5 +1,5 @@
 /* file: heaxml.c	G. Moody	28 June 2010
-                 	Last revised:	27 April 2020
+                 	Last revised:	12 May 2020
 -------------------------------------------------------------------------------
 heaxml: Convert a WFDB .hea (header) file to XML format
 Copyright (C) 2010 George B. Moody
@@ -321,6 +321,12 @@ int process_record(void)
 	  case 61:
 	  case 160:
 	    t = nbytes / (2*framesize);
+	    break;
+	  case 24:
+	    t = nbytes / (3*framesize);
+	    break;
+	  case 32:
+	    t = nbytes / (4*framesize);
 	    break;
 	  case 212:
 	    t = (2L * nbytes) / (3*framesize);
