@@ -1331,6 +1331,10 @@ Failure: unable to open input annotation file
 Failure: unable to open output annotation file
 @item @t{-5}
 Failure: illegal @code{stat} (in @var{aiarray}) specified for annotation file
+@item @t{-6}
+Failure: unable to sort output annotations (only if @var{nann} is 0)
+@item @t{-7}
+Failure: error writing annotation file (only if @var{nann} is 0)
 @end table
 @c @end group
 
@@ -1387,9 +1391,10 @@ directories specified by @code{WFDB} (@pxref{WFDB path}); output annotators are
 created in the current directory.  Several of the example programs in chapter 6
 illustrate the use of @code{annopen}; for example, @pxref{Example 1}.
 
-As a special case, if @var{nann} is 0, @var{aiarray} can be @code{NULL}.
-This can be useful to force open annotation files to be closed without
-closing open signal files.
+To close all annotation files and check that any output annotations were
+written successfully, invoke @code{annopen("", NULL, 0)}.  (Prior to WFDB
+library version 10.7.0, this would always return 0.)  This can also be useful
+to force open annotation files to be closed without closing open signal files.
 
 @c @group
 @node     isigopen, osigopen, annopen, selecting

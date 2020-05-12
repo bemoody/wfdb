@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:    28 April 2020   	wfdblib 10.7.0
+			Last revised:     20 May 2020    	wfdblib 10.7.0
 WFDB library functions for annotations
 
 _______________________________________________________________________________
@@ -183,6 +183,8 @@ static struct oadata {
 } **oad;
 static WFDB_Frequency oafreq;	/* time resolution in ticks/sec for newly-
 				   created output annotators */
+static int annclose_error;	/* if <0, error occurred while closing
+				   annotation files */
 
 #ifdef WFDB_LARGETIME
 typedef unsigned long long unsigned_time;
@@ -361,10 +363,17 @@ FINT annopen(char *record, const WFDB_Anninfo *aiarray,
     int a;
     unsigned int i, niafneeded, noafneeded;
 
+    annclose_error = 0;
+
     if (*record == '+')		/* don't close open annotation files */
 	record++;		/* discard the '+' prefix */
     else
 	wfdb_anclose();		/* close previously opened annotation files */
+
+    /* If no annotation files are to be opened, report whether errors
+       occurred while closing previously-opened files. */
+    if (nann == 0)
+	return (annclose_error);
 
     /* Remove trailing .hea, if any, from record name. */
     wfdb_striphea(record);
@@ -1062,7 +1071,7 @@ FVOID iannclose(WFDB_Annotator n)
 /* oannclose: close output annotation file n */
 FVOID oannclose(WFDB_Annotator n)
 {
-    int i;
+    int i, errflag;
     char *cmdbuf = NULL;
     struct oadata *oa;
 
@@ -1077,7 +1086,14 @@ FVOID oannclose(WFDB_Annotator n)
 		(void)wfdb_putc(EOAF, oa->file);
 	    break;
 	}
-	(void)wfdb_fclose(oa->file);
+	errflag = wfdb_ferror(oa->file);
+	if (wfdb_fclose(oa->file))
+	    errflag = 1;
+	if (errflag) {
+	    wfdb_error("oannclose: write error on annotation file %s\n",
+		       oa->info.name);
+	    annclose_error = -7;
+	}
 	if (oa->out_of_order) {
 	    int dosort = DEFWFDBANNSORT;
 	    char *p = getenv("WFDBANNSORT");
@@ -1108,6 +1124,8 @@ FVOID oannclose(WFDB_Annotator n)
 		      wfdb_error(
 			       "\nAnnotations still need to be rearranged.\n");
 		    SFREE(cmdbuf);
+		    if (annclose_error == 0)
+			annclose_error = -6;
 		}
 	    }
 	}
@@ -1115,6 +1133,8 @@ FVOID oannclose(WFDB_Annotator n)
 	    wfdb_error("Use the command:\n  sortann -r %s -a %s\n",
 		       oa->rname, oa->info.name);
 	    wfdb_error("to rearrange annotations in the correct order.\n");
+	    if (annclose_error == 0)
+		annclose_error = -6;
 	}
 	SFREE(oa->info.name);
 	SFREE(oa->rname);
