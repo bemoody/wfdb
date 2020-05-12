@@ -1630,6 +1630,8 @@ long, illegal @code{fmt} or @code{bsize}, or incorrect signal group
 assignment)
 @item @t{-3}
 Failure: unable to open output signal(s)
+@item @t{-4}
+Failure: error writing signal file (only if @var{nsig} is 0)
 @end table
 @c @end group
 
@@ -1659,9 +1661,11 @@ signal files, specify a unique @code{fname} and @code{group} for each
 signal.  @xref{Example 8}, for an illustration of the use of
 @code{osigfopen}.
 
-As a special case, if @var{nsig} is 0, @var{siarray} can be @code{NULL}.
-This can be useful to force open output signal files to be closed
-without closing open annotation or input signal files.
+To close all output signal and header files and check that they were written
+successfully, invoke @code{osigfopen(NULL, 0)}.  (Prior to WFDB library version
+10.7.0, this would always return 0.)  This can also be useful to force open
+output signal files to be closed without closing open annotation or input
+signal files.
 
 @c @group
 @node     wfdbinit, , osigfopen, selecting    
@@ -3479,6 +3483,17 @@ systems, keep record names short (6 characters or less) and avoid those
 that are distinguished by case alone.  To avoid confusion with MIT DB
 and AHA DB records, do not use three- or four-digit record names.
 
+After calling @code{newheader}, you can call @code{putinfo} to add info strings
+to the header file.  To close the header file, along with output signal files,
+and check that they were written successfully, invoke
+@code{osigfopen(NULL, 0)}
+@ifnotinfo
+(@pxref{osigfopen, , @code{osigfopen}}).
+@end ifnotinfo
+@ifinfo
+(@pxref{osigfopen}).
+@end ifinfo
+
 @c @group
 @node     setheader, setmsheader, newheader, miscellaneous functions
 @unnumberedsubsec setheader
@@ -3543,6 +3558,15 @@ the @file{hea} file for record @file{old} must be copied explicitly;
 (This function was first
 introduced in WFDB library version 5.0.)
 
+To close the header file, along with output signal files, and check that they
+were written successfully, invoke @code{osigfopen(NULL, 0)}
+@ifnotinfo
+(@pxref{osigfopen, , @code{osigfopen}}).
+@end ifnotinfo
+@ifinfo
+(@pxref{osigfopen}).
+@end ifinfo
+
 @c @group
 @node     setmsheader, getseginfo, setheader, miscellaneous functions
 @unnumberedsubsec setmsheader
@@ -3587,6 +3611,15 @@ read signals (@code{getvec}, @code{getframe}, @code{isigsettime}, and
 as required.  For an example of the use of @code{setmsheader}, see
 @file{app/wfdbcollate.c} in the WFDB Software Package.  (This function was
 first introduced in WFDB library version 9.1.)
+
+To close the header file, along with output signal files, and check that they
+were written successfully, invoke @code{osigfopen(NULL, 0)}
+@ifnotinfo
+(@pxref{osigfopen, , @code{osigfopen}}).
+@end ifnotinfo
+@ifinfo
+(@pxref{osigfopen}).
+@end ifinfo
 
 @c @group
 @node     getseginfo, wfdbquit, setmsheader, miscellaneous functions

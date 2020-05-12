@@ -1372,11 +1372,12 @@ static void isigclose(void)
 	hsdfree();
 }
 
-static void osigclose(void)
+static int osigclose(void)
 {
     struct osdata *os;
     struct ogdata *og;
     WFDB_Group g;
+    int stat = 0, errflag;
 
     for (g = 0; g < nogroup; g++)
 	if (ogd && (og = ogd[g]))
@@ -1407,10 +1408,19 @@ static void osigclose(void)
 		    /* Flush the last block unless it's empty. */
 		    if (og->bp != og->buf)
 			(void)wfdb_fwrite(og->buf, 1, og->bp-og->buf, og->fp);
+		    if (og->fp->fp == stdout)
+			wfdb_fflush(og->fp);
+		    errflag = wfdb_ferror(og->fp);
 		    /* Close file (except stdout, which is closed on exit). */
 		    if (og->fp->fp != stdout) {
-			(void)wfdb_fclose(og->fp);
+			if (wfdb_fclose(og->fp))
+			    errflag = 1;
 			og->fp = NULL;
+		    }
+		    if (errflag) {
+			wfdb_error("osigclose: write error"
+				   " in signal group %d\n", maxogroup);
+			stat = -4;
 		    }
 		}
 		SFREE(og->buf);
@@ -1422,12 +1432,20 @@ static void osigclose(void)
 
     ostime = 0L;
     if (oheader) {
-	(void)wfdb_fclose(oheader);
+	errflag = wfdb_ferror(oheader);
+	if (wfdb_fclose(oheader))
+	    errflag = 1;
+	if (errflag) {
+	    wfdb_error("osigclose: write error in header file\n");
+	    stat = -4;
+	}
 	if (outinfo == oheader) outinfo = NULL;
 	oheader = NULL;
     }
     if (nisig == 0 && maxhsig != 0)
 	hsdfree();
+
+    return (stat);
 }
 
 /* Low-level I/O routines.  The input routines each get a single argument (the
@@ -2460,14 +2478,14 @@ FINT osigopen(char *record, WFDB_Siginfo *siarray, unsigned int nsig)
 
 FINT osigfopen(const WFDB_Siginfo *siarray, unsigned int nsig)
 {
-    int s;
+    int s, stat;
     const WFDB_Siginfo *si;
 
     /* Close any open output signals. */
-    osigclose();
+    stat = osigclose();
 
     /* Do nothing further if there are no signals to open. */
-    if (siarray == NULL || nsig == 0) return (0);
+    if (siarray == NULL || nsig == 0) return (stat);
 
     if (obsize <= 0) obsize = BUFSIZ;
 
