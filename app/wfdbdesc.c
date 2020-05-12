@@ -1,5 +1,5 @@
 /* file: wfdbdesc.c		G. Moody	  June 1989
-				Last revised:   27 April 2020
+				Last revised:    12 May 2020
 
 -------------------------------------------------------------------------------
 wfdbdesc: Describe signal specifications
@@ -106,6 +106,12 @@ char *argv[];
 	  case 61:
 	  case 160:
 	    t = nbytes / (2*framesize);
+	    break;
+	  case 24:
+	    t = nbytes / (3*framesize);
+	    break;
+	  case 32:
+	    t = nbytes / (4*framesize);
 	    break;
 	  case 212:
 	    t = (2L * nbytes) / (3*framesize);
