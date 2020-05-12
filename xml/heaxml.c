@@ -316,7 +316,6 @@ int process_record(void)
 	  case 80:
 	    t = nbytes / framesize;
 	    break;
-	  default:
 	  case 16:
 	  case 61:
 	  case 160:
@@ -335,8 +334,12 @@ int process_record(void)
 	  case 311:
 	    t = (3L * nbytes) / (4*framesize);
 	    break;
+	  default:
+	    t = -1;
+	    break;
 	}
-      (void)fprintf(ofile, "<length>%"WFDB_Pd_TIME"</length>\n", t);
+	if (t >= 0)
+	    fprintf(ofile, "<length>%"WFDB_Pd_TIME"</length>\n", t);
     }
 
     (void)fprintf(ofile, "<samplingfrequency>%.12g</samplingfrequency>\n",
