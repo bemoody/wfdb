@@ -1,5 +1,5 @@
 /* file: wfdbmap.c	G. Moody       	22 March 2009
-			Last revised:	15 November 2011
+			Last revised:	12 May 2020
 
 -------------------------------------------------------------------------------
 wfdbmap: generates a 'plt' script to make a PostScript map of a WFDB record
@@ -136,14 +136,21 @@ char *argv[];
 	  case 310:
 	  case 311: fs += 1.33333333*si[i].spf; break;
 	  case 212: fs += 1.5*si[i].spf; break;
-	  default:  fs += 2*si[i].spf; break;
+	  case 16:
+	  case 61:
+	  case 160: fs += 2*si[i].spf; break;
+	  case 24:  fs += 3*si[i].spf; break;
+	  case 32:  fs += 3*si[i].spf; break;
+	  default:  fs = 0; break;
 	  }
-	bpm = fs * spm + 0.5;  /* bytes per minute */
-	p = wfdbfile(si[i].fname, NULL);
-	ifile = fopen(p, "r");
-	fseek(ifile, 0L, SEEK_END);
-	length = ftell(ifile)/bpm;
-	fclose(ifile);
+	if (fs > 0) {
+	    bpm = fs * spm + 0.5;  /* bytes per minute */
+	    p = wfdbfile(si[i].fname, NULL);
+	    ifile = fopen(p, "r");
+	    fseek(ifile, 0L, SEEK_END);
+	    length = ftell(ifile)/bpm;
+	    fclose(ifile);
+	}
     }
 
     if (length < 1) {	/* try to get length from annotation file(s) */
