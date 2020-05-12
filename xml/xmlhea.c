@@ -1,5 +1,5 @@
 /* file: xmlhea.c	G. Moody	20 August 2010
-                 	Last revised:	27 April 2020
+                 	Last revised:	12 May 2020
 -------------------------------------------------------------------------------
 xmlhea: Convert an XML file to a WFDB-compatible .hea (header) file
 Copyright (C) 2010 George B. Moody
@@ -43,13 +43,14 @@ char *record, *rec, *sfname, *age, *sex, **diagnosis, *extra, **medication,
 double sps, cps, cbase, second;
 int nseg, nsig, sig, dx, rx, ox;
 int year, month, day, hour, minute;
-long length, offset;
+WFDB_Time length;
+long offset;
 WFDB_Seginfo *segi;
 
 int mnsig;
 double msps, mcps, mcbase, msecond;
 int myear, mmonth, mday, mhour, mminute;
-long mlength;
+WFDB_Time mlength;
 
 struct asiginfo {
     char *fname;
@@ -173,7 +174,7 @@ void XMLCALL end(void *data, const char *el)
 		  if (mcbase)
 		      fprintf(ofile, "(%.12g)", mcbase);
 	      }
-	      fprintf(ofile, " %ld %02d:%02d:%02d",
+	      fprintf(ofile, " %"WFDB_Pd_TIME" %02d:%02d:%02d",
 		      mlength, mhour, mminute, (int)msecond);
 	      if (i = ((int)(msecond*1000. + 0.5)) % 1000)
 		  fprintf(ofile, ".%03d", i);
@@ -197,7 +198,7 @@ void XMLCALL end(void *data, const char *el)
   }
   else if (depth == 1) {
       if (strcmp("length", el) == 0)
-	  sscanf(content, "%ld", &length);
+	  sscanf(content, "%"WFDB_Sd_TIME, &length);
       else if (strcmp("samplingfrequency", el) == 0)
 	  sscanf(content, "%lf", &sps);
       else if (strcmp("counterfrequency", el) == 0)
@@ -215,12 +216,12 @@ void XMLCALL end(void *data, const char *el)
   }
 
   else if (strcmp("/wfdbrecord/segment/length", data) == 0) {
-      sscanf(content, "%ld", &length);
+      sscanf(content, "%"WFDB_Sd_TIME, &length);
       segi[nseg].nsamp = length;
   }
   else if (strcmp("/wfdbrecord/segment/gap/length", data) == 0) {
       strcpy(segi[nseg].recname, "~");
-      sscanf(content, "%ld", &length);
+      sscanf(content, "%"WFDB_Sd_TIME, &length);
       segi[nseg].nsamp = length;
   }
   else if (strcmp("/wfdbrecord/segment/signals", data) == 0)
