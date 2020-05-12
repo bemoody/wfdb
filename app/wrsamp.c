@@ -1,5 +1,5 @@
 /* file: wrsamp.c	G. Moody	10 August 1993
-			Last revised:  27 February 2014
+			Last revised:     18 May 2022
 
 -------------------------------------------------------------------------------
 wrsamp: Select fields or columns from a file and generate a WFDB record
@@ -477,16 +477,24 @@ char *argv[];
 	si[i].spf = 1;
 	si[i].bsize = 0;
 	switch (format) {
+	  case 508:
 	  case 80:  si[i].adcres = 8; break;
 	  case 310:
 	  case 311: si[i].adcres = 10; break;
 	  case 212: si[i].adcres = 12; break;
+	  case 516:
 	  case 16:
 	  case 160:
 	  case 61:  si[i].adcres = 16; break;
+	  case 524:
 	  case 24:  si[i].adcres = 24; break;
 	  case 32:  si[i].adcres = 32; break;
-	  default:  si[i].adcres = WFDB_DEFRES;
+	  default:
+	    /* resolution for unknown future formats */
+	    if (format > 100 && format % 100 > 0 && format % 100 <= 32)
+		si[i].adcres = format % 100;
+	    else
+		si[i].adcres = WFDB_DEFRES;
 	}
 	si[i].adczero = 0;
 	si[i].baseline = 0;
