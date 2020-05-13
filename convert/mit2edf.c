@@ -203,13 +203,25 @@ char **argv;
     for (i = 0; i < nsig; i++) {
 	if (si[i].adcres < 1) {	/* invalid ADC resolution in input .hea file */
 	    switch (si[i].fmt) { /* guess ADC resolution based on format */
+	      case 524:
 	      case 24: si[i].adcres = 24; break;
 	      case 32: si[i].adcres = 32; break;
+	      case 508:
 	      case 80: si[i].adcres = 8; break;
 	      case 212: si[i].adcres = 12; break;
 	      case 310:
 	      case 311: si[i].adcres = 10; break;
-	      default: si[i].adcres = 16; break;
+	      case 516:
+	      case 16:
+	      case 61:
+	      case 160: si[i].adcres = 16; break;
+	      default:
+		/* resolution for unknown future formats */
+		if (si[i].fmt >= 100 &&
+		    si[i].fmt % 100 > 0 && si[i].fmt % 100 <= 32)
+		    si[i].adcres = si[i].fmt % 100;
+		else
+		    si[i].adcres = 16;
 	    }
 	}
 	dmax[i] = si[i].adczero + (1 << (si[i].adcres - 1)) - 1;
