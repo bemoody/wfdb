@@ -1673,6 +1673,7 @@ static int flac_getsamp(struct igdata *g)
 static int flac_isopen(struct igdata *ig, struct hsdata **hs, unsigned ns)
 {
     unsigned int i;
+    char *p;
 
     if (ns > FLAC__MAX_CHANNELS) {
 	wfdb_error(
@@ -1694,6 +1695,12 @@ static int flac_isopen(struct igdata *ig, struct hsdata **hs, unsigned ns)
 	wfdb_error("isigopen: cannot initialize stream decoder\n");
 	return (-1);
     }
+    /* If the WFDB_FLAC_CHECK_MD5 environment variable is defined, try
+       to verify the MD5 hash of the stream.  Note that this will only
+       work if the application reads the entire record, never calls
+       isigsettime, and calls wfdbquit afterwards. */
+    if ((p = getenv("WFDB_FLAC_CHECK_MD5")) && *p)
+	FLAC__stream_decoder_set_md5_checking(ig->flacdec, 1);
 
     ig->data = ns;
     ig->datb = hs[0]->info.fmt - 500;
@@ -1716,8 +1723,14 @@ static int flac_isopen(struct igdata *ig, struct hsdata **hs, unsigned ns)
 /* Close a stream decoder. */
 static int flac_isclose(struct igdata *ig)
 {
+    int stat = 0;
+
+    if (!FLAC__stream_decoder_finish(ig->flacdec)) {
+	wfdb_error("isigclose: warning: incorrect MD5 hash in FLAC input\n");
+	stat = -1;
+    }
     FLAC__stream_decoder_delete(ig->flacdec);
-    return (0);
+    return (stat);
 }
 
 /* Seek to the given frame number in an input stream. */
