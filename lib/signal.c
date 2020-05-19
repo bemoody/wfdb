@@ -266,6 +266,8 @@ static struct isdata {		/* unique for each input signal */
     WFDB_Siginfo info;		/* input signal information */
     WFDB_Sample samp;		/* most recent sample read */
     int skew;			/* intersignal skew (in frames) */
+    int gvindex;		/* current high-resolution sample number */
+    int gvcount;		/* counter for updating gvindex */
 } **isd;
 static struct igdata {		/* shared by all signals in a group (file) */
     int data;			/* raw data read by r*() */
@@ -2197,8 +2199,18 @@ static int rgetvec(WFDB_Sample *vector)
 	}
 	for (s = 0, tp = tvector; s < nvsig; s++) {
 	    int sf = vsd[s]->info.spf;
-
-	    *vector++ = tp[(sf*gvc)/ispfmax];
+	    if (gvc == 0) {
+		vsd[s]->gvindex = 0;
+		vsd[s]->gvcount = -ispfmax;
+	    }
+	    else {
+		vsd[s]->gvcount += sf;
+		if (vsd[s]->gvcount >= 0) {
+		    vsd[s]->gvindex++;
+		    vsd[s]->gvcount -= ispfmax;
+		}
+	    }
+	    *vector++ = tp[vsd[s]->gvindex];
 	    tp += sf;
 	}
 	gvc++;
