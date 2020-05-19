@@ -2124,13 +2124,14 @@ static int getskewedframe(WFDB_Sample *vector)
 }
 
 /* meansamp: calculate the mean of n sample values.  The result is
-   rounded towards zero. */
+   rounded to the nearest integer, with halfway cases always rounded
+   up. */
 static WFDB_Sample meansamp(const WFDB_Sample *s, int n)
 {
     /* If a WFDB_Time is large enough to hold the sum of the sample
        values, then simply add them up and divide by n. */
     if (WFDB_SAMPLE_MAX <= WFDB_TIME_MAX / INT_MAX) {
-	WFDB_Time sum = 0;
+	WFDB_Time sum = n / 2;
 	int i;
 
 	for (i = 0; i < n; i++) {
@@ -2138,13 +2139,16 @@ static WFDB_Sample meansamp(const WFDB_Sample *s, int n)
 		return (WFDB_INVALID_SAMPLE);
 	    sum += *s++;
 	}
-	return (sum / n);
+	if (sum < 0)
+	    return (-(1 + (-sum - 1) / n));
+	else
+	    return (sum / n);
     }
     /* Otherwise, calculate the quotient and remainder separately to
        avoid overflows. */
     else {
 	WFDB_Sample q, qq = 0;
-	int i, r, rr = 0;
+	int i, r, rr = n / 2;
 
 	for (i = 0; i < n; i++) {
 	    if (*s == WFDB_INVALID_SAMPLE)
@@ -2163,7 +2167,7 @@ static WFDB_Sample meansamp(const WFDB_Sample *s, int n)
 	    }
 	    s++;
 	}
-	return (qq < 0 && rr > 0 ? qq + 1 : qq);
+	return (qq);
     }
 }
 
