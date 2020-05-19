@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:    20 May 2020 		wfdblib 10.7.0
+			Last revised:    11 June 2020		wfdblib 10.7.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -43,6 +43,7 @@ visible outside of this file:
  osigclose	(closes output signals)
  isgsetframe	(skips to a specified frame number in a specified signal group)
  getskewedframe	(reads an input frame, without skew correction)
+ meansamp       (calculates mean of an array of samples)
  rgetvec        (reads a sample from each input signal without resampling)
  openosig       (opens output signals)
 
@@ -2122,6 +2123,50 @@ static int getskewedframe(WFDB_Sample *vector)
     return (stat);
 }
 
+/* meansamp: calculate the mean of n sample values.  The result is
+   rounded towards zero. */
+static WFDB_Sample meansamp(const WFDB_Sample *s, int n)
+{
+    /* If a WFDB_Time is large enough to hold the sum of the sample
+       values, then simply add them up and divide by n. */
+    if (WFDB_SAMPLE_MAX <= WFDB_TIME_MAX / INT_MAX) {
+	WFDB_Time sum = 0;
+	int i;
+
+	for (i = 0; i < n; i++) {
+	    if (*s == WFDB_INVALID_SAMPLE)
+		return (WFDB_INVALID_SAMPLE);
+	    sum += *s++;
+	}
+	return (sum / n);
+    }
+    /* Otherwise, calculate the quotient and remainder separately to
+       avoid overflows. */
+    else {
+	WFDB_Sample q, qq = 0;
+	int i, r, rr = 0;
+
+	for (i = 0; i < n; i++) {
+	    if (*s == WFDB_INVALID_SAMPLE)
+		return (WFDB_INVALID_SAMPLE);
+	    q = *s / n;
+	    r = *s % n;
+	    if (r >= 0) {
+		q++;
+		r -= n;
+	    }
+	    qq += q;
+	    rr += r;
+	    if (rr < 0) {
+		rr += n;
+		qq--;
+	    }
+	    s++;
+	}
+	return (qq < 0 && rr > 0 ? qq + 1 : qq);
+    }
+}
+
 static int rgetvec(WFDB_Sample *vector)
 {
     WFDB_Sample *tp;
@@ -2133,21 +2178,11 @@ static int rgetvec(WFDB_Sample *vector)
 
     if ((gvmode & WFDB_HIGHRES) != WFDB_HIGHRES) {
 	/* return one sample per frame, decimating by averaging if necessary */
-	unsigned c;
-	long v;
-
 	stat = getframe(tvector);
 	for (s = 0, tp = tvector; s < nvsig; s++) {
 	    int sf = vsd[s]->info.spf;
-
-	    for (c = v = 0; c < sf && *tp != WFDB_INVALID_SAMPLE; c++) 
-		v += *tp++;
-	    if (c == sf)
-		*vector++ = v/sf;
-	    else {
-		*vector++ = WFDB_INVALID_SAMPLE;
-		tp += sf - c;
-	    }
+	    *vector++ = meansamp(tp, sf);
+	    tp += sf;
 	}
     }
     else {			/* return ispfmax samples per frame, using
