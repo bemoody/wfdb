@@ -1,5 +1,5 @@
 /* file: calib.c	G. Moody	  4 July 1991
-			Last revised:      6 May 2020  		wfdblib 10.7.0
+			Last revised:     20 May 2020  		wfdblib 10.7.0
 WFDB library functions for signal calibration
 
 _______________________________________________________________________________
@@ -201,6 +201,7 @@ FINT putcal(const WFDB_Calinfo *cal)
 FINT newcal(const char *cfname)
 {
     WFDB_FILE *cfile;
+    int errflag;
 
     if (wfdb_checkname(cfname, "calibration file") < 0)
 	return (-1);
@@ -236,7 +237,14 @@ FINT newcal(const char *cfname)
 		      this_cle->scale,
 		      this_cle->units);
     }
-    (void)wfdb_fclose(cfile);
+
+    errflag = wfdb_ferror(cfile);
+    if (wfdb_fclose(cfile))
+	errflag = 1;
+    if (errflag) {
+	wfdb_error("newcal: write error in calibration file\n");
+	return (-1);
+    }
     return (0);
 }
 
