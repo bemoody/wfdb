@@ -2141,10 +2141,14 @@ static WFDB_Sample meansamp(const WFDB_Sample *s, int n)
 		return (WFDB_INVALID_SAMPLE);
 	    sum += *s++;
 	}
-	if (sum < 0)
-	    return (-(1 + (-sum - 1) / n));
-	else
-	    return (sum / n);
+	if (n & (n - 1)) {	/* if n is not a power of two */
+	    return (sum + (sum < 0)) / n - (sum < 0);
+	}
+	else {
+	    while ((n /= 2) != 0)
+		sum = (sum - (sum < 0)) / 2;
+	    return sum;
+	}
     }
     /* Otherwise, calculate the quotient and remainder separately to
        avoid overflows. */
