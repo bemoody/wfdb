@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:     20 May 2020    	wfdblib 10.7.0
+			Last revised:     8 June 2020    	wfdblib 10.7.0
 WFDB library functions for annotations
 
 _______________________________________________________________________________
@@ -120,7 +120,7 @@ may be attached to the same signal provided that their num fields are unique.
 #define CHN	((unsigned)(62 << CS))	/* change 'chan' field */
 #define AUX	((unsigned)(63 << CS))	/* auxiliary information */
 
-#define AUXBUFLEN 520
+#define AUXBUFLEN 771
 
 /* Constants for AHA annotation files only */
 #define ABLKSIZ	1024		/* AHA annotation file block length */
