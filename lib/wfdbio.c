@@ -172,6 +172,8 @@ specified (local) FILE (using wfdb_getiwfdb); such files may be nested up to
 
 static char *wfdbpath = NULL, *wfdbpath_init = NULL;
 
+char *wfdb_getiwfdb(char *p);
+
 /* resetwfdb is called by wfdbquit, and can be called within an application,
 to restore the WFDB path to the value that was returned by the first call
 to getwfdb (or NULL if getwfdb was not called). */
@@ -184,7 +186,7 @@ FVOID resetwfdb(void)
 FSTRING getwfdb(void)
 {
     if (wfdbpath == NULL) {
-	char *p = getenv("WFDB"), *wfdb_getiwfdb(char *p);
+	char *p = getenv("WFDB");
 
 	if (p == NULL) p = DEFWFDB;
 	if (*p == '@') p = wfdb_getiwfdb(p);
@@ -202,9 +204,12 @@ FVOID setwfdb(const char *p)
     void wfdb_export_config(void);
 
     if (p == NULL && (p = getenv("WFDB")) == NULL) p = DEFWFDB;
-    wfdb_parse_path(p);
     SSTRCPY(wfdbpath, p);
     wfdb_export_config();
+
+    if (*p == '@') p = wfdb_getiwfdb(p);
+    SSTRCPY(wfdbpath, p);
+    wfdb_parse_path(p);
 }
 
 /* wfdbquiet can be used to suppress error messages from the WFDB library. */
