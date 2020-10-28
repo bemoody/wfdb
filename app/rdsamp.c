@@ -449,6 +449,7 @@ char *argv[];
     if (xflag)		/* print trailer if WFDB-XML output was selected */
 	printf("</samplevectors>\n</wfdbsampleset>\n");
 
+    wfdbquit();
     exit(0);
 }
 
