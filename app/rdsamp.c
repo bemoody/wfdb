@@ -1,5 +1,5 @@
 /* file: rdsamp.c	G. Moody	 23 June 1983
-			Last revised:   4 November 2020
+			Last revised:     18 May 2022
 
 -------------------------------------------------------------------------------
 rdsamp: Print an arbitrary number of samples from each signal
@@ -449,6 +449,7 @@ char *argv[];
     if (xflag)		/* print trailer if WFDB-XML output was selected */
 	printf("</samplevectors>\n</wfdbsampleset>\n");
 
+    wfdbquit();
     exit(0);
 }
 
