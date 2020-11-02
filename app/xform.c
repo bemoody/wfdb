@@ -412,10 +412,18 @@ char *argv[];
 	  "   24   24-bit two's complement amplitudes (LSB first)\n");
 	    (void)fprintf(stderr,
 	  "   32   32-bit two's complement amplitudes (LSB first)\n");
+#ifdef WFDB_FLAC_SUPPORT
+	    fprintf(stderr,
+		"  508  8-bit amplitudes with FLAC compression\n");
+	    fprintf(stderr,
+		"  516  16-bit amplitudes with FLAC compression\n");
+	    fprintf(stderr,
+		"  524  24-bit amplitudes with FLAC compression\n");
+#endif
 	    do {
 		format = dfin[0].fmt;
 		(void)fprintf(stderr,
-		 "Choose an output format (8/16/61/80/160/212/310/311/24/32) [%d]: ",
+		 "Choose an output format from the list above [%d]: ",
 			      format);
 		script_fgets(answer, sizeof(answer), ttyin);
 		(void)sscanf(answer, "%d", &format);
