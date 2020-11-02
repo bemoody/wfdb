@@ -126,7 +126,6 @@ checkpkg/expected/wfdbdesc.out
 checkpkg/expected/wfdbwhich.out
 checkpkg/expected/wfd.hea
 checkpkg/expected/xform-1.out
-checkpkg/expected/xform-2.out
 checkpkg/expected/xform.all
 checkpkg/expected/xform.dat
 checkpkg/expected/xform.hea

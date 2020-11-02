@@ -1,6 +1,6 @@
 #!/bin/sh
 # file: appcheck		G. Moody       7 September 2001
-#                               Last revised:   24 April 2020
+#                               Last revised:     18 May 2022
 #
 # This script checks the basic functionality of most of the WFDB applications
 # in the 'app' directory.  These programs are not (yet) tested by this script:
@@ -542,7 +542,7 @@ then
       sed "s+record $rec+record mimicdb/237/237+" < xform.hea > xform.tmp
       mv xform.tmp xform.hea
   fi
-  for F in xform-2.out xform.hea xform.dat xform.all
+  for F in xform.hea xform.dat xform.all
   do
     if ( ./checkfile $F )
     then
@@ -553,6 +553,7 @@ then
     fi
     TESTS=`expr $TESTS + 1`
   done 
+  rm -f xform-2.out
 fi
 rm -f grep.out
 
