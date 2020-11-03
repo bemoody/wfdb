@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:    11 June 2020		wfdblib 10.7.0
+			Last revised:  3 November 2020		wfdblib 10.7.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -3894,6 +3894,7 @@ void wfdb_sigclose(void)
     SFREE(gv1);
     SFREE(tvector);
     SFREE(uvector);
+    SFREE(vvector);
     tuvlen = 0;
 
     sigmap_cleanup();
