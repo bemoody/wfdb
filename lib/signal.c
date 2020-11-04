@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  3 November 2020		wfdblib 10.7.0
+			Last revised:  4 November 2020		wfdblib 10.7.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -3454,8 +3454,8 @@ FINT setsampfreq(WFDB_Frequency freq)
     return (-1);
 }
 
-static char date_string[12] = "";
-static char time_string[30];
+static char date_string[37];
+static char time_string[62];
 
 #ifndef __STDC__
 #ifndef _WINDOWS
