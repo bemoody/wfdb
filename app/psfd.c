@@ -1,5 +1,5 @@
 /* file: psfd.c		G. Moody         9 August 1988
-               		Last revised:	 24 April 2020
+               		Last revised:	4 November 2020
 
 -------------------------------------------------------------------------------
 psfd: Produces annotated full-disclosure ECG plots on a PostScript device
@@ -192,7 +192,7 @@ char *argv[];
 		  now->tm_mday, month[now->tm_mon], now->tm_year + 1900);
 
     /* Set the default copyright notice string. */
-    copyright = (char *)malloc((unsigned)strlen(COPYR) + 3);
+    copyright = (char *)malloc((unsigned)strlen(COPYR) + 10);
     (void)sprintf(copyright, COPYR, now->tm_year + 1900);
 
     /* Set the default page dimensions and margins. */
@@ -716,7 +716,7 @@ double dpadu;	/* pixels per adu.  This quantity must be recalculated for each
 char *timcstr(t)
 WFDB_Time t;
 {
-    static char cstring[10];
+    static char cstring[14];
     static double basecount, cfreq = -1.;
 
     if (cfreq < 0) {

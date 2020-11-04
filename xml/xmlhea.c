@@ -1,5 +1,5 @@
 /* file: xmlhea.c	G. Moody	20 August 2010
-                 	Last revised:	12 May 2020
+                 	Last revised:	4 November 2020
 -------------------------------------------------------------------------------
 xmlhea: Convert an XML file to a WFDB-compatible .hea (header) file
 Copyright (C) 2010 George B. Moody
@@ -351,7 +351,7 @@ void write_header(char *recname)
 	if (cbase > 0) setbasecount(cbase);
     }
     if (year || month || day || hour || minute || second) {
-	char tstart[24];
+	char tstart[74];
 	if (year || month || day)
 	    sprintf(tstart, "%02d:%02d:%g %02d/%02d/%d",
 		    hour, minute, second, day, month, year);

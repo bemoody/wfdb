@@ -1,5 +1,5 @@
 /* file: pschart.c	G. Moody       15 March 1988
-			Last revised:  24 April 2020
+			Last revised: 4 November 2020
 
 -------------------------------------------------------------------------------
 pschart: Produce annotated `chart recordings' on a PostScript device
@@ -205,7 +205,7 @@ char *argv[];
 		  now->tm_mday, month[now->tm_mon], now->tm_year + 1900);
 
     /* Set the default copyright notice string. */
-    copyright = (char *)malloc((unsigned)strlen(COPYR) + 3);
+    copyright = (char *)malloc((unsigned)strlen(COPYR) + 10);
     (void)sprintf(copyright, COPYR, now->tm_year + 1900);
 
     /* Set the default page dimensions and margins. */

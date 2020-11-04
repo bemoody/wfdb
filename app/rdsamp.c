@@ -1,5 +1,5 @@
 /* file: rdsamp.c	G. Moody	 23 June 1983
-			Last revised:    27 April 2020
+			Last revised:   4 November 2020
 
 -------------------------------------------------------------------------------
 rdsamp: Print an arbitrary number of samples from each signal
@@ -50,7 +50,8 @@ int argc;
 char *argv[];
 {
     char *record = NULL, *search = NULL, *escapify(), *prog_name();
-    char *invalid, *snfmt, *tfmt, *tnfmt, *tufmt, *vfmt, speriod[16], tustr[16];
+    char *invalid, *snfmt, *tfmt, *tnfmt, *tufmt, *vfmt, speriod[16],
+	tustr[21];
     int cflag = 0, highres = 0, i, isiglist, nsig, nosig = 0, pflag = 0, s,
 	*sig = NULL, timeunits = SECONDS, vflag = 0, xflag = 0;
     WFDB_Frequency freq;
@@ -322,7 +323,7 @@ char *argv[];
 	    p = si[sig[i]].desc;
 	    if (strstr(p, ", signal ")) {
 		char *t;
-		if (t = malloc(10*sizeof(char))) {
+		if (t = malloc(16*sizeof(char))) {
 		    (void)sprintf(t, "sig %d", sig[i]);
 		    p = t;
 		}

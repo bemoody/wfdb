@@ -1,5 +1,5 @@
 /* file: wfdbmap.c	G. Moody       	22 March 2009
-			Last revised:	12 May 2020
+			Last revised:	4 November 2020
 
 -------------------------------------------------------------------------------
 wfdbmap: generates a 'plt' script to make a PostScript map of a WFDB record
@@ -307,7 +307,7 @@ void map_ann(char *record, WFDB_Anninfo *ai, int nann, int **map, int length)
     namax = malloc(nann * sizeof(int));
     wfdbquiet();   /* suppress warnings if an annotator can't be opened */
     for (i = 0; i < nann; i++) {
-	char tstring[10];
+	char tstring[12];
 	int minutes, *na, *nq, *ne, *nv;
 	WFDB_Annotation annot;
 	WFDB_Time end_of_epoch;

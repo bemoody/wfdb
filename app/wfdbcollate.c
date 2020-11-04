@@ -1,5 +1,5 @@
 /* file: wfdbcollate.c        G. Moody        28 April 1994
-                              Last revised:   24 April 2020
+                              Last revised:  4 November 2020
 
 -------------------------------------------------------------------------------
 wfdbcollate: Collate WFDB records into a multi-segment record
@@ -106,7 +106,7 @@ int argc;
 char *argv[];
 {
     int framelen, i, segnumber = 0, nsig;
-    static char *irecname, *orecname, segname[10], sigfname[15];
+    static char *irecname, *orecname, segname[15], sigfname[19];
     static char irecbase[30], segbase[30];
     static WFDB_Time seglen, t, tf;
 
@@ -223,7 +223,7 @@ char *argv[];
 	t++;
     }
     if (t > 0) {
-	char *cargv[4], lastsegstr[10];
+	char *cargv[4], lastsegstr[12];
 
 	setbasetime(segbase+1);
 	newheader(segname);	/* write header for final segment */
@@ -309,7 +309,7 @@ char *argv[];
 	nsegments = last-first+1;
 	irecname = (char **)malloc(sizeof(char *) * nsegments);
 	for (i = first; i <= last; i++) {
-	    irecname[i-first] = (char *)malloc(9);
+	    irecname[i-first] = (char *)malloc(15);
 	    sprintf(irecname[i-first], "%s%05d", orecname, i);
 	}
     }

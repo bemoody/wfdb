@@ -1,5 +1,5 @@
 /* file: ann2rr.c		G. Moody	 16 May 1995
-				Last revised:   27 April 2020
+				Last revised:  4 November 2020
 -------------------------------------------------------------------------------
 ann2rr: Calculate RR intervals from an annotation file
 Copyright (C) 1995-2009 George B. Moody
@@ -41,7 +41,7 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-    char *record = NULL, rrfstr[8], t0fstr[8], t1fstr[8], *prog_name();
+    char *record = NULL, rrfstr[16], t0fstr[16], t1fstr[16], *prog_name();
     double sps, spm, sph;
     int Aflag = 0, a0, a0flag = 0, a1, a1flag = 0,
 	cflag = 0, i,  j, pflag = 0, previous_annot_valid = 0, rrdigits = 3,
@@ -256,17 +256,17 @@ char *argv[];
 	          char rrstr[20];
 		  double frr;
 
-		  case 'h': (void)sprintf(rrstr, rrfstr, rr/sph);
+		  case 'h': snprintf(rrstr, sizeof(rrstr), rrfstr, rr/sph);
 		      (void)printf("%s", rrstr);
 		      (void)sscanf(rrstr, "%lf", &frr);
 		      t1 = t0 + frr * sph + 0.5;
 		      break;
-		  case 'm': (void)sprintf(rrstr, rrfstr, rr/spm);
+		  case 'm': snprintf(rrstr, sizeof(rrstr), rrfstr, rr/spm);
 		      (void)printf("%s", rrstr);
 		      (void)sscanf(rrstr, "%lf", &frr);
 		      t1 = t0 + frr * spm + 0.5;
 		      break;
-		  case 's': (void)sprintf(rrstr, rrfstr, rr/sps);
+		  case 's': snprintf(rrstr, sizeof(rrstr), rrfstr, rr/sps);
 		      (void)printf("%s", rrstr);
 		      (void)sscanf(rrstr, "%lf", &frr);
 		      t1 = t0 + frr * sps + 0.5;

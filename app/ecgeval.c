@@ -1,5 +1,5 @@
 /* file: ecgeval.c	G. Moody	22 March 1992
-			Last revised:  19 November 2013		wfdb 10.5.21
+			Last revised:  4 November 2020		wfdb 10.7.0
 
 -------------------------------------------------------------------------------
 ecgeval: Generate and run a script of commands to compare sets of annotations
@@ -115,7 +115,7 @@ main()
     int evalsv = 1, evalvf = 1, evalaf = 1, evalst = 1, evalst2 = 1;
     struct tm *now;
     static char rhrname[20], tname[20], tans[20], *dbfn, dbtn[5],
-        reportname[30], scriptname[20], *epicmpSoption, evalcommand[30];
+        reportname[36], scriptname[30], *epicmpSoption, evalcommand[35];
     static char bxbcommand[256], rxrcommand[256], mxmcommand[256],
 		epicmpcommand[256];
     static char bxbfile1[40] = "bxb.out", bxbfile2[40] = "sd.out",

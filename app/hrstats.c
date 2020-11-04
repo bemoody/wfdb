@@ -1,5 +1,5 @@
 /* file: hrstats.c		G. Moody	 18 March 2012
-				Last revised:	  6 April 2012
+				Last revised:	4 November 2020
 -------------------------------------------------------------------------------
 hrstats: Collect and summarize heart rate statistics
 Copyright (C) 1985-2012 George B. Moody
@@ -202,7 +202,7 @@ WFDB_Time getbeat()
 
 void cleanup()
 {
-    char hrbuf[80];
+    char hrbuf[100];
     double mean, sampdev, ssum, sum, target;
     int extreme_high, extreme_low, i, imean, max95, min5, n, outliers;
 

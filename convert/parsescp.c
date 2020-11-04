@@ -1,5 +1,5 @@
 /* file: parsescp.c	G. Moody and E. Moody	 10 January 2000
-			Last revised:		 11 December 2017
+			Last revised:		 4 November 2020
 -------------------------------------------------------------------------------
 parsescp: parse an SCP-ECG file (read from the standard input)
 Copyright (C) 2000-2014 George B. Moody and Edna S. Moody
@@ -506,10 +506,10 @@ int ncompare(const void *a, const void *b)
 
 int write_output()
 {
-    char dname[15];		/* name of .des file */
-    char ename[15];		/* name of .ecg file */
-    char kname[15];		/* name of .key file */
-    char tname[15];		/* name of .txt file */
+    char dname[16];		/* name of .des file */
+    char ename[16];		/* name of .ecg file */
+    char kname[16];		/* name of .key file */
+    char tname[16];		/* name of .txt file */
     FILE *dfile; /* (text) description file:  measurements, diagnoses, etc. */
     FILE *efile; /* (binary) ECG signal file */
     FILE *kfile; /* (text) key file: patient name, medical record number */
@@ -726,7 +726,7 @@ int write_wfdb_record()
     int i;
     static char *leadname[12] = { "I", "II", "III", "aVR", "aVF", "aVL",
 				  "V1", "V2", "V3", "V4", "V5", "V6" };
-    static char info[20];
+    static char info[28];
     static WFDB_Sample v[12];
     static WFDB_Siginfo s[12];
 
