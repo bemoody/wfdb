@@ -1,5 +1,5 @@
 /* file: annot.c	G. Moody       	 13 April 1989
-			Last revised:     8 June 2020    	wfdblib 10.7.0
+			Last revised:   4 November 2020  	wfdblib 10.7.0
 WFDB library functions for annotations
 
 _______________________________________________________________________________
@@ -810,7 +810,7 @@ static char *cstring[ACMAX+1] = {  /* ECG mnemonics for each code */
 /* ecgstr: convert an anntyp value to a mnemonic string */
 FSTRING ecgstr(int code)
 {
-    static char buf[9];
+    static char buf[14];
 
     if (0 <= code && code <= ACMAX)
 	return (cstring[code]);
@@ -864,7 +864,7 @@ static char *astring[ACMAX+1] = {  /* mnemonic strings for each code */
 
 FSTRING annstr(int code)
 {
-    static char buf[9];
+    static char buf[14];
 
     if (0 <= code && code <= ACMAX)
 	return (astring[code]);
