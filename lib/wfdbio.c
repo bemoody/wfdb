@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:    27 October 2020      wfdblib 10.7.0
+                        Last revised:    4 November 2020      wfdblib 10.7.0
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -172,7 +172,7 @@ specified (local) FILE (using wfdb_getiwfdb); such files may be nested up to
 
 static char *wfdbpath = NULL, *wfdbpath_init = NULL;
 
-char *wfdb_getiwfdb(char *p);
+static const char *wfdb_getiwfdb(char **p);
 
 /* resetwfdb is called by wfdbquit, and can be called within an application,
 to restore the WFDB path to the value that was returned by the first call
@@ -186,12 +186,12 @@ FVOID resetwfdb(void)
 FSTRING getwfdb(void)
 {
     if (wfdbpath == NULL) {
-	char *p = getenv("WFDB");
+	const char *p = getenv("WFDB");
 
 	if (p == NULL) p = DEFWFDB;
-	if (*p == '@') p = wfdb_getiwfdb(p);
-	SSTRCPY(wfdbpath_init, p);
 	SSTRCPY(wfdbpath, p);
+	p = wfdb_getiwfdb(&wfdbpath);
+	SSTRCPY(wfdbpath_init, wfdbpath);
 	wfdb_parse_path(p);
     }
     return (wfdbpath);
@@ -207,8 +207,8 @@ FVOID setwfdb(const char *p)
     SSTRCPY(wfdbpath, p);
     wfdb_export_config();
 
-    if (*p == '@') p = wfdb_getiwfdb(p);
     SSTRCPY(wfdbpath, p);
+    p = wfdb_getiwfdb(&wfdbpath);
     wfdb_parse_path(p);
 }
 
@@ -550,31 +550,35 @@ contents of the WFDB path) seems an unnecessary security risk. */
 #define SEEK_END 2
 #endif
 
-char *wfdb_getiwfdb(char *p)
+static const char *wfdb_getiwfdb(char **p)
 {
     FILE *wfdbpfile;
     int i = 0;
     long len;
 
-    for (i = 0; i < 10 && *p == '@'; i++) {
-	if ((wfdbpfile = fopen(p+1, RB)) == NULL) p = "";
+    for (i = 0; i < 10 && *p != NULL && **p == '@'; i++) {
+	if ((wfdbpfile = fopen((*p) + 1, RB)) == NULL) **p = 0;
 	else {
 	    if (fseek(wfdbpfile, 0L, SEEK_END) == 0)
 		len = ftell(wfdbpfile);
 	    else len = 255;
-	    SUALLOC(p, 1, len+1);
+	    SALLOC(*p, 1, len+1);
+	    if (*p == NULL) {
+		fclose(wfdbpfile);
+		break;
+	    }
 	    rewind(wfdbpfile);
-	    len = fread(p, 1, (int)len, wfdbpfile);
-	    while (p[len-1] == '\n' || p[len-1] == '\r')
-		p[--len] = '\0';
+	    len = fread(*p, 1, (int)len, wfdbpfile);
+	    while ((*p)[len-1] == '\n' || (*p)[len-1] == '\r')
+		(*p)[--len] = '\0';
 	    (void)fclose(wfdbpfile);
 	}
     }	
-    if (*p == '@') {
+    if (*p != NULL && **p == '@') {
 	wfdb_error("getwfdb: files nested too deeply\n");
-	p = "";
+	**p = 0;
     }
-    return (p);
+    return (*p);
 }
 
 /* wfdb_export_config is invoked from setwfdb to place the configuration
@@ -1370,10 +1374,9 @@ static void www_parse_passwords(const char *str)
     int n;
 
     SSTRCPY(xstr, str);
+    wfdb_getiwfdb(&xstr);
     if (!xstr)
 	return;
-    if (*xstr == '@')
-	xstr = wfdb_getiwfdb(xstr);
 
     SALLOC(passwords, 1, sizeof(char *));
     n = 0;
