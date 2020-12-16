@@ -1,5 +1,5 @@
 # file: mingw-slib.def		I. Henry and G. Moody	    11 February 2005
-#				Last revised:		      27 April 2020
+#				Last revised:		    16 December 2020
 #
 # This section contains settings suitable for generating a DLL (shared library)
 # under MS Windows using the free gcc ANSI C compiler.
@@ -67,7 +67,7 @@ MFLAGS =
 
 # CFLAGS is the set of C compiler options used when compiling the shared
 # library.  CFLAGS should always include CCDEFS.
-CFLAGS =$(MFLAGS) -g -O $(CCDEFS) $(LC) -I$(DESTDIR)$(INCDIR)
+CFLAGS = $(MFLAGS) -g -O $(CCDEFS) $(LC) -I$(DESTDIR)$(INCDIR)
 
 # WFDBLIB_BASENAME is the name, without version numbers, of the alternate
 # library.  WFDBLIB_SONAME is the shared object name ("soname") of the
