@@ -16,4 +16,4 @@ lcheck:		lcheck.c
 	  && echo " Succeeded"
 
 clean:
-	rm -f *~ lcheck libcheck.out appcheck.out
+	rm -f *~ lcheck lcheck.exe libcheck.out appcheck.out
