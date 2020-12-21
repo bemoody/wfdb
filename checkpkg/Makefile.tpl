@@ -1,6 +1,4 @@
-all:
-	@rm -f lcheck$(EXEEXT)
-	@$(MAKE) lcheck$(EXEEXT)
+all: lcheck$(EXEEXT)
 	-@./libcheck $(DESTDIR)$(DBDIR) $(DESTDIR)$(LIBDIR) >libcheck.out
 	@./appcheck $(DESTDIR)$(INCDIR) $(DESTDIR)$(BINDIR) $(DESTDIR)$(LIBDIR) $(DESTDIR)$(PSPDIR)
 	@echo
