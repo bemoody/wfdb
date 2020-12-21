@@ -7,7 +7,8 @@ all: lcheck$(EXEEXT)
 	@grep 'all .* tests passed' appcheck.out > grep.out
 	@rm -f grep.out
 
-lcheck.exe:	lcheck
+lcheck.exe: lcheck.c
+	$(MAKE) lcheck
 lcheck:		lcheck.c
 	@echo Compiling WFDB library test application ...
 	@$(CC) $(CFLAGS) lcheck.c -o lcheck$(EXEEXT) $(LDFLAGS) \
