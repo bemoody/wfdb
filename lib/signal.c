@@ -719,10 +719,23 @@ static int sigmap(WFDB_Sample *vector, const WFDB_Sample *ivec)
 
 /* end of code for handling variable-layout records */
 
+/* Read a fixed-size character field and remove trailing spaces. */
+static void read_edf_str(char *buf, int size, WFDB_FILE *ifile)
+{
+    if (wfdb_fread(buf, 1, size, ifile) != size) {
+	*buf = 0;
+    }
+    else {
+	while (size > 0 && buf[size - 1] == ' ')
+	    size--;
+	buf[size] = 0;
+    }
+}
+
 /* get header information from an EDF file */
 static int edfparse(WFDB_FILE *ifile)
 {
-    char buf[80], *edf_fname, *p;
+    char buf[81], *edf_fname, *p;
     double *pmax, *pmin, spr, baseline;
     int format, i, s, nsig, offset, day, month, year, hour, minute, second;
     long adcrange, *dmax, *dmin, nframes;
@@ -742,24 +755,22 @@ static int edfparse(WFDB_FILE *ifile)
     }
 
     /* Read the remainder of the fixed-size section of the header. */
-    wfdb_fread(buf, 1, 80, ifile);	/* patient ID (ignored) */
-    wfdb_fread(buf, 1, 80, ifile);	/* recording ID (ignored) */
-    wfdb_fread(buf, 1, 8, ifile);	/* recording date */
-    buf[8] = '\0';
+    read_edf_str(buf, 80, ifile);	/* patient ID (ignored) */
+    read_edf_str(buf, 80, ifile);	/* recording ID (ignored) */
+    read_edf_str(buf, 8, ifile);	/* recording date */
     sscanf(buf, "%d%*c%d%*c%d", &day, &month, &year);
     year += 1900;			/* EDF has only two-digit years */
     if (year < 1985) year += 100;	/* fix this before 1/1/2085! */
-    wfdb_fread(buf, 1, 8, ifile);	/* recording time */
+    read_edf_str(buf, 8, ifile);	/* recording time */
     sscanf(buf, "%d%*c%d%*c%d", &hour, &minute, &second);
-    wfdb_fread(buf, 1, 8, ifile);	/* number of bytes in header */
+    read_edf_str(buf, 8, ifile);	/* number of bytes in header */
     sscanf(buf, "%d", &offset);
-    wfdb_fread(buf, 1, 44, ifile);	/* free space (ignored) */
-    wfdb_fread(buf, 1, 8, ifile);	/* number of frames (EDF blocks) */
-    buf[8] = '\0';
+    read_edf_str(buf, 44, ifile);	/* free space (ignored) */
+    read_edf_str(buf, 8, ifile);	/* number of frames (EDF blocks) */
     sscanf(buf, "%ld", &nframes);
     if (nframes < 0) nframes = 0;
     nsamples = nframes;
-    wfdb_fread(buf, 1, 8, ifile);	/* data record duration (seconds) */
+    read_edf_str(buf, 8, ifile);	/* data record duration (seconds) */
     sscanf(buf, "%lf", &spr);
     if (spr <= 0.0) spr = 1.0;
     wfdb_fread(buf+4, 1, 4, ifile);	/* number of signals */
@@ -800,40 +811,35 @@ static int edfparse(WFDB_FILE *ifile)
 	hsd[s]->info.fmt = format;
 	hsd[s]->info.nsamp = nframes;
 
-	wfdb_fread(buf, 1, 16, ifile);	/* signal type */
-	buf[16] = ' ';
-	for (i = 16; i >= 0 && buf[i] == ' '; i--)
-	    buf[i] = '\0';
+	read_edf_str(buf, 16, ifile);	/* signal type */
 	SSTRCPY(hsd[s]->info.desc, buf);
     }
 
     for (s = 0; s < nsig; s++)
-	wfdb_fread(buf, 1, 80, ifile); /* transducer type (ignored) */
+	read_edf_str(buf, 80, ifile); /* transducer type (ignored) */
 
     for (s = 0; s < nsig; s++) {
-	wfdb_fread(buf, 1, 8, ifile);	/* signal units */
-	for (i = 7; i >= 0 && buf[i] == ' '; i--)
-	    buf[i] = '\0';
+	read_edf_str(buf, 8, ifile);	/* signal units */
 	SSTRCPY(hsd[s]->info.units, buf);
     }
 
     for (s = 0; s < nsig; s++) {
-	wfdb_fread(buf, 1, 8, ifile);	/* physical minimum */
+	read_edf_str(buf, 8, ifile);	/* physical minimum */
 	sscanf(buf, "%lf", &pmin[s]);
     }
 
     for (s = 0; s < nsig; s++) {
-	wfdb_fread(buf, 1, 8, ifile);	/* physical maximum */
+	read_edf_str(buf, 8, ifile);	/* physical maximum */
 	sscanf(buf, "%lf", &pmax[s]);
     }
 
     for (s = 0; s < nsig; s++) {
-	wfdb_fread(buf, 1, 8, ifile);	/* digital minimum */
+	read_edf_str(buf, 8, ifile);	/* digital minimum */
 	sscanf(buf, "%ld", &dmin[s]);
     }
 
     for (s = 0; s < nsig; s++) {
-	wfdb_fread(buf, 1, 8, ifile);	/* digital maximum */
+	read_edf_str(buf, 8, ifile);	/* digital maximum */
 	sscanf(buf, "%ld", &dmax[s]);
 	hsd[s]->info.initval = hsd[s]->info.adczero = (dmax[s]+1 + dmin[s])/2;
 	adcrange = dmax[s] - dmin[s];
@@ -853,15 +859,12 @@ static int edfparse(WFDB_FILE *ifile)
     }
 
     for (s = 0; s < nsig; s++)
-	wfdb_fread(buf, 1, 80, ifile);	/* filtering information (ignored) */
+	read_edf_str(buf, 80, ifile);	/* filtering information (ignored) */
 
     for (s = 0; s < nsig; s++) {
 	int n;
 
-	wfdb_fread(buf, 1, 8, ifile);	/* samples per frame (EDF block) */
-	buf[8] = ' ';
-	for (i = 8; i >= 0 && buf[i] == ' '; i--)
-	    buf[i] = '\0';
+	read_edf_str(buf, 8, ifile);	/* samples per frame (EDF block) */
 	sscanf(buf, "%d", &n);
 	if ((hsd[s]->info.spf = n) > spfmax) spfmax = n;
     }
