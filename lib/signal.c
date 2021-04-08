@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  4 November 2020		wfdblib 10.7.0
+			Last revised:    9 April 2021		wfdblib 10.7.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -722,7 +722,7 @@ static int sigmap(WFDB_Sample *vector, const WFDB_Sample *ivec)
 /* get header information from an EDF file */
 static int edfparse(WFDB_FILE *ifile)
 {
-    static char buf[80], *edf_fname, *p;
+    char buf[80], *edf_fname, *p;
     double *pmax, *pmin, spr, baseline;
     int format, i, s, nsig, offset, day, month, year, hour, minute, second;
     long adcrange, *dmax, *dmin, nframes;
