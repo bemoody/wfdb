@@ -1,5 +1,5 @@
 /* file: wfdb2mat.c	G. Moody	26 February 2009
-			Last revised:	  27 April 2020
+			Last revised:	  16 June 2021
 -------------------------------------------------------------------------------
 wfdb2mat: Convert (all or part of) a WFDB signal file to Matlab .mat format
 Copyright (C) 2009-2013 George B. Moody
@@ -73,6 +73,7 @@ wfdb2mat.
 */
 
 #include <stdio.h>
+#include <limits.h>
 #include <wfdb/wfdb.h>
 
 /* Output .mat data storage types (values of mattype), defined by the
@@ -122,7 +123,7 @@ char *argv[];
     WFDB_Frequency freq;
     WFDB_Sample *vi, *vo;
     WFDB_Siginfo *si, *so;
-    WFDB_Time from = 0L, maxl = 0L, t, to = 0L;
+    WFDB_Time from = 0L, maxl = 0L, t, to = 0L, lower, upper;
     void help();
 
     pname = prog_name(argv[0]);
@@ -254,6 +255,26 @@ char *argv[];
 	to = from + maxl;
 
     t = strtim("e"); /* the end of the record */
+    if (t == 0) {
+	/* record length unspecified; determine length by a binary search */
+	wfdbquiet();
+	lower = 0;
+	upper = WFDB_TIME_MAX;
+	t = 16 * 1024;
+	while (lower < upper) {
+	    if (isigsettime(t) >= 0 && getvec(vi) > 0)
+		lower = t + 1;
+	    else
+		upper = t;
+	    if (upper == WFDB_TIME_MAX && t < WFDB_TIME_MAX / 2)
+		t *= 2;
+	    else
+		t = lower + (upper - lower) / 2;
+	}
+	wfdbverbose();
+	if (isigsettime(from) < 0)
+	    exit(2);
+    }
     if (to == 0L || to > t)
 	to = t;
 
