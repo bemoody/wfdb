@@ -270,6 +270,8 @@ void copy_sig(char *nrec, char *irec, WFDB_Time from, WFDB_Time to, int recurse)
 	SSTRCPY(tstring, p + 1);
 	if ((p = strchr(tstring, ']')) != NULL)
 	    *p = 0;
+	if ((p = strchr(tstring, ' ')) != NULL && strchr(p, '/') == NULL)
+	    *p = 0;
     }
 
     if (recurse && (maxseg = getseginfo(&seginfo)) > 0) {
