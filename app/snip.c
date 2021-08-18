@@ -1,5 +1,5 @@
 /* file: snip.c		G. Moody	30 July 1989
-               		Last revised:   27 April 2020
+               		Last revised:  18 August 2021
 -------------------------------------------------------------------------------
 snip: Copy an excerpt of a database record
 Copyright (C) 1989-2013 George B. Moody
@@ -237,7 +237,7 @@ void copy_ann(char *nrec, char *irec, WFDB_Time from, WFDB_Time to,
 
 void copy_sig(char *nrec, char *irec, WFDB_Time from, WFDB_Time to, int recurse)
 {
-    char *ofname, *p, tstring[24];
+    char *ofname, *p, *tstring = NULL;
     int i, j, nsig, maxseg, maxres;
     WFDB_Time nsamp;
     WFDB_Sample *v;
@@ -267,10 +267,10 @@ void copy_sig(char *nrec, char *irec, WFDB_Time from, WFDB_Time to, int recurse)
 
     p = mstimstr(-from);
     if (*p == '[') {
-	strncpy(tstring, mstimstr(-from)+1, 23);
-	tstring[23] = 0;
+	SSTRCPY(tstring, p + 1);
+	if ((p = strchr(tstring, ']')) != NULL)
+	    *p = 0;
     }
-    else tstring[0] = '\0';
 
     if (recurse && (maxseg = getseginfo(&seginfo)) > 0) {
 	/* irec has multiple segments */
@@ -305,10 +305,11 @@ void copy_sig(char *nrec, char *irec, WFDB_Time from, WFDB_Time to, int recurse)
 		si[i].cksum = 0;
 	    }
 
-	    if (tstring[0]) {
-		static char tstring_copy[24];
-		strcpy(tstring_copy, tstring);
+	    if (tstring) {
+		char *tstring_copy = NULL;
+		SSTRCPY(tstring_copy, tstring);
 		setbasetime(tstring_copy);
+		SFREE(tstring_copy);
 	    }
 
 	    if (0 > setheader(olrecname, si, nsig)) {
@@ -347,7 +348,7 @@ void copy_sig(char *nrec, char *irec, WFDB_Time from, WFDB_Time to, int recurse)
 	/* Start writing the master output header. */
 	fprintf(ohfile, "%s/%d %d %.12g %"WFDB_Pd_TIME,
 		nrec, nseg, nsig, sfreq, to-from);
-	if (tstring[0]) fprintf(ohfile, " %s", tstring);
+	if (tstring) fprintf(ohfile, " %s", tstring);
 	fprintf(ohfile, "\r\n");
 
 	if (seginfo[0].nsamp == 0) {
@@ -432,7 +433,8 @@ void copy_sig(char *nrec, char *irec, WFDB_Time from, WFDB_Time to, int recurse)
     free(si);
     free(v);
     setsampfreq(sampfreq(NULL));
-    if (tstring[0]) setbasetime(tstring);
+    if (tstring) setbasetime(tstring);
+    SFREE(tstring);
     (void)newheader(nrec);
 }
 
