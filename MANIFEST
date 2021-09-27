@@ -174,6 +174,8 @@ conf/rpm.mc
 conf/solaris.def
 conf/solaris-slib.def
 conf/version.def
+conf/which-c
+conf/which-w
 convert
 convert/a2m.c
 convert/ad2m.c

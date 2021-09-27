@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody         24 May 2000
-#                             Last revised:    28 November 2018
+#                             Last revised:    27 September 2021
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -158,6 +158,13 @@ else
 ln -sf prompt-n prompt
 fi
 rm echo.out
+
+if [ -x "`command -v /bin/sh`" ]
+then
+    which=./which-c
+else
+    which=./which-w
+fi
 
 PACKAGE=`basename "$SRCDIR"`
 VERSION=
@@ -367,19 +374,11 @@ if [ "x$HOST" != "x" ]
 then
     CROSS_COMPILE=$HOST-
 fi
-WCC=`which ${CROSS_COMPILE}gcc 2>&1`
-if [ "x$WCC" = "x" ]
+WCC=`$which ${CROSS_COMPILE}gcc`
+if ! [ -x "$WCC" ]
 then
-    WCC="no gcc"
-fi
-if ( echo $WCC | egrep "no |not |unknown " >wcc.t1 )
-then
-    WCC=`which ${CROSS_COMPILE}cc 2>&1`
-    if [ "x$WCC" = "x" ]
-    then
-        WCC="no cc"
-    fi
-    if ( echo $WCC | egrep "no |not |unknown " >wcc.t2 )
+    WCC=`$which ${CROSS_COMPILE}cc`
+    if ! [ -x "$WCC" ]
     then
         echo "not found"
 	echo
@@ -405,12 +404,8 @@ sed "s|^CFLAGS = |CFLAGS = $wflags|" <site.tmp >site-slib.def
 rm -f wcc.t1 wcc.t2 site.tmp
 
 ./prompt "Looking for the command to strip debugging metadata ..."
-WSTRIP=`which ${CROSS_COMPILE}strip 2>&1`
-if [ "x$WSTRIP" = "x" ]
-then
-    WSTRIP="no strip"
-fi
-if ( echo $WSTRIP | egrep "no |not |unknown " >wstrip.t1 )
+WSTRIP=`$which ${CROSS_COMPILE}strip`
+if ! [ -x "$WSTRIP" ]
 then
     STRIP=:
     echo "not found"
@@ -418,7 +413,6 @@ else
     STRIP=${CROSS_COMPILE}strip
     echo "$STRIP"
 fi
-rm -f wstrip.t1
 if [ "x$STRIP" != "xstrip" ]
 then
     sed "s|^STRIP = .*|STRIP = $STRIP|" <site.def >site.tmp
@@ -548,12 +542,8 @@ echo
 if [ x$NETLIB = xunknown ]
     then
     ./prompt "Looking for libcurl ..."
-    WHICH=`which curl-config 2>&1`
-    if [ "x$WHICH" = "x" ]
-	then
-	WHICH="no curl-config"
-    fi
-    if ( echo $WHICH | egrep "no |not |unknown " >which.t1 )
+    WHICH=`$which curl-config`
+    if ! [ -x "$WHICH" ]
 	then
 	echo "not found"
 	echo "The WFDB software will be compiled without NETFILES"
@@ -567,7 +557,6 @@ if [ x$NETLIB = xunknown ]
 	echo "using libcurl."
 	NETLIB=libcurl
     fi
-    rm -f which.t1 which.t2
 fi
 
 case $NETLIB in
@@ -634,11 +623,7 @@ if [ "x$WAVE" = "xunknown" ]
     then
     echo
     conf/prompt "Looking for the XView libraries ..."
-    TEXTEDIT=`which textedit 2>&1`
-    if [ "x$TEXTEDIT" = "x" ]
-    then
-	TEXTEDIT="no textedit"
-    fi
+    TEXTEDIT=`cd conf; $which textedit`
     if [ -d $OWHOME ]
     then
 	WAVE=1;
@@ -654,7 +639,7 @@ if [ "x$WAVE" = "xunknown" ]
     then
 	WAVE=1;
 	OWHOME=/usr
-    elif ( echo $TEXTEDIT | egrep "no |not |unknown " >textedit.t1 )
+    elif ! [ -x "$TEXTEDIT" ]
     then
 	WAVE=0;
     else
@@ -662,7 +647,6 @@ if [ "x$WAVE" = "xunknown" ]
 	TEDIR=`dirname $TEXTEDIT`;
 	OWHOME=`dirname $TEDIR`;
     fi
-    rm -f textedit.t1
     if [ $WAVE = 0 ]
 	then
 	echo "not found"

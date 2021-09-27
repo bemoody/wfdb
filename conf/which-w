@@ -1,0 +1,4 @@
+#! /bin/sh
+
+which "$1" 2>conf-which.tmp
+rm -f conf-which.tmp
