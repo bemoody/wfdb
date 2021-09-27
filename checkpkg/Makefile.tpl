@@ -9,7 +9,7 @@ all: lcheck$(EXEEXT)
 
 lcheck.exe: lcheck.c
 	$(MAKE) lcheck
-lcheck:		lcheck.c
+lcheck:		lcheck.c $(DESTDIR)$(INCDIR)/wfdb/wfdb.h
 	@echo Compiling WFDB library test application ...
 	@$(CC) $(CFLAGS) lcheck.c -o lcheck$(EXEEXT) $(LDFLAGS) \
 	  && echo " Succeeded"
