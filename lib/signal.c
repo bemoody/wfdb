@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:    9 April 2021		wfdblib 10.7.0
+			Last revised: 27 September 2021		wfdblib 10.7.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -3459,6 +3459,7 @@ FINT setsampfreq(WFDB_Frequency freq)
 
 static char date_string[37];
 static char time_string[62];
+static WFDB_Date pdays = -1;
 
 #ifndef __STDC__
 #ifndef _WINDOWS
@@ -3470,6 +3471,7 @@ FINT setbasetime(char *string)
 {
     char *p;
 
+    pdays = -1;
     if (string == NULL || *string == '\0') {
 #ifndef NOTIME
 	struct tm *now;
@@ -3524,8 +3526,6 @@ FSTRING timstr(WFDB_Time t)
     return ftimstr(t, f);
 }
 
-static WFDB_Date pdays = -1;
-
 /* Convert sample number to string, using the given sampling
    frequency */
 static char *fmstimstr(WFDB_Time t, WFDB_Frequency f)
@@ -3569,11 +3569,12 @@ static char *fmstimstr(WFDB_Time t, WFDB_Frequency f)
 	days = t / 24;
 	if (days != pdays) {
 	    if (bdate > 0)
-		(void)datstr((pdays = days) + bdate);
+		(void)datstr(days + bdate);
 	    else if (days == 0)
 		date_string[0] = '\0';
 	    else
 		(void)sprintf(date_string, " %ld", days);
+	    pdays = days;
 	}
 	(void)sprintf(time_string, "[%02d:%02d:%02d.%03d%s]",
 		      hours, minutes, seconds, msec, date_string);
@@ -3695,6 +3696,7 @@ FSTRING datstr(WFDB_Date date)
     if (m > 2) y--;
     if (y <= 0) y--;
     (void)sprintf(date_string, " %02d/%02d/%d", d, m, y);
+    pdays = -1;
     return (date_string);
 }
 
