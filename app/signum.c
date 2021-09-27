@@ -1,4 +1,5 @@
 /* file: signum.c	G. Moody	 9 April 2008
+                 	Last revised:  27 September 2021
 
 -------------------------------------------------------------------------------
 signum: Print signal numbers for signals named as arguments
@@ -87,12 +88,11 @@ main(int argc, char **argv)
     for (i = 0; i < nosig; i++) {
 	found = 0;
 	for (j = 0; j < nsig; j++) {
-	    if (found) printf("\t");
 	    if (si[j].desc && (strcmp(argv[isiglist+i], si[j].desc) == 0)) {
+		if (found) printf("\t");
 		printf("%d", j);
-		break;
+		found = 1;
 	    }
-	    found = 1;
 	}
 	if (!found) printf("X");
 	printf("\n");
