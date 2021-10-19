@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: configure             G. Moody         24 May 2000
-#                             Last revised:    27 September 2021
+#                             Last revised:    19 October 2021
 # Configuration script for the WFDB Software Package
 
 # This script was not generated using 'autoconf'.  If you can implement
@@ -168,7 +168,7 @@ fi
 
 PACKAGE=`basename "$SRCDIR"`
 VERSION=
-if [ -d ../.git ]
+if [ -e ../.git ]
 then
     ./prompt "Checking the package version number ..."
     VERSION=`cd ..; git --git-dir=.git describe --dirty 2>conf/gitver.t1`
