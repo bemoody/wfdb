@@ -10,12 +10,12 @@ case $# in
 esac
 
 DIR=$1
-if [ ! -d $DIR ]
+if [ ! -d "$DIR" ]
 then
-    mkdir -p $DIR
+    mkdir -p "$DIR"
 fi
 
-if [ ! -d $DIR ]
+if [ ! -d "$DIR" ]
 then
     echo "Can't install in $DIR -- exiting."
     exit 1
@@ -23,15 +23,15 @@ fi
 
 shift
 
-for FILE in $*
+for FILE in "$@"
 do
-    if [ -f $FILE.exe ]
+    if [ -f "$FILE.exe" ]
     then
-        cp -p $FILE.exe $DIR
+        cp -p "$FILE.exe" "$DIR"
     else
-        if [ -f $FILE ]
+        if [ -f "$FILE" ]
         then
-	    cp -p $FILE $DIR
+	    cp -p "$FILE" "$DIR"
         else
 	    echo "$FILE does not exist"
 	    exit 1
