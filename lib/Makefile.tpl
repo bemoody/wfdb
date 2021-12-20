@@ -59,16 +59,16 @@ $(DESTDIR)$(INCDIR) $(DESTDIR)$(INCDIR)/wfdb $(DESTDIR)$(INCDIR)/ecg $(DESTDIR)$
 
 # Rules for installing the include files
 $(DESTDIR)$(INCDIR)/wfdb/wfdb.h:	$(DESTDIR)$(INCDIR)/wfdb wfdb.h
-	cp -p wfdb.h $(DESTDIR)$(INCDIR)/wfdb
+	../install.sh $(DESTDIR)$(INCDIR)/wfdb wfdb.h
 	$(SETPERMISSIONS) $(DESTDIR)$(INCDIR)/wfdb/wfdb.h
 $(DESTDIR)$(INCDIR)/wfdb/wfdblib.h:	$(DESTDIR)$(INCDIR)/wfdb wfdblib.h
-	cp -p wfdblib.h $(DESTDIR)$(INCDIR)/wfdb
+	../install.sh $(DESTDIR)$(INCDIR)/wfdb wfdblib.h
 	$(SETPERMISSIONS) $(DESTDIR)$(INCDIR)/wfdb/wfdblib.h
 $(DESTDIR)$(INCDIR)/wfdb/ecgcodes.h:	$(DESTDIR)$(INCDIR)/wfdb ecgcodes.h
-	cp -p ecgcodes.h $(DESTDIR)$(INCDIR)/wfdb
+	../install.sh $(DESTDIR)$(INCDIR)/wfdb ecgcodes.h
 	$(SETPERMISSIONS) $(DESTDIR)$(INCDIR)/wfdb/ecgcodes.h
 $(DESTDIR)$(INCDIR)/wfdb/ecgmap.h:	$(DESTDIR)$(INCDIR)/wfdb ecgmap.h
-	cp -p ecgmap.h $(DESTDIR)$(INCDIR)/wfdb
+	../install.sh $(DESTDIR)$(INCDIR)/wfdb ecgmap.h
 	$(SETPERMISSIONS) $(DESTDIR)$(INCDIR)/wfdb/ecgmap.h
 
 # Prerequisites for the library modules
