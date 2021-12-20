@@ -1,5 +1,5 @@
 # file: mingw-slib.def		I. Henry and G. Moody	    11 February 2005
-#				Last revised:		    16 December 2020
+#				Last revised:		    20 December 2021
 #
 # This section contains settings suitable for generating a DLL (shared library)
 # under MS Windows using the free gcc ANSI C compiler.
@@ -133,7 +133,7 @@ lib-post-install:
 	cd $(DESTDIR)$(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_BASENAME)
 	cd $(DESTDIR)$(LIBDIR); ln -sf $(WFDBLIB) $(WFDBLIB_SONAME)
 	mkdir -p $(DESTDIR)$(BINDIR); $(SETDPERMISSIONS) $(DESTDIR)$(BINDIR)
-	cp $(WFDBLIB_DLLNAME) $(DESTDIR)$(BINDIR)
+	../install.sh $(DESTDIR)$(BINDIR) $(WFDBLIB_DLLNAME)
 
 lib-post-uninstall:
 	rm -f $(DESTDIR)$(LIBDIR)/$(WFDBLIB_BASENAME)

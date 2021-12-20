@@ -1,5 +1,5 @@
 # file: cygwin-slib.def	I. Henry and G. Moody	19 November 2002
-#				Last revised:	  27 April 2020
+#				Last revised:	20 December 2021
 
 # This section contains settings suitable for generating a DLL (shared library)
 # under MS Windows using the free Cygwin/gcc ANSI C compiler, available from
@@ -135,9 +135,9 @@ lib-post-install:
 	 ( mkdir -p $(DESTDIR)$(BINDIR); \
 	   $(SETDPERMISSIONS) $(DESTDIR)$(BINDIR) )
 	test /usr/bin = $(BINDIR) || \
-	 ( cp -p /usr/bin/cygwin1.dll $(DESTDIR)$(BINDIR); \
-	   cp -p /usr/bin/cygz.dll $(DESTDIR)$(BINDIR) )
-	cp $(WFDBLIB_DLLNAME) $(DESTDIR)$(BINDIR)
+	 ( ../install.sh $(DESTDIR)$(BINDIR) /usr/bin/cygwin1.dll; \
+	   ../install.sh $(DESTDIR)$(BINDIR) /usr/bin/cygz.dll )
+	../install.sh $(DESTDIR)$(BINDIR) $(WFDBLIB_DLLNAME)
 	cd $(DESTDIR)$(BINDIR); $(SETLPERMISSIONS) *.dll
 	test $(BINDIR) != $(LIBDIR) || \
 	 ( mkdir $(DESTDIR)$(WFDBROOT)/lib; \
