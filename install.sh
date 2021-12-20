@@ -25,16 +25,23 @@ shift
 
 for FILE in "$@"
 do
+    BASE=`echo "/$FILE" | sed "s+.*/++g"`
+    TMPFILE=$DIR/$BASE.wfdb-install
+    rm -f "$TMPFILE"
+    trap 'status=$?; rm -f "$TMPFILE"; exit $status' 0
     if [ -f "$FILE.exe" ]
     then
-        cp -p "$FILE.exe" "$DIR"
+        cp -p "$FILE.exe" "$TMPFILE"
+        mv -f "$TMPFILE" "$DIR/$BASE.exe"
     else
         if [ -f "$FILE" ]
         then
-	    cp -p "$FILE" "$DIR"
+	    cp -p "$FILE" "$TMPFILE"
+	    mv -f "$TMPFILE" "$DIR/$BASE"
         else
 	    echo "$FILE does not exist"
 	    exit 1
         fi
     fi
+    trap '' 0
 done
