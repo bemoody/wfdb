@@ -1,5 +1,5 @@
 # file: Makefile.tpl		G. Moody	  24 May 2000
-#				Last revised:     9 May 2018
+#				Last revised:   20 December 2021
 # This section of the Makefile should not need to be changed.
 
 INCLUDES = $(DESTDIR)$(INCDIR)/wfdb/wfdb.h \
@@ -22,7 +22,7 @@ install:
 	$(MAKE) clean	    # force recompilation since config may have changed
 	$(MAKE) all
 	$(MAKE) $(INCLUDES) $(DESTDIR)$(LIBDIR)
-	cp $(WFDBLIB) $(DESTDIR)$(LIBDIR) 
+	../install.sh $(DESTDIR)$(LIBDIR) $(WFDBLIB)
 	$(SETLPERMISSIONS) $(DESTDIR)$(LIBDIR)/$(WFDBLIB)
 	$(MAKE) lib-post-install 2>/dev/null
 
