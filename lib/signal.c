@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised: 27 September 2021		wfdblib 10.7.0
+			Last revised:  18 January 2022		wfdblib 10.7.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -2644,13 +2644,13 @@ FVOID setgvmode(int mode)
 	    mode = DEFWFDBGVMODE;
     }
 
+    gvmode = mode & (WFDB_HIGHRES | WFDB_GVPAD);
+
     if ((mode & WFDB_HIGHRES) == WFDB_HIGHRES) {
-	gvmode |= WFDB_HIGHRES;
 	if (spfmax == 0) spfmax = 1;
 	sfreq = ffreq * spfmax;
     }
     else {
-	gvmode &= ~(WFDB_HIGHRES);
 	sfreq = ffreq;
     }
 }
