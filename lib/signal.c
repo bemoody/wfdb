@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  18 January 2022		wfdblib 10.7.0
+			Last revised:  28 January 2022		wfdblib 10.7.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -281,6 +281,7 @@ static struct igdata {		/* shared by all signals in a group (file) */
     char *be;			/* pointer to input buffer endpoint */
     char count;			/* input counter for bit-packed signal */
     char seek;			/* 0: do not seek on file, 1: seeks permitted */
+    char initial_skip;		/* 1 if isgsetframe is needed before reading */
     int stat;			/* signal file status flag */
 } **igd;
 static WFDB_Sample *tvector;	/* getvec workspace */
@@ -1793,6 +1794,7 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
     }
 
     ig = igd[g];
+    ig->initial_skip = 0;
     /* Determine the number of samples per frame for signals in the group. */
     for (n = nn = 0; s+n < nisig && isd[s+n]->info.group == g; n++)
 	nn += isd[s+n]->info.spf;
@@ -1996,12 +1998,12 @@ static int getskewedframe(WFDB_Sample *vector)
     if (istime == 0L) {
 	for (s = 0; s < nisig; s++)
 	    isd[s]->samp = isd[s]->info.initval;
-	for (g = nigroup; g; ) {
-	    /* Go through groups in reverse order since seeking on group 0
-	       should always be done last. */
-	    if (--g == 0 || igd[g]->start > 0L)
-		(void)isgsetframe(g, 0L);
-	}
+    }
+    for (g = nigroup; g; ) {
+	/* Go through groups in reverse order since seeking on group 0
+	   should always be done last. */
+	if (igd[--g]->initial_skip)
+	    isgsetframe(g, (in_msrec ? segp->samp0 : 0));
     }
 
     /* If the vector needs to be rearranged (variable-layout record),
@@ -2338,6 +2340,7 @@ FINT isigopen(char *record, WFDB_Siginfo *siarray, int nsig)
 	/* All tests passed -- fill in remaining data for this group. */
 	ig->be = ig->bp = ig->buf + ig->bsize;
 	ig->start = hs->start;
+	ig->initial_skip = (ig->start > 0);
 	ig->stat = 1;
 	while (si < sj && s < nsig) {
 	    copysi(&is->info, &hs->info);
