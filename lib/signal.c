@@ -2911,10 +2911,9 @@ FINT isgsettime(WFDB_Group g, WFDB_Time t)
 
     /* If we're in WFDB_HIGHRES mode, convert t from samples to frames, and
        save the remainder (if any) in trem. */
-    if (sfreq != ffreq) {
-	spf = (int)(sfreq/ffreq);
-	trem = t % spf;
-	t /= spf;
+    if (gvmode & WFDB_HIGHRES) {
+	trem = t % ispfmax;
+	t /= ispfmax;
     }
 
     if ((stat = isgsetframe(g, t)) == 0 && g == 0) {
