@@ -1743,9 +1743,6 @@ static int isgsetframe(WFDB_Group g, WFDB_Time t)
 	return (-2);
     }
 
-    /* Mark the contents of the deskewing buffer (if any) as invalid. */
-    dsbi = -1;
-
     /* If the current record contains multiple segments, locate the segment
        containing the desired sample. */
     if (in_msrec) {
@@ -2918,6 +2915,9 @@ FINT isgsettime(WFDB_Group g, WFDB_Time t)
 	trem = t % ispfmax;
 	t /= ispfmax;
     }
+
+    /* Mark the contents of the deskewing buffer (if any) as invalid. */
+    dsbi = -1;
 
     if ((stat = isgsetframe(g, t)) == 0 && g == 0) {
 	while (trem-- > 0) {
