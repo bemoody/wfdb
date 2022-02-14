@@ -85,18 +85,6 @@ most significant bits are unused (note that these bits are set to zero when
 using the WFDB library to write a format 311 signal file).  This process is
 repeated for each successive set of three samples.
 
-.PP
-If the format specifies a number of bits per sample that exceeds the number of
-bits in a \fBWFDB_Sample\fR, the excess high bits are not read on input, and
-they are replaced by zeroes on output.  Currently, this can happen only when
-using formats 24 or 32 on a 16-bit platform (unusual except for embedded
-processors); in this case, the \fBWFDB_Sample\fR data type may be redefined as
-\fBlong\fR (in \fIwfdb/wfdb.h\fR) before compiling the WFDB library and
-applications, to enable full-precision processing of signals in all formats.
-This is not done by default since it would increase memory and computational
-requirements unnecessarily in embedded applications that do not require 24- or
-32-bit precision.
-
 .SH SEE ALSO
 \fBannot\fR(5), \fBheader\fR(5), \fBwfdbcal\fR(5)
 .br
