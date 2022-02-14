@@ -84,6 +84,36 @@ is obtained from the next 10 bits, the third from the next 10 bits, and the two
 most significant bits are unused (note that these bits are set to zero when
 using the WFDB library to write a format 311 signal file).  This process is
 repeated for each successive set of three samples.
+.SS Formats 508, 516, and 524
+.PP
+Signals are compressed using the FLAC (Free Lossless Audio Codec) format,
+either using 8 bits per sample (in format 508), 16 bits per sample (in format
+516), or 24 bits per sample (in format 524).  See
+https://xiph.org/flac/format.html for the full specification of these formats.
+Note that these formats impose some restrictions on the signal data that can be
+stored:
+.IP \(bu 4
+The number of signals must equal the number of channels in the FLAC stream,
+which implies there can be at most eight signals stored in a single file.
+.IP \(bu 4
+Every signal in the file must have the same sampling frequency, and therefore
+the same number of samples per frame.
+.PP
+Conversely, some limitations apply when generating a FLAC stream to be used as
+a WFDB signal file:
+.IP \(bu 4
+The FLAC `bits per sample' field must be 8, 16, or 24.
+.IP \(bu 4
+Every sample in the stream must be within the range of values indicated by the
+`bits per sample' field.
+.PP
+Note that the number of samples per frame is unrelated to the size of the
+blocks used in FLAC compression; a single FLAC block may contain multiple WFDB
+frames, and a single WFDB frame may be split across multiple FLAC blocks.
+.PP
+Also note that the FLAC `sample rate' field should be set to 96000, regardless
+of the actual sampling frequency of the signals.  For compatibility with older
+FLAC implementations, this field should not be set to 88200, 176400, or 192000.
 
 .SH SEE ALSO
 \fBannot\fR(5), \fBheader\fR(5), \fBwfdbcal\fR(5)
