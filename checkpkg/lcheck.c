@@ -1,5 +1,5 @@
 /* file: lcheck.c	G. Moody       7 September 2001
-			Last revised:  27 April 2020
+			Last revised:  18 May 2022
 -------------------------------------------------------------------------------
 wfdbcheck: test WFDB library
 Copyright (C) 2001-2010 George B. Moody
@@ -37,6 +37,8 @@ WFDB_Calinfo cal;
 WFDB_Siginfo *si;
 WFDB_Sample *vector;
 void help(), list_untested();
+void check_annotations(char *record);
+void check_signals(char *record, char *orec, int fmt, int split_info);
 
 main(argc, argv)
 int argc;
@@ -172,8 +174,15 @@ char *argv[];
   else if (vflag)
     printf("[OK]:  newcal was successful\n");
 
-  /* Test I/O using the local record first. */
-  check("100s", "100z");
+  /* Test I/O using the local record first, converting signals to
+     another format and back. */
+  check_annotations("100s");
+#ifdef WFDB_FLAC_SUPPORT
+  check_signals("100s", "100y", 516, 1);
+#else
+  check_signals("100s", "100y", 16, 1);
+#endif
+  check_signals("100y", "100z", 212, 0);
 
   /* Test I/O again using the remote record. */
   if (WFDB_NETFILES) {
@@ -189,7 +198,8 @@ char *argv[];
       printf(" (reverting to default WFDB path)\n");
       setwfdb(defpath);
     }
-    check("udb/100s", "udb/100z");
+    check_annotations("udb/100s");
+    check_signals("udb/100s", "udb/100z", -1, 0);
   }
 
   /* If there were any errors detected by the WFDB library but not by this
@@ -235,12 +245,11 @@ char *argv[];
   exit(errors);
 }
 
-int check(char *record, char *orec)
+void check_annotations(char *record)
 {
   WFDB_Date d;
   WFDB_Frequency f;
-  WFDB_Time t, tt;
-  double x;
+  WFDB_Time t;
 
   /* *** sampfreq *** */
   if ((f = sampfreq(NULL)) != 0.0) {
@@ -456,6 +465,13 @@ int check(char *record, char *orec)
   }
   if (vflag)
     printf("[OK]:  %d annotations read, %d written\n", i, j);
+}
+
+void check_signals(char *record, char *orec, int ofmt, int split_info)
+{
+  WFDB_Frequency f;
+  WFDB_Time t, tt;
+  double x;
 
   /* *** isigopen *** */
   /* Get the number of signals without opening any signal files. */
@@ -626,6 +642,8 @@ int check(char *record, char *orec)
   for (i = 0; i < nsig; i++) {
     si[i].fname = realloc(si[i].fname, strlen(orec) + 5);
     sprintf(si[i].fname, "%s.dat", orec);
+    if (ofmt >= 0)
+      si[i].fmt = ofmt;
   }
   istat = osigfopen(si, nsig);
   if (istat != nsig) {
@@ -670,9 +688,18 @@ int check(char *record, char *orec)
   else if (vflag)	/* putvec wrote all samples without apparent error */
     printf("[OK]:  newheader created header for output record %s\n", orec);
 
-  /* *** getinfo, putinfo *** */
+  /* *** getinfo, setinfo, putinfo *** */
   n = 0;
   if (info = getinfo(record)) {
+    if (split_info) {
+      istat = setinfo(orec);
+      if (istat) {
+	printf("Error: setinfo returned %d (should have been 0)\n", istat);
+	errors++;
+      }
+      else if (vflag)
+	printf("[OK]:  setinfo created info for output record %s\n", orec);
+    }
     do {
       istat = putinfo(info);
       if (istat) {
