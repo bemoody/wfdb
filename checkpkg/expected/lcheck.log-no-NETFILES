@@ -72,6 +72,39 @@
 [OK]:  osigfopen returned 2
 [OK]:  getframe read 21600 samples
 [OK]:  putvec wrote 21600 samples
+[OK]:  newheader created header for output record 100y
+[OK]:  setinfo created info for output record 100y
+[OK]:  3 info strings copied to record 100y header
+[OK]:  isigopen(100y, NULL, 0) succeeded
+[OK]:  (at     0:00.000) getframe returned {  995,  1011}
+[OK]:  (at     0:00.003) getframe returned {  995,  1011}
+[OK]:  (at     0:00.006) getframe returned {  995,  1011}
+[OK]:  (at     0:00.008) getframe returned {  995,  1011}
+[OK]:  (at     0:00.011) getframe returned {  995,  1011}
+[OK]:  aduphys returned -0.12
+[OK]:  physadu returned 1000
+[OK]:  adumuv returned 5000
+[OK]:  muvadu returned 1000
+[OK]:  sampfreq returned 360
+[OK]:  strtim returned 7200
+[OK]:  timstr returned '    0:20'
+[OK]:  isigsettime skipping forward to     0:20
+[OK]:  (at     0:20.000) getvec returned {  943,   946} [-0.405, -0.390]
+[OK]:  (at     0:20.003) getvec returned {  942,   945} [-0.410, -0.395]
+[OK]:  (at     0:20.006) getvec returned {  942,   946} [-0.410, -0.390]
+[OK]:  (at     0:20.008) getvec returned {  942,   945} [-0.410, -0.395]
+[OK]:  (at     0:20.011) getvec returned {  942,   949} [-0.410, -0.375]
+[OK]:  isigsettime skipping backward to     0:19.997
+[OK]:  (at     0:19.997) getframe returned {  940,   944}
+[OK]:  (at     0:20.000) getframe returned {  943,   946}
+[OK]:  (at     0:20.003) getframe returned {  942,   945}
+[OK]:  (at     0:20.006) getframe returned {  942,   946}
+[OK]:  (at     0:20.008) getframe returned {  942,   945}
+[OK]:  (at     0:20.011) getframe returned {  942,   949}
+[OK]:  isigsettime skipping backward to     0:00.000
+[OK]:  osigfopen returned 2
+[OK]:  getframe read 21600 samples
+[OK]:  putvec wrote 21600 samples
 [OK]:  newheader created header for output record 100z
 [OK]:  3 info strings copied to record 100z header
 [OK]:  no WFDB library errors

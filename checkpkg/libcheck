@@ -115,7 +115,7 @@ do
     TESTS=`expr $TESTS + 1`
 done
 
-rm -rf data
+rm -rf data 100y.*
 
 if [ $PASS = $TESTS ]
 then
