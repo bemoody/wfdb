@@ -34,7 +34,7 @@ if [ "x$1" != "x-q" ]; then
   fi
 
   # Install fonts and 32-bit libraries available from Fedora repositories
-  yum -y install make gcc glibc-devel \
+  sudo apt-get -y install make gcc glibc-devel \
         libgcc.i686 glibc-devel.i686 libX11-devel.i686 \
 	libXpm-devel.i686 libcurl.i686 libcurl-devel.i686 \
 	xorg-x11-fonts-100dpi xorg-x11-fonts-ISO8859-1-100dpi \
