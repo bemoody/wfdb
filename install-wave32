@@ -1,6 +1,6 @@
 #! /bin/sh
 # file: install-wave32		G. Moody	7 October 2008
-#				Last revised:	15 December 2015
+#				Last revised:	11 April 2022
 # Build and install WAVE on 64-bit GNU/Linux platforms
 
 # *****************************************************************************
@@ -46,7 +46,7 @@ if [ "x$1" != "x-q" ]; then
             xview-clients-3.2p1.4-21.1.fc8.i386.rpm
             xview-devel-3.2p1.4-21.1.fc8.i386.rpm'
   for pkg in $PACKAGES; do
-    wget -O $pkg http://physionet.org/physiotools/xview/i386-Fedora/$pkg
+    wget -O $pkg http://archive.physionet.org/physiotools/xview/i386-Fedora/$pkg
   done
   if ! sha256sum -c - <<EOF
 0af569dbef5fc244159e20728e43ad693be49c828595a12baebb6b0d6ec42e24  xview-3.2p1.4-21.1.fc8.i386.rpm
