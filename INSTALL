@@ -1,5 +1,5 @@
 file: INSTALL			G. Moody	30 January 2000
-				Last revised:	  21 July 2013
+				Last revised:	  19 May 2022
 WFDB Software Package installation notes
 
 These notes are infrequently updated, but are included here for those who may
@@ -27,44 +27,36 @@ you choose to use one of these unsupported compilers, you are on your own!
 
 PREPARATION
 
-There are three prerequisites for a complete build.  All are free, open-source
+The following are required for a complete build.  All are free, open-source
 software available for all popular platforms:
 
- * Software development tools (make, gcc, X11 libraries and *.h files, etc.)
+ * Software development tools (make, gcc, standard C header files, etc.)
 
-     + GNU/Linux, Unix, etc.:  usually included
+ * The libFLAC library (including *.h files)
 
-     + Mac OS X: install Mac OS X Developer Tools, X11 for Mac OS X, X11 SDK
-       (all included in current Mac OS X CD sets)
+ * The libcurl library (including *.h files)
 
-     + MS-Windows: Install Cygwin, including (at least) the following optional
-       packages: ImageMagick, X-start-menu-icons, bc, curl, cygutils-extra,
-       diffutils, gcc, gcc-fortran, gv, libX11-devel, libcurl-devel,
-       libexpat1-devel, make, sunrpc, twm, and xview-devel.  (Other required
-       packages will be installed automatically if those listed are selected.)
-       Detailed instructions are available at
-	    http://physionet.org/physiotools/cygwin/
+On Debian, Ubuntu, or similar operating systems, open a terminal and run the
+command:
+	sudo apt-get install gcc make libflac-dev libcurl4-gnutls-dev
 
- * An HTTP client library, either libcurl (preferred) or libwww
+On Fedora, Red Hat, or similar operating systems, open a terminal and run the
+command:
+	sudo dnf install gcc make flac-devel libcurl-devel
 
-     + GNU/Linux, Unix, etc.:  usually included, or from http://curl.haxx.se/
-       (libcurl) or http://www.w3.org/Library/ (libwww)
+On Mac OS X, install Homebrew (https://brew.sh/), and run the command:
+	brew install flac
 
-     + Mac OS X: install libcurl or libwww (both base and development packages)
-       from Fink (http://fink.sourceforge.net)
+On MS-Windows, install Cygwin (https://cygwin.com/), including (at least) the
+following optional packages: diffutils, flac-devel, gcc, libcurl-devel, make.
+(Other required packages will be installed automatically if those listed are
+selected.)
 
-     + MS-Windows: install curl-devel from Cygwin (see above)
-
-     One or both of these libraries may already be installed on your system;
-     to check, try running the commands
-	curl-config --version
-	libwww-config --version
-
- * The XView libraries and *.h files
-
-     + MS-Windows: install xview-devel from Cygwin (see above)
-
-     + Other platforms: free from http://physionet.org/physiotools/xview/
+On other GNU/Linux or Unix-like operating systems, if these packages are not
+included in your distribution's package manager, you may need to compile and
+install them yourself:
+	https://xiph.org/flac/
+	https://curl.se/
 
 Detailed instructions for obtaining and installing these prerequisites are
 included in the WFDB quick-start guides for the popular platforms (see above).
