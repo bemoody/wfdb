@@ -1,5 +1,5 @@
 /* file: signal.c	G. Moody	13 April 1989
-			Last revised:  28 January 2022		wfdblib 10.7.0
+			Last revised:   11 April 2022		wfdblib 10.7.0
 WFDB library functions for signals
 
 _______________________________________________________________________________
@@ -3349,7 +3349,8 @@ Return NULL if there are no more info strings. */
 
 FSTRING getinfo(char *record)
 {
-    static char buf[256], *p;
+    char *buf = NULL, *p;
+    size_t bufsize = 0;
     static int i;
     WFDB_FILE *ifile;
 
@@ -3376,9 +3377,9 @@ FSTRING getinfo(char *record)
 	    /* Remove trailing .hea, if any, from record name. */
 	    wfdb_striphea(record);
 	    if ((ifile = wfdb_open("hea", record, WFDB_READ))) {
-		while (wfdb_fgets(buf, 256, ifile))
+		while (wfdb_getline(&buf, &bufsize, ifile))
 		    if (*buf != '#') break; /* skip initial comments, if any */
-		while (wfdb_fgets(buf, 256, ifile))
+		while (wfdb_getline(&buf, &bufsize, ifile))
 		    if (*buf == '#') break; /* skip header content */
 		while (*buf) {	/* read and save info */
 		    if (*buf == '#') {	    /* skip anything that isn't info */
@@ -3394,14 +3395,14 @@ FSTRING getinfo(char *record)
 			SSTRCPY(pinfo[ninfo], buf+1);
 			ninfo++;
 		    }
-		    if (wfdb_fgets(buf, 256, ifile) == NULL) break;
+		    if (wfdb_getline(&buf, &bufsize, ifile) == 0) break;
 		}
 		wfdb_fclose(ifile);
 	    }
 	}
 	/* Read more info from the .info file, if available */
 	if ((ifile = wfdb_open("info", record, WFDB_READ))) {
-	    while (wfdb_fgets(buf, 256, ifile)) {
+	    while (wfdb_getline(&buf, &bufsize, ifile)) {
 		if (*buf == '#') {
 		    p = buf + strlen(buf) - 1;
 		    if (*p == '\n') *p-- = '\0';
@@ -3418,6 +3419,7 @@ FSTRING getinfo(char *record)
 	    }
 	    wfdb_fclose(ifile);
 	}
+	SFREE(buf);
     }
     if (i < ninfo)
 	return pinfo[i++];
