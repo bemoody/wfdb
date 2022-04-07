@@ -1,5 +1,5 @@
 /* file: calib.c	G. Moody	  4 July 1991
-			Last revised:     20 May 2020  		wfdblib 10.7.0
+			Last revised:    11 April 2022		wfdblib 10.7.0
 WFDB library functions for signal calibration
 
 _______________________________________________________________________________
@@ -69,7 +69,8 @@ static struct cle {
 FINT calopen(const char *cfname)
 {
     WFDB_FILE *cfile;
-    char buf[128], *p1, *p2, *p3, *p4, *p5, *p6;
+    char *buf = NULL, *p1, *p2, *p3, *p4, *p5, *p6;
+    size_t bufsize = 0;
 
     /* If no calibration file is specified, return immediately. */
     if (cfname == NULL && (cfname = getenv("WFDBCAL")) == NULL &&
@@ -88,7 +89,7 @@ FINT calopen(const char *cfname)
 
     /* Read a line of the calibration file on each iteration.  See wfdbcal(5)
        for a description of the format. */
-    while (wfdb_fgets(buf, 127, cfile)) {
+    while (wfdb_getline(&buf, &bufsize, cfile)) {
 	/* ignore leading whitespace */
 	for (p1 = buf; *p1 == ' ' || *p1 == '\t' || *p1 == '\r'; p1++)
 	    ;
@@ -144,6 +145,7 @@ FINT calopen(const char *cfname)
 	    first_cle = prev_cle = this_cle;
     }
 
+    SFREE(buf);
     (void)wfdb_fclose(cfile);
     return (0);
 }
