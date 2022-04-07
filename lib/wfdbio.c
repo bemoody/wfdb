@@ -1,5 +1,5 @@
 /* file: wfdbio.c	G. Moody	18 November 1988
-                        Last revised:    4 November 2020      wfdblib 10.7.0
+                        Last revised:     11 April 2022       wfdblib 10.7.0
 Low-level I/O functions for the WFDB library
 
 _______________________________________________________________________________
@@ -54,6 +54,7 @@ library functions defined elsewhere:
  wfdb_g32		(reads a 32-bit integer)
  wfdb_p16		(writes a 16-bit integer)
  wfdb_p32		(writes a 32-bit integer)
+ wfdb_getline		(reads a line from a text file)
  wfdb_free_path_list [10.0.1] (frees data structures assigned to the path list)
  wfdb_parse_path [10.0.1] (splits WFDB path into components)
  wfdb_export_config [10.3.9] (puts the WFDB path, etc. into the environment)
@@ -353,6 +354,35 @@ void wfdb_p32(long x, WFDB_FILE *fp)
 {
     wfdb_p16((unsigned int)(x >> 16), fp);
     wfdb_p16((unsigned int)x, fp);
+}
+
+/* Read a line of text, allocating a buffer large enough to hold the
+result.  Note that unlike the POSIX getline function, this function
+returns zero at end of file. */
+size_t wfdb_getline(char **buffer, size_t *buffer_size, WFDB_FILE *fp)
+{
+    size_t n = (*buffer == NULL ? 0 : *buffer_size), i = 0;
+    char *s = *buffer;
+    int c;
+
+    do {
+	if (i + 1 >= n) {
+	    n += 256;
+	    SREALLOC(s, n, 1);
+	    if (s == NULL)
+		break;
+	    *buffer = s;
+	    *buffer_size = n;
+	}
+	c = wfdb_getc(fp);
+	if (c == EOF)
+	    break;
+	s[i++] = c;
+    } while (c != '\n');
+
+    if (i > 0)
+	(*buffer)[i] = 0;
+    return (i);
 }
 
 struct wfdb_path_component {
