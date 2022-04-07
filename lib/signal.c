@@ -193,6 +193,8 @@ void example(void)
 */
 static unsigned maxhsig;	/* # of hsdata structures pointed to by hsd */
 static WFDB_FILE *hheader;	/* file pointer for header file */
+static char *linebuf;		/* temporary buffer for reading header lines */
+static size_t linebufsize;	/* size of linebuf */
 static struct hsdata {
     WFDB_Siginfo info;		/* info about signal from header */
     long start;			/* signal file byte offset to sample 0 */
@@ -893,7 +895,7 @@ static int edfparse(WFDB_FILE *ifile)
 
 static int readheader(const char *record)
 {
-    char linebuf[256], *p, *q;
+    char *p, *q;
     WFDB_Frequency f;
     WFDB_Signal s;
     WFDB_Time ns;
@@ -945,7 +947,7 @@ static int readheader(const char *record)
     }
 
     /* Read the first line and check for a magic string. */
-    if (wfdb_fgets(linebuf, 256, hheader) == NULL) {
+    if (wfdb_getline(&linebuf, &linebufsize, hheader) == 0) {
         wfdb_error("init: record %s header is empty\n", record);
 	    return (-2);
     }
@@ -968,7 +970,7 @@ static int readheader(const char *record)
     /* Get the first token (the record name) from the first non-empty,
        non-comment line. */
     while ((p = strtok(linebuf, sep)) == NULL || *p == '#') {
-	if (wfdb_fgets(linebuf, 256, hheader) == NULL) {
+	if (wfdb_getline(&linebuf, &linebufsize, hheader) == 0) {
 	    wfdb_error("init: can't find record name in record %s header\n",
 		     record);
 	    return (-2);
@@ -1105,7 +1107,7 @@ static int readheader(const char *record)
 	for (i = 0, ns = (WFDB_Time)0L; i < segments; i++, segp++) {
 	    /* Get next segment spec, skip empty lines and comments. */
 	    do {
-		if (wfdb_fgets(linebuf, 256, hheader) == NULL) {
+		if (wfdb_getline(&linebuf, &linebufsize, hheader) == 0) {
 		    wfdb_error(
 			"init: unexpected EOF in header file for record %s\n",
 			record);
@@ -1179,7 +1181,7 @@ static int readheader(const char *record)
 	/* Get the first token (the signal file name) from the next
 	   non-empty, non-comment line. */
 	do {
-	    if (wfdb_fgets(linebuf, 256, hheader) == NULL) {
+	    if (wfdb_getline(&linebuf, &linebufsize, hheader) == 0) {
 		wfdb_error(
 			"init: unexpected EOF in header file for record %s\n",
 			record);
@@ -1375,6 +1377,7 @@ static void isigclose(void)
 	(void)wfdb_fclose(hheader);
 	hheader = NULL;
     }
+    SFREE(linebuf);
     if (nosig == 0 && maxhsig != 0)
 	hsdfree();
 }
