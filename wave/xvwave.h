@@ -1,5 +1,5 @@
 /* file: xvwave.h    	G. Moody	27 April 1990
-			Last revised:   24 April 2020
+			Last revised:   14 April 2022
 XView constants, macros, function prototypes, and global variables for WAVE
 
 -------------------------------------------------------------------------------
@@ -94,7 +94,7 @@ COMMON GC draw_sig, clear_sig,
     highlight_sig, unhighlight_sig,
     clear_all;
 
-COMMON int ann_popup_active;	/* <0: annotation template popup not created,
+extern int ann_popup_active;	/* <0: annotation template popup not created,
 				    0: popup not visible, >0: popup visible */
 
 /* Display lists
