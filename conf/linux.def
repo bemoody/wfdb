@@ -1,5 +1,5 @@
 # file: linux.def		G. Moody	31 May 2000
-#				Last revised:  27 April 2020
+#				Last revised:	4 May 2022
 # 'make' definitions for compiling the WFDB Software Package under Linux
 
 # Choose a value for WFDBROOT to determine where the WFDB Software Package will
@@ -153,8 +153,13 @@ XINCDIR = $(XHOME)/include
 # XLIBDIR is the directory in which the X11 libraries are found.
 XLIBDIR = $(XHOME)/lib
 
+# RPCINCDIR is the directory in which the 'rpc/rpc.h' file is found,
+# if it is not in the default path.
+RPCINCDIR = /usr/include/tirpc
+
 # WCFLAGS is the set of C compiler options to use when compiling WAVE.
-WCFLAGS = $(CFLAGS) -I$(OWINCDIR) -I$(XINCDIR) -fno-stack-protector
+WCFLAGS = $(CFLAGS) -I$(OWINCDIR) -I$(XINCDIR) -I$(RPCINCDIR) \
+          -fno-stack-protector
 
 # HELPOBJ can be set to "help.o" if you wish to recompile the XView spot help
 # functions in "wave/help.c" (recommended under Linux).

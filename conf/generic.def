@@ -1,5 +1,5 @@
 # file: generic.def		G. Moody	31 May 2000
-#				Last revised:	27 April 2020
+#				Last revised:	4 May 2022
 # This file contains default 'make' definitions for compiling the WFDB Software
 # Package under versions of UNIX that are not otherwise recognized by
 # 'configure'.
@@ -199,8 +199,12 @@ XINCDIR = $(XHOME)/include
 # XLIBDIR is the directory in which the X11 libraries are found.
 XLIBDIR = $(XHOME)/lib
 
+# RPCINCDIR is the directory in which the 'rpc/rpc.h' file is found,
+# if it is not in the default path.
+RPCINCDIR = /usr/include/tirpc
+
 # WCFLAGS is the set of C compiler options to use when compiling WAVE.
-WCFLAGS = $(CFLAGS) -I$(OWINCDIR) -I$(XINCDIR)
+WCFLAGS = $(CFLAGS) -I$(OWINCDIR) -I$(XINCDIR) -I$(RPCINCDIR)
 
 # HELPOBJ can be set to "help.o" if you wish to recompile the XView spot help
 # functions in "wave/help.c" (recommended under Linux).
