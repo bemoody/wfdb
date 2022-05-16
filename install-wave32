@@ -1,23 +1,19 @@
 #! /bin/sh
 # file: install-wave32		G. Moody	7 October 2008
-#				Last revised:	11 April 2022
+#				Last revised:	16 May 2022
 # Build and install WAVE on 64-bit GNU/Linux platforms
 
 # *****************************************************************************
-# This script builds and installs 'wave' as a 32-bit application on x86_64
-# (AMD/Intel 64-bit) Fedora GNU/Linux.  It has been tested on Fedora 12, 14, 16,
-# and 18; it will probably require modification on other platforms.
+# This script builds and installs 'wave' as a 32-bit application on GNU/Linux.
+# It has been tested on x86_64 (AMD/Intel 64-bit) Fedora and Debian platforms,
+# and may work on similar platforms such as Ubuntu and CentOS.
 #
 # Part 1 of this script automates installation of prerequisite 32-bit libraries
-# and *.h files on Fedora GNU/Linux and compatible platforms such as Red Hat,
-# Scientific Linux, and Centos.  It is harmless to rerun this script if some or
-# all of these prerequisites have been installed already.
+# and *.h files on supported platforms.  It is harmless to rerun this script if
+# some or all of these prerequisites have been installed already.
 #
-# If you use another GNU/Linux platform such as Debian, Ubuntu, or Mint:
-# You will need to install these prerequisites in some other way before running
-# part 2 of this script using the -q option; see
-#    http://physionet.org/physiotools/wave-installation.shtml
-# for details.
+# If you use another GNU/Linux platform, you will need to install these
+# prerequisites in some other way, then run this script using the -q option.
 # *****************************************************************************
 
 set -e
@@ -25,45 +21,185 @@ set -e
 echo
 echo "If this script fails, read it for troubleshooting hints."
 
+distro=unknown
+host_arch=unknown
+prereqs=yes
+while [ "$#" != 0 ]; do
+  arg=$1
+  shift
+  case $arg in
+    -q) prereqs=no ;;
+    -d) distro=$1; shift ;;
+    -a) host_arch=$1; shift ;;
+    *)
+      echo "Usage: $0 [-q] [-d DISTRIBUTION] [-a HOST-ARCHITECTURE]" >&2
+      exit 1
+      ;;
+  esac
+done
+
+if [ "x$distro" = "xunknown" ]; then
+  if [ -x "$(command -v apt-get)" ]; then
+    distro=debian
+    if [ "x$host_arch" = "xunknown" ]; then
+      host_arch=$(dpkg --print-architecture)
+    fi
+  elif [ -x "$(command -v dnf)" ] || [ -x "$(command -v yum)" ]; then
+    distro=fedora
+    if [ "x$host_arch" = "xunknown" ]; then
+      host_arch=$(rpm -q rpm | tr . \\n | tail -1)
+    fi
+  fi
+fi
+
+configure_args=-m32
+case $distro-$host_arch in
+  fedora-i686)      arch=i686; pn_arch=i386;;
+  fedora-x86_64)    arch=i686; pn_arch=i386;;
+
+  debian-amd64)     arch=i386; gcc_package=gcc-multilib;;
+  debian-arm64)     arch=armhf; gcc_package=gcc-arm-linux-gnueabihf;
+                    configure_args="--host=arm-linux-gnueabihf
+                                    --with-xview=/usr
+                                    --libdir=/usr/local/lib32";;
+  debian-armel)     arch=armel; gcc_package=gcc;;
+  debian-armhf)     arch=armhf; gcc_package=gcc;;
+  debian-i386)      arch=i386; gcc_package=gcc;;
+  debian-mips)      arch=mips; gcc_package=gcc;;
+  debian-mips64el)  arch=mipsel; gcc_package=gcc-multilib;;
+  debian-mipsel)    arch=mipsel; gcc_package=gcc;;
+  debian-powerpc)   arch=powerpc; gcc_package=gcc;;
+
+  *)
+    echo "This OS or architecture is not recognized."
+    if [ "$prereqs" = "yes" ]; then
+      exit 1
+    fi
+    ;;
+esac
+
 # Part 1: install prerequisites (unless skipped using -q option)
-if [ "x$1" != "x-q" ]; then
-  if [ $UID != 0 ]; then
+if [ "$prereqs" = "yes" ]; then
+  if [ "$(id -u)" != 0 ]; then
     echo "You do not have root (superuser) permissions, so this script may fail"
     echo "if it needs to install missing libraries.  If this happens, rerun it"
     echo "as root (e.g., using su or sudo)."
   fi
 
-  # Install fonts and 32-bit libraries available from Fedora repositories
-  yum -y install make gcc glibc-devel \
-        libgcc.i686 glibc-devel.i686 libX11-devel.i686 \
-	libXpm-devel.i686 libcurl.i686 libcurl-devel.i686 \
-	xorg-x11-fonts-100dpi xorg-x11-fonts-ISO8859-1-100dpi \
-	xorg-x11-fonts-75dpi xorg-x11-fonts-ISO8859-1-75dpi \
-	xorg-x11-fonts-misc
+  case $distro in
+    fedora)
+      if [ -x "$(command -v dnf)" ]; then dnf=dnf; else dnf=yum; fi
 
-  # Install XView libraries and development toolkit available from PhysioNet
-  PACKAGES='xview-3.2p1.4-21.1.fc8.i386.rpm
-            xview-clients-3.2p1.4-21.1.fc8.i386.rpm
-            xview-devel-3.2p1.4-21.1.fc8.i386.rpm'
-  for pkg in $PACKAGES; do
-    wget -O $pkg http://archive.physionet.org/physiotools/xview/i386-Fedora/$pkg
-  done
-  if ! sha256sum -c - <<EOF
+      # Install fonts and 32-bit libraries from Fedora repositories
+      $dnf -y install \
+           make gcc \
+           glibc-devel glibc-devel.$arch libtirpc-devel \
+           libX11-devel libX11-devel.$arch \
+           libXpm-devel libXpm-devel.$arch \
+           libcurl-devel libcurl-devel.$arch \
+           flac-devel flac-devel.$arch \
+           xorg-x11-fonts-100dpi xorg-x11-fonts-ISO8859-1-100dpi \
+           xorg-x11-fonts-75dpi xorg-x11-fonts-ISO8859-1-75dpi \
+           xorg-x11-fonts-misc \
+           xset
+
+      # Install XView libraries and development toolkit from PhysioNet
+      PKGURL=http://archive.physionet.org/physiotools/xview/$pn_arch-Fedora
+      PACKAGES="xview-3.2p1.4-21.1.fc8.$pn_arch.rpm
+                xview-clients-3.2p1.4-21.1.fc8.$pn_arch.rpm
+                xview-devel-3.2p1.4-21.1.fc8.$pn_arch.rpm"
+      for pkg in $PACKAGES; do
+        wget -O $pkg $PKGURL/$pkg
+      done
+      if ! sha256sum -c - <<EOF
 0af569dbef5fc244159e20728e43ad693be49c828595a12baebb6b0d6ec42e24  xview-3.2p1.4-21.1.fc8.i386.rpm
 ae7cd665be7ffa4557df4bdcf44e381da391c8e7996512d8d718437b09e09d07  xview-clients-3.2p1.4-21.1.fc8.i386.rpm
 b0900d75a8a75223f2ab3aeaa7fa9c14f814c59a576557892298a6fdc257e96a  xview-devel-3.2p1.4-21.1.fc8.i386.rpm
 EOF
-  then
-    echo "Unable to download/verify XView package(s)."
-    exit 1
+      then
+        echo "Unable to download/verify XView package(s)."
+        exit 1
+      fi
+      rpm -Uvh --replacepkgs $PACKAGES
+      ;;
+
+    debian)
+      if grep -q "^ID=ubuntu" /etc/os-release; then
+        apt-add-repository universe
+      fi
+      if ! (dpkg --print-architecture;
+            dpkg --print-foreign-architectures) | grep -q $arch; then
+        dpkg --add-architecture $arch
+        apt-get update
+      fi
+
+      # Install fonts and 32-bit libraries from Debian repositories
+      apt-get -y install \
+              make gcc $gcc_package \
+              libc6-dev libc6-dev:$arch libtirpc-dev \
+              libcurl4-openssl-dev libcurl4-openssl-dev:$arch \
+              libflac-dev libflac-dev:$arch \
+              xfonts-100dpi xfonts-base \
+              x11-xserver-utils
+
+      # Install XView libraries and development toolkit from PhysioNet
+      PKGURL=http://archive.physionet.org/physiotools/xview/debian
+      PACKAGES="xviewg_3.2p1.4-28.2_$arch.deb
+                xviewg-dev_3.2p1.4-28.2_$arch.deb
+                xview-clients_3.2p1.4-28.2_$arch.deb"
+      for pkg in $PACKAGES; do
+        wget -O $pkg $PKGURL/$pkg
+      done
+      if ! grep $arch.deb <<EOF | sha256sum -c -
+28edec91e0557402659ed21654e74c63074526aa074543935a96f6b5ddbb13eb  xview-clients_3.2p1.4-28.2_armel.deb
+eec15483a9f959edf1ac887e7e253cc467666f394c7c5a83fe0fee36f69936d8  xviewg-dev_3.2p1.4-28.2_armel.deb
+7d812fe6bc79026c1c84f711bae297fe6a400c929ce0a8dd543ef5bb52752941  xviewg_3.2p1.4-28.2_armel.deb
+
+7eeef1e7983eb89efe94eb6360cf1b91960f84308cb64c493d195c67c4334313  xview-clients_3.2p1.4-28.2_armhf.deb
+95c8acc0a80e7659fd956c0ca9a8a3e10b9aa387949e1386f07f8046c858630f  xviewg-dev_3.2p1.4-28.2_armhf.deb
+4e22cda1346fa068394216ccca5b1caa83d57d13a29fce3a700f204d511985a7  xviewg_3.2p1.4-28.2_armhf.deb
+
+3384d5a1893207edd908686e6ced3bbb49240f39910ec1a7afccf83540ee8816  xview-clients_3.2p1.4-28.2_i386.deb
+3edae410a073eac79f9de38430a4d3d48a4ec2f0797c8f4157691b92ef10f6de  xviewg-dev_3.2p1.4-28.2_i386.deb
+74968b5e53c6dee5251c7e77044de688e08c16a494d6b51135b102c1feab16c6  xviewg_3.2p1.4-28.2_i386.deb
+
+2f0c52a5730739ef9161f65d6b554b4844a59284e7cf5fe20a717441803a3c41  xview-clients_3.2p1.4-28.2_mips.deb
+1af2f0b7f37d84af0939720bd52f3d4118d9b115cf5aec9a2da2d50fc58d782d  xviewg-dev_3.2p1.4-28.2_mips.deb
+f6d6294cf6f08b373191deb0dfa094368e7ba997b986117e55066e0c9bd3c9ae  xviewg_3.2p1.4-28.2_mips.deb
+
+8c014ecbe70d9ee7ee807ff4c84051d4ed96beb61bde5d0ff40e104a9fe42516  xview-clients_3.2p1.4-28.2_mipsel.deb
+66e4d2e202c6fb272be2d314183fed69fbf1a58e5d26e23bbeb24f05592de0e7  xviewg-dev_3.2p1.4-28.2_mipsel.deb
+170f1d70c65a5bac75e16232c502d6e1355ed0f6202bf942bbcc965ec44b7ace  xviewg_3.2p1.4-28.2_mipsel.deb
+
+02ca0d1e289ecabb0bf1bd055f8283f7a7a349b17bdcbca3d6777efaa181a793  xview-clients_3.2p1.4-28.2_powerpc.deb
+4d51a65c1667740e72f13025d1d9bcb8bfdf8ec05970b24c77460b1a3b34bb03  xviewg-dev_3.2p1.4-28.2_powerpc.deb
+b4cda700a8a99014550b5ac0a4b3368476dae71cad54aa761ba1a3782e3b9f60  xviewg_3.2p1.4-28.2_powerpc.deb
+EOF
+      then
+        echo "Unable to download/verify XView package(s)."
+        exit 1
+      fi
+      apt-get -y install $(printf './%s ' $PACKAGES)
+      ;;
+  esac
+
+  # If fonts were not previously installed, add them to the running X server
+  if [ "x$DISPLAY" != "x" ]; then
+    for dir in /usr/share/fonts/X11/100dpi \
+               /usr/share/fonts/X11/misc \
+               /usr/share/X11/fonts/100dpi \
+               /usr/share/X11/fonts/misc; do
+      if [ -d "$dir" ]; then
+        xset fp+ $dir
+      fi
+    done
+    xset fp rehash
   fi
-  rpm -Uvh --replacepkgs $PACKAGES
 fi
 
 # Part 2: compile and install 32-bit WFDB library and WAVE
 export PKG_CONFIG_PATH=/usr/lib/pkgconfig
-make clean
-./configure -m32 $*
+./configure $configure_args
 cd lib;
  make install
 cd ../wave;
