@@ -1,3 +1,51 @@
+10.7.0 (10 June 2022):
+	The WFDB library now supports storing signals in compressed form, using
+	the FLAC (Free Lossless Audio Codec) algorithm.  Compressed signal
+	files are designated by the the format code 508, 516, or 524 (depending
+	on the signal resolution.)  In order to read and write signals in these
+	formats, the FLAC library and header files must be installed when
+	compiling the WFDB Software Package.
+
+	In calibration files, a signal may be listed as "*", which is a
+	"wildcard" entry that will match any signal description.
+
+	There is no longer a limit on the number of characters per line in a
+	header, calibration, or info file.
+
+	'wfdbdesc', 'wfdbmap', and 'heaxml' will correctly handle signal files
+	where the length cannot be determined.
+
+	When reading a multi-frequency record in low-resolution mode, sample
+	values are rounded to the nearest integer (rather than being truncated
+	towards zero.)
+
+	The WFDB library and applications can now handle multi-segment records
+	that are more than 2,147,483,647 sample intervals in length, even on
+	systems where a long integer is 32 bits.
+
+	In high-resolution mode, sampfreq() will return the highest sampling
+	frequency of any signal in the given record.
+
+	The osigfopen(), annopen(), setinfo(), and newcal() functions allow the
+	caller to detect I/O errors when writing an output file.
+
+	The getframe() function will handle skewed signals in variable-layout
+	records, skewed signals with multiple signal files, skewed signals with
+	signal file prologs, and multi-segment records with signal file
+	prologs.  The wfdbgetskew() and wfdbsetiskew() functions will work
+	correctly.
+
+	URLs in the WFDB path may use colons to designate port numbers, IPv6
+	addresses, or passwords.
+
+	The sample() function will work when reading samples in random order.
+
+	The SALLOC(), SUALLOC(), SREALLOC(), and SSTRCPY() macros will check
+	for overflows and will avoid evaluating their arguments multiple times.
+
+	The Fortran wrapper functions in fortran/wfdbf.c will avoid buffer
+	overflows, and have improved support for native Fortran strings.
+
 10.6.2 (8 March 2019):
 	Minor bugs have been fixed in the command-line option handling of
 	'gqfuse' and 'gqpost', so these programs will behave as documented.

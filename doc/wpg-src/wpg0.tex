@@ -9548,6 +9548,110 @@ guide in June, 1999.  See @file{NEWS}, in the top-level directory of the
 WFDB Software Package distribution, for information on any more recent
 changes that may not be described here.
 
+@unnumberedsec WFDB 10.7
+
+@unnumberedsubsec New features in version 10.7
+
+The WFDB library now supports storing signals in compressed form, using the
+FLAC (Free Lossless Audio Codec) algorithm.  Compressed signal files are
+designated by the the format code 508, 516, or 524 (depending on the signal
+resolution.)  In order to read and write signals in these formats, the FLAC
+library and header files must be installed when compiling the WFDB Software
+Package.
+
+If the symbol @code{WFDB_LARGETIME} is defined before including @code{wfdb.h},
+then the type @code{WFDB_Time} is defined as a @code{long long} rather than a
+@code{long} (@pxref{Large time values}).
+
+New macros, defined in @file{wfdb.h}, can be used to construct format strings
+for @code{printf()} (@pxref{Displaying numeric values}) and @code{scanf()}
+(@pxref{Parsing numeric values}), independent of the underlying data types.
+
+If high-resolution mode is enabled using @code{setgvmode()}, then
+@code{sampfreq(@var{r})} will return the highest sampling frequency of any
+signal in record @var{r}, and subsequent calls to @code{mstimstr()} and
+@code{strtim()} will likewise interpret sample and frame numbers just as if the
+record were actually opened using @code{isigopen()}.
+
+If an error occurs while writing an output file, the library usually cannot
+detect the error until the file is closed.  (For example, after calling
+@code{putvec()}, the output samples will be buffered, but there might not be
+enough disk space to store them.)  In order to check that the output was
+written successfully, an application can call @samp{osigfopen(NULL, 0)} (for
+signal and header files), @samp{annopen("", NULL, 0)} (for annotation files),
+or @samp{setinfo(NULL)} (for info files).  These function calls also work with
+previous versions of the library, but would always return 0.
+
+In calibration files, the signal description @samp{*} is treated as a wildcard
+entry that will match any signal with the specified units.
+
+When reading a multi-frequency record using @code{getvec()} or @code{sample()},
+the resampled values will be correctly rounded to the nearest integer, and will
+be calculated correctly for large numbers of samples per frame.
+
+The Fortran wrapper functions have improved support for working with ``native
+Fortran'' string data (when @code{FIXSTRINGS} is defined), allowing Fortran
+programs to work with strings containing embedded spaces.  These functions will
+now avoid buffer overflows, both with and without @code{FIXSTRINGS}.
+
+The macros @code{SALLOC}, @code{SUALLOC}, @code{SREALLOC}, @code{SSTRCPY}, and
+@code{MEMERR} will avoid evaluating their arguments more than once (except for
+the pointer argument.)  These macros will now handle zero-byte allocations
+consistently, and will check for integer overflows.
+
+@code{osigopen()} permits the @var{siarray} argument to be @code{NULL} (like
+@code{isigopen()}.)
+
+@unnumberedsubsec Bugs fixed in version 10.7.0 (10 June 2022)
+
+A number of corner cases have been fixed in @code{getframe()}.  It now
+correctly handles skewed signals in variable-layout records, records with
+multiple signal files, and records with signal file prologs.  It also correctly
+handles multi-segment records with signal file prologs, and multi-segment
+records where some signal files are missing.  The @code{wfdbgetskew()} and
+@code{wfdbsetiskew()} functions now work as documented.
+
+Functions for reading header, calibration, and info files will now correctly
+handle lines of any length, rather than being limited to 255 or 126 characters
+per line.
+
+In the WFDB path, colons can be used within the ``authority'' portion of a URL,
+in order to designate a port number (@samp{http://example.org:8080/}), an IPv6
+address (@samp{http://[::1]/}), or a password
+(@samp{http://x:y@@example.org/}).  Colons that appear after the third slash in
+a URL are treated as path separators, as usual.
+
+Many library functions accept an argument that is a pointer to a string, array,
+or structure of some kind.  If the object pointed to is not modified, the
+argument is now declared with the @code{const} qualifier.
+
+Previously, the @code{putvec()} function would sometimes modify the array
+provided by the caller; now, the array is never modified.
+
+The @code{sample()} function will return correct results when samples are
+retrieved in random order.  Previously, if the caller requested sample 1,
+followed by sample 5000, followed by sample 2, @code{sample()} would return
+sample 1, followed by sample 4998, followed by sample 5001.
+
+A multi-segment record in which the first segment has non-zero length, but the
+first segment @emph{header} file is missing length or checksum fields, is now
+handled correctly as a fixed-layout record.
+
+@code{setgvmode()} will handle @code{WFDB_GVPAD}, as documented; this was
+broken in WFDB library versions 10.5.3 through 10.6.2.
+
+@code{getwfdb()} will no longer add or modify existing environment variables.
+In previous versions of the library, the first time @code{getwfdb()} was
+called, it would set the @code{WFDB}, @code{WFDBCAL}, @code{WFDBANNSORT}, and
+@code{WFDBGVMODE} environment variables, if these variables were not already
+defined.
+
+@code{setwfdb()} will correctly handle indirect paths (e.g., @samp{@@file}).
+
+@code{timstr()} or @code{mstimstr()} would, in some cases, return an incorrect
+date following a call to @code{setbasetime()} or @code{datstr()}.  This has
+been fixed.
+
 @unnumberedsec WFDB 10.6
 
 @unnumberedsubsec Changes in version 10.6.2 (8 March 2019)
