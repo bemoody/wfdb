@@ -1,6 +1,6 @@
 #!/bin/sh
 
-for FILE in $*
+for FILE in $
 do
-   strip $FILE.exe
+   strip $FILE
 done
